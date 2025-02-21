@@ -8,14 +8,11 @@ interface SemesterTabsProps {
 
 const SemesterTabs = ({ selectedSemester, onSelect }: SemesterTabsProps) => {
   const [newSemester, setNewSemester] = useState("");
-
-  // In a real app, semesters would be fetched from your database.
-  const semesters = ["Spring2025", "Fall2024"];
+  const [semesters, setSemesters] = useState<string[]>([]);
 
   const handleAddSemester = () => {
     if (newSemester.trim() !== "") {
-      // Save new semester to your database here.
-      semesters.push(newSemester);
+      setSemesters([...semesters, newSemester]);
       onSelect(newSemester);
       setNewSemester("");
     }

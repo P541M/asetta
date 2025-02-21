@@ -17,8 +17,7 @@ interface Assessment {
 const Dashboard = () => {
   const { user, loading, logout } = useAuth();
   const router = useRouter();
-  const [selectedSemester, setSelectedSemester] =
-    useState<string>("Spring2025");
+  const [selectedSemester, setSelectedSemester] = useState<string>(""); // default is now empty
   const [assessments, setAssessments] = useState<Assessment[]>([]);
 
   useEffect(() => {
@@ -27,32 +26,11 @@ const Dashboard = () => {
     }
   }, [user, loading, router]);
 
-  // Dummy function: Fetch assessments based on the selected semester.
-  // The parameter 'semester' is now used to simulate different data.
+  // Updated: No pre-added dummy data; start with an empty slate.
   const fetchAssessments = async (semester: string) => {
-    // Simulated fetched data (in a real app, fetch from Firestore)
-    const dummyData: Assessment[] = [
-      {
-        courseName: "CS101",
-        assignmentName: "Assignment 1",
-        dueDate: "2025-03-01",
-        weight: 10,
-        status: "Not started",
-      },
-      {
-        courseName: "CS101",
-        assignmentName: "Project",
-        dueDate: "2025-04-15",
-        weight: 20,
-        status: "Not started",
-      },
-    ];
-    // Here we simulate that different semesters could yield different data.
-    if (semester === "Spring2025") {
-      setAssessments(dummyData);
-    } else {
-      setAssessments([]);
-    }
+    // In a real implementation, fetch assessments for the semester from your database.
+    // For now, ensure it resets to an empty array.
+    setAssessments([]);
   };
 
   useEffect(() => {
@@ -83,16 +61,22 @@ const Dashboard = () => {
         onSelect={setSelectedSemester}
       />
 
-      <div className="mt-6">
-        <UploadForm
-          semester={selectedSemester}
-          onUploadSuccess={fetchAssessments}
-        />
-      </div>
+      {selectedSemester ? (
+        <>
+          <div className="mt-6">
+            <UploadForm
+              semester={selectedSemester}
+              onUploadSuccess={fetchAssessments}
+            />
+          </div>
 
-      <div className="mt-6">
-        <AssessmentsTable assessments={assessments} />
-      </div>
+          <div className="mt-6">
+            <AssessmentsTable assessments={assessments} />
+          </div>
+        </>
+      ) : (
+        <p>Please add a semester to get started.</p>
+      )}
     </div>
   );
 };
