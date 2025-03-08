@@ -3,10 +3,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import formidable, { IncomingForm, Fields, Files } from "formidable";
 import fs from "fs";
 import pdfParse from "pdf-parse";
-import { db } from "../../lib/firebase";
-import { collection, addDoc, getDocs, where, query } from "firebase/firestore";
-import { getAuth } from "firebase/auth";
-import { admin } from "../../lib/firebase-admin"; // You'll need to add this
+import { getAdmin } from "../../lib/firebase-admin";
 
 // Disable body parsing so that formidable can handle the file
 export const config = {
@@ -68,6 +65,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     }
 
     const token = authHeader.split(" ")[1];
+    const admin = await getAdmin(); // Get the Firebase Admin instance
     let userId;
 
     try {
@@ -80,6 +78,23 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         .status(401)
         .json({ success: false, error: "Invalid authentication token" });
     }
+
+    // Get the admin Firestore instance
+    const adminDb = admin.firestore();
+
+    // Find the semester ID based on the name
+    const semestersRef = adminDb.collection(`users/${userId}/semesters`);
+    const semesterQuery = semestersRef.where("name", "==", semester).limit(1);
+    const semesterSnapshot = await semesterQuery.get();
+
+    if (semesterSnapshot.empty) {
+      return res
+        .status(400)
+        .json({ success: false, error: "Semester not found" });
+    }
+
+    const semesterDoc = semesterSnapshot.docs[0];
+    const semesterId = semesterDoc.id;
 
     // Ensure file is a single file
     const fileField = files.file;
@@ -114,7 +129,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     }
 
     // --- Parse the PDF text without AI (simplified approach) ---
-    // This is a simplified example - in a real app, you'd need more sophisticated parsing
     const assessments: Assessment[] = [];
 
     // Example: Look for patterns like "Assignment X - Due: MM/DD/YYYY"
@@ -131,10 +145,9 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       });
     }
 
-    // If no assessments were found, try to identify sections that might contain assignment info
+    // If no assessments were found, try to identify sections
     if (assessments.length === 0) {
       const sections = extractedText.split(/\n{2,}/);
-
       for (const section of sections) {
         if (
           /assessment|assignment|quiz|exam|test|grading|evaluation/i.test(
@@ -166,24 +179,23 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       });
     }
 
-    // Save the PDF filename and metadata
-    await addDoc(collection(db, "users", userId, "documents"), {
+    // Save the PDF metadata using admin Firestore
+    await adminDb.collection(`users/${userId}/documents`).add({
       fileName,
       uploadDate: new Date(),
       semester,
-      text: extractedText.slice(0, 5000), // Store the first 5000 chars for reference
+      text: extractedText.slice(0, 5000),
     });
 
-    // Add the assessments to the correct location in Firestore
-    // Note: We're using a consistent path structure
+    // Add the assessments using admin Firestore
+    const assessmentsRef = adminDb.collection(
+      `users/${userId}/semesters/${semesterId}/assessments`
+    );
     for (const assessment of assessments) {
-      await addDoc(
-        collection(db, "users", userId, "semesters", semester, "assessments"),
-        {
-          ...assessment,
-          createdAt: new Date(),
-        }
-      );
+      await assessmentsRef.add({
+        ...assessment,
+        createdAt: new Date(),
+      });
     }
 
     return res.status(200).json({
@@ -201,18 +213,14 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
 // Helper functions for extracting information from the PDF text
 function extractCourseName(text: string): string | null {
-  // Look for common course code patterns: 2-4 letters followed by 3-4 digits
   const courseCodePattern = /([A-Z]{2,4})\s*(\d{3,4})/i;
   const match = text.match(courseCodePattern);
-
   if (match) {
     return `${match[1]}${match[2]}`;
   }
 
-  // Look for "Course:" or "Course Title:" patterns
   const courseTitlePattern = /[Cc]ourse\s*(?:[Tt]itle)?:?\s*([A-Za-z0-9\s&]+)/;
   const titleMatch = text.match(courseTitlePattern);
-
   if (titleMatch) {
     return titleMatch[1].trim();
   }
@@ -223,11 +231,8 @@ function extractCourseName(text: string): string | null {
 function formatDate(dateStr: string): string {
   try {
     const parts = dateStr.split(/[\/-]/);
-    // Assume MM/DD/YYYY format, but handle variations
     let month, day, year;
-
     if (parts.length === 3) {
-      // Handle different date formats
       if (parts[0].length === 4) {
         // YYYY-MM-DD
         year = parts[0];
@@ -239,20 +244,15 @@ function formatDate(dateStr: string): string {
         day = parts[1];
         year = parts[2];
       } else {
-        // MM/DD/YY - add century prefix
+        // MM/DD/YY
         month = parts[0];
         day = parts[1];
         year = parts[2].length === 2 ? `20${parts[2]}` : parts[2];
       }
-
-      // Ensure two digits for month and day
       month = month.padStart(2, "0");
       day = day.padStart(2, "0");
-
       return `${year}-${month}-${day}`;
     }
-
-    // If parsing fails, return the original string
     return dateStr;
   } catch (e) {
     return dateStr;
@@ -260,14 +260,11 @@ function formatDate(dateStr: string): string {
 }
 
 function extractDate(text: string): string | null {
-  // Look for dates in various formats
   const datePattern = /(\d{1,2}[\/-]\d{1,2}[\/-]\d{2,4})/;
   const match = text.match(datePattern);
-
   if (match) {
     return formatDate(match[1]);
   }
-
   return null;
 }
 
