@@ -1,10 +1,12 @@
-// pages/api/upload.ts
+// Updated upload.ts to fix PDF parsing and database structure
 import type { NextApiRequest, NextApiResponse } from "next";
 import formidable, { IncomingForm, Fields, Files } from "formidable";
 import fs from "fs";
 import pdfParse from "pdf-parse";
 import { db } from "../../lib/firebase";
-import { collection, addDoc } from "firebase/firestore";
+import { collection, addDoc, getDocs, where, query } from "firebase/firestore";
+import { getAuth } from "firebase/auth";
+import { admin } from "../../lib/firebase-admin"; // You'll need to add this
 
 // Disable body parsing so that formidable can handle the file
 export const config = {
@@ -13,21 +15,38 @@ export const config = {
   },
 };
 
+// Sample data structure for assessments
+interface Assessment {
+  courseName: string;
+  assignmentName: string;
+  dueDate: string;
+  weight: number;
+  status: string;
+}
+
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-  if (req.method !== "POST")
+  if (req.method !== "POST") {
     return res
       .status(405)
       .json({ success: false, error: "Method not allowed" });
+  }
 
-  const form = new IncomingForm();
+  // Create a promise to handle the form parsing
+  const parseForm = (
+    req: NextApiRequest
+  ): Promise<{ fields: Fields; files: Files }> => {
+    return new Promise((resolve, reject) => {
+      const form = new IncomingForm();
+      form.parse(req, (err, fields, files) => {
+        if (err) reject(err);
+        resolve({ fields, files });
+      });
+    });
+  };
 
-  form.parse(req, async (err: Error | null, fields: Fields, files: Files) => {
-    if (err) {
-      console.error("Error parsing form:", err);
-      return res
-        .status(500)
-        .json({ success: false, error: "Error parsing form" });
-    }
+  try {
+    // Parse the form
+    const { fields, files } = await parseForm(req);
 
     // Ensure semester is a string
     const semesterField = fields.semester;
@@ -38,6 +57,28 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       return res
         .status(400)
         .json({ success: false, error: "Semester is required" });
+    }
+
+    // Get userId from the Authorization header
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return res
+        .status(401)
+        .json({ success: false, error: "Authentication required" });
+    }
+
+    const token = authHeader.split(" ")[1];
+    let userId;
+
+    try {
+      // Verify the Firebase token
+      const decodedToken = await admin.auth().verifyIdToken(token);
+      userId = decodedToken.uid;
+    } catch (error) {
+      console.error("Invalid token:", error);
+      return res
+        .status(401)
+        .json({ success: false, error: "Invalid authentication token" });
     }
 
     // Ensure file is a single file
@@ -52,7 +93,9 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         .status(400)
         .json({ success: false, error: "File is required" });
     }
+
     const filePath = fileData.filepath;
+    const fileName = fileData.originalFilename || "unknown.pdf";
 
     // Read file into a buffer
     const pdfBuffer = fs.readFileSync(filePath);
@@ -70,98 +113,162 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         .json({ success: false, error: "Error reading PDF content" });
     }
 
-    // --- Deepseek AI Integration ---
-    try {
-      // Construct the full endpoint URL by appending "/chat/completions"
-      const baseEndpoint =
-        process.env.DEEPSEEK_ENDPOINT || "https://api.deepseek.com/v1";
-      const deepseekEndpoint = `${baseEndpoint}/chat/completions`;
+    // --- Parse the PDF text without AI (simplified approach) ---
+    // This is a simplified example - in a real app, you'd need more sophisticated parsing
+    const assessments: Assessment[] = [];
 
-      // Updated prompt: instruct the AI to return only valid JSON with key "assessments"
-      const promptText = `Analyze the following syllabus and return ONLY a valid JSON object with a key "assessments". Do not include any extra text, explanations, or commentary. Use the following format strictly: {"assessments": [ ... ]}.\n\n${extractedText}`;
-
-      const requestBody = {
-        model: "deepseek-chat",
-        messages: [
-          { role: "system", content: "You are a helpful assistant." },
-          { role: "user", content: promptText },
-        ],
-        temperature: 0.3,
-      };
-
-      const deepseekResponse = await fetch(deepseekEndpoint, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${process.env.DEEPSEEK_API_KEY}`,
-        },
-        body: JSON.stringify(requestBody),
-      });
-
-      if (!deepseekResponse.ok) {
-        throw new Error(`HTTP error! status: ${deepseekResponse.status}`);
-      }
-
-      const responseData = await deepseekResponse.json();
-      console.log("Full API response:", responseData);
-
-      // Extract the AI's message content
-      const aiContent = responseData.choices[0]?.message?.content;
-      if (!aiContent) {
-        throw new Error("No content in AI response");
-      }
-
-      // Attempt to parse the output as JSON
-      let extractedData;
-      try {
-        extractedData = JSON.parse(aiContent);
-      } catch (parseError) {
-        console.error("Error parsing AI response JSON:", parseError);
-        // Fallback: extract JSON substring between the first '{' and last '}'
-        const firstBrace = aiContent.indexOf("{");
-        const lastBrace = aiContent.lastIndexOf("}");
-        if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
-          const jsonSubstring = aiContent.substring(firstBrace, lastBrace + 1);
-          try {
-            extractedData = JSON.parse(jsonSubstring);
-          } catch (fallbackError) {
-            console.error("Fallback JSON parsing failed:", fallbackError);
-            throw new Error("Invalid JSON output from Deepseek AI");
-          }
-        } else {
-          throw new Error("Invalid JSON output from Deepseek AI");
-        }
-      }
-      console.log("Parsed assessments:", extractedData);
-
-      // Check if the parsed response contains an 'assessments' array
-      if (
-        extractedData.assessments &&
-        Array.isArray(extractedData.assessments)
-      ) {
-        for (const assessment of extractedData.assessments) {
-          await addDoc(collection(db, "semesters", semester, "assessments"), {
-            ...assessment,
-            status: "Not started", // default status
-            createdAt: new Date(),
-          });
-        }
-        return res.status(200).json({ success: true });
-      } else {
-        console.error("Unexpected response structure:", extractedData);
-        return res.status(500).json({
-          success: false,
-          error: "Invalid response from Deepseek AI",
-        });
-      }
-    } catch (error) {
-      console.error("Processing error:", error);
-      return res.status(500).json({
-        success: false,
-        error: error instanceof Error ? error.message : "Unknown error",
+    // Example: Look for patterns like "Assignment X - Due: MM/DD/YYYY"
+    const assignmentPattern =
+      /([Aa]ssignment|[Qq]uiz|[Tt]est|[Ee]xam)\s+(\d+)[\s\-:]+[Dd]ue\s*:?\s*(\d{1,2}[\/-]\d{1,2}[\/-]\d{2,4})/g;
+    let match;
+    while ((match = assignmentPattern.exec(extractedText)) !== null) {
+      assessments.push({
+        courseName: extractCourseName(extractedText) || "Unknown Course",
+        assignmentName: `${match[1]} ${match[2]}`,
+        dueDate: formatDate(match[3]),
+        weight: 0, // You'd need to extract this from the text
+        status: "Not started",
       });
     }
-  });
+
+    // If no assessments were found, try to identify sections that might contain assignment info
+    if (assessments.length === 0) {
+      const sections = extractedText.split(/\n{2,}/);
+
+      for (const section of sections) {
+        if (
+          /assessment|assignment|quiz|exam|test|grading|evaluation/i.test(
+            section
+          ) &&
+          /\d{1,2}[\/-]\d{1,2}[\/-]\d{2,4}/.test(section)
+        ) {
+          assessments.push({
+            courseName: extractCourseName(extractedText) || "Unknown Course",
+            assignmentName:
+              "Assignment from " + section.slice(0, 30).trim() + "...",
+            dueDate:
+              extractDate(section) || new Date().toISOString().split("T")[0],
+            weight: 0,
+            status: "Not started",
+          });
+        }
+      }
+    }
+
+    // If still no assessments, add a placeholder
+    if (assessments.length === 0) {
+      assessments.push({
+        courseName: extractCourseName(extractedText) || "Unknown Course",
+        assignmentName: "Manual Review Required",
+        dueDate: new Date().toISOString().split("T")[0],
+        weight: 0,
+        status: "Not started",
+      });
+    }
+
+    // Save the PDF filename and metadata
+    await addDoc(collection(db, "users", userId, "documents"), {
+      fileName,
+      uploadDate: new Date(),
+      semester,
+      text: extractedText.slice(0, 5000), // Store the first 5000 chars for reference
+    });
+
+    // Add the assessments to the correct location in Firestore
+    // Note: We're using a consistent path structure
+    for (const assessment of assessments) {
+      await addDoc(
+        collection(db, "users", userId, "semesters", semester, "assessments"),
+        {
+          ...assessment,
+          createdAt: new Date(),
+        }
+      );
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: `Extracted ${assessments.length} assessments from the PDF`,
+    });
+  } catch (error) {
+    console.error("Processing error:", error);
+    return res.status(500).json({
+      success: false,
+      error: error instanceof Error ? error.message : "Unknown error",
+    });
+  }
 };
+
+// Helper functions for extracting information from the PDF text
+function extractCourseName(text: string): string | null {
+  // Look for common course code patterns: 2-4 letters followed by 3-4 digits
+  const courseCodePattern = /([A-Z]{2,4})\s*(\d{3,4})/i;
+  const match = text.match(courseCodePattern);
+
+  if (match) {
+    return `${match[1]}${match[2]}`;
+  }
+
+  // Look for "Course:" or "Course Title:" patterns
+  const courseTitlePattern = /[Cc]ourse\s*(?:[Tt]itle)?:?\s*([A-Za-z0-9\s&]+)/;
+  const titleMatch = text.match(courseTitlePattern);
+
+  if (titleMatch) {
+    return titleMatch[1].trim();
+  }
+
+  return null;
+}
+
+function formatDate(dateStr: string): string {
+  try {
+    const parts = dateStr.split(/[\/-]/);
+    // Assume MM/DD/YYYY format, but handle variations
+    let month, day, year;
+
+    if (parts.length === 3) {
+      // Handle different date formats
+      if (parts[0].length === 4) {
+        // YYYY-MM-DD
+        year = parts[0];
+        month = parts[1];
+        day = parts[2];
+      } else if (parts[2].length === 4) {
+        // MM/DD/YYYY
+        month = parts[0];
+        day = parts[1];
+        year = parts[2];
+      } else {
+        // MM/DD/YY - add century prefix
+        month = parts[0];
+        day = parts[1];
+        year = parts[2].length === 2 ? `20${parts[2]}` : parts[2];
+      }
+
+      // Ensure two digits for month and day
+      month = month.padStart(2, "0");
+      day = day.padStart(2, "0");
+
+      return `${year}-${month}-${day}`;
+    }
+
+    // If parsing fails, return the original string
+    return dateStr;
+  } catch (e) {
+    return dateStr;
+  }
+}
+
+function extractDate(text: string): string | null {
+  // Look for dates in various formats
+  const datePattern = /(\d{1,2}[\/-]\d{1,2}[\/-]\d{2,4})/;
+  const match = text.match(datePattern);
+
+  if (match) {
+    return formatDate(match[1]);
+  }
+
+  return null;
+}
 
 export default handler;
