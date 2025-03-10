@@ -1,5 +1,5 @@
 // components/SemesterTabs.tsx
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { db } from "../lib/firebase";
 import {
@@ -33,15 +33,32 @@ const SemesterTabs = ({ selectedSemester, onSelect }: SemesterTabsProps) => {
   const [editingName, setEditingName] = useState("");
   const [dropdownOpenId, setDropdownOpenId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isAdding, setIsAdding] = useState(false);
+
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setDropdownOpenId(null);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   // Listen for changes to the user's semesters in Firestore
   useEffect(() => {
     if (!user) return;
-
     setIsLoading(true);
     const semColRef = collection(db, "users", user.uid, "semesters");
     const q = query(semColRef, orderBy("name"));
-
     const unsubscribe = onSnapshot(
       q,
       (snapshot) => {
@@ -51,7 +68,6 @@ const SemesterTabs = ({ selectedSemester, onSelect }: SemesterTabsProps) => {
         }));
         setSemesters(sems);
         setIsLoading(false);
-
         // If there are semesters but none selected, select the first one
         if (sems.length > 0 && !selectedSemester) {
           onSelect(sems[0].name);
@@ -62,66 +78,58 @@ const SemesterTabs = ({ selectedSemester, onSelect }: SemesterTabsProps) => {
         setIsLoading(false);
       }
     );
-
     return () => unsubscribe();
   }, [user, selectedSemester, onSelect]);
 
   // Add a new semester to Firestore
   const handleAddSemester = async () => {
     if (newSemester.trim() === "" || !user) return;
-
     try {
+      setIsAdding(true);
       const semesterName = newSemester.trim();
       const semColRef = collection(db, "users", user.uid, "semesters");
-
       // Check if semester already exists
       const q = query(semColRef, orderBy("name"));
       const querySnapshot = await getDocs(q);
       const exists = querySnapshot.docs.some(
         (doc) => doc.data().name.toLowerCase() === semesterName.toLowerCase()
       );
-
       if (exists) {
         alert(`Semester "${semesterName}" already exists.`);
+        setIsAdding(false);
         return;
       }
-
       const docRef = await addDoc(semColRef, {
         name: semesterName,
         createdAt: new Date(),
       });
-
       onSelect(semesterName);
       setNewSemester("");
     } catch (error) {
       console.error("Error adding semester:", error);
       alert("Failed to add semester. Please try again.");
+    } finally {
+      setIsAdding(false);
     }
   };
 
   // Delete a semester from Firestore
   const handleDeleteSemester = async (id: string) => {
     if (!user) return;
-
     // Find the semester to delete
     const semToDelete = semesters.find((sem) => sem.id === id);
     if (!semToDelete) return;
-
     // Confirm deletion
     const confirm = window.confirm(
       `Are you sure you want to delete the semester "${semToDelete.name}" and all its assessments? This action cannot be undone.`
     );
-
     if (!confirm) return;
-
     try {
       // Start a batch operation
       const batch = writeBatch(db);
-
       // Delete the semester document
       const semDocRef = doc(db, "users", user.uid, "semesters", id);
       batch.delete(semDocRef);
-
       // Delete all assessments for this semester
       const assessmentsRef = collection(
         db,
@@ -132,7 +140,6 @@ const SemesterTabs = ({ selectedSemester, onSelect }: SemesterTabsProps) => {
         "assessments"
       );
       const assessmentSnapshot = await getDocs(assessmentsRef);
-
       assessmentSnapshot.docs.forEach((assessmentDoc) => {
         batch.delete(
           doc(
@@ -146,10 +153,8 @@ const SemesterTabs = ({ selectedSemester, onSelect }: SemesterTabsProps) => {
           )
         );
       });
-
       // Commit the batch
       await batch.commit();
-
       // If the deleted semester was selected, clear the selection
       if (semToDelete.name === selectedSemester) {
         if (semesters.length > 1) {
@@ -177,33 +182,27 @@ const SemesterTabs = ({ selectedSemester, onSelect }: SemesterTabsProps) => {
   // Update the semester name in Firestore
   const handleEditSave = async (id: string) => {
     if (!user || editingName.trim() === "") return;
-
     try {
       const updatedName = editingName.trim();
-
       // Check if the name already exists (excluding the current semester)
       const existingWithSameName = semesters.some(
         (sem) =>
           sem.id !== id && sem.name.toLowerCase() === updatedName.toLowerCase()
       );
-
       if (existingWithSameName) {
         alert(`Semester "${updatedName}" already exists.`);
         return;
       }
-
       const semDocRef = doc(db, "users", user.uid, "semesters", id);
       await updateDoc(semDocRef, {
         name: updatedName,
         updatedAt: new Date(),
       });
-
       // If the edited semester was selected, update the selection
       const oldName = semesters.find((sem) => sem.id === id)?.name;
       if (selectedSemester === oldName) {
         onSelect(updatedName);
       }
-
       setEditingId(null);
       setEditingName("");
     } catch (error) {
@@ -223,45 +222,76 @@ const SemesterTabs = ({ selectedSemester, onSelect }: SemesterTabsProps) => {
   };
 
   if (isLoading) {
-    return <div className="p-4">Loading semesters...</div>;
+    return (
+      <div className="flex justify-center py-4">
+        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary-600"></div>
+      </div>
+    );
   }
 
   return (
-    <div className="mb-4">
-      <div className="flex flex-wrap gap-2 items-center">
+    <div className="mb-6">
+      <div className="flex flex-wrap gap-2 items-center mb-4">
         {semesters.map((sem) => (
           <div key={sem.id} className="relative">
             {editingId === sem.id ? (
-              <div className="flex items-center">
+              <div className="flex items-center bg-white rounded-lg shadow-soft p-1">
                 <input
                   type="text"
                   value={editingName}
                   onChange={(e) => setEditingName(e.target.value)}
                   onKeyDown={(e) => handleEditKeyPress(e, sem.id)}
                   autoFocus
-                  className="border p-1 rounded"
+                  className="input py-1 px-2"
                 />
                 <button
                   onClick={() => handleEditSave(sem.id)}
-                  className="bg-blue-500 text-white px-2 py-1 rounded ml-2"
+                  className="ml-2 p-1 text-accent-600 hover:text-accent-700"
+                  title="Save"
                 >
-                  Save
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
                 </button>
                 <button
                   onClick={() => setEditingId(null)}
-                  className="bg-gray-300 text-gray-700 px-2 py-1 rounded ml-1"
+                  className="p-1 text-secondary-600 hover:text-secondary-700"
+                  title="Cancel"
                 >
-                  Cancel
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
                 </button>
               </div>
             ) : (
-              <div className="relative inline-block">
+              <div
+                className="relative inline-block"
+                ref={dropdownOpenId === sem.id ? dropdownRef : null}
+              >
                 <button
                   onClick={() => onSelect(sem.name)}
-                  className={`relative px-4 py-2 rounded text-left ${
+                  className={`px-4 py-2 rounded-lg font-medium transition-all ${
                     selectedSemester === sem.name
-                      ? "bg-blue-500 text-white"
-                      : "bg-white border"
+                      ? "bg-primary-500 text-white shadow-soft"
+                      : "bg-white text-secondary-700 hover:bg-secondary-100 shadow-soft border border-secondary-100"
                   }`}
                 >
                   {sem.name}
@@ -275,19 +305,33 @@ const SemesterTabs = ({ selectedSemester, onSelect }: SemesterTabsProps) => {
                     className="ml-2 text-sm opacity-70 hover:opacity-100"
                     aria-label="Menu"
                   >
-                    ⋮
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-4 w-4 inline"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                    >
+                      <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
+                    </svg>
                   </button>
                 </button>
-
                 {dropdownOpenId === sem.id && (
-                  <div className="absolute right-0 top-full mt-1 bg-white border rounded shadow-md z-10">
+                  <div className="absolute right-0 top-full mt-1 bg-white border border-secondary-100 rounded-lg shadow-soft z-10 min-w-32">
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
                         handleEditStart(sem.id, sem.name);
                       }}
-                      className="block px-4 py-2 text-sm hover:bg-gray-100 w-full text-left"
+                      className="flex items-center w-full px-4 py-2 text-sm hover:bg-secondary-50 text-left rounded-t-lg"
                     >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-4 w-4 mr-2 text-secondary-600"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                      >
+                        <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                      </svg>
                       Edit
                     </button>
                     <button
@@ -295,8 +339,20 @@ const SemesterTabs = ({ selectedSemester, onSelect }: SemesterTabsProps) => {
                         e.stopPropagation();
                         handleDeleteSemester(sem.id);
                       }}
-                      className="block px-4 py-2 text-sm hover:bg-gray-100 w-full text-left text-red-500"
+                      className="flex items-center w-full px-4 py-2 text-sm hover:bg-red-50 text-left text-red-600 rounded-b-lg"
                     >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-4 w-4 mr-2 text-red-500"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
                       Delete
                     </button>
                   </div>
@@ -307,8 +363,8 @@ const SemesterTabs = ({ selectedSemester, onSelect }: SemesterTabsProps) => {
         ))}
       </div>
 
-      <div className="mt-4">
-        <div className="flex">
+      <div className="flex flex-col sm:flex-row gap-2 items-center">
+        <div className="relative flex-grow">
           <input
             type="text"
             placeholder="Add new semester"
@@ -317,15 +373,79 @@ const SemesterTabs = ({ selectedSemester, onSelect }: SemesterTabsProps) => {
             onKeyDown={(e) => {
               if (e.key === "Enter") handleAddSemester();
             }}
-            className="border p-2 rounded mr-2 flex-grow"
+            className="input pr-10"
           />
-          <button
-            onClick={handleAddSemester}
-            className="bg-green-500 text-white px-3 py-2 rounded whitespace-nowrap"
-          >
-            Add Semester
-          </button>
+          {newSemester && (
+            <button
+              onClick={() => setNewSemester("")}
+              className="absolute right-10 top-1/2 transform -translate-y-1/2 text-secondary-400 hover:text-secondary-600"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            </button>
+          )}
         </div>
+        <button
+          onClick={handleAddSemester}
+          disabled={isAdding || !newSemester.trim()}
+          className={`btn-accent flex items-center whitespace-nowrap ${
+            isAdding || !newSemester.trim()
+              ? "opacity-50 cursor-not-allowed"
+              : ""
+          }`}
+        >
+          {isAdding ? (
+            <>
+              <svg
+                className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                ></circle>
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                ></path>
+              </svg>
+              Adding...
+            </>
+          ) : (
+            <>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-4 w-4 mr-1"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
+                  clipRule="evenodd"
+                />
+              </svg>
+              Add Semester
+            </>
+          )}
+        </button>
       </div>
     </div>
   );
