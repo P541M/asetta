@@ -50,6 +50,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     const semester = Array.isArray(semesterField)
       ? semesterField[0]
       : semesterField;
+
     if (!semester) {
       return res
         .status(400)
@@ -66,14 +67,18 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
     const token = authHeader.split(" ")[1];
     const admin = await getAdmin(); // Get the Firebase Admin instance
-    let userId;
 
+    let userId;
     try {
       // Verify the Firebase token
       const decodedToken = await admin.auth().verifyIdToken(token);
       userId = decodedToken.uid;
     } catch (error) {
-      console.error("Invalid token:", error);
+      // Safely log the error
+      console.error(
+        "Invalid token:",
+        error instanceof Error ? error.message : String(error)
+      );
       return res
         .status(401)
         .json({ success: false, error: "Invalid authentication token" });
@@ -99,6 +104,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     // Ensure file is a single file
     const fileField = files.file;
     let fileData: formidable.File;
+
     if (Array.isArray(fileField)) {
       fileData = fileField[0];
     } else if (fileField) {
@@ -122,7 +128,11 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       extractedText = data.text;
       console.log("Extracted text from PDF:", extractedText.slice(0, 100));
     } catch (error) {
-      console.error("Error parsing PDF:", error);
+      // Safely log the error
+      console.error(
+        "Error parsing PDF:",
+        error instanceof Error ? error.message : String(error)
+      );
       return res
         .status(500)
         .json({ success: false, error: "Error reading PDF content" });
@@ -134,6 +144,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     // Example: Look for patterns like "Assignment X - Due: MM/DD/YYYY"
     const assignmentPattern =
       /([Aa]ssignment|[Qq]uiz|[Tt]est|[Ee]xam)\s+(\d+)[\s\-:]+[Dd]ue\s*:?\s*(\d{1,2}[\/-]\d{1,2}[\/-]\d{2,4})/g;
+
     let match;
     while ((match = assignmentPattern.exec(extractedText)) !== null) {
       assessments.push({
@@ -191,6 +202,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     const assessmentsRef = adminDb.collection(
       `users/${userId}/semesters/${semesterId}/assessments`
     );
+
     for (const assessment of assessments) {
       await assessmentsRef.add({
         ...assessment,
@@ -203,7 +215,20 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       message: `Extracted ${assessments.length} assessments from the PDF`,
     });
   } catch (error) {
-    console.error("Processing error:", error);
+    // Safely log the error with more details
+    try {
+      if (error instanceof Error) {
+        console.error("Processing error:", error.message);
+        console.error("Error stack:", error.stack);
+      } else if (error === null) {
+        console.error("Processing error: null");
+      } else {
+        console.error("Processing error:", String(error));
+      }
+    } catch (logError) {
+      console.error("Error while logging error:", String(logError));
+    }
+
     return res.status(500).json({
       success: false,
       error: error instanceof Error ? error.message : "Unknown error",
@@ -218,13 +243,11 @@ function extractCourseName(text: string): string | null {
   if (match) {
     return `${match[1]}${match[2]}`;
   }
-
   const courseTitlePattern = /[Cc]ourse\s*(?:[Tt]itle)?:?\s*([A-Za-z0-9\s&]+)/;
   const titleMatch = text.match(courseTitlePattern);
   if (titleMatch) {
     return titleMatch[1].trim();
   }
-
   return null;
 }
 

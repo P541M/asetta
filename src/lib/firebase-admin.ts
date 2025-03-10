@@ -7,21 +7,40 @@ async function initializeAdmin() {
   if (adminInstance) return adminInstance;
 
   try {
-    let serviceAccount;
-
-    if (process.env.NODE_ENV === "development") {
+    // Try to use the local file first
+    try {
       const serviceAccountModule = await import("../../serviceAccountKey.json");
-      serviceAccount = serviceAccountModule.default;
-    } else if (process.env.FIREBASE_SERVICE_ACCOUNT) {
-      serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
-    }
+      const serviceAccount = serviceAccountModule.default;
 
-    if (serviceAccount) {
       adminInstance = admin.initializeApp({
         credential: admin.credential.cert(serviceAccount),
       });
-      console.log("Firebase Admin initialized with service account");
-    } else {
+      console.log("Firebase Admin initialized with local service account file");
+      return adminInstance;
+    } catch (fileError) {
+      console.log(
+        "No local serviceAccountKey.json found, trying environment variable"
+      );
+
+      // Fall back to environment variable
+      if (process.env.FIREBASE_SERVICE_ACCOUNT) {
+        try {
+          const serviceAccount = JSON.parse(
+            process.env.FIREBASE_SERVICE_ACCOUNT
+          );
+          adminInstance = admin.initializeApp({
+            credential: admin.credential.cert(serviceAccount),
+          });
+          console.log(
+            "Firebase Admin initialized with service account from env"
+          );
+          return adminInstance;
+        } catch (parseError) {
+          console.error("Error parsing FIREBASE_SERVICE_ACCOUNT:", parseError);
+        }
+      }
+
+      // Last resort: use application default credentials
       adminInstance = admin.initializeApp({
         projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
       });
