@@ -38,6 +38,7 @@ const AddAssessmentForm = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
     if (!user) {
       setMessage({
         text: "You must be logged in to add assessments",
@@ -45,17 +46,21 @@ const AddAssessmentForm = ({
       });
       return;
     }
+
     // Validate the form
     if (!formData.courseName.trim()) {
       setMessage({ text: "Course name is required", type: "error" });
       return;
     }
+
     if (!formData.assignmentName.trim()) {
       setMessage({ text: "Assessment name is required", type: "error" });
       return;
     }
+
     setIsSubmitting(true);
     setMessage({ text: "", type: "" });
+
     try {
       // Add the assessment to Firestore
       await addDoc(
@@ -72,6 +77,7 @@ const AddAssessmentForm = ({
           createdAt: new Date(),
         }
       );
+
       // Reset the form
       setFormData({
         courseName: "",
@@ -80,14 +86,17 @@ const AddAssessmentForm = ({
         weight: 0,
         status: "Not started",
       });
+
       setMessage({
         text: "Assessment added successfully!",
         type: "success",
       });
+
       // Call the onSuccess callback
       onSuccess();
     } catch (error) {
       console.error("Error adding assessment:", error);
+
       setMessage({
         text: "Failed to add assessment. Please try again.",
         type: "error",
@@ -101,130 +110,136 @@ const AddAssessmentForm = ({
     <div>
       <h2 className="text-xl font-medium mb-6">Add Assessment Manually</h2>
 
-      <form onSubmit={handleSubmit}>
-        <div className="form-group">
-          <label htmlFor="courseName" className="form-label">
-            Course Name/Code
-          </label>
-          <input
-            type="text"
-            id="courseName"
-            name="courseName"
-            value={formData.courseName}
-            onChange={handleChange}
-            className="input"
-            placeholder="e.g., CS101"
-            required
-          />
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="form-group">
+            <label htmlFor="courseName" className="form-label">
+              Course Name/Code
+            </label>
+            <input
+              type="text"
+              id="courseName"
+              name="courseName"
+              value={formData.courseName}
+              onChange={handleChange}
+              className="input"
+              placeholder="e.g., CS101"
+              required
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="assignmentName" className="form-label">
+              Assessment Name
+            </label>
+            <input
+              type="text"
+              id="assignmentName"
+              name="assignmentName"
+              value={formData.assignmentName}
+              onChange={handleChange}
+              className="input"
+              placeholder="e.g., Midterm Exam"
+              required
+            />
+          </div>
         </div>
 
-        <div className="form-group">
-          <label htmlFor="assignmentName" className="form-label">
-            Assessment Name
-          </label>
-          <input
-            type="text"
-            id="assignmentName"
-            name="assignmentName"
-            value={formData.assignmentName}
-            onChange={handleChange}
-            className="input"
-            placeholder="e.g., Midterm Exam"
-            required
-          />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="form-group">
+            <label htmlFor="dueDate" className="form-label">
+              Due Date
+            </label>
+            <input
+              type="date"
+              id="dueDate"
+              name="dueDate"
+              value={formData.dueDate}
+              onChange={handleChange}
+              className="input"
+              required
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="weight" className="form-label">
+              Weight (%)
+            </label>
+            <input
+              type="number"
+              id="weight"
+              name="weight"
+              value={formData.weight}
+              onChange={handleChange}
+              min="0"
+              max="100"
+              step="0.1"
+              className="input"
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="status" className="form-label">
+              Status
+            </label>
+            <select
+              id="status"
+              name="status"
+              value={formData.status}
+              onChange={handleChange}
+              className="input"
+            >
+              <option value="Not started">Not started</option>
+              <option value="In progress">In progress</option>
+              <option value="Completed">Completed</option>
+            </select>
+          </div>
         </div>
 
-        <div className="form-group">
-          <label htmlFor="dueDate" className="form-label">
-            Due Date
-          </label>
-          <input
-            type="date"
-            id="dueDate"
-            name="dueDate"
-            value={formData.dueDate}
-            onChange={handleChange}
-            className="input"
-            required
-          />
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="weight" className="form-label">
-            Weight (%)
-          </label>
-          <input
-            type="number"
-            id="weight"
-            name="weight"
-            value={formData.weight}
-            onChange={handleChange}
-            min="0"
-            max="100"
-            step="0.1"
-            className="input"
-          />
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="status" className="form-label">
-            Status
-          </label>
-          <select
-            id="status"
-            name="status"
-            value={formData.status}
-            onChange={handleChange}
-            className="input"
+        <div className="flex items-center justify-end pt-4">
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className={`btn-primary px-6 ${
+              isSubmitting ? "opacity-70 cursor-not-allowed" : ""
+            }`}
           >
-            <option value="Not started">Not started</option>
-            <option value="In progress">In progress</option>
-            <option value="Completed">Completed</option>
-          </select>
+            {isSubmitting ? (
+              <span className="flex items-center justify-center">
+                <svg
+                  className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
+                </svg>
+                Adding...
+              </span>
+            ) : (
+              "Add Assessment"
+            )}
+          </button>
         </div>
-
-        <button
-          type="submit"
-          disabled={isSubmitting}
-          className={`w-full ${
-            isSubmitting ? "bg-secondary-400 cursor-not-allowed" : "btn-success"
-          }`}
-        >
-          {isSubmitting ? (
-            <span className="flex items-center justify-center">
-              <svg
-                className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-              >
-                <circle
-                  className="opacity-25"
-                  cx="12"
-                  cy="12"
-                  r="10"
-                  stroke="currentColor"
-                  strokeWidth="4"
-                ></circle>
-                <path
-                  className="opacity-75"
-                  fill="currentColor"
-                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                ></path>
-              </svg>
-              Adding...
-            </span>
-          ) : (
-            "Add Assessment"
-          )}
-        </button>
 
         {message.text && (
           <div
             className={`mt-4 p-3 rounded-lg text-sm ${
               message.type === "error"
                 ? "bg-red-50 text-red-700 border border-red-100"
-                : "bg-green-50 text-green-700 border border-green-100"
+                : "bg-emerald-50 text-emerald-700 border border-emerald-100"
             }`}
           >
             {message.type === "error" ? (
@@ -246,7 +261,7 @@ const AddAssessmentForm = ({
             ) : (
               <div className="flex items-start">
                 <svg
-                  className="h-5 w-5 mr-2 mt-0.5 text-green-500"
+                  className="h-5 w-5 mr-2 mt-0.5 text-emerald-500"
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 20 20"
                   fill="currentColor"

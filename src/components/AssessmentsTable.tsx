@@ -81,14 +81,11 @@ const AssessmentsTable = ({
 
   const handleDeleteAssessment = async (assessment: Assessment) => {
     if (!user || !assessment.id) return;
-
     // Confirm deletion
     const confirm = window.confirm(
       `Are you sure you want to delete "${assessment.assignmentName}" for ${assessment.courseName}? This action cannot be undone.`
     );
-
     if (!confirm) return;
-
     try {
       const assessmentRef = doc(
         db,
@@ -100,7 +97,6 @@ const AssessmentsTable = ({
         assessment.id
       );
       await deleteDoc(assessmentRef);
-
       if (onStatusChange) {
         onStatusChange();
       }
@@ -127,14 +123,12 @@ const AssessmentsTable = ({
   return (
     <div>
       <div className="flex flex-col sm:flex-row justify-between mb-6 gap-4">
-        <h2 className="text-xl font-medium text-secondary-900">
-          Your Assessments
-        </h2>
+        <h2 className="text-xl font-medium text-gray-900">Your Assessments</h2>
         <div className="flex">
           <select
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
-            className="input bg-white max-w-xs"
+            className="input bg-white max-w-xs py-1.5 px-3 text-sm"
           >
             <option value="all">All Tasks</option>
             <option value="incomplete">Incomplete</option>
@@ -142,11 +136,12 @@ const AssessmentsTable = ({
           </select>
         </div>
       </div>
+
       {sortedAssessments.length === 0 ? (
-        <div className="text-center py-10 text-secondary-500">
+        <div className="text-center py-10 text-gray-500">
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            className="h-12 w-12 mx-auto mb-4 text-secondary-300"
+            className="h-12 w-12 mx-auto mb-4 text-gray-300"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -164,19 +159,19 @@ const AssessmentsTable = ({
           </p>
         </div>
       ) : (
-        <div className="overflow-x-auto -mx-6">
-          <table className="w-full">
+        <div className="table-container">
+          <table className="data-table">
             <thead>
-              <tr className="border-b border-secondary-200">
-                <th className="p-3 text-left w-24">Status</th>
+              <tr>
+                <th className="w-24">Status</th>
                 <th
                   onClick={() => handleSort("courseName")}
-                  className="p-3 text-left cursor-pointer"
+                  className="cursor-pointer"
                 >
                   <div className="flex items-center space-x-1">
                     <span>Course</span>
                     {sortKey === "courseName" && (
-                      <span className="text-primary-600">
+                      <span className="text-indigo-600">
                         {sortOrder === "asc" ? "↑" : "↓"}
                       </span>
                     )}
@@ -184,12 +179,12 @@ const AssessmentsTable = ({
                 </th>
                 <th
                   onClick={() => handleSort("assignmentName")}
-                  className="p-3 text-left cursor-pointer"
+                  className="cursor-pointer"
                 >
                   <div className="flex items-center space-x-1">
                     <span>Task</span>
                     {sortKey === "assignmentName" && (
-                      <span className="text-primary-600">
+                      <span className="text-indigo-600">
                         {sortOrder === "asc" ? "↑" : "↓"}
                       </span>
                     )}
@@ -197,12 +192,12 @@ const AssessmentsTable = ({
                 </th>
                 <th
                   onClick={() => handleSort("dueDate")}
-                  className="p-3 text-left cursor-pointer"
+                  className="cursor-pointer"
                 >
                   <div className="flex items-center space-x-1">
                     <span>Due Date</span>
                     {sortKey === "dueDate" && (
-                      <span className="text-primary-600">
+                      <span className="text-indigo-600">
                         {sortOrder === "asc" ? "↑" : "↓"}
                       </span>
                     )}
@@ -210,18 +205,18 @@ const AssessmentsTable = ({
                 </th>
                 <th
                   onClick={() => handleSort("weight")}
-                  className="p-3 text-right cursor-pointer"
+                  className="text-right cursor-pointer"
                 >
                   <div className="flex items-center justify-end space-x-1">
                     <span>Weight</span>
                     {sortKey === "weight" && (
-                      <span className="text-primary-600">
+                      <span className="text-indigo-600">
                         {sortOrder === "asc" ? "↑" : "↓"}
                       </span>
                     )}
                   </div>
                 </th>
-                <th className="p-3 text-center">Actions</th>
+                <th className="text-center">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -230,17 +225,17 @@ const AssessmentsTable = ({
                 return (
                   <tr
                     key={assessment.id || index}
-                    className={`border-b border-secondary-100 hover:bg-secondary-50 transition-colors ${
+                    className={`transition-colors ${
                       assessment.status === "Completed"
-                        ? "bg-green-50/40"
+                        ? "bg-emerald-50/40"
                         : dueDateStatus === "overdue"
                         ? "bg-red-50/40"
                         : dueDateStatus === "urgent"
-                        ? "bg-yellow-50/40"
+                        ? "bg-amber-50/40"
                         : ""
                     }`}
                   >
-                    <td className="p-3">
+                    <td>
                       <select
                         value={assessment.status}
                         onChange={(e) =>
@@ -248,10 +243,10 @@ const AssessmentsTable = ({
                         }
                         className={`input py-1 px-2 text-sm ${
                           assessment.status === "Completed"
-                            ? "bg-green-100 border-green-200 text-green-800"
+                            ? "bg-emerald-100 border-emerald-200 text-emerald-800"
                             : assessment.status === "In progress"
                             ? "bg-blue-100 border-blue-200 text-blue-800"
-                            : "bg-secondary-100 border-secondary-200 text-secondary-800"
+                            : "bg-gray-100 border-gray-200 text-gray-800"
                         }`}
                       >
                         {statusOptions.map((option) => (
@@ -261,14 +256,14 @@ const AssessmentsTable = ({
                         ))}
                       </select>
                     </td>
-                    <td className="p-3 font-medium">{assessment.courseName}</td>
-                    <td className="p-3">{assessment.assignmentName}</td>
+                    <td className="font-medium">{assessment.courseName}</td>
+                    <td>{assessment.assignmentName}</td>
                     <td
-                      className={`p-3 ${
+                      className={`${
                         dueDateStatus === "overdue"
                           ? "text-red-600 font-medium"
                           : dueDateStatus === "urgent"
-                          ? "text-yellow-600 font-medium"
+                          ? "text-amber-600 font-medium"
                           : ""
                       }`}
                     >
@@ -282,16 +277,16 @@ const AssessmentsTable = ({
                         {new Date(assessment.dueDate).toLocaleDateString()}
                       </div>
                     </td>
-                    <td className="p-3 text-right">
+                    <td className="text-right">
                       {assessment.weight ? (
                         <span className="font-medium">
                           {assessment.weight}%
                         </span>
                       ) : (
-                        <span className="text-secondary-400">-</span>
+                        <span className="text-gray-400">-</span>
                       )}
                     </td>
-                    <td className="p-3 text-center">
+                    <td className="text-center">
                       <button
                         onClick={() => handleDeleteAssessment(assessment)}
                         className="text-red-500 hover:text-red-700 transition-colors"

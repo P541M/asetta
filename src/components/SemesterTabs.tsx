@@ -34,7 +34,6 @@ const SemesterTabs = ({ selectedSemester, onSelect }: SemesterTabsProps) => {
   const [dropdownOpenId, setDropdownOpenId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
-
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Close dropdown when clicking outside
@@ -224,18 +223,20 @@ const SemesterTabs = ({ selectedSemester, onSelect }: SemesterTabsProps) => {
   if (isLoading) {
     return (
       <div className="flex justify-center py-4">
-        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary-600"></div>
+        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-indigo-600"></div>
       </div>
     );
   }
 
   return (
-    <div className="mb-6">
+    <div className="mb-6 bg-white rounded-xl shadow-sm p-5 border border-gray-100">
+      <h2 className="text-lg font-medium text-gray-900 mb-4">Semesters</h2>
+
       <div className="flex flex-wrap gap-2 items-center mb-4">
         {semesters.map((sem) => (
           <div key={sem.id} className="relative">
             {editingId === sem.id ? (
-              <div className="flex items-center bg-white rounded-lg shadow-soft p-1">
+              <div className="flex items-center bg-white rounded-lg shadow-sm p-1">
                 <input
                   type="text"
                   value={editingName}
@@ -246,7 +247,7 @@ const SemesterTabs = ({ selectedSemester, onSelect }: SemesterTabsProps) => {
                 />
                 <button
                   onClick={() => handleEditSave(sem.id)}
-                  className="ml-2 p-1 text-accent-600 hover:text-accent-700"
+                  className="ml-2 p-1 text-indigo-600 hover:text-indigo-700"
                   title="Save"
                 >
                   <svg
@@ -264,7 +265,7 @@ const SemesterTabs = ({ selectedSemester, onSelect }: SemesterTabsProps) => {
                 </button>
                 <button
                   onClick={() => setEditingId(null)}
-                  className="p-1 text-secondary-600 hover:text-secondary-700"
+                  className="p-1 text-gray-600 hover:text-gray-700"
                   title="Cancel"
                 >
                   <svg
@@ -290,8 +291,8 @@ const SemesterTabs = ({ selectedSemester, onSelect }: SemesterTabsProps) => {
                   onClick={() => onSelect(sem.name)}
                   className={`px-4 py-2 rounded-lg font-medium transition-all ${
                     selectedSemester === sem.name
-                      ? "bg-primary-500 text-white shadow-soft"
-                      : "bg-white text-secondary-700 hover:bg-secondary-100 shadow-soft border border-secondary-100"
+                      ? "bg-indigo-500 text-white shadow-sm"
+                      : "bg-white text-gray-700 hover:bg-gray-100 shadow-sm border border-gray-200"
                   }`}
                 >
                   {sem.name}
@@ -316,17 +317,17 @@ const SemesterTabs = ({ selectedSemester, onSelect }: SemesterTabsProps) => {
                   </button>
                 </button>
                 {dropdownOpenId === sem.id && (
-                  <div className="absolute right-0 top-full mt-1 bg-white border border-secondary-100 rounded-lg shadow-soft z-10 min-w-32">
+                  <div className="absolute right-0 top-full mt-1 bg-white border border-gray-100 rounded-lg shadow-sm z-10 min-w-32">
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
                         handleEditStart(sem.id, sem.name);
                       }}
-                      className="flex items-center w-full px-4 py-2 text-sm hover:bg-secondary-50 text-left rounded-t-lg"
+                      className="flex items-center w-full px-4 py-2 text-sm hover:bg-gray-50 text-left rounded-t-lg"
                     >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
-                        className="h-4 w-4 mr-2 text-secondary-600"
+                        className="h-4 w-4 mr-2 text-gray-600"
                         viewBox="0 0 20 20"
                         fill="currentColor"
                       >
@@ -378,7 +379,7 @@ const SemesterTabs = ({ selectedSemester, onSelect }: SemesterTabsProps) => {
           {newSemester && (
             <button
               onClick={() => setNewSemester("")}
-              className="absolute right-10 top-1/2 transform -translate-y-1/2 text-secondary-400 hover:text-secondary-600"
+              className="absolute right-10 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
