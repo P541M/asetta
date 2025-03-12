@@ -1,5 +1,5 @@
 // components/AssessmentsTable.tsx
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { db } from "../lib/firebase";
 import { doc, updateDoc, deleteDoc } from "firebase/firestore";
 import { useAuth } from "../contexts/AuthContext";
@@ -28,6 +28,34 @@ const AssessmentsTable = ({
   const [sortKey, setSortKey] = useState<keyof Assessment>("dueDate");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   const [filter, setFilter] = useState<string>("all");
+  const [dropdownOpenId, setDropdownOpenId] = useState<string | null>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setDropdownOpenId(null);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  // Edit mode state
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editFormData, setEditFormData] = useState<Assessment>({
+    courseName: "",
+    assignmentName: "",
+    dueDate: "",
+    weight: 0,
+    status: "Not started",
+  });
 
   // Apply filters and sorting
   const filteredAssessments = assessments.filter((assessment) => {
@@ -105,6 +133,57 @@ const AssessmentsTable = ({
     }
   };
 
+  // Edit functions
+  const handleEditClick = (assessment: Assessment) => {
+    setEditingId(assessment.id!);
+    setEditFormData({
+      courseName: assessment.courseName,
+      assignmentName: assessment.assignmentName,
+      dueDate: assessment.dueDate,
+      weight: assessment.weight,
+      status: assessment.status,
+    });
+  };
+
+  const handleCancelEdit = () => {
+    setEditingId(null);
+  };
+
+  const handleEditFormChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target;
+    setEditFormData((prev) => ({
+      ...prev,
+      [name]: name === "weight" ? parseFloat(value) || 0 : value,
+    }));
+  };
+
+  const handleSaveEdit = async (assessmentId: string) => {
+    if (!user || !assessmentId) return;
+    try {
+      const assessmentRef = doc(
+        db,
+        "users",
+        user.uid,
+        "semesters",
+        semesterId,
+        "assessments",
+        assessmentId
+      );
+      await updateDoc(assessmentRef, {
+        ...editFormData,
+        updatedAt: new Date(),
+      });
+      setEditingId(null);
+      if (onStatusChange) {
+        onStatusChange();
+      }
+    } catch (error) {
+      console.error("Error updating assessment:", error);
+    }
+  };
+
   // Calculate due date status
   const getDueDateStatus = (dueDate: string) => {
     const now = new Date();
@@ -136,7 +215,6 @@ const AssessmentsTable = ({
           </select>
         </div>
       </div>
-
       {sortedAssessments.length === 0 ? (
         <div className="text-center py-10 text-gray-500">
           <svg
@@ -222,7 +300,110 @@ const AssessmentsTable = ({
             <tbody>
               {sortedAssessments.map((assessment, index) => {
                 const dueDateStatus = getDueDateStatus(assessment.dueDate);
-                return (
+                return editingId === assessment.id ? (
+                  // Editing mode row
+                  <tr
+                    key={`editing-${assessment.id}`}
+                    className="bg-blue-50/50"
+                  >
+                    <td>
+                      <select
+                        name="status"
+                        value={editFormData.status}
+                        onChange={handleEditFormChange}
+                        className="input py-1 px-2 text-sm"
+                      >
+                        {statusOptions.map((option) => (
+                          <option key={option} value={option}>
+                            {option}
+                          </option>
+                        ))}
+                      </select>
+                    </td>
+                    <td>
+                      <input
+                        type="text"
+                        name="courseName"
+                        value={editFormData.courseName}
+                        onChange={handleEditFormChange}
+                        className="input py-1 px-2 text-sm w-full"
+                        placeholder="Course Name"
+                      />
+                    </td>
+                    <td>
+                      <input
+                        type="text"
+                        name="assignmentName"
+                        value={editFormData.assignmentName}
+                        onChange={handleEditFormChange}
+                        className="input py-1 px-2 text-sm w-full"
+                        placeholder="Assignment Name"
+                      />
+                    </td>
+                    <td>
+                      <input
+                        type="date"
+                        name="dueDate"
+                        value={editFormData.dueDate}
+                        onChange={handleEditFormChange}
+                        className="input py-1 px-2 text-sm w-full"
+                      />
+                    </td>
+                    <td>
+                      <input
+                        type="number"
+                        name="weight"
+                        value={editFormData.weight}
+                        onChange={handleEditFormChange}
+                        min="0"
+                        max="100"
+                        step="0.1"
+                        className="input py-1 px-2 text-sm w-full text-right"
+                      />
+                    </td>
+                    <td className="text-center">
+                      <div className="flex items-center justify-center space-x-2">
+                        <button
+                          onClick={() => handleSaveEdit(assessment.id!)}
+                          className="text-emerald-600 hover:text-emerald-800 transition-colors"
+                          title="Save"
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-5 w-5"
+                            viewBox="0 0 20 20"
+                            fill="currentColor"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                        </button>
+                        <button
+                          onClick={handleCancelEdit}
+                          className="text-gray-600 hover:text-gray-800 transition-colors"
+                          title="Cancel"
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-5 w-5"
+                            viewBox="0 0 20 20"
+                            fill="currentColor"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ) : (
+                  // Normal view row
                   <tr
                     key={assessment.id || index}
                     className={`transition-colors ${
@@ -287,24 +468,80 @@ const AssessmentsTable = ({
                       )}
                     </td>
                     <td className="text-center">
-                      <button
-                        onClick={() => handleDeleteAssessment(assessment)}
-                        className="text-red-500 hover:text-red-700 transition-colors"
-                        title="Delete Assessment"
+                      <div
+                        className="relative inline-block text-left"
+                        ref={
+                          dropdownOpenId === assessment.id ? dropdownRef : null
+                        }
                       >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="h-5 w-5"
-                          viewBox="0 0 20 20"
-                          fill="currentColor"
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            // Toggle dropdown menu
+                            setDropdownOpenId(
+                              dropdownOpenId === assessment.id
+                                ? null
+                                : assessment.id
+                            );
+                          }}
+                          className="text-gray-500 hover:text-gray-700 transition-colors"
+                          title="Options"
                         >
-                          <path
-                            fillRule="evenodd"
-                            d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
-                      </button>
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-5 w-5"
+                            viewBox="0 0 20 20"
+                            fill="currentColor"
+                          >
+                            <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
+                          </svg>
+                        </button>
+
+                        {dropdownOpenId === assessment.id && (
+                          <div className="absolute right-0 z-10 mt-2 w-36 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                            <div className="py-1">
+                              <button
+                                onClick={() => {
+                                  setDropdownOpenId(null);
+                                  handleEditClick(assessment);
+                                }}
+                                className="flex w-full items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                              >
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  className="h-4 w-4 mr-2 text-blue-500"
+                                  viewBox="0 0 20 20"
+                                  fill="currentColor"
+                                >
+                                  <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                                </svg>
+                                Edit
+                              </button>
+                              <button
+                                onClick={() => {
+                                  setDropdownOpenId(null);
+                                  handleDeleteAssessment(assessment);
+                                }}
+                                className="flex w-full items-center px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
+                              >
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  className="h-4 w-4 mr-2 text-red-500"
+                                  viewBox="0 0 20 20"
+                                  fill="currentColor"
+                                >
+                                  <path
+                                    fillRule="evenodd"
+                                    d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
+                                    clipRule="evenodd"
+                                  />
+                                </svg>
+                                Delete
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 );
