@@ -36,7 +36,7 @@ export default function LandingPage() {
           <div className="flex flex-col lg:flex-row items-center">
             <div className="lg:w-1/2 lg:pr-12 mb-10 lg:mb-0">
               <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-                Simplify Your Academic Journey with Acadify
+                Simplify Your Academic Journey with Kivo
               </h1>
               <p className="text-xl text-gray-600 mb-8">
                 Stay on top of your coursework, track assignments, and never
@@ -61,7 +61,7 @@ export default function LandingPage() {
             <div className="lg:w-1/2">
               <img
                 src="/api/placeholder/600/400"
-                alt="Acadify Dashboard Preview"
+                alt="Kivo Dashboard Preview"
                 className="rounded-xl shadow-lg"
               />
             </div>
@@ -76,7 +76,7 @@ export default function LandingPage() {
               Features That Make Academic Life Easier
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Designed specifically for students, Acadify helps you organize
+              Designed specifically for students, Kivo helps you organize
               coursework and stay ahead of deadlines.
             </p>
           </div>
@@ -131,7 +131,7 @@ export default function LandingPage() {
                 Syllabus Upload
               </h3>
               <p className="text-gray-600">
-                Upload your course syllabus and Acadify automatically extracts
+                Upload your course syllabus and Kivo automatically extracts
                 assignment details and due dates.
               </p>
             </div>
@@ -253,8 +253,8 @@ export default function LandingPage() {
             Ready to Take Control of Your Academic Life?
           </h2>
           <p className="text-xl text-gray-700 mb-8 max-w-3xl mx-auto">
-            Join thousands of students who are using Acadify to stay organized
-            and boost their academic performance.
+            Join thousands of students who are using Kivo to stay organized and
+            boost their academic performance.
           </p>
           <Link
             href="/login"
@@ -280,11 +280,11 @@ export default function LandingPage() {
                   <path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3zM3.31 9.397L5 10.12v4.102a8.969 8.969 0 00-1.05-.174 1 1 0 01-.89-.89 11.115 11.115 0 01.25-3.762zM9.3 16.573A9.026 9.026 0 007 14.935v-3.957l1.818.78a3 3 0 002.364 0l5.508-2.361a11.026 11.026 0 01.25 3.762 1 1 0 01-.89.89 8.968 8.968 0 00-5.35 2.524 1 1 0 01-1.4 0zM6 18a1 1 0 001-1v-2.065a8.935 8.935 0 00-2-.712V17a1 1 0 001 1z" />
                 </svg>
                 <span className="ml-2 text-xl font-bold text-indigo-600">
-                  Acadify
+                  Kivo
                 </span>
               </Link>
               <p className="text-gray-600 mb-4">
-                Acadify makes academic management simpler and more efficient, so
+                Kivo makes academic management simpler and more efficient, so
                 you can focus on what matters most—learning.
               </p>
             </div>
@@ -343,7 +343,7 @@ export default function LandingPage() {
           </div>
 
           <div className="mt-12 pt-8 border-t border-gray-100 text-center text-gray-500 text-sm">
-            <p>© {new Date().getFullYear()} Acadify. All rights reserved.</p>
+            <p>© {new Date().getFullYear()} Kivo. All rights reserved.</p>
           </div>
         </div>
       </footer>

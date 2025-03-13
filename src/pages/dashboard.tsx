@@ -349,7 +349,7 @@ const Dashboard = () => {
                   />
                 </svg>
               </div>
-              <h2 className="text-xl font-bold mb-2">Welcome to Acadify!</h2>
+              <h2 className="text-xl font-bold mb-2">Welcome to Kivo!</h2>
               <p className="text-gray-600 mb-6">
                 Track your assignments, exams, and projects in one place.
               </p>
@@ -363,7 +363,7 @@ const Dashboard = () => {
 
       <footer className="bg-white border-t border-gray-100 py-4 text-center text-sm text-gray-500">
         <div className="max-w-7xl mx-auto px-4">
-          <p>© {new Date().getFullYear()} Acadify. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} Kivo. All rights reserved.</p>
         </div>
       </footer>
     </div>
