@@ -39,12 +39,15 @@ const Dashboard = () => {
   );
   const [animateStatCards, setAnimateStatCards] = useState(false);
 
-  // Stats for dashboard
+  // Stats for dashboard with new categories
   const [stats, setStats] = useState({
     total: 0,
-    completed: 0,
-    inProgress: 0,
-    notStarted: 0,
+    // New categorized stats
+    planning: 0, // Not started, Draft
+    active: 0, // In progress, On Hold, Needs Revision
+    submission: 0, // Pending Submission, Submitted, Under Review
+    completed: 0, // Completed
+    problem: 0, // Missed/Late, Deferred
     upcomingDeadlines: 0,
   });
 
@@ -107,20 +110,46 @@ const Dashboard = () => {
           });
         });
         setAssessments(assessmentsList);
-        // Calculate stats
+
+        // Calculate stats with new categories
         const now = new Date();
         const oneWeek = new Date();
         oneWeek.setDate(now.getDate() + 7);
+
         const totalCount = assessmentsList.length;
+
+        // Planning statuses
+        const planningCount = assessmentsList.filter(
+          (a) => a.status === "Not started" || a.status === "Draft"
+        ).length;
+
+        // Active work statuses
+        const activeCount = assessmentsList.filter(
+          (a) =>
+            a.status === "In progress" ||
+            a.status === "On Hold" ||
+            a.status === "Needs Revision"
+        ).length;
+
+        // Submission statuses
+        const submissionCount = assessmentsList.filter(
+          (a) =>
+            a.status === "Pending Submission" ||
+            a.status === "Submitted" ||
+            a.status === "Under Review"
+        ).length;
+
+        // Completed status
         const completedCount = assessmentsList.filter(
           (a) => a.status === "Completed"
         ).length;
-        const inProgressCount = assessmentsList.filter(
-          (a) => a.status === "In progress"
+
+        // Problem statuses
+        const problemCount = assessmentsList.filter(
+          (a) => a.status === "Missed/Late" || a.status === "Deferred"
         ).length;
-        const notStartedCount = assessmentsList.filter(
-          (a) => a.status === "Not started"
-        ).length;
+
+        // Upcoming deadlines (due within the next week and not completed)
         const upcomingCount = assessmentsList.filter((a) => {
           const dueDate = new Date(a.dueDate);
           return (
@@ -131,16 +160,17 @@ const Dashboard = () => {
         // Set the stats and trigger animation
         setStats({
           total: totalCount,
+          planning: planningCount,
+          active: activeCount,
+          submission: submissionCount,
           completed: completedCount,
-          inProgress: inProgressCount,
-          notStarted: notStartedCount,
+          problem: problemCount,
           upcomingDeadlines: upcomingCount,
         });
 
         // Trigger animation for stat cards
         setAnimateStatCards(true);
         setTimeout(() => setAnimateStatCards(false), 1000);
-
         setIsLoading(false);
       },
       (err) => {
@@ -193,8 +223,8 @@ const Dashboard = () => {
           />
           {selectedSemester ? (
             <>
-              {/* Dashboard Stats */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
+              {/* Dashboard Stats - Updated with new categories */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 mb-6">
                 <div
                   className={`bg-white rounded-xl shadow-sm p-4 border border-gray-100 stat-card ${
                     animateStatCards ? "animate-scale" : ""
@@ -207,44 +237,60 @@ const Dashboard = () => {
                     {stats.total}
                   </h3>
                 </div>
+
                 <div
                   className={`bg-white rounded-xl shadow-sm p-4 border border-gray-100 stat-card ${
                     animateStatCards ? "animate-scale" : ""
                   }`}
                   style={{ animationDelay: "0.1s" }}
                 >
-                  <p className="text-sm text-gray-500 mb-1">Completed</p>
-                  <h3 className="text-2xl font-bold text-emerald-600">
-                    {stats.completed}
+                  <p className="text-sm text-gray-500 mb-1">Planning</p>
+                  <h3 className="text-2xl font-bold text-gray-600">
+                    {stats.planning}
                   </h3>
                 </div>
+
                 <div
                   className={`bg-white rounded-xl shadow-sm p-4 border border-gray-100 stat-card ${
                     animateStatCards ? "animate-scale" : ""
                   }`}
                   style={{ animationDelay: "0.2s" }}
                 >
-                  <p className="text-sm text-gray-500 mb-1">In Progress</p>
+                  <p className="text-sm text-gray-500 mb-1">Active Work</p>
                   <h3 className="text-2xl font-bold text-blue-600">
-                    {stats.inProgress}
+                    {stats.active}
                   </h3>
                 </div>
+
                 <div
                   className={`bg-white rounded-xl shadow-sm p-4 border border-gray-100 stat-card ${
                     animateStatCards ? "animate-scale" : ""
                   }`}
                   style={{ animationDelay: "0.3s" }}
                 >
-                  <p className="text-sm text-gray-500 mb-1">Not Started</p>
-                  <h3 className="text-2xl font-bold text-gray-600">
-                    {stats.notStarted}
+                  <p className="text-sm text-gray-500 mb-1">Submission</p>
+                  <h3 className="text-2xl font-bold text-indigo-600">
+                    {stats.submission}
                   </h3>
                 </div>
+
                 <div
                   className={`bg-white rounded-xl shadow-sm p-4 border border-gray-100 stat-card ${
                     animateStatCards ? "animate-scale" : ""
                   }`}
                   style={{ animationDelay: "0.4s" }}
+                >
+                  <p className="text-sm text-gray-500 mb-1">Completed</p>
+                  <h3 className="text-2xl font-bold text-emerald-600">
+                    {stats.completed}
+                  </h3>
+                </div>
+
+                <div
+                  className={`bg-white rounded-xl shadow-sm p-4 border border-gray-100 stat-card ${
+                    animateStatCards ? "animate-scale" : ""
+                  }`}
+                  style={{ animationDelay: "0.5s" }}
                 >
                   <p className="text-sm text-gray-500 mb-1">Due This Week</p>
                   <h3 className="text-2xl font-bold text-amber-600">
@@ -255,6 +301,34 @@ const Dashboard = () => {
                   )}
                 </div>
               </div>
+
+              {/* Show problems stat only if there are any */}
+              {stats.problem > 0 && (
+                <div className="mb-6">
+                  <div
+                    className={`bg-white rounded-xl shadow-sm p-4 border border-red-100 stat-card ${
+                      animateStatCards ? "animate-scale" : ""
+                    }`}
+                    style={{ animationDelay: "0.6s" }}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm text-gray-500 mb-1">
+                          Attention Required
+                        </p>
+                        <h3 className="text-2xl font-bold text-red-600">
+                          {stats.problem} assessment
+                          {stats.problem > 1 ? "s" : ""}
+                        </h3>
+                      </div>
+                      <div className="text-sm text-gray-600">
+                        <p>Assessments marked as Missed/Late or Deferred</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               <div className="bg-white rounded-xl shadow-sm border border-gray-100 mb-6 overflow-hidden transition-all duration-300 hover:shadow-md">
                 <div className="border-b border-gray-100">
                   <div className="flex">

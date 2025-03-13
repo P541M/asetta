@@ -291,7 +291,19 @@ const AssessmentsTable = ({
   };
 
   // Status options
-  const statusOptions = ["Not started", "In progress", "Completed"];
+  const statusOptions = [
+    "Not started",
+    "Draft",
+    "In progress",
+    "On Hold",
+    "Needs Revision",
+    "Pending Submission",
+    "Submitted",
+    "Under Review",
+    "Completed",
+    "Missed/Late",
+    "Deferred",
+  ];
 
   return (
     <div>
@@ -490,11 +502,33 @@ const AssessmentsTable = ({
                         onChange={handleEditFormChange}
                         className="input py-1 px-2 text-sm w-full"
                       >
-                        {statusOptions.map((option) => (
-                          <option key={option} value={option}>
-                            {option}
+                        <optgroup label="Planning">
+                          <option value="Not started">Not started</option>
+                          <option value="Draft">Draft</option>
+                        </optgroup>
+
+                        <optgroup label="Active Work">
+                          <option value="In progress">In progress</option>
+                          <option value="On Hold">On Hold</option>
+                          <option value="Needs Revision">Needs Revision</option>
+                        </optgroup>
+
+                        <optgroup label="Submission">
+                          <option value="Pending Submission">
+                            Pending Submission
                           </option>
-                        ))}
+                          <option value="Submitted">Submitted</option>
+                          <option value="Under Review">Under Review</option>
+                        </optgroup>
+
+                        <optgroup label="Completed">
+                          <option value="Completed">Completed</option>
+                        </optgroup>
+
+                        <optgroup label="Other">
+                          <option value="Missed/Late">Missed/Late</option>
+                          <option value="Deferred">Deferred</option>
+                        </optgroup>
                       </select>
                     </td>
                     <td>
@@ -586,6 +620,15 @@ const AssessmentsTable = ({
                     className={`transition-all duration-300 ${
                       assessment.status === "Completed"
                         ? "bg-emerald-50/40"
+                        : assessment.status === "Missed/Late"
+                        ? "bg-red-50/50"
+                        : assessment.status === "Pending Submission"
+                        ? "bg-orange-50/40"
+                        : assessment.status === "Submitted" ||
+                          assessment.status === "Under Review"
+                        ? "bg-cyan-50/40"
+                        : assessment.status === "Needs Revision"
+                        ? "bg-amber-50/40"
                         : dueDateStatus === "overdue"
                         ? "bg-red-50/40"
                         : dueDateStatus === "urgent"
@@ -616,14 +659,52 @@ const AssessmentsTable = ({
                             ? "bg-emerald-100 border-emerald-200 text-emerald-800"
                             : assessment.status === "In progress"
                             ? "bg-blue-100 border-blue-200 text-blue-800"
+                            : assessment.status === "Draft"
+                            ? "bg-purple-100 border-purple-200 text-purple-800"
+                            : assessment.status === "Pending Submission"
+                            ? "bg-orange-100 border-orange-200 text-orange-800"
+                            : assessment.status === "Submitted"
+                            ? "bg-cyan-100 border-cyan-200 text-cyan-800"
+                            : assessment.status === "Under Review"
+                            ? "bg-indigo-100 border-indigo-200 text-indigo-800"
+                            : assessment.status === "Needs Revision"
+                            ? "bg-amber-100 border-amber-200 text-amber-800"
+                            : assessment.status === "Missed/Late"
+                            ? "bg-red-100 border-red-200 text-red-800"
+                            : assessment.status === "On Hold"
+                            ? "bg-yellow-100 border-yellow-200 text-yellow-800"
+                            : assessment.status === "Deferred"
+                            ? "bg-gray-200 border-gray-300 text-gray-700"
                             : "bg-gray-100 border-gray-200 text-gray-800"
                         } hover:shadow-sm`}
                       >
-                        {statusOptions.map((option) => (
-                          <option key={option} value={option}>
-                            {option}
+                        <optgroup label="Planning">
+                          <option value="Not started">Not started</option>
+                          <option value="Draft">Draft</option>
+                        </optgroup>
+
+                        <optgroup label="Active Work">
+                          <option value="In progress">In progress</option>
+                          <option value="On Hold">On Hold</option>
+                          <option value="Needs Revision">Needs Revision</option>
+                        </optgroup>
+
+                        <optgroup label="Submission">
+                          <option value="Pending Submission">
+                            Pending Submission
                           </option>
-                        ))}
+                          <option value="Submitted">Submitted</option>
+                          <option value="Under Review">Under Review</option>
+                        </optgroup>
+
+                        <optgroup label="Completed">
+                          <option value="Completed">Completed</option>
+                        </optgroup>
+
+                        <optgroup label="Other">
+                          <option value="Missed/Late">Missed/Late</option>
+                          <option value="Deferred">Deferred</option>
+                        </optgroup>
                       </select>
                     </td>
                     <td className="font-medium">{assessment.courseName}</td>

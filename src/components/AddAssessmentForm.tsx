@@ -228,9 +228,31 @@ const AddAssessmentForm = ({
               onChange={handleChange}
               className="input hover:shadow-sm transition-all duration-200"
             >
-              <option value="Not started">Not started</option>
-              <option value="In progress">In progress</option>
-              <option value="Completed">Completed</option>
+              <optgroup label="Planning">
+                <option value="Not started">Not started</option>
+                <option value="Draft">Draft</option>
+              </optgroup>
+
+              <optgroup label="Active Work">
+                <option value="In progress">In progress</option>
+                <option value="On Hold">On Hold</option>
+                <option value="Needs Revision">Needs Revision</option>
+              </optgroup>
+
+              <optgroup label="Submission">
+                <option value="Pending Submission">Pending Submission</option>
+                <option value="Submitted">Submitted</option>
+                <option value="Under Review">Under Review</option>
+              </optgroup>
+
+              <optgroup label="Completed">
+                <option value="Completed">Completed</option>
+              </optgroup>
+
+              <optgroup label="Other">
+                <option value="Missed/Late">Missed/Late</option>
+                <option value="Deferred">Deferred</option>
+              </optgroup>
             </select>
           </div>
         </div>
