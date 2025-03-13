@@ -16,10 +16,21 @@ const AddAssessmentForm = ({
   onSuccess,
 }: AddAssessmentFormProps) => {
   const { user } = useAuth();
+
+  // Helper function to get today's date as YYYY-MM-DD
+  const getTodayDateString = (): string => {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, "0");
+    const day = String(today.getDate()).padStart(2, "0");
+
+    return `${year}-${month}-${day}`;
+  };
+
   const [formData, setFormData] = useState({
     courseName: "",
     assignmentName: "",
-    dueDate: new Date().toISOString().split("T")[0],
+    dueDate: getTodayDateString(),
     weight: 0,
     status: "Not started",
   });
@@ -64,6 +75,7 @@ const AddAssessmentForm = ({
       });
       return;
     }
+
     // Validate the form
     if (!formData.courseName.trim()) {
       setMessage({ text: "Course name is required", type: "error" });
@@ -72,12 +84,15 @@ const AddAssessmentForm = ({
       }
       return;
     }
+
     if (!formData.assignmentName.trim()) {
       setMessage({ text: "Assessment name is required", type: "error" });
       return;
     }
+
     setIsSubmitting(true);
     setMessage({ text: "", type: "" });
+
     try {
       // Add the assessment to Firestore
       await addDoc(
@@ -102,7 +117,7 @@ const AddAssessmentForm = ({
       setFormData({
         courseName: "",
         assignmentName: "",
-        dueDate: new Date().toISOString().split("T")[0],
+        dueDate: getTodayDateString(),
         weight: 0,
         status: "Not started",
       });

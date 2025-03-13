@@ -33,6 +33,22 @@ const AssessmentsTable = ({
   const [lastStatusChange, setLastStatusChange] = useState<string | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
+  // Format date consistently to avoid timezone issues
+  const formatDateForDisplay = (dateStr: string): string => {
+    // Parse the date string and create a date object, preserving the actual date
+    // by using specific time components to avoid timezone issues
+    const [year, month, day] = dateStr
+      .split("-")
+      .map((num) => parseInt(num, 10));
+
+    // Create a date object with the specific date components
+    // Set the time to noon to avoid any day shifts due to timezone conversions
+    const date = new Date(year, month - 1, day, 12, 0, 0);
+
+    // Format the date for display using toLocaleDateString
+    return date.toLocaleDateString();
+  };
+
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -101,13 +117,11 @@ const AssessmentsTable = ({
         status: newStatus,
         updatedAt: new Date(),
       });
-
       // Highlight the row that just had its status changed
       setLastStatusChange(assessment.id);
       setTimeout(() => {
         setLastStatusChange(null);
       }, 1500);
-
       if (onStatusChange) {
         onStatusChange();
       }
@@ -145,14 +159,12 @@ const AssessmentsTable = ({
   // Bulk actions for selected rows
   const handleBulkAction = async (action: "complete" | "delete" | "reset") => {
     if (!user || selectedRows.length === 0) return;
-
     if (action === "delete") {
       const confirm = window.confirm(
         `Are you sure you want to delete ${selectedRows.length} selected assessment(s)? This action cannot be undone.`
       );
       if (!confirm) return;
     }
-
     try {
       for (const id of selectedRows) {
         const assessmentRef = doc(
@@ -164,7 +176,6 @@ const AssessmentsTable = ({
           "assessments",
           id
         );
-
         if (action === "delete") {
           await deleteDoc(assessmentRef);
         } else if (action === "complete") {
@@ -179,7 +190,6 @@ const AssessmentsTable = ({
           });
         }
       }
-
       setSelectedRows([]);
       if (onStatusChange) {
         onStatusChange();
@@ -250,13 +260,11 @@ const AssessmentsTable = ({
         updatedAt: new Date(),
       });
       setEditingId(null);
-
       // Highlight the row that was just edited
       setLastStatusChange(assessmentId);
       setTimeout(() => {
         setLastStatusChange(null);
       }, 1500);
-
       if (onStatusChange) {
         onStatusChange();
       }
@@ -268,7 +276,12 @@ const AssessmentsTable = ({
   // Calculate due date status
   const getDueDateStatus = (dueDate: string) => {
     const now = new Date();
-    const due = new Date(dueDate);
+    // Parse the date using our consistent method to avoid timezone issues
+    const [year, month, day] = dueDate
+      .split("-")
+      .map((num) => parseInt(num, 10));
+    const due = new Date(year, month - 1, day, 12, 0, 0);
+
     const diffTime = due.getTime() - now.getTime();
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     if (diffDays < 0) return "overdue";
@@ -294,7 +307,6 @@ const AssessmentsTable = ({
             <option value="incomplete">Incomplete</option>
             <option value="completed">Completed</option>
           </select>
-
           {selectedRows.length > 0 && (
             <div className="flex items-center space-x-2 animate-fade-in">
               <span className="text-sm text-gray-600">
@@ -632,7 +644,7 @@ const AssessmentsTable = ({
                         {dueDateStatus === "urgent" && (
                           <span className="mr-2 badge-warning">Due soon</span>
                         )}
-                        {new Date(assessment.dueDate).toLocaleDateString()}
+                        {formatDateForDisplay(assessment.dueDate)}
                       </div>
                     </td>
                     <td className="text-right">
