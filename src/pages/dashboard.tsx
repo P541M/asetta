@@ -37,6 +37,7 @@ const Dashboard = () => {
   const [activeTab, setActiveTab] = useState<"assessments" | "add" | "upload">(
     "assessments"
   );
+  const [animateStatCards, setAnimateStatCards] = useState(false);
 
   // Stats for dashboard
   const [stats, setStats] = useState({
@@ -106,12 +107,10 @@ const Dashboard = () => {
           });
         });
         setAssessments(assessmentsList);
-
         // Calculate stats
         const now = new Date();
         const oneWeek = new Date();
         oneWeek.setDate(now.getDate() + 7);
-
         const totalCount = assessmentsList.length;
         const completedCount = assessmentsList.filter(
           (a) => a.status === "Completed"
@@ -129,6 +128,7 @@ const Dashboard = () => {
           );
         }).length;
 
+        // Set the stats and trigger animation
         setStats({
           total: totalCount,
           completed: completedCount,
@@ -136,6 +136,10 @@ const Dashboard = () => {
           notStarted: notStartedCount,
           upcomingDeadlines: upcomingCount,
         });
+
+        // Trigger animation for stat cards
+        setAnimateStatCards(true);
+        setTimeout(() => setAnimateStatCards(false), 1000);
 
         setIsLoading(false);
       },
@@ -162,7 +166,7 @@ const Dashboard = () => {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="flex flex-col items-center">
+        <div className="flex flex-col items-center animate-pulse">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
           <p className="mt-4 text-gray-600">Loading...</p>
         </div>
@@ -173,10 +177,9 @@ const Dashboard = () => {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <Header onLogout={handleLogout} />
-
       <div className="flex-grow p-4 md:p-6">
         <div className="max-w-7xl mx-auto">
-          <div className="mb-8">
+          <div className="mb-8 animate-fade-in">
             <h1 className="text-2xl font-bold text-gray-900 mb-2">
               Academic Dashboard
             </h1>
@@ -184,17 +187,19 @@ const Dashboard = () => {
               Organize and track your academic tasks efficiently
             </p>
           </div>
-
           <SemesterTabs
             selectedSemester={selectedSemester}
             onSelect={setSelectedSemester}
           />
-
           {selectedSemester ? (
             <>
               {/* Dashboard Stats */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
-                <div className="bg-white rounded-xl shadow-sm p-4 border border-gray-100">
+                <div
+                  className={`bg-white rounded-xl shadow-sm p-4 border border-gray-100 stat-card ${
+                    animateStatCards ? "animate-scale" : ""
+                  }`}
+                >
                   <p className="text-sm text-gray-500 mb-1">
                     Total Assessments
                   </p>
@@ -202,77 +207,92 @@ const Dashboard = () => {
                     {stats.total}
                   </h3>
                 </div>
-                <div className="bg-white rounded-xl shadow-sm p-4 border border-gray-100">
+                <div
+                  className={`bg-white rounded-xl shadow-sm p-4 border border-gray-100 stat-card ${
+                    animateStatCards ? "animate-scale" : ""
+                  }`}
+                  style={{ animationDelay: "0.1s" }}
+                >
                   <p className="text-sm text-gray-500 mb-1">Completed</p>
                   <h3 className="text-2xl font-bold text-emerald-600">
                     {stats.completed}
                   </h3>
                 </div>
-                <div className="bg-white rounded-xl shadow-sm p-4 border border-gray-100">
+                <div
+                  className={`bg-white rounded-xl shadow-sm p-4 border border-gray-100 stat-card ${
+                    animateStatCards ? "animate-scale" : ""
+                  }`}
+                  style={{ animationDelay: "0.2s" }}
+                >
                   <p className="text-sm text-gray-500 mb-1">In Progress</p>
                   <h3 className="text-2xl font-bold text-blue-600">
                     {stats.inProgress}
                   </h3>
                 </div>
-                <div className="bg-white rounded-xl shadow-sm p-4 border border-gray-100">
+                <div
+                  className={`bg-white rounded-xl shadow-sm p-4 border border-gray-100 stat-card ${
+                    animateStatCards ? "animate-scale" : ""
+                  }`}
+                  style={{ animationDelay: "0.3s" }}
+                >
                   <p className="text-sm text-gray-500 mb-1">Not Started</p>
                   <h3 className="text-2xl font-bold text-gray-600">
                     {stats.notStarted}
                   </h3>
                 </div>
-                <div className="bg-white rounded-xl shadow-sm p-4 border border-gray-100">
+                <div
+                  className={`bg-white rounded-xl shadow-sm p-4 border border-gray-100 stat-card ${
+                    animateStatCards ? "animate-scale" : ""
+                  }`}
+                  style={{ animationDelay: "0.4s" }}
+                >
                   <p className="text-sm text-gray-500 mb-1">Due This Week</p>
                   <h3 className="text-2xl font-bold text-amber-600">
                     {stats.upcomingDeadlines}
                   </h3>
+                  {stats.upcomingDeadlines > 0 && (
+                    <span className="inline-block w-2 h-2 bg-amber-500 rounded-full animate-pulse mt-1"></span>
+                  )}
                 </div>
               </div>
-
-              <div className="bg-white rounded-xl shadow-sm border border-gray-100 mb-6 overflow-hidden">
+              <div className="bg-white rounded-xl shadow-sm border border-gray-100 mb-6 overflow-hidden transition-all duration-300 hover:shadow-md">
                 <div className="border-b border-gray-100">
                   <div className="flex">
                     <button
                       onClick={() => setActiveTab("assessments")}
-                      className={`px-5 py-4 font-medium text-sm ${
-                        activeTab === "assessments"
-                          ? "text-indigo-700 border-b-2 border-indigo-500"
-                          : "text-gray-600 hover:text-indigo-600"
+                      className={`px-5 py-4 font-medium text-sm tab ${
+                        activeTab === "assessments" ? "active" : ""
                       }`}
                     >
                       Assessments
                     </button>
                     <button
                       onClick={() => setActiveTab("add")}
-                      className={`px-5 py-4 font-medium text-sm ${
-                        activeTab === "add"
-                          ? "text-indigo-700 border-b-2 border-indigo-500"
-                          : "text-gray-600 hover:text-indigo-600"
+                      className={`px-5 py-4 font-medium text-sm tab ${
+                        activeTab === "add" ? "active" : ""
                       }`}
                     >
                       Add Manually
                     </button>
                     <button
                       onClick={() => setActiveTab("upload")}
-                      className={`px-5 py-4 font-medium text-sm ${
-                        activeTab === "upload"
-                          ? "text-indigo-700 border-b-2 border-indigo-500"
-                          : "text-gray-600 hover:text-indigo-600"
+                      className={`px-5 py-4 font-medium text-sm tab ${
+                        activeTab === "upload" ? "active" : ""
                       }`}
                     >
                       Upload Outline
                     </button>
                   </div>
                 </div>
-
                 <div className="p-6">
                   {activeTab === "assessments" && (
-                    <div>
+                    <div className="animate-fade-in">
                       {isLoading ? (
                         <div className="flex justify-center py-8">
                           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
                         </div>
                       ) : error ? (
-                        <div className="p-4 bg-red-50 rounded-lg text-red-700">
+                        <div className="p-4 bg-red-50 rounded-lg text-red-700 animate-fade-in">
                           <p>{error}</p>
                         </div>
                       ) : (
@@ -284,9 +304,8 @@ const Dashboard = () => {
                       )}
                     </div>
                   )}
-
                   {activeTab === "add" && selectedSemesterId && (
-                    <div>
+                    <div className="animate-fade-in">
                       <AddAssessmentForm
                         semester={selectedSemester}
                         semesterId={selectedSemesterId}
@@ -294,9 +313,8 @@ const Dashboard = () => {
                       />
                     </div>
                   )}
-
                   {activeTab === "upload" && (
-                    <div>
+                    <div className="animate-fade-in">
                       <UploadForm
                         semester={selectedSemester}
                         onUploadSuccess={refreshAssessments}
@@ -305,12 +323,11 @@ const Dashboard = () => {
                   )}
                 </div>
               </div>
-
               {activeTab === "assessments" && assessments.length > 0 && (
                 <div className="flex justify-end mb-10">
                   <button
                     onClick={() => setActiveTab("add")}
-                    className="btn-primary flex items-center gap-2"
+                    className="btn-primary flex items-center gap-2 shadow hover:shadow-md transition-all duration-300 hover:-translate-y-0.5"
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -332,8 +349,8 @@ const Dashboard = () => {
               )}
             </>
           ) : (
-            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-10 text-center">
-              <div className="mb-6">
+            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-10 text-center hover:shadow-md transition-all duration-300">
+              <div className="mb-6 animate-bounce-light">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   className="h-16 w-16 mx-auto text-indigo-300"
@@ -360,7 +377,6 @@ const Dashboard = () => {
           )}
         </div>
       </div>
-
       <footer className="bg-white border-t border-gray-100 py-4 text-center text-sm text-gray-500">
         <div className="max-w-7xl mx-auto px-4">
           <p>© {new Date().getFullYear()} Kivo. All rights reserved.</p>

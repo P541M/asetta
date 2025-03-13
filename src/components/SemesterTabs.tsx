@@ -34,7 +34,10 @@ const SemesterTabs = ({ selectedSemester, onSelect }: SemesterTabsProps) => {
   const [dropdownOpenId, setDropdownOpenId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
+  const [lastAdded, setLastAdded] = useState<string | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const newInputRef = useRef<HTMLInputElement>(null);
+  const editInputRef = useRef<HTMLInputElement>(null);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -51,6 +54,21 @@ const SemesterTabs = ({ selectedSemester, onSelect }: SemesterTabsProps) => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
+  // Auto-focus on the new semester input when triggered
+  useEffect(() => {
+    if (newSemester === "" && newInputRef.current) {
+      newInputRef.current.focus();
+    }
+  }, [newSemester]);
+
+  // Auto-focus on the edit input when editing starts
+  useEffect(() => {
+    if (editingId && editInputRef.current) {
+      editInputRef.current.focus();
+      editInputRef.current.select();
+    }
+  }, [editingId]);
 
   // Listen for changes to the user's semesters in Firestore
   useEffect(() => {
@@ -104,6 +122,12 @@ const SemesterTabs = ({ selectedSemester, onSelect }: SemesterTabsProps) => {
       });
       onSelect(semesterName);
       setNewSemester("");
+      setLastAdded(docRef.id);
+
+      // Clear the "last added" highlight after 2 seconds
+      setTimeout(() => {
+        setLastAdded(null);
+      }, 2000);
     } catch (error) {
       console.error("Error adding semester:", error);
       alert("Failed to add semester. Please try again.");
@@ -204,6 +228,12 @@ const SemesterTabs = ({ selectedSemester, onSelect }: SemesterTabsProps) => {
       }
       setEditingId(null);
       setEditingName("");
+
+      // Highlight the updated semester temporarily
+      setLastAdded(id);
+      setTimeout(() => {
+        setLastAdded(null);
+      }, 2000);
     } catch (error) {
       console.error("Error updating semester:", error);
       alert("Failed to update semester name. Please try again.");
@@ -222,32 +252,33 @@ const SemesterTabs = ({ selectedSemester, onSelect }: SemesterTabsProps) => {
 
   if (isLoading) {
     return (
-      <div className="flex justify-center py-4">
-        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-indigo-600"></div>
+      <div className="mb-6 bg-white rounded-xl shadow-sm p-5 border border-gray-100">
+        <div className="flex justify-center py-4">
+          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-indigo-600"></div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="mb-6 bg-white rounded-xl shadow-sm p-5 border border-gray-100">
+    <div className="mb-6 bg-white rounded-xl shadow-sm p-5 border border-gray-100 hover:shadow-md transition-all duration-300">
       <h2 className="text-lg font-medium text-gray-900 mb-4">Semesters</h2>
-
       <div className="flex flex-wrap gap-2 items-center mb-4">
         {semesters.map((sem) => (
-          <div key={sem.id} className="relative">
+          <div key={sem.id} className="relative animate-scale">
             {editingId === sem.id ? (
-              <div className="flex items-center bg-white rounded-lg shadow-sm p-1">
+              <div className="flex items-center bg-white rounded-lg shadow-sm p-1 animate-fade-in">
                 <input
                   type="text"
                   value={editingName}
                   onChange={(e) => setEditingName(e.target.value)}
                   onKeyDown={(e) => handleEditKeyPress(e, sem.id)}
-                  autoFocus
+                  ref={editInputRef}
                   className="input py-1 px-2"
                 />
                 <button
                   onClick={() => handleEditSave(sem.id)}
-                  className="ml-2 p-1 text-indigo-600 hover:text-indigo-700"
+                  className="ml-2 p-1 text-indigo-600 hover:text-indigo-700 transition-colors duration-200"
                   title="Save"
                 >
                   <svg
@@ -265,7 +296,7 @@ const SemesterTabs = ({ selectedSemester, onSelect }: SemesterTabsProps) => {
                 </button>
                 <button
                   onClick={() => setEditingId(null)}
-                  className="p-1 text-gray-600 hover:text-gray-700"
+                  className="p-1 text-gray-600 hover:text-gray-700 transition-colors duration-200"
                   title="Cancel"
                 >
                   <svg
@@ -289,10 +320,14 @@ const SemesterTabs = ({ selectedSemester, onSelect }: SemesterTabsProps) => {
               >
                 <button
                   onClick={() => onSelect(sem.name)}
-                  className={`px-4 py-2 rounded-lg font-medium transition-all ${
+                  className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 ${
                     selectedSemester === sem.name
-                      ? "bg-indigo-500 text-white shadow-sm"
-                      : "bg-white text-gray-700 hover:bg-gray-100 shadow-sm border border-gray-200"
+                      ? "bg-indigo-500 text-white shadow-sm transform scale-105"
+                      : "bg-white text-gray-700 hover:bg-gray-100 shadow-sm border border-gray-200 hover:-translate-y-0.5"
+                  } ${
+                    lastAdded === sem.id
+                      ? "animate-pulse border-indigo-300"
+                      : ""
                   }`}
                 >
                   {sem.name}
@@ -303,12 +338,14 @@ const SemesterTabs = ({ selectedSemester, onSelect }: SemesterTabsProps) => {
                         dropdownOpenId === sem.id ? null : sem.id
                       );
                     }}
-                    className="ml-2 text-sm opacity-70 hover:opacity-100"
+                    className="ml-2 text-sm opacity-70 hover:opacity-100 transition-opacity duration-200"
                     aria-label="Menu"
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
-                      className="h-4 w-4 inline"
+                      className={`h-4 w-4 inline transition-transform duration-200 ${
+                        dropdownOpenId === sem.id ? "rotate-180" : ""
+                      }`}
                       viewBox="0 0 20 20"
                       fill="currentColor"
                     >
@@ -317,13 +354,13 @@ const SemesterTabs = ({ selectedSemester, onSelect }: SemesterTabsProps) => {
                   </button>
                 </button>
                 {dropdownOpenId === sem.id && (
-                  <div className="absolute right-0 top-full mt-1 bg-white border border-gray-100 rounded-lg shadow-sm z-10 min-w-32">
+                  <div className="absolute right-0 top-full mt-1 bg-white border border-gray-100 rounded-lg shadow-sm z-10 min-w-32 animate-fade-in-down">
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
                         handleEditStart(sem.id, sem.name);
                       }}
-                      className="flex items-center w-full px-4 py-2 text-sm hover:bg-gray-50 text-left rounded-t-lg"
+                      className="flex items-center w-full px-4 py-2 text-sm hover:bg-gray-50 text-left rounded-t-lg transition-colors duration-150"
                     >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -340,7 +377,7 @@ const SemesterTabs = ({ selectedSemester, onSelect }: SemesterTabsProps) => {
                         e.stopPropagation();
                         handleDeleteSemester(sem.id);
                       }}
-                      className="flex items-center w-full px-4 py-2 text-sm hover:bg-red-50 text-left text-red-600 rounded-b-lg"
+                      className="flex items-center w-full px-4 py-2 text-sm hover:bg-red-50 text-left text-red-600 rounded-b-lg transition-colors duration-150"
                     >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -363,7 +400,6 @@ const SemesterTabs = ({ selectedSemester, onSelect }: SemesterTabsProps) => {
           </div>
         ))}
       </div>
-
       <div className="flex flex-col sm:flex-row gap-2 items-center">
         <div className="relative flex-grow">
           <input
@@ -374,12 +410,13 @@ const SemesterTabs = ({ selectedSemester, onSelect }: SemesterTabsProps) => {
             onKeyDown={(e) => {
               if (e.key === "Enter") handleAddSemester();
             }}
-            className="input pr-10"
+            ref={newInputRef}
+            className="input pr-10 transition-all duration-200 hover:shadow-sm focus:shadow"
           />
           {newSemester && (
             <button
               onClick={() => setNewSemester("")}
-              className="absolute right-10 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              className="absolute right-10 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors duration-200"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -399,7 +436,7 @@ const SemesterTabs = ({ selectedSemester, onSelect }: SemesterTabsProps) => {
         <button
           onClick={handleAddSemester}
           disabled={isAdding || !newSemester.trim()}
-          className={`btn-accent flex items-center whitespace-nowrap ${
+          className={`btn-accent flex items-center whitespace-nowrap hover:shadow hover:-translate-y-0.5 transition-all duration-300 ${
             isAdding || !newSemester.trim()
               ? "opacity-50 cursor-not-allowed"
               : ""

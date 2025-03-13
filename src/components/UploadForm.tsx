@@ -23,7 +23,9 @@ const UploadForm = ({ semester, onUploadSuccess }: UploadFormProps) => {
   const [uploadStatus, setUploadStatus] = useState<UploadStatus>("idle");
   const [overallProgress, setOverallProgress] = useState(0);
   const [message, setMessage] = useState({ text: "", type: "" });
+  const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const dropZoneRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     // Update file progresses when files change
@@ -40,7 +42,6 @@ const UploadForm = ({ semester, onUploadSuccess }: UploadFormProps) => {
     if (e.target.files && e.target.files.length > 0) {
       const newFiles: File[] = [];
       let hasError = false;
-
       // Check each file
       Array.from(e.target.files).forEach((file) => {
         if (file.type !== "application/pdf") {
@@ -49,7 +50,6 @@ const UploadForm = ({ semester, onUploadSuccess }: UploadFormProps) => {
         }
         newFiles.push(file);
       });
-
       if (hasError) {
         setMessage({
           text: "Only PDF files are accepted. Some files were not added.",
@@ -58,7 +58,6 @@ const UploadForm = ({ semester, onUploadSuccess }: UploadFormProps) => {
       } else {
         setMessage({ text: "", type: "" });
       }
-
       // Add to existing files
       setFiles((prevFiles) => [...prevFiles, ...newFiles]);
     }
@@ -83,12 +82,10 @@ const UploadForm = ({ semester, onUploadSuccess }: UploadFormProps) => {
       }
       return updated;
     });
-
     // Update overall progress
     const totalProgress = fileProgresses.reduce((sum, file, i) => {
       return sum + (i === index ? progress : file.progress);
     }, 0);
-
     setOverallProgress(Math.round(totalProgress / fileProgresses.length));
   };
 
@@ -101,16 +98,13 @@ const UploadForm = ({ semester, onUploadSuccess }: UploadFormProps) => {
       });
       return;
     }
-
     // Reset progress and set status to uploading
     setUploadStatus("uploading");
     setOverallProgress(0);
     fileProgresses.forEach((_, index) => {
       updateFileProgress(index, 0, "uploading");
     });
-
     setMessage({ text: "", type: "" });
-
     // Create FormData with all files
     const formData = new FormData();
     files.forEach((file, index) => {
@@ -118,17 +112,14 @@ const UploadForm = ({ semester, onUploadSuccess }: UploadFormProps) => {
     });
     formData.append("semester", semester);
     formData.append("fileCount", files.length.toString());
-
     try {
       // Get user auth token
       const idToken = await user.getIdToken();
-
       // Simulate upload progress for better UX
       const uploadInterval = setInterval(() => {
         setFileProgresses((prev) => {
           const updated = [...prev];
           let totalProgress = 0;
-
           // Increment progress for each file that's still uploading
           updated.forEach((file, index) => {
             if (file.status === "uploading" && file.progress < 90) {
@@ -138,12 +129,10 @@ const UploadForm = ({ semester, onUploadSuccess }: UploadFormProps) => {
             }
             totalProgress += updated[index].progress;
           });
-
           setOverallProgress(Math.round(totalProgress / updated.length));
           return updated;
         });
       }, 500);
-
       // Send the upload request
       const res = await fetch("/api/upload", {
         method: "POST",
@@ -152,18 +141,14 @@ const UploadForm = ({ semester, onUploadSuccess }: UploadFormProps) => {
         },
         body: formData,
       });
-
       // Clear the upload progress interval
       clearInterval(uploadInterval);
-
       // Transition to processing state
       setUploadStatus("processing");
       fileProgresses.forEach((_, index) => {
         updateFileProgress(index, 95, "processing");
       });
-
       const data = await res.json();
-
       if (data.success) {
         // Mark all files as complete
         fileProgresses.forEach((_, index) => {
@@ -171,12 +156,10 @@ const UploadForm = ({ semester, onUploadSuccess }: UploadFormProps) => {
         });
         setOverallProgress(100);
         setUploadStatus("success");
-
         setMessage({
           text: data.message || "Files processed successfully!",
           type: "success",
         });
-
         // Reset file input for next upload
         setTimeout(() => {
           setFiles([]);
@@ -193,7 +176,6 @@ const UploadForm = ({ semester, onUploadSuccess }: UploadFormProps) => {
           updateFileProgress(index, 0, "error");
         });
         setUploadStatus("error");
-
         setMessage({
           text: data.error || "Error processing files.",
           type: "error",
@@ -202,12 +184,10 @@ const UploadForm = ({ semester, onUploadSuccess }: UploadFormProps) => {
     } catch (error) {
       console.error(error);
       setUploadStatus("error");
-
       // Mark all files as error
       fileProgresses.forEach((_, index) => {
         updateFileProgress(index, 0, "error");
       });
-
       setMessage({
         text: "Upload failed. Please try again.",
         type: "error",
@@ -215,19 +195,39 @@ const UploadForm = ({ semester, onUploadSuccess }: UploadFormProps) => {
     }
   };
 
+  const handleDragEnter = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    // Only set isDragging to false if we're leaving the dropzone (not an inner element)
+    if (
+      dropZoneRef.current &&
+      !dropZoneRef.current.contains(e.relatedTarget as Node)
+    ) {
+      setIsDragging(false);
+    }
+  };
+
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
+    setIsDragging(true);
   };
 
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
+    setIsDragging(false);
 
     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
       const newFiles: File[] = [];
       let hasError = false;
-
       Array.from(e.dataTransfer.files).forEach((file) => {
         if (file.type !== "application/pdf") {
           hasError = true;
@@ -235,7 +235,6 @@ const UploadForm = ({ semester, onUploadSuccess }: UploadFormProps) => {
         }
         newFiles.push(file);
       });
-
       if (hasError) {
         setMessage({
           text: "Only PDF files are accepted. Some files were not added.",
@@ -244,7 +243,6 @@ const UploadForm = ({ semester, onUploadSuccess }: UploadFormProps) => {
       } else if (newFiles.length > 0) {
         setMessage({ text: "", type: "" });
       }
-
       setFiles((prevFiles) => [...prevFiles, ...newFiles]);
     }
   };
@@ -295,12 +293,18 @@ const UploadForm = ({ semester, onUploadSuccess }: UploadFormProps) => {
         Upload your course outline PDFs to automatically extract assignment
         details. Multiple files can be uploaded at once.
       </p>
-
       <form onSubmit={handleUpload}>
         {uploadStatus === "idle" && (
           <div
-            className="border-2 border-dashed border-gray-200 bg-gray-50 rounded-lg p-8 text-center mb-6 cursor-pointer hover:bg-gray-100 transition-colors"
+            ref={dropZoneRef}
+            className={`border-2 border-dashed ${
+              isDragging
+                ? "border-indigo-400 bg-indigo-50"
+                : "border-gray-200 bg-gray-50"
+            } rounded-lg p-8 text-center mb-6 cursor-pointer hover:bg-gray-100 transition-all duration-300`}
+            onDragEnter={handleDragEnter}
             onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
             onDrop={handleDrop}
             onClick={() => fileInputRef.current?.click()}
           >
@@ -313,12 +317,13 @@ const UploadForm = ({ semester, onUploadSuccess }: UploadFormProps) => {
               id="file-upload"
               multiple
             />
-
             {files.length === 0 ? (
               <div className="space-y-2">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className="h-12 w-12 mx-auto text-gray-400"
+                  className={`h-12 w-12 mx-auto text-gray-400 transition-transform duration-300 ${
+                    isDragging ? "scale-110 text-indigo-400" : ""
+                  }`}
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -330,15 +335,24 @@ const UploadForm = ({ semester, onUploadSuccess }: UploadFormProps) => {
                     d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
                   />
                 </svg>
-                <p className="font-medium text-gray-700">
-                  Drag and drop your PDFs here, or click to browse
+                <p
+                  className={`font-medium ${
+                    isDragging ? "text-indigo-700" : "text-gray-700"
+                  } transition-colors duration-300`}
+                >
+                  {isDragging
+                    ? "Drop files here"
+                    : "Drag and drop your PDFs here, or click to browse"}
                 </p>
                 <p className="text-sm text-gray-500">
                   (Only PDF files are accepted)
                 </p>
               </div>
             ) : (
-              <div className="space-y-2" onClick={(e) => e.stopPropagation()}>
+              <div
+                className="space-y-2 animate-fade-in"
+                onClick={(e) => e.stopPropagation()}
+              >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   className="h-10 w-10 mx-auto text-indigo-500"
@@ -354,34 +368,35 @@ const UploadForm = ({ semester, onUploadSuccess }: UploadFormProps) => {
                 <p className="font-medium text-indigo-700">
                   {files.length} file(s) selected
                 </p>
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    fileInputRef.current?.click();
-                  }}
-                  className="text-xs text-indigo-600 hover:text-indigo-700 underline"
-                >
-                  Add more files
-                </button>
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    clearFiles();
-                  }}
-                  className="ml-2 text-xs text-red-500 hover:text-red-600 underline"
-                >
-                  Clear all
-                </button>
+                <div className="flex justify-center space-x-2">
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      fileInputRef.current?.click();
+                    }}
+                    className="text-xs text-indigo-600 hover:text-indigo-700 transition-colors duration-200 bg-white px-2 py-1 rounded-md shadow-sm hover:shadow border border-indigo-200"
+                  >
+                    Add more files
+                  </button>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      clearFiles();
+                    }}
+                    className="text-xs text-red-500 hover:text-red-600 transition-colors duration-200 bg-white px-2 py-1 rounded-md shadow-sm hover:shadow border border-red-200"
+                  >
+                    Clear all
+                  </button>
+                </div>
               </div>
             )}
           </div>
         )}
-
         {/* Overall Progress Bar (only visible during upload/processing) */}
         {(uploadStatus === "uploading" || uploadStatus === "processing") && (
-          <div className="mb-6">
+          <div className="mb-6 bg-white p-6 rounded-lg shadow-sm border border-gray-100 animate-fade-in">
             <div className="flex justify-between mb-1">
               <span className="text-sm font-medium text-gray-700">
                 Overall Progress
@@ -390,9 +405,9 @@ const UploadForm = ({ semester, onUploadSuccess }: UploadFormProps) => {
                 {overallProgress}%
               </span>
             </div>
-            <div className="w-full bg-gray-200 rounded-full h-2.5">
+            <div className="w-full bg-gray-200 rounded-full h-2.5 overflow-hidden">
               <div
-                className={`h-2.5 rounded-full ${
+                className={`h-2.5 rounded-full progress-bar ${
                   uploadStatus === "uploading" ? "bg-blue-500" : "bg-indigo-600"
                 }`}
                 style={{ width: `${overallProgress}%` }}
@@ -405,14 +420,17 @@ const UploadForm = ({ semester, onUploadSuccess }: UploadFormProps) => {
             </p>
           </div>
         )}
-
         {/* File List with Progress */}
         {files.length > 0 && (
           <div className="mb-6">
             <h3 className="text-sm font-medium text-gray-900 mb-2">Files:</h3>
-            <ul className="bg-white rounded-lg border border-gray-200 divide-y divide-gray-200">
+            <ul className="bg-white rounded-lg border border-gray-200 divide-y divide-gray-200 shadow-sm">
               {fileProgresses.map((fileProgress, index) => (
-                <li key={index} className="px-4 py-3">
+                <li
+                  key={index}
+                  className="px-4 py-3 animate-fade-in"
+                  style={{ animationDelay: `${index * 0.05}s` }}
+                >
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center max-w-[70%]">
                       <svg
@@ -436,12 +454,11 @@ const UploadForm = ({ semester, onUploadSuccess }: UploadFormProps) => {
                         </p>
                       </div>
                     </div>
-
                     {fileProgress.status === "idle" ? (
                       <button
                         type="button"
                         onClick={() => removeFile(index)}
-                        className="text-red-500 hover:text-red-700 transition-colors p-1"
+                        className="text-red-500 hover:text-red-700 transition-colors p-1 hover:bg-red-50 rounded-full"
                         title="Remove file"
                       >
                         <svg
@@ -459,7 +476,7 @@ const UploadForm = ({ semester, onUploadSuccess }: UploadFormProps) => {
                       </button>
                     ) : (
                       <span
-                        className={`text-xs font-medium px-2 py-1 rounded-full ${
+                        className={`text-xs font-medium px-2 py-1 rounded-full transition-colors duration-200 ${
                           fileProgress.status === "success"
                             ? "bg-green-100 text-green-800"
                             : fileProgress.status === "error"
@@ -473,14 +490,18 @@ const UploadForm = ({ semester, onUploadSuccess }: UploadFormProps) => {
                       </span>
                     )}
                   </div>
-
                   {/* File-specific progress bar */}
                   {fileProgress.status !== "idle" && (
-                    <div className="w-full bg-gray-200 rounded-full h-1.5">
+                    <div className="w-full bg-gray-200 rounded-full h-1.5 overflow-hidden">
                       <div
-                        className={`h-1.5 rounded-full ${getStatusColor(
+                        className={`h-1.5 rounded-full transition-all duration-300 ${getStatusColor(
                           fileProgress.status
-                        )}`}
+                        )} ${
+                          fileProgress.status === "uploading" ||
+                          fileProgress.status === "processing"
+                            ? "progress-bar"
+                            : ""
+                        }`}
                         style={{ width: `${fileProgress.progress}%` }}
                       ></div>
                     </div>
@@ -490,12 +511,11 @@ const UploadForm = ({ semester, onUploadSuccess }: UploadFormProps) => {
             </ul>
           </div>
         )}
-
         <div className="flex justify-end">
           <button
             type="submit"
             disabled={uploadStatus !== "idle" || files.length === 0}
-            className={`btn-primary px-6 py-2.5 ${
+            className={`btn-primary px-6 py-2.5 transition-all duration-300 shadow-sm hover:shadow hover:-translate-y-0.5 ${
               files.length === 0 || uploadStatus !== "idle"
                 ? "bg-gray-300 cursor-not-allowed text-gray-600"
                 : ""
@@ -550,21 +570,33 @@ const UploadForm = ({ semester, onUploadSuccess }: UploadFormProps) => {
                 Processing...
               </span>
             ) : (
-              `Upload and Process ${
-                files.length > 0
+              <span className="flex items-center">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-4 w-4 mr-2"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+                Upload and Process{" "}
+                {files.length > 0
                   ? `(${files.length} file${files.length > 1 ? "s" : ""})`
-                  : ""
-              }`
+                  : ""}
+              </span>
             )}
           </button>
         </div>
-
         {message.text && (
           <div
             className={`mt-4 p-3 rounded-lg text-sm ${
               message.type === "error"
-                ? "bg-red-50 text-red-700 border border-red-100"
-                : "bg-emerald-50 text-emerald-700 border border-emerald-100"
+                ? "bg-red-50 text-red-700 border border-red-100 animate-fade-in"
+                : "bg-emerald-50 text-emerald-700 border border-emerald-100 animate-fade-in"
             }`}
           >
             {message.type === "error" ? (
