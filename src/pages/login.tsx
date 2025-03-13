@@ -84,7 +84,7 @@ const Auth = () => {
       <div className="flex-grow flex items-center justify-center p-4">
         <div className="w-full max-w-xl">
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-gray-900">
+            <h1 className="text-3xl font-bold text-gray-900 font-heading tracking-tight">
               {isLogin ? "Welcome Back" : "Join Kivo"}
             </h1>
             <p className="text-gray-600 mt-2">

@@ -1,5 +1,4 @@
 import type { Config } from "tailwindcss";
-
 export default {
   content: [
     "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
@@ -55,7 +54,8 @@ export default {
         sm: "0 1px 2px 0 rgba(0, 0, 0, 0.05)",
       },
       fontFamily: {
-        sans: ["Inter", "system-ui", "sans-serif"],
+        sans: ["Outfit", "Inter", "system-ui", "sans-serif"],
+        heading: ["Lexend", "Inter", "system-ui", "sans-serif"],
       },
     },
   },
