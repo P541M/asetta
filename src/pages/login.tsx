@@ -3,13 +3,13 @@ import { useState } from "react";
 import { useRouter } from "next/router";
 import { auth } from "../lib/firebase";
 import {
-  createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signInWithPopup,
   GoogleAuthProvider,
 } from "firebase/auth";
 import Header from "../components/Header";
 import Link from "next/link";
+import EnhancedRegisterForm from "../components/EnhancedRegisterForm";
 
 const Auth = () => {
   const [email, setEmail] = useState("");
@@ -17,33 +17,46 @@ const Auth = () => {
   const [error, setError] = useState<string | null>(null);
   const [isLogin, setIsLogin] = useState(true); // Toggle between login and register
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [authMethod, setAuthMethod] = useState<"email" | "google">("google"); // Default to Google for prominent display
   const router = useRouter();
 
-  // Handle form submission based on mode (login or register)
+  // Handle form submission for login only
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     setIsSubmitting(true);
     try {
-      if (isLogin) {
-        // Sign in existing user
-        await signInWithEmailAndPassword(auth, email, password);
-      } else {
-        // Register new user
-        await createUserWithEmailAndPassword(auth, email, password);
-      }
+      // Sign in existing user
+      await signInWithEmailAndPassword(auth, email, password);
       router.push("/dashboard");
     } catch (error: unknown) {
       if (error instanceof Error) {
-        setError(
-          `${isLogin ? "Login" : "Registration"} failed. ${error.message}`
-        );
+        // Present more user-friendly error messages
+        let errorMessage = "Login failed. ";
+
+        if (
+          error.message.includes("auth/wrong-password") ||
+          error.message.includes("auth/user-not-found")
+        ) {
+          errorMessage += "Invalid email or password.";
+        } else if (error.message.includes("auth/invalid-email")) {
+          errorMessage += "Please enter a valid email address.";
+        } else {
+          errorMessage += error.message;
+        }
+
+        setError(errorMessage);
       } else {
-        setError(`${isLogin ? "Login" : "Registration"} failed.`);
+        setError("Login failed.");
       }
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  // Handle registration success
+  const handleRegistrationSuccess = () => {
+    router.push("/dashboard");
   };
 
   // Register / Sign in using Google
@@ -68,9 +81,8 @@ const Auth = () => {
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
       <Header />
-
       <div className="flex-grow flex items-center justify-center p-4">
-        <div className="w-full max-w-md">
+        <div className="w-full max-w-xl">
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold text-gray-900">
               {isLogin ? "Welcome Back" : "Join Acadify"}
@@ -82,7 +94,31 @@ const Auth = () => {
             </p>
           </div>
 
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8 md:p-10">
+            {/* Auth Method Selector */}
+            <div className="flex mb-6 border border-gray-200 rounded-lg overflow-hidden">
+              <button
+                onClick={() => setAuthMethod("google")}
+                className={`flex-1 py-3 px-4 font-medium text-sm ${
+                  authMethod === "google"
+                    ? "bg-indigo-50 text-indigo-600 border-b-2 border-indigo-500"
+                    : "text-gray-600 hover:bg-gray-50"
+                }`}
+              >
+                {isLogin ? "Sign in with Google" : "Sign up with Google"}
+              </button>
+              <button
+                onClick={() => setAuthMethod("email")}
+                className={`flex-1 py-3 px-4 font-medium text-sm ${
+                  authMethod === "email"
+                    ? "bg-indigo-50 text-indigo-600 border-b-2 border-indigo-500"
+                    : "text-gray-600 hover:bg-gray-50"
+                }`}
+              >
+                {isLogin ? "Sign in with Email" : "Sign up with Email"}
+              </button>
+            </div>
+
             {error && (
               <div className="mb-6 p-3 bg-red-50 border border-red-100 rounded-lg text-red-700 text-sm">
                 <div className="flex">
@@ -103,154 +139,214 @@ const Auth = () => {
               </div>
             )}
 
-            <form onSubmit={handleSubmit} className="space-y-5">
-              <div className="form-group">
-                <label htmlFor="email" className="form-label">
-                  Email Address
-                </label>
-                <input
-                  id="email"
-                  type="email"
-                  placeholder="you@example.com"
-                  className="input"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
+            {authMethod === "google" ? (
+              <div className="text-center">
+                <button
+                  onClick={handleGoogleSignIn}
                   disabled={isSubmitting}
-                />
-              </div>
-
-              <div className="form-group">
-                <div className="flex justify-between">
-                  <label htmlFor="password" className="form-label">
-                    Password
-                  </label>
-                  {isLogin && (
-                    <Link
-                      href="#"
-                      className="text-sm text-indigo-600 hover:text-indigo-800"
-                    >
-                      Forgot password?
-                    </Link>
-                  )}
-                </div>
-                <input
-                  id="password"
-                  type="password"
-                  placeholder={
-                    isLogin ? "Your password" : "Create a secure password"
-                  }
-                  className="input"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  disabled={isSubmitting}
-                  minLength={6}
-                />
-              </div>
-
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className={`btn-primary w-full py-2.5 ${
-                  isSubmitting ? "opacity-70 cursor-not-allowed" : ""
-                }`}
-              >
-                {isSubmitting ? (
-                  <span className="flex items-center justify-center">
-                    <svg
-                      className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                    >
-                      <circle
-                        className="opacity-25"
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        strokeWidth="4"
-                      ></circle>
-                      <path
-                        className="opacity-75"
-                        fill="currentColor"
-                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                      ></path>
-                    </svg>
-                    {isLogin ? "Signing in..." : "Creating account..."}
-                  </span>
-                ) : (
-                  <span>{isLogin ? "Sign In" : "Create Account"}</span>
-                )}
-              </button>
-            </form>
-
-            <div className="mt-6 text-center">
-              <button
-                onClick={() => setIsLogin(!isLogin)}
-                className="text-indigo-600 hover:text-indigo-800 text-sm font-medium"
-              >
-                {isLogin
-                  ? "Need an account? Sign up"
-                  : "Already have an account? Sign in"}
-              </button>
-            </div>
-
-            <div className="mt-8">
-              <div className="relative mb-4">
-                <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-gray-200"></div>
-                </div>
-                <div className="relative flex justify-center">
-                  <span className="px-3 bg-white text-sm text-gray-500">
-                    Or continue with
-                  </span>
-                </div>
-              </div>
-
-              <button
-                onClick={handleGoogleSignIn}
-                disabled={isSubmitting}
-                className="btn-outline w-full flex items-center justify-center gap-2 py-2.5"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="18"
-                  height="18"
-                  viewBox="0 0 48 48"
-                  className="mr-2"
+                  className="btn-primary w-full flex items-center justify-center gap-2 py-3"
                 >
-                  <path
-                    fill="#EA4335"
-                    d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"
-                  />
-                  <path
-                    fill="#4285F4"
-                    d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"
-                  />
-                  <path
-                    fill="#FBBC05"
-                    d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"
-                  />
-                  <path
-                    fill="#34A853"
-                    d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"
-                  />
-                </svg>
-                Sign in with Google
-              </button>
-            </div>
-          </div>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="18"
+                    height="18"
+                    viewBox="0 0 48 48"
+                    className="mr-2"
+                  >
+                    <path
+                      fill="#fff"
+                      d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"
+                    />
+                    <path
+                      fill="#fff"
+                      d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"
+                    />
+                    <path
+                      fill="#fff"
+                      d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"
+                    />
+                    <path
+                      fill="#fff"
+                      d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"
+                    />
+                  </svg>
+                  {isSubmitting
+                    ? isLogin
+                      ? "Signing in..."
+                      : "Signing up..."
+                    : isLogin
+                    ? "Continue with Google"
+                    : "Sign up with Google"}
+                </button>
 
+                <div className="mt-6 text-center">
+                  <p className="text-sm text-gray-600 mb-2">
+                    {isLogin
+                      ? "Don't have a Google account?"
+                      : "Prefer a different method?"}
+                  </p>
+                  <button
+                    onClick={() => setAuthMethod("email")}
+                    className="text-indigo-600 hover:text-indigo-800 text-sm font-medium"
+                  >
+                    {isLogin
+                      ? "Use email and password instead"
+                      : "Sign up with email and password"}
+                  </button>
+                </div>
+              </div>
+            ) : (
+              // Email authentication section
+              <>
+                {isLogin ? (
+                  // Login Form
+                  <form onSubmit={handleSubmit} className="space-y-5">
+                    <div className="form-group">
+                      <label htmlFor="email" className="form-label">
+                        Email Address
+                      </label>
+                      <input
+                        id="email"
+                        type="email"
+                        placeholder="you@example.com"
+                        className="input"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        required
+                        disabled={isSubmitting}
+                      />
+                    </div>
+                    <div className="form-group">
+                      <div className="flex justify-between">
+                        <label htmlFor="password" className="form-label">
+                          Password
+                        </label>
+                        <Link
+                          href="/reset-password"
+                          className="text-sm text-indigo-600 hover:text-indigo-800"
+                        >
+                          Forgot password?
+                        </Link>
+                      </div>
+                      <input
+                        id="password"
+                        type="password"
+                        placeholder="Your password"
+                        className="input"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
+                        disabled={isSubmitting}
+                        minLength={6}
+                      />
+                    </div>
+                    <button
+                      type="submit"
+                      disabled={isSubmitting}
+                      className={`btn-primary w-full py-2.5 ${
+                        isSubmitting ? "opacity-70 cursor-not-allowed" : ""
+                      }`}
+                    >
+                      {isSubmitting ? (
+                        <span className="flex items-center justify-center">
+                          <svg
+                            className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                          >
+                            <circle
+                              className="opacity-25"
+                              cx="12"
+                              cy="12"
+                              r="10"
+                              stroke="currentColor"
+                              strokeWidth="4"
+                            ></circle>
+                            <path
+                              className="opacity-75"
+                              fill="currentColor"
+                              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                            ></path>
+                          </svg>
+                          Signing in...
+                        </span>
+                      ) : (
+                        <span>Sign In</span>
+                      )}
+                    </button>
+
+                    <div className="mt-4 text-center">
+                      <button
+                        onClick={() => setIsLogin(false)}
+                        className="text-indigo-600 hover:text-indigo-800 text-sm font-medium"
+                      >
+                        Need an account? Sign up
+                      </button>
+                    </div>
+                  </form>
+                ) : (
+                  // Registration Form - uses the enhanced form component
+                  <EnhancedRegisterForm
+                    onSuccess={handleRegistrationSuccess}
+                    onCancel={() => setIsLogin(true)}
+                    isSubmitting={isSubmitting}
+                    setIsSubmitting={setIsSubmitting}
+                    setError={setError}
+                  />
+                )}
+
+                <div className="mt-6 text-center">
+                  <p className="text-sm text-gray-600 mb-2">Or use:</p>
+                  <button
+                    type="button"
+                    onClick={() => setAuthMethod("google")}
+                    className="btn-outline flex items-center justify-center w-full gap-2 py-2.5"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="18"
+                      height="18"
+                      viewBox="0 0 48 48"
+                      className="mr-2"
+                    >
+                      <path
+                        fill="#EA4335"
+                        d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"
+                      />
+                      <path
+                        fill="#4285F4"
+                        d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"
+                      />
+                      <path
+                        fill="#FBBC05"
+                        d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"
+                      />
+                      <path
+                        fill="#34A853"
+                        d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"
+                      />
+                    </svg>
+                    {isLogin ? "Sign in with Google" : "Sign up with Google"}
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
           <div className="mt-8 text-center text-sm text-gray-500">
             <p>
               By signing in, you agree to our{" "}
-              <Link href="#" className="text-indigo-600 hover:text-indigo-800">
+              <Link
+                href="/terms"
+                className="text-indigo-600 hover:text-indigo-800"
+              >
                 Terms of Service
               </Link>{" "}
               and{" "}
-              <Link href="#" className="text-indigo-600 hover:text-indigo-800">
+              <Link
+                href="/privacy"
+                className="text-indigo-600 hover:text-indigo-800"
+              >
                 Privacy Policy
               </Link>
               .
