@@ -21,7 +21,10 @@ interface Assessment {
   status: string;
 }
 
-const handler = async (req: NextApiRequest, res: NextApiResponse) => {
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse
+) {
   if (req.method !== "POST") {
     return res
       .status(405)
@@ -33,7 +36,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     req: NextApiRequest
   ): Promise<{ fields: Fields; files: Files }> => {
     return new Promise((resolve, reject) => {
-      const form = new IncomingForm();
+      const form = new IncomingForm({ multiples: true });
       form.parse(req, (err, fields, files) => {
         if (err) reject(err);
         resolve({ fields, files });
@@ -67,6 +70,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
     const token = authHeader.split(" ")[1];
     const admin = await getAdmin(); // Get the Firebase Admin instance
+
     let userId;
     try {
       // Verify the Firebase token
@@ -90,213 +94,227 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     const semestersRef = adminDb.collection(`users/${userId}/semesters`);
     const semesterQuery = semestersRef.where("name", "==", semester).limit(1);
     const semesterSnapshot = await semesterQuery.get();
+
     if (semesterSnapshot.empty) {
       return res
         .status(400)
         .json({ success: false, error: "Semester not found" });
     }
+
     const semesterDoc = semesterSnapshot.docs[0];
     const semesterId = semesterDoc.id;
 
-    // Ensure file is a single file
-    const fileField = files.file;
-    let fileData: formidable.File;
-    if (Array.isArray(fileField)) {
-      fileData = fileField[0];
-    } else if (fileField) {
-      fileData = fileField;
-    } else {
+    // Process all files
+    // Get file count from fields
+    const fileCount = parseInt(
+      Array.isArray(fields.fileCount)
+        ? fields.fileCount[0]
+        : fields.fileCount || "0"
+    );
+
+    // Get all uploaded files (they might be named with different keys)
+    const uploadedFiles: formidable.File[] = [];
+
+    // If files are in multiple format (multiple files with the same field name)
+    Object.keys(files).forEach((key) => {
+      const file = files[key];
+      if (Array.isArray(file)) {
+        uploadedFiles.push(...file);
+      } else if (file) {
+        uploadedFiles.push(file);
+      }
+    });
+
+    if (uploadedFiles.length === 0) {
       return res
         .status(400)
-        .json({ success: false, error: "File is required" });
+        .json({ success: false, error: "No valid files were uploaded" });
     }
 
-    const filePath = fileData.filepath;
-    const fileName = fileData.originalFilename || "unknown.pdf";
+    // Initialize counters for summary
+    let totalAssessments = 0;
+    let processedFiles = 0;
+    let failedFiles = 0;
 
-    // Read file into a buffer
-    const pdfBuffer = fs.readFileSync(filePath);
-
-    // --- Extract Text from PDF ---
-    let extractedText: string;
-    try {
-      const data = await pdfParse(pdfBuffer);
-      extractedText = data.text;
-      console.log("Extracted text from PDF:", extractedText.slice(0, 100));
-    } catch (error) {
-      console.error(
-        "Error parsing PDF:",
-        error instanceof Error ? error.message : String(error)
-      );
-      return res
-        .status(500)
-        .json({ success: false, error: "Error reading PDF content" });
-    }
-
-    // Call DeepSeek API to extract assessments
-    try {
-      const deepseekEndpoint = process.env.DEEPSEEK_ENDPOINT;
-      const deepseekApiKey = process.env.DEEPSEEK_API_KEY;
-
-      if (!deepseekEndpoint || !deepseekApiKey) {
-        throw new Error("DeepSeek API credentials not configured");
-      }
-
-      const prompt = `
-        You are an AI assistant that extracts assessment information from course outlines.
-        
-        Extract all assessments from the following course outline text. Return a JSON array with objects having the following structure:
-        {
-          "courseName": "The course code or name",
-          "assignmentName": "Name of the assessment",
-          "dueDate": "YYYY-MM-DD format date",
-          "weight": "Percentage weight as a number",
-          "status": "Not started"
-        }
-        
-        Only include assessments that have clear due dates or deadline information. Extract as many assessments as you can find.
-        
-        Course outline text:
-        ${extractedText}
-        
-        Respond with ONLY a valid JSON array of assessment objects. No other explanation or text.
-      `;
-
-      const response = await fetch(deepseekEndpoint, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${deepseekApiKey}`,
-        },
-        body: JSON.stringify({
-          model: "deepseek-chat",
-          messages: [
-            {
-              role: "user",
-              content: prompt,
-            },
-          ],
-          temperature: 0.2,
-          max_tokens: 4000,
-        }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.text();
-        console.error("DeepSeek API error:", errorData);
-        throw new Error(`DeepSeek API returned status ${response.status}`);
-      }
-
-      const aiResponse = await response.json();
-
-      // Extract the content from the AI response
-      const aiContent = aiResponse.choices[0].message.content;
-
-      // Try to parse the JSON from the AI's response
-      let assessments: Assessment[] = [];
+    // Process each file
+    for (const fileData of uploadedFiles) {
       try {
-        // Find JSON in the response if it's not a perfect JSON string
-        const jsonMatch = aiContent.match(/\[[\s\S]*\]/);
-        const jsonString = jsonMatch ? jsonMatch[0] : aiContent;
+        const filePath = fileData.filepath;
+        const fileName = fileData.originalFilename || "unknown.pdf";
 
-        assessments = JSON.parse(jsonString);
+        // Read file into a buffer
+        const pdfBuffer = fs.readFileSync(filePath);
 
-        // Validate and clean the data
-        assessments = assessments.map((assessment) => ({
-          courseName:
-            assessment.courseName ||
-            extractCourseName(extractedText) ||
-            "Unknown Course",
-          assignmentName: assessment.assignmentName || "Unknown Assessment",
-          dueDate:
-            formatDate(assessment.dueDate) ||
-            new Date().toISOString().split("T")[0],
-          weight:
-            typeof assessment.weight === "number"
-              ? assessment.weight
-              : parseFloat(assessment.weight) || 0,
-          status: "Not started",
-        }));
-      } catch (parseError) {
-        console.error("Error parsing AI response:", parseError);
-        console.log("AI raw response:", aiContent);
+        // Extract Text from PDF
+        let extractedText: string;
+        try {
+          const data = await pdfParse(pdfBuffer);
+          extractedText = data.text;
+          console.log(
+            `Extracted text from PDF ${fileName}:`,
+            extractedText.slice(0, 100)
+          );
+        } catch (error) {
+          console.error(
+            `Error parsing PDF ${fileName}:`,
+            error instanceof Error ? error.message : String(error)
+          );
+          failedFiles++;
+          continue; // Skip to next file
+        }
 
-        // Fallback to basic extraction if AI parsing fails
-        assessments = extractAssessmentsBasic(extractedText);
-      }
+        // Process the extracted text to get assessments
+        let assessments: Assessment[] = [];
 
-      // If no assessments were found even after AI processing, add a placeholder
-      if (assessments.length === 0) {
-        assessments.push({
-          courseName: extractCourseName(extractedText) || "Unknown Course",
-          assignmentName: "Manual Review Required",
-          dueDate: new Date().toISOString().split("T")[0],
-          weight: 0,
-          status: "Not started",
+        try {
+          // Try to use DeepSeek API if configured
+          const deepseekEndpoint = process.env.DEEPSEEK_ENDPOINT;
+          const deepseekApiKey = process.env.DEEPSEEK_API_KEY;
+
+          if (deepseekEndpoint && deepseekApiKey) {
+            const prompt = `
+              You are an AI assistant that extracts assessment information from course outlines.
+              
+              Extract all assessments from the following course outline text. Return a JSON array with objects having the following structure:
+              {
+                "courseName": "The course code or name",
+                "assignmentName": "Name of the assessment",
+                "dueDate": "YYYY-MM-DD format date",
+                "weight": "Percentage weight as a number",
+                "status": "Not started"
+              }
+              
+              Only include assessments that have clear due dates or deadline information. Extract as many assessments as you can find.
+              
+              Course outline text:
+              ${extractedText}
+              
+              Respond with ONLY a valid JSON array of assessment objects. No other explanation or text.
+            `;
+
+            const response = await fetch(deepseekEndpoint, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${deepseekApiKey}`,
+              },
+              body: JSON.stringify({
+                model: "deepseek-chat",
+                messages: [
+                  {
+                    role: "user",
+                    content: prompt,
+                  },
+                ],
+                temperature: 0.2,
+                max_tokens: 4000,
+              }),
+            });
+
+            if (!response.ok) {
+              const errorData = await response.text();
+              console.error(`DeepSeek API error for ${fileName}:`, errorData);
+              throw new Error(
+                `DeepSeek API returned status ${response.status}`
+              );
+            }
+
+            const aiResponse = await response.json();
+            const aiContent = aiResponse.choices[0].message.content;
+
+            // Try to parse the JSON from the AI's response
+            try {
+              // Find JSON in the response if it's not a perfect JSON string
+              const jsonMatch = aiContent.match(/\[[\s\S]*\]/);
+              const jsonString = jsonMatch ? jsonMatch[0] : aiContent;
+              assessments = JSON.parse(jsonString);
+
+              // Validate and clean the data
+              assessments = assessments.map((assessment) => ({
+                courseName:
+                  assessment.courseName ||
+                  extractCourseName(extractedText) ||
+                  "Unknown Course",
+                assignmentName:
+                  assessment.assignmentName || "Unknown Assessment",
+                dueDate:
+                  formatDate(assessment.dueDate) ||
+                  new Date().toISOString().split("T")[0],
+                weight:
+                  typeof assessment.weight === "number"
+                    ? assessment.weight
+                    : parseFloat(assessment.weight) || 0,
+                status: "Not started",
+              }));
+            } catch (parseError) {
+              console.error(
+                `Error parsing AI response for ${fileName}:`,
+                parseError
+              );
+              // Fallback to basic extraction
+              throw parseError;
+            }
+          } else {
+            // No DeepSeek API configured, use basic extraction
+            throw new Error("DeepSeek API not configured");
+          }
+        } catch (aiError) {
+          // Fallback to basic extraction
+          assessments = extractAssessmentsBasic(extractedText);
+        }
+
+        // If no assessments were found, add a placeholder
+        if (assessments.length === 0) {
+          assessments.push({
+            courseName: extractCourseName(extractedText) || "Unknown Course",
+            assignmentName: "Manual Review Required",
+            dueDate: new Date().toISOString().split("T")[0],
+            weight: 0,
+            status: "Not started",
+          });
+        }
+
+        // Save the PDF metadata using admin Firestore
+        await adminDb.collection(`users/${userId}/documents`).add({
+          fileName,
+          uploadDate: new Date(),
+          semester,
+          text: extractedText.slice(0, 5000),
         });
+
+        // Add the assessments using admin Firestore
+        const assessmentsRef = adminDb.collection(
+          `users/${userId}/semesters/${semesterId}/assessments`
+        );
+
+        const batch = adminDb.batch();
+        for (const assessment of assessments) {
+          const newAssessmentRef = assessmentsRef.doc();
+          batch.set(newAssessmentRef, {
+            ...assessment,
+            createdAt: new Date(),
+            sourceFile: fileName,
+          });
+        }
+
+        await batch.commit();
+
+        // Update counters
+        totalAssessments += assessments.length;
+        processedFiles++;
+      } catch (fileError) {
+        console.error("Error processing file:", fileError);
+        failedFiles++;
       }
-
-      // Save the PDF metadata using admin Firestore
-      await adminDb.collection(`users/${userId}/documents`).add({
-        fileName,
-        uploadDate: new Date(),
-        semester,
-        text: extractedText.slice(0, 5000),
-      });
-
-      // Add the assessments using admin Firestore
-      const assessmentsRef = adminDb.collection(
-        `users/${userId}/semesters/${semesterId}/assessments`
-      );
-
-      const batch = adminDb.batch();
-      for (const assessment of assessments) {
-        const newAssessmentRef = assessmentsRef.doc();
-        batch.set(newAssessmentRef, {
-          ...assessment,
-          createdAt: new Date(),
-        });
-      }
-      await batch.commit();
-
-      return res.status(200).json({
-        success: true,
-        message: `Extracted ${assessments.length} assessments from the PDF`,
-      });
-    } catch (aiError) {
-      console.error("AI processing error:", aiError);
-
-      // Fallback to basic extraction if AI fails
-      const assessments = extractAssessmentsBasic(extractedText);
-
-      // Save the PDF metadata using admin Firestore
-      await adminDb.collection(`users/${userId}/documents`).add({
-        fileName,
-        uploadDate: new Date(),
-        semester,
-        text: extractedText.slice(0, 5000),
-      });
-
-      // Add the assessments using admin Firestore
-      const assessmentsRef = adminDb.collection(
-        `users/${userId}/semesters/${semesterId}/assessments`
-      );
-
-      const batch = adminDb.batch();
-      for (const assessment of assessments) {
-        const newAssessmentRef = assessmentsRef.doc();
-        batch.set(newAssessmentRef, {
-          ...assessment,
-          createdAt: new Date(),
-        });
-      }
-      await batch.commit();
-
-      return res.status(200).json({
-        success: true,
-        message: `Extracted ${assessments.length} assessments from the PDF (fallback method)`,
-      });
     }
+
+    // Return summary of all processed files
+    return res.status(200).json({
+      success: true,
+      message: `Processed ${processedFiles} file(s), extracted ${totalAssessments} assessments. ${
+        failedFiles > 0 ? `Failed to process ${failedFiles} file(s).` : ""
+      }`,
+    });
   } catch (error) {
     // Safely log the error with more details
     try {
@@ -311,12 +329,13 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     } catch (logError) {
       console.error("Error while logging error:", String(logError));
     }
+
     return res.status(500).json({
       success: false,
       error: error instanceof Error ? error.message : "Unknown error",
     });
   }
-};
+}
 
 // Basic extraction function as fallback
 function extractAssessmentsBasic(extractedText: string): Assessment[] {
@@ -384,75 +403,6 @@ function extractCourseName(text: string): string | null {
   }
 
   return null;
-}
-
-function formatDate(dateStr: string): string {
-  try {
-    // Check if it's already in YYYY-MM-DD format
-    if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
-      return dateStr;
-    }
-
-    // Check for month name format (e.g., "January 15, 2023")
-    const monthNamePattern = /(\w+)\s+(\d{1,2}),?\s*(\d{4})/i;
-    const monthNameMatch = dateStr.match(monthNamePattern);
-    if (monthNameMatch) {
-      const monthNames = [
-        "january",
-        "february",
-        "march",
-        "april",
-        "may",
-        "june",
-        "july",
-        "august",
-        "september",
-        "october",
-        "november",
-        "december",
-      ];
-      const month =
-        monthNames.findIndex((m) => m === monthNameMatch[1].toLowerCase()) + 1;
-      if (month > 0) {
-        const day = parseInt(monthNameMatch[2]);
-        const year = parseInt(monthNameMatch[3]);
-        return `${year}-${month.toString().padStart(2, "0")}-${day
-          .toString()
-          .padStart(2, "0")}`;
-      }
-    }
-
-    // Handle formats like MM/DD/YYYY or DD/MM/YYYY
-    const parts = dateStr.split(/[\/-]/);
-    if (parts.length === 3) {
-      let month, day, year;
-      if (parts[0].length === 4) {
-        // YYYY-MM-DD
-        year = parts[0];
-        month = parts[1];
-        day = parts[2];
-      } else if (parts[2].length === 4) {
-        // Assume MM/DD/YYYY for US format (most common)
-        month = parts[0];
-        day = parts[1];
-        year = parts[2];
-      } else {
-        // MM/DD/YY
-        month = parts[0];
-        day = parts[1];
-        year = parts[2].length === 2 ? `20${parts[2]}` : parts[2];
-      }
-
-      month = month.padStart(2, "0");
-      day = day.padStart(2, "0");
-      return `${year}-${month}-${day}`;
-    }
-
-    return dateStr;
-  } catch (e) {
-    console.error("Date formatting error:", e);
-    return dateStr;
-  }
 }
 
 function extractDate(text: string): string | null {
@@ -530,4 +480,70 @@ function extractWeight(text: string, context?: string): number | null {
   return null;
 }
 
-export default handler;
+function formatDate(dateStr: string): string {
+  try {
+    // Check if it's already in YYYY-MM-DD format
+    if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+      return dateStr;
+    }
+
+    // Check for month name format (e.g., "January 15, 2023")
+    const monthNamePattern = /(\w+)\s+(\d{1,2}),?\s*(\d{4})/i;
+    const monthNameMatch = dateStr.match(monthNamePattern);
+    if (monthNameMatch) {
+      const monthNames = [
+        "january",
+        "february",
+        "march",
+        "april",
+        "may",
+        "june",
+        "july",
+        "august",
+        "september",
+        "october",
+        "november",
+        "december",
+      ];
+      const month =
+        monthNames.findIndex((m) => m === monthNameMatch[1].toLowerCase()) + 1;
+      if (month > 0) {
+        const day = parseInt(monthNameMatch[2]);
+        const year = parseInt(monthNameMatch[3]);
+        return `${year}-${month.toString().padStart(2, "0")}-${day
+          .toString()
+          .padStart(2, "0")}`;
+      }
+    }
+
+    // Handle formats like MM/DD/YYYY or DD/MM/YYYY
+    const parts = dateStr.split(/[\/-]/);
+    if (parts.length === 3) {
+      let month, day, year;
+      if (parts[0].length === 4) {
+        // YYYY-MM-DD
+        year = parts[0];
+        month = parts[1];
+        day = parts[2];
+      } else if (parts[2].length === 4) {
+        // Assume MM/DD/YYYY for US format (most common)
+        month = parts[0];
+        day = parts[1];
+        year = parts[2];
+      } else {
+        // MM/DD/YY
+        month = parts[0];
+        day = parts[1];
+        year = parts[2].length === 2 ? `20${parts[2]}` : parts[2];
+      }
+      month = month.padStart(2, "0");
+      day = day.padStart(2, "0");
+      return `${year}-${month}-${day}`;
+    }
+
+    return dateStr;
+  } catch (e) {
+    console.error("Date formatting error:", e);
+    return dateStr;
+  }
+}
