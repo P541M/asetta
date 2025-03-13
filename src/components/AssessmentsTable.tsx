@@ -648,13 +648,13 @@ const AssessmentsTable = ({
                         />
                       )}
                     </td>
-                    <td>
+                    <td className="w-40">
                       <select
                         value={assessment.status}
                         onChange={(e) =>
                           handleStatusChange(assessment, e.target.value)
                         }
-                        className={`input py-1 px-2 text-sm transition-all duration-300 ${
+                        className={`input py-1 px-2 text-sm transition-all duration-300 w-full ${
                           assessment.status === "Completed"
                             ? "bg-emerald-100 border-emerald-200 text-emerald-800"
                             : assessment.status === "In progress"
@@ -682,13 +682,11 @@ const AssessmentsTable = ({
                           <option value="Not started">Not started</option>
                           <option value="Draft">Draft</option>
                         </optgroup>
-
                         <optgroup label="Active Work">
                           <option value="In progress">In progress</option>
                           <option value="On Hold">On Hold</option>
                           <option value="Needs Revision">Needs Revision</option>
                         </optgroup>
-
                         <optgroup label="Submission">
                           <option value="Pending Submission">
                             Pending Submission
@@ -696,11 +694,9 @@ const AssessmentsTable = ({
                           <option value="Submitted">Submitted</option>
                           <option value="Under Review">Under Review</option>
                         </optgroup>
-
                         <optgroup label="Completed">
                           <option value="Completed">Completed</option>
                         </optgroup>
-
                         <optgroup label="Other">
                           <option value="Missed/Late">Missed/Late</option>
                           <option value="Deferred">Deferred</option>
@@ -708,7 +704,14 @@ const AssessmentsTable = ({
                       </select>
                     </td>
                     <td className="font-medium">{assessment.courseName}</td>
-                    <td>{assessment.assignmentName}</td>
+                    <td>
+                      <div
+                        className="truncate max-w-xs"
+                        title={assessment.assignmentName}
+                      >
+                        {assessment.assignmentName}
+                      </div>
+                    </td>
                     <td
                       className={`${
                         dueDateStatus === "overdue"
