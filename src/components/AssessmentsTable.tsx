@@ -273,8 +273,14 @@ const AssessmentsTable = ({
     }
   };
 
-  // Calculate due date status
-  const getDueDateStatus = (dueDate: string) => {
+  // Calculate due date status, taking into account the assessment status
+  const getDueDateStatus = (dueDate: string, status: string) => {
+    // If the assessment is completed or submitted, don't show overdue/urgent indicators
+    const completedStatuses = ["Completed", "Submitted", "Under Review"];
+    if (completedStatuses.includes(status)) {
+      return "future"; // Use "future" to indicate no warning needed
+    }
+
     const now = new Date();
     // Parse the date using our consistent method to avoid timezone issues
     const [year, month, day] = dueDate
@@ -487,7 +493,10 @@ const AssessmentsTable = ({
             </thead>
             <tbody>
               {sortedAssessments.map((assessment, index) => {
-                const dueDateStatus = getDueDateStatus(assessment.dueDate);
+                const dueDateStatus = getDueDateStatus(
+                  assessment.dueDate,
+                  assessment.status
+                );
                 return editingId === assessment.id ? (
                   // Editing mode row
                   <tr
