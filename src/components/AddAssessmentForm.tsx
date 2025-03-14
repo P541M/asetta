@@ -1,4 +1,4 @@
-// components/AddAssessmentForm.tsx
+// src/components/AddAssessmentForm.tsx
 import { useState, useEffect, useRef } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { db } from "../lib/firebase";
@@ -17,13 +17,11 @@ const AddAssessmentForm = ({
 }: AddAssessmentFormProps) => {
   const { user } = useAuth();
 
-  // Helper function to get today's date as YYYY-MM-DD
   const getTodayDateString = (): string => {
     const today = new Date();
     const year = today.getFullYear();
     const month = String(today.getMonth() + 1).padStart(2, "0");
     const day = String(today.getDate()).padStart(2, "0");
-
     return `${year}-${month}-${day}`;
   };
 
@@ -39,19 +37,15 @@ const AddAssessmentForm = ({
   const [formSuccess, setFormSuccess] = useState(false);
   const courseNameRef = useRef<HTMLInputElement>(null);
 
-  // Focus on the course name input when the form loads
   useEffect(() => {
     if (courseNameRef.current) {
       courseNameRef.current.focus();
     }
   }, []);
 
-  // Clear form success state after animation completes
   useEffect(() => {
     if (formSuccess) {
-      const timer = setTimeout(() => {
-        setFormSuccess(false);
-      }, 1000); // Match this with the animation duration
+      const timer = setTimeout(() => setFormSuccess(false), 1000);
       return () => clearTimeout(timer);
     }
   }, [formSuccess]);
@@ -76,12 +70,9 @@ const AddAssessmentForm = ({
       return;
     }
 
-    // Validate the form
     if (!formData.courseName.trim()) {
       setMessage({ text: "Course name is required", type: "error" });
-      if (courseNameRef.current) {
-        courseNameRef.current.focus();
-      }
+      courseNameRef.current?.focus();
       return;
     }
 
@@ -94,7 +85,6 @@ const AddAssessmentForm = ({
     setMessage({ text: "", type: "" });
 
     try {
-      // Add the assessment to Firestore
       await addDoc(
         collection(
           db,
@@ -104,16 +94,9 @@ const AddAssessmentForm = ({
           semesterId,
           "assessments"
         ),
-        {
-          ...formData,
-          createdAt: new Date(),
-        }
+        { ...formData, createdAt: new Date() }
       );
-
-      // Apply success animation
       setFormSuccess(true);
-
-      // Reset the form
       setFormData({
         courseName: "",
         assignmentName: "",
@@ -121,19 +104,9 @@ const AddAssessmentForm = ({
         weight: 0,
         status: "Not started",
       });
-
-      setMessage({
-        text: "Assessment added successfully!",
-        type: "success",
-      });
-
-      // Call the onSuccess callback
+      setMessage({ text: "Assessment added successfully!", type: "success" });
       onSuccess();
-
-      // Focus back on the course name field for rapid entry
-      if (courseNameRef.current) {
-        courseNameRef.current.focus();
-      }
+      courseNameRef.current?.focus();
     } catch (error) {
       console.error("Error adding assessment:", error);
       setMessage({
@@ -232,23 +205,16 @@ const AddAssessmentForm = ({
                 <option value="Not started">Not started</option>
                 <option value="Draft">Draft</option>
               </optgroup>
-
               <optgroup label="Active Work">
                 <option value="In progress">In progress</option>
                 <option value="On Hold">On Hold</option>
                 <option value="Needs Revision">Needs Revision</option>
               </optgroup>
-
               <optgroup label="Submission">
                 <option value="Pending Submission">Pending Submission</option>
                 <option value="Submitted">Submitted</option>
                 <option value="Under Review">Under Review</option>
               </optgroup>
-
-              <optgroup label="Completed">
-                <option value="Completed">Completed</option>
-              </optgroup>
-
               <optgroup label="Other">
                 <option value="Missed/Late">Missed/Late</option>
                 <option value="Deferred">Deferred</option>

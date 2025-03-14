@@ -1,4 +1,4 @@
-// components/AssessmentsTable.tsx
+// src/components/AssessmentsTable.tsx
 import { useState, useEffect, useRef } from "react";
 import { db } from "../lib/firebase";
 import { doc, updateDoc, deleteDoc } from "firebase/firestore";
@@ -33,23 +33,14 @@ const AssessmentsTable = ({
   const [lastStatusChange, setLastStatusChange] = useState<string | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Format date consistently to avoid timezone issues
   const formatDateForDisplay = (dateStr: string): string => {
-    // Parse the date string and create a date object, preserving the actual date
-    // by using specific time components to avoid timezone issues
     const [year, month, day] = dateStr
       .split("-")
       .map((num) => parseInt(num, 10));
-
-    // Create a date object with the specific date components
-    // Set the time to noon to avoid any day shifts due to timezone conversions
     const date = new Date(year, month - 1, day, 12, 0, 0);
-
-    // Format the date for display using toLocaleDateString
     return date.toLocaleDateString();
   };
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -60,12 +51,9 @@ const AssessmentsTable = ({
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Edit mode state
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editFormData, setEditFormData] = useState<Assessment>({
     courseName: "",
@@ -75,11 +63,10 @@ const AssessmentsTable = ({
     status: "Not started",
   });
 
-  // Apply filters and sorting
   const filteredAssessments = assessments.filter((assessment) => {
     if (filter === "all") return true;
-    if (filter === "incomplete") return assessment.status !== "Completed";
-    if (filter === "completed") return assessment.status === "Completed";
+    if (filter === "not_submitted") return assessment.status !== "Submitted";
+    if (filter === "submitted") return assessment.status === "Submitted";
     return true;
   });
 
@@ -117,14 +104,9 @@ const AssessmentsTable = ({
         status: newStatus,
         updatedAt: new Date(),
       });
-      // Highlight the row that just had its status changed
       setLastStatusChange(assessment.id);
-      setTimeout(() => {
-        setLastStatusChange(null);
-      }, 1500);
-      if (onStatusChange) {
-        onStatusChange();
-      }
+      setTimeout(() => setLastStatusChange(null), 1500);
+      onStatusChange?.();
     } catch (error) {
       console.error("Error updating assessment status:", error);
     }
@@ -132,11 +114,12 @@ const AssessmentsTable = ({
 
   const handleDeleteAssessment = async (assessment: Assessment) => {
     if (!user || !assessment.id) return;
-    // Confirm deletion
-    const confirm = window.confirm(
-      `Are you sure you want to delete "${assessment.assignmentName}" for ${assessment.courseName}? This action cannot be undone.`
-    );
-    if (!confirm) return;
+    if (
+      !window.confirm(
+        `Are you sure you want to delete "${assessment.assignmentName}" for ${assessment.courseName}?`
+      )
+    )
+      return;
     try {
       const assessmentRef = doc(
         db,
@@ -148,23 +131,21 @@ const AssessmentsTable = ({
         assessment.id
       );
       await deleteDoc(assessmentRef);
-      if (onStatusChange) {
-        onStatusChange();
-      }
+      onStatusChange?.();
     } catch (error) {
       console.error("Error deleting assessment:", error);
     }
   };
 
-  // Bulk actions for selected rows
   const handleBulkAction = async (action: "complete" | "delete" | "reset") => {
     if (!user || selectedRows.length === 0) return;
-    if (action === "delete") {
-      const confirm = window.confirm(
-        `Are you sure you want to delete ${selectedRows.length} selected assessment(s)? This action cannot be undone.`
-      );
-      if (!confirm) return;
-    }
+    if (
+      action === "delete" &&
+      !window.confirm(
+        `Are you sure you want to delete ${selectedRows.length} selected assessment(s)?`
+      )
+    )
+      return;
     try {
       for (const id of selectedRows) {
         const assessmentRef = doc(
@@ -176,48 +157,42 @@ const AssessmentsTable = ({
           "assessments",
           id
         );
-        if (action === "delete") {
-          await deleteDoc(assessmentRef);
-        } else if (action === "complete") {
+        if (action === "delete") await deleteDoc(assessmentRef);
+        else if (action === "complete")
           await updateDoc(assessmentRef, {
-            status: "Completed",
+            status: "Submitted",
             updatedAt: new Date(),
           });
-        } else if (action === "reset") {
+        else if (action === "reset")
           await updateDoc(assessmentRef, {
             status: "Not started",
             updatedAt: new Date(),
           });
-        }
       }
       setSelectedRows([]);
-      if (onStatusChange) {
-        onStatusChange();
-      }
+      onStatusChange?.();
     } catch (error) {
       console.error(`Error performing bulk ${action}:`, error);
     }
   };
 
   const toggleSelectAll = () => {
-    if (selectedRows.length === sortedAssessments.length) {
-      setSelectedRows([]);
-    } else {
-      setSelectedRows(
-        sortedAssessments.map((a) => a.id || "").filter((id) => id !== "")
-      );
-    }
+    setSelectedRows(
+      selectedRows.length === sortedAssessments.length &&
+        sortedAssessments.length > 0
+        ? []
+        : sortedAssessments.map((a) => a.id || "").filter((id) => id !== "")
+    );
   };
 
   const toggleRowSelection = (id: string) => {
-    if (selectedRows.includes(id)) {
-      setSelectedRows(selectedRows.filter((rowId) => rowId !== id));
-    } else {
-      setSelectedRows([...selectedRows, id]);
-    }
+    setSelectedRows(
+      selectedRows.includes(id)
+        ? selectedRows.filter((rowId) => rowId !== id)
+        : [...selectedRows, id]
+    );
   };
 
-  // Edit functions
   const handleEditClick = (assessment: Assessment) => {
     setEditingId(assessment.id!);
     setEditFormData({
@@ -229,9 +204,7 @@ const AssessmentsTable = ({
     });
   };
 
-  const handleCancelEdit = () => {
-    setEditingId(null);
-  };
+  const handleCancelEdit = () => setEditingId(null);
 
   const handleEditFormChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -260,56 +233,30 @@ const AssessmentsTable = ({
         updatedAt: new Date(),
       });
       setEditingId(null);
-      // Highlight the row that was just edited
       setLastStatusChange(assessmentId);
-      setTimeout(() => {
-        setLastStatusChange(null);
-      }, 1500);
-      if (onStatusChange) {
-        onStatusChange();
-      }
+      setTimeout(() => setLastStatusChange(null), 1500);
+      onStatusChange?.();
     } catch (error) {
       console.error("Error updating assessment:", error);
     }
   };
 
-  // Calculate due date status, taking into account the assessment status
   const getDueDateStatus = (dueDate: string, status: string) => {
-    // If the assessment is completed or submitted, don't show overdue/urgent indicators
-    const completedStatuses = ["Completed", "Submitted", "Under Review"];
-    if (completedStatuses.includes(status)) {
-      return "future"; // Use "future" to indicate no warning needed
-    }
-
+    const completedStatuses = ["Submitted", "Under Review"];
+    if (completedStatuses.includes(status)) return "future";
     const now = new Date();
-    // Parse the date using our consistent method to avoid timezone issues
     const [year, month, day] = dueDate
       .split("-")
       .map((num) => parseInt(num, 10));
     const due = new Date(year, month - 1, day, 12, 0, 0);
-
-    const diffTime = due.getTime() - now.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    const diffDays = Math.ceil(
+      (due.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
+    );
     if (diffDays < 0) return "overdue";
     if (diffDays <= 3) return "urgent";
     if (diffDays <= 7) return "upcoming";
     return "future";
   };
-
-  // Status options
-  const statusOptions = [
-    "Not started",
-    "Draft",
-    "In progress",
-    "On Hold",
-    "Needs Revision",
-    "Pending Submission",
-    "Submitted",
-    "Under Review",
-    "Completed",
-    "Missed/Late",
-    "Deferred",
-  ];
 
   return (
     <div>
@@ -322,8 +269,8 @@ const AssessmentsTable = ({
             className="input bg-white max-w-xs py-1.5 px-3 text-sm transition-all duration-300 hover:shadow-sm"
           >
             <option value="all">All Tasks</option>
-            <option value="incomplete">Incomplete</option>
-            <option value="completed">Completed</option>
+            <option value="not_submitted">Not Submitted</option>
+            <option value="submitted">Submitted</option>
           </select>
           {selectedRows.length > 0 && (
             <div className="flex items-center space-x-2 animate-fade-in">
@@ -334,7 +281,7 @@ const AssessmentsTable = ({
                 <button
                   onClick={() => handleBulkAction("complete")}
                   className="p-1.5 bg-emerald-100 text-emerald-700 rounded-md hover:bg-emerald-200 transition-colors duration-200"
-                  title="Mark selected as completed"
+                  title="Mark selected as submitted"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -498,7 +445,6 @@ const AssessmentsTable = ({
                   assessment.status
                 );
                 return editingId === assessment.id ? (
-                  // Editing mode row
                   <tr
                     key={`editing-${assessment.id}`}
                     className="bg-blue-50/50 animate-fade-in"
@@ -515,13 +461,11 @@ const AssessmentsTable = ({
                           <option value="Not started">Not started</option>
                           <option value="Draft">Draft</option>
                         </optgroup>
-
                         <optgroup label="Active Work">
                           <option value="In progress">In progress</option>
                           <option value="On Hold">On Hold</option>
                           <option value="Needs Revision">Needs Revision</option>
                         </optgroup>
-
                         <optgroup label="Submission">
                           <option value="Pending Submission">
                             Pending Submission
@@ -529,11 +473,6 @@ const AssessmentsTable = ({
                           <option value="Submitted">Submitted</option>
                           <option value="Under Review">Under Review</option>
                         </optgroup>
-
-                        <optgroup label="Completed">
-                          <option value="Completed">Completed</option>
-                        </optgroup>
-
                         <optgroup label="Other">
                           <option value="Missed/Late">Missed/Late</option>
                           <option value="Deferred">Deferred</option>
@@ -623,18 +562,16 @@ const AssessmentsTable = ({
                     </td>
                   </tr>
                 ) : (
-                  // Normal view row
                   <tr
                     key={assessment.id || index}
                     className={`transition-all duration-300 ${
-                      assessment.status === "Completed"
+                      assessment.status === "Submitted"
                         ? "bg-emerald-50/40"
                         : assessment.status === "Missed/Late"
                         ? "bg-red-50/50"
                         : assessment.status === "Pending Submission"
                         ? "bg-orange-50/40"
-                        : assessment.status === "Submitted" ||
-                          assessment.status === "Under Review"
+                        : assessment.status === "Under Review"
                         ? "bg-cyan-50/40"
                         : assessment.status === "Needs Revision"
                         ? "bg-amber-50/40"
@@ -664,7 +601,7 @@ const AssessmentsTable = ({
                           handleStatusChange(assessment, e.target.value)
                         }
                         className={`input py-1 px-2 text-sm transition-all duration-300 w-full ${
-                          assessment.status === "Completed"
+                          assessment.status === "Submitted"
                             ? "bg-emerald-100 border-emerald-200 text-emerald-800"
                             : assessment.status === "In progress"
                             ? "bg-blue-100 border-blue-200 text-blue-800"
@@ -672,8 +609,6 @@ const AssessmentsTable = ({
                             ? "bg-purple-100 border-purple-200 text-purple-800"
                             : assessment.status === "Pending Submission"
                             ? "bg-orange-100 border-orange-200 text-orange-800"
-                            : assessment.status === "Submitted"
-                            ? "bg-cyan-100 border-cyan-200 text-cyan-800"
                             : assessment.status === "Under Review"
                             ? "bg-indigo-100 border-indigo-200 text-indigo-800"
                             : assessment.status === "Needs Revision"
@@ -702,9 +637,6 @@ const AssessmentsTable = ({
                           </option>
                           <option value="Submitted">Submitted</option>
                           <option value="Under Review">Under Review</option>
-                        </optgroup>
-                        <optgroup label="Completed">
-                          <option value="Completed">Completed</option>
                         </optgroup>
                         <optgroup label="Other">
                           <option value="Missed/Late">Missed/Late</option>
@@ -759,7 +691,6 @@ const AssessmentsTable = ({
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
-                            // Toggle dropdown menu
                             setDropdownOpenId(
                               dropdownOpenId === assessment.id
                                 ? null
