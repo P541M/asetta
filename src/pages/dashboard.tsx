@@ -14,6 +14,8 @@ import {
 import SemesterTabs from "../components/SemesterTabs";
 import UploadForm from "../components/UploadForm";
 import AssessmentsTable from "../components/AssessmentsTable";
+import CoursesOverviewTable from "../components/CoursesOverviewTable";
+import CourseFilteredAssessments from "../components/CourseFilteredAssessments";
 import AddAssessmentForm from "../components/AddAssessmentForm";
 import CalendarView from "../components/CalendarView";
 import Header from "../components/Header";
@@ -36,8 +38,9 @@ const Dashboard = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<
-    "assessments" | "add" | "upload" | "calendar"
-  >("assessments");
+    "courses" | "assessments" | "add" | "upload" | "calendar"
+  >("courses");
+  const [selectedCourse, setSelectedCourse] = useState<string | null>(null);
   const [animateStatCards, setAnimateStatCards] = useState(false);
 
   // Stats for dashboard with new categories
@@ -176,7 +179,19 @@ const Dashboard = () => {
   const refreshAssessments = () => {
     // This function now serves as a placeholder since we're using real-time listeners
     console.log("Assessment data refreshed");
+    // Reset to the main assessments view when data refreshes
+    setActiveTab("courses");
+    setSelectedCourse(null);
+  };
+
+  const handleSelectCourse = (courseName: string) => {
+    setSelectedCourse(courseName);
     setActiveTab("assessments");
+  };
+
+  const handleClearCourseSelection = () => {
+    setSelectedCourse(null);
+    setActiveTab("courses");
   };
 
   const handleLogout = async () => {
@@ -317,12 +332,30 @@ const Dashboard = () => {
                 <div className="border-b border-gray-100">
                   <div className="flex flex-wrap">
                     <button
-                      onClick={() => setActiveTab("assessments")}
+                      onClick={() => {
+                        setActiveTab("courses");
+                        setSelectedCourse(null);
+                      }}
                       className={`px-5 py-4 font-medium text-sm tab ${
-                        activeTab === "assessments" ? "active" : ""
+                        activeTab === "courses" && !selectedCourse
+                          ? "active"
+                          : ""
                       }`}
                     >
-                      Assessments
+                      Courses
+                    </button>
+                    <button
+                      onClick={() => {
+                        setActiveTab("assessments");
+                        setSelectedCourse(null);
+                      }}
+                      className={`px-5 py-4 font-medium text-sm tab ${
+                        activeTab === "assessments" && !selectedCourse
+                          ? "active"
+                          : ""
+                      }`}
+                    >
+                      All Assessments
                     </button>
                     <button
                       onClick={() => setActiveTab("calendar")}
@@ -351,7 +384,34 @@ const Dashboard = () => {
                   </div>
                 </div>
                 <div className="p-6">
-                  {activeTab === "assessments" && (
+                  {activeTab === "courses" && !selectedCourse && (
+                    <div className="animate-fade-in">
+                      {isLoading ? (
+                        <div className="flex justify-center py-8">
+                          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+                        </div>
+                      ) : error ? (
+                        <div className="p-4 bg-red-50 rounded-lg text-red-700 animate-fade-in">
+                          <p>{error}</p>
+                        </div>
+                      ) : (
+                        <CoursesOverviewTable
+                          semesterId={selectedSemesterId}
+                          onSelectCourse={handleSelectCourse}
+                        />
+                      )}
+                    </div>
+                  )}
+                  {activeTab === "assessments" && selectedCourse && (
+                    <div className="animate-fade-in">
+                      <CourseFilteredAssessments
+                        semesterId={selectedSemesterId}
+                        selectedCourse={selectedCourse}
+                        onBack={handleClearCourseSelection}
+                      />
+                    </div>
+                  )}
+                  {activeTab === "assessments" && !selectedCourse && (
                     <div className="animate-fade-in">
                       {isLoading ? (
                         <div className="flex justify-center py-8">
@@ -397,7 +457,9 @@ const Dashboard = () => {
                   )}
                 </div>
               </div>
-              {(activeTab === "assessments" || activeTab === "calendar") &&
+              {(activeTab === "assessments" ||
+                activeTab === "courses" ||
+                activeTab === "calendar") &&
                 assessments.length > 0 && (
                   <div className="flex justify-end mb-10">
                     <button
