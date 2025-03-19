@@ -15,6 +15,7 @@ import SemesterTabs from "../components/SemesterTabs";
 import UploadForm from "../components/UploadForm";
 import AssessmentsTable from "../components/AssessmentsTable";
 import AddAssessmentForm from "../components/AddAssessmentForm";
+import CalendarView from "../components/CalendarView";
 import Header from "../components/Header";
 
 interface Assessment {
@@ -34,9 +35,9 @@ const Dashboard = () => {
   const [assessments, setAssessments] = useState<Assessment[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<"assessments" | "add" | "upload">(
-    "assessments"
-  );
+  const [activeTab, setActiveTab] = useState<
+    "assessments" | "add" | "upload" | "calendar"
+  >("assessments");
   const [animateStatCards, setAnimateStatCards] = useState(false);
 
   // Stats for dashboard with new categories
@@ -110,19 +111,15 @@ const Dashboard = () => {
           });
         });
         setAssessments(assessmentsList);
-
         // Calculate stats with new categories
         const now = new Date();
         const oneWeek = new Date();
         oneWeek.setDate(now.getDate() + 7);
-
         const totalCount = assessmentsList.length;
-
         // Planning statuses
         const planningCount = assessmentsList.filter(
           (a) => a.status === "Not started" || a.status === "Draft"
         ).length;
-
         // Active work statuses
         const activeCount = assessmentsList.filter(
           (a) =>
@@ -130,7 +127,6 @@ const Dashboard = () => {
             a.status === "On Hold" ||
             a.status === "Needs Revision"
         ).length;
-
         // Submission statuses
         const submissionCount = assessmentsList.filter(
           (a) =>
@@ -138,17 +134,14 @@ const Dashboard = () => {
             a.status === "Submitted" ||
             a.status === "Under Review"
         ).length;
-
         // Completed status
         const completedCount = assessmentsList.filter(
           (a) => a.status === "Completed"
         ).length;
-
         // Problem statuses
         const problemCount = assessmentsList.filter(
           (a) => a.status === "Missed/Late" || a.status === "Deferred"
         ).length;
-
         // Upcoming deadlines (due within the next week and not completed)
         const upcomingCount = assessmentsList.filter((a) => {
           const dueDate = new Date(a.dueDate);
@@ -156,7 +149,6 @@ const Dashboard = () => {
             dueDate > now && dueDate <= oneWeek && a.status !== "Completed"
           );
         }).length;
-
         // Set the stats and trigger animation
         setStats({
           total: totalCount,
@@ -167,7 +159,6 @@ const Dashboard = () => {
           problem: problemCount,
           upcomingDeadlines: upcomingCount,
         });
-
         // Trigger animation for stat cards
         setAnimateStatCards(true);
         setTimeout(() => setAnimateStatCards(false), 1000);
@@ -237,7 +228,6 @@ const Dashboard = () => {
                     {stats.total}
                   </h3>
                 </div>
-
                 <div
                   className={`bg-white rounded-xl shadow-sm p-4 border border-gray-100 stat-card ${
                     animateStatCards ? "animate-scale" : ""
@@ -249,7 +239,6 @@ const Dashboard = () => {
                     {stats.planning}
                   </h3>
                 </div>
-
                 <div
                   className={`bg-white rounded-xl shadow-sm p-4 border border-gray-100 stat-card ${
                     animateStatCards ? "animate-scale" : ""
@@ -261,7 +250,6 @@ const Dashboard = () => {
                     {stats.active}
                   </h3>
                 </div>
-
                 <div
                   className={`bg-white rounded-xl shadow-sm p-4 border border-gray-100 stat-card ${
                     animateStatCards ? "animate-scale" : ""
@@ -273,7 +261,6 @@ const Dashboard = () => {
                     {stats.submission}
                   </h3>
                 </div>
-
                 <div
                   className={`bg-white rounded-xl shadow-sm p-4 border border-gray-100 stat-card ${
                     animateStatCards ? "animate-scale" : ""
@@ -285,7 +272,6 @@ const Dashboard = () => {
                     {stats.completed}
                   </h3>
                 </div>
-
                 <div
                   className={`bg-white rounded-xl shadow-sm p-4 border border-gray-100 stat-card ${
                     animateStatCards ? "animate-scale" : ""
@@ -301,7 +287,6 @@ const Dashboard = () => {
                   )}
                 </div>
               </div>
-
               {/* Show problems stat only if there are any */}
               {stats.problem > 0 && (
                 <div className="mb-6">
@@ -328,10 +313,9 @@ const Dashboard = () => {
                   </div>
                 </div>
               )}
-
               <div className="bg-white rounded-xl shadow-sm border border-gray-100 mb-6 overflow-hidden transition-all duration-300 hover:shadow-md">
                 <div className="border-b border-gray-100">
-                  <div className="flex">
+                  <div className="flex flex-wrap">
                     <button
                       onClick={() => setActiveTab("assessments")}
                       className={`px-5 py-4 font-medium text-sm tab ${
@@ -339,6 +323,14 @@ const Dashboard = () => {
                       }`}
                     >
                       Assessments
+                    </button>
+                    <button
+                      onClick={() => setActiveTab("calendar")}
+                      className={`px-5 py-4 font-medium text-sm tab ${
+                        activeTab === "calendar" ? "active" : ""
+                      }`}
+                    >
+                      Calendar
                     </button>
                     <button
                       onClick={() => setActiveTab("add")}
@@ -378,6 +370,14 @@ const Dashboard = () => {
                       )}
                     </div>
                   )}
+                  {activeTab === "calendar" && (
+                    <div className="animate-fade-in">
+                      <CalendarView
+                        selectedSemester={selectedSemester}
+                        semesterId={selectedSemesterId}
+                      />
+                    </div>
+                  )}
                   {activeTab === "add" && selectedSemesterId && (
                     <div className="animate-fade-in">
                       <AddAssessmentForm
@@ -397,30 +397,31 @@ const Dashboard = () => {
                   )}
                 </div>
               </div>
-              {activeTab === "assessments" && assessments.length > 0 && (
-                <div className="flex justify-end mb-10">
-                  <button
-                    onClick={() => setActiveTab("add")}
-                    className="btn-primary flex items-center gap-2 shadow hover:shadow-md transition-all duration-300 hover:-translate-y-0.5"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="16"
-                      height="16"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
+              {(activeTab === "assessments" || activeTab === "calendar") &&
+                assessments.length > 0 && (
+                  <div className="flex justify-end mb-10">
+                    <button
+                      onClick={() => setActiveTab("add")}
+                      className="btn-primary flex items-center gap-2 shadow hover:shadow-md transition-all duration-300 hover:-translate-y-0.5"
                     >
-                      <line x1="12" y1="5" x2="12" y2="19"></line>
-                      <line x1="5" y1="12" x2="19" y2="12"></line>
-                    </svg>
-                    Add Assessment
-                  </button>
-                </div>
-              )}
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                      </svg>
+                      Add Assessment
+                    </button>
+                  </div>
+                )}
             </>
           ) : (
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-10 text-center hover:shadow-md transition-all duration-300">
