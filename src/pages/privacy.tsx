@@ -8,8 +8,11 @@ const Privacy: NextPage = () => {
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
       <Head>
-        <title>Privacy Policy | Kivo</title>
-        <meta name="description" content="Kivo Privacy Policy" />
+        <title>Kivo - Privacy Policy</title>
+        <meta
+          name="description"
+          content="Read Kivo's Privacy Policy to understand how we collect, use, and protect your information."
+        />
       </Head>
 
       <Header />

@@ -1,6 +1,7 @@
 // src/pages/login.tsx
 import { useState } from "react";
 import { useRouter } from "next/router";
+import Head from "next/head";
 import { auth } from "../lib/firebase";
 import {
   signInWithEmailAndPassword,
@@ -60,6 +61,17 @@ const Auth = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
+      <Head>
+        <title>{isLogin ? "Kivo - Sign In" : "Kivo - Sign Up"}</title>
+        <meta
+          name="description"
+          content={
+            isLogin
+              ? "Sign in to Kivo to manage your academic tasks."
+              : "Sign up for Kivo to start tracking your academic progress."
+          }
+        />
+      </Head>
       <Header />
       <div className="flex-grow flex items-center justify-center p-4">
         <div className="w-full max-w-xl">

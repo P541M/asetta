@@ -2,6 +2,7 @@
 import { useEffect } from "react";
 import Image from "next/image";
 import { useRouter } from "next/router";
+import Head from "next/head";
 import Link from "next/link";
 import { useAuth } from "../contexts/AuthContext";
 import Header from "../components/Header";
@@ -10,7 +11,6 @@ export default function LandingPage() {
   const router = useRouter();
   const { user, loading } = useAuth();
 
-  // If user is already logged in, redirect to dashboard
   useEffect(() => {
     if (!loading && user) {
       router.push("/dashboard");
@@ -30,8 +30,14 @@ export default function LandingPage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
+      <Head>
+        <title>Kivo - Simplify Your Academic Journey</title>
+        <meta
+          name="description"
+          content="Kivo is an all-in-one platform to help students manage assignments, track deadlines, and stay organized."
+        />
+      </Head>
       <Header />
-      {/* Hero Section */}
       <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col lg:flex-row items-center">
@@ -72,7 +78,6 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
-      {/* Features Section */}
       <section id="features" className="py-20 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
@@ -86,7 +91,6 @@ export default function LandingPage() {
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {/* Feature 1 */}
             <div className="bg-white rounded-xl shadow-sm p-8 border border-gray-100">
               <div className="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center mb-5">
                 <svg
@@ -113,7 +117,6 @@ export default function LandingPage() {
               </p>
             </div>
 
-            {/* Feature 2 */}
             <div className="bg-white rounded-xl shadow-sm p-8 border border-gray-100">
               <div className="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center mb-5">
                 <svg
@@ -140,7 +143,6 @@ export default function LandingPage() {
               </p>
             </div>
 
-            {/* Feature 3 */}
             <div className="bg-white rounded-xl shadow-sm p-8 border border-gray-100">
               <div className="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center mb-5">
                 <svg
@@ -167,7 +169,6 @@ export default function LandingPage() {
               </p>
             </div>
 
-            {/* Feature 4 */}
             <div className="bg-white rounded-xl shadow-sm p-8 border border-gray-100">
               <div className="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center mb-5">
                 <svg
@@ -194,7 +195,6 @@ export default function LandingPage() {
               </p>
             </div>
 
-            {/* Feature 5 */}
             <div className="bg-white rounded-xl shadow-sm p-8 border border-gray-100">
               <div className="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center mb-5">
                 <svg
@@ -221,7 +221,6 @@ export default function LandingPage() {
               </p>
             </div>
 
-            {/* Feature 6 */}
             <div className="bg-white rounded-xl shadow-sm p-8 border border-gray-100">
               <div className="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center mb-5">
                 <svg
@@ -250,7 +249,6 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
-      {/* CTA Section */}
       <section className="py-16 bg-indigo-50">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl font-bold text-gray-900 mb-6">
@@ -269,7 +267,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Footer */}
       <footer className="bg-white border-t border-gray-100 py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">

@@ -1,5 +1,6 @@
 // src/pages/reset-password.tsx
 import { useState } from "react";
+import Head from "next/head";
 import { auth } from "../lib/firebase";
 import { sendPasswordResetEmail } from "firebase/auth";
 import Header from "../components/Header";
@@ -52,6 +53,13 @@ const ResetPassword = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
+      <Head>
+        <title>Kivo - Reset Password</title>
+        <meta
+          name="description"
+          content="Reset your Kivo account password to regain access to your academic dashboard."
+        />
+      </Head>
       <Header />
       <div className="flex-grow flex items-center justify-center p-4">
         <div className="w-full max-w-xl">

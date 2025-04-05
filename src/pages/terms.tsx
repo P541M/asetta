@@ -8,8 +8,11 @@ const Terms: NextPage = () => {
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
       <Head>
-        <title>Terms of Service | Kivo</title>
-        <meta name="description" content="Kivo Terms of Service" />
+        <title>Kivo - Terms of Service</title>
+        <meta
+          name="description"
+          content="Review Kivo's Terms of Service to understand the rules and guidelines for using our platform."
+        />
       </Head>
 
       <Header />

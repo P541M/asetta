@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { useRouter } from "next/router";
+import Head from "next/head";
 import { db } from "../lib/firebase";
 import {
   collection,
@@ -28,7 +29,7 @@ interface Assessment {
   dueTime: string;
   weight: number;
   status: string;
-  notes?: string; // Added notes field
+  notes?: string;
 }
 
 const Dashboard = () => {
@@ -204,6 +205,13 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
+      <Head>
+        <title>Kivo - Your Academic Dashboard</title>
+        <meta
+          name="description"
+          content="Manage your semesters, track assessments, and stay organized with Kivo."
+        />
+      </Head>
       <Header onLogout={handleLogout} />
       <div className="flex-grow p-4 md:p-6">
         <div className="max-w-7xl mx-auto">
