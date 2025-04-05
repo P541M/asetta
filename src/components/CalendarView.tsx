@@ -2,13 +2,14 @@ import { useState, useEffect } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { db } from "../lib/firebase";
 import { collection, getDocs, query } from "firebase/firestore";
+import { generateICSFile } from "../utils/icsGenerator"; // New utility import
 
 interface Assessment {
   id: string;
   courseName: string;
   assignmentName: string;
   dueDate: string;
-  dueTime: string; // Added dueTime
+  dueTime: string;
   weight: number;
   status: string;
 }
@@ -225,6 +226,25 @@ const CalendarView = ({ selectedSemester, semesterId }: CalendarViewProps) => {
       .length;
   };
 
+  // Function to handle exporting the calendar
+  const handleExportCalendar = () => {
+    if (assessments.length === 0) {
+      alert("No assessments to export.");
+      return;
+    }
+
+    const icsContent = generateICSFile(assessments, selectedSemester);
+    const blob = new Blob([icsContent], { type: "text/calendar" });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `${selectedSemester}_assessments.ics`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+  };
+
   if (isLoading) {
     return (
       <div className="flex justify-center items-center h-64">
@@ -288,6 +308,24 @@ const CalendarView = ({ selectedSemester, semesterId }: CalendarViewProps) => {
             className="ml-4 px-3 py-1 text-sm bg-indigo-100 text-indigo-700 rounded-md hover:bg-indigo-200 transition-colors"
           >
             Today
+          </button>
+          <button
+            onClick={handleExportCalendar}
+            className="ml-4 px-3 py-1 text-sm bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors flex items-center"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-4 w-4 mr-2"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
+              <path
+                fillRule="evenodd"
+                d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"
+                clipRule="evenodd"
+              />
+            </svg>
+            Export to Calendar
           </button>
         </div>
       </div>
