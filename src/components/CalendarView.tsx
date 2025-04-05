@@ -1,14 +1,14 @@
-// src/components/CalendarView.tsx
 import { useState, useEffect } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { db } from "../lib/firebase";
-import { collection, getDocs, query, where } from "firebase/firestore";
+import { collection, getDocs, query } from "firebase/firestore";
 
 interface Assessment {
   id: string;
   courseName: string;
   assignmentName: string;
   dueDate: string;
+  dueTime: string; // Added dueTime
   weight: number;
   status: string;
 }
@@ -33,7 +33,6 @@ const CalendarView = ({ selectedSemester, semesterId }: CalendarViewProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [selectedDay, setSelectedDay] = useState<Date | null>(null);
 
-  // Month names for header
   const monthNames = [
     "January",
     "February",
@@ -48,18 +47,14 @@ const CalendarView = ({ selectedSemester, semesterId }: CalendarViewProps) => {
     "November",
     "December",
   ];
-
-  // Day names for header
   const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
-  // Fetch assessments when semester ID changes
   useEffect(() => {
     const fetchAssessments = async () => {
       if (!user || !semesterId) {
         setAssessments([]);
         return;
       }
-
       setIsLoading(true);
       try {
         const assessmentsRef = collection(
@@ -72,7 +67,6 @@ const CalendarView = ({ selectedSemester, semesterId }: CalendarViewProps) => {
         );
         const q = query(assessmentsRef);
         const querySnapshot = await getDocs(q);
-
         const assessmentsList: Assessment[] = [];
         querySnapshot.forEach((doc) => {
           assessmentsList.push({
@@ -80,7 +74,6 @@ const CalendarView = ({ selectedSemester, semesterId }: CalendarViewProps) => {
             ...(doc.data() as Omit<Assessment, "id">),
           });
         });
-
         setAssessments(assessmentsList);
       } catch (error) {
         console.error("Error fetching assessments for calendar:", error);
@@ -88,40 +81,24 @@ const CalendarView = ({ selectedSemester, semesterId }: CalendarViewProps) => {
         setIsLoading(false);
       }
     };
-
     fetchAssessments();
   }, [user, semesterId]);
 
-  // Generate calendar days when month or assessments change
   useEffect(() => {
     const generateCalendarDays = () => {
       const year = currentMonth.getFullYear();
       const month = currentMonth.getMonth();
-
-      // First day of the month
       const firstDayOfMonth = new Date(year, month, 1);
-      // Last day of the month
       const lastDayOfMonth = new Date(year, month + 1, 0);
-
-      // Days from previous month to fill the first week
       const daysFromPrevMonth = firstDayOfMonth.getDay();
-      // Days from next month to fill the last week
       const daysFromNextMonth = 6 - lastDayOfMonth.getDay();
-
-      // Total days to display
       const totalDays =
         daysFromPrevMonth + lastDayOfMonth.getDate() + daysFromNextMonth;
-
-      // Today's date for highlighting
       const today = new Date();
       today.setHours(0, 0, 0, 0);
-
       const days: CalendarDay[] = [];
-
-      // Add days from previous month
       const prevMonth = new Date(year, month, 0);
       const prevMonthDays = prevMonth.getDate();
-
       for (let i = daysFromPrevMonth - 1; i >= 0; i--) {
         const date = new Date(year, month - 1, prevMonthDays - i);
         days.push({
@@ -131,8 +108,6 @@ const CalendarView = ({ selectedSemester, semesterId }: CalendarViewProps) => {
           assessments: getAssessmentsForDate(date),
         });
       }
-
-      // Add days from current month
       for (let i = 1; i <= lastDayOfMonth.getDate(); i++) {
         const date = new Date(year, month, i);
         days.push({
@@ -142,8 +117,6 @@ const CalendarView = ({ selectedSemester, semesterId }: CalendarViewProps) => {
           assessments: getAssessmentsForDate(date),
         });
       }
-
-      // Add days from next month
       for (let i = 1; i <= daysFromNextMonth; i++) {
         const date = new Date(year, month + 1, i);
         days.push({
@@ -153,21 +126,17 @@ const CalendarView = ({ selectedSemester, semesterId }: CalendarViewProps) => {
           assessments: getAssessmentsForDate(date),
         });
       }
-
       setCalendarDays(days);
     };
 
     const getAssessmentsForDate = (date: Date): Assessment[] => {
       const dateStr = formatDateForComparison(date);
-      return assessments.filter((assessment) => {
-        return assessment.dueDate === dateStr;
-      });
+      return assessments.filter((assessment) => assessment.dueDate === dateStr);
     };
 
     generateCalendarDays();
   }, [currentMonth, assessments]);
 
-  // Format date as YYYY-MM-DD for comparison
   const formatDateForComparison = (date: Date): string => {
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, "0");
@@ -175,16 +144,18 @@ const CalendarView = ({ selectedSemester, semesterId }: CalendarViewProps) => {
     return `${year}-${month}-${day}`;
   };
 
-  // Format date for display
-  const formatDate = (date: Date): string => {
-    return date.toLocaleDateString("en-US", {
+  const formatDateTime = (date: Date, time: string): string => {
+    const [hours, minutes] = time.split(":").map((num) => parseInt(num, 10));
+    date.setHours(hours, minutes);
+    return date.toLocaleString("en-US", {
       month: "short",
       day: "numeric",
       year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
     });
   };
 
-  // Navigate to previous month
   const previousMonth = () => {
     setCurrentMonth(
       new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1)
@@ -192,7 +163,6 @@ const CalendarView = ({ selectedSemester, semesterId }: CalendarViewProps) => {
     setSelectedDay(null);
   };
 
-  // Navigate to next month
   const nextMonth = () => {
     setCurrentMonth(
       new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1)
@@ -200,19 +170,16 @@ const CalendarView = ({ selectedSemester, semesterId }: CalendarViewProps) => {
     setSelectedDay(null);
   };
 
-  // Navigate to today
   const goToToday = () => {
     const today = new Date();
     setCurrentMonth(new Date(today.getFullYear(), today.getMonth(), 1));
     setSelectedDay(today);
   };
 
-  // Handle day selection
   const handleDayClick = (day: CalendarDay) => {
     setSelectedDay(day.date);
   };
 
-  // Get status color for assessment
   const getStatusColor = (status: string): string => {
     switch (status) {
       case "Submitted":
@@ -238,22 +205,20 @@ const CalendarView = ({ selectedSemester, semesterId }: CalendarViewProps) => {
     }
   };
 
-  // Get due date status color
-  const getDueDateStatus = (date: Date): string => {
+  const getDueDateStatus = (date: Date, time: string): string => {
     const now = new Date();
-    now.setHours(0, 0, 0, 0);
-
+    const [hours, minutes] = time.split(":").map((num) => parseInt(num, 10));
+    const due = new Date(date);
+    due.setHours(hours, minutes);
     const diffDays = Math.ceil(
-      (date.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
+      (due.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
     );
-
-    if (diffDays < 0) return "border-red-300 bg-red-50"; // Overdue
-    if (diffDays <= 3) return "border-amber-300 bg-amber-50"; // Due soon
-    if (diffDays <= 7) return "border-yellow-300 bg-yellow-50"; // Upcoming
-    return ""; // Default
+    if (diffDays < 0) return "border-red-300 bg-red-50";
+    if (diffDays <= 3) return "border-amber-300 bg-amber-50";
+    if (diffDays <= 7) return "border-yellow-300 bg-yellow-50";
+    return "";
   };
 
-  // Count assessments for specific date
   const countAssessments = (date: Date): number => {
     const dateStr = formatDateForComparison(date);
     return assessments.filter((assessment) => assessment.dueDate === dateStr)
@@ -326,10 +291,7 @@ const CalendarView = ({ selectedSemester, semesterId }: CalendarViewProps) => {
           </button>
         </div>
       </div>
-
-      {/* Calendar Grid */}
       <div className="border rounded-lg overflow-hidden shadow-sm">
-        {/* Day Headers */}
         <div className="grid grid-cols-7 border-b bg-gray-50">
           {dayNames.map((day, index) => (
             <div
@@ -340,8 +302,6 @@ const CalendarView = ({ selectedSemester, semesterId }: CalendarViewProps) => {
             </div>
           ))}
         </div>
-
-        {/* Calendar Days */}
         <div className="grid grid-cols-7 auto-rows-fr bg-white">
           {calendarDays.map((day, index) => (
             <div
@@ -369,8 +329,6 @@ const CalendarView = ({ selectedSemester, semesterId }: CalendarViewProps) => {
                   </span>
                 )}
               </div>
-
-              {/* Show max 2 assessments in compact view */}
               <div className="mt-1 space-y-1 text-xs">
                 {day.assessments.slice(0, 2).map((assessment, idx) => (
                   <div
@@ -378,7 +336,7 @@ const CalendarView = ({ selectedSemester, semesterId }: CalendarViewProps) => {
                     className={`p-1 rounded truncate border ${getStatusColor(
                       assessment.status
                     )}`}
-                    title={`${assessment.courseName}: ${assessment.assignmentName}`}
+                    title={`${assessment.courseName}: ${assessment.assignmentName} - Due ${assessment.dueTime}`}
                   >
                     {assessment.courseName}: {assessment.assignmentName}
                   </div>
@@ -393,14 +351,15 @@ const CalendarView = ({ selectedSemester, semesterId }: CalendarViewProps) => {
           ))}
         </div>
       </div>
-
-      {/* Selected Day Detail */}
       {selectedDay && (
         <div className="mt-6 border rounded-lg p-4 bg-white shadow-sm animate-fade-in">
           <h3 className="text-lg font-medium text-gray-900 mb-2">
-            {formatDate(selectedDay)}
+            {selectedDay.toLocaleDateString("en-US", {
+              month: "short",
+              day: "numeric",
+              year: "numeric",
+            })}
           </h3>
-
           {countAssessments(selectedDay) === 0 ? (
             <p className="text-gray-500">No assessments due on this day</p>
           ) : (
@@ -414,7 +373,8 @@ const CalendarView = ({ selectedSemester, semesterId }: CalendarViewProps) => {
                   <div
                     key={index}
                     className={`p-3 rounded-lg border ${getDueDateStatus(
-                      selectedDay
+                      selectedDay,
+                      assessment.dueTime
                     )}`}
                   >
                     <div className="flex justify-between items-start">
@@ -424,6 +384,13 @@ const CalendarView = ({ selectedSemester, semesterId }: CalendarViewProps) => {
                         </h4>
                         <p className="text-sm text-gray-600">
                           {assessment.courseName}
+                        </p>
+                        <p className="text-sm text-gray-600">
+                          Due:{" "}
+                          {formatDateTime(
+                            new Date(assessment.dueDate),
+                            assessment.dueTime
+                          )}
                         </p>
                       </div>
                       <div

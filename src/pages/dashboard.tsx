@@ -19,14 +19,18 @@ import CourseFilteredAssessments from "../components/CourseFilteredAssessments";
 import AddAssessmentForm from "../components/AddAssessmentForm";
 import CalendarView from "../components/CalendarView";
 import Header from "../components/Header";
+
+// Updated Assessment interface
 interface Assessment {
   id: string;
   courseName: string;
   assignmentName: string;
   dueDate: string;
+  dueTime: string; // Added dueTime
   weight: number;
   status: string;
 }
+
 const Dashboard = () => {
   const { user, loading, logout } = useAuth();
   const router = useRouter();
@@ -37,26 +41,27 @@ const Dashboard = () => {
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<
     "courses" | "assessments" | "add" | "upload" | "calendar"
-  >("assessments"); // Changed default tab to "assessments"
+  >("assessments");
   const [selectedCourse, setSelectedCourse] = useState<string | null>(null);
   const [animateStatCards, setAnimateStatCards] = useState(false);
-  // Stats for dashboard with new categories
+
   const [stats, setStats] = useState({
     total: 0,
-    // New categorized stats
-    planning: 0, // Not started, Draft
-    active: 0, // In progress, On Hold, Needs Revision
-    submission: 0, // Pending Submission, Submitted, Under Review
-    completed: 0, // Completed
-    problem: 0, // Missed/Late, Deferred
+    planning: 0,
+    active: 0,
+    submission: 0,
+    completed: 0,
+    problem: 0,
     upcomingDeadlines: 0,
   });
+
   // Redirect to login if not authenticated
   useEffect(() => {
     if (!loading && !user) {
       router.push("/login");
     }
   }, [user, loading, router]);
+
   // Find semester ID when semester name changes
   useEffect(() => {
     const findSemesterId = async () => {
@@ -80,6 +85,7 @@ const Dashboard = () => {
     };
     findSemesterId();
   }, [selectedSemester, user]);
+
   // Listen for assessments when semester ID changes
   useEffect(() => {
     if (!user || !selectedSemesterId) {
@@ -100,53 +106,52 @@ const Dashboard = () => {
     const unsubscribe = onSnapshot(
       q,
       (snapshot) => {
-        const assessmentsList: Assessment[] = [];
-        snapshot.forEach((doc) => {
-          assessmentsList.push({
+        const assessmentsList: Assessment[] = snapshot.docs.map((doc) => {
+          const data = doc.data();
+          const today = new Date().toISOString().split("T")[0];
+          return {
             id: doc.id,
-            ...(doc.data() as Omit<Assessment, "id">),
-          });
+            courseName: data.courseName || "Unknown Course",
+            assignmentName: data.assignmentName || "Unknown Assessment",
+            dueDate: data.dueDate || today,
+            dueTime: data.dueTime || "23:59",
+            weight: data.weight || 0,
+            status: data.status || "Not started",
+          };
         });
         setAssessments(assessmentsList);
-        // Calculate stats with new categories
+
         const now = new Date();
         const oneWeek = new Date();
         oneWeek.setDate(now.getDate() + 7);
         const totalCount = assessmentsList.length;
-        // Planning statuses
         const planningCount = assessmentsList.filter(
           (a) => a.status === "Not started" || a.status === "Draft"
         ).length;
-        // Active work statuses
         const activeCount = assessmentsList.filter(
           (a) =>
             a.status === "In progress" ||
             a.status === "On Hold" ||
             a.status === "Needs Revision"
         ).length;
-        // Submission statuses
         const submissionCount = assessmentsList.filter(
           (a) =>
             a.status === "Pending Submission" ||
             a.status === "Submitted" ||
             a.status === "Under Review"
         ).length;
-        // Completed status
         const completedCount = assessmentsList.filter(
           (a) => a.status === "Completed"
         ).length;
-        // Problem statuses
         const problemCount = assessmentsList.filter(
           (a) => a.status === "Missed/Late" || a.status === "Deferred"
         ).length;
-        // Upcoming deadlines (due within the next week and not completed)
         const upcomingCount = assessmentsList.filter((a) => {
           const dueDate = new Date(a.dueDate);
           return (
             dueDate > now && dueDate <= oneWeek && a.status !== "Completed"
           );
         }).length;
-        // Set the stats and trigger animation
         setStats({
           total: totalCount,
           planning: planningCount,
@@ -156,7 +161,6 @@ const Dashboard = () => {
           problem: problemCount,
           upcomingDeadlines: upcomingCount,
         });
-        // Trigger animation for stat cards
         setAnimateStatCards(true);
         setTimeout(() => setAnimateStatCards(false), 1000);
         setIsLoading(false);
@@ -169,26 +173,26 @@ const Dashboard = () => {
     );
     return () => unsubscribe();
   }, [selectedSemesterId, user]);
-  const refreshAssessments = () => {
-    // No longer resetting to main view - comment this out
-    // setActiveTab("courses");
-    // setSelectedCourse(null);
 
-    // Instead, just log that data was refreshed
+  const refreshAssessments = () => {
     console.log("Assessment data refreshed");
   };
+
   const handleSelectCourse = (courseName: string) => {
     setSelectedCourse(courseName);
     setActiveTab("assessments");
   };
+
   const handleClearCourseSelection = () => {
     setSelectedCourse(null);
-    setActiveTab("assessments"); // Changed to go back to assessments instead of courses
+    setActiveTab("assessments");
   };
+
   const handleLogout = async () => {
     await logout();
     router.push("/login");
   };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -199,6 +203,7 @@ const Dashboard = () => {
       </div>
     );
   }
+
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <Header onLogout={handleLogout} />
@@ -218,7 +223,6 @@ const Dashboard = () => {
           />
           {selectedSemester ? (
             <>
-              {/* Dashboard Stats - Updated with new categories */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 mb-6">
                 <div
                   className={`bg-white rounded-xl shadow-sm p-4 border border-gray-100 stat-card ${
@@ -291,7 +295,6 @@ const Dashboard = () => {
                   )}
                 </div>
               </div>
-              {/* Show problems stat only if there are any */}
               {stats.problem > 0 && (
                 <div className="mb-6">
                   <div
@@ -511,4 +514,5 @@ const Dashboard = () => {
     </div>
   );
 };
+
 export default Dashboard;

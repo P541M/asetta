@@ -8,6 +8,7 @@ interface Assessment {
   courseName: string;
   assignmentName: string;
   dueDate: string;
+  dueTime: string; // Added dueTime
   weight: number;
   status: string;
 }
@@ -32,37 +33,46 @@ const AssessmentsTable = ({
   const [lastStatusChange, setLastStatusChange] = useState<string | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const formatDateForDisplay = (dateStr: string): string => {
+  const formatDateTimeForDisplay = (
+    dateStr: string,
+    timeStr: string
+  ): string => {
     const [year, month, day] = dateStr
       .split("-")
       .map((num) => parseInt(num, 10));
-    const date = new Date(year, month - 1, day, 12, 0, 0);
-    return date.toLocaleDateString();
+    const [hours, minutes] = timeStr.split(":").map((num) => parseInt(num, 10));
+    const date = new Date(year, month - 1, day, hours, minutes);
+    return date.toLocaleString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
   };
 
-  // Calculate days until due date
-  const getDaysTillDue = (dueDate: string, status: string): number | null => {
+  // Calculate days until due date, considering time
+  const getDaysTillDue = (
+    dueDate: string,
+    dueTime: string,
+    status: string
+  ): number | null => {
     const completedStatuses = ["Submitted", "Under Review", "Completed"];
     if (completedStatuses.includes(status)) return null;
-
     const now = new Date();
-    now.setHours(0, 0, 0, 0);
-
     const [year, month, day] = dueDate
       .split("-")
       .map((num) => parseInt(num, 10));
-    const due = new Date(year, month - 1, day, 12, 0, 0);
-
+    const [hours, minutes] = dueTime.split(":").map((num) => parseInt(num, 10));
+    const due = new Date(year, month - 1, day, hours, minutes);
     const diffTime = due.getTime() - now.getTime();
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
     return diffDays;
   };
 
   // Format the days till due for display
   const formatDaysTillDue = (days: number | null): JSX.Element | null => {
     if (days === null) return null;
-
     if (days < 0) {
       return (
         <span className="text-red-600 font-medium">
@@ -102,6 +112,7 @@ const AssessmentsTable = ({
     courseName: "",
     assignmentName: "",
     dueDate: "",
+    dueTime: "23:59", // Default to 11:59 PM
     weight: 0,
     status: "Not started",
   });
@@ -114,6 +125,13 @@ const AssessmentsTable = ({
   });
 
   const sortedAssessments = [...filteredAssessments].sort((a, b) => {
+    if (sortKey === "dueDate") {
+      const dateA = new Date(`${a.dueDate}T${a.dueTime}`);
+      const dateB = new Date(`${b.dueDate}T${b.dueTime}`);
+      return sortOrder === "asc"
+        ? dateA.getTime() - dateB.getTime()
+        : dateB.getTime() - dateA.getTime();
+    }
     if (a[sortKey] < b[sortKey]) return sortOrder === "asc" ? -1 : 1;
     if (a[sortKey] > b[sortKey]) return sortOrder === "asc" ? 1 : -1;
     return 0;
@@ -242,6 +260,7 @@ const AssessmentsTable = ({
       courseName: assessment.courseName,
       assignmentName: assessment.assignmentName,
       dueDate: assessment.dueDate,
+      dueTime: assessment.dueTime,
       weight: assessment.weight,
       status: assessment.status,
     });
@@ -284,14 +303,19 @@ const AssessmentsTable = ({
     }
   };
 
-  const getDueDateStatus = (dueDate: string, status: string) => {
+  const getDueDateStatus = (
+    dueDate: string,
+    dueTime: string,
+    status: string
+  ) => {
     const completedStatuses = ["Submitted", "Under Review"];
     if (completedStatuses.includes(status)) return "future";
     const now = new Date();
     const [year, month, day] = dueDate
       .split("-")
       .map((num) => parseInt(num, 10));
-    const due = new Date(year, month - 1, day, 12, 0, 0);
+    const [hours, minutes] = dueTime.split(":").map((num) => parseInt(num, 10));
+    const due = new Date(year, month - 1, day, hours, minutes);
     const diffDays = Math.ceil(
       (due.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
     );
@@ -454,7 +478,7 @@ const AssessmentsTable = ({
                 >
                   <div className="flex items-center space-x-1 group">
                     <span className="group-hover:text-indigo-600 transition-colors duration-200">
-                      Due Date
+                      Due Date & Time
                     </span>
                     {sortKey === "dueDate" && (
                       <span className="text-indigo-600">
@@ -486,13 +510,14 @@ const AssessmentsTable = ({
               {sortedAssessments.map((assessment, index) => {
                 const dueDateStatus = getDueDateStatus(
                   assessment.dueDate,
+                  assessment.dueTime,
                   assessment.status
                 );
                 const daysTillDue = getDaysTillDue(
                   assessment.dueDate,
+                  assessment.dueTime,
                   assessment.status
                 );
-
                 return editingId === assessment.id ? (
                   <tr
                     key={`editing-${assessment.id}`}
@@ -549,16 +574,24 @@ const AssessmentsTable = ({
                       />
                     </td>
                     <td>
-                      <input
-                        type="date"
-                        name="dueDate"
-                        value={editFormData.dueDate}
-                        onChange={handleEditFormChange}
-                        className="input py-1 px-2 text-sm w-full"
-                      />
+                      <div className="flex space-x-2">
+                        <input
+                          type="date"
+                          name="dueDate"
+                          value={editFormData.dueDate}
+                          onChange={handleEditFormChange}
+                          className="input py-1 px-2 text-sm w-2/3"
+                        />
+                        <input
+                          type="time"
+                          name="dueTime"
+                          value={editFormData.dueTime}
+                          onChange={handleEditFormChange}
+                          className="input py-1 px-2 text-sm w-1/3"
+                        />
+                      </div>
                     </td>
                     <td>
-                      {/* Days till due not editable directly */}
                       <span className="text-gray-400 text-sm italic">
                         Will update on save
                       </span>
@@ -724,7 +757,10 @@ const AssessmentsTable = ({
                         {dueDateStatus === "urgent" && (
                           <span className="mr-2 badge-warning">Due soon</span>
                         )}
-                        {formatDateForDisplay(assessment.dueDate)}
+                        {formatDateTimeForDisplay(
+                          assessment.dueDate,
+                          assessment.dueTime
+                        )}
                       </div>
                     </td>
                     <td>{formatDaysTillDue(daysTillDue)}</td>

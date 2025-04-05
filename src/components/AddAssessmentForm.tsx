@@ -28,6 +28,7 @@ const AddAssessmentForm = ({
     courseName: "",
     assignmentName: "",
     dueDate: getTodayDateString(),
+    dueTime: "23:59", // Default to 11:59 PM
     weight: 0,
     status: "Not started",
   });
@@ -68,21 +69,17 @@ const AddAssessmentForm = ({
       });
       return;
     }
-
     if (!formData.courseName.trim()) {
       setMessage({ text: "Course name is required", type: "error" });
       courseNameRef.current?.focus();
       return;
     }
-
     if (!formData.assignmentName.trim()) {
       setMessage({ text: "Assessment name is required", type: "error" });
       return;
     }
-
     setIsSubmitting(true);
     setMessage({ text: "", type: "" });
-
     try {
       await addDoc(
         collection(
@@ -100,6 +97,7 @@ const AddAssessmentForm = ({
         courseName: "",
         assignmentName: "",
         dueDate: getTodayDateString(),
+        dueTime: "23:59", // Reset to default
         weight: 0,
         status: "Not started",
       });
@@ -174,6 +172,20 @@ const AddAssessmentForm = ({
             />
           </div>
           <div className="form-group">
+            <label htmlFor="dueTime" className="form-label">
+              Due Time <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="time"
+              id="dueTime"
+              name="dueTime"
+              value={formData.dueTime}
+              onChange={handleChange}
+              className="input hover:shadow-sm transition-all duration-200"
+              required
+            />
+          </div>
+          <div className="form-group">
             <label htmlFor="weight" className="form-label">
               Weight (%)
             </label>
@@ -189,7 +201,9 @@ const AddAssessmentForm = ({
               className="input hover:shadow-sm transition-all duration-200"
             />
           </div>
-          <div className="form-group">
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="form-group md:col-span-2">
             <label htmlFor="status" className="form-label">
               Status
             </label>
