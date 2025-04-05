@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { db } from "../lib/firebase";
 import { doc, updateDoc, deleteDoc } from "firebase/firestore";
 import { useAuth } from "../contexts/AuthContext";
+
 interface Assessment {
   id?: string;
   courseName: string;
@@ -10,11 +11,13 @@ interface Assessment {
   weight: number;
   status: string;
 }
+
 interface AssessmentsTableProps {
   assessments: Assessment[];
   semesterId: string;
   onStatusChange?: () => void;
 }
+
 const AssessmentsTable = ({
   assessments,
   semesterId,
@@ -28,6 +31,7 @@ const AssessmentsTable = ({
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
   const [lastStatusChange, setLastStatusChange] = useState<string | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
+
   const formatDateForDisplay = (dateStr: string): string => {
     const [year, month, day] = dateStr
       .split("-")
@@ -35,6 +39,51 @@ const AssessmentsTable = ({
     const date = new Date(year, month - 1, day, 12, 0, 0);
     return date.toLocaleDateString();
   };
+
+  // Calculate days until due date
+  const getDaysTillDue = (dueDate: string, status: string): number | null => {
+    const completedStatuses = ["Submitted", "Under Review", "Completed"];
+    if (completedStatuses.includes(status)) return null;
+
+    const now = new Date();
+    now.setHours(0, 0, 0, 0);
+
+    const [year, month, day] = dueDate
+      .split("-")
+      .map((num) => parseInt(num, 10));
+    const due = new Date(year, month - 1, day, 12, 0, 0);
+
+    const diffTime = due.getTime() - now.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    return diffDays;
+  };
+
+  // Format the days till due for display
+  const formatDaysTillDue = (days: number | null): JSX.Element | null => {
+    if (days === null) return null;
+
+    if (days < 0) {
+      return (
+        <span className="text-red-600 font-medium">
+          {Math.abs(days)} {Math.abs(days) === 1 ? "day" : "days"} overdue
+        </span>
+      );
+    } else if (days === 0) {
+      return <span className="text-red-600 font-bold">Due today</span>;
+    } else if (days === 1) {
+      return <span className="text-amber-600 font-bold">Due tomorrow</span>;
+    } else if (days <= 3) {
+      return (
+        <span className="text-amber-600 font-medium">Due in {days} days</span>
+      );
+    } else if (days <= 7) {
+      return <span className="text-indigo-600">Due in {days} days</span>;
+    } else {
+      return <span className="text-gray-600">Due in {days} days</span>;
+    }
+  };
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -47,6 +96,7 @@ const AssessmentsTable = ({
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editFormData, setEditFormData] = useState<Assessment>({
     courseName: "",
@@ -55,17 +105,20 @@ const AssessmentsTable = ({
     weight: 0,
     status: "Not started",
   });
+
   const filteredAssessments = assessments.filter((assessment) => {
     if (filter === "all") return true;
     if (filter === "not_submitted") return assessment.status !== "Submitted";
     if (filter === "submitted") return assessment.status === "Submitted";
     return true;
   });
+
   const sortedAssessments = [...filteredAssessments].sort((a, b) => {
     if (a[sortKey] < b[sortKey]) return sortOrder === "asc" ? -1 : 1;
     if (a[sortKey] > b[sortKey]) return sortOrder === "asc" ? 1 : -1;
     return 0;
   });
+
   const handleSort = (key: keyof Assessment) => {
     if (sortKey === key) {
       setSortOrder(sortOrder === "asc" ? "desc" : "asc");
@@ -74,6 +127,7 @@ const AssessmentsTable = ({
       setSortOrder("asc");
     }
   };
+
   const handleStatusChange = async (
     assessment: Assessment,
     newStatus: string
@@ -100,6 +154,7 @@ const AssessmentsTable = ({
       console.error("Error updating assessment status:", error);
     }
   };
+
   const handleDeleteAssessment = async (assessment: Assessment) => {
     if (!user || !assessment.id) return;
     if (
@@ -124,6 +179,7 @@ const AssessmentsTable = ({
       console.error("Error deleting assessment:", error);
     }
   };
+
   const handleBulkAction = async (action: "complete" | "delete" | "reset") => {
     if (!user || selectedRows.length === 0) return;
     if (
@@ -162,6 +218,7 @@ const AssessmentsTable = ({
       console.error(`Error performing bulk ${action}:`, error);
     }
   };
+
   const toggleSelectAll = () => {
     setSelectedRows(
       selectedRows.length === sortedAssessments.length &&
@@ -170,6 +227,7 @@ const AssessmentsTable = ({
         : sortedAssessments.map((a) => a.id || "").filter((id) => id !== "")
     );
   };
+
   const toggleRowSelection = (id: string) => {
     setSelectedRows(
       selectedRows.includes(id)
@@ -177,6 +235,7 @@ const AssessmentsTable = ({
         : [...selectedRows, id]
     );
   };
+
   const handleEditClick = (assessment: Assessment) => {
     setEditingId(assessment.id!);
     setEditFormData({
@@ -187,7 +246,9 @@ const AssessmentsTable = ({
       status: assessment.status,
     });
   };
+
   const handleCancelEdit = () => setEditingId(null);
+
   const handleEditFormChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
@@ -197,6 +258,7 @@ const AssessmentsTable = ({
       [name]: name === "weight" ? parseFloat(value) || 0 : value,
     }));
   };
+
   const handleSaveEdit = async (assessmentId: string) => {
     if (!user || !assessmentId) return;
     try {
@@ -221,6 +283,7 @@ const AssessmentsTable = ({
       console.error("Error updating assessment:", error);
     }
   };
+
   const getDueDateStatus = (dueDate: string, status: string) => {
     const completedStatuses = ["Submitted", "Under Review"];
     if (completedStatuses.includes(status)) return "future";
@@ -237,6 +300,7 @@ const AssessmentsTable = ({
     if (diffDays <= 7) return "upcoming";
     return "future";
   };
+
   return (
     <div>
       <div className="flex flex-col sm:flex-row justify-between mb-6 gap-4">
@@ -399,6 +463,7 @@ const AssessmentsTable = ({
                     )}
                   </div>
                 </th>
+                <th className="text-left">Days Till Due</th>
                 <th
                   onClick={() => handleSort("weight")}
                   className="text-right cursor-pointer"
@@ -423,6 +488,11 @@ const AssessmentsTable = ({
                   assessment.dueDate,
                   assessment.status
                 );
+                const daysTillDue = getDaysTillDue(
+                  assessment.dueDate,
+                  assessment.status
+                );
+
                 return editingId === assessment.id ? (
                   <tr
                     key={`editing-${assessment.id}`}
@@ -486,6 +556,12 @@ const AssessmentsTable = ({
                         onChange={handleEditFormChange}
                         className="input py-1 px-2 text-sm w-full"
                       />
+                    </td>
+                    <td>
+                      {/* Days till due not editable directly */}
+                      <span className="text-gray-400 text-sm italic">
+                        Will update on save
+                      </span>
                     </td>
                     <td>
                       <input
@@ -651,6 +727,7 @@ const AssessmentsTable = ({
                         {formatDateForDisplay(assessment.dueDate)}
                       </div>
                     </td>
+                    <td>{formatDaysTillDue(daysTillDue)}</td>
                     <td className="text-right">
                       {assessment.weight ? (
                         <span className="font-medium">
@@ -744,4 +821,5 @@ const AssessmentsTable = ({
     </div>
   );
 };
+
 export default AssessmentsTable;
