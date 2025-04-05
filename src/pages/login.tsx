@@ -6,7 +6,6 @@ import {
   signInWithEmailAndPassword,
   signInWithPopup,
   GoogleAuthProvider,
-  OAuthProvider,
 } from "firebase/auth";
 import Header from "../components/Header";
 import Link from "next/link";
@@ -18,9 +17,7 @@ const Auth = () => {
   const [error, setError] = useState<string | null>(null);
   const [isLogin, setIsLogin] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [authMethod, setAuthMethod] = useState<"email" | "google" | "apple">(
-    "google"
-  );
+  const [authMethod, setAuthMethod] = useState<"email" | "google">("google");
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -61,25 +58,6 @@ const Auth = () => {
     }
   };
 
-  const handleAppleSignIn = async () => {
-    setError(null);
-    setIsSubmitting(true);
-    const provider = new OAuthProvider("apple.com");
-    provider.addScope("email");
-    provider.addScope("name");
-    try {
-      await signInWithPopup(auth, provider);
-      router.push("/dashboard");
-    } catch (error: unknown) {
-      setError(
-        error instanceof Error
-          ? `Apple sign-in failed: ${error.message}`
-          : "Apple sign-in failed."
-      );
-      setIsSubmitting(false);
-    }
-  };
-
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
       <Header />
@@ -107,16 +85,6 @@ const Auth = () => {
                 }`}
               >
                 {isLogin ? "Sign in with Google" : "Sign up with Google"}
-              </button>
-              <button
-                onClick={() => setAuthMethod("apple")}
-                className={`flex-1 py-3 px-4 font-medium text-sm ${
-                  authMethod === "apple"
-                    ? "bg-indigo-50 text-indigo-600 border-b-2 border-indigo-500"
-                    : "text-gray-600 hover:bg-gray-50"
-                }`}
-              >
-                {isLogin ? "Sign in with Apple" : "Sign up with Apple"}
               </button>
               <button
                 onClick={() => setAuthMethod("email")}
@@ -188,32 +156,6 @@ const Auth = () => {
                     : isLogin
                     ? "Continue with Google"
                     : "Sign up with Google"}
-                </button>
-              </div>
-            ) : authMethod === "apple" ? (
-              <div className="text-center">
-                <button
-                  onClick={handleAppleSignIn}
-                  disabled={isSubmitting}
-                  className="btn-primary w-full flex items-center justify-center gap-2 py-3"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="18"
-                    height="18"
-                    viewBox="0 0 24 24"
-                    fill="white"
-                    className="mr-2"
-                  >
-                    <path d="M17.05 20.28c-.98.95-2.05.88-3.08.42-1.09-.49-2.09-.48-3.26.42-1.13.87-2.07.95-3.05-.42-4.95-5.48-1.45-13.78 5.04-13.78 5.79 0 8.08 6.49 4.06 13.06-.64.71-1.29 1.39-2.01 2.08zM12.23 4.93c.96-1.2 2.65-2.02 4.21-1.77-.17 1.58-1 3.03-2.35 4-1.26.91-2.81.51-4.09-.45-.73-.54-1.36-1.38-1.77-2.28z" />
-                  </svg>
-                  {isSubmitting
-                    ? isLogin
-                      ? "Signing in..."
-                      : "Signing up..."
-                    : isLogin
-                    ? "Continue with Apple"
-                    : "Sign up with Apple"}
                 </button>
               </div>
             ) : (
@@ -314,7 +256,7 @@ const Auth = () => {
                 )}
               </>
             )}
-            {(authMethod === "google" || authMethod === "apple") && (
+            {authMethod === "google" && (
               <div className="mt-6 text-center">
                 <p className="text-sm text-gray-600 mb-2">
                   {isLogin
