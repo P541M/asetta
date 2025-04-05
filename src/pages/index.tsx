@@ -60,7 +60,7 @@ export default function LandingPage() {
             </div>
             <div className="lg:w-1/2">
               <img
-                src="/api/placeholder/600/400"
+                src="../../public/images/kivo-dashboard.png"
                 alt="Kivo Dashboard Preview"
                 className="rounded-xl shadow-lg"
               />
