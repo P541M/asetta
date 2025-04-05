@@ -35,13 +35,15 @@ const SemesterTabs = ({ selectedSemester, onSelect }: SemesterTabsProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
   const [lastAdded, setLastAdded] = useState<string | null>(null);
+  const [showAddInput, setShowAddInput] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const addInputRef = useRef<HTMLDivElement>(null); // Ref for the add input container
   const newInputRef = useRef<HTMLInputElement>(null);
   const editInputRef = useRef<HTMLInputElement>(null);
 
   // Close dropdown when clicking outside
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
+    const handleClickOutsideDropdown = (event: MouseEvent) => {
       if (
         dropdownRef.current &&
         !dropdownRef.current.contains(event.target as Node)
@@ -49,18 +51,36 @@ const SemesterTabs = ({ selectedSemester, onSelect }: SemesterTabsProps) => {
         setDropdownOpenId(null);
       }
     };
-    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutsideDropdown);
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutsideDropdown);
     };
   }, []);
 
-  // Auto-focus on the new semester input when triggered
+  // Hide add input when clicking outside
   useEffect(() => {
-    if (newSemester === "" && newInputRef.current) {
+    const handleClickOutsideAddInput = (event: MouseEvent) => {
+      if (
+        showAddInput &&
+        addInputRef.current &&
+        !addInputRef.current.contains(event.target as Node)
+      ) {
+        setShowAddInput(false);
+        setNewSemester(""); // Clear the input when hiding
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutsideAddInput);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutsideAddInput);
+    };
+  }, [showAddInput]);
+
+  // Auto-focus on the new semester input when shown
+  useEffect(() => {
+    if (showAddInput && newInputRef.current) {
       newInputRef.current.focus();
     }
-  }, [newSemester]);
+  }, [showAddInput]);
 
   // Auto-focus on the edit input when editing starts
   useEffect(() => {
@@ -85,7 +105,6 @@ const SemesterTabs = ({ selectedSemester, onSelect }: SemesterTabsProps) => {
         }));
         setSemesters(sems);
         setIsLoading(false);
-        // If there are semesters but none selected, select the first one
         if (sems.length > 0 && !selectedSemester) {
           onSelect(sems[0].name);
         }
@@ -105,7 +124,6 @@ const SemesterTabs = ({ selectedSemester, onSelect }: SemesterTabsProps) => {
       setIsAdding(true);
       const semesterName = newSemester.trim();
       const semColRef = collection(db, "users", user.uid, "semesters");
-      // Check if semester already exists
       const q = query(semColRef, orderBy("name"));
       const querySnapshot = await getDocs(q);
       const exists = querySnapshot.docs.some(
@@ -123,11 +141,8 @@ const SemesterTabs = ({ selectedSemester, onSelect }: SemesterTabsProps) => {
       onSelect(semesterName);
       setNewSemester("");
       setLastAdded(docRef.id);
-
-      // Clear the "last added" highlight after 2 seconds
-      setTimeout(() => {
-        setLastAdded(null);
-      }, 2000);
+      setShowAddInput(false); // Hide input after adding
+      setTimeout(() => setLastAdded(null), 2000);
     } catch (error) {
       console.error("Error adding semester:", error);
       alert("Failed to add semester. Please try again.");
@@ -139,21 +154,16 @@ const SemesterTabs = ({ selectedSemester, onSelect }: SemesterTabsProps) => {
   // Delete a semester from Firestore
   const handleDeleteSemester = async (id: string) => {
     if (!user) return;
-    // Find the semester to delete
     const semToDelete = semesters.find((sem) => sem.id === id);
     if (!semToDelete) return;
-    // Confirm deletion
     const confirm = window.confirm(
       `Are you sure you want to delete the semester "${semToDelete.name}" and all its assessments? This action cannot be undone.`
     );
     if (!confirm) return;
     try {
-      // Start a batch operation
       const batch = writeBatch(db);
-      // Delete the semester document
       const semDocRef = doc(db, "users", user.uid, "semesters", id);
       batch.delete(semDocRef);
-      // Delete all assessments for this semester
       const assessmentsRef = collection(
         db,
         "users",
@@ -176,12 +186,9 @@ const SemesterTabs = ({ selectedSemester, onSelect }: SemesterTabsProps) => {
           )
         );
       });
-      // Commit the batch
       await batch.commit();
-      // If the deleted semester was selected, clear the selection
       if (semToDelete.name === selectedSemester) {
         if (semesters.length > 1) {
-          // Find the next semester to select
           const nextSemIndex = semesters.findIndex((s) => s.id === id) - 1;
           const nextSem = semesters[nextSemIndex >= 0 ? nextSemIndex : 1];
           onSelect(nextSem.id === id ? "" : nextSem.name);
@@ -199,7 +206,7 @@ const SemesterTabs = ({ selectedSemester, onSelect }: SemesterTabsProps) => {
   const handleEditStart = (id: string, currentName: string) => {
     setEditingId(id);
     setEditingName(currentName);
-    setDropdownOpenId(null); // close dropdown if open
+    setDropdownOpenId(null);
   };
 
   // Update the semester name in Firestore
@@ -207,7 +214,6 @@ const SemesterTabs = ({ selectedSemester, onSelect }: SemesterTabsProps) => {
     if (!user || editingName.trim() === "") return;
     try {
       const updatedName = editingName.trim();
-      // Check if the name already exists (excluding the current semester)
       const existingWithSameName = semesters.some(
         (sem) =>
           sem.id !== id && sem.name.toLowerCase() === updatedName.toLowerCase()
@@ -221,19 +227,14 @@ const SemesterTabs = ({ selectedSemester, onSelect }: SemesterTabsProps) => {
         name: updatedName,
         updatedAt: new Date(),
       });
-      // If the edited semester was selected, update the selection
       const oldName = semesters.find((sem) => sem.id === id)?.name;
       if (selectedSemester === oldName) {
         onSelect(updatedName);
       }
       setEditingId(null);
       setEditingName("");
-
-      // Highlight the updated semester temporarily
       setLastAdded(id);
-      setTimeout(() => {
-        setLastAdded(null);
-      }, 2000);
+      setTimeout(() => setLastAdded(null), 2000);
     } catch (error) {
       console.error("Error updating semester:", error);
       alert("Failed to update semester name. Please try again.");
@@ -399,92 +400,121 @@ const SemesterTabs = ({ selectedSemester, onSelect }: SemesterTabsProps) => {
             )}
           </div>
         ))}
-      </div>
-      <div className="flex flex-col sm:flex-row gap-2 items-center">
-        <div className="relative flex-grow">
-          <input
-            type="text"
-            placeholder="Add new semester"
-            value={newSemester}
-            onChange={(e) => setNewSemester(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") handleAddSemester();
-            }}
-            ref={newInputRef}
-            className="input pr-10 transition-all duration-200 hover:shadow-sm focus:shadow"
-          />
-          {newSemester && (
-            <button
-              onClick={() => setNewSemester("")}
-              className="absolute right-10 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors duration-200"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                  clipRule="evenodd"
-                />
-              </svg>
-            </button>
-          )}
-        </div>
+        {/* "+" Button to Show Input */}
         <button
-          onClick={handleAddSemester}
-          disabled={isAdding || !newSemester.trim()}
-          className={`btn-accent flex items-center whitespace-nowrap hover:shadow hover:-translate-y-0.5 transition-all duration-300 ${
-            isAdding || !newSemester.trim()
-              ? "opacity-50 cursor-not-allowed"
-              : ""
-          }`}
+          onClick={() => setShowAddInput(true)}
+          className="p-2 bg-indigo-100 text-indigo-600 rounded-full hover:bg-indigo-200 transition-all duration-200"
+          title="Add new semester"
         >
-          {isAdding ? (
-            <>
-              <svg
-                className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-              >
-                <circle
-                  className="opacity-25"
-                  cx="12"
-                  cy="12"
-                  r="10"
-                  stroke="currentColor"
-                  strokeWidth="4"
-                ></circle>
-                <path
-                  className="opacity-75"
-                  fill="currentColor"
-                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                ></path>
-              </svg>
-              Adding...
-            </>
-          ) : (
-            <>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-4 w-4 mr-1"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
-                  clipRule="evenodd"
-                />
-              </svg>
-              Add Semester
-            </>
-          )}
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-5 w-5"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+          >
+            <path
+              fillRule="evenodd"
+              d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
+              clipRule="evenodd"
+            />
+          </svg>
         </button>
       </div>
+
+      {/* Conditionally Rendered Input Field with Ref */}
+      {showAddInput && (
+        <div
+          ref={addInputRef}
+          className="flex flex-col sm:flex-row gap-2 items-center animate-fade-in"
+        >
+          <div className="relative flex-grow">
+            <input
+              type="text"
+              placeholder="Add new semester"
+              value={newSemester}
+              onChange={(e) => setNewSemester(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") handleAddSemester();
+              }}
+              ref={newInputRef}
+              className="input pr-10 transition-all duration-200 hover:shadow-sm focus:shadow"
+            />
+            {newSemester && (
+              <button
+                onClick={() => {
+                  setNewSemester("");
+                  setShowAddInput(false);
+                }}
+                className="absolute right-10 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors duration-200"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-5 w-5"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              </button>
+            )}
+          </div>
+          <button
+            onClick={handleAddSemester}
+            disabled={isAdding || !newSemester.trim()}
+            className={`btn-accent flex items-center whitespace-nowrap hover:shadow hover:-translate-y-0.5 transition-all duration-300 ${
+              isAdding || !newSemester.trim()
+                ? "opacity-50 cursor-not-allowed"
+                : ""
+            }`}
+          >
+            {isAdding ? (
+              <>
+                <svg
+                  className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
+                </svg>
+                Adding...
+              </>
+            ) : (
+              <>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-4 w-4 mr-1"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+                Add Semester
+              </>
+            )}
+          </button>
+        </div>
+      )}
     </div>
   );
 };
