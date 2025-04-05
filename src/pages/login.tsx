@@ -6,6 +6,7 @@ import {
   signInWithEmailAndPassword,
   signInWithPopup,
   GoogleAuthProvider,
+  OAuthProvider,
 } from "firebase/auth";
 import Header from "../components/Header";
 import Link from "next/link";
@@ -15,51 +16,34 @@ const Auth = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const [isLogin, setIsLogin] = useState(true); // Toggle between login and register
+  const [isLogin, setIsLogin] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [authMethod, setAuthMethod] = useState<"email" | "google">("google"); // Default to Google for prominent display
+  const [authMethod, setAuthMethod] = useState<"email" | "google" | "apple">(
+    "google"
+  );
   const router = useRouter();
 
-  // Handle form submission for login only
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     setIsSubmitting(true);
     try {
-      // Sign in existing user
       await signInWithEmailAndPassword(auth, email, password);
       router.push("/dashboard");
     } catch (error: unknown) {
-      if (error instanceof Error) {
-        // Present more user-friendly error messages
-        let errorMessage = "Login failed. ";
-
-        if (
-          error.message.includes("auth/wrong-password") ||
-          error.message.includes("auth/user-not-found")
-        ) {
-          errorMessage += "Invalid email or password.";
-        } else if (error.message.includes("auth/invalid-email")) {
-          errorMessage += "Please enter a valid email address.";
-        } else {
-          errorMessage += error.message;
-        }
-
-        setError(errorMessage);
-      } else {
-        setError("Login failed.");
-      }
-    } finally {
+      setError(
+        error instanceof Error
+          ? `Login failed: ${error.message}`
+          : "Login failed."
+      );
       setIsSubmitting(false);
     }
   };
 
-  // Handle registration success
   const handleRegistrationSuccess = () => {
     router.push("/dashboard");
   };
 
-  // Register / Sign in using Google
   const handleGoogleSignIn = async () => {
     setError(null);
     setIsSubmitting(true);
@@ -68,12 +52,30 @@ const Auth = () => {
       await signInWithPopup(auth, provider);
       router.push("/dashboard");
     } catch (error: unknown) {
-      if (error instanceof Error) {
-        setError("Google sign in failed. " + error.message);
-      } else {
-        setError("Google sign in failed.");
-      }
-    } finally {
+      setError(
+        error instanceof Error
+          ? `Google sign-in failed: ${error.message}`
+          : "Google sign-in failed."
+      );
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleAppleSignIn = async () => {
+    setError(null);
+    setIsSubmitting(true);
+    const provider = new OAuthProvider("apple.com");
+    provider.addScope("email");
+    provider.addScope("name");
+    try {
+      await signInWithPopup(auth, provider);
+      router.push("/dashboard");
+    } catch (error: unknown) {
+      setError(
+        error instanceof Error
+          ? `Apple sign-in failed: ${error.message}`
+          : "Apple sign-in failed."
+      );
       setIsSubmitting(false);
     }
   };
@@ -95,7 +97,6 @@ const Auth = () => {
           </div>
 
           <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8 md:p-10">
-            {/* Auth Method Selector */}
             <div className="flex mb-6 border border-gray-200 rounded-lg overflow-hidden">
               <button
                 onClick={() => setAuthMethod("google")}
@@ -106,6 +107,16 @@ const Auth = () => {
                 }`}
               >
                 {isLogin ? "Sign in with Google" : "Sign up with Google"}
+              </button>
+              <button
+                onClick={() => setAuthMethod("apple")}
+                className={`flex-1 py-3 px-4 font-medium text-sm ${
+                  authMethod === "apple"
+                    ? "bg-indigo-50 text-indigo-600 border-b-2 border-indigo-500"
+                    : "text-gray-600 hover:bg-gray-50"
+                }`}
+              >
+                {isLogin ? "Sign in with Apple" : "Sign up with Apple"}
               </button>
               <button
                 onClick={() => setAuthMethod("email")}
@@ -178,28 +189,36 @@ const Auth = () => {
                     ? "Continue with Google"
                     : "Sign up with Google"}
                 </button>
-
-                <div className="mt-6 text-center">
-                  <p className="text-sm text-gray-600 mb-2">
-                    {isLogin
-                      ? "Don't have a Google account?"
-                      : "Prefer a different method?"}
-                  </p>
-                  <button
-                    onClick={() => setAuthMethod("email")}
-                    className="text-indigo-600 hover:text-indigo-800 text-sm font-medium"
+              </div>
+            ) : authMethod === "apple" ? (
+              <div className="text-center">
+                <button
+                  onClick={handleAppleSignIn}
+                  disabled={isSubmitting}
+                  className="btn-primary w-full flex items-center justify-center gap-2 py-3"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="white"
+                    className="mr-2"
                   >
-                    {isLogin
-                      ? "Use email and password instead"
-                      : "Sign up with email and password"}
-                  </button>
-                </div>
+                    <path d="M17.05 20.28c-.98.95-2.05.88-3.08.42-1.09-.49-2.09-.48-3.26.42-1.13.87-2.07.95-3.05-.42-4.95-5.48-1.45-13.78 5.04-13.78 5.79 0 8.08 6.49 4.06 13.06-.64.71-1.29 1.39-2.01 2.08zM12.23 4.93c.96-1.2 2.65-2.02 4.21-1.77-.17 1.58-1 3.03-2.35 4-1.26.91-2.81.51-4.09-.45-.73-.54-1.36-1.38-1.77-2.28z" />
+                  </svg>
+                  {isSubmitting
+                    ? isLogin
+                      ? "Signing in..."
+                      : "Signing up..."
+                    : isLogin
+                    ? "Continue with Apple"
+                    : "Sign up with Apple"}
+                </button>
               </div>
             ) : (
-              // Email authentication section
               <>
                 {isLogin ? (
-                  // Login Form
                   <form onSubmit={handleSubmit} className="space-y-5">
                     <div className="form-group">
                       <label htmlFor="email" className="form-label">
@@ -272,10 +291,9 @@ const Auth = () => {
                           Signing in...
                         </span>
                       ) : (
-                        <span>Sign In</span>
+                        "Sign In"
                       )}
                     </button>
-
                     <div className="mt-4 text-center">
                       <button
                         onClick={() => setIsLogin(false)}
@@ -286,7 +304,6 @@ const Auth = () => {
                     </div>
                   </form>
                 ) : (
-                  // Registration Form - uses the enhanced form component
                   <EnhancedRegisterForm
                     onSuccess={handleRegistrationSuccess}
                     onCancel={() => setIsLogin(true)}
@@ -295,62 +312,44 @@ const Auth = () => {
                     setError={setError}
                   />
                 )}
-
-                <div className="mt-6 text-center">
-                  <p className="text-sm text-gray-600 mb-2">Or use:</p>
-                  <button
-                    type="button"
-                    onClick={() => setAuthMethod("google")}
-                    className="btn-outline flex items-center justify-center w-full gap-2 py-2.5"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="18"
-                      height="18"
-                      viewBox="0 0 48 48"
-                      className="mr-2"
-                    >
-                      <path
-                        fill="#EA4335"
-                        d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"
-                      />
-                      <path
-                        fill="#4285F4"
-                        d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"
-                      />
-                      <path
-                        fill="#FBBC05"
-                        d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"
-                      />
-                      <path
-                        fill="#34A853"
-                        d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"
-                      />
-                    </svg>
-                    {isLogin ? "Sign in with Google" : "Sign up with Google"}
-                  </button>
-                </div>
               </>
             )}
-          </div>
-          <div className="mt-8 text-center text-sm text-gray-500">
-            <p>
-              By signing in, you agree to our{" "}
-              <Link
-                href="/terms"
-                className="text-indigo-600 hover:text-indigo-800"
-              >
-                Terms of Service
-              </Link>{" "}
-              and{" "}
-              <Link
-                href="/privacy"
-                className="text-indigo-600 hover:text-indigo-800"
-              >
-                Privacy Policy
-              </Link>
-              .
-            </p>
+            {(authMethod === "google" || authMethod === "apple") && (
+              <div className="mt-6 text-center">
+                <p className="text-sm text-gray-600 mb-2">
+                  {isLogin
+                    ? "Don't have this account?"
+                    : "Prefer a different method?"}
+                </p>
+                <button
+                  onClick={() => setAuthMethod("email")}
+                  className="text-indigo-600 hover:text-indigo-800 text-sm font-medium"
+                >
+                  {isLogin
+                    ? "Use email and password instead"
+                    : "Sign up with email and password"}
+                </button>
+              </div>
+            )}
+            <div className="mt-8 text-center text-sm text-gray-500">
+              <p>
+                By signing in, you agree to our{" "}
+                <Link
+                  href="/terms"
+                  className="text-indigo-600 hover:text-indigo-800"
+                >
+                  Terms of Service
+                </Link>{" "}
+                and{" "}
+                <Link
+                  href="/privacy"
+                  className="text-indigo-600 hover:text-indigo-800"
+                >
+                  Privacy Policy
+                </Link>
+                .
+              </p>
+            </div>
           </div>
         </div>
       </div>
