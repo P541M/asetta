@@ -1,3 +1,4 @@
+// src/components/AssessmentsTable.tsx
 import { useState, useEffect, useRef } from "react";
 import { db } from "../lib/firebase";
 import { doc, updateDoc, deleteDoc } from "firebase/firestore";
@@ -8,9 +9,10 @@ interface Assessment {
   courseName: string;
   assignmentName: string;
   dueDate: string;
-  dueTime: string; // Added dueTime
+  dueTime: string;
   weight: number;
   status: string;
+  notes?: string; // Added notes field
 }
 
 interface AssessmentsTableProps {
@@ -32,6 +34,19 @@ const AssessmentsTable = ({
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
   const [lastStatusChange, setLastStatusChange] = useState<string | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editFormData, setEditFormData] = useState<Assessment>({
+    courseName: "",
+    assignmentName: "",
+    dueDate: "",
+    dueTime: "23:59",
+    weight: 0,
+    status: "Not started",
+    notes: "",
+  });
+  const [selectedAssessment, setSelectedAssessment] =
+    useState<Assessment | null>(null);
+  const [notesInput, setNotesInput] = useState<string>("");
 
   const formatDateTimeForDisplay = (
     dateStr: string,
@@ -51,7 +66,6 @@ const AssessmentsTable = ({
     });
   };
 
-  // Calculate days until due date, considering time
   const getDaysTillDue = (
     dueDate: string,
     dueTime: string,
@@ -70,7 +84,6 @@ const AssessmentsTable = ({
     return diffDays;
   };
 
-  // Format the days till due for display
   const formatDaysTillDue = (days: number | null): JSX.Element | null => {
     if (days === null) return null;
     if (days < 0) {
@@ -102,20 +115,17 @@ const AssessmentsTable = ({
       ) {
         setDropdownOpenId(null);
       }
+      if (
+        selectedAssessment &&
+        event.target instanceof Node &&
+        !document.getElementById("notes-modal")?.contains(event.target)
+      ) {
+        setSelectedAssessment(null);
+      }
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [editFormData, setEditFormData] = useState<Assessment>({
-    courseName: "",
-    assignmentName: "",
-    dueDate: "",
-    dueTime: "23:59", // Default to 11:59 PM
-    weight: 0,
-    status: "Not started",
-  });
+  }, [selectedAssessment]);
 
   const filteredAssessments = assessments.filter((assessment) => {
     if (filter === "all") return true;
@@ -263,13 +273,16 @@ const AssessmentsTable = ({
       dueTime: assessment.dueTime,
       weight: assessment.weight,
       status: assessment.status,
+      notes: assessment.notes || "",
     });
   };
 
   const handleCancelEdit = () => setEditingId(null);
 
   const handleEditFormChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >
   ) => {
     const { name, value } = e.target;
     setEditFormData((prev) => ({
@@ -323,6 +336,36 @@ const AssessmentsTable = ({
     if (diffDays <= 3) return "urgent";
     if (diffDays <= 7) return "upcoming";
     return "future";
+  };
+
+  const handleRowClick = (assessment: Assessment) => {
+    if (!editingId && assessment.id) {
+      setSelectedAssessment(assessment);
+      setNotesInput(assessment.notes || "");
+    }
+  };
+
+  const handleSaveNotes = async () => {
+    if (!user || !selectedAssessment?.id) return;
+    try {
+      const assessmentRef = doc(
+        db,
+        "users",
+        user.uid,
+        "semesters",
+        semesterId,
+        "assessments",
+        selectedAssessment.id
+      );
+      await updateDoc(assessmentRef, {
+        notes: notesInput,
+        updatedAt: new Date(),
+      });
+      setSelectedAssessment(null);
+      onStatusChange?.();
+    } catch (error) {
+      console.error("Error saving notes:", error);
+    }
   };
 
   return (
@@ -652,7 +695,8 @@ const AssessmentsTable = ({
                 ) : (
                   <tr
                     key={assessment.id || index}
-                    className={`transition-all duration-300 ${
+                    onClick={() => handleRowClick(assessment)}
+                    className={`transition-all duration-300 cursor-pointer ${
                       assessment.status === "Submitted"
                         ? "bg-emerald-50/40"
                         : assessment.status === "Missed/Late"
@@ -678,6 +722,7 @@ const AssessmentsTable = ({
                           type="checkbox"
                           checked={selectedRows.includes(assessment.id)}
                           onChange={() => toggleRowSelection(assessment.id!)}
+                          onClick={(e) => e.stopPropagation()}
                           className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 transition-all duration-200"
                         />
                       )}
@@ -688,6 +733,7 @@ const AssessmentsTable = ({
                         onChange={(e) =>
                           handleStatusChange(assessment, e.target.value)
                         }
+                        onClick={(e) => e.stopPropagation()}
                         className={`input py-1 px-2 text-sm transition-all duration-300 w-full ${
                           assessment.status === "Submitted"
                             ? "bg-emerald-100 border-emerald-200 text-emerald-800"
@@ -734,11 +780,23 @@ const AssessmentsTable = ({
                     </td>
                     <td className="font-medium">{assessment.courseName}</td>
                     <td>
-                      <div
-                        className="truncate max-w-xs"
-                        title={assessment.assignmentName}
-                      >
-                        {assessment.assignmentName}
+                      <div className="flex items-center">
+                        <span
+                          className="truncate max-w-xs"
+                          title={assessment.assignmentName}
+                        >
+                          {assessment.assignmentName}
+                        </span>
+                        {assessment.notes && (
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-4 w-4 ml-2 text-indigo-600"
+                            viewBox="0 0 20 20"
+                            fill="currentColor"
+                          >
+                            <path d="M8 5a2 2 0 012-2h5a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h3zm0 2v8h7V5h-5v2H8z" />
+                          </svg>
+                        )}
                       </div>
                     </td>
                     <td
@@ -773,7 +831,10 @@ const AssessmentsTable = ({
                         <span className="text-gray-400">-</span>
                       )}
                     </td>
-                    <td className="text-center">
+                    <td
+                      className="text-center"
+                      onClick={(e) => e.stopPropagation()}
+                    >
                       <div
                         className="relative inline-block text-left"
                         ref={
@@ -852,6 +913,59 @@ const AssessmentsTable = ({
               })}
             </tbody>
           </table>
+        </div>
+      )}
+
+      {/* Notes Modal */}
+      {selectedAssessment && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div
+            id="notes-modal"
+            className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md animate-scale"
+          >
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-medium text-gray-900">
+                Notes for {selectedAssessment.assignmentName}
+              </h3>
+              <button
+                onClick={() => setSelectedAssessment(null)}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-5 w-5"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              </button>
+            </div>
+            <textarea
+              value={notesInput}
+              onChange={(e) => setNotesInput(e.target.value)}
+              className="input w-full h-40 mb-4"
+              placeholder="Add your notes here (e.g., to-do list, contacts, reminders)..."
+            />
+            <div className="flex justify-end space-x-2">
+              <button
+                onClick={() => setSelectedAssessment(null)}
+                className="btn-outline py-1.5 px-4"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSaveNotes}
+                className="btn-primary py-1.5 px-4"
+              >
+                Save
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

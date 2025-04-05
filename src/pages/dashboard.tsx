@@ -1,4 +1,4 @@
-// pages/dashboard.tsx
+// src/pages/dashboard.tsx
 import { useEffect, useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { useRouter } from "next/router";
@@ -20,15 +20,15 @@ import AddAssessmentForm from "../components/AddAssessmentForm";
 import CalendarView from "../components/CalendarView";
 import Header from "../components/Header";
 
-// Updated Assessment interface
 interface Assessment {
   id: string;
   courseName: string;
   assignmentName: string;
   dueDate: string;
-  dueTime: string; // Added dueTime
+  dueTime: string;
   weight: number;
   status: string;
+  notes?: string; // Added notes field
 }
 
 const Dashboard = () => {
@@ -55,14 +55,12 @@ const Dashboard = () => {
     upcomingDeadlines: 0,
   });
 
-  // Redirect to login if not authenticated
   useEffect(() => {
     if (!loading && !user) {
       router.push("/login");
     }
   }, [user, loading, router]);
 
-  // Find semester ID when semester name changes
   useEffect(() => {
     const findSemesterId = async () => {
       if (!user || !selectedSemester) {
@@ -86,7 +84,6 @@ const Dashboard = () => {
     findSemesterId();
   }, [selectedSemester, user]);
 
-  // Listen for assessments when semester ID changes
   useEffect(() => {
     if (!user || !selectedSemesterId) {
       setAssessments([]);
@@ -117,6 +114,7 @@ const Dashboard = () => {
             dueTime: data.dueTime || "23:59",
             weight: data.weight || 0,
             status: data.status || "Not started",
+            notes: data.notes || "",
           };
         });
         setAssessments(assessmentsList);
