@@ -1,5 +1,6 @@
 // src/pages/index.tsx
 import { useEffect } from "react";
+import Image from "next/image";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import { useAuth } from "../contexts/AuthContext";
@@ -59,10 +60,13 @@ export default function LandingPage() {
               </div>
             </div>
             <div className="lg:w-1/2">
-              <img
-                src="../../public/images/kivo-dashboard.png"
+              <Image
+                src="/images/kivo-dashboard.png"
                 alt="Kivo Dashboard Preview"
-                className="rounded-xl shadow-lg"
+                width={700}
+                height={400}
+                priority
+                className="rounded-lg shadow-lg"
               />
             </div>
           </div>
