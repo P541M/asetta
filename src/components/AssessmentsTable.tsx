@@ -1,9 +1,7 @@
-// src/components/AssessmentsTable.tsx
 import { useState, useEffect, useRef } from "react";
 import { db } from "../lib/firebase";
 import { doc, updateDoc, deleteDoc } from "firebase/firestore";
 import { useAuth } from "../contexts/AuthContext";
-
 interface Assessment {
   id?: string;
   courseName: string;
@@ -12,13 +10,11 @@ interface Assessment {
   weight: number;
   status: string;
 }
-
 interface AssessmentsTableProps {
   assessments: Assessment[];
   semesterId: string;
   onStatusChange?: () => void;
 }
-
 const AssessmentsTable = ({
   assessments,
   semesterId,
@@ -32,7 +28,6 @@ const AssessmentsTable = ({
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
   const [lastStatusChange, setLastStatusChange] = useState<string | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
-
   const formatDateForDisplay = (dateStr: string): string => {
     const [year, month, day] = dateStr
       .split("-")
@@ -40,7 +35,6 @@ const AssessmentsTable = ({
     const date = new Date(year, month - 1, day, 12, 0, 0);
     return date.toLocaleDateString();
   };
-
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -53,7 +47,6 @@ const AssessmentsTable = ({
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
-
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editFormData, setEditFormData] = useState<Assessment>({
     courseName: "",
@@ -62,20 +55,17 @@ const AssessmentsTable = ({
     weight: 0,
     status: "Not started",
   });
-
   const filteredAssessments = assessments.filter((assessment) => {
     if (filter === "all") return true;
     if (filter === "not_submitted") return assessment.status !== "Submitted";
     if (filter === "submitted") return assessment.status === "Submitted";
     return true;
   });
-
   const sortedAssessments = [...filteredAssessments].sort((a, b) => {
     if (a[sortKey] < b[sortKey]) return sortOrder === "asc" ? -1 : 1;
     if (a[sortKey] > b[sortKey]) return sortOrder === "asc" ? 1 : -1;
     return 0;
   });
-
   const handleSort = (key: keyof Assessment) => {
     if (sortKey === key) {
       setSortOrder(sortOrder === "asc" ? "desc" : "asc");
@@ -84,7 +74,6 @@ const AssessmentsTable = ({
       setSortOrder("asc");
     }
   };
-
   const handleStatusChange = async (
     assessment: Assessment,
     newStatus: string
@@ -111,7 +100,6 @@ const AssessmentsTable = ({
       console.error("Error updating assessment status:", error);
     }
   };
-
   const handleDeleteAssessment = async (assessment: Assessment) => {
     if (!user || !assessment.id) return;
     if (
@@ -136,7 +124,6 @@ const AssessmentsTable = ({
       console.error("Error deleting assessment:", error);
     }
   };
-
   const handleBulkAction = async (action: "complete" | "delete" | "reset") => {
     if (!user || selectedRows.length === 0) return;
     if (
@@ -175,7 +162,6 @@ const AssessmentsTable = ({
       console.error(`Error performing bulk ${action}:`, error);
     }
   };
-
   const toggleSelectAll = () => {
     setSelectedRows(
       selectedRows.length === sortedAssessments.length &&
@@ -184,7 +170,6 @@ const AssessmentsTable = ({
         : sortedAssessments.map((a) => a.id || "").filter((id) => id !== "")
     );
   };
-
   const toggleRowSelection = (id: string) => {
     setSelectedRows(
       selectedRows.includes(id)
@@ -192,7 +177,6 @@ const AssessmentsTable = ({
         : [...selectedRows, id]
     );
   };
-
   const handleEditClick = (assessment: Assessment) => {
     setEditingId(assessment.id!);
     setEditFormData({
@@ -203,9 +187,7 @@ const AssessmentsTable = ({
       status: assessment.status,
     });
   };
-
   const handleCancelEdit = () => setEditingId(null);
-
   const handleEditFormChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
@@ -215,7 +197,6 @@ const AssessmentsTable = ({
       [name]: name === "weight" ? parseFloat(value) || 0 : value,
     }));
   };
-
   const handleSaveEdit = async (assessmentId: string) => {
     if (!user || !assessmentId) return;
     try {
@@ -240,7 +221,6 @@ const AssessmentsTable = ({
       console.error("Error updating assessment:", error);
     }
   };
-
   const getDueDateStatus = (dueDate: string, status: string) => {
     const completedStatuses = ["Submitted", "Under Review"];
     if (completedStatuses.includes(status)) return "future";
@@ -257,7 +237,6 @@ const AssessmentsTable = ({
     if (diffDays <= 7) return "upcoming";
     return "future";
   };
-
   return (
     <div>
       <div className="flex flex-col sm:flex-row justify-between mb-6 gap-4">
@@ -765,5 +744,4 @@ const AssessmentsTable = ({
     </div>
   );
 };
-
 export default AssessmentsTable;

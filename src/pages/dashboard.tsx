@@ -19,7 +19,6 @@ import CourseFilteredAssessments from "../components/CourseFilteredAssessments";
 import AddAssessmentForm from "../components/AddAssessmentForm";
 import CalendarView from "../components/CalendarView";
 import Header from "../components/Header";
-
 interface Assessment {
   id: string;
   courseName: string;
@@ -28,7 +27,6 @@ interface Assessment {
   weight: number;
   status: string;
 }
-
 const Dashboard = () => {
   const { user, loading, logout } = useAuth();
   const router = useRouter();
@@ -39,10 +37,9 @@ const Dashboard = () => {
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<
     "courses" | "assessments" | "add" | "upload" | "calendar"
-  >("courses");
+  >("assessments"); // Changed default tab to "assessments"
   const [selectedCourse, setSelectedCourse] = useState<string | null>(null);
   const [animateStatCards, setAnimateStatCards] = useState(false);
-
   // Stats for dashboard with new categories
   const [stats, setStats] = useState({
     total: 0,
@@ -54,14 +51,12 @@ const Dashboard = () => {
     problem: 0, // Missed/Late, Deferred
     upcomingDeadlines: 0,
   });
-
   // Redirect to login if not authenticated
   useEffect(() => {
     if (!loading && !user) {
       router.push("/login");
     }
   }, [user, loading, router]);
-
   // Find semester ID when semester name changes
   useEffect(() => {
     const findSemesterId = async () => {
@@ -85,7 +80,6 @@ const Dashboard = () => {
     };
     findSemesterId();
   }, [selectedSemester, user]);
-
   // Listen for assessments when semester ID changes
   useEffect(() => {
     if (!user || !selectedSemesterId) {
@@ -175,30 +169,26 @@ const Dashboard = () => {
     );
     return () => unsubscribe();
   }, [selectedSemesterId, user]);
-
   const refreshAssessments = () => {
-    // This function now serves as a placeholder since we're using real-time listeners
-    console.log("Assessment data refreshed");
-    // Reset to the main assessments view when data refreshes
-    setActiveTab("courses");
-    setSelectedCourse(null);
-  };
+    // No longer resetting to main view - comment this out
+    // setActiveTab("courses");
+    // setSelectedCourse(null);
 
+    // Instead, just log that data was refreshed
+    console.log("Assessment data refreshed");
+  };
   const handleSelectCourse = (courseName: string) => {
     setSelectedCourse(courseName);
     setActiveTab("assessments");
   };
-
   const handleClearCourseSelection = () => {
     setSelectedCourse(null);
-    setActiveTab("courses");
+    setActiveTab("assessments"); // Changed to go back to assessments instead of courses
   };
-
   const handleLogout = async () => {
     await logout();
     router.push("/login");
   };
-
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -209,7 +199,6 @@ const Dashboard = () => {
       </div>
     );
   }
-
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <Header onLogout={handleLogout} />
@@ -522,5 +511,4 @@ const Dashboard = () => {
     </div>
   );
 };
-
 export default Dashboard;
