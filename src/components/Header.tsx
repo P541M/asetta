@@ -87,7 +87,7 @@ const Header = ({ onLogout }: HeaderProps) => {
   return (
     <>
       <header
-        className={`bg-white border-b border-gray-100 sticky top-0 z-10 transition-all duration-300 ${
+        className={`bg-white border-b border-gray-100 sticky top-0 z-50 transition-all duration-300 ${
           scrolled ? "shadow-md backdrop-blur-sm bg-white/95" : "bg-white"
         }`}
       >
