@@ -1,4 +1,3 @@
-// src/pages/dashboard.tsx
 import { useEffect, useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { useRouter } from "next/router";
@@ -30,6 +29,7 @@ interface Assessment {
   weight: number;
   status: string;
   notes?: string;
+  outlineUrl?: string;
 }
 
 const Dashboard = () => {
@@ -116,6 +116,7 @@ const Dashboard = () => {
             weight: data.weight || 0,
             status: data.status || "Not started",
             notes: data.notes || "",
+            outlineUrl: data.outlineUrl || "",
           };
         });
         setAssessments(assessmentsList);

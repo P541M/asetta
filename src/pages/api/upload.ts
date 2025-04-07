@@ -3,6 +3,7 @@ import formidable, { IncomingForm, Fields, Files } from "formidable";
 import fs from "fs";
 import pdfParse from "pdf-parse";
 import { getAdmin } from "../../lib/firebase-admin";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 export const config = {
   api: {
@@ -17,6 +18,7 @@ interface Assessment {
   dueTime: string;
   weight: number;
   status: string;
+  outlineUrl?: string;
 }
 
 export default async function handler(
@@ -66,16 +68,14 @@ export default async function handler(
       const decodedToken = await admin.auth().verifyIdToken(token);
       userId = decodedToken.uid;
     } catch (error) {
-      console.error(
-        "Invalid token:",
-        error instanceof Error ? error.message : String(error)
-      );
+      console.error("Invalid token:", error);
       return res
         .status(401)
         .json({ success: false, error: "Invalid authentication token" });
     }
 
     const adminDb = admin.firestore();
+    const storage = getStorage();
     const semestersRef = adminDb.collection(`users/${userId}/semesters`);
     const semesterQuery = semestersRef.where("name", "==", semester).limit(1);
     const semesterSnapshot = await semesterQuery.get();
@@ -121,6 +121,13 @@ export default async function handler(
           continue;
         }
 
+        const storageRef = ref(
+          storage,
+          `users/${userId}/outlines/${semesterId}/${fileName}`
+        );
+        await uploadBytes(storageRef, pdfBuffer);
+        const outlineUrl = await getDownloadURL(storageRef);
+
         let assessments: Assessment[] = [];
         try {
           const deepseekEndpoint = process.env.DEEPSEEK_ENDPOINT;
@@ -128,7 +135,6 @@ export default async function handler(
           if (deepseekEndpoint && deepseekApiKey) {
             const prompt = `
               You are an AI assistant that extracts assessment information from course outlines.
-
               Extract all assessments from the following course outline text. Return a JSON array with objects having the following structure:
               {
                 "courseName": "The course code or name",
@@ -160,11 +166,7 @@ export default async function handler(
               }),
             });
             if (!response.ok) {
-              const errorData = await response.text();
-              console.error(`DeepSeek API error for ${fileName}:`, errorData);
-              throw new Error(
-                `DeepSeek API returned status ${response.status}`
-              );
+              throw new Error(`DeepSeek API error: ${response.status}`);
             }
             const aiResponse = await response.json();
             const aiContent = aiResponse.choices[0].message.content;
@@ -180,18 +182,24 @@ export default async function handler(
               dueDate:
                 formatDate(assessment.dueDate) ||
                 new Date().toISOString().split("T")[0],
-              dueTime: assessment.dueTime || "23:59", // Default to 11:59 PM
+              dueTime: assessment.dueTime || "23:59",
               weight:
                 typeof assessment.weight === "number"
                   ? assessment.weight
                   : parseFloat(assessment.weight) || 0,
               status: "Not started",
+              outlineUrl,
             }));
           } else {
             throw new Error("DeepSeek API not configured");
           }
         } catch (aiError) {
-          assessments = extractAssessmentsBasic(extractedText);
+          assessments = extractAssessmentsBasic(extractedText).map(
+            (assessment) => ({
+              ...assessment,
+              outlineUrl,
+            })
+          );
         }
 
         if (assessments.length === 0) {
@@ -199,9 +207,10 @@ export default async function handler(
             courseName: extractCourseName(extractedText) || "Unknown Course",
             assignmentName: "Manual Review Required",
             dueDate: new Date().toISOString().split("T")[0],
-            dueTime: "23:59", // Default to 11:59 PM
+            dueTime: "23:59",
             weight: 0,
             status: "Not started",
+            outlineUrl,
           });
         }
 
@@ -210,6 +219,7 @@ export default async function handler(
           uploadDate: new Date(),
           semester,
           text: extractedText.slice(0, 5000),
+          outlineUrl,
         });
 
         const assessmentsRef = adminDb.collection(
@@ -257,7 +267,7 @@ function extractAssessmentsBasic(extractedText: string): Assessment[] {
   let match;
   while ((match = assignmentPattern.exec(extractedText)) !== null) {
     const timeMatch = match[6] || match[7];
-    const dueTime = extractTime(timeMatch) || "23:59"; // Default to 11:59 PM
+    const dueTime = extractTime(timeMatch) || "23:59";
     assessments.push({
       courseName: extractCourseName(extractedText) || "Unknown Course",
       assignmentName: `${match[1]} ${match[2] || ""}`.trim(),
@@ -277,7 +287,7 @@ function extractAssessmentsBasic(extractedText: string): Assessment[] {
         /\d{1,2}[\/-]\d{1,2}[\/-]\d{2,4}|\w+\s+\d{1,2},?\s*\d{4}/i.test(section)
       ) {
         const date = extractDate(section);
-        const time = extractTimeFromSection(section) || "23:59"; // Default to 11:59 PM
+        const time = extractTimeFromSection(section) || "23:59";
         assessments.push({
           courseName: extractCourseName(extractedText) || "Unknown Course",
           assignmentName:

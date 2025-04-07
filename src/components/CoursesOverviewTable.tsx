@@ -1,8 +1,8 @@
-// src/components/CoursesOverviewTable.tsx
 import { useState, useEffect } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { db } from "../lib/firebase";
-import { collection, query, getDocs } from "firebase/firestore";
+import { collection, query, getDocs, doc, setDoc } from "firebase/firestore";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 interface Assessment {
   id: string;
@@ -20,7 +20,8 @@ interface CourseStats {
   completedAssessments: number;
   nextDueDate: string | null;
   nextAssignment: string | null;
-  progress: number; // Percentage of completed assessments
+  progress: number;
+  outlineUrl?: string;
 }
 
 interface CoursesOverviewTableProps {
@@ -38,6 +39,7 @@ const CoursesOverviewTable = ({
   const [error, setError] = useState<string | null>(null);
   const [sortField, setSortField] = useState<keyof CourseStats>("courseName");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
+  const [uploadingCourse, setUploadingCourse] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchCourseData = async () => {
@@ -58,20 +60,13 @@ const CoursesOverviewTable = ({
           semesterId,
           "assessments"
         );
-
         const querySnapshot = await getDocs(query(assessmentsRef));
-        const assessmentsList: Assessment[] = [];
+        const assessmentsList: Assessment[] = querySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...(doc.data() as Omit<Assessment, "id">),
+        }));
 
-        querySnapshot.forEach((doc) => {
-          assessmentsList.push({
-            id: doc.id,
-            ...(doc.data() as Omit<Assessment, "id">),
-          });
-        });
-
-        // Group assessments by course
         const courseMap = new Map<string, Assessment[]>();
-
         assessmentsList.forEach((assessment) => {
           if (!courseMap.has(assessment.courseName)) {
             courseMap.set(assessment.courseName, []);
@@ -79,17 +74,22 @@ const CoursesOverviewTable = ({
           courseMap.get(assessment.courseName)?.push(assessment);
         });
 
-        // Calculate stats for each course
-        const courseStatsList: CourseStats[] = [];
+        const coursesRef = collection(db, "users", user.uid, "courses");
+        const coursesSnapshot = await getDocs(query(coursesRef));
+        const courseOutlines = new Map<string, string>();
+        coursesSnapshot.forEach((doc) => {
+          const data = doc.data();
+          if (data.semesterId === semesterId) {
+            courseOutlines.set(data.courseName, data.outlineUrl);
+          }
+        });
 
+        const courseStatsList: CourseStats[] = [];
         courseMap.forEach((assessments, courseName) => {
-          // Submission statuses
           const completedStatuses = ["Submitted", "Under Review", "Completed"];
           const completed = assessments.filter((a) =>
             completedStatuses.includes(a.status)
           );
-
-          // Find next due assessment
           const now = new Date();
           const upcomingAssessments = assessments
             .filter(
@@ -101,9 +101,7 @@ const CoursesOverviewTable = ({
               (a, b) =>
                 new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime()
             );
-
-          const nextAssignment =
-            upcomingAssessments.length > 0 ? upcomingAssessments[0] : null;
+          const nextAssignment = upcomingAssessments[0] || null;
 
           courseStatsList.push({
             courseName,
@@ -118,6 +116,7 @@ const CoursesOverviewTable = ({
               assessments.length > 0
                 ? Math.round((completed.length / assessments.length) * 100)
                 : 0,
+            outlineUrl: courseOutlines.get(courseName),
           });
         });
 
@@ -135,103 +134,108 @@ const CoursesOverviewTable = ({
 
   const handleSort = (field: keyof CourseStats) => {
     if (field === sortField) {
-      // Toggle direction if clicking the same field
       setSortDirection(sortDirection === "asc" ? "desc" : "asc");
     } else {
-      // New field, set to ascending by default
       setSortField(field);
       setSortDirection("asc");
     }
   };
 
   const sortedCourses = [...courses].sort((a, b) => {
-    // Special case for dates
     if (sortField === "nextDueDate") {
-      // Handle null values
       if (!a.nextDueDate && !b.nextDueDate) return 0;
       if (!a.nextDueDate) return sortDirection === "asc" ? 1 : -1;
       if (!b.nextDueDate) return sortDirection === "asc" ? -1 : 1;
-
       const dateA = new Date(a.nextDueDate);
       const dateB = new Date(b.nextDueDate);
       return sortDirection === "asc"
         ? dateA.getTime() - dateB.getTime()
         : dateB.getTime() - dateA.getTime();
     }
-
-    // For other fields
     const fieldA = a[sortField];
     const fieldB = b[sortField];
-
     if (fieldA < fieldB) return sortDirection === "asc" ? -1 : 1;
     if (fieldA > fieldB) return sortDirection === "asc" ? 1 : -1;
     return 0;
   });
 
-  // Format date for display
   const formatDate = (dateStr: string | null) => {
     if (!dateStr) return "-";
-    const options: Intl.DateTimeFormatOptions = {
+    return new Date(dateStr).toLocaleDateString(undefined, {
       month: "short",
       day: "numeric",
       year: "numeric",
-    };
-    return new Date(dateStr).toLocaleDateString(undefined, options);
+    });
   };
 
-  // Check if a due date is upcoming (within 7 days)
   const isUpcoming = (dateStr: string | null) => {
     if (!dateStr) return false;
-
     const now = new Date();
     const dueDate = new Date(dateStr);
     const diffDays = Math.round(
       (dueDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
     );
-
     return diffDays >= 0 && diffDays <= 7;
   };
 
-  if (isLoading) {
-    return (
-      <div className="flex justify-center py-8">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
-      </div>
-    );
-  }
+  const handleOutlineUpload = async (
+    e: React.ChangeEvent<HTMLInputElement>,
+    courseName: string
+  ) => {
+    if (!user || !e.target.files || e.target.files.length === 0) return;
+    const file = e.target.files[0];
+    if (file.type !== "application/pdf") {
+      setError("Please upload a PDF file.");
+      return;
+    }
 
-  if (error) {
-    return (
-      <div className="p-4 bg-red-50 rounded-lg text-red-700 animate-fade-in">
-        <p>{error}</p>
-      </div>
-    );
-  }
+    setUploadingCourse(courseName);
+    setError(null);
 
-  if (courses.length === 0) {
-    return (
-      <div className="text-center py-10 text-gray-500 animate-fade-in">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="h-12 w-12 mx-auto mb-4 text-gray-300 animate-bounce-light"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
-          />
-        </svg>
-        <p className="text-lg font-medium mb-2">No courses found</p>
-        <p>
-          Add assessments manually or upload a course outline to get started.
-        </p>
-      </div>
-    );
-  }
+    try {
+      const storage = getStorage();
+      const storageRef = ref(
+        storage,
+        `users/${user.uid}/outlines/${semesterId}/${courseName}_${file.name}`
+      );
+      await uploadBytes(storageRef, file);
+      const outlineUrl = await getDownloadURL(storageRef);
+
+      const courseDocRef = doc(
+        db,
+        "users",
+        user.uid,
+        "courses",
+        `${semesterId}_${courseName}`
+      );
+      await setDoc(
+        courseDocRef,
+        {
+          courseName,
+          semesterId,
+          outlineUrl,
+          updatedAt: new Date(),
+        },
+        { merge: true }
+      );
+
+      setCourses((prev) =>
+        prev.map((course) =>
+          course.courseName === courseName ? { ...course, outlineUrl } : course
+        )
+      );
+    } catch (err) {
+      console.error("Error uploading outline:", err);
+      setError("Failed to upload course outline.");
+    } finally {
+      setUploadingCourse(null);
+      if (e.target) e.target.value = "";
+    }
+  };
+
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div className="text-red-600">{error}</div>;
+  if (courses.length === 0) return <div>No courses found.</div>;
 
   return (
     <div>
@@ -241,13 +245,11 @@ const CoursesOverviewTable = ({
           <thead>
             <tr>
               <th
-                className="cursor-pointer"
                 onClick={() => handleSort("courseName")}
+                className="cursor-pointer"
               >
                 <div className="flex items-center space-x-1 group">
-                  <span className="group-hover:text-indigo-600 transition-colors duration-200">
-                    Course
-                  </span>
+                  <span className="group-hover:text-indigo-600">Course</span>
                   {sortField === "courseName" && (
                     <span className="text-indigo-600">
                       {sortDirection === "asc" ? "↑" : "↓"}
@@ -256,13 +258,11 @@ const CoursesOverviewTable = ({
                 </div>
               </th>
               <th
-                className="cursor-pointer"
                 onClick={() => handleSort("totalAssessments")}
+                className="cursor-pointer"
               >
                 <div className="flex items-center space-x-1 group">
-                  <span className="group-hover:text-indigo-600 transition-colors duration-200">
-                    Total
-                  </span>
+                  <span className="group-hover:text-indigo-600">Total</span>
                   {sortField === "totalAssessments" && (
                     <span className="text-indigo-600">
                       {sortDirection === "asc" ? "↑" : "↓"}
@@ -271,13 +271,11 @@ const CoursesOverviewTable = ({
                 </div>
               </th>
               <th
-                className="cursor-pointer"
                 onClick={() => handleSort("pendingAssessments")}
+                className="cursor-pointer"
               >
                 <div className="flex items-center space-x-1 group">
-                  <span className="group-hover:text-indigo-600 transition-colors duration-200">
-                    Pending
-                  </span>
+                  <span className="group-hover:text-indigo-600">Pending</span>
                   {sortField === "pendingAssessments" && (
                     <span className="text-indigo-600">
                       {sortDirection === "asc" ? "↑" : "↓"}
@@ -286,13 +284,11 @@ const CoursesOverviewTable = ({
                 </div>
               </th>
               <th
-                className="cursor-pointer"
                 onClick={() => handleSort("progress")}
+                className="cursor-pointer"
               >
                 <div className="flex items-center space-x-1 group">
-                  <span className="group-hover:text-indigo-600 transition-colors duration-200">
-                    Progress
-                  </span>
+                  <span className="group-hover:text-indigo-600">Progress</span>
                   {sortField === "progress" && (
                     <span className="text-indigo-600">
                       {sortDirection === "asc" ? "↑" : "↓"}
@@ -301,13 +297,11 @@ const CoursesOverviewTable = ({
                 </div>
               </th>
               <th
-                className="cursor-pointer"
                 onClick={() => handleSort("nextDueDate")}
+                className="cursor-pointer"
               >
                 <div className="flex items-center space-x-1 group">
-                  <span className="group-hover:text-indigo-600 transition-colors duration-200">
-                    Next Due
-                  </span>
+                  <span className="group-hover:text-indigo-600">Next Due</span>
                   {sortField === "nextDueDate" && (
                     <span className="text-indigo-600">
                       {sortDirection === "asc" ? "↑" : "↓"}
@@ -315,6 +309,7 @@ const CoursesOverviewTable = ({
                   )}
                 </div>
               </th>
+              <th className="text-center">Outline</th>
               <th className="text-center">Actions</th>
             </tr>
           </thead>
@@ -359,15 +354,60 @@ const CoursesOverviewTable = ({
                       >
                         {formatDate(course.nextDueDate)}
                       </div>
-                      <div
-                        className="text-sm text-gray-500 truncate max-w-[200px]"
-                        title={course.nextAssignment || ""}
-                      >
+                      <div className="text-sm text-gray-500 truncate max-w-[200px]">
                         {course.nextAssignment}
                       </div>
                     </div>
                   ) : (
                     <span className="text-gray-400">-</span>
+                  )}
+                </td>
+                <td className="text-center">
+                  {course.outlineUrl ? (
+                    <a
+                      href={course.outlineUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-indigo-600 hover:text-indigo-800 p-1.5 hover:bg-indigo-50 rounded"
+                      title="View Course Outline"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-5 w-5"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                      >
+                        <path d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9z" />
+                      </svg>
+                    </a>
+                  ) : (
+                    <label className="relative cursor-pointer">
+                      <input
+                        type="file"
+                        accept="application/pdf"
+                        onChange={(e) =>
+                          handleOutlineUpload(e, course.courseName)
+                        }
+                        className="hidden"
+                        disabled={uploadingCourse === course.courseName}
+                      />
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className={`h-5 w-5 text-gray-500 hover:text-indigo-600 ${
+                          uploadingCourse === course.courseName
+                            ? "animate-spin"
+                            : ""
+                        }`}
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    </label>
                   )}
                 </td>
                 <td className="text-center">
