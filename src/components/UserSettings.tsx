@@ -20,6 +20,7 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
     new Date().getFullYear() + 4
   );
   const [showDaysTillDue, setShowDaysTillDue] = useState<boolean>(true);
+  const [showWeight, setShowWeight] = useState<boolean>(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState({ text: "", type: "" });
   const [imagePreview, setImagePreview] = useState<string | null>(
@@ -28,6 +29,7 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const modalRef = useRef<HTMLDivElement>(null);
+  const [activeTab, setActiveTab] = useState<'profile' | 'preferences'>('profile');
 
   // Current year for graduation year input
   const currentYear = new Date().getFullYear();
@@ -67,6 +69,7 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
           setStudyProgram(userData.studyProgram || "");
           setGraduationYear(userData.graduationYear || currentYear + 4);
           setShowDaysTillDue(userData.showDaysTillDue ?? true);
+          setShowWeight(userData.showWeight ?? true);
         }
       } catch (error) {
         console.error("Error fetching user data:", error);
@@ -155,12 +158,13 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
         studyProgram: studyProgram,
         graduationYear: graduationYear,
         showDaysTillDue: showDaysTillDue,
+        showWeight: showWeight,
         updatedAt: new Date(),
       });
 
       // Trigger a custom event to notify other components of the preference change
       const event = new CustomEvent('userPreferencesUpdated', {
-        detail: { showDaysTillDue }
+        detail: { showDaysTillDue, showWeight }
       });
       window.dispatchEvent(event);
 
@@ -168,11 +172,6 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
         text: "Profile updated successfully!",
         type: "success",
       });
-
-      // Close the modal after a short delay
-      setTimeout(() => {
-        onClose();
-      }, 1500);
     } catch (error) {
       console.error("Error updating profile:", error);
       setMessage({
@@ -213,149 +212,205 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
           </button>
         </div>
 
+        {/* Tabs */}
+        <div className="border-b border-gray-200 mb-6">
+          <nav className="-mb-px flex space-x-8">
+            <button
+              onClick={() => setActiveTab('profile')}
+              className={`${
+                activeTab === 'profile'
+                  ? 'border-indigo-500 text-indigo-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
+            >
+              Profile
+            </button>
+            <button
+              onClick={() => setActiveTab('preferences')}
+              className={`${
+                activeTab === 'preferences'
+                  ? 'border-indigo-500 text-indigo-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
+            >
+              Preferences
+            </button>
+          </nav>
+        </div>
+
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Profile picture */}
-          <div className="flex flex-col items-center mb-6">
-            <div className="relative">
-              <div className="h-24 w-24 rounded-full overflow-hidden bg-gray-100 mb-2">
-                {imagePreview ? (
-                  <img
-                    src={imagePreview}
-                    alt="Profile"
-                    className="h-full w-full object-cover"
-                  />
-                ) : (
-                  <div className="h-full w-full bg-indigo-100 flex items-center justify-center text-indigo-600">
+          {activeTab === 'profile' ? (
+            <>
+              {/* Profile picture */}
+              <div className="flex flex-col items-center mb-6">
+                <div className="relative">
+                  <div className="h-24 w-24 rounded-full overflow-hidden bg-gray-100 mb-2">
+                    {imagePreview ? (
+                      <img
+                        src={imagePreview}
+                        alt="Profile"
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      <div className="h-full w-full bg-indigo-100 flex items-center justify-center text-indigo-600">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-12 w-12"
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                      </div>
+                    )}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleChooseImage}
+                    className="absolute bottom-0 right-0 bg-indigo-600 text-white p-1 rounded-full shadow hover:bg-indigo-700 transition-colors"
+                  >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
-                      className="h-12 w-12"
+                      className="h-4 w-4"
                       viewBox="0 0 20 20"
                       fill="currentColor"
                     >
-                      <path
-                        fillRule="evenodd"
-                        d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
-                        clipRule="evenodd"
-                      />
+                      <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
                     </svg>
-                  </div>
-                )}
-              </div>
-              <button
-                type="button"
-                onClick={handleChooseImage}
-                className="absolute bottom-0 right-0 bg-indigo-600 text-white p-1 rounded-full shadow hover:bg-indigo-700 transition-colors"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-4 w-4"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                >
-                  <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
-                </svg>
-              </button>
-            </div>
-            <input
-              type="file"
-              ref={fileInputRef}
-              onChange={handleImageSelect}
-              className="hidden"
-              accept="image/*"
-            />
-            <button
-              type="button"
-              onClick={handleChooseImage}
-              className="text-sm text-indigo-600 hover:text-indigo-800 mt-1"
-            >
-              Change profile picture
-            </button>
-          </div>
-
-          {/* Form fields */}
-          <div className="space-y-4">
-            <div className="form-group">
-              <label htmlFor="displayName" className="form-label">
-                Display Name
-              </label>
-              <input
-                id="displayName"
-                type="text"
-                value={displayName}
-                onChange={(e) => setDisplayName(e.target.value)}
-                className="input hover:shadow-sm transition-all duration-200"
-                placeholder="Your name"
-              />
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="institution" className="form-label">
-                Institution/School
-              </label>
-              <input
-                id="institution"
-                type="text"
-                value={institution}
-                onChange={(e) => setInstitution(e.target.value)}
-                className="input hover:shadow-sm transition-all duration-200"
-                placeholder="Your university or school"
-              />
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="studyProgram" className="form-label">
-                Program/Major
-              </label>
-              <input
-                id="studyProgram"
-                type="text"
-                value={studyProgram}
-                onChange={(e) => setStudyProgram(e.target.value)}
-                className="input hover:shadow-sm transition-all duration-200"
-                placeholder="Your field of study"
-              />
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="graduationYear" className="form-label">
-                Expected Graduation Year
-              </label>
-              <input
-                id="graduationYear"
-                type="number"
-                min={currentYear}
-                max={currentYear + 10}
-                value={graduationYear}
-                onChange={(e) => setGraduationYear(parseInt(e.target.value))}
-                className="input hover:shadow-sm transition-all duration-200"
-                placeholder="e.g., 2027"
-              />
-            </div>
-
-            <div className="form-group">
-              <div className="flex items-center justify-between">
-                <label htmlFor="showDaysTillDue" className="form-label">
-                  Show Days Till Due
-                </label>
+                  </button>
+                </div>
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  onChange={handleImageSelect}
+                  className="hidden"
+                  accept="image/*"
+                />
                 <button
                   type="button"
-                  onClick={() => setShowDaysTillDue(!showDaysTillDue)}
-                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 ${
-                    showDaysTillDue ? "bg-indigo-600" : "bg-gray-200"
-                  }`}
+                  onClick={handleChooseImage}
+                  className="text-sm text-indigo-600 hover:text-indigo-800 mt-1"
                 >
-                  <span
-                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                      showDaysTillDue ? "translate-x-6" : "translate-x-1"
-                    }`}
-                  />
+                  Change profile picture
                 </button>
               </div>
-              <p className="text-sm text-gray-500 mt-1">
-                Toggle the display of days remaining until due date in the assessments table
-              </p>
+
+              {/* Form fields */}
+              <div className="space-y-4">
+                <div className="form-group">
+                  <label htmlFor="displayName" className="form-label">
+                    Display Name
+                  </label>
+                  <input
+                    id="displayName"
+                    type="text"
+                    value={displayName}
+                    onChange={(e) => setDisplayName(e.target.value)}
+                    className="input hover:shadow-sm transition-all duration-200"
+                    placeholder="Your name"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="institution" className="form-label">
+                    Institution/School
+                  </label>
+                  <input
+                    id="institution"
+                    type="text"
+                    value={institution}
+                    onChange={(e) => setInstitution(e.target.value)}
+                    className="input hover:shadow-sm transition-all duration-200"
+                    placeholder="Your university or school"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="studyProgram" className="form-label">
+                    Program/Major
+                  </label>
+                  <input
+                    id="studyProgram"
+                    type="text"
+                    value={studyProgram}
+                    onChange={(e) => setStudyProgram(e.target.value)}
+                    className="input hover:shadow-sm transition-all duration-200"
+                    placeholder="Your field of study"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="graduationYear" className="form-label">
+                    Expected Graduation Year
+                  </label>
+                  <input
+                    id="graduationYear"
+                    type="number"
+                    min={currentYear}
+                    max={currentYear + 10}
+                    value={graduationYear}
+                    onChange={(e) => setGraduationYear(parseInt(e.target.value))}
+                    className="input hover:shadow-sm transition-all duration-200"
+                    placeholder="e.g., 2027"
+                  />
+                </div>
+              </div>
+            </>
+          ) : (
+            <div className="space-y-4">
+              <div className="form-group">
+                <div className="flex items-center justify-between">
+                  <label htmlFor="showDaysTillDue" className="form-label">
+                    Show Days Till Due
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => setShowDaysTillDue(!showDaysTillDue)}
+                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 ${
+                      showDaysTillDue ? "bg-indigo-600" : "bg-gray-200"
+                    }`}
+                  >
+                    <span
+                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                        showDaysTillDue ? "translate-x-6" : "translate-x-1"
+                      }`}
+                    />
+                  </button>
+                </div>
+                <p className="text-sm text-gray-500 mt-1">
+                  Toggle the display of days remaining until due date in the assessments table
+                </p>
+              </div>
+
+              <div className="form-group">
+                <div className="flex items-center justify-between">
+                  <label htmlFor="showWeight" className="form-label">
+                    Show Weight Column
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => setShowWeight(!showWeight)}
+                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 ${
+                      showWeight ? "bg-indigo-600" : "bg-gray-200"
+                    }`}
+                  >
+                    <span
+                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                        showWeight ? "translate-x-6" : "translate-x-1"
+                      }`}
+                    />
+                  </button>
+                </div>
+                <p className="text-sm text-gray-500 mt-1">
+                  Toggle the display of the weight column in the assessments table
+                </p>
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Submit button */}
           <div className="flex justify-end pt-2">

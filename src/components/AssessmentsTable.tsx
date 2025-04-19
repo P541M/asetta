@@ -129,6 +129,7 @@ const AssessmentsTable = ({
   const [lastStatusChange, setLastStatusChange] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [showDaysTillDue, setShowDaysTillDue] = useState<boolean>(true);
+  const [showWeight, setShowWeight] = useState<boolean>(true);
   const [editFormData, setEditFormData] = useState<Assessment>({
     courseName: "",
     assignmentName: "",
@@ -156,6 +157,7 @@ const AssessmentsTable = ({
         if (userSnapshot.exists()) {
           const userData = userSnapshot.data();
           setShowDaysTillDue(userData.showDaysTillDue ?? true);
+          setShowWeight(userData.showWeight ?? true);
         }
       } catch (error) {
         console.error("Error fetching user preferences:", error);
@@ -167,8 +169,13 @@ const AssessmentsTable = ({
 
     // Add event listener for preference updates
     const handlePreferencesUpdate = (event: CustomEvent) => {
-      if (event.detail && 'showDaysTillDue' in event.detail) {
-        setShowDaysTillDue(event.detail.showDaysTillDue);
+      if (event.detail) {
+        if ('showDaysTillDue' in event.detail) {
+          setShowDaysTillDue(event.detail.showDaysTillDue);
+        }
+        if ('showWeight' in event.detail) {
+          setShowWeight(event.detail.showWeight);
+        }
       }
     };
 
@@ -659,19 +666,21 @@ const AssessmentsTable = ({
                 {showDaysTillDue && (
                   <th className="text-left">Days Till Due</th>
                 )}
-                <th
-                  onClick={() => handleSort("weight")}
-                  className="text-right cursor-pointer"
-                >
-                  <div className="flex items-center justify-end space-x-1 group">
-                    <span className="group-hover:text-indigo-600">Weight</span>
-                    {sortKey === "weight" && (
-                      <span className="text-indigo-600">
-                        {sortOrder === "asc" ? "↑" : "↓"}
-                      </span>
-                    )}
-                  </div>
-                </th>
+                {showWeight && (
+                  <th
+                    onClick={() => handleSort("weight")}
+                    className="text-right cursor-pointer"
+                  >
+                    <div className="flex items-center justify-end space-x-1 group">
+                      <span className="group-hover:text-indigo-600">Weight</span>
+                      {sortKey === "weight" && (
+                        <span className="text-indigo-600">
+                          {sortOrder === "asc" ? "↑" : "↓"}
+                        </span>
+                      )}
+                    </div>
+                  </th>
+                )}
                 <th className="text-center">Notes</th>
                 <th className="text-center">Actions</th>
               </tr>
@@ -961,15 +970,17 @@ const AssessmentsTable = ({
                     {showDaysTillDue && (
                       <td>{formatDaysTillDue(daysTillDue)}</td>
                     )}
-                    <td className="text-right">
-                      {assessment.weight ? (
-                        <span className="font-medium">
-                          {assessment.weight}%
-                        </span>
-                      ) : (
-                        <span className="text-gray-400">-</span>
-                      )}
-                    </td>
+                    {showWeight && (
+                      <td className="text-right">
+                        {assessment.weight ? (
+                          <span className="font-medium">
+                            {assessment.weight}%
+                          </span>
+                        ) : (
+                          <span className="text-gray-400">-</span>
+                        )}
+                      </td>
+                    )}
                     <td className="text-center">
                       <button
                         onClick={() => handleNotesClick(assessment)}
