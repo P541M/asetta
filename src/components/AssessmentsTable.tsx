@@ -951,46 +951,76 @@ const AssessmentsTable = ({
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div
             id="notes-modal"
-            className="bg-white rounded-lg shadow-lg p-6 w-full max-w-2xl animate-scale"
+            className="bg-white rounded-lg shadow-lg p-6 w-full max-w-4xl h-[90vh] flex flex-col animate-scale"
           >
             <div className="flex justify-between items-center mb-4">
               <div>
-                <h3 className="text-lg font-medium text-gray-900">
+                <h3 className="text-xl font-medium text-gray-900">
                   Notes for {selectedAssessment.assignmentName}
                 </h3>
                 <p className="text-sm text-gray-500">
                   {selectedAssessment.courseName}
                 </p>
+                <div className="mt-2 flex items-center space-x-4 text-sm">
+                  <span className="text-gray-600">
+                    Due: {formatDateTimeForDisplay(selectedAssessment.dueDate, selectedAssessment.dueTime)}
+                  </span>
+                  <span className="text-gray-600">
+                    Weight: {selectedAssessment.weight}%
+                  </span>
+                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                    selectedAssessment.status === "Submitted" ? "bg-emerald-100 text-emerald-800" :
+                    selectedAssessment.status === "In progress" ? "bg-blue-100 text-blue-800" :
+                    "bg-gray-100 text-gray-800"
+                  }`}>
+                    {selectedAssessment.status}
+                  </span>
+                </div>
               </div>
-              <button
-                onClick={() => {
-                  setShowNotes(null);
-                  setSelectedAssessment(null);
-                }}
-                className="text-gray-400 hover:text-gray-600"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
+              <div className="flex items-center space-x-2">
+                <button
+                  onClick={() => {
+                    const text = `Assignment: ${selectedAssessment.assignmentName}\nCourse: ${selectedAssessment.courseName}\nDue: ${formatDateTimeForDisplay(selectedAssessment.dueDate, selectedAssessment.dueTime)}\nWeight: ${selectedAssessment.weight}%\nStatus: ${selectedAssessment.status}\n\nNotes:\n${notesInput}`;
+                    navigator.clipboard.writeText(text);
+                  }}
+                  className="inline-flex items-center px-3 py-1.5 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                  title="Copy Notes"
                 >
-                  <path
-                    fillRule="evenodd"
-                    d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-              </button>
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                  </svg>
+                  Copy
+                </button>
+                <button
+                  onClick={() => {
+                    setShowNotes(null);
+                    setSelectedAssessment(null);
+                  }}
+                  className="inline-flex items-center p-1.5 border border-transparent rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                  </svg>
+                </button>
+              </div>
             </div>
-            <div className="mb-4 border rounded-lg overflow-hidden">
+            <div className="flex-1 mb-4 border rounded-lg overflow-hidden">
               <RichTextEditor
                 content={notesInput}
                 onChange={setNotesInput}
-                placeholder="Add your notes here..."
+                placeholder={`Add your notes here...
+
+• Key concepts and definitions
+• Important formulas
+• Questions for class
+• Resources to review
+• Progress updates
+• Feedback received`}
               />
             </div>
-            <div className="flex justify-end space-x-2">
+            <div className="flex justify-end space-x-3">
               <button
                 onClick={() => {
                   setShowNotes(null);
