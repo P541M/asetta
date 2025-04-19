@@ -3,7 +3,7 @@ import formidable, { IncomingForm, Fields, Files } from "formidable";
 import fs from "fs";
 import pdfParse from "pdf-parse";
 import { getAdmin } from "../../lib/firebase-admin";
-import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { supabase } from "../../lib/supabase";
 
 export const config = {
   api: {
@@ -75,7 +75,6 @@ export default async function handler(
     }
 
     const adminDb = admin.firestore();
-    const storage = getStorage();
     const semestersRef = adminDb.collection(`users/${userId}/semesters`);
     const semesterQuery = semestersRef.where("name", "==", semester).limit(1);
     const semesterSnapshot = await semesterQuery.get();
@@ -121,12 +120,22 @@ export default async function handler(
           continue;
         }
 
-        const storageRef = ref(
-          storage,
-          `users/${userId}/outlines/${semesterId}/${fileName}`
-        );
-        await uploadBytes(storageRef, pdfBuffer);
-        const outlineUrl = await getDownloadURL(storageRef);
+        // Upload to Supabase Storage
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from('outlines')
+          .upload(`${userId}/${semesterId}/${fileName}`, pdfBuffer, {
+            contentType: 'application/pdf',
+            upsert: true
+          });
+
+        if (uploadError) {
+          throw uploadError;
+        }
+
+        // Get the public URL
+        const { data: { publicUrl } } = supabase.storage
+          .from('outlines')
+          .getPublicUrl(`${userId}/${semesterId}/${fileName}`);
 
         let assessments: Assessment[] = [];
         try {
@@ -232,6 +241,7 @@ export default async function handler(
             ...assessment,
             createdAt: new Date(),
             sourceFile: fileName,
+            outlineUrl: publicUrl
           });
         }
         await batch.commit();

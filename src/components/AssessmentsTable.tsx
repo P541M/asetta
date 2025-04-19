@@ -47,7 +47,7 @@ const AssessmentsTable = ({
   const [selectedAssessment, setSelectedAssessment] =
     useState<Assessment | null>(null);
   const [notesInput, setNotesInput] = useState<string>("");
-  const [showOutline, setShowOutline] = useState<string | null>(null); // State for outline viewer
+  const [showOutline, setShowOutline] = useState<string | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Existing helper functions remain largely unchanged; updating only where necessary

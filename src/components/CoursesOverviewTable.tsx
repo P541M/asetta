@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { db } from "../lib/firebase";
 import { collection, query, getDocs, doc, setDoc } from "firebase/firestore";
-import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { supabase } from "../lib/supabase";
 
 interface Assessment {
   id: string;
@@ -40,6 +40,7 @@ const CoursesOverviewTable = ({
   const [sortField, setSortField] = useState<keyof CourseStats>("courseName");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
   const [uploadingCourse, setUploadingCourse] = useState<string | null>(null);
+  const [showOutline, setShowOutline] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchCourseData = async () => {
@@ -193,13 +194,42 @@ const CoursesOverviewTable = ({
     setError(null);
 
     try {
-      const storage = getStorage();
-      const storageRef = ref(
-        storage,
-        `users/${user.uid}/outlines/${semesterId}/${courseName}_${file.name}`
-      );
-      await uploadBytes(storageRef, file);
-      const outlineUrl = await getDownloadURL(storageRef);
+      console.log('Starting upload to Supabase...');
+      console.log('File:', file.name);
+      console.log('User ID:', user.uid);
+      console.log('Semester ID:', semesterId);
+
+      // Create a safe filename by removing special characters and spaces
+      const safeFileName = `${courseName}_${file.name}`
+        .replace(/[^a-zA-Z0-9.-]/g, '_')
+        .replace(/\s+/g, '_');
+      
+      // Create a simple path structure
+      const filePath = `${user.uid}/${safeFileName}`;
+
+      console.log('Upload path:', filePath);
+
+      // Upload to Supabase Storage
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('outlines')
+        .upload(filePath, file, {
+          contentType: 'application/pdf',
+          upsert: true
+        });
+
+      if (uploadError) {
+        console.error('Supabase upload error:', uploadError);
+        throw uploadError;
+      }
+
+      console.log('Upload successful:', uploadData);
+
+      // Get the public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('outlines')
+        .getPublicUrl(filePath);
+
+      console.log('Public URL:', publicUrl);
 
       const courseDocRef = doc(
         db,
@@ -213,7 +243,7 @@ const CoursesOverviewTable = ({
         {
           courseName,
           semesterId,
-          outlineUrl,
+          outlineUrl: publicUrl,
           updatedAt: new Date(),
         },
         { merge: true }
@@ -221,16 +251,20 @@ const CoursesOverviewTable = ({
 
       setCourses((prev) =>
         prev.map((course) =>
-          course.courseName === courseName ? { ...course, outlineUrl } : course
+          course.courseName === courseName ? { ...course, outlineUrl: publicUrl } : course
         )
       );
     } catch (err) {
       console.error("Error uploading outline:", err);
-      setError("Failed to upload course outline.");
+      setError(`Failed to upload course outline: ${err instanceof Error ? err.message : 'Unknown error'}`);
     } finally {
       setUploadingCourse(null);
       if (e.target) e.target.value = "";
     }
+  };
+
+  const handleViewOutline = (courseName: string) => {
+    setShowOutline(courseName);
   };
 
   if (isLoading) return <div>Loading...</div>;
@@ -364,10 +398,8 @@ const CoursesOverviewTable = ({
                 </td>
                 <td className="text-center">
                   {course.outlineUrl ? (
-                    <a
-                      href={course.outlineUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
+                    <button
+                      onClick={() => handleViewOutline(course.courseName)}
                       className="text-indigo-600 hover:text-indigo-800 p-1.5 hover:bg-indigo-50 rounded"
                       title="View Course Outline"
                     >
@@ -379,7 +411,7 @@ const CoursesOverviewTable = ({
                       >
                         <path d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9z" />
                       </svg>
-                    </a>
+                    </button>
                   ) : (
                     <label className="relative cursor-pointer">
                       <input
@@ -436,6 +468,43 @@ const CoursesOverviewTable = ({
           </tbody>
         </table>
       </div>
+
+      {/* Outline Viewer Modal */}
+      {showOutline && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div
+            className="bg-white rounded-lg shadow-lg p-6 w-full max-w-4xl h-[80vh] flex flex-col animate-scale"
+          >
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-medium text-gray-900">
+                Course Outline for {showOutline}
+              </h3>
+              <button
+                onClick={() => setShowOutline(null)}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-5 w-5"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              </button>
+            </div>
+            <iframe
+              src={courses.find(c => c.courseName === showOutline)?.outlineUrl}
+              className="w-full flex-grow rounded-md border border-gray-200"
+              title="Course Outline"
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 };
