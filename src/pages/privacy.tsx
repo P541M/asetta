@@ -25,7 +25,7 @@ const Privacy: NextPage = () => {
             </h1>
 
             <div className="prose prose-indigo max-w-none">
-              <p className="text-gray-700 mb-6">Last Updated: March 10, 2025</p>
+              <p className="text-gray-700 mb-6">Last Updated: April 19, 2025</p>
 
               <p className="mb-6">
                 At Kivo, we take your privacy seriously. This Privacy Policy

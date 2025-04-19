@@ -25,7 +25,7 @@ const Terms: NextPage = () => {
             </h1>
 
             <div className="prose prose-indigo max-w-none">
-              <p className="text-gray-700 mb-6">Last Updated: March 10, 2025</p>
+              <p className="text-gray-700 mb-6">Last Updated: April 19, 2025</p>
 
               <h2 className="text-xl font-semibold mt-8 mb-4">
                 1. Acceptance of Terms
