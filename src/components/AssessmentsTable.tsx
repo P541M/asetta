@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { db } from "../lib/firebase";
-import { doc, updateDoc, deleteDoc } from "firebase/firestore";
+import { doc, updateDoc, deleteDoc, getDoc } from "firebase/firestore";
 import { useAuth } from "../contexts/AuthContext";
 import RichTextEditor from './RichTextEditor';
 
@@ -128,6 +128,7 @@ const AssessmentsTable = ({
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
   const [lastStatusChange, setLastStatusChange] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [showDaysTillDue, setShowDaysTillDue] = useState<boolean>(true);
   const [editFormData, setEditFormData] = useState<Assessment>({
     courseName: "",
     assignmentName: "",
@@ -144,6 +145,40 @@ const AssessmentsTable = ({
   const [showLinkModal, setShowLinkModal] = useState(false);
   const [linkCallback, setLinkCallback] = useState<((url: string, text: string) => void) | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Fetch user preferences
+  useEffect(() => {
+    const fetchUserPreferences = async () => {
+      if (!user) return;
+      try {
+        const userDocRef = doc(db, "users", user.uid);
+        const userSnapshot = await getDoc(userDocRef);
+        if (userSnapshot.exists()) {
+          const userData = userSnapshot.data();
+          setShowDaysTillDue(userData.showDaysTillDue ?? true);
+        }
+      } catch (error) {
+        console.error("Error fetching user preferences:", error);
+      }
+    };
+
+    // Initial fetch
+    fetchUserPreferences();
+
+    // Add event listener for preference updates
+    const handlePreferencesUpdate = (event: CustomEvent) => {
+      if (event.detail && 'showDaysTillDue' in event.detail) {
+        setShowDaysTillDue(event.detail.showDaysTillDue);
+      }
+    };
+
+    window.addEventListener('userPreferencesUpdated', handlePreferencesUpdate as EventListener);
+
+    // Cleanup
+    return () => {
+      window.removeEventListener('userPreferencesUpdated', handlePreferencesUpdate as EventListener);
+    };
+  }, [user]);
 
   // Existing helper functions remain largely unchanged; updating only where necessary
   const formatDateTimeForDisplay = (
@@ -621,7 +656,9 @@ const AssessmentsTable = ({
                     )}
                   </div>
                 </th>
-                <th className="text-left">Days Till Due</th>
+                {showDaysTillDue && (
+                  <th className="text-left">Days Till Due</th>
+                )}
                 <th
                   onClick={() => handleSort("weight")}
                   className="text-right cursor-pointer"
@@ -921,7 +958,9 @@ const AssessmentsTable = ({
                         assessment.dueTime
                       )}
                     </td>
-                    <td>{formatDaysTillDue(daysTillDue)}</td>
+                    {showDaysTillDue && (
+                      <td>{formatDaysTillDue(daysTillDue)}</td>
+                    )}
                     <td className="text-right">
                       {assessment.weight ? (
                         <span className="font-medium">

@@ -19,6 +19,7 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
   const [graduationYear, setGraduationYear] = useState<number>(
     new Date().getFullYear() + 4
   );
+  const [showDaysTillDue, setShowDaysTillDue] = useState<boolean>(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState({ text: "", type: "" });
   const [imagePreview, setImagePreview] = useState<string | null>(
@@ -57,7 +58,6 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
       if (!user) return;
 
       try {
-        // Fixed: Use getDoc to fetch the document
         const userDocRef = doc(db, "users", user.uid);
         const userSnapshot = await getDoc(userDocRef);
 
@@ -66,6 +66,7 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
           setInstitution(userData.institution || "");
           setStudyProgram(userData.studyProgram || "");
           setGraduationYear(userData.graduationYear || currentYear + 4);
+          setShowDaysTillDue(userData.showDaysTillDue ?? true);
         }
       } catch (error) {
         console.error("Error fetching user data:", error);
@@ -153,8 +154,15 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
         institution: institution,
         studyProgram: studyProgram,
         graduationYear: graduationYear,
+        showDaysTillDue: showDaysTillDue,
         updatedAt: new Date(),
       });
+
+      // Trigger a custom event to notify other components of the preference change
+      const event = new CustomEvent('userPreferencesUpdated', {
+        detail: { showDaysTillDue }
+      });
+      window.dispatchEvent(event);
 
       setMessage({
         text: "Profile updated successfully!",
@@ -323,6 +331,30 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
                 placeholder="e.g., 2027"
               />
             </div>
+
+            <div className="form-group">
+              <div className="flex items-center justify-between">
+                <label htmlFor="showDaysTillDue" className="form-label">
+                  Show Days Till Due
+                </label>
+                <button
+                  type="button"
+                  onClick={() => setShowDaysTillDue(!showDaysTillDue)}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 ${
+                    showDaysTillDue ? "bg-indigo-600" : "bg-gray-200"
+                  }`}
+                >
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                      showDaysTillDue ? "translate-x-6" : "translate-x-1"
+                    }`}
+                  />
+                </button>
+              </div>
+              <p className="text-sm text-gray-500 mt-1">
+                Toggle the display of days remaining until due date in the assessments table
+              </p>
+            </div>
           </div>
 
           {/* Submit button */}
@@ -391,7 +423,7 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
                   >
                     <path
                       fillRule="evenodd"
-                      d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                      d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 00-1.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
                       clipRule="evenodd"
                     />
                   </svg>
