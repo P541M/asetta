@@ -59,6 +59,34 @@ const Privacy: NextPage = () => {
               </ul>
 
               <h2 className="text-xl font-semibold mt-8 mb-4">
+                1.1 Course Outlines and Academic Content
+              </h2>
+              <p>
+                When you upload course outlines or other academic content:
+              </p>
+              <ul className="list-disc pl-6 my-4 space-y-2">
+                <li>
+                  We store the content solely for the purpose of providing you with access to your academic materials
+                </li>
+                <li>
+                  We do not claim ownership of any uploaded course materials
+                </li>
+                <li>
+                  The original creators (professors or educational institutions) retain all rights to the content
+                </li>
+                <li>
+                  We process and store this content in accordance with academic fair use guidelines
+                </li>
+                <li>
+                  You are responsible for ensuring you have the right to upload and share such content
+                </li>
+              </ul>
+              <p>
+                By using our service to store course outlines, you acknowledge that you understand and agree to these terms
+                regarding the handling of academic content.
+              </p>
+
+              <h2 className="text-xl font-semibold mt-8 mb-4">
                 2. How We Use Your Information
               </h2>
               <p>We use the information we collect to:</p>
