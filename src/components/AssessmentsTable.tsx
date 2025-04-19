@@ -893,25 +893,33 @@ const AssessmentsTable = ({
                     </td>
                     <td
                       className={`${
-                        dueDateStatus === "overdue"
+                        assessment.status === "Submitted"
+                          ? "text-emerald-600 font-medium"
+                          : assessment.status === "Under Review"
+                          ? "text-indigo-600 font-medium"
+                          : assessment.status === "In progress"
+                          ? "text-blue-600 font-medium"
+                          : assessment.status === "Draft"
+                          ? "text-purple-600 font-medium"
+                          : assessment.status === "Pending Submission"
+                          ? "text-orange-600 font-medium"
+                          : assessment.status === "Needs Revision"
+                          ? "text-amber-600 font-medium"
+                          : assessment.status === "Missed/Late"
+                          ? "text-red-600 font-medium"
+                          : assessment.status === "On Hold"
+                          ? "text-yellow-600 font-medium"
+                          : dueDateStatus === "overdue"
                           ? "text-red-600 font-medium"
                           : dueDateStatus === "urgent"
                           ? "text-amber-600 font-medium"
                           : ""
                       }`}
                     >
-                      <div className="flex items-center">
-                        {dueDateStatus === "overdue" && (
-                          <span className="mr-2 badge-danger">Overdue</span>
-                        )}
-                        {dueDateStatus === "urgent" && (
-                          <span className="mr-2 badge-warning">Due soon</span>
-                        )}
-                        {formatDateTimeForDisplay(
-                          assessment.dueDate,
-                          assessment.dueTime
-                        )}
-                      </div>
+                      {formatDateTimeForDisplay(
+                        assessment.dueDate,
+                        assessment.dueTime
+                      )}
                     </td>
                     <td>{formatDaysTillDue(daysTillDue)}</td>
                     <td className="text-right">
