@@ -557,9 +557,44 @@ const AssessmentsTable = ({
                         name="status"
                         value={editFormData.status}
                         onChange={handleEditFormChange}
-                        className="input py-1 px-2 text-sm w-full"
+                        className={`input py-1 px-2 text-sm transition-all duration-300 w-full ${
+                          editFormData.status === "Submitted"
+                            ? "bg-emerald-100 border-emerald-200 text-emerald-800"
+                            : editFormData.status === "In progress"
+                            ? "bg-blue-100 border-blue-200 text-blue-800"
+                            : editFormData.status === "Draft"
+                            ? "bg-purple-100 border-purple-200 text-purple-800"
+                            : editFormData.status === "Pending Submission"
+                            ? "bg-orange-100 border-orange-200 text-orange-800"
+                            : editFormData.status === "Under Review"
+                            ? "bg-indigo-100 border-indigo-200 text-indigo-800"
+                            : editFormData.status === "Needs Revision"
+                            ? "bg-amber-100 border-amber-200 text-amber-800"
+                            : editFormData.status === "Missed/Late"
+                            ? "bg-red-100 border-red-200 text-red-800"
+                            : editFormData.status === "On Hold"
+                            ? "bg-yellow-100 border-yellow-200 text-yellow-800"
+                            : "bg-gray-100 border-gray-200 text-gray-800"
+                        }`}
                       >
-                        {/* Options remain the same */}
+                        <optgroup label="Planning">
+                          <option value="Not started">Not started</option>
+                          <option value="Draft">Draft</option>
+                        </optgroup>
+                        <optgroup label="Active Work">
+                          <option value="In progress">In progress</option>
+                          <option value="On Hold">On Hold</option>
+                          <option value="Needs Revision">Needs Revision</option>
+                        </optgroup>
+                        <optgroup label="Submission">
+                          <option value="Pending Submission">Pending Submission</option>
+                          <option value="Submitted">Submitted</option>
+                          <option value="Under Review">Under Review</option>
+                        </optgroup>
+                        <optgroup label="Other">
+                          <option value="Missed/Late">Missed/Late</option>
+                          <option value="Deferred">Deferred</option>
+                        </optgroup>
                       </select>
                     </td>
                     <td>
@@ -694,10 +729,41 @@ const AssessmentsTable = ({
                         className={`input py-1 px-2 text-sm transition-all duration-300 w-full ${
                           assessment.status === "Submitted"
                             ? "bg-emerald-100 border-emerald-200 text-emerald-800"
+                            : assessment.status === "In progress"
+                            ? "bg-blue-100 border-blue-200 text-blue-800"
+                            : assessment.status === "Draft"
+                            ? "bg-purple-100 border-purple-200 text-purple-800"
+                            : assessment.status === "Pending Submission"
+                            ? "bg-orange-100 border-orange-200 text-orange-800"
+                            : assessment.status === "Under Review"
+                            ? "bg-indigo-100 border-indigo-200 text-indigo-800"
+                            : assessment.status === "Needs Revision"
+                            ? "bg-amber-100 border-amber-200 text-amber-800"
+                            : assessment.status === "Missed/Late"
+                            ? "bg-red-100 border-red-200 text-red-800"
+                            : assessment.status === "On Hold"
+                            ? "bg-yellow-100 border-yellow-200 text-yellow-800"
                             : "bg-gray-100 border-gray-200 text-gray-800"
                         }`}
                       >
-                        {/* Options remain the same */}
+                        <optgroup label="Planning">
+                          <option value="Not started">Not started</option>
+                          <option value="Draft">Draft</option>
+                        </optgroup>
+                        <optgroup label="Active Work">
+                          <option value="In progress">In progress</option>
+                          <option value="On Hold">On Hold</option>
+                          <option value="Needs Revision">Needs Revision</option>
+                        </optgroup>
+                        <optgroup label="Submission">
+                          <option value="Pending Submission">Pending Submission</option>
+                          <option value="Submitted">Submitted</option>
+                          <option value="Under Review">Under Review</option>
+                        </optgroup>
+                        <optgroup label="Other">
+                          <option value="Missed/Late">Missed/Late</option>
+                          <option value="Deferred">Deferred</option>
+                        </optgroup>
                       </select>
                     </td>
                     <td className="font-medium">{assessment.courseName}</td>
