@@ -40,7 +40,8 @@ const CoursesOverviewTable = ({
   const [sortField, setSortField] = useState<keyof CourseStats>("courseName");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
   const [uploadingCourse, setUploadingCourse] = useState<string | null>(null);
-  const [showOutline, setShowOutline] = useState<string | null>(null);
+  const [selectedOutline, setSelectedOutline] = useState<string | null>(null);
+  const [outlineUrls, setOutlineUrls] = useState<Record<string, string>>({});
 
   useEffect(() => {
     const fetchCourseData = async () => {
@@ -77,11 +78,11 @@ const CoursesOverviewTable = ({
 
         const coursesRef = collection(db, "users", user.uid, "courses");
         const coursesSnapshot = await getDocs(query(coursesRef));
-        const courseOutlines = new Map<string, string>();
+        const courseOutlines: Record<string, string> = {};
         coursesSnapshot.forEach((doc) => {
           const data = doc.data();
           if (data.semesterId === semesterId) {
-            courseOutlines.set(data.courseName, data.outlineUrl);
+            courseOutlines[data.courseName] = data.outlineUrl;
           }
         });
 
@@ -117,11 +118,12 @@ const CoursesOverviewTable = ({
               assessments.length > 0
                 ? Math.round((completed.length / assessments.length) * 100)
                 : 0,
-            outlineUrl: courseOutlines.get(courseName),
+            outlineUrl: courseOutlines[courseName],
           });
         });
 
         setCourses(courseStatsList);
+        setOutlineUrls(courseOutlines);
       } catch (err) {
         console.error("Error fetching course data:", err);
         setError("Failed to load course overview data.");
@@ -264,7 +266,7 @@ const CoursesOverviewTable = ({
   };
 
   const handleViewOutline = (courseName: string) => {
-    setShowOutline(courseName);
+    setSelectedOutline(courseName);
   };
 
   if (isLoading) return <div>Loading...</div>;
@@ -398,47 +400,89 @@ const CoursesOverviewTable = ({
                 </td>
                 <td className="text-center">
                   {course.outlineUrl ? (
-                    <button
-                      onClick={() => handleViewOutline(course.courseName)}
-                      className="text-indigo-600 hover:text-indigo-800 p-1.5 hover:bg-indigo-50 rounded"
-                      title="View Course Outline"
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-5 w-5"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
+                    <div className="flex items-center justify-center space-x-2">
+                      <button
+                        onClick={() => handleViewOutline(course.courseName)}
+                        className="group flex items-center space-x-1 text-indigo-600 hover:text-indigo-800 p-1.5 hover:bg-indigo-50 rounded transition-all duration-200"
+                        title="View Course Outline"
                       >
-                        <path d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9z" />
-                      </svg>
-                    </button>
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-5 w-5"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                          <polyline points="14 2 14 8 20 8"></polyline>
+                          <line x1="16" y1="13" x2="8" y2="13"></line>
+                          <line x1="16" y1="17" x2="8" y2="17"></line>
+                          <polyline points="10 9 9 9 8 9"></polyline>
+                        </svg>
+                        <span className="text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                          View
+                        </span>
+                      </button>
+                      <button
+                        onClick={() => {
+                          const input = document.createElement('input');
+                          input.type = 'file';
+                          input.accept = 'application/pdf';
+                          input.onchange = (e) => handleOutlineUpload(e as any, course.courseName);
+                          input.click();
+                        }}
+                        className="text-gray-400 hover:text-indigo-600 p-1.5 hover:bg-gray-50 rounded transition-all duration-200"
+                        title="Update Outline"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-5 w-5"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                          <polyline points="17 8 12 3 7 8"></polyline>
+                          <line x1="12" y1="3" x2="12" y2="15"></line>
+                        </svg>
+                      </button>
+                    </div>
                   ) : (
-                    <label className="relative cursor-pointer">
+                    <label className="relative cursor-pointer group">
                       <input
                         type="file"
                         accept="application/pdf"
-                        onChange={(e) =>
-                          handleOutlineUpload(e, course.courseName)
-                        }
+                        onChange={(e) => handleOutlineUpload(e, course.courseName)}
                         className="hidden"
                         disabled={uploadingCourse === course.courseName}
                       />
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className={`h-5 w-5 text-gray-500 hover:text-indigo-600 ${
-                          uploadingCourse === course.courseName
-                            ? "animate-spin"
-                            : ""
-                        }`}
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
+                      <div className="flex items-center justify-center space-x-1 text-gray-400 group-hover:text-indigo-600 p-1.5 group-hover:bg-gray-50 rounded transition-all duration-200">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className={`h-5 w-5 ${
+                            uploadingCourse === course.courseName ? "animate-spin" : ""
+                          }`}
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                          <polyline points="17 8 12 3 7 8"></polyline>
+                          <line x1="12" y1="3" x2="12" y2="15"></line>
+                        </svg>
+                        <span className="text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                          Upload
+                        </span>
+                      </div>
                     </label>
                   )}
                 </td>
@@ -470,38 +514,68 @@ const CoursesOverviewTable = ({
       </div>
 
       {/* Outline Viewer Modal */}
-      {showOutline && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div
-            className="bg-white rounded-lg shadow-lg p-6 w-full max-w-4xl h-[80vh] flex flex-col animate-scale"
-          >
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-medium text-gray-900">
-                Course Outline for {showOutline}
-              </h3>
-              <button
-                onClick={() => setShowOutline(null)}
-                className="text-gray-400 hover:text-gray-600"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
+      {selectedOutline && outlineUrls[selectedOutline] && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl w-[95vw] h-[95vh] flex flex-col">
+            <div className="p-4 border-b flex items-center justify-between">
+              <div>
+                <h3 className="text-xl font-semibold text-gray-900">
+                  {selectedOutline} Course Outline
+                </h3>
+                <p className="text-sm text-gray-500">
+                  View and navigate through the course outline
+                </p>
+              </div>
+              <div className="flex items-center space-x-2">
+                <button
+                  onClick={() => window.open(outlineUrls[selectedOutline], '_blank')}
+                  className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                 >
-                  <path
-                    fillRule="evenodd"
-                    d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-              </button>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-4 w-4 mr-1.5"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                    <polyline points="15 3 21 3 21 9"></polyline>
+                    <line x1="10" y1="14" x2="21" y2="3"></line>
+                  </svg>
+                  Open in New Tab
+                </button>
+                <button
+                  onClick={() => setSelectedOutline(null)}
+                  className="inline-flex items-center p-2 border border-transparent rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                  </svg>
+                </button>
+              </div>
             </div>
-            <iframe
-              src={courses.find(c => c.courseName === showOutline)?.outlineUrl}
-              className="w-full flex-grow rounded-md border border-gray-200"
-              title="Course Outline"
-            />
+            <div className="flex-1 p-4 overflow-hidden">
+              <div className="w-full h-full bg-gray-50 rounded-lg overflow-hidden">
+                <iframe
+                  src={outlineUrls[selectedOutline]}
+                  className="w-full h-full"
+                  title={`${selectedOutline} Course Outline`}
+                />
+              </div>
+            </div>
           </div>
         </div>
       )}

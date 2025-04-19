@@ -1,0 +1,36 @@
+.rich-text-editor {
+  @apply bg-white;
+}
+
+.rich-text-editor .ProseMirror {
+  @apply min-h-[200px] outline-none;
+}
+
+.rich-text-editor .ProseMirror p {
+  @apply mb-4;
+}
+
+.rich-text-editor .ProseMirror ul {
+  @apply list-disc pl-4 mb-4;
+}
+
+.rich-text-editor .ProseMirror ol {
+  @apply list-decimal pl-4 mb-4;
+}
+
+.rich-text-editor .ProseMirror a {
+  @apply text-blue-600 hover:text-blue-800 underline;
+}
+
+.rich-text-editor .ProseMirror p.is-editor-empty:first-child::before {
+  @apply text-gray-400 float-left h-0 pointer-events-none;
+  content: attr(data-placeholder);
+}
+
+.rich-text-editor .toolbar button {
+  @apply text-gray-600 hover:text-gray-900 transition-colors;
+}
+
+.rich-text-editor .toolbar button.is-active {
+  @apply text-indigo-600 bg-indigo-50;
+} 

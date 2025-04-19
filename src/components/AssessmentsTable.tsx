@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { db } from "../lib/firebase";
 import { doc, updateDoc, deleteDoc } from "firebase/firestore";
 import { useAuth } from "../contexts/AuthContext";
+import RichTextEditor from './RichTextEditor';
 
 interface Assessment {
   id?: string;
@@ -48,6 +49,7 @@ const AssessmentsTable = ({
     useState<Assessment | null>(null);
   const [notesInput, setNotesInput] = useState<string>("");
   const [showOutline, setShowOutline] = useState<string | null>(null);
+  const [showNotes, setShowNotes] = useState<string | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Existing helper functions remain largely unchanged; updating only where necessary
@@ -324,11 +326,10 @@ const AssessmentsTable = ({
     return "future";
   };
 
-  const handleRowClick = (assessment: Assessment) => {
-    if (!editingId && assessment.id) {
-      setSelectedAssessment(assessment);
-      setNotesInput(assessment.notes || "");
-    }
+  const handleNotesClick = (assessment: Assessment) => {
+    setSelectedAssessment(assessment);
+    setNotesInput(assessment.notes || "");
+    setShowNotes(assessment.id || null);
   };
 
   const handleSaveNotes = async () => {
@@ -531,6 +532,7 @@ const AssessmentsTable = ({
                   </div>
                 </th>
                 <th className="text-center">Outline</th>
+                <th className="text-center">Notes</th>
                 <th className="text-center">Actions</th>
               </tr>
             </thead>
@@ -693,8 +695,7 @@ const AssessmentsTable = ({
                 ) : (
                   <tr
                     key={assessment.id || index}
-                    onClick={() => handleRowClick(assessment)}
-                    className={`transition-all duration-300 cursor-pointer ${
+                    className={`transition-all duration-300 ${
                       assessment.status === "Submitted"
                         ? "bg-emerald-50/40"
                         : assessment.status === "Missed/Late"
@@ -842,6 +843,26 @@ const AssessmentsTable = ({
                         <span className="text-gray-400">-</span>
                       )}
                     </td>
+                    <td className="text-center">
+                      <button
+                        onClick={() => handleNotesClick(assessment)}
+                        className={`p-1.5 rounded ${
+                          assessment.notes
+                            ? "text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50"
+                            : "text-gray-400 hover:text-gray-600 hover:bg-gray-50"
+                        }`}
+                        title={assessment.notes ? "Edit Notes" : "Add Notes"}
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-5 w-5"
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
+                        >
+                          <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                        </svg>
+                      </button>
+                    </td>
                     <td
                       className="text-center"
                       onClick={(e) => e.stopPropagation()}
@@ -926,18 +947,26 @@ const AssessmentsTable = ({
       )}
 
       {/* Notes Modal */}
-      {selectedAssessment && (
+      {showNotes && selectedAssessment && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div
             id="notes-modal"
-            className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md animate-scale"
+            className="bg-white rounded-lg shadow-lg p-6 w-full max-w-2xl animate-scale"
           >
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-medium text-gray-900">
-                Notes for {selectedAssessment.assignmentName}
-              </h3>
+              <div>
+                <h3 className="text-lg font-medium text-gray-900">
+                  Notes for {selectedAssessment.assignmentName}
+                </h3>
+                <p className="text-sm text-gray-500">
+                  {selectedAssessment.courseName}
+                </p>
+              </div>
               <button
-                onClick={() => setSelectedAssessment(null)}
+                onClick={() => {
+                  setShowNotes(null);
+                  setSelectedAssessment(null);
+                }}
                 className="text-gray-400 hover:text-gray-600"
               >
                 <svg
@@ -954,24 +983,31 @@ const AssessmentsTable = ({
                 </svg>
               </button>
             </div>
-            <textarea
-              value={notesInput}
-              onChange={(e) => setNotesInput(e.target.value)}
-              className="input w-full h-40 mb-4"
-              placeholder="Add your notes here..."
-            />
+            <div className="mb-4 border rounded-lg overflow-hidden">
+              <RichTextEditor
+                content={notesInput}
+                onChange={setNotesInput}
+                placeholder="Add your notes here..."
+              />
+            </div>
             <div className="flex justify-end space-x-2">
               <button
-                onClick={() => setSelectedAssessment(null)}
+                onClick={() => {
+                  setShowNotes(null);
+                  setSelectedAssessment(null);
+                }}
                 className="btn-outline py-1.5 px-4"
               >
                 Cancel
               </button>
               <button
-                onClick={handleSaveNotes}
+                onClick={() => {
+                  handleSaveNotes();
+                  setShowNotes(null);
+                }}
                 className="btn-primary py-1.5 px-4"
               >
-                Save
+                Save Notes
               </button>
             </div>
           </div>
