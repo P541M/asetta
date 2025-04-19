@@ -512,7 +512,7 @@ const CoursesOverviewTable = ({
       {/* Outline Viewer Modal */}
       {selectedOutline && outlineUrls[selectedOutline] && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-xl w-[95vw] h-[95vh] flex flex-col">
+          <div className="bg-white rounded-lg shadow-xl w-[80vw] h-[95vh] flex flex-col">
             <div className="p-4 border-b flex items-center justify-between">
               <div>
                 <h3 className="text-xl font-semibold text-gray-900">
@@ -543,6 +543,30 @@ const CoursesOverviewTable = ({
                   </svg>
                   Open in New Tab
                 </button>
+                <label className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 cursor-pointer">
+                  <input
+                    type="file"
+                    accept="application/pdf"
+                    onChange={(e) => handleOutlineUpload(e, selectedOutline)}
+                    className="hidden"
+                    disabled={uploadingCourse === selectedOutline}
+                  />
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-4 w-4 mr-1.5"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="17 8 12 3 7 8"></polyline>
+                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                  </svg>
+                  {uploadingCourse === selectedOutline ? "Uploading..." : "Reupload"}
+                </label>
                 <button
                   onClick={() => setSelectedOutline(null)}
                   className="inline-flex items-center p-2 border border-transparent rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
