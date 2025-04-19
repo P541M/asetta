@@ -21,6 +21,100 @@ interface AssessmentsTableProps {
   onStatusChange?: () => void;
 }
 
+interface LinkModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onAddLink: (url: string, text: string) => void;
+}
+
+const LinkModal = ({ isOpen, onClose, onAddLink }: LinkModalProps) => {
+  const [url, setUrl] = useState("");
+  const [text, setText] = useState("");
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (url) {
+      onAddLink(url, text || url);
+      setUrl("");
+      setText("");
+      onClose();
+    }
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div id="link-modal" className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[100]">
+      <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md animate-scale">
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-lg font-medium text-gray-900">Add Link</h3>
+          <button
+            onClick={onClose}
+            className="text-gray-400 hover:text-gray-500"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
+              <path
+                fillRule="evenodd"
+                d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                clipRule="evenodd"
+              />
+            </svg>
+          </button>
+        </div>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label htmlFor="url" className="block text-sm font-medium text-gray-700">
+              URL
+            </label>
+            <input
+              type="url"
+              id="url"
+              value={url}
+              onChange={(e) => setUrl(e.target.value)}
+              placeholder="https://example.com"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+              required
+            />
+          </div>
+          <div>
+            <label htmlFor="text" className="block text-sm font-medium text-gray-700">
+              Link Text (optional)
+            </label>
+            <input
+              type="text"
+              id="text"
+              value={text}
+              onChange={(e) => setText(e.target.value)}
+              placeholder="Display text"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+            />
+          </div>
+          <div className="flex justify-end space-x-3">
+            <button
+              type="button"
+              onClick={onClose}
+              className="btn-outline py-1.5 px-4"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="btn-primary py-1.5 px-4"
+            >
+              Add Link
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
+
 const AssessmentsTable = ({
   assessments,
   semesterId,
@@ -47,6 +141,8 @@ const AssessmentsTable = ({
     useState<Assessment | null>(null);
   const [notesInput, setNotesInput] = useState<string>("");
   const [showNotes, setShowNotes] = useState<string | null>(null);
+  const [showLinkModal, setShowLinkModal] = useState(false);
+  const [linkCallback, setLinkCallback] = useState<((url: string, text: string) => void) | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Existing helper functions remain largely unchanged; updating only where necessary
@@ -115,6 +211,9 @@ const AssessmentsTable = ({
         event.target instanceof Node &&
         !document
           .getElementById(`notes-modal`)
+          ?.contains(event.target) &&
+        !document
+          .getElementById(`link-modal`)
           ?.contains(event.target)
       ) {
         setShowNotes(null);
@@ -349,6 +448,18 @@ const AssessmentsTable = ({
       onStatusChange?.();
     } catch (error) {
       console.error("Error saving notes:", error);
+    }
+  };
+
+  const handleAddLink = (callback: (url: string, text: string) => void) => {
+    setLinkCallback(() => callback);
+    setShowLinkModal(true);
+  };
+
+  const handleLinkSubmit = (url: string, text: string) => {
+    if (linkCallback) {
+      linkCallback(url, text);
+      setLinkCallback(null);
     }
   };
 
@@ -979,6 +1090,7 @@ const AssessmentsTable = ({
               <RichTextEditor
                 content={notesInput}
                 onChange={setNotesInput}
+                onAddLink={handleAddLink}
                 placeholder={`Add your notes here...
 
 • Key concepts and definitions
@@ -1012,6 +1124,16 @@ const AssessmentsTable = ({
           </div>
         </div>
       )}
+
+      {/* Link Modal */}
+      <LinkModal
+        isOpen={showLinkModal}
+        onClose={() => {
+          setShowLinkModal(false);
+          setLinkCallback(null);
+        }}
+        onAddLink={handleLinkSubmit}
+      />
     </div>
   );
 };
