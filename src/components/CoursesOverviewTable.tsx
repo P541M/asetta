@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { db } from "../lib/firebase";
-import { collection, query, getDocs, doc, setDoc } from "firebase/firestore";
+import { collection, query, getDocs, doc, setDoc, writeBatch, where } from "firebase/firestore";
 import { supabase } from "../lib/supabase";
 
 interface Assessment {
@@ -185,71 +185,67 @@ const CoursesOverviewTable = ({
     e: React.ChangeEvent<HTMLInputElement>,
     courseName: string
   ) => {
-    if (!user || !e.target.files || e.target.files.length === 0) return;
-    const file = e.target.files[0];
-    if (file.type !== "application/pdf") {
-      setError("Please upload a PDF file.");
-      return;
-    }
-
+    if (!user || !e.target.files || !e.target.files[0]) return;
     setUploadingCourse(courseName);
     setError(null);
 
     try {
-      console.log('Starting upload to Supabase...');
-      console.log('File:', file.name);
-      console.log('User ID:', user.uid);
-      console.log('Semester ID:', semesterId);
+      const file = e.target.files[0];
+      if (file.type !== "application/pdf") {
+        throw new Error("Please upload a PDF file");
+      }
 
-      // Create a safe filename by removing special characters and spaces
-      const safeFileName = `${courseName}_${file.name}`
-        .replace(/[^a-zA-Z0-9.-]/g, '_')
-        .replace(/\s+/g, '_');
-      
-      // Create a simple path structure
-      const filePath = `${user.uid}/${safeFileName}`;
-
-      console.log('Upload path:', filePath);
+      // Create a safe filename
+      const safeFilename = file.name.replace(/[^a-zA-Z0-9.-]/g, "_");
+      const filePath = `${user.uid}/${semesterId}/${safeFilename}`;
 
       // Upload to Supabase Storage
       const { data: uploadData, error: uploadError } = await supabase.storage
-        .from('outlines')
+        .from("outlines")
         .upload(filePath, file, {
-          contentType: 'application/pdf',
-          upsert: true
+          contentType: "application/pdf",
+          upsert: true,
         });
 
-      if (uploadError) {
-        console.error('Supabase upload error:', uploadError);
-        throw uploadError;
-      }
-
-      console.log('Upload successful:', uploadData);
+      if (uploadError) throw uploadError;
 
       // Get the public URL
       const { data: { publicUrl } } = supabase.storage
-        .from('outlines')
+        .from("outlines")
         .getPublicUrl(filePath);
 
-      console.log('Public URL:', publicUrl);
+      // Update the course document
+      const courseRef = doc(db, "users", user.uid, "courses", courseName);
+      await setDoc(courseRef, {
+        courseName,
+        semesterId,
+        outlineUrl: publicUrl,
+        updatedAt: new Date(),
+      });
 
-      const courseDocRef = doc(
+      // Update all assessments for this course with the new outline URL
+      const assessmentsRef = collection(
         db,
         "users",
         user.uid,
-        "courses",
-        `${semesterId}_${courseName}`
+        "semesters",
+        semesterId,
+        "assessments"
       );
-      await setDoc(
-        courseDocRef,
-        {
-          courseName,
-          semesterId,
-          outlineUrl: publicUrl,
-          updatedAt: new Date(),
-        },
-        { merge: true }
-      );
+      const q = query(assessmentsRef, where("courseName", "==", courseName));
+      const querySnapshot = await getDocs(q);
+      
+      const batch = writeBatch(db);
+      querySnapshot.forEach((doc) => {
+        batch.update(doc.ref, { outlineUrl: publicUrl });
+      });
+      await batch.commit();
+
+      // Update local state
+      setOutlineUrls((prev) => ({
+        ...prev,
+        [courseName]: publicUrl,
+      }));
 
       setCourses((prev) =>
         prev.map((course) =>
@@ -541,7 +537,7 @@ const CoursesOverviewTable = ({
                     strokeLinecap="round"
                     strokeLinejoin="round"
                   >
-                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                     <polyline points="15 3 21 3 21 9"></polyline>
                     <line x1="10" y1="14" x2="21" y2="3"></line>
                   </svg>

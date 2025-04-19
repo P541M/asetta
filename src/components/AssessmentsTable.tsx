@@ -13,7 +13,6 @@ interface Assessment {
   weight: number;
   status: string;
   notes?: string;
-  outlineUrl?: string; // Add outline URL
 }
 
 interface AssessmentsTableProps {
@@ -43,12 +42,10 @@ const AssessmentsTable = ({
     weight: 0,
     status: "Not started",
     notes: "",
-    outlineUrl: "",
   });
   const [selectedAssessment, setSelectedAssessment] =
     useState<Assessment | null>(null);
   const [notesInput, setNotesInput] = useState<string>("");
-  const [showOutline, setShowOutline] = useState<string | null>(null);
   const [showNotes, setShowNotes] = useState<string | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -114,18 +111,18 @@ const AssessmentsTable = ({
         setDropdownOpenId(null);
       }
       if (
-        showOutline &&
+        showNotes &&
         event.target instanceof Node &&
         !document
-          .getElementById(`outline-modal-${showOutline}`)
+          .getElementById(`notes-modal`)
           ?.contains(event.target)
       ) {
-        setShowOutline(null);
+        setShowNotes(null);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [showOutline]);
+  }, [showNotes]);
 
   const filteredAssessments = assessments.filter((assessment) => {
     if (filter === "all") return true;
@@ -355,10 +352,6 @@ const AssessmentsTable = ({
     }
   };
 
-  const handleViewOutline = (assessmentId: string) => {
-    setShowOutline(assessmentId);
-  };
-
   return (
     <div>
       <div className="flex flex-col sm:flex-row justify-between mb-6 gap-4">
@@ -531,7 +524,6 @@ const AssessmentsTable = ({
                     )}
                   </div>
                 </th>
-                <th className="text-center">Outline</th>
                 <th className="text-center">Notes</th>
                 <th className="text-center">Actions</th>
               </tr>
@@ -820,29 +812,6 @@ const AssessmentsTable = ({
                         <span className="text-gray-400">-</span>
                       )}
                     </td>
-                    <td
-                      className="text-center"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      {assessment.outlineUrl ? (
-                        <button
-                          onClick={() => handleViewOutline(assessment.id!)}
-                          className="text-indigo-600 hover:text-indigo-800 p-1.5 hover:bg-indigo-50 rounded"
-                          title="View Course Outline"
-                        >
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="h-5 w-5"
-                            viewBox="0 0 20 20"
-                            fill="currentColor"
-                          >
-                            <path d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9z" />
-                          </svg>
-                        </button>
-                      ) : (
-                        <span className="text-gray-400">-</span>
-                      )}
-                    </td>
                     <td className="text-center">
                       <button
                         onClick={() => handleNotesClick(assessment)}
@@ -1040,45 +1009,6 @@ const AssessmentsTable = ({
                 Save Notes
               </button>
             </div>
-          </div>
-        </div>
-      )}
-
-      {/* Outline Viewer Modal */}
-      {showOutline && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div
-            id={`outline-modal-${showOutline}`}
-            className="bg-white rounded-lg shadow-lg p-6 w-full max-w-4xl h-[80vh] flex flex-col animate-scale"
-          >
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-medium text-gray-900">
-                Course Outline for{" "}
-                {assessments.find((a) => a.id === showOutline)?.courseName}
-              </h3>
-              <button
-                onClick={() => setShowOutline(null)}
-                className="text-gray-400 hover:text-gray-600"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-              </button>
-            </div>
-            <iframe
-              src={assessments.find((a) => a.id === showOutline)?.outlineUrl}
-              className="w-full flex-grow rounded-md border border-gray-200"
-              title="Course Outline"
-            />
           </div>
         </div>
       )}
