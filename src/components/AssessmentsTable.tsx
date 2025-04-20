@@ -1,24 +1,28 @@
+/// <reference types="react" />
+import React, { JSX } from 'react';
 import { useState, useEffect, useRef } from "react";
 import { db } from "../lib/firebase";
-import { doc, updateDoc, deleteDoc, getDoc } from "firebase/firestore";
+import { doc, updateDoc, deleteDoc, getDoc, serverTimestamp, Timestamp } from "firebase/firestore";
 import { useAuth } from "../contexts/AuthContext";
 import RichTextEditor from './RichTextEditor';
+import { getFromLocalStorage, setToLocalStorage } from '../utils/localStorage';
 
 interface Assessment {
-  id?: string;
-  courseName: string;
-  assignmentName: string;
+  id: string;
+  title: string;
   dueDate: string;
-  dueTime: string;
-  weight: number;
   status: string;
   notes?: string;
+  courseName: string;
+  assignmentName: string;
+  dueTime: string;
+  weight: number;
 }
 
 interface AssessmentsTableProps {
   assessments: Assessment[];
   semesterId: string;
-  onStatusChange?: () => void;
+  onStatusChange?: (assessmentId: string, newStatus: string) => void;
 }
 
 interface LinkModalProps {
@@ -115,15 +119,21 @@ const LinkModal = ({ isOpen, onClose, onAddLink }: LinkModalProps) => {
   );
 };
 
-const AssessmentsTable = ({
+const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
   assessments,
   semesterId,
   onStatusChange,
-}: AssessmentsTableProps) => {
+}) => {
   const { user } = useAuth();
-  const [sortKey, setSortKey] = useState<keyof Assessment>("dueDate");
-  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
-  const [filter, setFilter] = useState<string>("all");
+  const [sortKey, setSortKey] = useState<keyof Assessment>(() => 
+    getFromLocalStorage<keyof Assessment>('assessmentSortKey', 'dueDate')
+  );
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">(() => 
+    getFromLocalStorage<'asc' | 'desc'>('assessmentSortOrder', 'asc')
+  );
+  const [filter, setFilter] = useState<string>(() => 
+    getFromLocalStorage<string>('assessmentFilter', 'all')
+  );
   const [dropdownOpenId, setDropdownOpenId] = useState<string | null>(null);
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
   const [lastStatusChange, setLastStatusChange] = useState<string | null>(null);
@@ -131,13 +141,15 @@ const AssessmentsTable = ({
   const [showDaysTillDue, setShowDaysTillDue] = useState<boolean>(true);
   const [showWeight, setShowWeight] = useState<boolean>(true);
   const [editFormData, setEditFormData] = useState<Assessment>({
-    courseName: "",
-    assignmentName: "",
+    id: "",
+    title: "",
     dueDate: "",
-    dueTime: "23:59",
-    weight: 0,
     status: "Not started",
     notes: "",
+    courseName: "",
+    assignmentName: "",
+    dueTime: "23:59",
+    weight: 0,
   });
   const [selectedAssessment, setSelectedAssessment] =
     useState<Assessment | null>(null);
@@ -186,6 +198,19 @@ const AssessmentsTable = ({
       window.removeEventListener('userPreferencesUpdated', handlePreferencesUpdate as EventListener);
     };
   }, [user]);
+
+  // Update localStorage when sort preferences change
+  useEffect(() => {
+    setToLocalStorage('assessmentSortKey', sortKey);
+  }, [sortKey]);
+
+  useEffect(() => {
+    setToLocalStorage('assessmentSortOrder', sortOrder);
+  }, [sortOrder]);
+
+  useEffect(() => {
+    setToLocalStorage('assessmentFilter', filter);
+  }, [filter]);
 
   // Existing helper functions remain largely unchanged; updating only where necessary
   const formatDateTimeForDisplay = (
@@ -280,8 +305,12 @@ const AssessmentsTable = ({
         ? dateA.getTime() - dateB.getTime()
         : dateB.getTime() - dateA.getTime();
     }
-    if (a[sortKey] < b[sortKey]) return sortOrder === "asc" ? -1 : 1;
-    if (a[sortKey] > b[sortKey]) return sortOrder === "asc" ? 1 : -1;
+    const valA = a[sortKey];
+    const valB = b[sortKey];
+    if (valA != null && valB != null) {
+      if (valA < valB) return sortOrder === "asc" ? -1 : 1;
+      if (valA > valB) return sortOrder === "asc" ? 1 : -1;
+    }
     return 0;
   });
 
@@ -294,53 +323,32 @@ const AssessmentsTable = ({
     }
   };
 
-  const handleStatusChange = async (
-    assessment: Assessment,
-    newStatus: string
-  ) => {
-    if (!user || !assessment.id) return;
+  const handleStatusChange = async (assessmentId: string, newStatus: string) => {
+    if (!user || !assessmentId) return;
+    
     try {
-      const assessmentRef = doc(
-        db,
-        "users",
-        user.uid,
-        "semesters",
-        semesterId,
-        "assessments",
-        assessment.id
-      );
+      const assessmentRef = doc(db, 'users', user.uid, 'assessments', assessmentId);
       await updateDoc(assessmentRef, {
         status: newStatus,
-        updatedAt: new Date(),
+        updatedAt: serverTimestamp(),
       });
-      setLastStatusChange(assessment.id);
-      setTimeout(() => setLastStatusChange(null), 1500);
-      onStatusChange?.();
+      if (onStatusChange) {
+        onStatusChange(assessmentId, newStatus);
+      }
     } catch (error) {
-      console.error("Error updating status:", error);
+      console.error("Error updating assessment status:", error);
     }
   };
 
   const handleDeleteAssessment = async (assessment: Assessment) => {
     if (!user || !assessment.id) return;
-    if (
-      !window.confirm(
-        `Are you sure you want to delete "${assessment.assignmentName}" for ${assessment.courseName}?`
-      )
-    )
-      return;
+    
     try {
-      const assessmentRef = doc(
-        db,
-        "users",
-        user.uid,
-        "semesters",
-        semesterId,
-        "assessments",
-        assessment.id
-      );
+      const assessmentRef = doc(db, 'users', user.uid, 'assessments', assessment.id);
       await deleteDoc(assessmentRef);
-      onStatusChange?.();
+      if (onStatusChange) {
+        onStatusChange(assessment.id, "Deleted");
+      }
     } catch (error) {
       console.error("Error deleting assessment:", error);
     }
@@ -379,7 +387,7 @@ const AssessmentsTable = ({
           });
       }
       setSelectedRows([]);
-      onStatusChange?.();
+      onStatusChange?.(selectedRows[0], "Reset");
     } catch (error) {
       console.error(`Error performing bulk ${action}:`, error);
     }
@@ -403,8 +411,12 @@ const AssessmentsTable = ({
   };
 
   const handleEditClick = (assessment: Assessment) => {
-    setEditingId(assessment.id!);
-    setEditFormData({ ...assessment });
+    if (!assessment.id) return;
+    setEditingId(assessment.id);
+    setEditFormData({
+      ...assessment,
+      notes: assessment.notes || '',
+    });
   };
 
   const handleCancelEdit = () => setEditingId(null);
@@ -438,7 +450,7 @@ const AssessmentsTable = ({
         updatedAt: new Date(),
       });
       setEditingId(null);
-      onStatusChange?.();
+      onStatusChange?.(assessmentId, editFormData.status);
     } catch (error) {
       console.error("Error updating assessment:", error);
     }
@@ -487,7 +499,7 @@ const AssessmentsTable = ({
         updatedAt: new Date(),
       });
       setSelectedAssessment(null);
-      onStatusChange?.();
+      onStatusChange?.(selectedAssessment.id, selectedAssessment.status);
     } catch (error) {
       console.error("Error saving notes:", error);
     }
@@ -503,6 +515,10 @@ const AssessmentsTable = ({
       linkCallback(url, text);
       setLinkCallback(null);
     }
+  };
+
+  const handleDropdownToggle = (id: string | null) => {
+    setDropdownOpenId(id);
   };
 
   return (
@@ -687,6 +703,7 @@ const AssessmentsTable = ({
             </thead>
             <tbody>
               {sortedAssessments.map((assessment, index) => {
+                if (!assessment) return null;
                 const dueDateStatus = getDueDateStatus(
                   assessment.dueDate,
                   assessment.dueTime,
@@ -843,11 +860,11 @@ const AssessmentsTable = ({
                   </tr>
                 ) : (
                   <tr
-                    key={assessment.id || index}
+                    key={assessment?.id || index}
                     className={`transition-all duration-300 ${
-                      assessment.status === "Submitted"
+                      assessment?.status === "Submitted"
                         ? "bg-emerald-50/40"
-                        : assessment.status === "Missed/Late"
+                        : assessment?.status === "Missed/Late"
                         ? "bg-red-50/50"
                         : dueDateStatus === "overdue"
                         ? "bg-red-50/40"
@@ -855,15 +872,15 @@ const AssessmentsTable = ({
                         ? "bg-amber-50/40"
                         : ""
                     } ${
-                      lastStatusChange === assessment.id ? "animate-pulse" : ""
+                      lastStatusChange === assessment?.id ? "animate-pulse" : ""
                     } hover:bg-gray-50/80`}
                   >
                     <td className="pl-4">
-                      {assessment.id && (
+                      {assessment?.id && (
                         <input
                           type="checkbox"
                           checked={selectedRows.includes(assessment.id)}
-                          onChange={() => toggleRowSelection(assessment.id!)}
+                          onChange={() => toggleRowSelection(assessment.id)}
                           onClick={(e) => e.stopPropagation()}
                           className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
                         />
@@ -871,27 +888,27 @@ const AssessmentsTable = ({
                     </td>
                     <td className="w-40">
                       <select
-                        value={assessment.status}
+                        value={assessment?.status || 'Not started'}
                         onChange={(e) =>
-                          handleStatusChange(assessment, e.target.value)
+                          assessment?.id && handleStatusChange(assessment.id, e.target.value)
                         }
                         onClick={(e) => e.stopPropagation()}
                         className={`input py-1 px-2 text-sm transition-all duration-300 w-full ${
-                          assessment.status === "Submitted"
+                          assessment?.status === "Submitted"
                             ? "bg-emerald-100 border-emerald-200 text-emerald-800"
-                            : assessment.status === "In progress"
+                            : assessment?.status === "In progress"
                             ? "bg-blue-100 border-blue-200 text-blue-800"
-                            : assessment.status === "Draft"
+                            : assessment?.status === "Draft"
                             ? "bg-purple-100 border-purple-200 text-purple-800"
-                            : assessment.status === "Pending Submission"
+                            : assessment?.status === "Pending Submission"
                             ? "bg-orange-100 border-orange-200 text-orange-800"
-                            : assessment.status === "Under Review"
+                            : assessment?.status === "Under Review"
                             ? "bg-indigo-100 border-indigo-200 text-indigo-800"
-                            : assessment.status === "Needs Revision"
+                            : assessment?.status === "Needs Revision"
                             ? "bg-amber-100 border-amber-200 text-amber-800"
-                            : assessment.status === "Missed/Late"
+                            : assessment?.status === "Missed/Late"
                             ? "bg-red-100 border-red-200 text-red-800"
-                            : assessment.status === "On Hold"
+                            : assessment?.status === "On Hold"
                             ? "bg-yellow-100 border-yellow-200 text-yellow-800"
                             : "bg-gray-100 border-gray-200 text-gray-800"
                         }`}
@@ -916,16 +933,16 @@ const AssessmentsTable = ({
                         </optgroup>
                       </select>
                     </td>
-                    <td className="font-medium">{assessment.courseName}</td>
+                    <td className="font-medium">{assessment?.courseName}</td>
                     <td>
                       <div className="flex items-center">
                         <span
                           className="truncate w-full"
-                          title={assessment.assignmentName}
+                          title={assessment?.assignmentName}
                         >
-                          {assessment.assignmentName}
+                          {assessment?.assignmentName}
                         </span>
-                        {assessment.notes && (
+                        {assessment?.notes && (
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
                             className="h-4 w-4 ml-2 text-indigo-600"
@@ -939,21 +956,21 @@ const AssessmentsTable = ({
                     </td>
                     <td
                       className={`${
-                        assessment.status === "Submitted"
+                        assessment?.status === "Submitted"
                           ? "text-emerald-600 font-medium"
-                          : assessment.status === "Under Review"
+                          : assessment?.status === "Under Review"
                           ? "text-indigo-600 font-medium"
-                          : assessment.status === "In progress"
+                          : assessment?.status === "In progress"
                           ? "text-blue-600 font-medium"
-                          : assessment.status === "Draft"
+                          : assessment?.status === "Draft"
                           ? "text-purple-600 font-medium"
-                          : assessment.status === "Pending Submission"
+                          : assessment?.status === "Pending Submission"
                           ? "text-orange-600 font-medium"
-                          : assessment.status === "Needs Revision"
+                          : assessment?.status === "Needs Revision"
                           ? "text-amber-600 font-medium"
-                          : assessment.status === "Missed/Late"
+                          : assessment?.status === "Missed/Late"
                           ? "text-red-600 font-medium"
-                          : assessment.status === "On Hold"
+                          : assessment?.status === "On Hold"
                           ? "text-yellow-600 font-medium"
                           : dueDateStatus === "overdue"
                           ? "text-red-600 font-medium"
@@ -962,17 +979,15 @@ const AssessmentsTable = ({
                           : ""
                       }`}
                     >
-                      {formatDateTimeForDisplay(
-                        assessment.dueDate,
-                        assessment.dueTime
-                      )}
+                      {assessment?.dueDate && assessment?.dueTime && 
+                        formatDateTimeForDisplay(assessment.dueDate, assessment.dueTime)}
                     </td>
                     {showDaysTillDue && (
                       <td>{formatDaysTillDue(daysTillDue)}</td>
                     )}
                     {showWeight && (
                       <td>
-                        {assessment.weight ? (
+                        {assessment?.weight ? (
                           <span className="font-medium">
                             {assessment.weight}%
                           </span>
@@ -985,11 +1000,11 @@ const AssessmentsTable = ({
                       <button
                         onClick={() => handleNotesClick(assessment)}
                         className={`p-1.5 rounded ${
-                          assessment.notes
+                          assessment?.notes
                             ? "text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50"
                             : "text-gray-400 hover:text-gray-600 hover:bg-gray-50"
                         }`}
-                        title={assessment.notes ? "Edit Notes" : "Add Notes"}
+                        title={assessment?.notes ? "Edit Notes" : "Add Notes"}
                       >
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
@@ -1007,15 +1022,15 @@ const AssessmentsTable = ({
                       <div
                         className="relative inline-block"
                         ref={
-                          dropdownOpenId === assessment.id ? dropdownRef : null
+                          dropdownOpenId === assessment?.id ? dropdownRef : null
                         }
                       >
                         <button
                           onClick={() =>
-                            setDropdownOpenId(
-                              dropdownOpenId === assessment.id
+                            handleDropdownToggle(
+                              dropdownOpenId === assessment?.id
                                 ? null
-                                : assessment.id
+                                : assessment?.id || null
                             )
                           }
                           className="text-gray-500 hover:text-gray-700 p-1.5 hover:bg-gray-100 rounded-full"
@@ -1029,12 +1044,12 @@ const AssessmentsTable = ({
                             <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
                           </svg>
                         </button>
-                        {dropdownOpenId === assessment.id && (
+                        {dropdownOpenId === assessment?.id && (
                           <div className="absolute right-0 z-10 mt-2 w-36 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5">
                             <div className="py-1">
                               <button
                                 onClick={() => {
-                                  setDropdownOpenId(null);
+                                  handleDropdownToggle(null);
                                   handleEditClick(assessment);
                                 }}
                                 className="flex w-full items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
@@ -1051,7 +1066,7 @@ const AssessmentsTable = ({
                               </button>
                               <button
                                 onClick={() => {
-                                  setDropdownOpenId(null);
+                                  handleDropdownToggle(null);
                                   handleDeleteAssessment(assessment);
                                 }}
                                 className="flex w-full items-center px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
