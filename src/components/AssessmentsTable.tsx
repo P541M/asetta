@@ -664,14 +664,14 @@ const AssessmentsTable = ({
                   </div>
                 </th>
                 {showDaysTillDue && (
-                  <th className="text-left">Days Till Due</th>
+                  <th>Days Till Due</th>
                 )}
                 {showWeight && (
                   <th
                     onClick={() => handleSort("weight")}
-                    className="text-right cursor-pointer"
+                    className="cursor-pointer"
                   >
-                    <div className="flex items-center justify-end space-x-1 group">
+                    <div className="flex items-center space-x-1 group">
                       <span className="group-hover:text-indigo-600">Weight</span>
                       {sortKey === "weight" && (
                         <span className="text-indigo-600">
@@ -681,8 +681,8 @@ const AssessmentsTable = ({
                     </div>
                   </th>
                 )}
-                <th className="text-center">Notes</th>
-                <th className="text-center">Actions</th>
+                <th>Notes</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -798,12 +798,12 @@ const AssessmentsTable = ({
                         min="0"
                         max="100"
                         step="0.1"
-                        className="input py-1 px-2 text-sm w-full text-right"
+                        className="input py-1 px-2 text-sm w-full"
                       />
                     </td>
                     <td></td>
-                    <td className="text-center">
-                      <div className="flex items-center justify-center space-x-2">
+                    <td>
+                      <div className="flex items-center space-x-2">
                         <button
                           onClick={() => handleSaveEdit(assessment.id!)}
                           className="text-emerald-600 hover:text-emerald-800 p-1.5 hover:bg-emerald-50 rounded"
@@ -971,7 +971,7 @@ const AssessmentsTable = ({
                       <td>{formatDaysTillDue(daysTillDue)}</td>
                     )}
                     {showWeight && (
-                      <td className="text-right">
+                      <td>
                         {assessment.weight ? (
                           <span className="font-medium">
                             {assessment.weight}%
@@ -981,7 +981,7 @@ const AssessmentsTable = ({
                         )}
                       </td>
                     )}
-                    <td className="text-center">
+                    <td>
                       <button
                         onClick={() => handleNotesClick(assessment)}
                         className={`p-1.5 rounded ${
@@ -1002,7 +1002,6 @@ const AssessmentsTable = ({
                       </button>
                     </td>
                     <td
-                      className="text-center"
                       onClick={(e) => e.stopPropagation()}
                     >
                       <div

@@ -341,8 +341,8 @@ const CoursesOverviewTable = ({
                   )}
                 </div>
               </th>
-              <th className="text-center">Outline</th>
-              <th className="text-center">Actions</th>
+              <th>Outline</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -394,61 +394,33 @@ const CoursesOverviewTable = ({
                     <span className="text-gray-400">-</span>
                   )}
                 </td>
-                <td className="text-center">
+                <td>
                   {course.outlineUrl ? (
-                    <div className="flex items-center justify-center space-x-2">
-                      <button
-                        onClick={() => handleViewOutline(course.courseName)}
-                        className="group flex items-center space-x-1 text-indigo-600 hover:text-indigo-800 p-1.5 hover:bg-indigo-50 rounded transition-all duration-200"
-                        title="View Course Outline"
+                    <button
+                      onClick={() => handleViewOutline(course.courseName)}
+                      className="group flex items-center space-x-1 text-indigo-600 hover:text-indigo-800 p-1.5 hover:bg-indigo-50 rounded transition-all duration-200"
+                      title="View Course Outline"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-5 w-5"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
                       >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="h-5 w-5"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        >
-                          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                          <polyline points="14 2 14 8 20 8"></polyline>
-                          <line x1="16" y1="13" x2="8" y2="13"></line>
-                          <line x1="16" y1="17" x2="8" y2="17"></line>
-                          <polyline points="10 9 9 9 8 9"></polyline>
-                        </svg>
-                        <span className="text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                          View
-                        </span>
-                      </button>
-                      <button
-                        onClick={() => {
-                          const input = document.createElement('input');
-                          input.type = 'file';
-                          input.accept = 'application/pdf';
-                          input.onchange = (e) => handleOutlineUpload(e as any, course.courseName);
-                          input.click();
-                        }}
-                        className="text-gray-400 hover:text-indigo-600 p-1.5 hover:bg-gray-50 rounded transition-all duration-200"
-                        title="Update Outline"
-                      >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="h-5 w-5"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        >
-                          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                          <polyline points="17 8 12 3 7 8"></polyline>
-                          <line x1="12" y1="3" x2="12" y2="15"></line>
-                        </svg>
-                      </button>
-                    </div>
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                        <polyline points="10 9 9 9 8 9"></polyline>
+                      </svg>
+                      <span className="text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                        View
+                      </span>
+                    </button>
                   ) : (
                     <label className="relative cursor-pointer group">
                       <input
@@ -458,7 +430,7 @@ const CoursesOverviewTable = ({
                         className="hidden"
                         disabled={uploadingCourse === course.courseName}
                       />
-                      <div className="flex items-center justify-center space-x-1 text-gray-400 group-hover:text-indigo-600 p-1.5 group-hover:bg-gray-50 rounded transition-all duration-200">
+                      <div className="flex items-center space-x-1 text-gray-400 group-hover:text-indigo-600 p-1.5 group-hover:bg-gray-50 rounded transition-all duration-200">
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
                           className={`h-5 w-5 ${
@@ -482,10 +454,10 @@ const CoursesOverviewTable = ({
                     </label>
                   )}
                 </td>
-                <td className="text-center">
+                <td>
                   <button
                     onClick={() => onSelectCourse(course.courseName)}
-                    className="btn-primary py-1 px-3 text-sm hover:shadow-sm flex items-center justify-center mx-auto"
+                    className="btn-primary py-1 px-3 text-sm hover:shadow-sm flex items-center"
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
