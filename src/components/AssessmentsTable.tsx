@@ -920,7 +920,7 @@ const AssessmentsTable = ({
                     <td>
                       <div className="flex items-center">
                         <span
-                          className="truncate max-w-xs"
+                          className="truncate w-full"
                           title={assessment.assignmentName}
                         >
                           {assessment.assignmentName}
