@@ -249,7 +249,7 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
-      <section className="py-16 bg-indigo-50">
+      <section className="py-16 bg-gray-50">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl font-bold text-gray-900 mb-6">
             Ready to Take Control of Your Academic Life?
@@ -258,18 +258,12 @@ export default function LandingPage() {
             Join thousands of students who are using Kivo to stay organized and
             boost their academic performance.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <div className="flex justify-center">
             <Link
               href="/register"
               className="btn-primary py-3 px-8 text-lg inline-block"
             >
               Create Your Free Account
-            </Link>
-            <Link
-              href="/login"
-              className="btn-outline py-3 px-8 text-lg inline-block"
-            >
-              Sign In
             </Link>
           </div>
         </div>
