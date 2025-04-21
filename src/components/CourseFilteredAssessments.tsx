@@ -4,19 +4,12 @@ import { useAuth } from "../contexts/AuthContext";
 import { db } from "../lib/firebase";
 import { collection, query, where, getDocs } from "firebase/firestore";
 import AssessmentsTable from "./AssessmentsTable";
-
-interface Assessment {
-  id: string;
-  courseName: string;
-  assignmentName: string;
-  dueDate: string;
-  weight: number;
-  status: string;
-}
+import GradeCalculator from "./GradeCalculator";
+import { Assessment } from "../types/assessment";
 
 interface CourseFilteredAssessmentsProps {
   semesterId: string;
-  selectedCourse: string | null;
+  selectedCourse: string;
   onBack: () => void;
 }
 
@@ -29,6 +22,7 @@ const CourseFilteredAssessments = ({
   const [assessments, setAssessments] = useState<Assessment[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showGradeCalculator, setShowGradeCalculator] = useState(false);
 
   useEffect(() => {
     const fetchAssessments = async () => {
@@ -118,30 +112,28 @@ const CourseFilteredAssessments = ({
   };
 
   return (
-    <div>
-      <div className="flex items-center mb-6">
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
         <button
           onClick={onBack}
-          className="mr-3 p-1.5 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors duration-200"
-          title="Back to all courses"
+          className="text-indigo-600 hover:text-indigo-800 font-medium"
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-5 w-5 text-gray-600"
-            viewBox="0 0 20 20"
-            fill="currentColor"
-          >
-            <path
-              fillRule="evenodd"
-              d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z"
-              clipRule="evenodd"
-            />
-          </svg>
+          ← Back to All Courses
         </button>
-        <h2 className="text-xl font-medium text-gray-900">
-          {selectedCourse ? `Assessments for ${selectedCourse}` : "Course Assessments"}
-        </h2>
+        <button
+          onClick={() => setShowGradeCalculator(!showGradeCalculator)}
+          className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors"
+        >
+          {showGradeCalculator ? 'Hide Grade Calculator' : 'Show Grade Calculator'}
+        </button>
       </div>
+
+      {showGradeCalculator && (
+        <GradeCalculator
+          semesterId={semesterId}
+          selectedCourse={selectedCourse}
+        />
+      )}
 
       {isLoading ? (
         <div className="flex justify-center py-8">

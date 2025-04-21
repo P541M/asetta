@@ -7,18 +7,7 @@ import { useAuth } from "../contexts/AuthContext";
 import RichTextEditor from './RichTextEditor';
 import { getFromLocalStorage, setToLocalStorage } from '../utils/localStorage';
 import { utcToLocal, formatLocalDateTime, getDaysUntil } from '../utils/dateUtils';
-
-interface Assessment {
-  id: string;
-  title: string;
-  dueDate: string;
-  status: string;
-  notes?: string;
-  courseName: string;
-  assignmentName: string;
-  dueTime: string;
-  weight: number;
-}
+import { Assessment } from '../types/assessment';
 
 interface AssessmentsTableProps {
   assessments: Assessment[];
@@ -287,13 +276,12 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
   const [showWeight, setShowWeight] = useState<boolean>(true);
   const [editFormData, setEditFormData] = useState<Assessment>({
     id: "",
-    title: "",
-    dueDate: "",
-    status: "Not started",
-    notes: "",
     courseName: "",
     assignmentName: "",
+    dueDate: "",
     dueTime: "23:59",
+    status: "Not started",
+    notes: "",
     weight: 0,
   });
   const [selectedAssessment, setSelectedAssessment] =
