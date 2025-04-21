@@ -52,7 +52,7 @@ export default function LandingPage() {
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link
-                  href="/login"
+                  href="/register"
                   className="btn-primary text-center py-3 px-8"
                 >
                   Get Started Free
@@ -81,16 +81,16 @@ export default function LandingPage() {
       <section id="features" className="py-20 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4 font-heading tracking-tight">
-              Features That Make Academic Life Easier
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">
+              Everything You Need to Succeed
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Designed specifically for students, Kivo helps you organize
-              coursework and stay ahead of deadlines.
+              Kivo provides all the tools you need to manage your academic life
+              efficiently.
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             <div className="bg-white rounded-xl shadow-sm p-8 border border-gray-100">
               <div className="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center mb-5">
                 <svg
@@ -112,60 +112,8 @@ export default function LandingPage() {
                 Assignment Tracking
               </h3>
               <p className="text-gray-600">
-                Keep track of all your assignments, their due dates, and
-                completion status in one organized dashboard.
-              </p>
-            </div>
-
-            <div className="bg-white rounded-xl shadow-sm p-8 border border-gray-100">
-              <div className="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center mb-5">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-6 w-6 text-indigo-600"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
-                  />
-                </svg>
-              </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-3">
-                Syllabus Upload
-              </h3>
-              <p className="text-gray-600">
-                Upload your course syllabus and Kivo automatically extracts
-                assignment details and due dates.
-              </p>
-            </div>
-
-            <div className="bg-white rounded-xl shadow-sm p-8 border border-gray-100">
-              <div className="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center mb-5">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-6 w-6 text-indigo-600"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
-              </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-3">
-                Deadline Reminders
-              </h3>
-              <p className="text-gray-600">
-                Get visual indicators for upcoming and overdue assignments so
-                you never miss an important deadline.
+                Keep track of all your assignments, deadlines, and progress in
+                one place.
               </p>
             </div>
 
@@ -187,11 +135,11 @@ export default function LandingPage() {
                 </svg>
               </div>
               <h3 className="text-xl font-semibold text-gray-900 mb-3">
-                Semester Management
+                Calendar Integration
               </h3>
               <p className="text-gray-600">
-                Organize your courses by semester and easily switch between
-                current and past academic terms.
+                Sync your academic schedule with your personal calendar for
+                seamless planning.
               </p>
             </div>
 
@@ -213,11 +161,63 @@ export default function LandingPage() {
                 </svg>
               </div>
               <h3 className="text-xl font-semibold text-gray-900 mb-3">
-                Weight Tracking
+                Progress Analytics
               </h3>
               <p className="text-gray-600">
-                See the weight of each assignment to prioritize your work based
-                on what impacts your grades the most.
+                Visualize your academic progress and identify areas for
+                improvement.
+              </p>
+            </div>
+
+            <div className="bg-white rounded-xl shadow-sm p-8 border border-gray-100">
+              <div className="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center mb-5">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-6 w-6 text-indigo-600"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+                  />
+                </svg>
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900 mb-3">
+                Study Resources
+              </h3>
+              <p className="text-gray-600">
+                Access curated study materials and resources to enhance your
+                learning experience.
+              </p>
+            </div>
+
+            <div className="bg-white rounded-xl shadow-sm p-8 border border-gray-100">
+              <div className="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center mb-5">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-6 w-6 text-indigo-600"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+                  />
+                </svg>
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900 mb-3">
+                Collaboration Tools
+              </h3>
+              <p className="text-gray-600">
+                Work together with classmates on group projects and share
+                resources easily.
               </p>
             </div>
 
@@ -258,12 +258,20 @@ export default function LandingPage() {
             Join thousands of students who are using Kivo to stay organized and
             boost their academic performance.
           </p>
-          <Link
-            href="/login"
-            className="btn-primary py-3 px-8 text-lg inline-block"
-          >
-            Create Your Free Account
-          </Link>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link
+              href="/register"
+              className="btn-primary py-3 px-8 text-lg inline-block"
+            >
+              Create Your Free Account
+            </Link>
+            <Link
+              href="/login"
+              className="btn-outline py-3 px-8 text-lg inline-block"
+            >
+              Sign In
+            </Link>
+          </div>
         </div>
       </section>
 

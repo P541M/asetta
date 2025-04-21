@@ -1,65 +1,152 @@
-// src/pages/login.tsx
 import { useState } from "react";
 import { useRouter } from "next/router";
 import Head from "next/head";
-import { auth } from "../lib/firebase";
-import {
-  signInWithEmailAndPassword,
-  signInWithPopup,
+import { auth, db } from "../lib/firebase";
+import { 
+  createUserWithEmailAndPassword, 
+  updateProfile,
   GoogleAuthProvider,
+  signInWithPopup
 } from "firebase/auth";
+import { doc, setDoc } from "firebase/firestore";
 import Header from "../components/Header";
 import Link from "next/link";
 
-const Login = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+const Register = () => {
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+    confirmPassword: "",
+    displayName: "",
+    institution: "",
+    studyProgram: "",
+    graduationYear: new Date().getFullYear() + 4,
+  });
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [authMethod, setAuthMethod] = useState<"email" | "google">("email");
   const router = useRouter();
 
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: name === "graduationYear" ? parseInt(value) : value,
+    }));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+
+    // Validate form
+    if (formData.password !== formData.confirmPassword) {
+      setError("Passwords do not match");
+      return;
+    }
+
+    if (formData.password.length < 8) {
+      setError("Password must be at least 8 characters long");
+      return;
+    }
+
+    if (!formData.displayName.trim()) {
+      setError("Please enter your name");
+      return;
+    }
+
     setIsSubmitting(true);
+
     try {
-      await signInWithEmailAndPassword(auth, email, password);
-      router.push("/dashboard");
-    } catch (error: unknown) {
-      setError(
-        error instanceof Error
-          ? `Login failed: ${error.message}`
-          : "Login failed."
+      // Create the user with email and password
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        formData.email,
+        formData.password
       );
+
+      const user = userCredential.user;
+
+      // Update the user profile with the display name
+      await updateProfile(user, {
+        displayName: formData.displayName,
+      });
+
+      // Store additional user data in Firestore
+      await setDoc(doc(db, "users", user.uid), {
+        displayName: formData.displayName,
+        email: formData.email,
+        institution: formData.institution,
+        studyProgram: formData.studyProgram,
+        graduationYear: formData.graduationYear,
+        createdAt: new Date(),
+        lastLogin: new Date(),
+      });
+
+      router.push("/dashboard");
+    } catch (error) {
+      if (error instanceof Error) {
+        let errorMessage = "Registration failed. ";
+
+        if (error.message.includes("auth/email-already-in-use")) {
+          errorMessage += "An account with this email already exists.";
+        } else if (error.message.includes("auth/invalid-email")) {
+          errorMessage += "Please enter a valid email address.";
+        } else {
+          errorMessage += error.message;
+        }
+
+        setError(errorMessage);
+      } else {
+        setError("Registration failed due to an unknown error.");
+      }
       setIsSubmitting(false);
     }
   };
 
-  const handleGoogleSignIn = async () => {
+  const handleGoogleSignUp = async () => {
     setError(null);
     setIsSubmitting(true);
     const provider = new GoogleAuthProvider();
     try {
-      await signInWithPopup(auth, provider);
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+      
+      // Store additional user data in Firestore
+      await setDoc(doc(db, "users", user.uid), {
+        displayName: user.displayName || "User",
+        email: user.email,
+        createdAt: new Date(),
+        lastLogin: new Date(),
+      });
+      
       router.push("/dashboard");
     } catch (error: unknown) {
       setError(
         error instanceof Error
-          ? `Google sign-in failed: ${error.message}`
-          : "Google sign-in failed."
+          ? `Google sign-up failed: ${error.message}`
+          : "Google sign-up failed."
       );
       setIsSubmitting(false);
     }
   };
 
+  // Years for graduation dropdown
+  const currentYear = new Date().getFullYear();
+  const graduationYears = Array.from(
+    { length: 11 },
+    (_, i) => currentYear + i
+  );
+
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-gray-50 to-white">
       <Head>
-        <title>Kivo - Sign In</title>
+        <title>Kivo - Create Account</title>
         <meta
           name="description"
-          content="Sign in to Kivo to manage your academic tasks."
+          content="Sign up for Kivo to start tracking your academic progress."
         />
       </Head>
       <Header />
@@ -67,10 +154,10 @@ const Login = () => {
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold text-gray-900 font-heading tracking-tight">
-              Welcome Back
+              Create Your Account
             </h1>
             <p className="text-gray-600 mt-2">
-              Sign in to access your academic dashboard
+              Join Kivo to start tracking your academic progress
             </p>
           </div>
 
@@ -84,7 +171,7 @@ const Login = () => {
                     : "text-gray-600 hover:text-gray-900"
                 }`}
               >
-                Sign in with Email
+                Sign up with Email
               </button>
               <button
                 onClick={() => setAuthMethod("google")}
@@ -94,7 +181,7 @@ const Login = () => {
                     : "text-gray-600 hover:text-gray-900"
                 }`}
               >
-                Sign in with Google
+                Sign up with Google
               </button>
             </div>
 
@@ -121,7 +208,7 @@ const Login = () => {
             {authMethod === "google" ? (
               <div className="text-center">
                 <button
-                  onClick={handleGoogleSignIn}
+                  onClick={handleGoogleSignUp}
                   disabled={isSubmitting}
                   className="w-full flex items-center justify-center gap-3 py-3 px-4 border border-gray-300 rounded-lg text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
@@ -148,50 +235,136 @@ const Login = () => {
                       d="M43.611 20.083H42V20H24v8h11.303a12.04 12.04 0 0 1-4.087 5.571l.003-.002 6.19 5.238C36.971 39.205 44 34 44 24c0-1.341-.138-2.65-.389-3.917z"
                     />
                   </svg>
-                  {isSubmitting ? "Signing in..." : "Continue with Google"}
+                  {isSubmitting ? "Creating account..." : "Sign up with Google"}
                 </button>
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-5">
                 <div className="form-group">
                   <label htmlFor="email" className="form-label">
-                    Email Address
+                    Email Address <span className="text-red-500">*</span>
                   </label>
                   <input
                     id="email"
+                    name="email"
                     type="email"
                     placeholder="you@example.com"
                     className="input focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    value={formData.email}
+                    onChange={handleChange}
                     required
                     disabled={isSubmitting}
                   />
                 </div>
-                <div className="form-group">
-                  <div className="flex justify-between items-center">
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="form-group">
                     <label htmlFor="password" className="form-label">
-                      Password
+                      Password <span className="text-red-500">*</span>
                     </label>
-                    <Link
-                      href="/reset-password"
-                      className="text-sm text-indigo-600 hover:text-indigo-800 transition-colors duration-200"
-                    >
-                      Forgot password?
-                    </Link>
+                    <input
+                      id="password"
+                      name="password"
+                      type="password"
+                      placeholder="Create a secure password"
+                      className="input focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                      value={formData.password}
+                      onChange={handleChange}
+                      required
+                      disabled={isSubmitting}
+                      minLength={8}
+                    />
                   </div>
+
+                  <div className="form-group">
+                    <label htmlFor="confirmPassword" className="form-label">
+                      Confirm Password <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      id="confirmPassword"
+                      name="confirmPassword"
+                      type="password"
+                      placeholder="Confirm your password"
+                      className="input focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                      value={formData.confirmPassword}
+                      onChange={handleChange}
+                      required
+                      disabled={isSubmitting}
+                    />
+                  </div>
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="displayName" className="form-label">
+                    Full Name <span className="text-red-500">*</span>
+                  </label>
                   <input
-                    id="password"
-                    type="password"
-                    placeholder="Your password"
+                    id="displayName"
+                    name="displayName"
+                    type="text"
+                    placeholder="Your name"
                     className="input focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    value={formData.displayName}
+                    onChange={handleChange}
                     required
                     disabled={isSubmitting}
-                    minLength={6}
                   />
                 </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="form-group">
+                    <label htmlFor="institution" className="form-label">
+                      Institution/School
+                    </label>
+                    <input
+                      id="institution"
+                      name="institution"
+                      type="text"
+                      placeholder="Your university or school"
+                      className="input focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                      value={formData.institution}
+                      onChange={handleChange}
+                      disabled={isSubmitting}
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label htmlFor="studyProgram" className="form-label">
+                      Program/Major
+                    </label>
+                    <input
+                      id="studyProgram"
+                      name="studyProgram"
+                      type="text"
+                      placeholder="Your field of study"
+                      className="input focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                      value={formData.studyProgram}
+                      onChange={handleChange}
+                      disabled={isSubmitting}
+                    />
+                  </div>
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="graduationYear" className="form-label">
+                    Expected Graduation Year
+                  </label>
+                  <select
+                    id="graduationYear"
+                    name="graduationYear"
+                    className="input focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                    value={formData.graduationYear}
+                    onChange={handleChange}
+                    disabled={isSubmitting}
+                  >
+                    {graduationYears.map((year) => (
+                      <option key={year} value={year}>
+                        {year}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
                 <button
                   type="submit"
                   disabled={isSubmitting}
@@ -221,10 +394,10 @@ const Login = () => {
                           d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                         ></path>
                       </svg>
-                      Signing in...
+                      Creating Account...
                     </span>
                   ) : (
-                    "Sign In"
+                    "Create Account"
                   )}
                 </button>
               </form>
@@ -233,32 +406,32 @@ const Login = () => {
             {authMethod === "google" && (
               <div className="mt-6 text-center">
                 <p className="text-sm text-gray-600 mb-2">
-                  Don't have this account?
+                  Prefer a different method?
                 </p>
                 <button
                   onClick={() => setAuthMethod("email")}
                   className="text-sm text-indigo-600 hover:text-indigo-800 transition-colors duration-200"
                 >
-                  Use email and password instead
+                  Sign up with email and password
                 </button>
               </div>
             )}
 
             <div className="mt-6 text-center">
               <p className="text-sm text-gray-600">
-                Don't have an account?{" "}
+                Already have an account?{" "}
                 <Link
-                  href="/register"
+                  href="/login"
                   className="text-indigo-600 hover:text-indigo-800 transition-colors duration-200"
                 >
-                  Sign up
+                  Sign in
                 </Link>
               </p>
             </div>
 
             <div className="mt-8 text-center text-sm text-gray-500">
               <p>
-                By signing in, you agree to our{" "}
+                By signing up, you agree to our{" "}
                 <Link
                   href="/terms"
                   className="text-indigo-600 hover:text-indigo-800 transition-colors duration-200"
@@ -282,4 +455,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default Register; 
