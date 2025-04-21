@@ -197,7 +197,7 @@ export default async function handler(
                   ? assessment.weight
                   : parseFloat(assessment.weight) || 0,
               status: "Not started",
-              outlineUrl,
+              outlineUrl: publicUrl,
             }));
           } else {
             throw new Error("DeepSeek API not configured");
@@ -206,7 +206,7 @@ export default async function handler(
           assessments = extractAssessmentsBasic(extractedText).map(
             (assessment) => ({
               ...assessment,
-              outlineUrl,
+              outlineUrl: publicUrl,
             })
           );
         }
@@ -219,7 +219,7 @@ export default async function handler(
             dueTime: "23:59",
             weight: 0,
             status: "Not started",
-            outlineUrl,
+            outlineUrl: publicUrl,
           });
         }
 
@@ -228,7 +228,7 @@ export default async function handler(
           uploadDate: new Date(),
           semester,
           text: extractedText.slice(0, 5000),
-          outlineUrl,
+          outlineUrl: publicUrl,
         });
 
         const assessmentsRef = adminDb.collection(
@@ -241,7 +241,6 @@ export default async function handler(
             ...assessment,
             createdAt: new Date(),
             sourceFile: fileName,
-            outlineUrl: publicUrl
           });
         }
         await batch.commit();
