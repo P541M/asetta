@@ -624,86 +624,16 @@ const SemesterTabs = ({ selectedSemester, onSelect }: SemesterTabsProps) => {
                 </button>
               </div>
             ) : (
-              <div className="relative inline-block">
-                <button
-                  onClick={() => onSelect(sem.name)}
-                  className={`px-3 py-1.5 rounded-md text-sm font-medium whitespace-nowrap transition-all duration-200 flex items-center ${
-                    selectedSemester === sem.name
-                      ? "bg-indigo-500 text-white shadow-sm"
-                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                  }`}
-                >
-                  {sem.name}
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setActiveDropdown(
-                        activeDropdown === sem.id ? null : sem.id
-                      );
-                    }}
-                    className="ml-1 opacity-60 hover:opacity-100"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-3.5 w-3.5 inline"
-                      viewBox="0 0 20 20"
-                      fill="currentColor"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                  </button>
-                </button>
-
-                {activeDropdown === sem.id && (
-                  <div
-                    ref={dropdownRef}
-                    className="absolute left-0 top-full mt-1 bg-white border border-gray-100 rounded-md shadow-sm z-10 min-w-32 animate-fade-in-down"
-                  >
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleEditStart(sem.id, sem.name);
-                      }}
-                      className="flex items-center w-full px-3 py-1.5 text-sm hover:bg-gray-50 text-left rounded-t-md transition-colors duration-150"
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-3.5 w-3.5 mr-1.5 text-gray-500"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
-                      >
-                        <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
-                      </svg>
-                      Edit
-                    </button>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDeleteSemester(sem.id);
-                      }}
-                      className="flex items-center w-full px-3 py-1.5 text-sm hover:bg-red-50 text-left text-red-600 rounded-b-md transition-colors duration-150"
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-3.5 w-3.5 mr-1.5 text-red-500"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                      Delete
-                    </button>
-                  </div>
-                )}
-              </div>
+              <button
+                onClick={() => onSelect(sem.name)}
+                className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-all duration-200 ${
+                  selectedSemester === sem.name
+                    ? "bg-indigo-500 text-white shadow-sm hover:bg-indigo-600"
+                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                }`}
+              >
+                {sem.name}
+              </button>
             )}
           </div>
         ))}
@@ -724,10 +654,10 @@ const SemesterTabs = ({ selectedSemester, onSelect }: SemesterTabsProps) => {
         >
           <div
             ref={manageModalRef}
-            className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md animate-scale"
+            className="bg-white rounded-lg shadow-lg p-4 w-full max-w-sm animate-scale"
           >
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-medium text-gray-900">
+            <div className="flex justify-between items-center mb-3">
+              <h3 className="text-base font-medium text-gray-900">
                 Manage Semesters
               </h3>
               <button
@@ -770,14 +700,14 @@ const SemesterTabs = ({ selectedSemester, onSelect }: SemesterTabsProps) => {
                                 ref={provided.innerRef}
                                 {...provided.draggableProps}
                                 {...provided.dragHandleProps}
-                                className={`p-3 hover:bg-gray-50 flex items-center justify-between ${
+                                className={`p-2 hover:bg-gray-50 flex items-center justify-between ${
                                   snapshot.isDragging ? 'bg-gray-100' : ''
                                 }`}
                               >
                                 <div className="flex items-center">
                                   <svg
                                     xmlns="http://www.w3.org/2000/svg"
-                                    className="h-5 w-5 mr-2 text-gray-400"
+                                    className="h-4 w-4 mr-2 text-gray-400"
                                     viewBox="0 0 20 20"
                                     fill="currentColor"
                                   >
@@ -899,7 +829,7 @@ const SemesterTabs = ({ selectedSemester, onSelect }: SemesterTabsProps) => {
               )}
             </div>
 
-            <div className="mt-6 text-right">
+            <div className="mt-4 text-right">
               <button
                 onClick={() => setShowManageModal(false)}
                 className="btn-outline text-sm py-1.5 px-4"
