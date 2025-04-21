@@ -104,77 +104,90 @@ const Dashboard = () => {
       "assessments"
     );
     const q = query(assessmentsRef, orderBy("dueDate", "asc"));
-    const unsubscribe = onSnapshot(
-      q,
-      (snapshot) => {
-        const assessmentsList: Assessment[] = snapshot.docs.map((doc) => {
-          const data = doc.data();
-          const today = new Date().toISOString().split("T")[0];
-          return {
-            id: doc.id,
-            title: data.assignmentName || "Unknown Assessment",
-            dueDate: data.dueDate || today,
-            status: data.status || "Not started",
-            notes: data.notes || "",
-            courseName: data.courseName || "Unknown Course",
-            assignmentName: data.assignmentName || "Unknown Assessment",
-            dueTime: data.dueTime || "23:59",
-            weight: data.weight || 0,
-          };
-        });
-        setAssessments(assessmentsList);
+    let unsubscribe: (() => void) | undefined;
+    
+    try {
+      unsubscribe = onSnapshot(
+        q,
+        (snapshot) => {
+          const assessmentsList: Assessment[] = snapshot.docs.map((doc) => {
+            const data = doc.data();
+            const today = new Date().toISOString().split("T")[0];
+            return {
+              id: doc.id,
+              title: data.assignmentName || "Unknown Assessment",
+              dueDate: data.dueDate || today,
+              status: data.status || "Not started",
+              notes: data.notes || "",
+              courseName: data.courseName || "Unknown Course",
+              assignmentName: data.assignmentName || "Unknown Assessment",
+              dueTime: data.dueTime || "23:59",
+              weight: data.weight || 0,
+            };
+          });
+          setAssessments(assessmentsList);
 
-        const now = new Date();
-        const oneWeek = new Date();
-        oneWeek.setDate(now.getDate() + 7);
-        const totalCount = assessmentsList.length;
-        const planningCount = assessmentsList.filter(
-          (a) => a.status === "Not started" || a.status === "Draft"
-        ).length;
-        const activeCount = assessmentsList.filter(
-          (a) =>
-            a.status === "In progress" ||
-            a.status === "On Hold" ||
-            a.status === "Needs Revision"
-        ).length;
-        const submissionCount = assessmentsList.filter(
-          (a) =>
-            a.status === "Pending Submission" ||
-            a.status === "Submitted" ||
-            a.status === "Under Review"
-        ).length;
-        const completedCount = assessmentsList.filter(
-          (a) => a.status === "Completed"
-        ).length;
-        const problemCount = assessmentsList.filter(
-          (a) => a.status === "Missed/Late" || a.status === "Deferred"
-        ).length;
-        const upcomingCount = assessmentsList.filter((a) => {
-          const dueDate = new Date(a.dueDate);
-          return (
-            dueDate > now && dueDate <= oneWeek && a.status !== "Completed"
-          );
-        }).length;
-        setStats({
-          total: totalCount,
-          planning: planningCount,
-          active: activeCount,
-          submission: submissionCount,
-          completed: completedCount,
-          problem: problemCount,
-          upcomingDeadlines: upcomingCount,
-        });
-        setAnimateStatCards(true);
-        setTimeout(() => setAnimateStatCards(false), 1000);
-        setIsLoading(false);
-      },
-      (err) => {
-        console.error("Error fetching assessments:", err);
-        setError("Failed to load assessments. Please try again.");
-        setIsLoading(false);
+          const now = new Date();
+          const oneWeek = new Date();
+          oneWeek.setDate(now.getDate() + 7);
+          const totalCount = assessmentsList.length;
+          const planningCount = assessmentsList.filter(
+            (a) => a.status === "Not started" || a.status === "Draft"
+          ).length;
+          const activeCount = assessmentsList.filter(
+            (a) =>
+              a.status === "In progress" ||
+              a.status === "On Hold" ||
+              a.status === "Needs Revision"
+          ).length;
+          const submissionCount = assessmentsList.filter(
+            (a) =>
+              a.status === "Pending Submission" ||
+              a.status === "Submitted" ||
+              a.status === "Under Review"
+          ).length;
+          const completedCount = assessmentsList.filter(
+            (a) => a.status === "Completed"
+          ).length;
+          const problemCount = assessmentsList.filter(
+            (a) => a.status === "Missed/Late" || a.status === "Deferred"
+          ).length;
+          const upcomingCount = assessmentsList.filter((a) => {
+            const dueDate = new Date(a.dueDate);
+            return (
+              dueDate > now && dueDate <= oneWeek && a.status !== "Completed"
+            );
+          }).length;
+          setStats({
+            total: totalCount,
+            planning: planningCount,
+            active: activeCount,
+            submission: submissionCount,
+            completed: completedCount,
+            problem: problemCount,
+            upcomingDeadlines: upcomingCount,
+          });
+          setAnimateStatCards(true);
+          setTimeout(() => setAnimateStatCards(false), 1000);
+          setIsLoading(false);
+        },
+        (err) => {
+          console.error("Error fetching assessments:", err);
+          setError("Failed to load assessments. Please try again.");
+          setIsLoading(false);
+        }
+      );
+    } catch (error) {
+      console.error("Error setting up assessments listener:", error);
+      setError("Failed to set up assessments listener. Please try again.");
+      setIsLoading(false);
+    }
+
+    return () => {
+      if (unsubscribe) {
+        unsubscribe();
       }
-    );
-    return () => unsubscribe();
+    };
   }, [selectedSemesterId, user]);
 
   useEffect(() => {

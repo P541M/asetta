@@ -47,13 +47,34 @@ const Register = () => {
       return;
     }
 
-    if (formData.password.length < 8) {
+    // Enhanced password validation
+    const password = formData.password;
+    const minLength = 8;
+    const hasUpperCase = /[A-Z]/.test(password);
+    const hasLowerCase = /[a-z]/.test(password);
+    const hasNumbers = /\d/.test(password);
+    const hasSpecialChar = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password);
+
+    if (password.length < minLength) {
       setError("Password must be at least 8 characters long");
+      return;
+    }
+
+    const criteriaCount = [hasUpperCase, hasLowerCase, hasNumbers, hasSpecialChar].filter(Boolean).length;
+    if (criteriaCount < 3) {
+      setError("Password must contain at least 3 of the following: uppercase letter, lowercase letter, number, or special character");
       return;
     }
 
     if (!formData.displayName.trim()) {
       setError("Please enter your name");
+      return;
+    }
+
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      setError("Please enter a valid email address");
       return;
     }
 
@@ -83,6 +104,7 @@ const Register = () => {
         graduationYear: formData.graduationYear,
         createdAt: new Date(),
         lastLogin: new Date(),
+        passwordUpdatedAt: new Date(),
       });
 
       router.push("/dashboard");
@@ -94,6 +116,8 @@ const Register = () => {
           errorMessage += "An account with this email already exists.";
         } else if (error.message.includes("auth/invalid-email")) {
           errorMessage += "Please enter a valid email address.";
+        } else if (error.message.includes("auth/weak-password")) {
+          errorMessage += "Please choose a stronger password.";
         } else {
           errorMessage += error.message;
         }

@@ -21,6 +21,56 @@ interface Assessment {
   outlineUrl?: string;
 }
 
+async function extractAssessmentsAI(text: string): Promise<string> {
+  const deepseekEndpoint = process.env.DEEPSEEK_ENDPOINT;
+  const deepseekApiKey = process.env.DEEPSEEK_API_KEY;
+  
+  if (!deepseekEndpoint || !deepseekApiKey) {
+    throw new Error("DeepSeek API not configured");
+  }
+
+  const prompt = `
+    You are an AI assistant that extracts assessment information from course outlines.
+    Extract all assessments from the following course outline text. Return a JSON array with objects having the following structure:
+    {
+      "courseName": "The course code or name",
+      "assignmentName": "Name of the assessment",
+      "dueDate": "YYYY-MM-DD format date",
+      "dueTime": "HH:MM format time (24-hour), default to '23:59' if not specified",
+      "weight": "Percentage weight as a number",
+      "status": "Not started"
+    }
+
+    Only include assessments that have clear due dates or deadline information. Extract as many assessments as you can find. If no time is specified, use '23:59' as the default.
+
+    Course outline text:
+    ${text}
+
+    Respond with ONLY a valid JSON array of assessment objects. No other explanation or text.
+  `;
+
+  const response = await fetch(deepseekEndpoint, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${deepseekApiKey}`,
+    },
+    body: JSON.stringify({
+      model: "deepseek-chat",
+      messages: [{ role: "user", content: prompt }],
+      temperature: 0.2,
+      max_tokens: 4000,
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`DeepSeek API error: ${response.status}`);
+  }
+
+  const aiResponse = await response.json();
+  return aiResponse.choices[0].message.content;
+}
+
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
@@ -35,7 +85,11 @@ export default async function handler(
     req: NextApiRequest
   ): Promise<{ fields: Fields; files: Files }> => {
     return new Promise((resolve, reject) => {
-      const form = new IncomingForm({ multiples: true });
+      const form = new IncomingForm({ 
+        multiples: true,
+        maxFileSize: 10 * 1024 * 1024, // 10MB limit
+        filter: ({ mimetype }) => mimetype === 'application/pdf'
+      });
       form.parse(req, (err, fields, files) => {
         if (err) reject(err);
         resolve({ fields, files });
@@ -104,6 +158,7 @@ export default async function handler(
     let totalAssessments = 0;
     let processedFiles = 0;
     let failedFiles = 0;
+    const errors: string[] = [];
 
     for (const fileData of uploadedFiles) {
       try {
@@ -117,6 +172,7 @@ export default async function handler(
         } catch (error) {
           console.error(`Error parsing PDF ${fileName}:`, error);
           failedFiles++;
+          errors.push(`Failed to parse PDF: ${fileName}`);
           continue;
         }
 
@@ -125,7 +181,8 @@ export default async function handler(
           .from('outlines')
           .upload(`${userId}/${semesterId}/${fileName}`, pdfBuffer, {
             contentType: 'application/pdf',
-            upsert: true
+            upsert: true,
+            cacheControl: '3600'
           });
 
         if (uploadError) {
@@ -139,46 +196,8 @@ export default async function handler(
 
         let assessments: Assessment[] = [];
         try {
-          const deepseekEndpoint = process.env.DEEPSEEK_ENDPOINT;
-          const deepseekApiKey = process.env.DEEPSEEK_API_KEY;
-          if (deepseekEndpoint && deepseekApiKey) {
-            const prompt = `
-              You are an AI assistant that extracts assessment information from course outlines.
-              Extract all assessments from the following course outline text. Return a JSON array with objects having the following structure:
-              {
-                "courseName": "The course code or name",
-                "assignmentName": "Name of the assessment",
-                "dueDate": "YYYY-MM-DD format date",
-                "dueTime": "HH:MM format time (24-hour), default to '23:59' if not specified",
-                "weight": "Percentage weight as a number",
-                "status": "Not started"
-              }
-
-              Only include assessments that have clear due dates or deadline information. Extract as many assessments as you can find. If no time is specified, use '23:59' as the default.
-
-              Course outline text:
-              ${extractedText}
-
-              Respond with ONLY a valid JSON array of assessment objects. No other explanation or text.
-            `;
-            const response = await fetch(deepseekEndpoint, {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${deepseekApiKey}`,
-              },
-              body: JSON.stringify({
-                model: "deepseek-chat",
-                messages: [{ role: "user", content: prompt }],
-                temperature: 0.2,
-                max_tokens: 4000,
-              }),
-            });
-            if (!response.ok) {
-              throw new Error(`DeepSeek API error: ${response.status}`);
-            }
-            const aiResponse = await response.json();
-            const aiContent = aiResponse.choices[0].message.content;
+          if (process.env.DEEPSEEK_API_KEY) {
+            const aiContent = await extractAssessmentsAI(extractedText);
             const jsonMatch = aiContent.match(/\[[\s\S]*\]/);
             const jsonString = jsonMatch ? jsonMatch[0] : aiContent;
             assessments = JSON.parse(jsonString);
@@ -203,6 +222,7 @@ export default async function handler(
             throw new Error("DeepSeek API not configured");
           }
         } catch (aiError) {
+          console.warn(`AI extraction failed for ${fileName}, falling back to basic extraction`);
           assessments = extractAssessmentsBasic(extractedText).map(
             (assessment) => ({
               ...assessment,
@@ -229,6 +249,8 @@ export default async function handler(
           semester,
           text: extractedText.slice(0, 5000),
           outlineUrl: publicUrl,
+          fileSize: pdfBuffer.length,
+          status: 'processed'
         });
 
         const assessmentsRef = adminDb.collection(
@@ -250,6 +272,7 @@ export default async function handler(
       } catch (fileError) {
         console.error("Error processing file:", fileError);
         failedFiles++;
+        errors.push(`Failed to process file: ${fileData.originalFilename}`);
       }
     }
 
@@ -258,6 +281,7 @@ export default async function handler(
       message: `Processed ${processedFiles} file(s), extracted ${totalAssessments} assessments. ${
         failedFiles > 0 ? `Failed to process ${failedFiles} file(s).` : ""
       }`,
+      errors: errors.length > 0 ? errors : undefined
     });
   } catch (error) {
     console.error("Processing error:", error);

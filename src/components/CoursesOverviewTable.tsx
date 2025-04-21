@@ -199,12 +199,24 @@ const CoursesOverviewTable = ({
 
     try {
       const file = e.target.files[0];
+      if (!file) {
+        throw new Error("No file selected");
+      }
+
+      // Validate file type
       if (file.type !== "application/pdf") {
         throw new Error("Please upload a PDF file");
       }
 
-      // Create a safe filename
-      const safeFilename = file.name.replace(/[^a-zA-Z0-9.-]/g, "_");
+      // Validate file size (max 10MB)
+      const maxSize = 10 * 1024 * 1024; // 10MB in bytes
+      if (file.size > maxSize) {
+        throw new Error("File size must be less than 10MB");
+      }
+
+      // Create a safe filename with timestamp to prevent collisions
+      const timestamp = new Date().getTime();
+      const safeFilename = `${timestamp}_${file.name.replace(/[^a-zA-Z0-9.-]/g, "_")}`;
       const filePath = `${user.uid}/${semesterId}/${safeFilename}`;
 
       // Upload to Supabase Storage
@@ -213,6 +225,7 @@ const CoursesOverviewTable = ({
         .upload(filePath, file, {
           contentType: "application/pdf",
           upsert: true,
+          cacheControl: "3600",
         });
 
       if (uploadError) throw uploadError;
@@ -229,6 +242,9 @@ const CoursesOverviewTable = ({
         semesterId,
         outlineUrl: publicUrl,
         updatedAt: new Date(),
+        fileName: safeFilename,
+        fileSize: file.size,
+        uploadDate: new Date(),
       });
 
       // Update all assessments for this course with the new outline URL
@@ -245,7 +261,10 @@ const CoursesOverviewTable = ({
       
       const batch = writeBatch(db);
       querySnapshot.forEach((doc) => {
-        batch.update(doc.ref, { outlineUrl: publicUrl });
+        batch.update(doc.ref, { 
+          outlineUrl: publicUrl,
+          outlineUpdatedAt: new Date()
+        });
       });
       await batch.commit();
 
@@ -262,7 +281,7 @@ const CoursesOverviewTable = ({
       );
     } catch (err) {
       console.error("Error uploading outline:", err);
-      setError(`Failed to upload course outline: ${err instanceof Error ? err.message : 'Unknown error'}`);
+      setError(err instanceof Error ? err.message : "Failed to upload outline");
     } finally {
       setUploadingCourse(null);
       if (e.target) e.target.value = "";

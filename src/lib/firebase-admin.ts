@@ -29,7 +29,7 @@ async function initializeAdmin() {
       const serviceAccountModule = await import("../../serviceAccountKey.json");
       const serviceAccount = serviceAccountModule.default;
       config = {
-        credential: admin.credential.cert(serviceAccount),
+        credential: admin.credential.cert(serviceAccount as admin.ServiceAccount),
       };
       console.log("Firebase Admin initialized with local service account file");
     } catch (fileError) {
@@ -44,7 +44,7 @@ async function initializeAdmin() {
             process.env.FIREBASE_SERVICE_ACCOUNT
           );
           config = {
-            credential: admin.credential.cert(serviceAccount),
+            credential: admin.credential.cert(serviceAccount as admin.ServiceAccount),
           };
           console.log(
             "Firebase Admin initialized with service account from env"
@@ -66,7 +66,15 @@ async function initializeAdmin() {
     // Initialize the app with the config
     return admin.initializeApp(config);
   } catch (error) {
-    console.error("Firebase admin initialization error:", error);
+    if (error instanceof Error) {
+      if (error.message.includes('already exists')) {
+        console.error("Firebase admin app already initialized");
+        return admin.getApps()[0];
+      }
+      console.error("Firebase admin initialization error:", error.message);
+    } else {
+      console.error("Unknown error during Firebase admin initialization");
+    }
     throw error;
   }
 }
