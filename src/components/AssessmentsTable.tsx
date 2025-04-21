@@ -31,6 +31,20 @@ interface LinkModalProps {
   onAddLink: (url: string, text: string) => void;
 }
 
+interface DeleteConfirmationModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onConfirm: () => void;
+  assessmentName: string;
+}
+
+interface BulkDeleteConfirmationModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onConfirm: () => void;
+  count: number;
+}
+
 const LinkModal = ({ isOpen, onClose, onAddLink }: LinkModalProps) => {
   const [url, setUrl] = useState("");
   const [text, setText] = useState("");
@@ -119,6 +133,136 @@ const LinkModal = ({ isOpen, onClose, onAddLink }: LinkModalProps) => {
   );
 };
 
+const DeleteConfirmationModal = ({ isOpen, onClose, onConfirm, assessmentName }: DeleteConfirmationModalProps) => {
+  if (!isOpen) return null;
+
+  const handleModalClick = (e: React.MouseEvent) => {
+    // Prevent click from propagating to elements behind the modal
+    e.stopPropagation();
+  };
+
+  return (
+    <div 
+      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[200] modal-open"
+      onClick={handleModalClick}
+    >
+      <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md animate-scale">
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-lg font-medium text-gray-900">Confirm Delete</h3>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onClose();
+            }}
+            className="text-gray-400 hover:text-gray-500"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
+              <path
+                fillRule="evenodd"
+                d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                clipRule="evenodd"
+              />
+            </svg>
+          </button>
+        </div>
+        <p className="text-gray-600 mb-6">
+          Are you sure you want to delete "{assessmentName}"? This action cannot be undone.
+        </p>
+        <div className="flex justify-end space-x-3">
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onClose();
+            }}
+            className="btn-outline py-1.5 px-4"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onConfirm();
+            }}
+            className="btn-danger py-1.5 px-4"
+          >
+            Delete
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const BulkDeleteConfirmationModal = ({ isOpen, onClose, onConfirm, count }: BulkDeleteConfirmationModalProps) => {
+  if (!isOpen) return null;
+
+  const handleModalClick = (e: React.MouseEvent) => {
+    // Prevent click from propagating to elements behind the modal
+    e.stopPropagation();
+  };
+
+  return (
+    <div 
+      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[200] modal-open"
+      onClick={handleModalClick}
+    >
+      <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md animate-scale">
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-lg font-medium text-gray-900">Confirm Bulk Delete</h3>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onClose();
+            }}
+            className="text-gray-400 hover:text-gray-500"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
+              <path
+                fillRule="evenodd"
+                d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                clipRule="evenodd"
+              />
+            </svg>
+          </button>
+        </div>
+        <p className="text-gray-600 mb-6">
+          Are you sure you want to delete {count} selected assessment{count === 1 ? '' : 's'}? This action cannot be undone.
+        </p>
+        <div className="flex justify-end space-x-3">
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onClose();
+            }}
+            className="btn-outline py-1.5 px-4"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onConfirm();
+            }}
+            className="btn-danger py-1.5 px-4"
+          >
+            Delete
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
   assessments,
   semesterId,
@@ -158,6 +302,9 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
   const [showLinkModal, setShowLinkModal] = useState(false);
   const [linkCallback, setLinkCallback] = useState<((url: string, text: string) => void) | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [assessmentToDelete, setAssessmentToDelete] = useState<Assessment | null>(null);
+  const [showBulkDeleteModal, setShowBulkDeleteModal] = useState(false);
 
   // Fetch user preferences
   useEffect(() => {
@@ -344,11 +491,13 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
     if (!user || !assessment.id) return;
     
     try {
-      const assessmentRef = doc(db, 'users', user.uid, 'assessments', assessment.id);
+      const assessmentRef = doc(db, 'users', user.uid, 'semesters', semesterId, 'assessments', assessment.id);
       await deleteDoc(assessmentRef);
       if (onStatusChange) {
         onStatusChange(assessment.id, "Deleted");
       }
+      setShowDeleteModal(false);
+      setAssessmentToDelete(null);
     } catch (error) {
       console.error("Error deleting assessment:", error);
     }
@@ -356,13 +505,12 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
 
   const handleBulkAction = async (action: "complete" | "delete" | "reset") => {
     if (!user || selectedRows.length === 0) return;
-    if (
-      action === "delete" &&
-      !window.confirm(
-        `Are you sure you want to delete ${selectedRows.length} selected assessment(s)?`
-      )
-    )
+    
+    if (action === "delete") {
+      setShowBulkDeleteModal(true);
       return;
+    }
+
     try {
       for (const id of selectedRows) {
         const assessmentRef = doc(
@@ -374,8 +522,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
           "assessments",
           id
         );
-        if (action === "delete") await deleteDoc(assessmentRef);
-        else if (action === "complete")
+        if (action === "complete")
           await updateDoc(assessmentRef, {
             status: "Submitted",
             updatedAt: new Date(),
@@ -390,6 +537,30 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
       onStatusChange?.(selectedRows[0], "Reset");
     } catch (error) {
       console.error(`Error performing bulk ${action}:`, error);
+    }
+  };
+
+  const handleConfirmBulkDelete = async () => {
+    if (!user || selectedRows.length === 0) return;
+
+    try {
+      for (const id of selectedRows) {
+        const assessmentRef = doc(
+          db,
+          "users",
+          user.uid,
+          "semesters",
+          semesterId,
+          "assessments",
+          id
+        );
+        await deleteDoc(assessmentRef);
+      }
+      setSelectedRows([]);
+      setShowBulkDeleteModal(false);
+      onStatusChange?.(selectedRows[0], "Deleted");
+    } catch (error) {
+      console.error("Error performing bulk delete:", error);
     }
   };
 
@@ -519,6 +690,12 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
 
   const handleDropdownToggle = (id: string | null) => {
     setDropdownOpenId(id);
+  };
+
+  const handleDeleteClick = (assessment: Assessment) => {
+    setAssessmentToDelete(assessment);
+    setShowDeleteModal(true);
+    handleDropdownToggle(null);
   };
 
   return (
@@ -1067,7 +1244,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                               <button
                                 onClick={() => {
                                   handleDropdownToggle(null);
-                                  handleDeleteAssessment(assessment);
+                                  handleDeleteClick(assessment);
                                 }}
                                 className="flex w-full items-center px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
                               >
@@ -1205,6 +1382,25 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
           setLinkCallback(null);
         }}
         onAddLink={handleLinkSubmit}
+      />
+
+      {/* Delete Confirmation Modal */}
+      <DeleteConfirmationModal
+        isOpen={showDeleteModal}
+        onClose={() => {
+          setShowDeleteModal(false);
+          setAssessmentToDelete(null);
+        }}
+        onConfirm={() => assessmentToDelete && handleDeleteAssessment(assessmentToDelete)}
+        assessmentName={assessmentToDelete?.assignmentName || ''}
+      />
+
+      {/* Bulk Delete Confirmation Modal */}
+      <BulkDeleteConfirmationModal
+        isOpen={showBulkDeleteModal}
+        onClose={() => setShowBulkDeleteModal(false)}
+        onConfirm={handleConfirmBulkDelete}
+        count={selectedRows.length}
       />
     </div>
   );
