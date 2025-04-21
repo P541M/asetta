@@ -21,6 +21,7 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
   );
   const [showDaysTillDue, setShowDaysTillDue] = useState<boolean>(true);
   const [showWeight, setShowWeight] = useState<boolean>(true);
+  const [showStatsBar, setShowStatsBar] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState({ text: "", type: "" });
   const [imagePreview, setImagePreview] = useState<string | null>(
@@ -70,6 +71,7 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
           setGraduationYear(userData.graduationYear || currentYear + 4);
           setShowDaysTillDue(userData.showDaysTillDue ?? true);
           setShowWeight(userData.showWeight ?? true);
+          setShowStatsBar(userData.showStatsBar ?? false);
         }
       } catch (error) {
         console.error("Error fetching user data:", error);
@@ -159,12 +161,13 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
         graduationYear: graduationYear,
         showDaysTillDue: showDaysTillDue,
         showWeight: showWeight,
+        showStatsBar: showStatsBar,
         updatedAt: new Date(),
       });
 
       // Trigger a custom event to notify other components of the preference change
       const event = new CustomEvent('userPreferencesUpdated', {
-        detail: { showDaysTillDue, showWeight }
+        detail: { showDaysTillDue, showWeight, showStatsBar }
       });
       window.dispatchEvent(event);
 
@@ -407,6 +410,30 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
                 </div>
                 <p className="text-sm text-gray-500 mt-1">
                   Toggle the display of the weight column in the assessments table
+                </p>
+              </div>
+
+              <div className="form-group">
+                <div className="flex items-center justify-between">
+                  <label htmlFor="showStatsBar" className="form-label">
+                    Show Stats Bar
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => setShowStatsBar(!showStatsBar)}
+                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 ${
+                      showStatsBar ? "bg-indigo-600" : "bg-gray-200"
+                    }`}
+                  >
+                    <span
+                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                        showStatsBar ? "translate-x-6" : "translate-x-1"
+                      }`}
+                    />
+                  </button>
+                </div>
+                <p className="text-sm text-gray-500 mt-1">
+                  Toggle the display of the statistics bar above the assessments table
                 </p>
               </div>
             </div>

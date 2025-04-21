@@ -10,6 +10,8 @@ import {
   where,
   orderBy,
   onSnapshot,
+  doc,
+  getDoc,
 } from "firebase/firestore";
 import SemesterTabs from "../components/SemesterTabs";
 import UploadForm from "../components/UploadForm";
@@ -22,14 +24,14 @@ import Header from "../components/Header";
 
 interface Assessment {
   id: string;
-  courseName: string;
-  assignmentName: string;
+  title: string;
   dueDate: string;
-  dueTime: string;
-  weight: number;
   status: string;
   notes?: string;
-  outlineUrl?: string;
+  courseName: string;
+  assignmentName: string;
+  dueTime: string;
+  weight: number;
 }
 
 const Dashboard = () => {
@@ -45,6 +47,7 @@ const Dashboard = () => {
   >("assessments");
   const [selectedCourse, setSelectedCourse] = useState<string | null>(null);
   const [animateStatCards, setAnimateStatCards] = useState(false);
+  const [showStatsBar, setShowStatsBar] = useState(false);
 
   const [stats, setStats] = useState({
     total: 0,
@@ -109,14 +112,14 @@ const Dashboard = () => {
           const today = new Date().toISOString().split("T")[0];
           return {
             id: doc.id,
-            courseName: data.courseName || "Unknown Course",
-            assignmentName: data.assignmentName || "Unknown Assessment",
+            title: data.assignmentName || "Unknown Assessment",
             dueDate: data.dueDate || today,
-            dueTime: data.dueTime || "23:59",
-            weight: data.weight || 0,
             status: data.status || "Not started",
             notes: data.notes || "",
-            outlineUrl: data.outlineUrl || "",
+            courseName: data.courseName || "Unknown Course",
+            assignmentName: data.assignmentName || "Unknown Assessment",
+            dueTime: data.dueTime || "23:59",
+            weight: data.weight || 0,
           };
         });
         setAssessments(assessmentsList);
@@ -174,6 +177,38 @@ const Dashboard = () => {
     return () => unsubscribe();
   }, [selectedSemesterId, user]);
 
+  useEffect(() => {
+    const fetchUserPreferences = async () => {
+      if (!user) return;
+      try {
+        const userDocRef = doc(db, "users", user.uid);
+        const userSnapshot = await getDoc(userDocRef);
+        if (userSnapshot.exists()) {
+          const userData = userSnapshot.data();
+          setShowStatsBar(userData.showStatsBar ?? false);
+        }
+      } catch (error) {
+        console.error("Error fetching user preferences:", error);
+      }
+    };
+
+    fetchUserPreferences();
+
+    const handlePreferencesUpdate = (event: CustomEvent) => {
+      if (event.detail) {
+        if ('showStatsBar' in event.detail) {
+          setShowStatsBar(event.detail.showStatsBar);
+        }
+      }
+    };
+
+    window.addEventListener('userPreferencesUpdated', handlePreferencesUpdate as EventListener);
+
+    return () => {
+      window.removeEventListener('userPreferencesUpdated', handlePreferencesUpdate as EventListener);
+    };
+  }, [user]);
+
   const refreshAssessments = () => {
     console.log("Assessment data refreshed");
   };
@@ -230,78 +265,80 @@ const Dashboard = () => {
           />
           {selectedSemester ? (
             <>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 mb-6">
-                <div
-                  className={`bg-white rounded-xl shadow-sm p-4 border border-gray-100 stat-card ${
-                    animateStatCards ? "animate-scale" : ""
-                  }`}
-                >
-                  <p className="text-sm text-gray-500 mb-1">
-                    Total Assessments
-                  </p>
-                  <h3 className="text-2xl font-bold text-gray-900">
-                    {stats.total}
-                  </h3>
+              {showStatsBar && (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 mb-6">
+                  <div
+                    className={`bg-white rounded-xl shadow-sm p-4 border border-gray-100 stat-card ${
+                      animateStatCards ? "animate-scale" : ""
+                    }`}
+                  >
+                    <p className="text-sm text-gray-500 mb-1">
+                      Total Assessments
+                    </p>
+                    <h3 className="text-2xl font-bold text-gray-900">
+                      {stats.total}
+                    </h3>
+                  </div>
+                  <div
+                    className={`bg-white rounded-xl shadow-sm p-4 border border-gray-100 stat-card ${
+                      animateStatCards ? "animate-scale" : ""
+                    }`}
+                    style={{ animationDelay: "0.1s" }}
+                  >
+                    <p className="text-sm text-gray-500 mb-1">Planning</p>
+                    <h3 className="text-2xl font-bold text-gray-600">
+                      {stats.planning}
+                    </h3>
+                  </div>
+                  <div
+                    className={`bg-white rounded-xl shadow-sm p-4 border border-gray-100 stat-card ${
+                      animateStatCards ? "animate-scale" : ""
+                    }`}
+                    style={{ animationDelay: "0.2s" }}
+                  >
+                    <p className="text-sm text-gray-500 mb-1">Active Work</p>
+                    <h3 className="text-2xl font-bold text-blue-600">
+                      {stats.active}
+                    </h3>
+                  </div>
+                  <div
+                    className={`bg-white rounded-xl shadow-sm p-4 border border-gray-100 stat-card ${
+                      animateStatCards ? "animate-scale" : ""
+                    }`}
+                    style={{ animationDelay: "0.3s" }}
+                  >
+                    <p className="text-sm text-gray-500 mb-1">Submission</p>
+                    <h3 className="text-2xl font-bold text-indigo-600">
+                      {stats.submission}
+                    </h3>
+                  </div>
+                  <div
+                    className={`bg-white rounded-xl shadow-sm p-4 border border-gray-100 stat-card ${
+                      animateStatCards ? "animate-scale" : ""
+                    }`}
+                    style={{ animationDelay: "0.4s" }}
+                  >
+                    <p className="text-sm text-gray-500 mb-1">Completed</p>
+                    <h3 className="text-2xl font-bold text-emerald-600">
+                      {stats.completed}
+                    </h3>
+                  </div>
+                  <div
+                    className={`bg-white rounded-xl shadow-sm p-4 border border-gray-100 stat-card ${
+                      animateStatCards ? "animate-scale" : ""
+                    }`}
+                    style={{ animationDelay: "0.5s" }}
+                  >
+                    <p className="text-sm text-gray-500 mb-1">Due This Week</p>
+                    <h3 className="text-2xl font-bold text-amber-600">
+                      {stats.upcomingDeadlines}
+                    </h3>
+                    {stats.upcomingDeadlines > 0 && (
+                      <span className="inline-block w-2 h-2 bg-amber-500 rounded-full animate-pulse mt-1"></span>
+                    )}
+                  </div>
                 </div>
-                <div
-                  className={`bg-white rounded-xl shadow-sm p-4 border border-gray-100 stat-card ${
-                    animateStatCards ? "animate-scale" : ""
-                  }`}
-                  style={{ animationDelay: "0.1s" }}
-                >
-                  <p className="text-sm text-gray-500 mb-1">Planning</p>
-                  <h3 className="text-2xl font-bold text-gray-600">
-                    {stats.planning}
-                  </h3>
-                </div>
-                <div
-                  className={`bg-white rounded-xl shadow-sm p-4 border border-gray-100 stat-card ${
-                    animateStatCards ? "animate-scale" : ""
-                  }`}
-                  style={{ animationDelay: "0.2s" }}
-                >
-                  <p className="text-sm text-gray-500 mb-1">Active Work</p>
-                  <h3 className="text-2xl font-bold text-blue-600">
-                    {stats.active}
-                  </h3>
-                </div>
-                <div
-                  className={`bg-white rounded-xl shadow-sm p-4 border border-gray-100 stat-card ${
-                    animateStatCards ? "animate-scale" : ""
-                  }`}
-                  style={{ animationDelay: "0.3s" }}
-                >
-                  <p className="text-sm text-gray-500 mb-1">Submission</p>
-                  <h3 className="text-2xl font-bold text-indigo-600">
-                    {stats.submission}
-                  </h3>
-                </div>
-                <div
-                  className={`bg-white rounded-xl shadow-sm p-4 border border-gray-100 stat-card ${
-                    animateStatCards ? "animate-scale" : ""
-                  }`}
-                  style={{ animationDelay: "0.4s" }}
-                >
-                  <p className="text-sm text-gray-500 mb-1">Completed</p>
-                  <h3 className="text-2xl font-bold text-emerald-600">
-                    {stats.completed}
-                  </h3>
-                </div>
-                <div
-                  className={`bg-white rounded-xl shadow-sm p-4 border border-gray-100 stat-card ${
-                    animateStatCards ? "animate-scale" : ""
-                  }`}
-                  style={{ animationDelay: "0.5s" }}
-                >
-                  <p className="text-sm text-gray-500 mb-1">Due This Week</p>
-                  <h3 className="text-2xl font-bold text-amber-600">
-                    {stats.upcomingDeadlines}
-                  </h3>
-                  {stats.upcomingDeadlines > 0 && (
-                    <span className="inline-block w-2 h-2 bg-amber-500 rounded-full animate-pulse mt-1"></span>
-                  )}
-                </div>
-              </div>
+              )}
               {stats.problem > 0 && (
                 <div className="mb-6">
                   <div
