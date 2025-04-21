@@ -56,14 +56,21 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
           });
         });
         
-        setAssessments(assessmentsList);
+        // Sort assessments by due date
+        const sortedAssessments = assessmentsList.sort((a, b) => {
+          const dateA = new Date(`${a.dueDate}T${a.dueTime}`);
+          const dateB = new Date(`${b.dueDate}T${b.dueTime}`);
+          return dateA.getTime() - dateB.getTime();
+        });
+        
+        setAssessments(sortedAssessments);
         
         // Calculate total weight of all assessments
-        const total = assessmentsList.reduce((sum, assessment) => sum + assessment.weight, 0);
+        const total = sortedAssessments.reduce((sum, assessment) => sum + assessment.weight, 0);
         setTotalWeight(total);
         
         // Calculate current grade based on completed assessments
-        const completedAssessments = assessmentsList.filter(a => a.status === 'Submitted' && a.mark !== null && a.mark !== undefined);
+        const completedAssessments = sortedAssessments.filter(a => a.status === 'Submitted' && a.mark !== null && a.mark !== undefined);
         if (completedAssessments.length > 0) {
           const weightedSum = completedAssessments.reduce((sum, assessment) => {
             if (assessment.mark === null || assessment.mark === undefined) return sum;
