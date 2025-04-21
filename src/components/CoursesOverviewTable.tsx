@@ -3,12 +3,14 @@ import { useAuth } from "../contexts/AuthContext";
 import { db } from "../lib/firebase";
 import { collection, query, getDocs, doc, setDoc, writeBatch, where } from "firebase/firestore";
 import { supabase } from "../lib/supabase";
+import { parseLocalDateTime, formatLocalDate, isUpcoming as isDateUpcoming } from "../utils/dateUtils";
 
 interface Assessment {
   id: string;
   courseName: string;
   assignmentName: string;
   dueDate: string;
+  dueTime: string;
   weight: number;
   status: string;
 }
@@ -97,11 +99,25 @@ const CoursesOverviewTable = ({
             .filter(
               (a) =>
                 !completedStatuses.includes(a.status) &&
-                new Date(a.dueDate) >= now
+                (() => {
+                  const [year, month, day] = a.dueDate.split("-").map(Number);
+                  const [hours, minutes] = (a.dueTime || "23:59").split(":").map(Number);
+                  const due = new Date(year, month - 1, day, hours, minutes);
+                  return due >= now;
+                })()
             )
             .sort(
-              (a, b) =>
-                new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime()
+              (a, b) => {
+                const [yearA, monthA, dayA] = a.dueDate.split("-").map(Number);
+                const [hoursA, minutesA] = (a.dueTime || "23:59").split(":").map(Number);
+                const dueA = new Date(yearA, monthA - 1, dayA, hoursA, minutesA);
+                
+                const [yearB, monthB, dayB] = b.dueDate.split("-").map(Number);
+                const [hoursB, minutesB] = (b.dueTime || "23:59").split(":").map(Number);
+                const dueB = new Date(yearB, monthB - 1, dayB, hoursB, minutesB);
+                
+                return dueA.getTime() - dueB.getTime();
+              }
             );
           const nextAssignment = upcomingAssessments[0] || null;
 
@@ -157,28 +173,20 @@ const CoursesOverviewTable = ({
     }
     const fieldA = a[sortField];
     const fieldB = b[sortField];
+    if (fieldA === null || fieldA === undefined) return sortDirection === "asc" ? 1 : -1;
+    if (fieldB === null || fieldB === undefined) return sortDirection === "asc" ? -1 : 1;
     if (fieldA < fieldB) return sortDirection === "asc" ? -1 : 1;
     if (fieldA > fieldB) return sortDirection === "asc" ? 1 : -1;
     return 0;
   });
 
   const formatDate = (dateStr: string | null) => {
-    if (!dateStr) return "-";
-    return new Date(dateStr).toLocaleDateString(undefined, {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-    });
+    return formatLocalDate(dateStr);
   };
 
   const isUpcoming = (dateStr: string | null) => {
     if (!dateStr) return false;
-    const now = new Date();
-    const dueDate = new Date(dateStr);
-    const diffDays = Math.round(
-      (dueDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
-    );
-    return diffDays >= 0 && diffDays <= 7;
+    return isDateUpcoming(dateStr);
   };
 
   const handleOutlineUpload = async (

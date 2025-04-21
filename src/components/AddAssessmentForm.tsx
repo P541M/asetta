@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { db } from "../lib/firebase";
-import { addDoc, collection } from "firebase/firestore";
+import { collection, addDoc } from "firebase/firestore";
+import { localToUTC } from "../utils/dateUtils";
 
 interface AddAssessmentFormProps {
   semester: string;
@@ -81,6 +82,12 @@ const AddAssessmentForm = ({
     setIsSubmitting(true);
     setMessage({ text: "", type: "" });
     try {
+      // Convert local date/time to UTC for storage
+      const { date: utcDate, time: utcTime } = localToUTC(
+        formData.dueDate,
+        formData.dueTime
+      );
+      
       await addDoc(
         collection(
           db,
@@ -90,7 +97,12 @@ const AddAssessmentForm = ({
           semesterId,
           "assessments"
         ),
-        { ...formData, createdAt: new Date() }
+        { 
+          ...formData,
+          dueDate: utcDate,
+          dueTime: utcTime,
+          createdAt: new Date() 
+        }
       );
       setFormSuccess(true);
       setFormData({

@@ -6,6 +6,7 @@ import { doc, updateDoc, deleteDoc, getDoc, serverTimestamp, Timestamp } from "f
 import { useAuth } from "../contexts/AuthContext";
 import RichTextEditor from './RichTextEditor';
 import { getFromLocalStorage, setToLocalStorage } from '../utils/localStorage';
+import { utcToLocal, formatLocalDateTime, getDaysUntil } from '../utils/dateUtils';
 
 interface Assessment {
   id: string;
@@ -364,16 +365,9 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
     dateStr: string,
     timeStr: string
   ): string => {
-    const [year, month, day] = dateStr.split("-").map(Number);
-    const [hours, minutes] = timeStr.split(":").map(Number);
-    const date = new Date(year, month - 1, day, hours, minutes);
-    return date.toLocaleString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
+    // Convert UTC to local for display
+    const { date, time } = utcToLocal(dateStr, timeStr);
+    return formatLocalDateTime(date, time);
   };
 
   const getDaysTillDue = (
@@ -383,12 +377,10 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
   ): number | null => {
     const completedStatuses = ["Submitted", "Under Review", "Completed"];
     if (completedStatuses.includes(status)) return null;
-    const now = new Date();
-    const [year, month, day] = dueDate.split("-").map(Number);
-    const [hours, minutes] = dueTime.split(":").map(Number);
-    const due = new Date(year, month - 1, day, hours, minutes);
-    const diffTime = due.getTime() - now.getTime();
-    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    // Convert UTC to local for calculation
+    const { date, time } = utcToLocal(dueDate, dueTime);
+    return getDaysUntil(date, time);
   };
 
   const formatDaysTillDue = (days: number | null): JSX.Element | null => {
