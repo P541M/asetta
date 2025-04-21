@@ -306,15 +306,7 @@ export default function LandingPage() {
                     href="/login"
                     className="text-gray-600 hover:text-indigo-600"
                   >
-                    Login
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/login"
-                    className="text-gray-600 hover:text-indigo-600"
-                  >
-                    Sign Up
+                    Get Started
                   </Link>
                 </li>
               </ul>

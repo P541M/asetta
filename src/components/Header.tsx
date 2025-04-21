@@ -219,12 +219,6 @@ const Header = ({ onLogout }: HeaderProps) => {
                 <>
                   <Link
                     href="/login"
-                    className="text-gray-600 hover:text-indigo-600 font-medium transition-colors duration-200"
-                  >
-                    Login
-                  </Link>
-                  <Link
-                    href="/login"
                     className="btn-primary text-sm px-4 py-2 shadow-sm hover:shadow transition-all duration-300 hover:-translate-y-0.5"
                   >
                     Get Started
