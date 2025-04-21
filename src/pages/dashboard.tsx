@@ -233,7 +233,7 @@ const Dashboard = () => {
 
   const handleClearCourseSelection = () => {
     setSelectedCourse(null);
-    setActiveTab("assessments");
+    setActiveTab("courses");
   };
 
   const handleLogout = async () => {
