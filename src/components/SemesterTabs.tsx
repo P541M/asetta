@@ -442,14 +442,14 @@ const SemesterTabs = ({ selectedSemester, onSelect }: SemesterTabsProps) => {
   }
 
   return (
-    <div className="mb-4 bg-white rounded-lg shadow-sm p-4 border border-gray-100 transition-all duration-300">
+    <div className="semester-tabs-container mb-6 bg-white rounded-lg shadow-sm p-4 border border-gray-100 transition-all duration-300">
       <div className="flex items-center justify-between mb-2">
         <h2 className="text-base font-medium text-gray-700">Semesters</h2>
         <div className="flex items-center">
           {/* Add button */}
           <button
             onClick={() => setShowAddInput(true)}
-            className="p-1.5 text-indigo-600 hover:bg-indigo-50 rounded-md mr-1"
+            className="add-semester-button p-1.5 text-indigo-600 hover:bg-indigo-50 rounded-md mr-1"
             title="Add new semester"
           >
             <svg
@@ -606,7 +606,7 @@ const SemesterTabs = ({ selectedSemester, onSelect }: SemesterTabsProps) => {
                 </button>
                 <button
                   onClick={() => setEditingId(null)}
-                  className="p-1 text-gray-600 hover:text-gray-700 transition-colors"
+                  className="p-1 text-gray-500 hover:text-gray-700 transition-colors"
                   title="Cancel"
                 >
                   <svg

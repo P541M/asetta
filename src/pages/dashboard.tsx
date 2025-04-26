@@ -48,6 +48,7 @@ const Dashboard = () => {
   const [selectedCourse, setSelectedCourse] = useState<string | null>(null);
   const [animateStatCards, setAnimateStatCards] = useState(false);
   const [showStatsBar, setShowStatsBar] = useState(false);
+  const [showManageModal, setShowManageModal] = useState(false);
 
   const [stats, setStats] = useState({
     total: 0,
@@ -264,13 +265,55 @@ const Dashboard = () => {
       <Header onLogout={handleLogout} />
       <div className="flex-grow p-4 md:p-6">
         <div className="max-w-7xl mx-auto">
-          <div className="mb-8 animate-fade-in">
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">
-              Academic Dashboard
-            </h1>
-            <p className="text-gray-600">
-              Organize and track your academic tasks efficiently
-            </p>
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
+            <div>
+              <h1 className="text-xl font-semibold text-gray-900">Dashboard</h1>
+              <p className="text-sm text-gray-500 mt-1">
+                {selectedSemester ? `Viewing ${selectedSemester} semester` : 'Select a semester to get started'}
+              </p>
+            </div>
+            <div className="flex items-center mt-4 md:mt-0 space-x-3">
+              {selectedSemester && (
+                <>
+                  <button
+                    onClick={() => setActiveTab("add")}
+                    className="btn-primary text-sm py-1.5 px-3 flex items-center"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-4 w-4 mr-1.5"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                    Add Assessment
+                  </button>
+                  <button
+                    onClick={() => setActiveTab("upload")}
+                    className="btn-outline text-sm py-1.5 px-3 flex items-center"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-4 w-4 mr-1.5"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                    Upload Outline
+                  </button>
+                </>
+              )}
+            </div>
           </div>
           <SemesterTabs
             selectedSemester={selectedSemester}
@@ -521,8 +564,8 @@ const Dashboard = () => {
                 )}
             </>
           ) : (
-            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-10 text-center hover:shadow-md transition-all duration-300">
-              <div className="mb-6 animate-bounce-light">
+            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-10 text-center">
+              <div className="mb-6">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   className="h-16 w-16 mx-auto text-indigo-300"
@@ -538,13 +581,39 @@ const Dashboard = () => {
                   />
                 </svg>
               </div>
-              <h2 className="text-xl font-bold mb-2">Welcome to Kivo!</h2>
-              <p className="text-gray-600 mb-6">
+              <h2 className="text-xl font-semibold mb-2">Welcome to Kivo</h2>
+              <p className="text-gray-600 mb-4">
                 Track your assignments, exams, and projects in one place.
               </p>
               <p className="text-gray-500 mb-6">
                 Please add a semester to get started tracking your assessments.
               </p>
+              <button
+                onClick={() => {
+                  const semesterTabsElement = document.querySelector('.semester-tabs-container');
+                  if (semesterTabsElement) {
+                    const addButton = semesterTabsElement.querySelector('.add-semester-button');
+                    if (addButton) {
+                      (addButton as HTMLElement).click();
+                    }
+                  }
+                }}
+                className="btn-primary flex items-center mx-auto"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-4 w-4 mr-2"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+                Add Semester
+              </button>
             </div>
           )}
         </div>
