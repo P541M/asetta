@@ -189,10 +189,10 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-gray-800 bg-opacity-75 flex items-center justify-center animate-fade-in">
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-gray-800 bg-opacity-75 flex items-center justify-center transition-opacity duration-150">
       <div
         ref={modalRef}
-        className="bg-white rounded-xl shadow-xl w-full max-w-lg p-6 mx-4 animate-scale"
+        className="bg-white rounded-xl shadow-xl w-full max-w-lg p-6 mx-4 transition-transform duration-150"
       >
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-xl font-bold text-gray-900">User Settings</h2>

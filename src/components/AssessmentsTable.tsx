@@ -758,10 +758,10 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
         </div>
       </div>
       {sortedAssessments.length === 0 ? (
-        <div className="text-center py-10 text-gray-500 animate-fade-in">
+        <div className="text-center py-10 text-gray-500">
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            className="h-12 w-12 mx-auto mb-4 text-gray-300 animate-bounce-light"
+            className="h-12 w-12 mx-auto mb-4 text-gray-300"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"

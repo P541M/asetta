@@ -281,9 +281,7 @@ const Dashboard = () => {
               {showStatsBar && (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 mb-6">
                   <div
-                    className={`bg-white rounded-xl shadow-sm p-4 border border-gray-100 stat-card ${
-                      animateStatCards ? "animate-scale" : ""
-                    }`}
+                    className={`bg-white rounded-xl shadow-sm p-4 border border-gray-100 stat-card`}
                   >
                     <p className="text-sm text-gray-500 mb-1">
                       Total Assessments
@@ -293,10 +291,8 @@ const Dashboard = () => {
                     </h3>
                   </div>
                   <div
-                    className={`bg-white rounded-xl shadow-sm p-4 border border-gray-100 stat-card ${
-                      animateStatCards ? "animate-scale" : ""
-                    }`}
-                    style={{ animationDelay: "0.1s" }}
+                    className={`bg-white rounded-xl shadow-sm p-4 border border-gray-100 stat-card`}
+                    style={{ animationDelay: "0.05s" }}
                   >
                     <p className="text-sm text-gray-500 mb-1">Planning</p>
                     <h3 className="text-2xl font-bold text-gray-600">
@@ -304,10 +300,8 @@ const Dashboard = () => {
                     </h3>
                   </div>
                   <div
-                    className={`bg-white rounded-xl shadow-sm p-4 border border-gray-100 stat-card ${
-                      animateStatCards ? "animate-scale" : ""
-                    }`}
-                    style={{ animationDelay: "0.2s" }}
+                    className={`bg-white rounded-xl shadow-sm p-4 border border-gray-100 stat-card`}
+                    style={{ animationDelay: "0.1s" }}
                   >
                     <p className="text-sm text-gray-500 mb-1">Active Work</p>
                     <h3 className="text-2xl font-bold text-blue-600">
@@ -315,10 +309,8 @@ const Dashboard = () => {
                     </h3>
                   </div>
                   <div
-                    className={`bg-white rounded-xl shadow-sm p-4 border border-gray-100 stat-card ${
-                      animateStatCards ? "animate-scale" : ""
-                    }`}
-                    style={{ animationDelay: "0.3s" }}
+                    className={`bg-white rounded-xl shadow-sm p-4 border border-gray-100 stat-card`}
+                    style={{ animationDelay: "0.15s" }}
                   >
                     <p className="text-sm text-gray-500 mb-1">Submission</p>
                     <h3 className="text-2xl font-bold text-indigo-600">
@@ -326,10 +318,8 @@ const Dashboard = () => {
                     </h3>
                   </div>
                   <div
-                    className={`bg-white rounded-xl shadow-sm p-4 border border-gray-100 stat-card ${
-                      animateStatCards ? "animate-scale" : ""
-                    }`}
-                    style={{ animationDelay: "0.4s" }}
+                    className={`bg-white rounded-xl shadow-sm p-4 border border-gray-100 stat-card`}
+                    style={{ animationDelay: "0.2s" }}
                   >
                     <p className="text-sm text-gray-500 mb-1">Completed</p>
                     <h3 className="text-2xl font-bold text-emerald-600">
@@ -337,10 +327,8 @@ const Dashboard = () => {
                     </h3>
                   </div>
                   <div
-                    className={`bg-white rounded-xl shadow-sm p-4 border border-gray-100 stat-card ${
-                      animateStatCards ? "animate-scale" : ""
-                    }`}
-                    style={{ animationDelay: "0.5s" }}
+                    className={`bg-white rounded-xl shadow-sm p-4 border border-gray-100 stat-card`}
+                    style={{ animationDelay: "0.25s" }}
                   >
                     <p className="text-sm text-gray-500 mb-1">Due This Week</p>
                     <h3 className="text-2xl font-bold text-amber-600">
@@ -355,10 +343,8 @@ const Dashboard = () => {
               {stats.problem > 0 && (
                 <div className="mb-6">
                   <div
-                    className={`bg-white rounded-xl shadow-sm p-4 border border-red-100 stat-card ${
-                      animateStatCards ? "animate-scale" : ""
-                    }`}
-                    style={{ animationDelay: "0.6s" }}
+                    className={`bg-white rounded-xl shadow-sm p-4 border border-red-100 stat-card`}
+                    style={{ animationDelay: "0.25s" }}
                   >
                     <div className="flex items-center justify-between">
                       <div>

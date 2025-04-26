@@ -251,7 +251,7 @@ const AddAssessmentForm = ({
           <button
             type="submit"
             disabled={isSubmitting}
-            className={`btn-primary px-6 shadow hover:shadow-md transition-all duration-300 hover:-translate-y-0.5 ${
+            className={`btn-primary px-6 shadow hover:shadow-md transition-all duration-150 ${
               isSubmitting ? "opacity-70 cursor-not-allowed" : ""
             }`}
           >
