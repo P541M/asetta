@@ -2,7 +2,21 @@ import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Link from '@tiptap/extension-link';
 import Placeholder from '@tiptap/extension-placeholder';
+import Underline from '@tiptap/extension-underline';
+import TextAlign from '@tiptap/extension-text-align';
 import { useState } from 'react';
+import { 
+  MdFormatBold, 
+  MdFormatItalic, 
+  MdFormatListBulleted, 
+  MdFormatListNumbered,
+  MdLink,
+  MdFormatAlignLeft,
+  MdFormatAlignCenter,
+  MdFormatAlignRight,
+  MdUndo,
+  MdRedo
+} from 'react-icons/md';
 
 interface RichTextEditorProps {
   content: string;
@@ -118,6 +132,10 @@ const RichTextEditor = ({ content, onChange, placeholder = 'Start typing...', on
       Placeholder.configure({
         placeholder,
       }),
+      Underline,
+      TextAlign.configure({
+        types: ['heading', 'paragraph'],
+      }),
     ],
     content,
     onUpdate: ({ editor }) => {
@@ -158,10 +176,7 @@ const RichTextEditor = ({ content, onChange, placeholder = 'Start typing...', on
           }`}
           title="Bold"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M6 4h8a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"></path>
-            <path d="M6 12h9a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"></path>
-          </svg>
+          <MdFormatBold className="h-5 w-5" />
         </button>
         <button
           onClick={() => editor.chain().focus().toggleItalic().run()}
@@ -170,11 +185,7 @@ const RichTextEditor = ({ content, onChange, placeholder = 'Start typing...', on
           }`}
           title="Italic"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <line x1="19" y1="4" x2="10" y2="4"></line>
-            <line x1="14" y1="20" x2="5" y2="20"></line>
-            <line x1="15" y1="4" x2="9" y2="20"></line>
-          </svg>
+          <MdFormatItalic className="h-5 w-5" />
         </button>
         <button
           onClick={() => editor.chain().focus().toggleBulletList().run()}
@@ -183,14 +194,7 @@ const RichTextEditor = ({ content, onChange, placeholder = 'Start typing...', on
           }`}
           title="Bullet List"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <line x1="9" y1="6" x2="20" y2="6"></line>
-            <line x1="9" y1="12" x2="20" y2="12"></line>
-            <line x1="9" y1="18" x2="20" y2="18"></line>
-            <circle cx="5" cy="6" r="2"></circle>
-            <circle cx="5" cy="12" r="2"></circle>
-            <circle cx="5" cy="18" r="2"></circle>
-          </svg>
+          <MdFormatListBulleted className="h-5 w-5" />
         </button>
         <button
           onClick={() => editor.chain().focus().toggleOrderedList().run()}
@@ -199,14 +203,54 @@ const RichTextEditor = ({ content, onChange, placeholder = 'Start typing...', on
           }`}
           title="Numbered List"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <line x1="10" y1="6" x2="21" y2="6"></line>
-            <line x1="10" y1="12" x2="21" y2="12"></line>
-            <line x1="10" y1="18" x2="21" y2="18"></line>
-            <path d="M4 6h1v4H4z"></path>
-            <path d="M4 12h1v4H4z"></path>
-            <path d="M4 18h1v4H4z"></path>
-          </svg>
+          <MdFormatListNumbered className="h-5 w-5" />
+        </button>
+        <button
+          onClick={() => editor.chain().focus().setTextAlign('left').run()}
+          className={`p-1.5 rounded hover:bg-gray-100 ${
+            editor.isActive({ textAlign: 'left' }) ? 'bg-gray-100' : ''
+          }`}
+          title="Align Left"
+        >
+          <MdFormatAlignLeft className="h-5 w-5" />
+        </button>
+        <button
+          onClick={() => editor.chain().focus().setTextAlign('center').run()}
+          className={`p-1.5 rounded hover:bg-gray-100 ${
+            editor.isActive({ textAlign: 'center' }) ? 'bg-gray-100' : ''
+          }`}
+          title="Align Center"
+        >
+          <MdFormatAlignCenter className="h-5 w-5" />
+        </button>
+        <button
+          onClick={() => editor.chain().focus().setTextAlign('right').run()}
+          className={`p-1.5 rounded hover:bg-gray-100 ${
+            editor.isActive({ textAlign: 'right' }) ? 'bg-gray-100' : ''
+          }`}
+          title="Align Right"
+        >
+          <MdFormatAlignRight className="h-5 w-5" />
+        </button>
+        <button
+          onClick={() => editor.chain().focus().undo().run()}
+          className={`p-1.5 rounded hover:bg-gray-100 ${
+            !editor.can().undo() ? 'opacity-50 cursor-not-allowed' : ''
+          }`}
+          title="Undo"
+          disabled={!editor.can().undo()}
+        >
+          <MdUndo className="h-5 w-5" />
+        </button>
+        <button
+          onClick={() => editor.chain().focus().redo().run()}
+          className={`p-1.5 rounded hover:bg-gray-100 ${
+            !editor.can().redo() ? 'opacity-50 cursor-not-allowed' : ''
+          }`}
+          title="Redo"
+          disabled={!editor.can().redo()}
+        >
+          <MdRedo className="h-5 w-5" />
         </button>
         <button
           onClick={handleAddLink}
@@ -215,10 +259,7 @@ const RichTextEditor = ({ content, onChange, placeholder = 'Start typing...', on
           }`}
           title="Add Link"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
-            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
-          </svg>
+          <MdLink className="h-5 w-5" />
         </button>
       </div>
       <EditorContent editor={editor} className="prose max-w-none p-4" />
