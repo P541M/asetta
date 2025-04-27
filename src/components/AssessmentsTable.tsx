@@ -645,10 +645,22 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
         "assessments",
         selectedAssessment.id
       );
-      await updateDoc(assessmentRef, {
-        notes: notesInput,
-        updatedAt: new Date(),
-      });
+      
+      // Strip HTML tags and whitespace to check if content is truly empty
+      const strippedContent = notesInput.replace(/<[^>]*>/g, '').trim();
+      
+      // If strippedContent is empty, remove the notes field
+      const updateData = strippedContent === "" 
+        ? { 
+            updatedAt: new Date(),
+            notes: null // Set to null to remove the field
+          } 
+        : { 
+            notes: notesInput,
+            updatedAt: new Date()
+          };
+      
+      await updateDoc(assessmentRef, updateData);
       setSelectedAssessment(null);
       onStatusChange?.(selectedAssessment.id, selectedAssessment.status);
     } catch (error) {
@@ -1147,11 +1159,11 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                       <button
                         onClick={() => handleNotesClick(assessment)}
                         className={`p-1.5 rounded ${
-                          assessment?.notes
+                          assessment?.notes && assessment.notes.trim() !== ""
                             ? "text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50"
                             : "text-gray-400 hover:text-gray-600 hover:bg-gray-50"
                         }`}
-                        title={assessment?.notes ? "Edit Notes" : "Add Notes"}
+                        title={assessment?.notes && assessment.notes.trim() !== "" ? "Edit Notes" : "Add Notes"}
                       >
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
