@@ -1099,16 +1099,6 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                         >
                           {assessment?.assignmentName}
                         </span>
-                        {assessment?.notes && (
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="h-4 w-4 ml-2 text-indigo-600 flex-shrink-0"
-                            viewBox="0 0 20 20"
-                            fill="currentColor"
-                          >
-                            <path d="M8 5a2 2 0 012-2h5a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h3zm0 2v8h7V5h-5v2H8z" />
-                          </svg>
-                        )}
                       </div>
                     </td>
                     <td className="whitespace-nowrap">
