@@ -794,10 +794,10 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                     className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
                   />
                 </th>
-                <th className="w-24">Status</th>
+                <th className="w-32">Status</th>
                 <th
                   onClick={() => handleSort("courseName")}
-                  className="cursor-pointer"
+                  className="cursor-pointer w-48"
                 >
                   <div className="flex items-center space-x-1 group">
                     <span className="group-hover:text-indigo-600">Course</span>
@@ -810,7 +810,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                 </th>
                 <th
                   onClick={() => handleSort("assignmentName")}
-                  className="cursor-pointer"
+                  className="cursor-pointer w-56"
                 >
                   <div className="flex items-center space-x-1 group">
                     <span className="group-hover:text-indigo-600">Task</span>
@@ -823,7 +823,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                 </th>
                 <th
                   onClick={() => handleSort("dueDate")}
-                  className="cursor-pointer"
+                  className="cursor-pointer w-48"
                 >
                   <div className="flex items-center space-x-1 group">
                     <span className="group-hover:text-indigo-600">
@@ -837,12 +837,12 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                   </div>
                 </th>
                 {showDaysTillDue && (
-                  <th>Days Till Due</th>
+                  <th className="w-32">Days Till Due</th>
                 )}
                 {showWeight && (
                   <th
                     onClick={() => handleSort("weight")}
-                    className="cursor-pointer"
+                    className="cursor-pointer w-24"
                   >
                     <div className="flex items-center space-x-1 group">
                       <span className="group-hover:text-indigo-600">Weight</span>
@@ -854,8 +854,8 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                     </div>
                   </th>
                 )}
-                <th>Notes</th>
-                <th>Actions</th>
+                <th className="w-24">Notes</th>
+                <th className="w-24">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -1043,7 +1043,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                         />
                       )}
                     </td>
-                    <td className="w-40">
+                    <td>
                       <select
                         value={assessment?.status || 'Not started'}
                         onChange={(e) =>
@@ -1074,7 +1074,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                           <option value="Not started">Not started</option>
                           <option value="Draft">Draft</option>
                         </optgroup>
-                        <optgroup label="Active Work">
+                        <optgroup label="In Progress">
                           <option value="In progress">In progress</option>
                           <option value="On Hold">On Hold</option>
                           <option value="Needs Revision">Needs Revision</option>
@@ -1090,11 +1090,11 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                         </optgroup>
                       </select>
                     </td>
-                    <td className="font-medium">{assessment?.courseName}</td>
+                    <td className="font-medium whitespace-nowrap">{assessment?.courseName}</td>
                     <td>
                       <div className="flex items-center">
                         <span
-                          className="truncate w-full"
+                          className="truncate max-w-[240px]"
                           title={assessment?.assignmentName}
                         >
                           {assessment?.assignmentName}
@@ -1102,7 +1102,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                         {assessment?.notes && (
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
-                            className="h-4 w-4 ml-2 text-indigo-600"
+                            className="h-4 w-4 ml-2 text-indigo-600 flex-shrink-0"
                             viewBox="0 0 20 20"
                             fill="currentColor"
                           >
@@ -1111,8 +1111,8 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                         )}
                       </div>
                     </td>
-                    <td
-                      className={`${
+                    <td className="whitespace-nowrap">
+                      <span className={`${
                         assessment?.status === "Submitted"
                           ? "text-emerald-600 font-medium"
                           : assessment?.status === "Under Review"
@@ -1134,16 +1134,16 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                           : dueDateStatus === "urgent"
                           ? "text-amber-600 font-medium"
                           : ""
-                      }`}
-                    >
-                      {assessment?.dueDate && assessment?.dueTime && 
-                        formatDateTimeForDisplay(assessment.dueDate, assessment.dueTime)}
+                      }`}>
+                        {assessment?.dueDate && assessment?.dueTime && 
+                          formatDateTimeForDisplay(assessment.dueDate, assessment.dueTime)}
+                      </span>
                     </td>
                     {showDaysTillDue && (
-                      <td>{formatDaysTillDue(daysTillDue)}</td>
+                      <td className="whitespace-nowrap">{formatDaysTillDue(daysTillDue)}</td>
                     )}
                     {showWeight && (
-                      <td>
+                      <td className="whitespace-nowrap">
                         {assessment?.weight ? (
                           <span className="font-medium">
                             {assessment.weight}%

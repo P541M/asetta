@@ -305,7 +305,7 @@ const CoursesOverviewTable = ({
             <tr>
               <th
                 onClick={() => handleSort("courseName")}
-                className="cursor-pointer"
+                className="cursor-pointer w-48"
               >
                 <div className="flex items-center space-x-1 group">
                   <span className="group-hover:text-indigo-600">Course</span>
@@ -318,7 +318,7 @@ const CoursesOverviewTable = ({
               </th>
               <th
                 onClick={() => handleSort("totalAssessments")}
-                className="cursor-pointer"
+                className="cursor-pointer w-24"
               >
                 <div className="flex items-center space-x-1 group">
                   <span className="group-hover:text-indigo-600">Total</span>
@@ -331,7 +331,7 @@ const CoursesOverviewTable = ({
               </th>
               <th
                 onClick={() => handleSort("pendingAssessments")}
-                className="cursor-pointer"
+                className="cursor-pointer w-24"
               >
                 <div className="flex items-center space-x-1 group">
                   <span className="group-hover:text-indigo-600">Pending</span>
@@ -344,7 +344,7 @@ const CoursesOverviewTable = ({
               </th>
               <th
                 onClick={() => handleSort("progress")}
-                className="cursor-pointer"
+                className="cursor-pointer w-32"
               >
                 <div className="flex items-center space-x-1 group">
                   <span className="group-hover:text-indigo-600">Progress</span>
@@ -357,7 +357,7 @@ const CoursesOverviewTable = ({
               </th>
               <th
                 onClick={() => handleSort("nextDueDate")}
-                className="cursor-pointer"
+                className="cursor-pointer w-48"
               >
                 <div className="flex items-center space-x-1 group">
                   <span className="group-hover:text-indigo-600">Next Due</span>
@@ -368,16 +368,16 @@ const CoursesOverviewTable = ({
                   )}
                 </div>
               </th>
-              <th>Outline</th>
-              <th>Actions</th>
+              <th className="w-24">Outline</th>
+              <th className="w-24">Actions</th>
             </tr>
           </thead>
           <tbody>
             {sortedCourses.map((course) => (
               <tr key={course.courseName}>
-                <td className="font-medium">{course.courseName}</td>
-                <td>{course.totalAssessments}</td>
-                <td>
+                <td className="font-medium whitespace-nowrap">{course.courseName}</td>
+                <td className="whitespace-nowrap">{course.totalAssessments}</td>
+                <td className="whitespace-nowrap">
                   {course.pendingAssessments > 0 ? (
                     <span
                       className={`font-medium ${
@@ -407,7 +407,7 @@ const CoursesOverviewTable = ({
                   {course.nextDueDate ? (
                     <div>
                       <div
-                        className={`font-medium ${
+                        className={`font-medium whitespace-nowrap ${
                           isUpcoming(course.nextDueDate) ? "text-amber-600" : ""
                         }`}
                       >
