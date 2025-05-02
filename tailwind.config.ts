@@ -5,6 +5,7 @@ export default {
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
+  darkMode: 'class',
   theme: {
     extend: {
       colors: {
@@ -43,6 +44,22 @@ export default {
           700: "#6d28d9",
           800: "#5b21b6",
           900: "#4c1d95",
+        },
+        dark: {
+          bg: {
+            primary: "#111827",
+            secondary: "#1f2937",
+            tertiary: "#374151",
+          },
+          text: {
+            primary: "#f9fafb",
+            secondary: "#e5e7eb",
+            tertiary: "#9ca3af",
+          },
+          border: {
+            primary: "#374151",
+            secondary: "#4b5563",
+          },
         },
       },
       borderRadius: {
