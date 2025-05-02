@@ -287,7 +287,7 @@ const UploadForm = ({ semester, onUploadSuccess }: UploadFormProps) => {
   };
 
   return (
-    <div>
+    <div className="bg-white dark:bg-dark-bg-secondary rounded-xl shadow-sm border border-gray-100 dark:border-dark-border-primary p-6">
       <h2 className="text-xl font-medium mb-4 dark:text-white">Upload Course Outlines</h2>
       <p className="text-gray-600 dark:text-gray-300 mb-6">
         Upload your course outline PDFs to automatically extract assignment

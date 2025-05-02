@@ -297,7 +297,8 @@ const CoursesOverviewTable = ({
   if (courses.length === 0) return <div>No courses found.</div>;
 
   return (
-    <div>
+    <div className="bg-white dark:bg-dark-bg-secondary rounded-xl shadow-sm border border-gray-100 dark:border-dark-border-primary p-6">
+
       <h2 className="text-xl font-medium text-gray-900 dark:text-dark-text-primary mb-6">Your Courses</h2>
       <div className="table-container rounded-lg shadow-sm border border-gray-100 dark:border-dark-border dark:bg-dark-bg-secondary">
         <table className="data-table">

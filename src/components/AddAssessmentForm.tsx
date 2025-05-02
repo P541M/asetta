@@ -128,6 +128,8 @@ const AddAssessmentForm = ({
   };
 
   return (
+    <div className="bg-white dark:bg-dark-bg-secondary rounded-xl shadow-sm border border-gray-100 dark:border-dark-border-primary p-6">
+      
     <div
       className={`transition-all duration-300 ${
         formSuccess ? "form-success" : ""
@@ -342,6 +344,7 @@ const AddAssessmentForm = ({
           </div>
         )}
       </form>
+    </div>
     </div>
   );
 };
