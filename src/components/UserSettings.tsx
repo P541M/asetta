@@ -1,6 +1,7 @@
 // components/UserSettings.tsx
 import { useState, useRef, useEffect } from "react";
 import { useAuth } from "../contexts/AuthContext";
+import { useTheme } from "../contexts/ThemeContext";
 import { updateProfile } from "firebase/auth";
 import { doc, updateDoc, getDoc } from "firebase/firestore";
 import { db } from "../lib/firebase";
@@ -13,6 +14,7 @@ interface UserSettingsProps {
 
 const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
   const { user } = useAuth();
+  const { isDarkMode, toggleDarkMode } = useTheme();
   const [displayName, setDisplayName] = useState(user?.displayName || "");
   const [institution, setInstitution] = useState("");
   const [studyProgram, setStudyProgram] = useState("");
@@ -31,19 +33,9 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const modalRef = useRef<HTMLDivElement>(null);
   const [activeTab, setActiveTab] = useState<'profile' | 'preferences'>('profile');
-  const [isDarkMode, setIsDarkMode] = useState(false);
 
   // Current year for graduation year input
   const currentYear = new Date().getFullYear();
-
-  useEffect(() => {
-    // Check for saved dark mode preference
-    const darkMode = localStorage.getItem('darkMode') === 'true';
-    setIsDarkMode(darkMode);
-    if (darkMode) {
-      document.documentElement.classList.add('dark');
-    }
-  }, []);
 
   // Close modal when clicking outside
   useEffect(() => {
@@ -196,15 +188,9 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
     }
   };
 
+  // Replace handleDarkModeToggle with the one from context
   const handleDarkModeToggle = () => {
-    const newDarkMode = !isDarkMode;
-    setIsDarkMode(newDarkMode);
-    localStorage.setItem('darkMode', String(newDarkMode));
-    if (newDarkMode) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
+    toggleDarkMode();
   };
 
   if (!isOpen) return null;
