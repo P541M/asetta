@@ -94,10 +94,10 @@
     @apply w-full border-collapse;
   }
   .data-table th {
-    @apply p-3 text-left bg-gray-50 border-b border-gray-200 font-medium text-gray-700;
+    @apply p-3 text-left bg-gray-50 border-b border-gray-200 font-medium text-gray-700 dark:bg-dark-bg-tertiary dark:border-dark-border-primary dark:text-dark-text-primary;
   }
   .data-table td {
-    @apply p-3 border-b border-gray-100;
+    @apply p-3 border-b border-gray-100 dark:border-dark-border-primary;
   }
   .tab {
     @apply relative px-5 py-4 font-medium text-sm;

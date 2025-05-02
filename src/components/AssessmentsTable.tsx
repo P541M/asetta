@@ -693,12 +693,12 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
   return (
     <div>
       <div className="flex flex-col sm:flex-row justify-between mb-6 gap-4">
-        <h2 className="text-xl font-medium text-gray-900">Your Assessments</h2>
+        <h2 className="text-xl font-medium text-gray-900 dark:text-dark-text-primary">Your Assessments</h2>
         <div className="flex space-x-2 items-center">
           <select
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
-            className="input bg-white max-w-xs py-1.5 px-3 text-sm transition-all duration-300 hover:shadow-sm"
+            className="input bg-white dark:bg-dark-bg-tertiary max-w-xs py-1.5 px-3 text-sm transition-all duration-300 hover:shadow-sm dark:text-dark-text-primary dark:border-dark-border"
           >
             <option value="all">All Tasks</option>
             <option value="not_submitted">Not Submitted</option>
@@ -706,13 +706,13 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
           </select>
           {selectedRows.length > 0 && (
             <div className="flex items-center space-x-2 animate-fade-in">
-              <span className="text-sm text-gray-600">
+              <span className="text-sm text-gray-600 dark:text-dark-text-secondary">
                 {selectedRows.length} selected
               </span>
               <div className="flex items-center space-x-1">
                 <button
                   onClick={() => handleBulkAction("complete")}
-                  className="p-1.5 bg-emerald-100 text-emerald-700 rounded-md hover:bg-emerald-200"
+                  className="p-1.5 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 rounded-md hover:bg-emerald-200 dark:hover:bg-emerald-900/50"
                   title="Mark selected as submitted"
                 >
                   <svg
@@ -730,7 +730,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                 </button>
                 <button
                   onClick={() => handleBulkAction("reset")}
-                  className="p-1.5 bg-blue-100 text-blue-700 rounded-md hover:bg-blue-200"
+                  className="p-1.5 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 rounded-md hover:bg-blue-200 dark:hover:bg-blue-900/50"
                   title="Reset selected to 'Not started'"
                 >
                   <svg
@@ -748,7 +748,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                 </button>
                 <button
                   onClick={() => handleBulkAction("delete")}
-                  className="p-1.5 bg-red-100 text-red-700 rounded-md hover:bg-red-200"
+                  className="p-1.5 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 rounded-md hover:bg-red-200 dark:hover:bg-red-900/50"
                   title="Delete selected"
                 >
                   <svg
@@ -770,10 +770,10 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
         </div>
       </div>
       {sortedAssessments.length === 0 ? (
-        <div className="text-center py-10 text-gray-500">
+        <div className="text-center py-10 text-gray-500 dark:text-dark-text-tertiary">
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            className="h-12 w-12 mx-auto mb-4 text-gray-300"
+            className="h-12 w-12 mx-auto mb-4 text-gray-300 dark:text-dark-text-tertiary"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -785,15 +785,15 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
               d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
             />
           </svg>
-          <p className="text-lg font-medium mb-2">No assessments found</p>
-          <p>
+          <p className="text-lg font-medium mb-2 dark:text-dark-text-primary">No assessments found</p>
+          <p className="dark:text-dark-text-secondary">
             Upload a course outline or add assessments manually to get started.
           </p>
         </div>
       ) : (
-        <div className="table-container rounded-lg shadow-sm border border-gray-100">
+        <div className="table-container rounded-lg shadow-sm border border-gray-100 dark:border-dark-border dark:bg-dark-bg-secondary">
           <table className="data-table">
-            <thead>
+            <thead className="bg-gray-50 dark:bg-dark-bg-tertiary">
               <tr>
                 <th className="w-10">
                   <input
@@ -803,18 +803,18 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                       sortedAssessments.length > 0
                     }
                     onChange={toggleSelectAll}
-                    className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                    className="h-4 w-4 rounded border-gray-300 dark:border-dark-border text-indigo-600 dark:text-indigo-400 focus:ring-indigo-500 dark:focus:ring-indigo-400"
                   />
                 </th>
-                <th className="w-32">Status</th>
+                <th className="w-32 dark:text-dark-text-primary">Status</th>
                 <th
                   onClick={() => handleSort("courseName")}
                   className="cursor-pointer w-48"
                 >
                   <div className="flex items-center space-x-1 group">
-                    <span className="group-hover:text-indigo-600">Course</span>
+                    <span className="group-hover:text-indigo-600 dark:group-hover:text-indigo-400 dark:text-dark-text-primary">Course</span>
                     {sortKey === "courseName" && (
-                      <span className="text-indigo-600">
+                      <span className="text-indigo-600 dark:text-indigo-400">
                         {sortOrder === "asc" ? "↑" : "↓"}
                       </span>
                     )}
@@ -825,9 +825,9 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                   className="cursor-pointer w-56"
                 >
                   <div className="flex items-center space-x-1 group">
-                    <span className="group-hover:text-indigo-600">Task</span>
+                    <span className="group-hover:text-indigo-600 dark:group-hover:text-indigo-400 dark:text-dark-text-primary">Task</span>
                     {sortKey === "assignmentName" && (
-                      <span className="text-indigo-600">
+                      <span className="text-indigo-600 dark:text-indigo-400">
                         {sortOrder === "asc" ? "↑" : "↓"}
                       </span>
                     )}
@@ -838,18 +838,18 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                   className="cursor-pointer w-48"
                 >
                   <div className="flex items-center space-x-1 group">
-                    <span className="group-hover:text-indigo-600">
+                    <span className="group-hover:text-indigo-600 dark:group-hover:text-indigo-400 dark:text-dark-text-primary">
                       Due Date & Time
                     </span>
                     {sortKey === "dueDate" && (
-                      <span className="text-indigo-600">
+                      <span className="text-indigo-600 dark:text-indigo-400">
                         {sortOrder === "asc" ? "↑" : "↓"}
                       </span>
                     )}
                   </div>
                 </th>
                 {showDaysTillDue && (
-                  <th className="w-32">Days Till Due</th>
+                  <th className="w-32 dark:text-dark-text-primary">Days Till Due</th>
                 )}
                 {showWeight && (
                   <th
@@ -857,17 +857,17 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                     className="cursor-pointer w-24"
                   >
                     <div className="flex items-center space-x-1 group">
-                      <span className="group-hover:text-indigo-600">Weight</span>
+                      <span className="group-hover:text-indigo-600 dark:group-hover:text-indigo-400 dark:text-dark-text-primary">Weight</span>
                       {sortKey === "weight" && (
-                        <span className="text-indigo-600">
+                        <span className="text-indigo-600 dark:text-indigo-400">
                           {sortOrder === "asc" ? "↑" : "↓"}
                         </span>
                       )}
                     </div>
                   </th>
                 )}
-                <th className="w-24">Notes</th>
-                <th className="w-24">Actions</th>
+                <th className="w-24 dark:text-dark-text-primary">Notes</th>
+                <th className="w-24 dark:text-dark-text-primary">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -886,7 +886,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                 return editingId === assessment.id ? (
                   <tr
                     key={`editing-${assessment.id}`}
-                    className="bg-blue-50/50 animate-fade-in"
+                    className="bg-blue-50/50 dark:bg-blue-900/20 animate-fade-in"
                   >
                     <td className="w-10"></td>
                     <td>
@@ -894,24 +894,24 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                         name="status"
                         value={editFormData.status}
                         onChange={handleEditFormChange}
-                        className={`input py-1 px-2 text-sm transition-all duration-300 w-full ${
+                        className={`input py-1 px-2 text-sm transition-all duration-300 w-full dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border ${
                           editFormData.status === "Submitted"
-                            ? "bg-emerald-100 border-emerald-200 text-emerald-800"
+                            ? "bg-emerald-100 dark:bg-emerald-900/30 border-emerald-200 dark:border-emerald-700 text-emerald-800 dark:text-emerald-400"
                             : editFormData.status === "In progress"
-                            ? "bg-blue-100 border-blue-200 text-blue-800"
+                            ? "bg-blue-100 dark:bg-blue-900/30 border-blue-200 dark:border-blue-700 text-blue-800 dark:text-blue-400"
                             : editFormData.status === "Draft"
-                            ? "bg-purple-100 border-purple-200 text-purple-800"
+                            ? "bg-purple-100 dark:bg-purple-900/30 border-purple-200 dark:border-purple-700 text-purple-800 dark:text-purple-400"
                             : editFormData.status === "Pending Submission"
-                            ? "bg-orange-100 border-orange-200 text-orange-800"
+                            ? "bg-orange-100 dark:bg-orange-900/30 border-orange-200 dark:border-orange-700 text-orange-800 dark:text-orange-400"
                             : editFormData.status === "Under Review"
-                            ? "bg-indigo-100 border-indigo-200 text-indigo-800"
+                            ? "bg-indigo-100 dark:bg-indigo-900/30 border-indigo-200 dark:border-indigo-700 text-indigo-800 dark:text-indigo-400"
                             : editFormData.status === "Needs Revision"
-                            ? "bg-amber-100 border-amber-200 text-amber-800"
+                            ? "bg-amber-100 dark:bg-amber-900/30 border-amber-200 dark:border-amber-700 text-amber-800 dark:text-amber-400"
                             : editFormData.status === "Missed/Late"
-                            ? "bg-red-100 border-red-200 text-red-800"
+                            ? "bg-red-100 dark:bg-red-900/30 border-red-200 dark:border-red-700 text-red-800 dark:text-red-400"
                             : editFormData.status === "On Hold"
-                            ? "bg-yellow-100 border-yellow-200 text-yellow-800"
-                            : "bg-gray-100 border-gray-200 text-gray-800"
+                            ? "bg-yellow-100 dark:bg-yellow-900/30 border-yellow-200 dark:border-yellow-700 text-yellow-800 dark:text-yellow-400"
+                            : "bg-gray-100 dark:bg-gray-900/30 border-gray-200 dark:border-gray-700 text-gray-800 dark:text-gray-400"
                         }`}
                       >
                         <optgroup label="Planning">
@@ -940,7 +940,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                         name="courseName"
                         value={editFormData.courseName}
                         onChange={handleEditFormChange}
-                        className="input py-1 px-2 text-sm w-full"
+                        className="input py-1 px-2 text-sm w-full dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border"
                       />
                     </td>
                     <td>
@@ -949,7 +949,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                         name="assignmentName"
                         value={editFormData.assignmentName}
                         onChange={handleEditFormChange}
-                        className="input py-1 px-2 text-sm w-full"
+                        className="input py-1 px-2 text-sm w-full dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border"
                       />
                     </td>
                     <td>
@@ -959,19 +959,19 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                           name="dueDate"
                           value={editFormData.dueDate}
                           onChange={handleEditFormChange}
-                          className="input py-1 px-2 text-sm w-2/3"
+                          className="input py-1 px-2 text-sm w-2/3 dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border"
                         />
                         <input
                           type="time"
                           name="dueTime"
                           value={editFormData.dueTime}
                           onChange={handleEditFormChange}
-                          className="input py-1 px-2 text-sm w-1/3"
+                          className="input py-1 px-2 text-sm w-1/3 dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border"
                         />
                       </div>
                     </td>
                     <td>
-                      <span className="text-gray-400 text-sm italic">
+                      <span className="text-gray-400 dark:text-dark-text-tertiary text-sm italic">
                         Will update on save
                       </span>
                     </td>
@@ -984,7 +984,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                         min="0"
                         max="100"
                         step="0.1"
-                        className="input py-1 px-2 text-sm w-full"
+                        className="input py-1 px-2 text-sm w-full dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border"
                       />
                     </td>
                     <td></td>
@@ -992,7 +992,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                       <div className="flex items-center space-x-2">
                         <button
                           onClick={() => handleSaveEdit(assessment.id!)}
-                          className="text-emerald-600 hover:text-emerald-800 p-1.5 hover:bg-emerald-50 rounded"
+                          className="text-emerald-600 dark:text-emerald-400 hover:text-emerald-800 dark:hover:text-emerald-300 p-1.5 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 rounded"
                         >
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -1009,7 +1009,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                         </button>
                         <button
                           onClick={handleCancelEdit}
-                          className="text-gray-600 hover:text-gray-800 p-1.5 hover:bg-gray-50 rounded"
+                          className="text-gray-600 dark:text-dark-text-tertiary hover:text-gray-800 dark:hover:text-dark-text-secondary p-1.5 hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary rounded"
                         >
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -1032,17 +1032,17 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                     key={assessment?.id || index}
                     className={`transition-all duration-300 ${
                       assessment?.status === "Submitted"
-                        ? "bg-emerald-50/40"
+                        ? "bg-emerald-50/40 dark:bg-emerald-900/20"
                         : assessment?.status === "Missed/Late"
-                        ? "bg-red-50/50"
+                        ? "bg-red-50/50 dark:bg-red-900/20"
                         : dueDateStatus === "overdue"
-                        ? "bg-red-50/40"
+                        ? "bg-red-50/40 dark:bg-red-900/20"
                         : dueDateStatus === "urgent"
-                        ? "bg-amber-50/40"
+                        ? "bg-amber-50/40 dark:bg-amber-900/20"
                         : ""
                     } ${
                       lastStatusChange === assessment?.id ? "animate-pulse" : ""
-                    } hover:bg-gray-50/80`}
+                    } hover:bg-gray-50/80 dark:hover:bg-dark-bg-tertiary`}
                   >
                     <td className="pl-4">
                       {assessment?.id && (
@@ -1051,7 +1051,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                           checked={selectedRows.includes(assessment.id)}
                           onChange={() => toggleRowSelection(assessment.id)}
                           onClick={(e) => e.stopPropagation()}
-                          className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                          className="h-4 w-4 rounded border-gray-300 dark:border-dark-border text-indigo-600 dark:text-indigo-400 focus:ring-indigo-500 dark:focus:ring-indigo-400"
                         />
                       )}
                     </td>
@@ -1062,24 +1062,24 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                           assessment?.id && handleStatusChange(assessment.id, e.target.value)
                         }
                         onClick={(e) => e.stopPropagation()}
-                        className={`input py-1 px-2 text-sm transition-all duration-300 w-full ${
+                        className={`input py-1 px-2 text-sm transition-all duration-300 w-full dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border ${
                           assessment?.status === "Submitted"
-                            ? "bg-emerald-100 border-emerald-200 text-emerald-800"
+                            ? "bg-emerald-100 dark:bg-emerald-900/30 border-emerald-200 dark:border-emerald-700 text-emerald-800 dark:text-emerald-400"
                             : assessment?.status === "In progress"
-                            ? "bg-blue-100 border-blue-200 text-blue-800"
+                            ? "bg-blue-100 dark:bg-blue-900/30 border-blue-200 dark:border-blue-700 text-blue-800 dark:text-blue-400"
                             : assessment?.status === "Draft"
-                            ? "bg-purple-100 border-purple-200 text-purple-800"
+                            ? "bg-purple-100 dark:bg-purple-900/30 border-purple-200 dark:border-purple-700 text-purple-800 dark:text-purple-400"
                             : assessment?.status === "Pending Submission"
-                            ? "bg-orange-100 border-orange-200 text-orange-800"
+                            ? "bg-orange-100 dark:bg-orange-900/30 border-orange-200 dark:border-orange-700 text-orange-800 dark:text-orange-400"
                             : assessment?.status === "Under Review"
-                            ? "bg-indigo-100 border-indigo-200 text-indigo-800"
+                            ? "bg-indigo-100 dark:bg-indigo-900/30 border-indigo-200 dark:border-indigo-700 text-indigo-800 dark:text-indigo-400"
                             : assessment?.status === "Needs Revision"
-                            ? "bg-amber-100 border-amber-200 text-amber-800"
+                            ? "bg-amber-100 dark:bg-amber-900/30 border-amber-200 dark:border-amber-700 text-amber-800 dark:text-amber-400"
                             : assessment?.status === "Missed/Late"
-                            ? "bg-red-100 border-red-200 text-red-800"
+                            ? "bg-red-100 dark:bg-red-900/30 border-red-200 dark:border-red-700 text-red-800 dark:text-red-400"
                             : assessment?.status === "On Hold"
-                            ? "bg-yellow-100 border-yellow-200 text-yellow-800"
-                            : "bg-gray-100 border-gray-200 text-gray-800"
+                            ? "bg-yellow-100 dark:bg-yellow-900/30 border-yellow-200 dark:border-yellow-700 text-yellow-800 dark:text-yellow-400"
+                            : "bg-gray-100 dark:bg-gray-900/30 border-gray-200 dark:border-gray-700 text-gray-800 dark:text-gray-400"
                         }`}
                       >
                         <optgroup label="Planning">
@@ -1102,11 +1102,11 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                         </optgroup>
                       </select>
                     </td>
-                    <td className="font-medium whitespace-nowrap">{assessment?.courseName}</td>
+                    <td className="font-medium whitespace-nowrap dark:text-dark-text-primary">{assessment?.courseName}</td>
                     <td>
                       <div className="flex items-center">
                         <span
-                          className="truncate max-w-[240px]"
+                          className="truncate max-w-[240px] dark:text-dark-text-primary"
                           title={assessment?.assignmentName}
                         >
                           {assessment?.assignmentName}
@@ -1116,26 +1116,26 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                     <td className="whitespace-nowrap">
                       <span className={`${
                         assessment?.status === "Submitted"
-                          ? "text-emerald-600 font-medium"
+                          ? "text-emerald-600 dark:text-emerald-400 font-medium"
                           : assessment?.status === "Under Review"
-                          ? "text-indigo-600 font-medium"
+                          ? "text-indigo-600 dark:text-indigo-400 font-medium"
                           : assessment?.status === "In progress"
-                          ? "text-blue-600 font-medium"
+                          ? "text-blue-600 dark:text-blue-400 font-medium"
                           : assessment?.status === "Draft"
-                          ? "text-purple-600 font-medium"
+                          ? "text-purple-600 dark:text-purple-400 font-medium"
                           : assessment?.status === "Pending Submission"
-                          ? "text-orange-600 font-medium"
+                          ? "text-orange-600 dark:text-orange-400 font-medium"
                           : assessment?.status === "Needs Revision"
-                          ? "text-amber-600 font-medium"
+                          ? "text-amber-600 dark:text-amber-400 font-medium"
                           : assessment?.status === "Missed/Late"
-                          ? "text-red-600 font-medium"
+                          ? "text-red-600 dark:text-red-400 font-medium"
                           : assessment?.status === "On Hold"
-                          ? "text-yellow-600 font-medium"
+                          ? "text-yellow-600 dark:text-yellow-400 font-medium"
                           : dueDateStatus === "overdue"
-                          ? "text-red-600 font-medium"
+                          ? "text-red-600 dark:text-red-400 font-medium"
                           : dueDateStatus === "urgent"
-                          ? "text-amber-600 font-medium"
-                          : ""
+                          ? "text-amber-600 dark:text-amber-400 font-medium"
+                          : "dark:text-dark-text-primary"
                       }`}>
                         {assessment?.dueDate && assessment?.dueTime && 
                           formatDateTimeForDisplay(assessment.dueDate, assessment.dueTime)}
@@ -1147,11 +1147,11 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                     {showWeight && (
                       <td className="whitespace-nowrap">
                         {assessment?.weight ? (
-                          <span className="font-medium">
+                          <span className="font-medium dark:text-dark-text-primary">
                             {assessment.weight}%
                           </span>
                         ) : (
-                          <span className="text-gray-400">-</span>
+                          <span className="text-gray-400 dark:text-dark-text-tertiary">-</span>
                         )}
                       </td>
                     )}
@@ -1160,8 +1160,8 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                         onClick={() => handleNotesClick(assessment)}
                         className={`p-1.5 rounded ${
                           assessment?.notes && assessment.notes.trim() !== ""
-                            ? "text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50"
-                            : "text-gray-400 hover:text-gray-600 hover:bg-gray-50"
+                            ? "text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 hover:bg-indigo-50 dark:hover:bg-indigo-900/30"
+                            : "text-gray-400 dark:text-dark-text-tertiary hover:text-gray-600 dark:hover:text-dark-text-secondary hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary"
                         }`}
                         title={assessment?.notes && assessment.notes.trim() !== "" ? "Edit Notes" : "Add Notes"}
                       >
@@ -1192,7 +1192,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                                 : assessment?.id || null
                             )
                           }
-                          className="text-gray-500 hover:text-gray-700 p-1.5 hover:bg-gray-100 rounded-full"
+                          className="text-gray-500 dark:text-dark-text-tertiary hover:text-gray-700 dark:hover:text-dark-text-secondary p-1.5 hover:bg-gray-100 dark:hover:bg-dark-bg-tertiary rounded-full"
                         >
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -1204,18 +1204,18 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                           </svg>
                         </button>
                         {dropdownOpenId === assessment?.id && (
-                          <div className="absolute right-0 z-10 mt-2 w-36 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5">
+                          <div className="absolute right-0 z-10 mt-2 w-36 rounded-md bg-white dark:bg-dark-bg-secondary shadow-lg ring-1 ring-black ring-opacity-5 dark:ring-dark-border">
                             <div className="py-1">
                               <button
                                 onClick={() => {
                                   handleDropdownToggle(null);
                                   handleEditClick(assessment);
                                 }}
-                                className="flex w-full items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                className="flex w-full items-center px-4 py-2 text-sm text-gray-700 dark:text-dark-text-primary hover:bg-gray-100 dark:hover:bg-dark-bg-tertiary"
                               >
                                 <svg
                                   xmlns="http://www.w3.org/2000/svg"
-                                  className="h-4 w-4 mr-2 text-blue-500"
+                                  className="h-4 w-4 mr-2 text-blue-500 dark:text-blue-400"
                                   viewBox="0 0 20 20"
                                   fill="currentColor"
                                 >
@@ -1228,11 +1228,11 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                                   handleDropdownToggle(null);
                                   handleDeleteClick(assessment);
                                 }}
-                                className="flex w-full items-center px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
+                                className="flex w-full items-center px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-dark-bg-tertiary"
                               >
                                 <svg
                                   xmlns="http://www.w3.org/2000/svg"
-                                  className="h-4 w-4 mr-2 text-red-500"
+                                  className="h-4 w-4 mr-2 text-red-500 dark:text-red-400"
                                   viewBox="0 0 20 20"
                                   fill="currentColor"
                                 >
@@ -1262,27 +1262,27 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div
             id="notes-modal"
-            className="bg-white rounded-lg shadow-lg p-6 w-full max-w-4xl h-[90vh] flex flex-col animate-scale"
+            className="bg-white dark:bg-dark-bg-secondary rounded-lg shadow-lg p-6 w-full max-w-4xl h-[90vh] flex flex-col animate-scale"
           >
             <div className="flex justify-between items-center mb-4">
               <div>
-                <h3 className="text-xl font-medium text-gray-900">
+                <h3 className="text-xl font-medium text-gray-900 dark:text-dark-text-primary">
                   Notes for {selectedAssessment.assignmentName}
                 </h3>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-gray-500 dark:text-dark-text-tertiary">
                   {selectedAssessment.courseName}
                 </p>
                 <div className="mt-2 flex items-center space-x-4 text-sm">
-                  <span className="text-gray-600">
+                  <span className="text-gray-600 dark:text-dark-text-secondary">
                     Due: {formatDateTimeForDisplay(selectedAssessment.dueDate, selectedAssessment.dueTime)}
                   </span>
-                  <span className="text-gray-600">
+                  <span className="text-gray-600 dark:text-dark-text-secondary">
                     Weight: {selectedAssessment.weight}%
                   </span>
                   <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                    selectedAssessment.status === "Submitted" ? "bg-emerald-100 text-emerald-800" :
-                    selectedAssessment.status === "In progress" ? "bg-blue-100 text-blue-800" :
-                    "bg-gray-100 text-gray-800"
+                    selectedAssessment.status === "Submitted" ? "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-800 dark:text-emerald-400" :
+                    selectedAssessment.status === "In progress" ? "bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400" :
+                    "bg-gray-100 dark:bg-gray-900/30 text-gray-800 dark:text-gray-400"
                   }`}>
                     {selectedAssessment.status}
                   </span>
@@ -1294,7 +1294,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                     const text = `Assignment: ${selectedAssessment.assignmentName}\nCourse: ${selectedAssessment.courseName}\nDue: ${formatDateTimeForDisplay(selectedAssessment.dueDate, selectedAssessment.dueTime)}\nWeight: ${selectedAssessment.weight}%\nStatus: ${selectedAssessment.status}\n\nNotes:\n${notesInput}`;
                     navigator.clipboard.writeText(text);
                   }}
-                  className="inline-flex items-center px-3 py-1.5 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                  className="inline-flex items-center px-3 py-1.5 border border-gray-300 dark:border-dark-border shadow-sm text-sm font-medium rounded-md text-gray-700 dark:text-dark-text-primary bg-white dark:bg-dark-bg-tertiary hover:bg-gray-50 dark:hover:bg-dark-bg-secondary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-indigo-400"
                   title="Copy Notes"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -1308,7 +1308,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                     setShowNotes(null);
                     setSelectedAssessment(null);
                   }}
-                  className="inline-flex items-center p-1.5 border border-transparent rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                  className="inline-flex items-center p-1.5 border border-transparent rounded-md text-gray-400 dark:text-dark-text-tertiary hover:text-gray-500 dark:hover:text-dark-text-secondary hover:bg-gray-100 dark:hover:bg-dark-bg-tertiary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-indigo-400"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <line x1="18" y1="6" x2="6" y2="18"></line>
@@ -1317,7 +1317,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                 </button>
               </div>
             </div>
-            <div className="flex-1 mb-4 border rounded-lg overflow-hidden">
+            <div className="flex-1 mb-4 border rounded-lg overflow-hidden dark:border-dark-border">
               <RichTextEditor
                 content={notesInput}
                 onChange={setNotesInput}
