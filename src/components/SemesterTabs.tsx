@@ -433,7 +433,7 @@ const SemesterTabs = ({ selectedSemester, onSelect }: SemesterTabsProps) => {
 
   if (isLoading) {
     return (
-      <div className="mb-4 bg-white rounded-lg shadow-sm p-4 border border-gray-100">
+      <div className="mb-4 bg-white dark:bg-dark-bg-secondary rounded-lg shadow-sm p-4 border border-gray-100 dark:border-dark-border">
         <div className="flex justify-center py-2">
           <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-indigo-600"></div>
         </div>
@@ -442,14 +442,14 @@ const SemesterTabs = ({ selectedSemester, onSelect }: SemesterTabsProps) => {
   }
 
   return (
-    <div className="semester-tabs-container mb-6 bg-white rounded-lg shadow-sm p-4 border border-gray-100 transition-all duration-300">
+    <div className="semester-tabs-container mb-6 bg-white dark:bg-dark-bg-secondary rounded-lg shadow-sm p-4 border border-gray-100 dark:border-dark-border transition-all duration-300">
       <div className="flex items-center justify-between mb-2">
-        <h2 className="text-base font-medium text-gray-700">Semesters</h2>
+        <h2 className="text-base font-medium text-gray-700 dark:text-dark-text-primary">Semesters</h2>
         <div className="flex items-center">
           {/* Add button */}
           <button
             onClick={() => setShowAddInput(true)}
-            className="add-semester-button p-1.5 text-indigo-600 hover:bg-indigo-50 rounded-md mr-1"
+            className="add-semester-button p-1.5 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-dark-bg-tertiary rounded-md mr-1"
             title="Add new semester"
           >
             <svg
@@ -470,7 +470,7 @@ const SemesterTabs = ({ selectedSemester, onSelect }: SemesterTabsProps) => {
           <div className="relative" ref={moreOptionsRef}>
             <button
               onClick={() => setShowMoreOptions(!showMoreOptions)}
-              className="p-1.5 text-gray-500 hover:bg-gray-100 rounded-md"
+              className="p-1.5 text-gray-500 dark:text-dark-text-tertiary hover:bg-gray-100 dark:hover:bg-dark-bg-tertiary rounded-md"
               title="More options"
             >
               <svg
@@ -485,7 +485,7 @@ const SemesterTabs = ({ selectedSemester, onSelect }: SemesterTabsProps) => {
 
             {showMoreOptions && (
               <div
-                className="absolute right-0 top-full mt-1 bg-white border border-gray-100 rounded-md shadow-sm z-20 animate-fade-in-down"
+                className="absolute right-0 top-full mt-1 bg-white dark:bg-dark-bg-secondary border border-gray-100 dark:border-dark-border rounded-md shadow-sm z-20 animate-fade-in-down"
                 style={{ minWidth: "150px" }}
               >
                 <button
@@ -493,11 +493,11 @@ const SemesterTabs = ({ selectedSemester, onSelect }: SemesterTabsProps) => {
                     setShowManageModal(true);
                     setShowMoreOptions(false);
                   }}
-                  className="flex items-center w-full px-3 py-2 text-sm hover:bg-gray-50 text-left rounded-t-md transition-colors duration-150 whitespace-nowrap"
+                  className="flex items-center w-full px-3 py-2 text-sm hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary text-left rounded-t-md transition-colors duration-150 whitespace-nowrap dark:text-dark-text-primary"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    className="h-3.5 w-3.5 mr-2 text-gray-600 flex-shrink-0"
+                    className="h-3.5 w-3.5 mr-2 text-gray-600 dark:text-dark-text-tertiary flex-shrink-0"
                     viewBox="0 0 20 20"
                     fill="currentColor"
                   >
@@ -528,7 +528,7 @@ const SemesterTabs = ({ selectedSemester, onSelect }: SemesterTabsProps) => {
                 }
               }}
               ref={newInputRef}
-              className="input text-sm py-1.5 px-3 flex-grow"
+              className="input text-sm py-1.5 px-3 flex-grow dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border"
             />
             <button
               onClick={handleAddSemester}
@@ -576,19 +576,19 @@ const SemesterTabs = ({ selectedSemester, onSelect }: SemesterTabsProps) => {
         {semesters.map((sem) => (
           <div key={sem.id} className="flex-shrink-0">
             {editingId === sem.id ? (
-              <div className="flex items-center bg-white rounded-lg shadow-sm border border-gray-200 p-1 animate-fade-in">
+              <div className="flex items-center bg-white dark:bg-dark-bg-secondary rounded-lg shadow-sm border border-gray-200 dark:border-dark-border p-1 animate-fade-in">
                 <input
                   type="text"
                   value={editingName}
                   onChange={(e) => setEditingName(e.target.value)}
                   onKeyDown={(e) => handleEditKeyPress(e, sem.id)}
                   ref={editInputRef}
-                  className="input text-sm py-1 px-1.5"
+                  className="input text-sm py-1 px-1.5 dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border"
                   style={{ width: "120px" }}
                 />
                 <button
                   onClick={() => handleEditSave(sem.id)}
-                  className="ml-1 p-1 text-indigo-600 hover:text-indigo-700 transition-colors"
+                  className="ml-1 p-1 text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 transition-colors"
                   title="Save"
                 >
                   <svg
@@ -606,7 +606,7 @@ const SemesterTabs = ({ selectedSemester, onSelect }: SemesterTabsProps) => {
                 </button>
                 <button
                   onClick={() => setEditingId(null)}
-                  className="p-1 text-gray-500 hover:text-gray-700 transition-colors"
+                  className="p-1 text-gray-500 dark:text-dark-text-tertiary hover:text-gray-700 dark:hover:text-dark-text-secondary transition-colors"
                   title="Cancel"
                 >
                   <svg
@@ -629,7 +629,7 @@ const SemesterTabs = ({ selectedSemester, onSelect }: SemesterTabsProps) => {
                 className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-all duration-200 ${
                   selectedSemester === sem.name
                     ? "bg-indigo-500 text-white shadow-sm hover:bg-indigo-600"
-                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                    : "bg-gray-100 dark:bg-dark-bg-tertiary text-gray-700 dark:text-dark-text-primary hover:bg-gray-200 dark:hover:bg-dark-bg-secondary"
                 }`}
               >
                 {sem.name}
@@ -641,7 +641,7 @@ const SemesterTabs = ({ selectedSemester, onSelect }: SemesterTabsProps) => {
 
       {/* Empty state when no semesters exist */}
       {semesters.length === 0 && !showAddInput && (
-        <div className="text-center py-2 text-gray-500 text-sm">
+        <div className="text-center py-2 text-gray-500 dark:text-dark-text-tertiary text-sm">
           <p>No semesters yet. Click "+" to add one.</p>
         </div>
       )}
@@ -654,15 +654,15 @@ const SemesterTabs = ({ selectedSemester, onSelect }: SemesterTabsProps) => {
         >
           <div
             ref={manageModalRef}
-            className="bg-white rounded-lg shadow-lg p-4 w-full max-w-sm animate-scale"
+            className="bg-white dark:bg-dark-bg-secondary rounded-lg shadow-lg p-4 w-full max-w-sm animate-scale"
           >
             <div className="flex justify-between items-center mb-3">
-              <h3 className="text-base font-medium text-gray-900">
+              <h3 className="text-base font-medium text-gray-900 dark:text-dark-text-primary">
                 Manage Semesters
               </h3>
               <button
                 onClick={() => setShowManageModal(false)}
-                className="text-gray-400 hover:text-gray-600"
+                className="text-gray-400 dark:text-dark-text-tertiary hover:text-gray-600 dark:hover:text-dark-text-secondary"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -679,9 +679,9 @@ const SemesterTabs = ({ selectedSemester, onSelect }: SemesterTabsProps) => {
               </button>
             </div>
 
-            <div className="max-h-64 overflow-y-auto border border-gray-200 rounded-md">
+            <div className="max-h-64 overflow-y-auto border border-gray-200 dark:border-dark-border rounded-md">
               {semesters.length === 0 ? (
-                <div className="py-4 text-center text-gray-500">
+                <div className="py-4 text-center text-gray-500 dark:text-dark-text-tertiary">
                   No semesters yet. Add one using the "+" button.
                 </div>
               ) : (
@@ -689,7 +689,7 @@ const SemesterTabs = ({ selectedSemester, onSelect }: SemesterTabsProps) => {
                   <Droppable droppableId="semesters">
                     {(provided) => (
                       <ul 
-                        className="divide-y divide-gray-200"
+                        className="divide-y divide-gray-200 dark:divide-dark-border"
                         {...provided.droppableProps}
                         ref={provided.innerRef}
                       >
@@ -700,14 +700,14 @@ const SemesterTabs = ({ selectedSemester, onSelect }: SemesterTabsProps) => {
                                 ref={provided.innerRef}
                                 {...provided.draggableProps}
                                 {...provided.dragHandleProps}
-                                className={`p-2 hover:bg-gray-50 flex items-center justify-between ${
-                                  snapshot.isDragging ? 'bg-gray-100' : ''
+                                className={`p-2 hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary flex items-center justify-between ${
+                                  snapshot.isDragging ? 'bg-gray-100 dark:bg-dark-bg-tertiary' : ''
                                 }`}
                               >
                                 <div className="flex items-center">
                                   <svg
                                     xmlns="http://www.w3.org/2000/svg"
-                                    className="h-4 w-4 mr-2 text-gray-400"
+                                    className="h-4 w-4 mr-2 text-gray-400 dark:text-dark-text-tertiary"
                                     viewBox="0 0 20 20"
                                     fill="currentColor"
                                   >
@@ -719,15 +719,15 @@ const SemesterTabs = ({ selectedSemester, onSelect }: SemesterTabsProps) => {
                                       value={editingName}
                                       onChange={(e) => setEditingName(e.target.value)}
                                       onKeyDown={(e) => handleEditKeyPress(e, sem.id)}
-                                      className="input text-sm py-1 px-2 w-40"
+                                      className="input text-sm py-1 px-2 w-40 dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border"
                                       autoFocus
                                     />
                                   ) : (
                                     <span
                                       className={`font-medium ${
                                         selectedSemester === sem.name
-                                          ? "text-indigo-600"
-                                          : ""
+                                          ? "text-indigo-600 dark:text-indigo-400"
+                                          : "dark:text-dark-text-primary"
                                       }`}
                                     >
                                       {sem.name}
@@ -740,7 +740,7 @@ const SemesterTabs = ({ selectedSemester, onSelect }: SemesterTabsProps) => {
                                     <>
                                       <button
                                         onClick={() => handleEditSave(sem.id)}
-                                        className="text-indigo-600 hover:text-indigo-800 p-1"
+                                        className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 p-1"
                                         title="Save"
                                       >
                                         <svg
@@ -758,7 +758,7 @@ const SemesterTabs = ({ selectedSemester, onSelect }: SemesterTabsProps) => {
                                       </button>
                                       <button
                                         onClick={() => setEditingId(null)}
-                                        className="text-gray-600 hover:text-gray-800 p-1"
+                                        className="text-gray-600 dark:text-dark-text-tertiary hover:text-gray-800 dark:hover:text-dark-text-secondary p-1"
                                         title="Cancel"
                                       >
                                         <svg
@@ -778,13 +778,13 @@ const SemesterTabs = ({ selectedSemester, onSelect }: SemesterTabsProps) => {
                                   ) : (
                                     <>
                                       {selectedSemester === sem.name && (
-                                        <span className="inline-block bg-indigo-100 text-indigo-800 text-xs px-2 py-0.5 rounded-full mr-2">
+                                        <span className="inline-block bg-indigo-100 dark:bg-indigo-900/30 text-indigo-800 dark:text-indigo-400 text-xs px-2 py-0.5 rounded-full mr-2">
                                           Current
                                         </span>
                                       )}
                                       <button
                                         onClick={() => handleEditStart(sem.id, sem.name)}
-                                        className="text-gray-500 hover:text-indigo-600 p-1"
+                                        className="text-gray-500 dark:text-dark-text-tertiary hover:text-indigo-600 dark:hover:text-indigo-400 p-1"
                                         title="Edit"
                                       >
                                         <svg
@@ -794,24 +794,6 @@ const SemesterTabs = ({ selectedSemester, onSelect }: SemesterTabsProps) => {
                                           fill="currentColor"
                                         >
                                           <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
-                                        </svg>
-                                      </button>
-                                      <button
-                                        onClick={() => handleDeleteSemester(sem.id)}
-                                        className="text-gray-500 hover:text-red-600 p-1"
-                                        title="Delete"
-                                      >
-                                        <svg
-                                          xmlns="http://www.w3.org/2000/svg"
-                                          className="h-4 w-4"
-                                          viewBox="0 0 20 20"
-                                          fill="currentColor"
-                                        >
-                                          <path
-                                            fillRule="evenodd"
-                                            d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
-                                            clipRule="evenodd"
-                                          />
                                         </svg>
                                       </button>
                                     </>
@@ -827,15 +809,6 @@ const SemesterTabs = ({ selectedSemester, onSelect }: SemesterTabsProps) => {
                   </Droppable>
                 </DragDropContext>
               )}
-            </div>
-
-            <div className="mt-4 text-right">
-              <button
-                onClick={() => setShowManageModal(false)}
-                className="btn-outline text-sm py-1.5 px-4"
-              >
-                Close
-              </button>
             </div>
           </div>
         </div>
