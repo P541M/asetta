@@ -254,7 +254,7 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
+    <div className="min-h-screen bg-gray-50 dark:bg-dark-bg-primary flex flex-col">
       <Head>
         <title>Kivo - Your Academic Dashboard</title>
         <meta
@@ -267,8 +267,8 @@ const Dashboard = () => {
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
             <div>
-              <h1 className="text-xl font-semibold text-gray-900">Dashboard</h1>
-              <p className="text-sm text-gray-500 mt-1">
+              <h1 className="text-xl font-semibold text-gray-900 dark:text-dark-text-primary">Dashboard</h1>
+              <p className="text-sm text-gray-500 dark:text-dark-text-tertiary mt-1">
                 {selectedSemester ? `Viewing ${selectedSemester} semester` : 'Select a semester to get started'}
               </p>
             </div>
@@ -324,61 +324,61 @@ const Dashboard = () => {
               {showStatsBar && (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 mb-6">
                   <div
-                    className={`bg-white rounded-xl shadow-sm p-4 border border-gray-100 stat-card`}
+                    className={`bg-white dark:bg-dark-bg-secondary rounded-xl shadow-sm p-4 border border-gray-100 dark:border-dark-border stat-card`}
                   >
-                    <p className="text-sm text-gray-500 mb-1">
+                    <p className="text-sm text-gray-500 dark:text-dark-text-tertiary mb-1">
                       Total Assessments
                     </p>
-                    <h3 className="text-2xl font-bold text-gray-900">
+                    <h3 className="text-2xl font-bold text-gray-900 dark:text-dark-text-primary">
                       {stats.total}
                     </h3>
                   </div>
                   <div
-                    className={`bg-white rounded-xl shadow-sm p-4 border border-gray-100 stat-card`}
+                    className={`bg-white dark:bg-dark-bg-secondary rounded-xl shadow-sm p-4 border border-gray-100 dark:border-dark-border stat-card`}
                     style={{ animationDelay: "0.05s" }}
                   >
-                    <p className="text-sm text-gray-500 mb-1">Planning</p>
-                    <h3 className="text-2xl font-bold text-gray-600">
+                    <p className="text-sm text-gray-500 dark:text-dark-text-tertiary mb-1">Planning</p>
+                    <h3 className="text-2xl font-bold text-gray-600 dark:text-dark-text-primary">
                       {stats.planning}
                     </h3>
                   </div>
                   <div
-                    className={`bg-white rounded-xl shadow-sm p-4 border border-gray-100 stat-card`}
+                    className={`bg-white dark:bg-dark-bg-secondary rounded-xl shadow-sm p-4 border border-gray-100 dark:border-dark-border stat-card`}
                     style={{ animationDelay: "0.1s" }}
                   >
-                    <p className="text-sm text-gray-500 mb-1">Active Work</p>
-                    <h3 className="text-2xl font-bold text-blue-600">
+                    <p className="text-sm text-gray-500 dark:text-dark-text-tertiary mb-1">Active Work</p>
+                    <h3 className="text-2xl font-bold text-blue-600 dark:text-blue-400">
                       {stats.active}
                     </h3>
                   </div>
                   <div
-                    className={`bg-white rounded-xl shadow-sm p-4 border border-gray-100 stat-card`}
+                    className={`bg-white dark:bg-dark-bg-secondary rounded-xl shadow-sm p-4 border border-gray-100 dark:border-dark-border stat-card`}
                     style={{ animationDelay: "0.15s" }}
                   >
-                    <p className="text-sm text-gray-500 mb-1">Submission</p>
-                    <h3 className="text-2xl font-bold text-indigo-600">
+                    <p className="text-sm text-gray-500 dark:text-dark-text-tertiary mb-1">Submission</p>
+                    <h3 className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">
                       {stats.submission}
                     </h3>
                   </div>
                   <div
-                    className={`bg-white rounded-xl shadow-sm p-4 border border-gray-100 stat-card`}
+                    className={`bg-white dark:bg-dark-bg-secondary rounded-xl shadow-sm p-4 border border-gray-100 dark:border-dark-border stat-card`}
                     style={{ animationDelay: "0.2s" }}
                   >
-                    <p className="text-sm text-gray-500 mb-1">Completed</p>
-                    <h3 className="text-2xl font-bold text-emerald-600">
+                    <p className="text-sm text-gray-500 dark:text-dark-text-tertiary mb-1">Completed</p>
+                    <h3 className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">
                       {stats.completed}
                     </h3>
                   </div>
                   <div
-                    className={`bg-white rounded-xl shadow-sm p-4 border border-gray-100 stat-card`}
+                    className={`bg-white dark:bg-dark-bg-secondary rounded-xl shadow-sm p-4 border border-gray-100 dark:border-dark-border stat-card`}
                     style={{ animationDelay: "0.25s" }}
                   >
-                    <p className="text-sm text-gray-500 mb-1">Due This Week</p>
-                    <h3 className="text-2xl font-bold text-amber-600">
+                    <p className="text-sm text-gray-500 dark:text-dark-text-tertiary mb-1">Due This Week</p>
+                    <h3 className="text-2xl font-bold text-amber-600 dark:text-amber-400">
                       {stats.upcomingDeadlines}
                     </h3>
                     {stats.upcomingDeadlines > 0 && (
-                      <span className="inline-block w-2 h-2 bg-amber-500 rounded-full animate-pulse mt-1"></span>
+                      <span className="inline-block w-2 h-2 bg-amber-500 dark:bg-amber-400 rounded-full animate-pulse mt-1"></span>
                     )}
                   </div>
                 </div>
@@ -386,35 +386,35 @@ const Dashboard = () => {
               {stats.problem > 0 && (
                 <div className="mb-6">
                   <div
-                    className={`bg-white rounded-xl shadow-sm p-4 border border-red-100 stat-card`}
+                    className={`bg-white dark:bg-dark-bg-secondary rounded-xl shadow-sm p-4 border border-red-100 dark:border-red-900/30 stat-card`}
                     style={{ animationDelay: "0.25s" }}
                   >
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm text-gray-500 mb-1">
+                        <p className="text-sm text-gray-500 dark:text-dark-text-tertiary mb-1">
                           Attention Required
                         </p>
-                        <h3 className="text-2xl font-bold text-red-600">
+                        <h3 className="text-2xl font-bold text-red-600 dark:text-red-400">
                           {stats.problem} assessment
                           {stats.problem > 1 ? "s" : ""}
                         </h3>
                       </div>
-                      <div className="text-sm text-gray-600">
+                      <div className="text-sm text-gray-600 dark:text-dark-text-tertiary">
                         <p>Assessments marked as Missed/Late or Deferred</p>
                       </div>
                     </div>
                   </div>
                 </div>
               )}
-              <div className="bg-white rounded-xl shadow-sm border border-gray-100 mb-6 overflow-hidden transition-all duration-300 hover:shadow-md">
-                <div className="border-b border-gray-100">
+              <div className="bg-white dark:bg-dark-bg-secondary rounded-xl shadow-sm border border-gray-100 dark:border-dark-border mb-6 overflow-hidden transition-all duration-300 hover:shadow-md">
+                <div className="border-b border-gray-100 dark:border-dark-border">
                   <div className="flex flex-wrap">
                     <button
                       onClick={() => {
                         setActiveTab("courses");
                         setSelectedCourse(null);
                       }}
-                      className={`px-5 py-4 font-medium text-sm tab ${
+                      className={`px-5 py-4 font-medium text-sm tab dark:text-dark-text-primary ${
                         activeTab === "courses" && !selectedCourse
                           ? "active"
                           : ""
@@ -427,7 +427,7 @@ const Dashboard = () => {
                         setActiveTab("assessments");
                         setSelectedCourse(null);
                       }}
-                      className={`px-5 py-4 font-medium text-sm tab ${
+                      className={`px-5 py-4 font-medium text-sm tab dark:text-dark-text-primary ${
                         activeTab === "assessments" && !selectedCourse
                           ? "active"
                           : ""
@@ -437,7 +437,7 @@ const Dashboard = () => {
                     </button>
                     <button
                       onClick={() => setActiveTab("calendar")}
-                      className={`px-5 py-4 font-medium text-sm tab ${
+                      className={`px-5 py-4 font-medium text-sm tab dark:text-dark-text-primary ${
                         activeTab === "calendar" ? "active" : ""
                       }`}
                     >
@@ -445,7 +445,7 @@ const Dashboard = () => {
                     </button>
                     <button
                       onClick={() => setActiveTab("add")}
-                      className={`px-5 py-4 font-medium text-sm tab ${
+                      className={`px-5 py-4 font-medium text-sm tab dark:text-dark-text-primary ${
                         activeTab === "add" ? "active" : ""
                       }`}
                     >
@@ -453,7 +453,7 @@ const Dashboard = () => {
                     </button>
                     <button
                       onClick={() => setActiveTab("upload")}
-                      className={`px-5 py-4 font-medium text-sm tab ${
+                      className={`px-5 py-4 font-medium text-sm tab dark:text-dark-text-primary ${
                         activeTab === "upload" ? "active" : ""
                       }`}
                     >
@@ -564,11 +564,11 @@ const Dashboard = () => {
                 )}
             </>
           ) : (
-            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-10 text-center">
+            <div className="bg-white dark:bg-dark-bg-secondary rounded-xl shadow-sm border border-gray-100 dark:border-dark-border p-10 text-center">
               <div className="mb-6">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className="h-16 w-16 mx-auto text-indigo-300"
+                  className="h-16 w-16 mx-auto text-indigo-300 dark:text-indigo-500"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -581,11 +581,11 @@ const Dashboard = () => {
                   />
                 </svg>
               </div>
-              <h2 className="text-xl font-semibold mb-2">Welcome to Kivo</h2>
-              <p className="text-gray-600 mb-4">
+              <h2 className="text-xl font-semibold mb-2 dark:text-dark-text-primary">Welcome to Kivo</h2>
+              <p className="text-gray-600 dark:text-dark-text-secondary mb-4">
                 Track your assignments, exams, and projects in one place.
               </p>
-              <p className="text-gray-500 mb-6">
+              <p className="text-gray-500 dark:text-dark-text-tertiary mb-6">
                 Please add a semester to get started tracking your assessments.
               </p>
               <button
@@ -618,7 +618,7 @@ const Dashboard = () => {
           )}
         </div>
       </div>
-      <footer className="bg-white border-t border-gray-100 py-4 text-center text-sm text-gray-500">
+      <footer className="bg-white dark:bg-dark-bg-secondary border-t border-gray-100 dark:border-dark-border py-4 text-center text-sm text-gray-500 dark:text-dark-text-tertiary">
         <div className="max-w-7xl mx-auto px-4">
           <p>© {new Date().getFullYear()} Kivo. All rights reserved.</p>
         </div>

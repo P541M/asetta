@@ -133,11 +133,11 @@ const AddAssessmentForm = ({
         formSuccess ? "form-success" : ""
       }`}
     >
-      <h2 className="text-xl font-medium mb-6">Add Assessment Manually</h2>
+      <h2 className="text-xl font-medium mb-6 dark:text-dark-text-primary">Add Assessment Manually</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="form-group">
-            <label htmlFor="courseName" className="form-label">
+            <label htmlFor="courseName" className="form-label dark:text-dark-text-primary">
               Course Name/Code <span className="text-red-500">*</span>
             </label>
             <input
@@ -147,13 +147,13 @@ const AddAssessmentForm = ({
               value={formData.courseName}
               onChange={handleChange}
               ref={courseNameRef}
-              className="input hover:shadow-sm transition-all duration-200"
+              className="input hover:shadow-sm transition-all duration-200 dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border"
               placeholder="e.g., CS101"
               required
             />
           </div>
           <div className="form-group">
-            <label htmlFor="assignmentName" className="form-label">
+            <label htmlFor="assignmentName" className="form-label dark:text-dark-text-primary">
               Assessment Name <span className="text-red-500">*</span>
             </label>
             <input
@@ -162,7 +162,7 @@ const AddAssessmentForm = ({
               name="assignmentName"
               value={formData.assignmentName}
               onChange={handleChange}
-              className="input hover:shadow-sm transition-all duration-200"
+              className="input hover:shadow-sm transition-all duration-200 dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border"
               placeholder="e.g., Midterm Exam"
               required
             />
@@ -170,7 +170,7 @@ const AddAssessmentForm = ({
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="form-group">
-            <label htmlFor="dueDate" className="form-label">
+            <label htmlFor="dueDate" className="form-label dark:text-dark-text-primary">
               Due Date <span className="text-red-500">*</span>
             </label>
             <input
@@ -179,12 +179,12 @@ const AddAssessmentForm = ({
               name="dueDate"
               value={formData.dueDate}
               onChange={handleChange}
-              className="input hover:shadow-sm transition-all duration-200"
+              className="input hover:shadow-sm transition-all duration-200 dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border"
               required
             />
           </div>
           <div className="form-group">
-            <label htmlFor="dueTime" className="form-label">
+            <label htmlFor="dueTime" className="form-label dark:text-dark-text-primary">
               Due Time <span className="text-red-500">*</span>
             </label>
             <input
@@ -193,12 +193,12 @@ const AddAssessmentForm = ({
               name="dueTime"
               value={formData.dueTime}
               onChange={handleChange}
-              className="input hover:shadow-sm transition-all duration-200"
+              className="input hover:shadow-sm transition-all duration-200 dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border"
               required
             />
           </div>
           <div className="form-group">
-            <label htmlFor="weight" className="form-label">
+            <label htmlFor="weight" className="form-label dark:text-dark-text-primary">
               Weight (%)
             </label>
             <input
@@ -210,13 +210,13 @@ const AddAssessmentForm = ({
               min="0"
               max="100"
               step="0.1"
-              className="input hover:shadow-sm transition-all duration-200"
+              className="input hover:shadow-sm transition-all duration-200 dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border"
             />
           </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="form-group md:col-span-2">
-            <label htmlFor="status" className="form-label">
+            <label htmlFor="status" className="form-label dark:text-dark-text-primary">
               Status
             </label>
             <select
@@ -224,25 +224,25 @@ const AddAssessmentForm = ({
               name="status"
               value={formData.status}
               onChange={handleChange}
-              className="input hover:shadow-sm transition-all duration-200"
+              className="input hover:shadow-sm transition-all duration-200 dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border"
             >
-              <optgroup label="Planning">
-                <option value="Not started">Not started</option>
-                <option value="Draft">Draft</option>
+              <optgroup label="Planning" className="dark:bg-dark-bg-secondary dark:text-dark-text-primary">
+                <option value="Not started" className="dark:bg-dark-bg-secondary dark:text-dark-text-primary">Not started</option>
+                <option value="Draft" className="dark:bg-dark-bg-secondary dark:text-dark-text-primary">Draft</option>
               </optgroup>
-              <optgroup label="Active Work">
-                <option value="In progress">In progress</option>
-                <option value="On Hold">On Hold</option>
-                <option value="Needs Revision">Needs Revision</option>
+              <optgroup label="Active Work" className="dark:bg-dark-bg-secondary dark:text-dark-text-primary">
+                <option value="In progress" className="dark:bg-dark-bg-secondary dark:text-dark-text-primary">In progress</option>
+                <option value="On Hold" className="dark:bg-dark-bg-secondary dark:text-dark-text-primary">On Hold</option>
+                <option value="Needs Revision" className="dark:bg-dark-bg-secondary dark:text-dark-text-primary">Needs Revision</option>
               </optgroup>
-              <optgroup label="Submission">
-                <option value="Pending Submission">Pending Submission</option>
-                <option value="Submitted">Submitted</option>
-                <option value="Under Review">Under Review</option>
+              <optgroup label="Submission" className="dark:bg-dark-bg-secondary dark:text-dark-text-primary">
+                <option value="Pending Submission" className="dark:bg-dark-bg-secondary dark:text-dark-text-primary">Pending Submission</option>
+                <option value="Submitted" className="dark:bg-dark-bg-secondary dark:text-dark-text-primary">Submitted</option>
+                <option value="Under Review" className="dark:bg-dark-bg-secondary dark:text-dark-text-primary">Under Review</option>
               </optgroup>
-              <optgroup label="Other">
-                <option value="Missed/Late">Missed/Late</option>
-                <option value="Deferred">Deferred</option>
+              <optgroup label="Other" className="dark:bg-dark-bg-secondary dark:text-dark-text-primary">
+                <option value="Missed/Late" className="dark:bg-dark-bg-secondary dark:text-dark-text-primary">Missed/Late</option>
+                <option value="Deferred" className="dark:bg-dark-bg-secondary dark:text-dark-text-primary">Deferred</option>
               </optgroup>
             </select>
           </div>
@@ -302,14 +302,14 @@ const AddAssessmentForm = ({
           <div
             className={`mt-4 p-3 rounded-lg text-sm ${
               message.type === "error"
-                ? "bg-red-50 text-red-700 border border-red-100 animate-fade-in"
-                : "bg-emerald-50 text-emerald-700 border border-emerald-100 animate-fade-in"
+                ? "bg-red-50 text-red-700 border border-red-100 dark:bg-red-900/20 dark:text-red-400 dark:border-red-900/30 animate-fade-in"
+                : "bg-emerald-50 text-emerald-700 border border-emerald-100 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-900/30 animate-fade-in"
             }`}
           >
             {message.type === "error" ? (
               <div className="flex items-start">
                 <svg
-                  className="h-5 w-5 mr-2 mt-0.5 text-red-500"
+                  className="h-5 w-5 mr-2 mt-0.5 text-red-500 dark:text-red-400"
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 20 20"
                   fill="currentColor"
@@ -325,7 +325,7 @@ const AddAssessmentForm = ({
             ) : (
               <div className="flex items-start">
                 <svg
-                  className="h-5 w-5 mr-2 mt-0.5 text-emerald-500"
+                  className="h-5 w-5 mr-2 mt-0.5 text-emerald-500 dark:text-emerald-400"
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 20 20"
                   fill="currentColor"

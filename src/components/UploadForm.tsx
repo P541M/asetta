@@ -288,19 +288,19 @@ const UploadForm = ({ semester, onUploadSuccess }: UploadFormProps) => {
 
   return (
     <div>
-      <h2 className="text-xl font-medium mb-4">Upload Course Outlines</h2>
-      <p className="text-gray-600 mb-6">
+      <h2 className="text-xl font-medium mb-4 dark:text-white">Upload Course Outlines</h2>
+      <p className="text-gray-600 dark:text-gray-300 mb-6">
         Upload your course outline PDFs to automatically extract assignment
         details. Multiple files can be uploaded at once.
       </p>
-      <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6">
+      <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4 mb-6">
         <div className="flex items-start">
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-amber-500 mr-2 mt-0.5" viewBox="0 0 20 20" fill="currentColor">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-amber-500 dark:text-amber-400 mr-2 mt-0.5" viewBox="0 0 20 20" fill="currentColor">
             <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
           </svg>
           <div>
-            <h3 className="text-sm font-medium text-amber-800">AI Extraction Disclaimer</h3>
-            <p className="text-sm text-amber-700 mt-1">
+            <h3 className="text-sm font-medium text-amber-800 dark:text-amber-200">AI Extraction Disclaimer</h3>
+            <p className="text-sm text-amber-700 dark:text-amber-300 mt-1">
               We use AI to extract assessment information from your course outlines. While we strive for accuracy, errors may occur. Please review your assessments table after upload to verify all extracted data is correct, and feel free to edit or delete any incorrect entries.
             </p>
           </div>
@@ -312,9 +312,9 @@ const UploadForm = ({ semester, onUploadSuccess }: UploadFormProps) => {
             ref={dropZoneRef}
             className={`border-2 border-dashed ${
               isDragging
-                ? "border-indigo-400 bg-indigo-50"
-                : "border-gray-200 bg-gray-50"
-            } rounded-lg p-8 text-center mb-6 cursor-pointer hover:bg-gray-100 transition-all duration-300`}
+                ? "border-indigo-400 dark:border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20"
+                : "border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50"
+            } rounded-lg p-8 text-center mb-6 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-all duration-300`}
             onDragEnter={handleDragEnter}
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
@@ -334,8 +334,8 @@ const UploadForm = ({ semester, onUploadSuccess }: UploadFormProps) => {
               <div className="space-y-2">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className={`h-12 w-12 mx-auto text-gray-400 transition-transform duration-300 ${
-                    isDragging ? "scale-110 text-indigo-400" : ""
+                  className={`h-12 w-12 mx-auto text-gray-400 dark:text-gray-500 transition-transform duration-300 ${
+                    isDragging ? "scale-110 text-indigo-400 dark:text-indigo-400" : ""
                   }`}
                   fill="none"
                   viewBox="0 0 24 24"
@@ -350,14 +350,14 @@ const UploadForm = ({ semester, onUploadSuccess }: UploadFormProps) => {
                 </svg>
                 <p
                   className={`font-medium ${
-                    isDragging ? "text-indigo-700" : "text-gray-700"
+                    isDragging ? "text-indigo-700 dark:text-indigo-300" : "text-gray-700 dark:text-gray-300"
                   } transition-colors duration-300`}
                 >
                   {isDragging
                     ? "Drop files here"
                     : "Drag and drop your PDFs here, or click to browse"}
                 </p>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-gray-500 dark:text-gray-400">
                   (Only PDF files are accepted)
                 </p>
               </div>
@@ -368,7 +368,7 @@ const UploadForm = ({ semester, onUploadSuccess }: UploadFormProps) => {
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className="h-10 w-10 mx-auto text-indigo-500"
+                  className="h-10 w-10 mx-auto text-indigo-500 dark:text-indigo-400"
                   viewBox="0 0 20 20"
                   fill="currentColor"
                 >
@@ -378,7 +378,7 @@ const UploadForm = ({ semester, onUploadSuccess }: UploadFormProps) => {
                     clipRule="evenodd"
                   />
                 </svg>
-                <p className="font-medium text-indigo-700">
+                <p className="font-medium text-indigo-700 dark:text-indigo-300">
                   {files.length} file(s) selected
                 </p>
                 <div className="flex justify-center space-x-2">
@@ -388,7 +388,7 @@ const UploadForm = ({ semester, onUploadSuccess }: UploadFormProps) => {
                       e.stopPropagation();
                       fileInputRef.current?.click();
                     }}
-                    className="text-xs text-indigo-600 hover:text-indigo-700 transition-colors duration-200 bg-white px-2 py-1 rounded-md shadow-sm hover:shadow border border-indigo-200"
+                    className="text-xs text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 transition-colors duration-200 bg-white dark:bg-gray-800 px-2 py-1 rounded-md shadow-sm hover:shadow border border-indigo-200 dark:border-indigo-700"
                   >
                     Add more files
                   </button>
@@ -398,7 +398,7 @@ const UploadForm = ({ semester, onUploadSuccess }: UploadFormProps) => {
                       e.stopPropagation();
                       clearFiles();
                     }}
-                    className="text-xs text-red-500 hover:text-red-600 transition-colors duration-200 bg-white px-2 py-1 rounded-md shadow-sm hover:shadow border border-red-200"
+                    className="text-xs text-red-500 dark:text-red-400 hover:text-red-600 dark:hover:text-red-300 transition-colors duration-200 bg-white dark:bg-gray-800 px-2 py-1 rounded-md shadow-sm hover:shadow border border-red-200 dark:border-red-700"
                   >
                     Clear all
                   </button>
@@ -409,24 +409,24 @@ const UploadForm = ({ semester, onUploadSuccess }: UploadFormProps) => {
         )}
         {/* Overall Progress Bar (only visible during upload/processing) */}
         {(uploadStatus === "uploading" || uploadStatus === "processing") && (
-          <div className="mb-6 bg-white p-6 rounded-lg shadow-sm border border-gray-100 animate-fade-in">
+          <div className="mb-6 bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700 animate-fade-in">
             <div className="flex justify-between mb-1">
-              <span className="text-sm font-medium text-gray-700">
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
                 Overall Progress
               </span>
-              <span className="text-sm font-medium text-gray-700">
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
                 {overallProgress}%
               </span>
             </div>
-            <div className="w-full bg-gray-200 rounded-full h-2.5 overflow-hidden">
+            <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5 overflow-hidden">
               <div
                 className={`h-2.5 rounded-full progress-bar ${
-                  uploadStatus === "uploading" ? "bg-blue-500" : "bg-indigo-600"
+                  uploadStatus === "uploading" ? "bg-blue-500 dark:bg-blue-400" : "bg-indigo-600 dark:bg-indigo-400"
                 }`}
                 style={{ width: `${overallProgress}%` }}
               ></div>
             </div>
-            <p className="text-sm text-gray-500 mt-2 text-center">
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-2 text-center">
               {uploadStatus === "uploading"
                 ? "Uploading files..."
                 : "Processing PDFs and extracting data..."}
@@ -436,8 +436,8 @@ const UploadForm = ({ semester, onUploadSuccess }: UploadFormProps) => {
         {/* File List with Progress */}
         {files.length > 0 && (
           <div className="mb-6">
-            <h3 className="text-sm font-medium text-gray-900 mb-2">Files:</h3>
-            <ul className="bg-white rounded-lg border border-gray-200 divide-y divide-gray-200 shadow-sm">
+            <h3 className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-2">Files:</h3>
+            <ul className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 divide-y divide-gray-200 dark:divide-gray-700 shadow-sm">
               {fileProgresses.map((fileProgress, index) => (
                 <li
                   key={index}
@@ -448,7 +448,7 @@ const UploadForm = ({ semester, onUploadSuccess }: UploadFormProps) => {
                     <div className="flex items-center max-w-[70%]">
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
-                        className="h-5 w-5 text-indigo-500 mr-2 flex-shrink-0"
+                        className="h-5 w-5 text-indigo-500 dark:text-indigo-400 mr-2 flex-shrink-0"
                         viewBox="0 0 20 20"
                         fill="currentColor"
                       >
@@ -459,10 +459,10 @@ const UploadForm = ({ semester, onUploadSuccess }: UploadFormProps) => {
                         />
                       </svg>
                       <div className="truncate">
-                        <p className="text-sm font-medium text-gray-800 truncate">
+                        <p className="text-sm font-medium text-gray-800 dark:text-gray-200 truncate">
                           {fileProgress.name}
                         </p>
-                        <p className="text-xs text-gray-500">
+                        <p className="text-xs text-gray-500 dark:text-gray-400">
                           {(fileProgress.size / 1024).toFixed(0)} KB
                         </p>
                       </div>
@@ -471,7 +471,7 @@ const UploadForm = ({ semester, onUploadSuccess }: UploadFormProps) => {
                       <button
                         type="button"
                         onClick={() => removeFile(index)}
-                        className="text-red-500 hover:text-red-700 transition-colors p-1 hover:bg-red-50 rounded-full"
+                        className="text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 transition-colors p-1 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-full"
                         title="Remove file"
                       >
                         <svg
@@ -491,12 +491,12 @@ const UploadForm = ({ semester, onUploadSuccess }: UploadFormProps) => {
                       <span
                         className={`text-xs font-medium px-2 py-1 rounded-full transition-colors duration-200 ${
                           fileProgress.status === "success"
-                            ? "bg-green-100 text-green-800"
+                            ? "bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-300"
                             : fileProgress.status === "error"
-                            ? "bg-red-100 text-red-800"
+                            ? "bg-red-100 dark:bg-red-900/20 text-red-800 dark:text-red-300"
                             : fileProgress.status === "processing"
-                            ? "bg-indigo-100 text-indigo-800"
-                            : "bg-blue-100 text-blue-800"
+                            ? "bg-indigo-100 dark:bg-indigo-900/20 text-indigo-800 dark:text-indigo-300"
+                            : "bg-blue-100 dark:bg-blue-900/20 text-blue-800 dark:text-blue-300"
                         }`}
                       >
                         {getStatusText(fileProgress.status)}
@@ -505,7 +505,7 @@ const UploadForm = ({ semester, onUploadSuccess }: UploadFormProps) => {
                   </div>
                   {/* File-specific progress bar */}
                   {fileProgress.status !== "idle" && (
-                    <div className="w-full bg-gray-200 rounded-full h-1.5 overflow-hidden">
+                    <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5 overflow-hidden">
                       <div
                         className={`h-1.5 rounded-full transition-all duration-300 ${getStatusColor(
                           fileProgress.status
@@ -530,7 +530,7 @@ const UploadForm = ({ semester, onUploadSuccess }: UploadFormProps) => {
             disabled={uploadStatus !== "idle" || files.length === 0}
             className={`btn-primary px-6 py-2.5 transition-all duration-300 shadow-sm hover:shadow hover:-translate-y-0.5 ${
               files.length === 0 || uploadStatus !== "idle"
-                ? "bg-gray-300 cursor-not-allowed text-gray-600"
+                ? "bg-gray-300 dark:bg-gray-600 cursor-not-allowed text-gray-600 dark:text-gray-400"
                 : ""
             }`}
           >
@@ -608,14 +608,14 @@ const UploadForm = ({ semester, onUploadSuccess }: UploadFormProps) => {
           <div
             className={`mt-4 p-3 rounded-lg text-sm ${
               message.type === "error"
-                ? "bg-red-50 text-red-700 border border-red-100 animate-fade-in"
-                : "bg-emerald-50 text-emerald-700 border border-emerald-100 animate-fade-in"
+                ? "bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300 border border-red-100 dark:border-red-800 animate-fade-in"
+                : "bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300 border border-emerald-100 dark:border-emerald-800 animate-fade-in"
             }`}
           >
             {message.type === "error" ? (
               <div className="flex items-start">
                 <svg
-                  className="h-5 w-5 mr-2 mt-0.5 text-red-500 flex-shrink-0"
+                  className="h-5 w-5 mr-2 mt-0.5 text-red-500 dark:text-red-400 flex-shrink-0"
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 20 20"
                   fill="currentColor"
@@ -631,7 +631,7 @@ const UploadForm = ({ semester, onUploadSuccess }: UploadFormProps) => {
             ) : (
               <div className="flex items-start">
                 <svg
-                  className="h-5 w-5 mr-2 mt-0.5 text-emerald-500 flex-shrink-0"
+                  className="h-5 w-5 mr-2 mt-0.5 text-emerald-500 dark:text-emerald-400 flex-shrink-0"
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 20 20"
                   fill="currentColor"
