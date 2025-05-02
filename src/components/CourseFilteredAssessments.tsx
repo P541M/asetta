@@ -116,7 +116,7 @@ const CourseFilteredAssessments = ({
       <div className="flex justify-between items-center">
         <button
           onClick={onBack}
-          className="text-indigo-600 hover:text-indigo-800 font-medium"
+          className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 font-medium"
         >
           ← Back to All Courses
         </button>
@@ -140,14 +140,14 @@ const CourseFilteredAssessments = ({
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
         </div>
       ) : error ? (
-        <div className="p-4 bg-red-50 rounded-lg text-red-700 animate-fade-in">
+        <div className="p-4 bg-red-50 dark:bg-red-900/20 rounded-lg text-red-700 dark:text-red-400 animate-fade-in">
           <p>{error}</p>
         </div>
       ) : assessments.length === 0 ? (
-        <div className="text-center py-10 text-gray-500 animate-fade-in">
+        <div className="text-center py-10 text-gray-500 dark:text-dark-text-tertiary animate-fade-in">
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            className="h-12 w-12 mx-auto mb-4 text-gray-300 animate-bounce-light"
+            className="h-12 w-12 mx-auto mb-4 text-gray-300 dark:text-dark-text-tertiary animate-bounce-light"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -159,7 +159,7 @@ const CourseFilteredAssessments = ({
               d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
             />
           </svg>
-          <p className="text-lg font-medium mb-2">No assessments found for this course</p>
+          <p className="text-lg font-medium mb-2 dark:text-dark-text-primary">No assessments found for this course</p>
           <p>
             This course doesn't have any assessments yet. Add assessments manually or upload a course outline.
           </p>

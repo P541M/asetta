@@ -298,19 +298,19 @@ const CoursesOverviewTable = ({
 
   return (
     <div>
-      <h2 className="text-xl font-medium text-gray-900 mb-6">Your Courses</h2>
-      <div className="table-container rounded-lg shadow-sm border border-gray-100">
+      <h2 className="text-xl font-medium text-gray-900 dark:text-dark-text-primary mb-6">Your Courses</h2>
+      <div className="table-container rounded-lg shadow-sm border border-gray-100 dark:border-dark-border dark:bg-dark-bg-secondary">
         <table className="data-table">
-          <thead>
+          <thead className="bg-gray-50 dark:bg-dark-bg-tertiary">
             <tr>
               <th
                 onClick={() => handleSort("courseName")}
-                className="cursor-pointer w-48"
+                className="cursor-pointer w-48 dark:text-dark-text-primary dark:bg-dark-bg-tertiary"
               >
                 <div className="flex items-center space-x-1 group">
-                  <span className="group-hover:text-indigo-600">Course</span>
+                  <span className="group-hover:text-indigo-600 dark:group-hover:text-indigo-400">Course</span>
                   {sortField === "courseName" && (
-                    <span className="text-indigo-600">
+                    <span className="text-indigo-600 dark:text-indigo-400">
                       {sortDirection === "asc" ? "↑" : "↓"}
                     </span>
                   )}
@@ -318,12 +318,12 @@ const CoursesOverviewTable = ({
               </th>
               <th
                 onClick={() => handleSort("totalAssessments")}
-                className="cursor-pointer w-24"
+                className="cursor-pointer w-24 dark:text-dark-text-primary dark:bg-dark-bg-tertiary"
               >
                 <div className="flex items-center space-x-1 group">
-                  <span className="group-hover:text-indigo-600">Total</span>
+                  <span className="group-hover:text-indigo-600 dark:group-hover:text-indigo-400">Total</span>
                   {sortField === "totalAssessments" && (
-                    <span className="text-indigo-600">
+                    <span className="text-indigo-600 dark:text-indigo-400">
                       {sortDirection === "asc" ? "↑" : "↓"}
                     </span>
                   )}
@@ -331,12 +331,12 @@ const CoursesOverviewTable = ({
               </th>
               <th
                 onClick={() => handleSort("pendingAssessments")}
-                className="cursor-pointer w-24"
+                className="cursor-pointer w-24 dark:text-dark-text-primary dark:bg-dark-bg-tertiary"
               >
                 <div className="flex items-center space-x-1 group">
-                  <span className="group-hover:text-indigo-600">Pending</span>
+                  <span className="group-hover:text-indigo-600 dark:group-hover:text-indigo-400">Pending</span>
                   {sortField === "pendingAssessments" && (
-                    <span className="text-indigo-600">
+                    <span className="text-indigo-600 dark:text-indigo-400">
                       {sortDirection === "asc" ? "↑" : "↓"}
                     </span>
                   )}
@@ -344,12 +344,12 @@ const CoursesOverviewTable = ({
               </th>
               <th
                 onClick={() => handleSort("progress")}
-                className="cursor-pointer w-32"
+                className="cursor-pointer w-32 dark:text-dark-text-primary dark:bg-dark-bg-tertiary"
               >
                 <div className="flex items-center space-x-1 group">
-                  <span className="group-hover:text-indigo-600">Progress</span>
+                  <span className="group-hover:text-indigo-600 dark:group-hover:text-indigo-400">Progress</span>
                   {sortField === "progress" && (
-                    <span className="text-indigo-600">
+                    <span className="text-indigo-600 dark:text-indigo-400">
                       {sortDirection === "asc" ? "↑" : "↓"}
                     </span>
                   )}
@@ -357,49 +357,49 @@ const CoursesOverviewTable = ({
               </th>
               <th
                 onClick={() => handleSort("nextDueDate")}
-                className="cursor-pointer w-48"
+                className="cursor-pointer w-48 dark:text-dark-text-primary dark:bg-dark-bg-tertiary"
               >
                 <div className="flex items-center space-x-1 group">
-                  <span className="group-hover:text-indigo-600">Next Due</span>
+                  <span className="group-hover:text-indigo-600 dark:group-hover:text-indigo-400">Next Due</span>
                   {sortField === "nextDueDate" && (
-                    <span className="text-indigo-600">
+                    <span className="text-indigo-600 dark:text-indigo-400">
                       {sortDirection === "asc" ? "↑" : "↓"}
                     </span>
                   )}
                 </div>
               </th>
-              <th className="w-24">Outline</th>
-              <th className="w-24">Actions</th>
+              <th className="w-24 dark:text-dark-text-primary dark:bg-dark-bg-tertiary">Outline</th>
+              <th className="w-24 dark:text-dark-text-primary dark:bg-dark-bg-tertiary">Actions</th>
             </tr>
           </thead>
           <tbody>
             {sortedCourses.map((course) => (
-              <tr key={course.courseName}>
-                <td className="font-medium whitespace-nowrap">{course.courseName}</td>
-                <td className="whitespace-nowrap">{course.totalAssessments}</td>
+              <tr key={course.courseName} className="dark:border-dark-border">
+                <td className="font-medium whitespace-nowrap dark:text-dark-text-primary">{course.courseName}</td>
+                <td className="whitespace-nowrap dark:text-dark-text-primary">{course.totalAssessments}</td>
                 <td className="whitespace-nowrap">
                   {course.pendingAssessments > 0 ? (
                     <span
                       className={`font-medium ${
-                        course.pendingAssessments > 2 ? "text-amber-600" : ""
+                        course.pendingAssessments > 2 ? "text-amber-600 dark:text-amber-400" : "dark:text-dark-text-primary"
                       }`}
                     >
                       {course.pendingAssessments}
                     </span>
                   ) : (
-                    <span className="text-emerald-600 font-medium">
+                    <span className="text-emerald-600 dark:text-emerald-400 font-medium">
                       All done!
                     </span>
                   )}
                 </td>
                 <td>
-                  <div className="w-full bg-gray-200 rounded-full h-2.5">
+                  <div className="w-full bg-gray-200 dark:bg-dark-bg-tertiary rounded-full h-2.5">
                     <div
-                      className="h-2.5 rounded-full bg-indigo-600"
+                      className="h-2.5 rounded-full bg-indigo-600 dark:bg-indigo-500"
                       style={{ width: `${course.progress}%` }}
                     ></div>
                   </div>
-                  <span className="text-xs text-gray-500 mt-1 inline-block">
+                  <span className="text-xs text-gray-500 dark:text-dark-text-tertiary mt-1 inline-block">
                     {course.progress}% complete
                   </span>
                 </td>
@@ -408,24 +408,24 @@ const CoursesOverviewTable = ({
                     <div>
                       <div
                         className={`font-medium whitespace-nowrap ${
-                          isUpcoming(course.nextDueDate) ? "text-amber-600" : ""
+                          isUpcoming(course.nextDueDate) ? "text-amber-600 dark:text-amber-400" : "dark:text-dark-text-primary"
                         }`}
                       >
                         {formatDate(course.nextDueDate)}
                       </div>
-                      <div className="text-sm text-gray-500 truncate max-w-[200px]">
+                      <div className="text-sm text-gray-500 dark:text-dark-text-tertiary truncate max-w-[200px]">
                         {course.nextAssignment}
                       </div>
                     </div>
                   ) : (
-                    <span className="text-gray-400">-</span>
+                    <span className="text-gray-400 dark:text-dark-text-tertiary">-</span>
                   )}
                 </td>
                 <td>
                   {course.outlineUrl ? (
                     <button
                       onClick={() => handleViewOutline(course.courseName)}
-                      className="group flex items-center space-x-1 text-indigo-600 hover:text-indigo-800 p-1.5 hover:bg-indigo-50 rounded transition-all duration-200"
+                      className="group flex items-center space-x-1 text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300 p-1.5 hover:bg-indigo-50 dark:hover:bg-dark-bg-tertiary rounded transition-all duration-200"
                       title="View Course Outline"
                     >
                       <svg
@@ -457,7 +457,7 @@ const CoursesOverviewTable = ({
                         className="hidden"
                         disabled={uploadingCourse === course.courseName}
                       />
-                      <div className="flex items-center space-x-1 text-gray-400 group-hover:text-indigo-600 p-1.5 group-hover:bg-gray-50 rounded transition-all duration-200">
+                      <div className="flex items-center space-x-1 text-gray-400 group-hover:text-indigo-600 dark:text-dark-text-tertiary dark:group-hover:text-indigo-400 p-1.5 group-hover:bg-gray-50 dark:group-hover:bg-dark-bg-tertiary rounded transition-all duration-200">
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
                           className={`h-5 w-5 ${
@@ -511,20 +511,20 @@ const CoursesOverviewTable = ({
       {/* Outline Viewer Modal */}
       {selectedOutline && outlineUrls[selectedOutline] && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-xl w-[80vw] h-[95vh] flex flex-col">
-            <div className="p-4 border-b flex items-center justify-between">
+          <div className="bg-white dark:bg-dark-bg-secondary rounded-lg shadow-xl w-[80vw] h-[95vh] flex flex-col">
+            <div className="p-4 border-b border-gray-100 dark:border-dark-border flex items-center justify-between">
               <div>
-                <h3 className="text-xl font-semibold text-gray-900">
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-dark-text-primary">
                   {selectedOutline} Course Outline
                 </h3>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-gray-500 dark:text-dark-text-tertiary">
                   View and navigate through the course outline
                 </p>
               </div>
               <div className="flex items-center space-x-2">
                 <button
                   onClick={() => window.open(outlineUrls[selectedOutline], '_blank')}
-                  className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                  className="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-dark-border shadow-sm text-sm font-medium rounded-md text-gray-700 dark:text-dark-text-primary bg-white dark:bg-dark-bg-secondary hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -542,7 +542,7 @@ const CoursesOverviewTable = ({
                   </svg>
                   Open in New Tab
                 </button>
-                <label className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 cursor-pointer">
+                <label className="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-dark-border shadow-sm text-sm font-medium rounded-md text-gray-700 dark:text-dark-text-primary bg-white dark:bg-dark-bg-secondary hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 cursor-pointer">
                   <input
                     type="file"
                     accept="application/pdf"
@@ -568,7 +568,7 @@ const CoursesOverviewTable = ({
                 </label>
                 <button
                   onClick={() => setSelectedOutline(null)}
-                  className="inline-flex items-center p-2 border border-transparent rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                  className="inline-flex items-center p-2 border border-transparent rounded-md text-gray-400 dark:text-dark-text-tertiary hover:text-gray-500 dark:hover:text-dark-text-secondary hover:bg-gray-100 dark:hover:bg-dark-bg-tertiary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -587,7 +587,7 @@ const CoursesOverviewTable = ({
               </div>
             </div>
             <div className="flex-1 p-4 overflow-hidden">
-              <div className="w-full h-full bg-gray-50 rounded-lg overflow-hidden">
+              <div className="w-full h-full bg-gray-50 dark:bg-dark-bg-tertiary rounded-lg overflow-hidden">
                 <iframe
                   src={outlineUrls[selectedOutline]}
                   className="w-full h-full"

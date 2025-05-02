@@ -243,11 +243,11 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
   }
 
   return (
-    <div className="bg-white rounded-lg shadow p-6">
+    <div className="bg-white dark:bg-dark-bg-secondary rounded-lg shadow p-6">
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">{selectedCourse}</h2>
-          <p className="text-sm text-gray-500 mt-1">Grade Calculator</p>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-dark-text-primary">{selectedCourse}</h2>
+          <p className="text-sm text-gray-500 dark:text-dark-text-tertiary mt-1">Grade Calculator</p>
         </div>
         {hasUnsavedChanges && (
           <button
@@ -260,85 +260,87 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-        <div className="p-4 bg-indigo-50 rounded-lg">
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">Current Grade</h3>
+        <div className="p-4 bg-indigo-50 dark:bg-dark-bg-tertiary rounded-lg">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-dark-text-primary mb-2">Current Grade</h3>
           {currentGrade !== null ? (
-            <div className="text-3xl font-bold text-indigo-600">
+            <div className="text-3xl font-bold text-indigo-600 dark:text-indigo-400">
               {currentGrade.toFixed(1)}%
             </div>
           ) : (
-            <div className="text-gray-500">No completed assessments yet</div>
+            <div className="text-gray-500 dark:text-dark-text-tertiary">No completed assessments yet</div>
           )}
         </div>
-        <div className="p-4 bg-indigo-50 rounded-lg">
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">Course Weight</h3>
-          <div className="text-3xl font-bold text-indigo-600">
+        <div className="p-4 bg-indigo-50 dark:bg-dark-bg-tertiary rounded-lg">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-dark-text-primary mb-2">Course Weight</h3>
+          <div className="text-3xl font-bold text-indigo-600 dark:text-indigo-400">
             {totalWeight}%
           </div>
         </div>
       </div>
 
       <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Assessment
-              </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-32">
-                Weight
-              </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-32">
-                Mark
-              </th>
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {assessments.map((assessment) => (
-              <tr key={assessment.id} className="hover:bg-gray-50">
-                <td className="px-4 py-3">
-                  <div className="text-sm font-medium text-gray-900">
-                    {assessment.assignmentName}
-                  </div>
-                  <div className="text-xs text-gray-500 mt-1">
-                    {assessment.status}
-                  </div>
-                </td>
-                <td className="px-4 py-3">
-                  <div className="flex items-center">
-                    <input
-                      type="number"
-                      inputMode="decimal"
-                      min="0"
-                      max="100"
-                      step="0.1"
-                      value={assessment.weight}
-                      onChange={(e) => handleWeightChange(assessment.id, e.target.value)}
-                      className="w-20 px-2 py-1 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                      placeholder="0-100"
-                    />
-                    <span className="ml-1 text-gray-500">%</span>
-                  </div>
-                </td>
-                <td className="px-4 py-3">
-                  <div className="flex items-center">
-                    <input
-                      type="number"
-                      inputMode="decimal"
-                      min="0"
-                      step="0.1"
-                      value={assessment.mark ?? ''}
-                      onChange={(e) => handleMarkChange(assessment.id, e.target.value)}
-                      className="w-20 px-2 py-1 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                      placeholder="0+"
-                    />
-                    <span className="ml-1 text-gray-500">%</span>
-                  </div>
-                </td>
+        <div className="rounded-lg border border-gray-200 dark:border-dark-border overflow-hidden">
+          <table className="min-w-full divide-y divide-gray-200 dark:divide-dark-border">
+            <thead className="bg-gray-50 dark:bg-dark-bg-tertiary">
+              <tr>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-dark-text-tertiary uppercase tracking-wider">
+                  Assessment
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-dark-text-tertiary uppercase tracking-wider w-32">
+                  Weight
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-dark-text-tertiary uppercase tracking-wider w-32">
+                  Mark
+                </th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="bg-white dark:bg-dark-bg-secondary divide-y divide-gray-200 dark:divide-dark-border">
+              {assessments.map((assessment) => (
+                <tr key={assessment.id} className="hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary">
+                  <td className="px-4 py-3">
+                    <div className="text-sm font-medium text-gray-900 dark:text-dark-text-primary">
+                      {assessment.assignmentName}
+                    </div>
+                    <div className="text-xs text-gray-500 dark:text-dark-text-tertiary mt-1">
+                      {assessment.status}
+                    </div>
+                  </td>
+                  <td className="px-4 py-3">
+                    <div className="flex items-center">
+                      <input
+                        type="number"
+                        inputMode="decimal"
+                        min="0"
+                        max="100"
+                        step="0.1"
+                        value={assessment.weight}
+                        onChange={(e) => handleWeightChange(assessment.id, e.target.value)}
+                        className="w-20 px-2 py-1 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                        placeholder="0-100"
+                      />
+                      <span className="ml-1 text-gray-500 dark:text-dark-text-tertiary">%</span>
+                    </div>
+                  </td>
+                  <td className="px-4 py-3">
+                    <div className="flex items-center">
+                      <input
+                        type="number"
+                        inputMode="decimal"
+                        min="0"
+                        step="0.1"
+                        value={assessment.mark ?? ''}
+                        onChange={(e) => handleMarkChange(assessment.id, e.target.value)}
+                        className="w-20 px-2 py-1 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                        placeholder="0+"
+                      />
+                      <span className="ml-1 text-gray-500 dark:text-dark-text-tertiary">%</span>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );
