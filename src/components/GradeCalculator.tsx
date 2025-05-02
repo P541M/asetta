@@ -282,64 +282,64 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
         <div className="rounded-lg border border-gray-200 dark:border-dark-border overflow-hidden">
           <table className="min-w-full divide-y divide-gray-200 dark:divide-dark-border">
             <thead className="bg-gray-50 dark:bg-dark-bg-tertiary">
-              <tr>
+            <tr>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-dark-text-tertiary uppercase tracking-wider">
-                  Assessment
-                </th>
+                Assessment
+              </th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-dark-text-tertiary uppercase tracking-wider w-32">
-                  Weight
-                </th>
+                Weight
+              </th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-dark-text-tertiary uppercase tracking-wider w-32">
-                  Mark
-                </th>
-              </tr>
-            </thead>
+                Mark
+              </th>
+            </tr>
+          </thead>
             <tbody className="bg-white dark:bg-dark-bg-secondary divide-y divide-gray-200 dark:divide-dark-border">
-              {assessments.map((assessment) => (
+            {assessments.map((assessment) => (
                 <tr key={assessment.id} className="hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary">
-                  <td className="px-4 py-3">
+                <td className="px-4 py-3">
                     <div className="text-sm font-medium text-gray-900 dark:text-dark-text-primary">
-                      {assessment.assignmentName}
-                    </div>
+                    {assessment.assignmentName}
+                  </div>
                     <div className="text-xs text-gray-500 dark:text-dark-text-tertiary mt-1">
-                      {assessment.status}
-                    </div>
-                  </td>
-                  <td className="px-4 py-3">
-                    <div className="flex items-center">
-                      <input
-                        type="number"
-                        inputMode="decimal"
-                        min="0"
-                        max="100"
-                        step="0.1"
-                        value={assessment.weight}
-                        onChange={(e) => handleWeightChange(assessment.id, e.target.value)}
+                    {assessment.status}
+                  </div>
+                </td>
+                <td className="px-4 py-3">
+                  <div className="flex items-center">
+                    <input
+                      type="number"
+                      inputMode="decimal"
+                      min="0"
+                      max="100"
+                      step="0.1"
+                      value={assessment.weight}
+                      onChange={(e) => handleWeightChange(assessment.id, e.target.value)}
                         className="w-20 px-2 py-1 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                        placeholder="0-100"
-                      />
+                      placeholder="0-100"
+                    />
                       <span className="ml-1 text-gray-500 dark:text-dark-text-tertiary">%</span>
-                    </div>
-                  </td>
-                  <td className="px-4 py-3">
-                    <div className="flex items-center">
-                      <input
-                        type="number"
-                        inputMode="decimal"
-                        min="0"
-                        step="0.1"
-                        value={assessment.mark ?? ''}
-                        onChange={(e) => handleMarkChange(assessment.id, e.target.value)}
+                  </div>
+                </td>
+                <td className="px-4 py-3">
+                  <div className="flex items-center">
+                    <input
+                      type="number"
+                      inputMode="decimal"
+                      min="0"
+                      step="0.1"
+                      value={assessment.mark ?? ''}
+                      onChange={(e) => handleMarkChange(assessment.id, e.target.value)}
                         className="w-20 px-2 py-1 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                        placeholder="0+"
-                      />
+                      placeholder="0+"
+                    />
                       <span className="ml-1 text-gray-500 dark:text-dark-text-tertiary">%</span>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
         </div>
       </div>
     </div>
