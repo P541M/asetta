@@ -454,7 +454,15 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
     if (!user || !assessmentId) return;
     
     try {
-      const assessmentRef = doc(db, 'users', user.uid, 'assessments', assessmentId);
+      const assessmentRef = doc(
+        db,
+        'users',
+        user.uid,
+        'semesters',
+        semesterId,
+        'assessments',
+        assessmentId
+      );
       await updateDoc(assessmentRef, {
         status: newStatus,
         updatedAt: serverTimestamp(),
