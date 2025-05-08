@@ -4,6 +4,7 @@ import Head from "next/head";
 import "../styles/globals.css";
 import { AuthProvider } from "../contexts/AuthContext";
 import { ThemeProvider } from "../contexts/ThemeContext";
+import BetaAccessGate from "../components/BetaAccessGate";
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (
@@ -19,7 +20,9 @@ function MyApp({ Component, pageProps }: AppProps) {
           <meta charSet="utf-8" />
           <link rel="icon" href="/favicon.ico" />
         </Head>
-        <Component {...pageProps} />
+        <BetaAccessGate>
+          <Component {...pageProps} />
+        </BetaAccessGate>
       </ThemeProvider>
     </AuthProvider>
   );
