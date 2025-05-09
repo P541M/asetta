@@ -1,8 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, KeyboardEvent, useCallback } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { db } from "../lib/firebase";
-import { collection, getDocs, query } from "firebase/firestore";
-import { generateICSFile } from "../utils/icsGenerator"; // New utility import
+import { collection, getDocs, query, updateDoc, doc } from "firebase/firestore";
+import { generateICSFile } from "../utils/icsGenerator";
+import { DndContext, DragEndEvent } from "@dnd-kit/core";
 
 interface Assessment {
   id: string;
@@ -33,6 +34,9 @@ const CalendarView = ({ selectedSemester, semesterId }: CalendarViewProps) => {
   const [assessments, setAssessments] = useState<Assessment[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedDay, setSelectedDay] = useState<Day | null>(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const calendarRef = useRef<HTMLDivElement>(null);
 
   const monthNames = [
     "January",
@@ -50,6 +54,7 @@ const CalendarView = ({ selectedSemester, semesterId }: CalendarViewProps) => {
   ];
   const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
+  // Fetch assessments
   useEffect(() => {
     const fetchAssessments = async () => {
       if (!user || !semesterId) {
@@ -85,6 +90,29 @@ const CalendarView = ({ selectedSemester, semesterId }: CalendarViewProps) => {
     fetchAssessments();
   }, [user, semesterId]);
 
+  // Filter assessments based on search and status
+  const getAssessmentsForDate = useCallback(
+    (date: Date): Assessment[] => {
+      const dateStr = formatDateForComparison(date);
+      return assessments.filter((assessment) => {
+        const matchesDate = assessment.dueDate === dateStr;
+        const matchesSearch =
+          searchTerm === "" ||
+          assessment.assignmentName
+            .toLowerCase()
+            .includes(searchTerm.toLowerCase()) ||
+          assessment.courseName
+            .toLowerCase()
+            .includes(searchTerm.toLowerCase());
+        const matchesStatus =
+          statusFilter === "all" || assessment.status === statusFilter;
+        return matchesDate && matchesSearch && matchesStatus;
+      });
+    },
+    [assessments, searchTerm, statusFilter]
+  );
+
+  // Generate calendar days
   useEffect(() => {
     const generateCalendarDays = () => {
       const year = currentMonth.getFullYear();
@@ -96,6 +124,8 @@ const CalendarView = ({ selectedSemester, semesterId }: CalendarViewProps) => {
       const today = new Date();
       today.setHours(0, 0, 0, 0);
       const days: Day[] = [];
+
+      // Previous month days
       const prevMonth = new Date(year, month, 0);
       const prevMonthDays = prevMonth.getDate();
       for (let i = daysFromPrevMonth - 1; i >= 0; i--) {
@@ -107,6 +137,8 @@ const CalendarView = ({ selectedSemester, semesterId }: CalendarViewProps) => {
           assessments: getAssessmentsForDate(date),
         });
       }
+
+      // Current month days
       for (let i = 1; i <= lastDayOfMonth.getDate(); i++) {
         const date = new Date(year, month, i);
         days.push({
@@ -116,6 +148,8 @@ const CalendarView = ({ selectedSemester, semesterId }: CalendarViewProps) => {
           assessments: getAssessmentsForDate(date),
         });
       }
+
+      // Next month days
       for (let i = 1; i <= daysFromNextMonth; i++) {
         const date = new Date(year, month + 1, i);
         days.push({
@@ -125,17 +159,14 @@ const CalendarView = ({ selectedSemester, semesterId }: CalendarViewProps) => {
           assessments: getAssessmentsForDate(date),
         });
       }
+
       setCalendarDays(days);
     };
 
-    const getAssessmentsForDate = (date: Date): Assessment[] => {
-      const dateStr = formatDateForComparison(date);
-      return assessments.filter((assessment) => assessment.dueDate === dateStr);
-    };
-
     generateCalendarDays();
-  }, [currentMonth, assessments]);
+  }, [currentMonth, getAssessmentsForDate]);
 
+  // Date formatting helpers
   const formatDateForComparison = (date: Date): string => {
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, "0");
@@ -155,6 +186,7 @@ const CalendarView = ({ selectedSemester, semesterId }: CalendarViewProps) => {
     });
   };
 
+  // Navigation handlers
   const previousMonth = () => {
     setCurrentMonth(
       new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1)
@@ -180,25 +212,75 @@ const CalendarView = ({ selectedSemester, semesterId }: CalendarViewProps) => {
     }
   };
 
-  const handleDayClick = (day: Day) => {
-    setSelectedDay(day);
+  // Keyboard navigation
+  const handleKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
+    if (!calendarRef.current) return;
+
+    switch (e.key) {
+      case "ArrowLeft":
+        e.preventDefault();
+        previousMonth();
+        break;
+      case "ArrowRight":
+        e.preventDefault();
+        nextMonth();
+        break;
+      case "Home":
+        e.preventDefault();
+        goToToday();
+        break;
+    }
   };
 
-  const getDueDateStatus = (date: Date, time: string): string => {
-    const now = new Date();
-    const [hours, minutes] = time.split(":").map((num) => parseInt(num, 10));
-    const due = new Date(date);
-    due.setHours(hours, minutes);
-    const diffDays = Math.ceil(
-      (due.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
-    );
-    if (diffDays < 0) return "border-red-300 bg-red-50";
-    if (diffDays <= 3) return "border-amber-300 bg-amber-50";
-    if (diffDays <= 7) return "border-yellow-300 bg-yellow-50";
-    return "";
+  // Drag and drop handlers
+  const handleDragEnd = async (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over || !user) return;
+
+    const assessmentId = active.id as string;
+    const newDate = over.id as string;
+
+    try {
+      const assessmentRef = doc(
+        db,
+        "users",
+        user.uid,
+        "semesters",
+        semesterId,
+        "assessments",
+        assessmentId
+      );
+      await updateDoc(assessmentRef, { dueDate: newDate });
+    } catch (error) {
+      console.error("Error updating assessment date:", error);
+    }
   };
 
-  // Function to handle exporting the calendar
+  // Status color mapping
+  const getStatusColor = (status: string): string => {
+    switch (status) {
+      case "Submitted":
+        return "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-800 dark:text-emerald-400";
+      case "In progress":
+        return "bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400";
+      case "Draft":
+        return "bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-400";
+      case "Pending Submission":
+        return "bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-400";
+      case "Under Review":
+        return "bg-indigo-100 dark:bg-indigo-900/30 text-indigo-800 dark:text-indigo-400";
+      case "Needs Revision":
+        return "bg-amber-100 dark:bg-amber-900/30 text-amber-800 dark:text-amber-400";
+      case "Missed/Late":
+        return "bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400";
+      case "On Hold":
+        return "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-400";
+      default:
+        return "bg-gray-100 dark:bg-gray-900/30 text-gray-800 dark:text-gray-400";
+    }
+  };
+
+  // Export calendar
   const handleExportCalendar = () => {
     if (assessments.length === 0) {
       alert("No assessments to export.");
@@ -217,179 +299,235 @@ const CalendarView = ({ selectedSemester, semesterId }: CalendarViewProps) => {
     window.URL.revokeObjectURL(url);
   };
 
+  // Loading skeleton
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+      <div className="bg-white dark:bg-dark-bg-secondary rounded-xl shadow-sm border border-gray-100 dark:border-dark-border-primary p-6">
+        <div className="animate-pulse">
+          <div className="flex justify-between items-center mb-6">
+            <div className="h-8 w-32 bg-gray-200 dark:bg-dark-bg-tertiary rounded"></div>
+            <div className="flex space-x-2">
+              <div className="h-8 w-8 bg-gray-200 dark:bg-dark-bg-tertiary rounded-full"></div>
+              <div className="h-8 w-8 bg-gray-200 dark:bg-dark-bg-tertiary rounded-full"></div>
+              <div className="h-8 w-20 bg-gray-200 dark:bg-dark-bg-tertiary rounded"></div>
+            </div>
+          </div>
+          <div className="grid grid-cols-7 gap-px bg-gray-200 dark:bg-dark-bg-tertiary">
+            {Array.from({ length: 42 }).map((_, i) => (
+              <div
+                key={i}
+                className="aspect-square bg-white dark:bg-dark-bg-secondary"
+              ></div>
+            ))}
+          </div>
+        </div>
       </div>
     );
   }
 
   return (
     <div className="bg-white dark:bg-dark-bg-secondary rounded-xl shadow-sm border border-gray-100 dark:border-dark-border-primary p-6">
-      <div className="flex flex-col md:flex-row justify-between items-center mb-6">
-        <h2 className="text-xl font-medium text-gray-900 dark:text-dark-text-primary mb-2 md:mb-0">
-          Calendar View
-        </h2>
-        <div className="flex items-center space-x-2">
-          <button
-            onClick={previousMonth}
-            className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-dark-bg-tertiary transition-colors"
-            title="Previous Month"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5 text-gray-600 dark:text-dark-text-tertiary"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M15 19l-7-7 7-7"
-              />
-            </svg>
-          </button>
-          <h3 className="text-lg font-medium text-gray-800 dark:text-dark-text-primary">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 space-y-4 md:space-y-0">
+        <div>
+          <h2 className="text-xl font-medium text-gray-900 dark:text-dark-text-primary">
+            Calendar View
+          </h2>
+          <p className="text-sm text-gray-500 dark:text-dark-text-tertiary">
             {monthNames[currentMonth.getMonth()]} {currentMonth.getFullYear()}
-          </h3>
-          <button
-            onClick={nextMonth}
-            className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-dark-bg-tertiary transition-colors"
-            title="Next Month"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5 text-gray-600 dark:text-dark-text-tertiary"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
+          </p>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-4">
+          {/* Search and filter */}
+          <div className="flex items-center space-x-2">
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Search assessments..."
+              className="input py-1.5 px-3 text-sm w-48 dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border"
+            />
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="input py-1.5 px-3 text-sm dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9 5l7 7-7 7"
-              />
-            </svg>
-          </button>
-          <button
-            onClick={goToToday}
-            className="ml-4 px-3 py-1 text-sm bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400 rounded-md hover:bg-indigo-200 dark:hover:bg-indigo-900/50 transition-colors"
-          >
-            Today
-          </button>
-          <button
-            onClick={handleExportCalendar}
-            className="ml-4 px-3 py-1 text-sm bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors flex items-center"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-4 w-4 mr-2"
-              viewBox="0 0 20 20"
-              fill="currentColor"
+              <option value="all">All Status</option>
+              <option value="Not started">Not Started</option>
+              <option value="In progress">In Progress</option>
+              <option value="Submitted">Submitted</option>
+              <option value="Under Review">Under Review</option>
+            </select>
+          </div>
+
+          {/* Navigation controls */}
+          <div className="flex items-center space-x-2">
+            <button
+              onClick={previousMonth}
+              className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-dark-bg-tertiary transition-colors"
+              title="Previous Month"
             >
-              <path
-                fillRule="evenodd"
-                d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"
-                clipRule="evenodd"
-              />
-            </svg>
-            Export to Calendar
-          </button>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5 text-gray-600 dark:text-dark-text-tertiary"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M15 19l-7-7 7-7"
+                />
+              </svg>
+            </button>
+            <button
+              onClick={goToToday}
+              className="px-3 py-1.5 text-sm bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400 rounded-md hover:bg-indigo-200 dark:hover:bg-indigo-900/50 transition-colors"
+            >
+              Today
+            </button>
+            <button
+              onClick={nextMonth}
+              className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-dark-bg-tertiary transition-colors"
+              title="Next Month"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5 text-gray-600 dark:text-dark-text-tertiary"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 5l7 7-7 7"
+                />
+              </svg>
+            </button>
+            <button
+              onClick={handleExportCalendar}
+              className="ml-2 px-3 py-1.5 text-sm bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors flex items-center"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-4 w-4 mr-2"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"
+                  clipRule="evenodd"
+                />
+              </svg>
+              Export
+            </button>
+          </div>
         </div>
       </div>
-      <div className="border dark:border-dark-border-primary rounded-lg overflow-hidden shadow-sm">
-        <div className="grid grid-cols-7 border-b dark:border-dark-border-primary bg-gray-50 dark:bg-dark-bg-tertiary">
-          {dayNames.map((day, index) => (
-            <div
-              key={index}
-              className="p-2 text-center text-sm font-medium text-gray-700 dark:text-dark-text-primary"
-            >
-              {day}
-            </div>
-          ))}
-        </div>
-        <div className="grid grid-cols-7 auto-rows-fr bg-white dark:bg-dark-bg-secondary">
-          {calendarDays.map((day, index) => (
-            <div
-              key={index}
-              onClick={() => handleDayClick(day)}
-              className={`relative p-2 min-h-[100px] border border-gray-200 dark:border-dark-border ${
-                day.isCurrentMonth
-                  ? "bg-white dark:bg-dark-bg-secondary"
-                  : "bg-gray-50 dark:bg-dark-bg-tertiary"
-              } ${
-                day.isToday ? "ring-2 ring-indigo-500 dark:ring-indigo-400" : ""
-              } ${
-                day.assessments.length > 0
-                  ? "cursor-pointer hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary"
-                  : ""
-              }`}
-            >
+
+      <DndContext onDragEnd={handleDragEnd}>
+        <div
+          ref={calendarRef}
+          tabIndex={0}
+          onKeyDown={handleKeyDown}
+          className="focus:outline-none"
+        >
+          <div className="grid grid-cols-7 border-b dark:border-dark-border-primary bg-gray-50 dark:bg-dark-bg-tertiary">
+            {dayNames.map((day, index) => (
               <div
-                className={`text-sm font-medium mb-1 ${
-                  day.isCurrentMonth
-                    ? "text-gray-900 dark:text-dark-text-primary"
-                    : "text-gray-400 dark:text-dark-text-tertiary"
-                } ${day.isToday ? "text-indigo-600 dark:text-indigo-400" : ""}`}
+                key={index}
+                className="p-2 text-center text-sm font-medium text-gray-700 dark:text-dark-text-primary"
               >
-                {day.date.getDate()}
+                {day}
               </div>
-              {day.assessments.length > 0 && (
+            ))}
+          </div>
+          <div className="grid grid-cols-7 auto-rows-fr bg-white dark:bg-dark-bg-secondary gap-px">
+            {calendarDays.map((day, index) => (
+              <div
+                key={index}
+                onClick={() =>
+                  day.assessments.length > 0 && setSelectedDay(day)
+                }
+                className={`relative p-2 min-h-[120px] border border-gray-200 dark:border-dark-border transition-colors ${
+                  day.isCurrentMonth
+                    ? "bg-white dark:bg-dark-bg-secondary"
+                    : "bg-gray-50 dark:bg-dark-bg-tertiary"
+                } ${
+                  day.isToday
+                    ? "ring-2 ring-indigo-500 dark:ring-indigo-400"
+                    : ""
+                } ${
+                  day.assessments.length > 0
+                    ? "cursor-pointer hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary"
+                    : ""
+                }`}
+              >
+                <div className="flex items-center justify-between mb-2">
+                  <span
+                    className={`text-sm font-medium ${
+                      day.isCurrentMonth
+                        ? "text-gray-900 dark:text-dark-text-primary"
+                        : "text-gray-400 dark:text-dark-text-tertiary"
+                    } ${
+                      day.isToday ? "text-indigo-600 dark:text-indigo-400" : ""
+                    }`}
+                  >
+                    {day.date.getDate()}
+                  </span>
+                  {day.assessments.length > 0 && (
+                    <span className="flex h-5 w-5 items-center justify-center text-xs font-medium text-indigo-600 dark:text-indigo-400 bg-indigo-100 dark:bg-indigo-900/30 rounded-full">
+                      {day.assessments.length}
+                    </span>
+                  )}
+                </div>
                 <div className="space-y-1">
-                  {day.assessments.slice(0, 2).map((assessment) => (
+                  {day.assessments.slice(0, 3).map((assessment) => (
                     <div
                       key={assessment.id}
-                      className={`text-xs px-1.5 py-0.5 rounded truncate ${
-                        assessment.status === "Submitted"
-                          ? "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-800 dark:text-emerald-400"
-                          : assessment.status === "In progress"
-                          ? "bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400"
-                          : assessment.status === "Draft"
-                          ? "bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-400"
-                          : assessment.status === "Pending Submission"
-                          ? "bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-400"
-                          : assessment.status === "Under Review"
-                          ? "bg-indigo-100 dark:bg-indigo-900/30 text-indigo-800 dark:text-indigo-400"
-                          : assessment.status === "Needs Revision"
-                          ? "bg-amber-100 dark:bg-amber-900/30 text-amber-800 dark:text-amber-400"
-                          : assessment.status === "Missed/Late"
-                          ? "bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400"
-                          : assessment.status === "On Hold"
-                          ? "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-400"
-                          : getDueDateStatus(day.date, assessment.dueTime) ===
-                            "overdue"
-                          ? "bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400"
-                          : getDueDateStatus(day.date, assessment.dueTime) ===
-                            "urgent"
-                          ? "bg-amber-100 dark:bg-amber-900/30 text-amber-800 dark:text-amber-400"
-                          : "bg-gray-100 dark:bg-gray-900/30 text-gray-800 dark:text-gray-400"
-                      }`}
+                      className={`text-xs px-1.5 py-0.5 rounded truncate ${getStatusColor(
+                        assessment.status
+                      )}`}
                     >
                       {assessment.assignmentName}
                     </div>
                   ))}
-                  {day.assessments.length > 2 && (
-                    <div className="text-xs text-gray-500 dark:text-dark-text-tertiary">
-                      +{day.assessments.length - 2} more
+                  {day.assessments.length > 3 && (
+                    <div className="text-xs text-gray-500 dark:text-dark-text-tertiary font-medium">
+                      +{day.assessments.length - 3} more
                     </div>
                   )}
                 </div>
-              )}
-            </div>
-          ))}
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
-      {selectedDay && selectedDay.assessments.length > 0 && (
+      </DndContext>
+
+      {/* Day detail modal */}
+      {selectedDay && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white dark:bg-dark-bg-secondary rounded-lg shadow-lg p-6 w-full max-w-2xl animate-scale">
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-medium text-gray-900 dark:text-dark-text-primary">
-                Assessments for {selectedDay.date.toLocaleDateString()}
-              </h3>
+              <div>
+                <h3 className="text-lg font-medium text-gray-900 dark:text-dark-text-primary">
+                  {selectedDay.date.toLocaleDateString(undefined, {
+                    weekday: "long",
+                    month: "long",
+                    day: "numeric",
+                    year: "numeric",
+                  })}
+                </h3>
+                <p className="text-sm text-gray-500 dark:text-dark-text-tertiary">
+                  {selectedDay.assessments.length} assessment
+                  {selectedDay.assessments.length !== 1 ? "s" : ""}
+                </p>
+              </div>
               <button
                 onClick={() => setSelectedDay(null)}
                 className="text-gray-400 dark:text-dark-text-tertiary hover:text-gray-500 dark:hover:text-dark-text-secondary"
@@ -408,11 +546,11 @@ const CalendarView = ({ selectedSemester, semesterId }: CalendarViewProps) => {
                 </svg>
               </button>
             </div>
-            <div className="space-y-4">
-              {selectedDay.assessments.map((assessment: Assessment) => (
+            <div className="space-y-3 max-h-[60vh] overflow-y-auto">
+              {selectedDay.assessments.map((assessment) => (
                 <div
                   key={assessment.id}
-                  className="p-4 rounded-lg border border-gray-200 dark:border-dark-border bg-white dark:bg-dark-bg-tertiary"
+                  className="p-4 rounded-lg border border-gray-200 dark:border-dark-border bg-white dark:bg-dark-bg-tertiary hover:shadow-sm transition-shadow"
                 >
                   <div className="flex justify-between items-start">
                     <div>
@@ -424,35 +562,9 @@ const CalendarView = ({ selectedSemester, semesterId }: CalendarViewProps) => {
                       </p>
                     </div>
                     <span
-                      className={`px-2 py-1 text-xs font-medium rounded-full ${
-                        assessment.status === "Submitted"
-                          ? "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-800 dark:text-emerald-400"
-                          : assessment.status === "In progress"
-                          ? "bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400"
-                          : assessment.status === "Draft"
-                          ? "bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-400"
-                          : assessment.status === "Pending Submission"
-                          ? "bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-400"
-                          : assessment.status === "Under Review"
-                          ? "bg-indigo-100 dark:bg-indigo-900/30 text-indigo-800 dark:text-indigo-400"
-                          : assessment.status === "Needs Revision"
-                          ? "bg-amber-100 dark:bg-amber-900/30 text-amber-800 dark:text-amber-400"
-                          : assessment.status === "Missed/Late"
-                          ? "bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400"
-                          : assessment.status === "On Hold"
-                          ? "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-400"
-                          : getDueDateStatus(
-                              selectedDay.date,
-                              assessment.dueTime
-                            ) === "overdue"
-                          ? "bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400"
-                          : getDueDateStatus(
-                              selectedDay.date,
-                              assessment.dueTime
-                            ) === "urgent"
-                          ? "bg-amber-100 dark:bg-amber-900/30 text-amber-800 dark:text-amber-400"
-                          : "bg-gray-100 dark:bg-gray-900/30 text-gray-800 dark:text-gray-400"
-                      }`}
+                      className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(
+                        assessment.status
+                      )}`}
                     >
                       {assessment.status}
                     </span>
