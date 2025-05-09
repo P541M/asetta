@@ -959,25 +959,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                         name="status"
                         value={editFormData.status}
                         onChange={handleEditFormChange}
-                        className={`input py-1 px-2 text-sm transition-all duration-300 w-full dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border ${
-                          editFormData.status === "Submitted"
-                            ? "bg-emerald-100 dark:bg-emerald-900/30 border-emerald-200 dark:border-emerald-700 text-emerald-800 dark:text-emerald-400"
-                            : editFormData.status === "In progress"
-                            ? "bg-blue-100 dark:bg-blue-900/30 border-blue-200 dark:border-blue-700 text-blue-800 dark:text-blue-400"
-                            : editFormData.status === "Draft"
-                            ? "bg-purple-100 dark:bg-purple-900/30 border-purple-200 dark:border-purple-700 text-purple-800 dark:text-purple-400"
-                            : editFormData.status === "Pending Submission"
-                            ? "bg-orange-100 dark:bg-orange-900/30 border-orange-200 dark:border-orange-700 text-orange-800 dark:text-orange-400"
-                            : editFormData.status === "Under Review"
-                            ? "bg-indigo-100 dark:bg-indigo-900/30 border-indigo-200 dark:border-indigo-700 text-indigo-800 dark:text-indigo-400"
-                            : editFormData.status === "Needs Revision"
-                            ? "bg-amber-100 dark:bg-amber-900/30 border-amber-200 dark:border-amber-700 text-amber-800 dark:text-amber-400"
-                            : editFormData.status === "Missed/Late"
-                            ? "bg-red-100 dark:bg-red-900/30 border-red-200 dark:border-red-700 text-red-800 dark:text-red-400"
-                            : editFormData.status === "On Hold"
-                            ? "bg-yellow-100 dark:bg-yellow-900/30 border-yellow-200 dark:border-yellow-700 text-yellow-800 dark:text-yellow-400"
-                            : "bg-gray-100 dark:bg-gray-900/30 border-gray-200 dark:border-gray-700 text-gray-800 dark:text-gray-400"
-                        }`}
+                        className="input py-1 px-2 text-sm transition-all duration-300 w-full dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border"
                       >
                         <optgroup label="Planning">
                           <option value="Not started">Not started</option>
@@ -1128,25 +1110,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                           handleStatusChange(assessment.id, e.target.value)
                         }
                         onClick={(e) => e.stopPropagation()}
-                        className={`input py-1 px-2 text-sm transition-all duration-300 w-full dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border ${
-                          assessment?.status === "Submitted"
-                            ? "bg-emerald-100 dark:bg-emerald-900/30 border-emerald-200 dark:border-emerald-700 text-emerald-800 dark:text-emerald-400"
-                            : assessment?.status === "In progress"
-                            ? "bg-blue-100 dark:bg-blue-900/30 border-blue-200 dark:border-blue-700 text-blue-800 dark:text-blue-400"
-                            : assessment?.status === "Draft"
-                            ? "bg-purple-100 dark:bg-purple-900/30 border-purple-200 dark:border-purple-700 text-purple-800 dark:text-purple-400"
-                            : assessment?.status === "Pending Submission"
-                            ? "bg-orange-100 dark:bg-orange-900/30 border-orange-200 dark:border-orange-700 text-orange-800 dark:text-orange-400"
-                            : assessment?.status === "Under Review"
-                            ? "bg-indigo-100 dark:bg-indigo-900/30 border-indigo-200 dark:border-indigo-700 text-indigo-800 dark:text-indigo-400"
-                            : assessment?.status === "Needs Revision"
-                            ? "bg-amber-100 dark:bg-amber-900/30 border-amber-200 dark:border-amber-700 text-amber-800 dark:text-amber-400"
-                            : assessment?.status === "Missed/Late"
-                            ? "bg-red-100 dark:bg-red-900/30 border-red-200 dark:border-red-700 text-red-800 dark:text-red-400"
-                            : assessment?.status === "On Hold"
-                            ? "bg-yellow-100 dark:bg-yellow-900/30 border-yellow-200 dark:border-yellow-700 text-yellow-800 dark:text-yellow-400"
-                            : "bg-gray-100 dark:bg-gray-900/30 border-gray-200 dark:border-gray-700 text-gray-800 dark:text-gray-400"
-                        }`}
+                        className="input py-1 px-2 text-sm transition-all duration-300 w-full dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border"
                       >
                         <optgroup label="Planning">
                           <option value="Not started">Not started</option>
