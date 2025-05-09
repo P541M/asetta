@@ -288,20 +288,37 @@ const UploadForm = ({ semester, onUploadSuccess }: UploadFormProps) => {
 
   return (
     <div className="bg-white dark:bg-dark-bg-secondary rounded-xl shadow-sm border border-gray-100 dark:border-dark-border-primary p-6">
-      <h2 className="text-xl font-medium mb-4 dark:text-white">Upload Course Outlines</h2>
+      <h2 className="text-xl font-medium mb-4 dark:text-white">
+        Upload Course Outlines
+      </h2>
       <p className="text-gray-600 dark:text-gray-300 mb-6">
         Upload your course outline PDFs to automatically extract assignment
         details. Multiple files can be uploaded at once.
       </p>
       <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4 mb-6">
         <div className="flex items-start">
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-amber-500 dark:text-amber-400 mr-2 mt-0.5" viewBox="0 0 20 20" fill="currentColor">
-            <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-5 w-5 text-amber-500 dark:text-amber-400 mr-2 mt-0.5"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+          >
+            <path
+              fillRule="evenodd"
+              d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+              clipRule="evenodd"
+            />
           </svg>
           <div>
-            <h3 className="text-sm font-medium text-amber-800 dark:text-amber-200">AI Extraction Disclaimer</h3>
+            <h3 className="text-sm font-medium text-amber-800 dark:text-amber-200">
+              AI Extraction Disclaimer
+            </h3>
             <p className="text-sm text-amber-700 dark:text-amber-300 mt-1">
-              We use AI to extract assessment information from your course outlines. While we strive for accuracy, errors may occur. Please review your assessments table after upload to verify all extracted data is correct, and feel free to edit or delete any incorrect entries.
+              We use AI to extract assessment information from your course
+              outlines. While we strive for accuracy, errors may occur. Please
+              review your assessments table after upload to verify all extracted
+              data is correct, and feel free to edit or delete any incorrect
+              entries.
             </p>
           </div>
         </div>
@@ -335,7 +352,9 @@ const UploadForm = ({ semester, onUploadSuccess }: UploadFormProps) => {
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   className={`h-12 w-12 mx-auto text-gray-400 dark:text-gray-500 transition-transform duration-300 ${
-                    isDragging ? "scale-110 text-indigo-400 dark:text-indigo-400" : ""
+                    isDragging
+                      ? "scale-110 text-indigo-400 dark:text-indigo-400"
+                      : ""
                   }`}
                   fill="none"
                   viewBox="0 0 24 24"
@@ -350,7 +369,9 @@ const UploadForm = ({ semester, onUploadSuccess }: UploadFormProps) => {
                 </svg>
                 <p
                   className={`font-medium ${
-                    isDragging ? "text-indigo-700 dark:text-indigo-300" : "text-gray-700 dark:text-gray-300"
+                    isDragging
+                      ? "text-indigo-700 dark:text-indigo-300"
+                      : "text-gray-700 dark:text-gray-300"
                   } transition-colors duration-300`}
                 >
                   {isDragging
@@ -421,7 +442,9 @@ const UploadForm = ({ semester, onUploadSuccess }: UploadFormProps) => {
             <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5 overflow-hidden">
               <div
                 className={`h-2.5 rounded-full progress-bar ${
-                  uploadStatus === "uploading" ? "bg-blue-500 dark:bg-blue-400" : "bg-indigo-600 dark:bg-indigo-400"
+                  uploadStatus === "uploading"
+                    ? "bg-blue-500 dark:bg-blue-400"
+                    : "bg-indigo-600 dark:bg-indigo-400"
                 }`}
                 style={{ width: `${overallProgress}%` }}
               ></div>
@@ -436,7 +459,9 @@ const UploadForm = ({ semester, onUploadSuccess }: UploadFormProps) => {
         {/* File List with Progress */}
         {files.length > 0 && (
           <div className="mb-6">
-            <h3 className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-2">Files:</h3>
+            <h3 className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-2">
+              Files:
+            </h3>
             <ul className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 divide-y divide-gray-200 dark:divide-gray-700 shadow-sm">
               {fileProgresses.map((fileProgress, index) => (
                 <li

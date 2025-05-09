@@ -1,22 +1,22 @@
-import { useEditor, EditorContent } from '@tiptap/react';
-import StarterKit from '@tiptap/starter-kit';
-import Link from '@tiptap/extension-link';
-import Placeholder from '@tiptap/extension-placeholder';
-import Underline from '@tiptap/extension-underline';
-import TextAlign from '@tiptap/extension-text-align';
-import { useState } from 'react';
-import { 
-  MdFormatBold, 
-  MdFormatItalic, 
-  MdFormatListBulleted, 
+import { useEditor, EditorContent } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
+import Link from "@tiptap/extension-link";
+import Placeholder from "@tiptap/extension-placeholder";
+import Underline from "@tiptap/extension-underline";
+import TextAlign from "@tiptap/extension-text-align";
+import { useState } from "react";
+import {
+  MdFormatBold,
+  MdFormatItalic,
+  MdFormatListBulleted,
   MdFormatListNumbered,
   MdLink,
   MdFormatAlignLeft,
   MdFormatAlignCenter,
   MdFormatAlignRight,
   MdUndo,
-  MdRedo
-} from 'react-icons/md';
+  MdRedo,
+} from "react-icons/md";
 
 interface RichTextEditorProps {
   content: string;
@@ -72,7 +72,10 @@ const LinkModal = ({ isOpen, onClose, onAddLink }: LinkModalProps) => {
         </div>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label htmlFor="url" className="block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="url"
+              className="block text-sm font-medium text-gray-700"
+            >
               URL
             </label>
             <input
@@ -86,7 +89,10 @@ const LinkModal = ({ isOpen, onClose, onAddLink }: LinkModalProps) => {
             />
           </div>
           <div>
-            <label htmlFor="text" className="block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="text"
+              className="block text-sm font-medium text-gray-700"
+            >
               Link Text (optional)
             </label>
             <input
@@ -106,10 +112,7 @@ const LinkModal = ({ isOpen, onClose, onAddLink }: LinkModalProps) => {
             >
               Cancel
             </button>
-            <button
-              type="submit"
-              className="btn-primary py-1.5 px-4"
-            >
+            <button type="submit" className="btn-primary py-1.5 px-4">
               Add Link
             </button>
           </div>
@@ -119,9 +122,16 @@ const LinkModal = ({ isOpen, onClose, onAddLink }: LinkModalProps) => {
   );
 };
 
-const RichTextEditor = ({ content, onChange, placeholder = 'Start typing...', onAddLink }: RichTextEditorProps) => {
+const RichTextEditor = ({
+  content,
+  onChange,
+  placeholder = "Start typing...",
+  onAddLink,
+}: RichTextEditorProps) => {
   const [showLinkModal, setShowLinkModal] = useState(false);
-  const [linkCallback, setLinkCallback] = useState<((url: string, text: string) => void) | null>(null);
+  const [linkCallback, setLinkCallback] = useState<
+    ((url: string, text: string) => void) | null
+  >(null);
 
   const editor = useEditor({
     extensions: [
@@ -134,7 +144,7 @@ const RichTextEditor = ({ content, onChange, placeholder = 'Start typing...', on
       }),
       Underline,
       TextAlign.configure({
-        types: ['heading', 'paragraph'],
+        types: ["heading", "paragraph"],
       }),
     ],
     content,
@@ -172,7 +182,7 @@ const RichTextEditor = ({ content, onChange, placeholder = 'Start typing...', on
         <button
           onClick={() => editor.chain().focus().toggleBold().run()}
           className={`p-1.5 rounded hover:bg-gray-100 ${
-            editor.isActive('bold') ? 'bg-gray-100' : ''
+            editor.isActive("bold") ? "bg-gray-100" : ""
           }`}
           title="Bold"
         >
@@ -181,7 +191,7 @@ const RichTextEditor = ({ content, onChange, placeholder = 'Start typing...', on
         <button
           onClick={() => editor.chain().focus().toggleItalic().run()}
           className={`p-1.5 rounded hover:bg-gray-100 ${
-            editor.isActive('italic') ? 'bg-gray-100' : ''
+            editor.isActive("italic") ? "bg-gray-100" : ""
           }`}
           title="Italic"
         >
@@ -190,7 +200,7 @@ const RichTextEditor = ({ content, onChange, placeholder = 'Start typing...', on
         <button
           onClick={() => editor.chain().focus().toggleBulletList().run()}
           className={`p-1.5 rounded hover:bg-gray-100 ${
-            editor.isActive('bulletList') ? 'bg-gray-100' : ''
+            editor.isActive("bulletList") ? "bg-gray-100" : ""
           }`}
           title="Bullet List"
         >
@@ -199,34 +209,34 @@ const RichTextEditor = ({ content, onChange, placeholder = 'Start typing...', on
         <button
           onClick={() => editor.chain().focus().toggleOrderedList().run()}
           className={`p-1.5 rounded hover:bg-gray-100 ${
-            editor.isActive('orderedList') ? 'bg-gray-100' : ''
+            editor.isActive("orderedList") ? "bg-gray-100" : ""
           }`}
           title="Numbered List"
         >
           <MdFormatListNumbered className="h-5 w-5" />
         </button>
         <button
-          onClick={() => editor.chain().focus().setTextAlign('left').run()}
+          onClick={() => editor.chain().focus().setTextAlign("left").run()}
           className={`p-1.5 rounded hover:bg-gray-100 ${
-            editor.isActive({ textAlign: 'left' }) ? 'bg-gray-100' : ''
+            editor.isActive({ textAlign: "left" }) ? "bg-gray-100" : ""
           }`}
           title="Align Left"
         >
           <MdFormatAlignLeft className="h-5 w-5" />
         </button>
         <button
-          onClick={() => editor.chain().focus().setTextAlign('center').run()}
+          onClick={() => editor.chain().focus().setTextAlign("center").run()}
           className={`p-1.5 rounded hover:bg-gray-100 ${
-            editor.isActive({ textAlign: 'center' }) ? 'bg-gray-100' : ''
+            editor.isActive({ textAlign: "center" }) ? "bg-gray-100" : ""
           }`}
           title="Align Center"
         >
           <MdFormatAlignCenter className="h-5 w-5" />
         </button>
         <button
-          onClick={() => editor.chain().focus().setTextAlign('right').run()}
+          onClick={() => editor.chain().focus().setTextAlign("right").run()}
           className={`p-1.5 rounded hover:bg-gray-100 ${
-            editor.isActive({ textAlign: 'right' }) ? 'bg-gray-100' : ''
+            editor.isActive({ textAlign: "right" }) ? "bg-gray-100" : ""
           }`}
           title="Align Right"
         >
@@ -235,7 +245,7 @@ const RichTextEditor = ({ content, onChange, placeholder = 'Start typing...', on
         <button
           onClick={() => editor.chain().focus().undo().run()}
           className={`p-1.5 rounded hover:bg-gray-100 ${
-            !editor.can().undo() ? 'opacity-50 cursor-not-allowed' : ''
+            !editor.can().undo() ? "opacity-50 cursor-not-allowed" : ""
           }`}
           title="Undo"
           disabled={!editor.can().undo()}
@@ -245,7 +255,7 @@ const RichTextEditor = ({ content, onChange, placeholder = 'Start typing...', on
         <button
           onClick={() => editor.chain().focus().redo().run()}
           className={`p-1.5 rounded hover:bg-gray-100 ${
-            !editor.can().redo() ? 'opacity-50 cursor-not-allowed' : ''
+            !editor.can().redo() ? "opacity-50 cursor-not-allowed" : ""
           }`}
           title="Redo"
           disabled={!editor.can().redo()}
@@ -255,7 +265,7 @@ const RichTextEditor = ({ content, onChange, placeholder = 'Start typing...', on
         <button
           onClick={handleAddLink}
           className={`p-1.5 rounded hover:bg-gray-100 ${
-            editor.isActive('link') ? 'bg-gray-100' : ''
+            editor.isActive("link") ? "bg-gray-100" : ""
           }`}
           title="Add Link"
         >
@@ -279,4 +289,4 @@ const RichTextEditor = ({ content, onChange, placeholder = 'Start typing...', on
   );
 };
 
-export default RichTextEditor; 
+export default RichTextEditor;

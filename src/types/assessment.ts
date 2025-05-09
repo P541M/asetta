@@ -8,4 +8,4 @@ export interface Assessment {
   status: string;
   notes?: string;
   mark?: number | null;
-} 
+}

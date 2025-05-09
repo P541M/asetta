@@ -5,7 +5,7 @@ export default {
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
-  darkMode: 'class',
+  darkMode: "class",
   theme: {
     extend: {
       colors: {
@@ -46,14 +46,14 @@ export default {
           900: "#4c1d95",
         },
         dark: {
-          'bg-primary': '#111827',    // Dark background
-          'bg-secondary': '#1F2937',  // Slightly lighter background
-          'bg-tertiary': '#374151',   // Even lighter background
-          'text-primary': '#F9FAFB',  // Primary text color
-          'text-secondary': '#E5E7EB', // Secondary text color
-          'text-tertiary': '#9CA3AF', // Tertiary text color
-          'border': '#374151',        // Border color
-          'border-primary': '#4B5563' // Primary border color
+          "bg-primary": "#111827", // Dark background
+          "bg-secondary": "#1F2937", // Slightly lighter background
+          "bg-tertiary": "#374151", // Even lighter background
+          "text-primary": "#F9FAFB", // Primary text color
+          "text-secondary": "#E5E7EB", // Secondary text color
+          "text-tertiary": "#9CA3AF", // Tertiary text color
+          border: "#374151", // Border color
+          "border-primary": "#4B5563", // Primary border color
         },
       },
       borderRadius: {
@@ -69,23 +69,23 @@ export default {
         heading: ["Lexend", "Inter", "system-ui", "sans-serif"],
       },
       animation: {
-        'fade-in': 'fadeIn 0.3s ease-in-out',
-        'fade-in-down': 'fadeInDown 0.3s ease-in-out',
-        'scale': 'scale 0.3s ease-in-out',
-        'pulse': 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+        "fade-in": "fadeIn 0.3s ease-in-out",
+        "fade-in-down": "fadeInDown 0.3s ease-in-out",
+        scale: "scale 0.3s ease-in-out",
+        pulse: "pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite",
       },
       keyframes: {
         fadeIn: {
-          '0%': { opacity: '0' },
-          '100%': { opacity: '1' },
+          "0%": { opacity: "0" },
+          "100%": { opacity: "1" },
         },
         fadeInDown: {
-          '0%': { opacity: '0', transform: 'translateY(-10px)' },
-          '100%': { opacity: '1', transform: 'translateY(0)' },
+          "0%": { opacity: "0", transform: "translateY(-10px)" },
+          "100%": { opacity: "1", transform: "translateY(0)" },
         },
         scale: {
-          '0%': { transform: 'scale(0.95)', opacity: '0' },
-          '100%': { transform: 'scale(1)', opacity: '1' },
+          "0%": { transform: "scale(0.95)", opacity: "0" },
+          "100%": { transform: "scale(1)", opacity: "1" },
         },
       },
     },

@@ -1,12 +1,23 @@
 // components/Header.tsx
 import { useAuth } from "../contexts/AuthContext";
 import Link from "next/link";
+import Image from "next/image";
 import { useState, useEffect, useRef } from "react";
 import UserSettings from "./UserSettings";
 
 interface HeaderProps {
   onLogout?: () => Promise<void>;
 }
+
+// Add a loader function for user avatars
+const avatarLoader = ({ src }: { src: string }) => {
+  // Return the URL directly if it's already a full URL (e.g., from Google)
+  if (src.startsWith("http")) {
+    return src;
+  }
+  // Add your default avatar URL here if needed
+  return `/default-avatar.png`;
+};
 
 const Header = ({ onLogout }: HeaderProps) => {
   const { user } = useAuth();
@@ -120,14 +131,17 @@ const Header = ({ onLogout }: HeaderProps) => {
                       className="flex items-center space-x-2 text-gray-600 dark:text-dark-text-secondary hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors duration-200 focus:outline-none"
                     >
                       {user.photoURL ? (
-                        // Use Google profile picture if available
-                        <img
-                          src={user.photoURL}
-                          alt={user.displayName || "User"}
-                          className="h-8 w-8 rounded-full object-cover border border-gray-200 dark:border-dark-border"
-                        />
+                        <div className="relative h-8 w-8">
+                          <Image
+                            src={user.photoURL}
+                            alt={user.displayName || "User"}
+                            width={32}
+                            height={32}
+                            className="rounded-full object-cover border border-gray-200 dark:border-dark-border"
+                            loader={avatarLoader}
+                          />
+                        </div>
                       ) : (
-                        // Default user icon avatar
                         <div className="h-8 w-8 rounded-full bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-700">
                           <svg
                             xmlns="http://www.w3.org/2000/svg"

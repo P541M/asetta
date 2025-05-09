@@ -1,27 +1,33 @@
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/router';
+import { useState, useEffect } from "react";
+import { useRouter } from "next/router";
 
 interface BetaAccessGateProps {
   children: React.ReactNode;
 }
 
 const BetaAccessGate: React.FC<BetaAccessGateProps> = ({ children }) => {
-  const [passcode, setPasscode] = useState('');
-  const [error, setError] = useState('');
+  const [passcode, setPasscode] = useState("");
+  const [error, setError] = useState("");
   const [hasAccess, setHasAccess] = useState(false);
   const router = useRouter();
 
   // Check if user already has beta access
   useEffect(() => {
-    const betaAccess = localStorage.getItem('beta_access');
-    if (betaAccess === 'granted') {
+    const betaAccess = localStorage.getItem("beta_access");
+    if (betaAccess === "granted") {
       setHasAccess(true);
     }
   }, []);
 
   // Exclude certain paths from beta gate
   const isExcludedPath = () => {
-    const excludedPaths = ['/login', '/register', '/reset-password', '/terms', '/privacy'];
+    const excludedPaths = [
+      "/login",
+      "/register",
+      "/reset-password",
+      "/terms",
+      "/privacy",
+    ];
     return excludedPaths.includes(router.pathname);
   };
 
@@ -30,16 +36,16 @@ const BetaAccessGate: React.FC<BetaAccessGateProps> = ({ children }) => {
     const BETA_PASSCODE = process.env.NEXT_PUBLIC_BETA_PASSCODE;
 
     if (!BETA_PASSCODE) {
-      setError('Beta access is not properly configured.');
+      setError("Beta access is not properly configured.");
       return;
     }
 
     if (passcode === BETA_PASSCODE) {
-      localStorage.setItem('beta_access', 'granted');
+      localStorage.setItem("beta_access", "granted");
       setHasAccess(true);
-      setError('');
+      setError("");
     } else {
-      setError('Invalid passcode. Please try again.');
+      setError("Invalid passcode. Please try again.");
     }
   };
 
@@ -72,7 +78,10 @@ const BetaAccessGate: React.FC<BetaAccessGateProps> = ({ children }) => {
         <div className="bg-white dark:bg-dark-bg-secondary py-8 px-4 shadow sm:rounded-lg sm:px-10">
           <form className="space-y-6" onSubmit={handleSubmit}>
             <div>
-              <label htmlFor="passcode" className="block text-sm font-medium text-gray-700 dark:text-dark-text-primary">
+              <label
+                htmlFor="passcode"
+                className="block text-sm font-medium text-gray-700 dark:text-dark-text-primary"
+              >
                 Beta Access Code
               </label>
               <div className="mt-1">
@@ -129,4 +138,4 @@ const BetaAccessGate: React.FC<BetaAccessGateProps> = ({ children }) => {
   );
 };
 
-export default BetaAccessGate; 
+export default BetaAccessGate;

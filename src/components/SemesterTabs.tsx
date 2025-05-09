@@ -122,19 +122,19 @@ const DeleteConfirmationModal = ({
 };
 
 // New SortableSemester component for drag-and-drop
-function SortableSemester({ semester, isSelected, onEdit, onDelete }: { 
+function SortableSemester({
+  semester,
+  isSelected,
+  onEdit,
+  onDelete,
+}: {
   semester: Semester;
   isSelected: boolean;
   onEdit: (id: string, name: string) => void;
   onDelete: (id: string) => void;
 }) {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-  } = useSortable({ id: semester.id });
+  const { attributes, listeners, setNodeRef, transform, transition } =
+    useSortable({ id: semester.id });
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -142,8 +142,20 @@ function SortableSemester({ semester, isSelected, onEdit, onDelete }: {
   };
 
   return (
-    <div ref={setNodeRef} style={style} {...attributes} {...listeners} className="py-2 px-4 hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary flex items-center justify-between">
-      <span className={`font-medium ${isSelected ? "text-indigo-600 dark:text-indigo-400" : "dark:text-dark-text-primary"}`}>
+    <div
+      ref={setNodeRef}
+      style={style}
+      {...attributes}
+      {...listeners}
+      className="py-2 px-4 hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary flex items-center justify-between"
+    >
+      <span
+        className={`font-medium ${
+          isSelected
+            ? "text-indigo-600 dark:text-indigo-400"
+            : "dark:text-dark-text-primary"
+        }`}
+      >
         {semester.name}
       </span>
       <div className="flex items-center space-x-2">
@@ -520,7 +532,7 @@ const SemesterTabs = ({ selectedSemester, onSelect }: SemesterTabsProps) => {
   // Replace handleDragEnd with dnd-kit version
   const handleDragEnd = async (event: DragEndEvent) => {
     const { active, over } = event;
-    
+
     if (!over || active.id === over.id) return;
 
     const oldIndex = semesters.findIndex((s) => s.id === active.id);
@@ -764,7 +776,10 @@ const SemesterTabs = ({ selectedSemester, onSelect }: SemesterTabsProps) => {
       {/* Manage Semesters Modal */}
       {showManageModal && (
         <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-[150] modal-open">
-          <div ref={manageModalRef} className="bg-white dark:bg-dark-bg-secondary rounded-lg shadow-lg p-4 w-full max-w-sm animate-scale">
+          <div
+            ref={manageModalRef}
+            className="bg-white dark:bg-dark-bg-secondary rounded-lg shadow-lg p-4 w-full max-w-sm animate-scale"
+          >
             <div className="flex justify-between items-center mb-3">
               <h3 className="text-base font-medium text-gray-900 dark:text-dark-text-primary">
                 Manage Semesters
@@ -800,7 +815,7 @@ const SemesterTabs = ({ selectedSemester, onSelect }: SemesterTabsProps) => {
                   onDragEnd={handleDragEnd}
                 >
                   <SortableContext
-                    items={semesters.map(s => s.id)}
+                    items={semesters.map((s) => s.id)}
                     strategy={verticalListSortingStrategy}
                   >
                     {semesters.map((semester) => (
