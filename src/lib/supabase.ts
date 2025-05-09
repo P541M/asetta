@@ -8,7 +8,4 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     persistSession: false,
     autoRefreshToken: false,
   },
-  storage: {
-    maxRetryCount: 3,
-  },
 });
