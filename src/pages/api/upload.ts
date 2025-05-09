@@ -24,7 +24,7 @@ interface Assessment {
 async function extractAssessmentsAI(text: string): Promise<string> {
   const deepseekEndpoint = process.env.DEEPSEEK_ENDPOINT;
   const deepseekApiKey = process.env.DEEPSEEK_API_KEY;
-  
+
   if (!deepseekEndpoint || !deepseekApiKey) {
     throw new Error("DeepSeek API not configured");
   }
@@ -85,10 +85,10 @@ export default async function handler(
     req: NextApiRequest
   ): Promise<{ fields: Fields; files: Files }> => {
     return new Promise((resolve, reject) => {
-      const form = new IncomingForm({ 
+      const form = new IncomingForm({
         multiples: true,
         maxFileSize: 10 * 1024 * 1024, // 10MB limit
-        filter: ({ mimetype }) => mimetype === 'application/pdf'
+        filter: ({ mimetype }) => mimetype === "application/pdf",
       });
       form.parse(req, (err, fields, files) => {
         if (err) reject(err);
@@ -178,11 +178,11 @@ export default async function handler(
 
         // Upload to Supabase Storage
         const { data: uploadData, error: uploadError } = await supabase.storage
-          .from('outlines')
+          .from("outlines")
           .upload(`${userId}/${semesterId}/${fileName}`, pdfBuffer, {
-            contentType: 'application/pdf',
+            contentType: "application/pdf",
             upsert: true,
-            cacheControl: '3600'
+            cacheControl: "3600",
           });
 
         if (uploadError) {
@@ -190,8 +190,10 @@ export default async function handler(
         }
 
         // Get the public URL
-        const { data: { publicUrl } } = supabase.storage
-          .from('outlines')
+        const {
+          data: { publicUrl },
+        } = supabase.storage
+          .from("outlines")
           .getPublicUrl(`${userId}/${semesterId}/${fileName}`);
 
         let assessments: Assessment[] = [];
@@ -222,7 +224,9 @@ export default async function handler(
             throw new Error("DeepSeek API not configured");
           }
         } catch (aiError) {
-          console.warn(`AI extraction failed for ${fileName}, falling back to basic extraction`);
+          console.warn(
+            `AI extraction failed for ${fileName}, falling back to basic extraction`
+          );
           assessments = extractAssessmentsBasic(extractedText).map(
             (assessment) => ({
               ...assessment,
@@ -250,7 +254,7 @@ export default async function handler(
           text: extractedText.slice(0, 5000),
           outlineUrl: publicUrl,
           fileSize: pdfBuffer.length,
-          status: 'processed'
+          status: "processed",
         });
 
         const assessmentsRef = adminDb.collection(
@@ -281,7 +285,7 @@ export default async function handler(
       message: `Processed ${processedFiles} file(s), extracted ${totalAssessments} assessments. ${
         failedFiles > 0 ? `Failed to process ${failedFiles} file(s).` : ""
       }`,
-      errors: errors.length > 0 ? errors : undefined
+      errors: errors.length > 0 ? errors : undefined,
     });
   } catch (error) {
     console.error("Processing error:", error);

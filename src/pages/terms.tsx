@@ -72,36 +72,41 @@ const Terms: NextPage = () => {
               </p>
               <p>
                 You are solely responsible for the content you upload and share
-                through our service. By uploading content, you represent and warrant that
-                you have all necessary rights and permissions to do so.
+                through our service. By uploading content, you represent and
+                warrant that you have all necessary rights and permissions to do
+                so.
               </p>
 
               <h2 className="text-xl font-semibold mt-8 mb-4">
                 4.1 Course Outlines and Academic Content
               </h2>
-              <p>
-                When uploading course outlines or other academic content:
-              </p>
+              <p>When uploading course outlines or other academic content:</p>
               <ul className="list-disc pl-6 my-4 space-y-2">
                 <li>
-                  You acknowledge that you are not transferring ownership of the content to Kivo
+                  You acknowledge that you are not transferring ownership of the
+                  content to Kivo
                 </li>
                 <li>
-                  The original creator (typically the professor or educational institution) retains all rights to the content
+                  The original creator (typically the professor or educational
+                  institution) retains all rights to the content
                 </li>
                 <li>
-                  Kivo acts solely as a storage and access platform, and does not claim ownership of any uploaded course materials
+                  Kivo acts solely as a storage and access platform, and does
+                  not claim ownership of any uploaded course materials
                 </li>
                 <li>
-                  You are responsible for ensuring you have the right to upload and share such content
+                  You are responsible for ensuring you have the right to upload
+                  and share such content
                 </li>
                 <li>
-                  Kivo reserves the right to remove any content that infringes on intellectual property rights or violates these terms
+                  Kivo reserves the right to remove any content that infringes
+                  on intellectual property rights or violates these terms
                 </li>
               </ul>
               <p>
-                By uploading course outlines or other academic content, you agree that you are either the original creator
-                or have obtained proper authorization to share such content through our platform.
+                By uploading course outlines or other academic content, you
+                agree that you are either the original creator or have obtained
+                proper authorization to share such content through our platform.
               </p>
 
               <h2 className="text-xl font-semibold mt-8 mb-4">
@@ -161,7 +166,7 @@ const Terms: NextPage = () => {
               <p>
                 We reserve the right to modify or replace these terms at any
                 time. If a revision is material, we will provide at least 30
-                days' notice prior to any new terms taking effect. What
+                days&apos; notice prior to any new terms taking effect. What
                 constitutes a material change will be determined at our sole
                 discretion.
               </p>

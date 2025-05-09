@@ -5,7 +5,7 @@ export function generateICSFile(
   semesterName: string
 ): string {
   // ICS file header
-  let icsContent = [
+  const icsContent = [
     "BEGIN:VCALENDAR",
     "VERSION:2.0",
     `PRODID:-//Kivo//${semesterName} Calendar//EN`,

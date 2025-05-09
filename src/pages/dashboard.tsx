@@ -48,7 +48,6 @@ const Dashboard = () => {
   const [selectedCourse, setSelectedCourse] = useState<string | null>(null);
   const [animateStatCards, setAnimateStatCards] = useState(false);
   const [showStatsBar, setShowStatsBar] = useState(false);
-  const [showManageModal, setShowManageModal] = useState(false);
 
   const [stats, setStats] = useState({
     total: 0,
@@ -106,7 +105,7 @@ const Dashboard = () => {
     );
     const q = query(assessmentsRef, orderBy("dueDate", "asc"));
     let unsubscribe: (() => void) | undefined;
-    
+
     try {
       unsubscribe = onSnapshot(
         q,
@@ -210,16 +209,22 @@ const Dashboard = () => {
 
     const handlePreferencesUpdate = (event: CustomEvent) => {
       if (event.detail) {
-        if ('showStatsBar' in event.detail) {
+        if ("showStatsBar" in event.detail) {
           setShowStatsBar(event.detail.showStatsBar);
         }
       }
     };
 
-    window.addEventListener('userPreferencesUpdated', handlePreferencesUpdate as EventListener);
+    window.addEventListener(
+      "userPreferencesUpdated",
+      handlePreferencesUpdate as EventListener
+    );
 
     return () => {
-      window.removeEventListener('userPreferencesUpdated', handlePreferencesUpdate as EventListener);
+      window.removeEventListener(
+        "userPreferencesUpdated",
+        handlePreferencesUpdate as EventListener
+      );
     };
   }, [user]);
 
@@ -267,9 +272,13 @@ const Dashboard = () => {
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
             <div>
-              <h1 className="text-xl font-semibold text-gray-900 dark:text-dark-text-primary">Dashboard</h1>
+              <h1 className="text-xl font-semibold text-gray-900 dark:text-dark-text-primary">
+                Dashboard
+              </h1>
               <p className="text-sm text-gray-500 dark:text-dark-text-tertiary mt-1">
-                {selectedSemester ? `Viewing ${selectedSemester} semester` : 'Select a semester to get started'}
+                {selectedSemester
+                  ? `Viewing ${selectedSemester} semester`
+                  : "Select a semester to get started"}
               </p>
             </div>
             <div className="flex items-center mt-4 md:mt-0 space-x-3">
@@ -324,7 +333,11 @@ const Dashboard = () => {
               {showStatsBar && (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 mb-6">
                   <div
-                    className={`bg-white dark:bg-dark-bg-secondary rounded-xl shadow-sm p-4 border border-gray-100 dark:border-dark-border stat-card`}
+                    className={`bg-white dark:bg-dark-bg-secondary rounded-xl shadow-sm p-4 border ${
+                      animateStatCards
+                        ? "border-indigo-500"
+                        : "border-gray-100 dark:border-dark-border"
+                    } transition-colors duration-300 stat-card`}
                   >
                     <p className="text-sm text-gray-500 dark:text-dark-text-tertiary mb-1">
                       Total Assessments
@@ -334,46 +347,71 @@ const Dashboard = () => {
                     </h3>
                   </div>
                   <div
-                    className={`bg-white dark:bg-dark-bg-secondary rounded-xl shadow-sm p-4 border border-gray-100 dark:border-dark-border stat-card`}
-                    style={{ animationDelay: "0.05s" }}
+                    className={`bg-white dark:bg-dark-bg-secondary rounded-xl shadow-sm p-4 border ${
+                      animateStatCards
+                        ? "border-indigo-500"
+                        : "border-gray-100 dark:border-dark-border"
+                    } transition-colors duration-300 stat-card`}
                   >
-                    <p className="text-sm text-gray-500 dark:text-dark-text-tertiary mb-1">Planning</p>
+                    <p className="text-sm text-gray-500 dark:text-dark-text-tertiary mb-1">
+                      Planning
+                    </p>
                     <h3 className="text-2xl font-bold text-gray-600 dark:text-dark-text-primary">
                       {stats.planning}
                     </h3>
                   </div>
                   <div
-                    className={`bg-white dark:bg-dark-bg-secondary rounded-xl shadow-sm p-4 border border-gray-100 dark:border-dark-border stat-card`}
-                    style={{ animationDelay: "0.1s" }}
+                    className={`bg-white dark:bg-dark-bg-secondary rounded-xl shadow-sm p-4 border ${
+                      animateStatCards
+                        ? "border-indigo-500"
+                        : "border-gray-100 dark:border-dark-border"
+                    } transition-colors duration-300 stat-card`}
                   >
-                    <p className="text-sm text-gray-500 dark:text-dark-text-tertiary mb-1">Active Work</p>
+                    <p className="text-sm text-gray-500 dark:text-dark-text-tertiary mb-1">
+                      Active Work
+                    </p>
                     <h3 className="text-2xl font-bold text-blue-600 dark:text-blue-400">
                       {stats.active}
                     </h3>
                   </div>
                   <div
-                    className={`bg-white dark:bg-dark-bg-secondary rounded-xl shadow-sm p-4 border border-gray-100 dark:border-dark-border stat-card`}
-                    style={{ animationDelay: "0.15s" }}
+                    className={`bg-white dark:bg-dark-bg-secondary rounded-xl shadow-sm p-4 border ${
+                      animateStatCards
+                        ? "border-indigo-500"
+                        : "border-gray-100 dark:border-dark-border"
+                    } transition-colors duration-300 stat-card`}
                   >
-                    <p className="text-sm text-gray-500 dark:text-dark-text-tertiary mb-1">Submission</p>
+                    <p className="text-sm text-gray-500 dark:text-dark-text-tertiary mb-1">
+                      Submission
+                    </p>
                     <h3 className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">
                       {stats.submission}
                     </h3>
                   </div>
                   <div
-                    className={`bg-white dark:bg-dark-bg-secondary rounded-xl shadow-sm p-4 border border-gray-100 dark:border-dark-border stat-card`}
-                    style={{ animationDelay: "0.2s" }}
+                    className={`bg-white dark:bg-dark-bg-secondary rounded-xl shadow-sm p-4 border ${
+                      animateStatCards
+                        ? "border-indigo-500"
+                        : "border-gray-100 dark:border-dark-border"
+                    } transition-colors duration-300 stat-card`}
                   >
-                    <p className="text-sm text-gray-500 dark:text-dark-text-tertiary mb-1">Completed</p>
+                    <p className="text-sm text-gray-500 dark:text-dark-text-tertiary mb-1">
+                      Completed
+                    </p>
                     <h3 className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">
                       {stats.completed}
                     </h3>
                   </div>
                   <div
-                    className={`bg-white dark:bg-dark-bg-secondary rounded-xl shadow-sm p-4 border border-gray-100 dark:border-dark-border stat-card`}
-                    style={{ animationDelay: "0.25s" }}
+                    className={`bg-white dark:bg-dark-bg-secondary rounded-xl shadow-sm p-4 border ${
+                      animateStatCards
+                        ? "border-indigo-500"
+                        : "border-gray-100 dark:border-dark-border"
+                    } transition-colors duration-300 stat-card`}
                   >
-                    <p className="text-sm text-gray-500 dark:text-dark-text-tertiary mb-1">Due This Week</p>
+                    <p className="text-sm text-gray-500 dark:text-dark-text-tertiary mb-1">
+                      Due This Week
+                    </p>
                     <h3 className="text-2xl font-bold text-amber-600 dark:text-amber-400">
                       {stats.upcomingDeadlines}
                     </h3>
@@ -386,8 +424,11 @@ const Dashboard = () => {
               {stats.problem > 0 && (
                 <div className="mb-6">
                   <div
-                    className={`bg-white dark:bg-dark-bg-secondary rounded-xl shadow-sm p-4 border border-red-100 dark:border-red-900/30 stat-card`}
-                    style={{ animationDelay: "0.25s" }}
+                    className={`bg-white dark:bg-dark-bg-secondary rounded-xl shadow-sm p-4 border ${
+                      animateStatCards
+                        ? "border-red-500"
+                        : "border-red-100 dark:border-red-900/30"
+                    } transition-colors duration-300 stat-card`}
                   >
                     <div className="flex items-center justify-between">
                       <div>
@@ -581,7 +622,9 @@ const Dashboard = () => {
                   />
                 </svg>
               </div>
-              <h2 className="text-xl font-semibold mb-2 dark:text-dark-text-primary">Welcome to Kivo</h2>
+              <h2 className="text-xl font-semibold mb-2 dark:text-dark-text-primary">
+                Welcome to Kivo
+              </h2>
               <p className="text-gray-600 dark:text-dark-text-secondary mb-4">
                 Track your assignments, exams, and projects in one place.
               </p>
@@ -590,9 +633,13 @@ const Dashboard = () => {
               </p>
               <button
                 onClick={() => {
-                  const semesterTabsElement = document.querySelector('.semester-tabs-container');
+                  const semesterTabsElement = document.querySelector(
+                    ".semester-tabs-container"
+                  );
                   if (semesterTabsElement) {
-                    const addButton = semesterTabsElement.querySelector('.add-semester-button');
+                    const addButton = semesterTabsElement.querySelector(
+                      ".add-semester-button"
+                    );
                     if (addButton) {
                       (addButton as HTMLElement).click();
                     }
