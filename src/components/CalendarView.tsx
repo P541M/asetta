@@ -93,8 +93,6 @@ const CalendarView = ({ selectedSemester, semesterId }: CalendarViewProps) => {
       const lastDayOfMonth = new Date(year, month + 1, 0);
       const daysFromPrevMonth = firstDayOfMonth.getDay();
       const daysFromNextMonth = 6 - lastDayOfMonth.getDay();
-      const totalDays =
-        daysFromPrevMonth + lastDayOfMonth.getDate() + daysFromNextMonth;
       const today = new Date();
       today.setHours(0, 0, 0, 0);
       const days: Day[] = [];
@@ -186,31 +184,6 @@ const CalendarView = ({ selectedSemester, semesterId }: CalendarViewProps) => {
     setSelectedDay(day);
   };
 
-  const getStatusColor = (status: string): string => {
-    switch (status) {
-      case "Submitted":
-        return "bg-emerald-100 border-emerald-200 text-emerald-800";
-      case "In progress":
-        return "bg-blue-100 border-blue-200 text-blue-800";
-      case "Draft":
-        return "bg-purple-100 border-purple-200 text-purple-800";
-      case "Pending Submission":
-        return "bg-orange-100 border-orange-200 text-orange-800";
-      case "Under Review":
-        return "bg-indigo-100 border-indigo-200 text-indigo-800";
-      case "Needs Revision":
-        return "bg-amber-100 border-amber-200 text-amber-800";
-      case "Missed/Late":
-        return "bg-red-100 border-red-200 text-red-800";
-      case "On Hold":
-        return "bg-yellow-100 border-yellow-200 text-yellow-800";
-      case "Deferred":
-        return "bg-gray-200 border-gray-300 text-gray-700";
-      default:
-        return "bg-gray-100 border-gray-200 text-gray-800";
-    }
-  };
-
   const getDueDateStatus = (date: Date, time: string): string => {
     const now = new Date();
     const [hours, minutes] = time.split(":").map((num) => parseInt(num, 10));
@@ -223,12 +196,6 @@ const CalendarView = ({ selectedSemester, semesterId }: CalendarViewProps) => {
     if (diffDays <= 3) return "border-amber-300 bg-amber-50";
     if (diffDays <= 7) return "border-yellow-300 bg-yellow-50";
     return "";
-  };
-
-  const countAssessments = (date: Date): number => {
-    const dateStr = formatDateForComparison(date);
-    return assessments.filter((assessment) => assessment.dueDate === dateStr)
-      .length;
   };
 
   // Function to handle exporting the calendar

@@ -245,25 +245,6 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
     }
   };
 
-  const calculateCurrentGrade = () => {
-    const completedAssessments = assessments.filter(
-      (a) => a.status === "Submitted" && a.mark !== null && a.mark !== undefined
-    );
-    if (completedAssessments.length === 0) return null;
-
-    const weightedSum = completedAssessments.reduce((sum, assessment) => {
-      if (assessment.mark === null || assessment.mark === undefined) return sum;
-      return sum + (assessment.mark * assessment.weight) / 100;
-    }, 0);
-
-    const completedWeight = completedAssessments.reduce((sum, assessment) => {
-      if (assessment.mark === null || assessment.mark === undefined) return sum;
-      return sum + assessment.weight;
-    }, 0);
-
-    return completedWeight > 0 ? (weightedSum / completedWeight) * 100 : 0;
-  };
-
   if (isLoading) {
     return (
       <div className="flex justify-center py-8">
