@@ -12,7 +12,6 @@ import {
 } from "firebase/firestore";
 import { supabase } from "../lib/supabase";
 import {
-  parseLocalDateTime,
   formatLocalDate,
   isUpcoming as isDateUpcoming,
 } from "../utils/dateUtils";
@@ -250,6 +249,7 @@ const CoursesOverviewTable = ({
         });
 
       if (uploadError) throw uploadError;
+      if (!uploadData) throw new Error("Upload failed - no data received");
 
       // Get the public URL
       const {

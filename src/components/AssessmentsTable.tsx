@@ -1,4 +1,3 @@
-/// <reference types="react" />
 import React, { JSX } from "react";
 import { useState, useEffect, useRef } from "react";
 import { db } from "../lib/firebase";
@@ -8,7 +7,6 @@ import {
   deleteDoc,
   getDoc,
   serverTimestamp,
-  Timestamp,
 } from "firebase/firestore";
 import { useAuth } from "../contexts/AuthContext";
 import RichTextEditor from "./RichTextEditor";
@@ -301,7 +299,6 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
   );
   const [dropdownOpenId, setDropdownOpenId] = useState<string | null>(null);
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
-  const [lastStatusChange, setLastStatusChange] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [showDaysTillDue, setShowDaysTillDue] = useState<boolean>(true);
   const [showWeight, setShowWeight] = useState<boolean>(true);
@@ -1110,8 +1107,6 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                         : dueDateStatus === "urgent"
                         ? "bg-amber-50/40 dark:bg-amber-900/20"
                         : ""
-                    } ${
-                      lastStatusChange === assessment?.id ? "animate-pulse" : ""
                     } hover:bg-gray-50/80 dark:hover:bg-dark-bg-tertiary`}
                   >
                     <td className="pl-4">
