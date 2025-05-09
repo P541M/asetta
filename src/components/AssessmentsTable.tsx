@@ -1,13 +1,24 @@
 /// <reference types="react" />
-import React, { JSX } from 'react';
+import React, { JSX } from "react";
 import { useState, useEffect, useRef } from "react";
 import { db } from "../lib/firebase";
-import { doc, updateDoc, deleteDoc, getDoc, serverTimestamp, Timestamp } from "firebase/firestore";
+import {
+  doc,
+  updateDoc,
+  deleteDoc,
+  getDoc,
+  serverTimestamp,
+  Timestamp,
+} from "firebase/firestore";
 import { useAuth } from "../contexts/AuthContext";
-import RichTextEditor from './RichTextEditor';
-import { getFromLocalStorage, setToLocalStorage } from '../utils/localStorage';
-import { utcToLocal, formatLocalDateTime, getDaysUntil } from '../utils/dateUtils';
-import { Assessment } from '../types/assessment';
+import RichTextEditor from "./RichTextEditor";
+import { getFromLocalStorage, setToLocalStorage } from "../utils/localStorage";
+import {
+  utcToLocal,
+  formatLocalDateTime,
+  getDaysUntil,
+} from "../utils/dateUtils";
+import { Assessment } from "../types/assessment";
 
 interface AssessmentsTableProps {
   assessments: Assessment[];
@@ -52,7 +63,10 @@ const LinkModal = ({ isOpen, onClose, onAddLink }: LinkModalProps) => {
   if (!isOpen) return null;
 
   return (
-    <div id="link-modal" className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[100]">
+    <div
+      id="link-modal"
+      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[100]"
+    >
       <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md animate-scale">
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-lg font-medium text-gray-900">Add Link</h3>
@@ -76,7 +90,10 @@ const LinkModal = ({ isOpen, onClose, onAddLink }: LinkModalProps) => {
         </div>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label htmlFor="url" className="block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="url"
+              className="block text-sm font-medium text-gray-700"
+            >
               URL
             </label>
             <input
@@ -90,7 +107,10 @@ const LinkModal = ({ isOpen, onClose, onAddLink }: LinkModalProps) => {
             />
           </div>
           <div>
-            <label htmlFor="text" className="block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="text"
+              className="block text-sm font-medium text-gray-700"
+            >
               Link Text (optional)
             </label>
             <input
@@ -110,10 +130,7 @@ const LinkModal = ({ isOpen, onClose, onAddLink }: LinkModalProps) => {
             >
               Cancel
             </button>
-            <button
-              type="submit"
-              className="btn-primary py-1.5 px-4"
-            >
+            <button type="submit" className="btn-primary py-1.5 px-4">
               Add Link
             </button>
           </div>
@@ -123,7 +140,12 @@ const LinkModal = ({ isOpen, onClose, onAddLink }: LinkModalProps) => {
   );
 };
 
-const DeleteConfirmationModal = ({ isOpen, onClose, onConfirm, assessmentName }: DeleteConfirmationModalProps) => {
+const DeleteConfirmationModal = ({
+  isOpen,
+  onClose,
+  onConfirm,
+  assessmentName,
+}: DeleteConfirmationModalProps) => {
   if (!isOpen) return null;
 
   const handleModalClick = (e: React.MouseEvent) => {
@@ -132,7 +154,7 @@ const DeleteConfirmationModal = ({ isOpen, onClose, onConfirm, assessmentName }:
   };
 
   return (
-    <div 
+    <div
       className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[200] modal-open"
       onClick={handleModalClick}
     >
@@ -161,7 +183,8 @@ const DeleteConfirmationModal = ({ isOpen, onClose, onConfirm, assessmentName }:
           </button>
         </div>
         <p className="text-gray-600 mb-6">
-          Are you sure you want to delete "{assessmentName}"? This action cannot be undone.
+          Are you sure you want to delete &ldquo;{assessmentName}&rdquo;? This
+          action cannot be undone.
         </p>
         <div className="flex justify-end space-x-3">
           <button
@@ -188,7 +211,12 @@ const DeleteConfirmationModal = ({ isOpen, onClose, onConfirm, assessmentName }:
   );
 };
 
-const BulkDeleteConfirmationModal = ({ isOpen, onClose, onConfirm, count }: BulkDeleteConfirmationModalProps) => {
+const BulkDeleteConfirmationModal = ({
+  isOpen,
+  onClose,
+  onConfirm,
+  count,
+}: BulkDeleteConfirmationModalProps) => {
   if (!isOpen) return null;
 
   const handleModalClick = (e: React.MouseEvent) => {
@@ -197,13 +225,15 @@ const BulkDeleteConfirmationModal = ({ isOpen, onClose, onConfirm, count }: Bulk
   };
 
   return (
-    <div 
+    <div
       className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[200] modal-open"
       onClick={handleModalClick}
     >
       <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md animate-scale">
         <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-medium text-gray-900">Confirm Bulk Delete</h3>
+          <h3 className="text-lg font-medium text-gray-900">
+            Confirm Bulk Delete
+          </h3>
           <button
             onClick={(e) => {
               e.stopPropagation();
@@ -226,7 +256,8 @@ const BulkDeleteConfirmationModal = ({ isOpen, onClose, onConfirm, count }: Bulk
           </button>
         </div>
         <p className="text-gray-600 mb-6">
-          Are you sure you want to delete {count} selected assessment{count === 1 ? '' : 's'}? This action cannot be undone.
+          Are you sure you want to delete {count} selected assessment
+          {count === 1 ? "" : "s"}? This action cannot be undone.
         </p>
         <div className="flex justify-end space-x-3">
           <button
@@ -259,14 +290,14 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
   onStatusChange,
 }) => {
   const { user } = useAuth();
-  const [sortKey, setSortKey] = useState<keyof Assessment>(() => 
-    getFromLocalStorage<keyof Assessment>('assessmentSortKey', 'dueDate')
+  const [sortKey, setSortKey] = useState<keyof Assessment>(() =>
+    getFromLocalStorage<keyof Assessment>("assessmentSortKey", "dueDate")
   );
-  const [sortOrder, setSortOrder] = useState<"asc" | "desc">(() => 
-    getFromLocalStorage<'asc' | 'desc'>('assessmentSortOrder', 'asc')
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">(() =>
+    getFromLocalStorage<"asc" | "desc">("assessmentSortOrder", "asc")
   );
-  const [filter, setFilter] = useState<string>(() => 
-    getFromLocalStorage<string>('assessmentFilter', 'all')
+  const [filter, setFilter] = useState<string>(() =>
+    getFromLocalStorage<string>("assessmentFilter", "all")
   );
   const [dropdownOpenId, setDropdownOpenId] = useState<string | null>(null);
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
@@ -289,10 +320,13 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
   const [notesInput, setNotesInput] = useState<string>("");
   const [showNotes, setShowNotes] = useState<string | null>(null);
   const [showLinkModal, setShowLinkModal] = useState(false);
-  const [linkCallback, setLinkCallback] = useState<((url: string, text: string) => void) | null>(null);
+  const [linkCallback, setLinkCallback] = useState<
+    ((url: string, text: string) => void) | null
+  >(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [assessmentToDelete, setAssessmentToDelete] = useState<Assessment | null>(null);
+  const [assessmentToDelete, setAssessmentToDelete] =
+    useState<Assessment | null>(null);
   const [showBulkDeleteModal, setShowBulkDeleteModal] = useState(false);
 
   // Fetch user preferences
@@ -318,34 +352,40 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
     // Add event listener for preference updates
     const handlePreferencesUpdate = (event: CustomEvent) => {
       if (event.detail) {
-        if ('showDaysTillDue' in event.detail) {
+        if ("showDaysTillDue" in event.detail) {
           setShowDaysTillDue(event.detail.showDaysTillDue);
         }
-        if ('showWeight' in event.detail) {
+        if ("showWeight" in event.detail) {
           setShowWeight(event.detail.showWeight);
         }
       }
     };
 
-    window.addEventListener('userPreferencesUpdated', handlePreferencesUpdate as EventListener);
+    window.addEventListener(
+      "userPreferencesUpdated",
+      handlePreferencesUpdate as EventListener
+    );
 
     // Cleanup
     return () => {
-      window.removeEventListener('userPreferencesUpdated', handlePreferencesUpdate as EventListener);
+      window.removeEventListener(
+        "userPreferencesUpdated",
+        handlePreferencesUpdate as EventListener
+      );
     };
   }, [user]);
 
   // Update localStorage when sort preferences change
   useEffect(() => {
-    setToLocalStorage('assessmentSortKey', sortKey);
+    setToLocalStorage("assessmentSortKey", sortKey);
   }, [sortKey]);
 
   useEffect(() => {
-    setToLocalStorage('assessmentSortOrder', sortOrder);
+    setToLocalStorage("assessmentSortOrder", sortOrder);
   }, [sortOrder]);
 
   useEffect(() => {
-    setToLocalStorage('assessmentFilter', filter);
+    setToLocalStorage("assessmentFilter", filter);
   }, [filter]);
 
   // Existing helper functions remain largely unchanged; updating only where necessary
@@ -365,7 +405,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
   ): number | null => {
     const completedStatuses = ["Submitted", "Under Review", "Completed"];
     if (completedStatuses.includes(status)) return null;
-    
+
     // Convert UTC to local for calculation
     const { date, time } = utcToLocal(dueDate, dueTime);
     return getDaysUntil(date, time);
@@ -403,12 +443,8 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
       if (
         showNotes &&
         event.target instanceof Node &&
-        !document
-          .getElementById(`notes-modal`)
-          ?.contains(event.target) &&
-        !document
-          .getElementById(`link-modal`)
-          ?.contains(event.target)
+        !document.getElementById(`notes-modal`)?.contains(event.target) &&
+        !document.getElementById(`link-modal`)?.contains(event.target)
       ) {
         setShowNotes(null);
       }
@@ -450,17 +486,20 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
     }
   };
 
-  const handleStatusChange = async (assessmentId: string, newStatus: string) => {
+  const handleStatusChange = async (
+    assessmentId: string,
+    newStatus: string
+  ) => {
     if (!user || !assessmentId) return;
-    
+
     try {
       const assessmentRef = doc(
         db,
-        'users',
+        "users",
         user.uid,
-        'semesters',
+        "semesters",
         semesterId,
-        'assessments',
+        "assessments",
         assessmentId
       );
       await updateDoc(assessmentRef, {
@@ -477,9 +516,17 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
 
   const handleDeleteAssessment = async (assessment: Assessment) => {
     if (!user || !assessment.id) return;
-    
+
     try {
-      const assessmentRef = doc(db, 'users', user.uid, 'semesters', semesterId, 'assessments', assessment.id);
+      const assessmentRef = doc(
+        db,
+        "users",
+        user.uid,
+        "semesters",
+        semesterId,
+        "assessments",
+        assessment.id
+      );
       await deleteDoc(assessmentRef);
       if (onStatusChange) {
         onStatusChange(assessment.id, "Deleted");
@@ -493,7 +540,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
 
   const handleBulkAction = async (action: "complete" | "delete" | "reset") => {
     if (!user || selectedRows.length === 0) return;
-    
+
     if (action === "delete") {
       setShowBulkDeleteModal(true);
       return;
@@ -574,7 +621,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
     setEditingId(assessment.id);
     setEditFormData({
       ...assessment,
-      notes: assessment.notes || '',
+      notes: assessment.notes || "",
     });
   };
 
@@ -653,21 +700,22 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
         "assessments",
         selectedAssessment.id
       );
-      
+
       // Strip HTML tags and whitespace to check if content is truly empty
-      const strippedContent = notesInput.replace(/<[^>]*>/g, '').trim();
-      
+      const strippedContent = notesInput.replace(/<[^>]*>/g, "").trim();
+
       // If strippedContent is empty, remove the notes field
-      const updateData = strippedContent === "" 
-        ? { 
-            updatedAt: new Date(),
-            notes: null // Set to null to remove the field
-          } 
-        : { 
-            notes: notesInput,
-            updatedAt: new Date()
-          };
-      
+      const updateData =
+        strippedContent === ""
+          ? {
+              updatedAt: new Date(),
+              notes: null, // Set to null to remove the field
+            }
+          : {
+              notes: notesInput,
+              updatedAt: new Date(),
+            };
+
       await updateDoc(assessmentRef, updateData);
       setSelectedAssessment(null);
       onStatusChange?.(selectedAssessment.id, selectedAssessment.status);
@@ -701,7 +749,9 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
   return (
     <div className="bg-white dark:bg-dark-bg-secondary rounded-xl shadow-sm border border-gray-100 dark:border-dark-border-primary p-6">
       <div className="flex flex-col sm:flex-row justify-between mb-6 gap-4">
-        <h2 className="text-xl font-medium text-gray-900 dark:text-dark-text-primary">Your Assessments</h2>
+        <h2 className="text-xl font-medium text-gray-900 dark:text-dark-text-primary">
+          Your Assessments
+        </h2>
         <div className="flex space-x-2 items-center">
           <select
             value={filter}
@@ -793,7 +843,9 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
               d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
             />
           </svg>
-          <p className="text-lg font-medium mb-2 dark:text-dark-text-primary">No assessments found</p>
+          <p className="text-lg font-medium mb-2 dark:text-dark-text-primary">
+            No assessments found
+          </p>
           <p className="dark:text-dark-text-secondary">
             Upload a course outline or add assessments manually to get started.
           </p>
@@ -820,7 +872,9 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                   className="cursor-pointer w-48"
                 >
                   <div className="flex items-center space-x-1 group">
-                    <span className="group-hover:text-indigo-600 dark:group-hover:text-indigo-400 dark:text-dark-text-primary">Course</span>
+                    <span className="group-hover:text-indigo-600 dark:group-hover:text-indigo-400 dark:text-dark-text-primary">
+                      Course
+                    </span>
                     {sortKey === "courseName" && (
                       <span className="text-indigo-600 dark:text-indigo-400">
                         {sortOrder === "asc" ? "↑" : "↓"}
@@ -833,7 +887,9 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                   className="cursor-pointer w-56"
                 >
                   <div className="flex items-center space-x-1 group">
-                    <span className="group-hover:text-indigo-600 dark:group-hover:text-indigo-400 dark:text-dark-text-primary">Task</span>
+                    <span className="group-hover:text-indigo-600 dark:group-hover:text-indigo-400 dark:text-dark-text-primary">
+                      Task
+                    </span>
                     {sortKey === "assignmentName" && (
                       <span className="text-indigo-600 dark:text-indigo-400">
                         {sortOrder === "asc" ? "↑" : "↓"}
@@ -857,7 +913,9 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                   </div>
                 </th>
                 {showDaysTillDue && (
-                  <th className="w-32 dark:text-dark-text-primary">Days Till Due</th>
+                  <th className="w-32 dark:text-dark-text-primary">
+                    Days Till Due
+                  </th>
                 )}
                 {showWeight && (
                   <th
@@ -865,7 +923,9 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                     className="cursor-pointer w-24"
                   >
                     <div className="flex items-center space-x-1 group">
-                      <span className="group-hover:text-indigo-600 dark:group-hover:text-indigo-400 dark:text-dark-text-primary">Weight</span>
+                      <span className="group-hover:text-indigo-600 dark:group-hover:text-indigo-400 dark:text-dark-text-primary">
+                        Weight
+                      </span>
                       {sortKey === "weight" && (
                         <span className="text-indigo-600 dark:text-indigo-400">
                           {sortOrder === "asc" ? "↑" : "↓"}
@@ -932,7 +992,9 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                           <option value="Needs Revision">Needs Revision</option>
                         </optgroup>
                         <optgroup label="Submission">
-                          <option value="Pending Submission">Pending Submission</option>
+                          <option value="Pending Submission">
+                            Pending Submission
+                          </option>
                           <option value="Submitted">Submitted</option>
                           <option value="Under Review">Under Review</option>
                         </optgroup>
@@ -1065,9 +1127,10 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                     </td>
                     <td>
                       <select
-                        value={assessment?.status || 'Not started'}
+                        value={assessment?.status || "Not started"}
                         onChange={(e) =>
-                          assessment?.id && handleStatusChange(assessment.id, e.target.value)
+                          assessment?.id &&
+                          handleStatusChange(assessment.id, e.target.value)
                         }
                         onClick={(e) => e.stopPropagation()}
                         className={`input py-1 px-2 text-sm transition-all duration-300 w-full dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border ${
@@ -1100,7 +1163,9 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                           <option value="Needs Revision">Needs Revision</option>
                         </optgroup>
                         <optgroup label="Submission">
-                          <option value="Pending Submission">Pending Submission</option>
+                          <option value="Pending Submission">
+                            Pending Submission
+                          </option>
                           <option value="Submitted">Submitted</option>
                           <option value="Under Review">Under Review</option>
                         </optgroup>
@@ -1110,7 +1175,9 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                         </optgroup>
                       </select>
                     </td>
-                    <td className="font-medium whitespace-nowrap dark:text-dark-text-primary">{assessment?.courseName}</td>
+                    <td className="font-medium whitespace-nowrap dark:text-dark-text-primary">
+                      {assessment?.courseName}
+                    </td>
                     <td>
                       <div className="flex items-center">
                         <span
@@ -1122,35 +1189,43 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                       </div>
                     </td>
                     <td className="whitespace-nowrap">
-                      <span className={`${
-                        assessment?.status === "Submitted"
-                          ? "text-emerald-600 dark:text-emerald-400 font-medium"
-                          : assessment?.status === "Under Review"
-                          ? "text-indigo-600 dark:text-indigo-400 font-medium"
-                          : assessment?.status === "In progress"
-                          ? "text-blue-600 dark:text-blue-400 font-medium"
-                          : assessment?.status === "Draft"
-                          ? "text-purple-600 dark:text-purple-400 font-medium"
-                          : assessment?.status === "Pending Submission"
-                          ? "text-orange-600 dark:text-orange-400 font-medium"
-                          : assessment?.status === "Needs Revision"
-                          ? "text-amber-600 dark:text-amber-400 font-medium"
-                          : assessment?.status === "Missed/Late"
-                          ? "text-red-600 dark:text-red-400 font-medium"
-                          : assessment?.status === "On Hold"
-                          ? "text-yellow-600 dark:text-yellow-400 font-medium"
-                          : dueDateStatus === "overdue"
-                          ? "text-red-600 dark:text-red-400 font-medium"
-                          : dueDateStatus === "urgent"
-                          ? "text-amber-600 dark:text-amber-400 font-medium"
-                          : "dark:text-dark-text-primary"
-                      }`}>
-                        {assessment?.dueDate && assessment?.dueTime && 
-                          formatDateTimeForDisplay(assessment.dueDate, assessment.dueTime)}
+                      <span
+                        className={`${
+                          assessment?.status === "Submitted"
+                            ? "text-emerald-600 dark:text-emerald-400 font-medium"
+                            : assessment?.status === "Under Review"
+                            ? "text-indigo-600 dark:text-indigo-400 font-medium"
+                            : assessment?.status === "In progress"
+                            ? "text-blue-600 dark:text-blue-400 font-medium"
+                            : assessment?.status === "Draft"
+                            ? "text-purple-600 dark:text-purple-400 font-medium"
+                            : assessment?.status === "Pending Submission"
+                            ? "text-orange-600 dark:text-orange-400 font-medium"
+                            : assessment?.status === "Needs Revision"
+                            ? "text-amber-600 dark:text-amber-400 font-medium"
+                            : assessment?.status === "Missed/Late"
+                            ? "text-red-600 dark:text-red-400 font-medium"
+                            : assessment?.status === "On Hold"
+                            ? "text-yellow-600 dark:text-yellow-400 font-medium"
+                            : dueDateStatus === "overdue"
+                            ? "text-red-600 dark:text-red-400 font-medium"
+                            : dueDateStatus === "urgent"
+                            ? "text-amber-600 dark:text-amber-400 font-medium"
+                            : "dark:text-dark-text-primary"
+                        }`}
+                      >
+                        {assessment?.dueDate &&
+                          assessment?.dueTime &&
+                          formatDateTimeForDisplay(
+                            assessment.dueDate,
+                            assessment.dueTime
+                          )}
                       </span>
                     </td>
                     {showDaysTillDue && (
-                      <td className="whitespace-nowrap">{formatDaysTillDue(daysTillDue)}</td>
+                      <td className="whitespace-nowrap">
+                        {formatDaysTillDue(daysTillDue)}
+                      </td>
                     )}
                     {showWeight && (
                       <td className="whitespace-nowrap">
@@ -1159,7 +1234,9 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                             {assessment.weight}%
                           </span>
                         ) : (
-                          <span className="text-gray-400 dark:text-dark-text-tertiary">-</span>
+                          <span className="text-gray-400 dark:text-dark-text-tertiary">
+                            -
+                          </span>
                         )}
                       </td>
                     )}
@@ -1171,7 +1248,11 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                             ? "text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 hover:bg-indigo-50 dark:hover:bg-indigo-900/30"
                             : "text-gray-400 dark:text-dark-text-tertiary hover:text-gray-600 dark:hover:text-dark-text-secondary hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary"
                         }`}
-                        title={assessment?.notes && assessment.notes.trim() !== "" ? "Edit Notes" : "Add Notes"}
+                        title={
+                          assessment?.notes && assessment.notes.trim() !== ""
+                            ? "Edit Notes"
+                            : "Add Notes"
+                        }
                       >
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
@@ -1183,9 +1264,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                         </svg>
                       </button>
                     </td>
-                    <td
-                      onClick={(e) => e.stopPropagation()}
-                    >
+                    <td onClick={(e) => e.stopPropagation()}>
                       <div
                         className="relative inline-block"
                         ref={
@@ -1282,16 +1361,24 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                 </p>
                 <div className="mt-2 flex items-center space-x-4 text-sm">
                   <span className="text-gray-600 dark:text-dark-text-secondary">
-                    Due: {formatDateTimeForDisplay(selectedAssessment.dueDate, selectedAssessment.dueTime)}
+                    Due:{" "}
+                    {formatDateTimeForDisplay(
+                      selectedAssessment.dueDate,
+                      selectedAssessment.dueTime
+                    )}
                   </span>
                   <span className="text-gray-600 dark:text-dark-text-secondary">
                     Weight: {selectedAssessment.weight}%
                   </span>
-                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                    selectedAssessment.status === "Submitted" ? "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-800 dark:text-emerald-400" :
-                    selectedAssessment.status === "In progress" ? "bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400" :
-                    "bg-gray-100 dark:bg-gray-900/30 text-gray-800 dark:text-gray-400"
-                  }`}>
+                  <span
+                    className={`px-2 py-1 rounded-full text-xs font-medium ${
+                      selectedAssessment.status === "Submitted"
+                        ? "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-800 dark:text-emerald-400"
+                        : selectedAssessment.status === "In progress"
+                        ? "bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400"
+                        : "bg-gray-100 dark:bg-gray-900/30 text-gray-800 dark:text-gray-400"
+                    }`}
+                  >
                     {selectedAssessment.status}
                   </span>
                 </div>
@@ -1299,14 +1386,39 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
               <div className="flex items-center space-x-2">
                 <button
                   onClick={() => {
-                    const text = `Assignment: ${selectedAssessment.assignmentName}\nCourse: ${selectedAssessment.courseName}\nDue: ${formatDateTimeForDisplay(selectedAssessment.dueDate, selectedAssessment.dueTime)}\nWeight: ${selectedAssessment.weight}%\nStatus: ${selectedAssessment.status}\n\nNotes:\n${notesInput}`;
+                    const text = `Assignment: ${
+                      selectedAssessment.assignmentName
+                    }\nCourse: ${
+                      selectedAssessment.courseName
+                    }\nDue: ${formatDateTimeForDisplay(
+                      selectedAssessment.dueDate,
+                      selectedAssessment.dueTime
+                    )}\nWeight: ${selectedAssessment.weight}%\nStatus: ${
+                      selectedAssessment.status
+                    }\n\nNotes:\n${notesInput}`;
                     navigator.clipboard.writeText(text);
                   }}
                   className="inline-flex items-center px-3 py-1.5 border border-gray-300 dark:border-dark-border shadow-sm text-sm font-medium rounded-md text-gray-700 dark:text-dark-text-primary bg-white dark:bg-dark-bg-tertiary hover:bg-gray-50 dark:hover:bg-dark-bg-secondary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-indigo-400"
                   title="Copy Notes"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-4 w-4 mr-1.5"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <rect
+                      x="9"
+                      y="9"
+                      width="13"
+                      height="13"
+                      rx="2"
+                      ry="2"
+                    ></rect>
                     <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
                   </svg>
                   Copy
@@ -1318,7 +1430,16 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                   }}
                   className="inline-flex items-center p-1.5 border border-transparent rounded-md text-gray-400 dark:text-dark-text-tertiary hover:text-gray-500 dark:hover:text-dark-text-secondary hover:bg-gray-100 dark:hover:bg-dark-bg-tertiary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-indigo-400"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
                     <line x1="18" y1="6" x2="6" y2="18"></line>
                     <line x1="6" y1="6" x2="18" y2="18"></line>
                   </svg>
@@ -1381,8 +1502,10 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
           setShowDeleteModal(false);
           setAssessmentToDelete(null);
         }}
-        onConfirm={() => assessmentToDelete && handleDeleteAssessment(assessmentToDelete)}
-        assessmentName={assessmentToDelete?.assignmentName || ''}
+        onConfirm={() =>
+          assessmentToDelete && handleDeleteAssessment(assessmentToDelete)
+        }
+        assessmentName={assessmentToDelete?.assignmentName || ""}
       />
 
       {/* Bulk Delete Confirmation Modal */}

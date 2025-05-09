@@ -43,23 +43,23 @@ const CourseFilteredAssessments = ({
           semesterId,
           "assessments"
         );
-        
+
         // Query for the specific course
         const q = query(
           assessmentsRef,
           where("courseName", "==", selectedCourse)
         );
-        
+
         const querySnapshot = await getDocs(q);
         const assessmentsList: Assessment[] = [];
-        
+
         querySnapshot.forEach((doc) => {
           assessmentsList.push({
             id: doc.id,
             ...(doc.data() as Omit<Assessment, "id">),
           });
         });
-        
+
         setAssessments(assessmentsList);
       } catch (err) {
         console.error("Error fetching course assessments:", err);
@@ -86,22 +86,22 @@ const CourseFilteredAssessments = ({
           semesterId,
           "assessments"
         );
-        
+
         const q = query(
           assessmentsRef,
           where("courseName", "==", selectedCourse)
         );
-        
+
         const querySnapshot = await getDocs(q);
         const assessmentsList: Assessment[] = [];
-        
+
         querySnapshot.forEach((doc) => {
           assessmentsList.push({
             id: doc.id,
             ...(doc.data() as Omit<Assessment, "id">),
           });
         });
-        
+
         setAssessments(assessmentsList);
       } catch (err) {
         console.error("Error refreshing course assessments:", err);
@@ -124,7 +124,9 @@ const CourseFilteredAssessments = ({
           onClick={() => setShowGradeCalculator(!showGradeCalculator)}
           className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors"
         >
-          {showGradeCalculator ? 'Hide Grade Calculator' : 'Show Grade Calculator'}
+          {showGradeCalculator
+            ? "Hide Grade Calculator"
+            : "Show Grade Calculator"}
         </button>
       </div>
 
@@ -159,9 +161,12 @@ const CourseFilteredAssessments = ({
               d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
             />
           </svg>
-          <p className="text-lg font-medium mb-2 dark:text-dark-text-primary">No assessments found for this course</p>
+          <p className="text-lg font-medium mb-2 dark:text-dark-text-primary">
+            No assessments found for this course
+          </p>
           <p>
-            This course doesn't have any assessments yet. Add assessments manually or upload a course outline.
+            This course doesn&apos;t have any assessments yet. Add assessments
+            manually or upload a course outline.
           </p>
         </div>
       ) : (

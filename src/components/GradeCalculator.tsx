@@ -1,8 +1,15 @@
-import { useState, useEffect } from 'react';
-import { useAuth } from '../contexts/AuthContext';
-import { db } from '../lib/firebase';
-import { collection, query, where, getDocs, doc, updateDoc } from 'firebase/firestore';
-import { Assessment } from '../types/assessment';
+import { useState, useEffect } from "react";
+import { useAuth } from "../contexts/AuthContext";
+import { db } from "../lib/firebase";
+import {
+  collection,
+  query,
+  where,
+  getDocs,
+  doc,
+  updateDoc,
+} from "firebase/firestore";
+import { Assessment } from "../types/assessment";
 
 interface GradeCalculatorProps {
   semesterId: string;
@@ -34,59 +41,72 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
       try {
         const assessmentsRef = collection(
           db,
-          'users',
+          "users",
           user.uid,
-          'semesters',
+          "semesters",
           semesterId,
-          'assessments'
+          "assessments"
         );
-        
+
         const q = query(
           assessmentsRef,
-          where('courseName', '==', selectedCourse)
+          where("courseName", "==", selectedCourse)
         );
-        
+
         const querySnapshot = await getDocs(q);
         const assessmentsList: Assessment[] = [];
-        
+
         querySnapshot.forEach((doc) => {
           assessmentsList.push({
             id: doc.id,
-            ...(doc.data() as Omit<Assessment, 'id'>),
+            ...(doc.data() as Omit<Assessment, "id">),
           });
         });
-        
+
         // Sort assessments by due date
         const sortedAssessments = assessmentsList.sort((a, b) => {
           const dateA = new Date(`${a.dueDate}T${a.dueTime}`);
           const dateB = new Date(`${b.dueDate}T${b.dueTime}`);
           return dateA.getTime() - dateB.getTime();
         });
-        
+
         setAssessments(sortedAssessments);
-        
+
         // Calculate total weight of all assessments
-        const total = sortedAssessments.reduce((sum, assessment) => sum + assessment.weight, 0);
+        const total = sortedAssessments.reduce(
+          (sum, assessment) => sum + assessment.weight,
+          0
+        );
         setTotalWeight(total);
-        
+
         // Calculate current grade based on completed assessments
-        const completedAssessments = sortedAssessments.filter(a => a.status === 'Submitted' && a.mark !== null && a.mark !== undefined);
+        const completedAssessments = sortedAssessments.filter(
+          (a) =>
+            a.status === "Submitted" && a.mark !== null && a.mark !== undefined
+        );
         if (completedAssessments.length > 0) {
           const weightedSum = completedAssessments.reduce((sum, assessment) => {
-            if (assessment.mark === null || assessment.mark === undefined) return sum;
-            return sum + (assessment.mark * assessment.weight / 100);
+            if (assessment.mark === null || assessment.mark === undefined)
+              return sum;
+            return sum + (assessment.mark * assessment.weight) / 100;
           }, 0);
-          const completedWeight = completedAssessments.reduce((sum, assessment) => {
-            if (assessment.mark === null || assessment.mark === undefined) return sum;
-            return sum + assessment.weight;
-          }, 0);
-          setCurrentGrade(completedWeight > 0 ? (weightedSum / completedWeight) * 100 : 0);
+          const completedWeight = completedAssessments.reduce(
+            (sum, assessment) => {
+              if (assessment.mark === null || assessment.mark === undefined)
+                return sum;
+              return sum + assessment.weight;
+            },
+            0
+          );
+          setCurrentGrade(
+            completedWeight > 0 ? (weightedSum / completedWeight) * 100 : 0
+          );
         } else {
           setCurrentGrade(null);
         }
       } catch (err) {
-        console.error('Error fetching course assessments:', err);
-        setError('Failed to load assessments for this course.');
+        console.error("Error fetching course assessments:", err);
+        setError("Failed to load assessments for this course.");
       } finally {
         setIsLoading(false);
       }
@@ -97,34 +117,40 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
 
   const handleMarkChange = (assessmentId: string, value: string) => {
     // Allow empty string to clear the mark, use null instead of undefined
-    const mark = value === '' ? null : Math.max(0, parseFloat(value) || 0);
-    
+    const mark = value === "" ? null : Math.max(0, parseFloat(value) || 0);
+
     // Update local state only
-    setAssessments(prevAssessments => 
-      prevAssessments.map(assessment => 
-        assessment.id === assessmentId 
-          ? { ...assessment, mark, status: 'Submitted' }
+    setAssessments((prevAssessments) =>
+      prevAssessments.map((assessment) =>
+        assessment.id === assessmentId
+          ? { ...assessment, mark, status: "Submitted" }
           : assessment
       )
     );
 
     // Recalculate current grade
-    const updatedAssessments = assessments.map(assessment => 
-      assessment.id === assessmentId 
-        ? { ...assessment, mark, status: 'Submitted' }
+    const updatedAssessments = assessments.map((assessment) =>
+      assessment.id === assessmentId
+        ? { ...assessment, mark, status: "Submitted" }
         : assessment
     );
-    const completedAssessments = updatedAssessments.filter(a => a.status === 'Submitted' && a.mark !== null && a.mark !== undefined);
+    const completedAssessments = updatedAssessments.filter(
+      (a) => a.status === "Submitted" && a.mark !== null && a.mark !== undefined
+    );
     if (completedAssessments.length > 0) {
       const weightedSum = completedAssessments.reduce((sum, assessment) => {
-        if (assessment.mark === null || assessment.mark === undefined) return sum;
-        return sum + (assessment.mark * assessment.weight / 100);
+        if (assessment.mark === null || assessment.mark === undefined)
+          return sum;
+        return sum + (assessment.mark * assessment.weight) / 100;
       }, 0);
       const completedWeight = completedAssessments.reduce((sum, assessment) => {
-        if (assessment.mark === null || assessment.mark === undefined) return sum;
+        if (assessment.mark === null || assessment.mark === undefined)
+          return sum;
         return sum + assessment.weight;
       }, 0);
-      setCurrentGrade(completedWeight > 0 ? (weightedSum / completedWeight) * 100 : 0);
+      setCurrentGrade(
+        completedWeight > 0 ? (weightedSum / completedWeight) * 100 : 0
+      );
     } else {
       setCurrentGrade(null);
     }
@@ -134,38 +160,48 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
 
   const handleWeightChange = (assessmentId: string, value: string) => {
     // Allow empty string to set weight to 0, but cap at 100
-    const newWeight = value === '' ? 0 : Math.min(100, Math.max(0, parseFloat(value) || 0));
+    const newWeight =
+      value === "" ? 0 : Math.min(100, Math.max(0, parseFloat(value) || 0));
 
     // Update local state only
-    setAssessments(prevAssessments => 
-      prevAssessments.map(assessment => 
-        assessment.id === assessmentId 
+    setAssessments((prevAssessments) =>
+      prevAssessments.map((assessment) =>
+        assessment.id === assessmentId
           ? { ...assessment, weight: newWeight }
           : assessment
       )
     );
 
     // Recalculate total weight
-    const updatedAssessments = assessments.map(assessment => 
-      assessment.id === assessmentId 
+    const updatedAssessments = assessments.map((assessment) =>
+      assessment.id === assessmentId
         ? { ...assessment, weight: newWeight }
         : assessment
     );
-    const total = updatedAssessments.reduce((sum, assessment) => sum + assessment.weight, 0);
+    const total = updatedAssessments.reduce(
+      (sum, assessment) => sum + assessment.weight,
+      0
+    );
     setTotalWeight(total);
 
     // Recalculate current grade
-    const completedAssessments = updatedAssessments.filter(a => a.status === 'Submitted' && a.mark !== null && a.mark !== undefined);
+    const completedAssessments = updatedAssessments.filter(
+      (a) => a.status === "Submitted" && a.mark !== null && a.mark !== undefined
+    );
     if (completedAssessments.length > 0) {
       const weightedSum = completedAssessments.reduce((sum, assessment) => {
-        if (assessment.mark === null || assessment.mark === undefined) return sum;
-        return sum + (assessment.mark * assessment.weight / 100);
+        if (assessment.mark === null || assessment.mark === undefined)
+          return sum;
+        return sum + (assessment.mark * assessment.weight) / 100;
       }, 0);
       const completedWeight = completedAssessments.reduce((sum, assessment) => {
-        if (assessment.mark === null || assessment.mark === undefined) return sum;
+        if (assessment.mark === null || assessment.mark === undefined)
+          return sum;
         return sum + assessment.weight;
       }, 0);
-      setCurrentGrade(completedWeight > 0 ? (weightedSum / completedWeight) * 100 : 0);
+      setCurrentGrade(
+        completedWeight > 0 ? (weightedSum / completedWeight) * 100 : 0
+      );
     }
 
     setHasUnsavedChanges(true);
@@ -182,47 +218,49 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
       for (const assessment of assessments) {
         const assessmentRef = doc(
           db,
-          'users',
+          "users",
           user.uid,
-          'semesters',
+          "semesters",
           semesterId,
-          'assessments',
+          "assessments",
           assessment.id
         );
-        
+
         // Convert undefined mark to null for Firestore
         const mark = assessment.mark === undefined ? null : assessment.mark;
-        
+
         await updateDoc(assessmentRef, {
           mark,
           weight: assessment.weight,
-          status: assessment.status
+          status: assessment.status,
         });
       }
 
       setHasUnsavedChanges(false);
     } catch (err) {
-      console.error('Error saving assessment changes:', err);
-      setError('Failed to save changes. Please try again.');
+      console.error("Error saving assessment changes:", err);
+      setError("Failed to save changes. Please try again.");
     } finally {
       setIsLoading(false);
     }
   };
 
   const calculateCurrentGrade = () => {
-    const completedAssessments = assessments.filter(a => a.status === 'Submitted' && a.mark !== null && a.mark !== undefined);
+    const completedAssessments = assessments.filter(
+      (a) => a.status === "Submitted" && a.mark !== null && a.mark !== undefined
+    );
     if (completedAssessments.length === 0) return null;
-    
+
     const weightedSum = completedAssessments.reduce((sum, assessment) => {
       if (assessment.mark === null || assessment.mark === undefined) return sum;
-      return sum + (assessment.mark * assessment.weight / 100);
+      return sum + (assessment.mark * assessment.weight) / 100;
     }, 0);
-    
+
     const completedWeight = completedAssessments.reduce((sum, assessment) => {
       if (assessment.mark === null || assessment.mark === undefined) return sum;
       return sum + assessment.weight;
     }, 0);
-    
+
     return completedWeight > 0 ? (weightedSum / completedWeight) * 100 : 0;
   };
 
@@ -246,8 +284,12 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
     <div className="bg-white dark:bg-dark-bg-secondary rounded-lg shadow p-6">
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-dark-text-primary">{selectedCourse}</h2>
-          <p className="text-sm text-gray-500 dark:text-dark-text-tertiary mt-1">Grade Calculator</p>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-dark-text-primary">
+            {selectedCourse}
+          </h2>
+          <p className="text-sm text-gray-500 dark:text-dark-text-tertiary mt-1">
+            Grade Calculator
+          </p>
         </div>
         {hasUnsavedChanges && (
           <button
@@ -258,20 +300,26 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
           </button>
         )}
       </div>
-      
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
         <div className="p-4 bg-indigo-50 dark:bg-dark-bg-tertiary rounded-lg">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-dark-text-primary mb-2">Current Grade</h3>
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-dark-text-primary mb-2">
+            Current Grade
+          </h3>
           {currentGrade !== null ? (
             <div className="text-3xl font-bold text-indigo-600 dark:text-indigo-400">
               {currentGrade.toFixed(1)}%
             </div>
           ) : (
-            <div className="text-gray-500 dark:text-dark-text-tertiary">No completed assessments yet</div>
+            <div className="text-gray-500 dark:text-dark-text-tertiary">
+              No completed assessments yet
+            </div>
           )}
         </div>
         <div className="p-4 bg-indigo-50 dark:bg-dark-bg-tertiary rounded-lg">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-dark-text-primary mb-2">Course Weight</h3>
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-dark-text-primary mb-2">
+            Course Weight
+          </h3>
           <div className="text-3xl font-bold text-indigo-600 dark:text-indigo-400">
             {totalWeight}%
           </div>
@@ -282,68 +330,79 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
         <div className="rounded-lg border border-gray-200 dark:border-dark-border overflow-hidden">
           <table className="min-w-full divide-y divide-gray-200 dark:divide-dark-border">
             <thead className="bg-gray-50 dark:bg-dark-bg-tertiary">
-            <tr>
+              <tr>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-dark-text-tertiary uppercase tracking-wider">
-                Assessment
-              </th>
+                  Assessment
+                </th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-dark-text-tertiary uppercase tracking-wider w-32">
-                Weight
-              </th>
+                  Weight
+                </th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-dark-text-tertiary uppercase tracking-wider w-32">
-                Mark
-              </th>
-            </tr>
-          </thead>
-            <tbody className="bg-white dark:bg-dark-bg-secondary divide-y divide-gray-200 dark:divide-dark-border">
-            {assessments.map((assessment) => (
-                <tr key={assessment.id} className="hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary">
-                <td className="px-4 py-3">
-                    <div className="text-sm font-medium text-gray-900 dark:text-dark-text-primary">
-                    {assessment.assignmentName}
-                  </div>
-                    <div className="text-xs text-gray-500 dark:text-dark-text-tertiary mt-1">
-                    {assessment.status}
-                  </div>
-                </td>
-                <td className="px-4 py-3">
-                  <div className="flex items-center">
-                    <input
-                      type="number"
-                      inputMode="decimal"
-                      min="0"
-                      max="100"
-                      step="0.1"
-                      value={assessment.weight}
-                      onChange={(e) => handleWeightChange(assessment.id, e.target.value)}
-                        className="w-20 px-2 py-1 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                      placeholder="0-100"
-                    />
-                      <span className="ml-1 text-gray-500 dark:text-dark-text-tertiary">%</span>
-                  </div>
-                </td>
-                <td className="px-4 py-3">
-                  <div className="flex items-center">
-                    <input
-                      type="number"
-                      inputMode="decimal"
-                      min="0"
-                      step="0.1"
-                      value={assessment.mark ?? ''}
-                      onChange={(e) => handleMarkChange(assessment.id, e.target.value)}
-                        className="w-20 px-2 py-1 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                      placeholder="0+"
-                    />
-                      <span className="ml-1 text-gray-500 dark:text-dark-text-tertiary">%</span>
-                  </div>
-                </td>
+                  Mark
+                </th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="bg-white dark:bg-dark-bg-secondary divide-y divide-gray-200 dark:divide-dark-border">
+              {assessments.map((assessment) => (
+                <tr
+                  key={assessment.id}
+                  className="hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary"
+                >
+                  <td className="px-4 py-3">
+                    <div className="text-sm font-medium text-gray-900 dark:text-dark-text-primary">
+                      {assessment.assignmentName}
+                    </div>
+                    <div className="text-xs text-gray-500 dark:text-dark-text-tertiary mt-1">
+                      {assessment.status}
+                    </div>
+                  </td>
+                  <td className="px-4 py-3">
+                    <div className="flex items-center">
+                      <input
+                        type="number"
+                        inputMode="decimal"
+                        min="0"
+                        max="100"
+                        step="0.1"
+                        value={assessment.weight}
+                        onChange={(e) =>
+                          handleWeightChange(assessment.id, e.target.value)
+                        }
+                        className="w-20 px-2 py-1 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                        placeholder="0-100"
+                      />
+                      <span className="ml-1 text-gray-500 dark:text-dark-text-tertiary">
+                        %
+                      </span>
+                    </div>
+                  </td>
+                  <td className="px-4 py-3">
+                    <div className="flex items-center">
+                      <input
+                        type="number"
+                        inputMode="decimal"
+                        min="0"
+                        step="0.1"
+                        value={assessment.mark ?? ""}
+                        onChange={(e) =>
+                          handleMarkChange(assessment.id, e.target.value)
+                        }
+                        className="w-20 px-2 py-1 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                        placeholder="0+"
+                      />
+                      <span className="ml-1 text-gray-500 dark:text-dark-text-tertiary">
+                        %
+                      </span>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
   );
 };
 
-export default GradeCalculator; 
+export default GradeCalculator;

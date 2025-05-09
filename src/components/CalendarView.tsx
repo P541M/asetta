@@ -174,7 +174,9 @@ const CalendarView = ({ selectedSemester, semesterId }: CalendarViewProps) => {
   const goToToday = () => {
     const today = new Date();
     setCurrentMonth(new Date(today.getFullYear(), today.getMonth(), 1));
-    const todayDay = calendarDays.find(day => day.date.getTime() === today.getTime());
+    const todayDay = calendarDays.find(
+      (day) => day.date.getTime() === today.getTime()
+    );
     if (todayDay) {
       setSelectedDay(todayDay);
     }
@@ -353,9 +355,7 @@ const CalendarView = ({ selectedSemester, semesterId }: CalendarViewProps) => {
                   ? "bg-white dark:bg-dark-bg-secondary"
                   : "bg-gray-50 dark:bg-dark-bg-tertiary"
               } ${
-                day.isToday
-                  ? "ring-2 ring-indigo-500 dark:ring-indigo-400"
-                  : ""
+                day.isToday ? "ring-2 ring-indigo-500 dark:ring-indigo-400" : ""
               } ${
                 day.assessments.length > 0
                   ? "cursor-pointer hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary"
@@ -367,11 +367,7 @@ const CalendarView = ({ selectedSemester, semesterId }: CalendarViewProps) => {
                   day.isCurrentMonth
                     ? "text-gray-900 dark:text-dark-text-primary"
                     : "text-gray-400 dark:text-dark-text-tertiary"
-                } ${
-                  day.isToday
-                    ? "text-indigo-600 dark:text-indigo-400"
-                    : ""
-                }`}
+                } ${day.isToday ? "text-indigo-600 dark:text-indigo-400" : ""}`}
               >
                 {day.date.getDate()}
               </div>
@@ -397,9 +393,11 @@ const CalendarView = ({ selectedSemester, semesterId }: CalendarViewProps) => {
                           ? "bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400"
                           : assessment.status === "On Hold"
                           ? "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-400"
-                          : getDueDateStatus(day.date, assessment.dueTime) === "overdue"
+                          : getDueDateStatus(day.date, assessment.dueTime) ===
+                            "overdue"
                           ? "bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400"
-                          : getDueDateStatus(day.date, assessment.dueTime) === "urgent"
+                          : getDueDateStatus(day.date, assessment.dueTime) ===
+                            "urgent"
                           ? "bg-amber-100 dark:bg-amber-900/30 text-amber-800 dark:text-amber-400"
                           : "bg-gray-100 dark:bg-gray-900/30 text-gray-800 dark:text-gray-400"
                       }`}
@@ -476,9 +474,15 @@ const CalendarView = ({ selectedSemester, semesterId }: CalendarViewProps) => {
                           ? "bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400"
                           : assessment.status === "On Hold"
                           ? "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-400"
-                          : getDueDateStatus(selectedDay.date, assessment.dueTime) === "overdue"
+                          : getDueDateStatus(
+                              selectedDay.date,
+                              assessment.dueTime
+                            ) === "overdue"
                           ? "bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400"
-                          : getDueDateStatus(selectedDay.date, assessment.dueTime) === "urgent"
+                          : getDueDateStatus(
+                              selectedDay.date,
+                              assessment.dueTime
+                            ) === "urgent"
                           ? "bg-amber-100 dark:bg-amber-900/30 text-amber-800 dark:text-amber-400"
                           : "bg-gray-100 dark:bg-gray-900/30 text-gray-800 dark:text-gray-400"
                       }`}
@@ -487,7 +491,10 @@ const CalendarView = ({ selectedSemester, semesterId }: CalendarViewProps) => {
                     </span>
                   </div>
                   <div className="mt-2 text-sm text-gray-600 dark:text-dark-text-secondary">
-                    <p>Due: {formatDateTime(selectedDay.date, assessment.dueTime)}</p>
+                    <p>
+                      Due:{" "}
+                      {formatDateTime(selectedDay.date, assessment.dueTime)}
+                    </p>
                     {assessment.weight > 0 && (
                       <p>Weight: {assessment.weight}%</p>
                     )}

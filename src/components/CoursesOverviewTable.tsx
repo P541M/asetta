@@ -1,9 +1,21 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { db } from "../lib/firebase";
-import { collection, query, getDocs, doc, setDoc, writeBatch, where } from "firebase/firestore";
+import {
+  collection,
+  query,
+  getDocs,
+  doc,
+  setDoc,
+  writeBatch,
+  where,
+} from "firebase/firestore";
 import { supabase } from "../lib/supabase";
-import { parseLocalDateTime, formatLocalDate, isUpcoming as isDateUpcoming } from "../utils/dateUtils";
+import {
+  parseLocalDateTime,
+  formatLocalDate,
+  isUpcoming as isDateUpcoming,
+} from "../utils/dateUtils";
 
 interface Assessment {
   id: string;
@@ -101,24 +113,28 @@ const CoursesOverviewTable = ({
                 !completedStatuses.includes(a.status) &&
                 (() => {
                   const [year, month, day] = a.dueDate.split("-").map(Number);
-                  const [hours, minutes] = (a.dueTime || "23:59").split(":").map(Number);
+                  const [hours, minutes] = (a.dueTime || "23:59")
+                    .split(":")
+                    .map(Number);
                   const due = new Date(year, month - 1, day, hours, minutes);
                   return due >= now;
                 })()
             )
-            .sort(
-              (a, b) => {
-                const [yearA, monthA, dayA] = a.dueDate.split("-").map(Number);
-                const [hoursA, minutesA] = (a.dueTime || "23:59").split(":").map(Number);
-                const dueA = new Date(yearA, monthA - 1, dayA, hoursA, minutesA);
-                
-                const [yearB, monthB, dayB] = b.dueDate.split("-").map(Number);
-                const [hoursB, minutesB] = (b.dueTime || "23:59").split(":").map(Number);
-                const dueB = new Date(yearB, monthB - 1, dayB, hoursB, minutesB);
-                
-                return dueA.getTime() - dueB.getTime();
-              }
-            );
+            .sort((a, b) => {
+              const [yearA, monthA, dayA] = a.dueDate.split("-").map(Number);
+              const [hoursA, minutesA] = (a.dueTime || "23:59")
+                .split(":")
+                .map(Number);
+              const dueA = new Date(yearA, monthA - 1, dayA, hoursA, minutesA);
+
+              const [yearB, monthB, dayB] = b.dueDate.split("-").map(Number);
+              const [hoursB, minutesB] = (b.dueTime || "23:59")
+                .split(":")
+                .map(Number);
+              const dueB = new Date(yearB, monthB - 1, dayB, hoursB, minutesB);
+
+              return dueA.getTime() - dueB.getTime();
+            });
           const nextAssignment = upcomingAssessments[0] || null;
 
           courseStatsList.push({
@@ -173,8 +189,10 @@ const CoursesOverviewTable = ({
     }
     const fieldA = a[sortField];
     const fieldB = b[sortField];
-    if (fieldA === null || fieldA === undefined) return sortDirection === "asc" ? 1 : -1;
-    if (fieldB === null || fieldB === undefined) return sortDirection === "asc" ? -1 : 1;
+    if (fieldA === null || fieldA === undefined)
+      return sortDirection === "asc" ? 1 : -1;
+    if (fieldB === null || fieldB === undefined)
+      return sortDirection === "asc" ? -1 : 1;
     if (fieldA < fieldB) return sortDirection === "asc" ? -1 : 1;
     if (fieldA > fieldB) return sortDirection === "asc" ? 1 : -1;
     return 0;
@@ -216,7 +234,10 @@ const CoursesOverviewTable = ({
 
       // Create a safe filename with timestamp to prevent collisions
       const timestamp = new Date().getTime();
-      const safeFilename = `${timestamp}_${file.name.replace(/[^a-zA-Z0-9.-]/g, "_")}`;
+      const safeFilename = `${timestamp}_${file.name.replace(
+        /[^a-zA-Z0-9.-]/g,
+        "_"
+      )}`;
       const filePath = `${user.uid}/${semesterId}/${safeFilename}`;
 
       // Upload to Supabase Storage
@@ -231,9 +252,9 @@ const CoursesOverviewTable = ({
       if (uploadError) throw uploadError;
 
       // Get the public URL
-      const { data: { publicUrl } } = supabase.storage
-        .from("outlines")
-        .getPublicUrl(filePath);
+      const {
+        data: { publicUrl },
+      } = supabase.storage.from("outlines").getPublicUrl(filePath);
 
       // Update the course document
       const courseRef = doc(db, "users", user.uid, "courses", courseName);
@@ -258,12 +279,12 @@ const CoursesOverviewTable = ({
       );
       const q = query(assessmentsRef, where("courseName", "==", courseName));
       const querySnapshot = await getDocs(q);
-      
+
       const batch = writeBatch(db);
       querySnapshot.forEach((doc) => {
-        batch.update(doc.ref, { 
+        batch.update(doc.ref, {
           outlineUrl: publicUrl,
-          outlineUpdatedAt: new Date()
+          outlineUpdatedAt: new Date(),
         });
       });
       await batch.commit();
@@ -276,7 +297,9 @@ const CoursesOverviewTable = ({
 
       setCourses((prev) =>
         prev.map((course) =>
-          course.courseName === courseName ? { ...course, outlineUrl: publicUrl } : course
+          course.courseName === courseName
+            ? { ...course, outlineUrl: publicUrl }
+            : course
         )
       );
     } catch (err) {
@@ -298,8 +321,9 @@ const CoursesOverviewTable = ({
 
   return (
     <div className="bg-white dark:bg-dark-bg-secondary rounded-xl shadow-sm border border-gray-100 dark:border-dark-border-primary p-6">
-
-      <h2 className="text-xl font-medium text-gray-900 dark:text-dark-text-primary mb-6">Your Courses</h2>
+      <h2 className="text-xl font-medium text-gray-900 dark:text-dark-text-primary mb-6">
+        Your Courses
+      </h2>
       <div className="table-container rounded-lg shadow-sm border border-gray-100 dark:border-dark-border dark:bg-dark-bg-secondary">
         <table className="data-table">
           <thead className="bg-gray-50 dark:bg-dark-bg-tertiary">
@@ -309,7 +333,9 @@ const CoursesOverviewTable = ({
                 className="cursor-pointer w-48 dark:text-dark-text-primary dark:bg-dark-bg-tertiary"
               >
                 <div className="flex items-center space-x-1 group">
-                  <span className="group-hover:text-indigo-600 dark:group-hover:text-indigo-400">Course</span>
+                  <span className="group-hover:text-indigo-600 dark:group-hover:text-indigo-400">
+                    Course
+                  </span>
                   {sortField === "courseName" && (
                     <span className="text-indigo-600 dark:text-indigo-400">
                       {sortDirection === "asc" ? "↑" : "↓"}
@@ -322,7 +348,9 @@ const CoursesOverviewTable = ({
                 className="cursor-pointer w-24 dark:text-dark-text-primary dark:bg-dark-bg-tertiary"
               >
                 <div className="flex items-center space-x-1 group">
-                  <span className="group-hover:text-indigo-600 dark:group-hover:text-indigo-400">Total</span>
+                  <span className="group-hover:text-indigo-600 dark:group-hover:text-indigo-400">
+                    Total
+                  </span>
                   {sortField === "totalAssessments" && (
                     <span className="text-indigo-600 dark:text-indigo-400">
                       {sortDirection === "asc" ? "↑" : "↓"}
@@ -335,7 +363,9 @@ const CoursesOverviewTable = ({
                 className="cursor-pointer w-24 dark:text-dark-text-primary dark:bg-dark-bg-tertiary"
               >
                 <div className="flex items-center space-x-1 group">
-                  <span className="group-hover:text-indigo-600 dark:group-hover:text-indigo-400">Pending</span>
+                  <span className="group-hover:text-indigo-600 dark:group-hover:text-indigo-400">
+                    Pending
+                  </span>
                   {sortField === "pendingAssessments" && (
                     <span className="text-indigo-600 dark:text-indigo-400">
                       {sortDirection === "asc" ? "↑" : "↓"}
@@ -348,7 +378,9 @@ const CoursesOverviewTable = ({
                 className="cursor-pointer w-32 dark:text-dark-text-primary dark:bg-dark-bg-tertiary"
               >
                 <div className="flex items-center space-x-1 group">
-                  <span className="group-hover:text-indigo-600 dark:group-hover:text-indigo-400">Progress</span>
+                  <span className="group-hover:text-indigo-600 dark:group-hover:text-indigo-400">
+                    Progress
+                  </span>
                   {sortField === "progress" && (
                     <span className="text-indigo-600 dark:text-indigo-400">
                       {sortDirection === "asc" ? "↑" : "↓"}
@@ -361,7 +393,9 @@ const CoursesOverviewTable = ({
                 className="cursor-pointer w-48 dark:text-dark-text-primary dark:bg-dark-bg-tertiary"
               >
                 <div className="flex items-center space-x-1 group">
-                  <span className="group-hover:text-indigo-600 dark:group-hover:text-indigo-400">Next Due</span>
+                  <span className="group-hover:text-indigo-600 dark:group-hover:text-indigo-400">
+                    Next Due
+                  </span>
                   {sortField === "nextDueDate" && (
                     <span className="text-indigo-600 dark:text-indigo-400">
                       {sortDirection === "asc" ? "↑" : "↓"}
@@ -369,20 +403,30 @@ const CoursesOverviewTable = ({
                   )}
                 </div>
               </th>
-              <th className="w-24 dark:text-dark-text-primary dark:bg-dark-bg-tertiary">Outline</th>
-              <th className="w-24 dark:text-dark-text-primary dark:bg-dark-bg-tertiary">Actions</th>
+              <th className="w-24 dark:text-dark-text-primary dark:bg-dark-bg-tertiary">
+                Outline
+              </th>
+              <th className="w-24 dark:text-dark-text-primary dark:bg-dark-bg-tertiary">
+                Actions
+              </th>
             </tr>
           </thead>
           <tbody>
             {sortedCourses.map((course) => (
               <tr key={course.courseName} className="dark:border-dark-border">
-                <td className="font-medium whitespace-nowrap dark:text-dark-text-primary">{course.courseName}</td>
-                <td className="whitespace-nowrap dark:text-dark-text-primary">{course.totalAssessments}</td>
+                <td className="font-medium whitespace-nowrap dark:text-dark-text-primary">
+                  {course.courseName}
+                </td>
+                <td className="whitespace-nowrap dark:text-dark-text-primary">
+                  {course.totalAssessments}
+                </td>
                 <td className="whitespace-nowrap">
                   {course.pendingAssessments > 0 ? (
                     <span
                       className={`font-medium ${
-                        course.pendingAssessments > 2 ? "text-amber-600 dark:text-amber-400" : "dark:text-dark-text-primary"
+                        course.pendingAssessments > 2
+                          ? "text-amber-600 dark:text-amber-400"
+                          : "dark:text-dark-text-primary"
                       }`}
                     >
                       {course.pendingAssessments}
@@ -409,7 +453,9 @@ const CoursesOverviewTable = ({
                     <div>
                       <div
                         className={`font-medium whitespace-nowrap ${
-                          isUpcoming(course.nextDueDate) ? "text-amber-600 dark:text-amber-400" : "dark:text-dark-text-primary"
+                          isUpcoming(course.nextDueDate)
+                            ? "text-amber-600 dark:text-amber-400"
+                            : "dark:text-dark-text-primary"
                         }`}
                       >
                         {formatDate(course.nextDueDate)}
@@ -419,7 +465,9 @@ const CoursesOverviewTable = ({
                       </div>
                     </div>
                   ) : (
-                    <span className="text-gray-400 dark:text-dark-text-tertiary">-</span>
+                    <span className="text-gray-400 dark:text-dark-text-tertiary">
+                      -
+                    </span>
                   )}
                 </td>
                 <td>
@@ -454,7 +502,9 @@ const CoursesOverviewTable = ({
                       <input
                         type="file"
                         accept="application/pdf"
-                        onChange={(e) => handleOutlineUpload(e, course.courseName)}
+                        onChange={(e) =>
+                          handleOutlineUpload(e, course.courseName)
+                        }
                         className="hidden"
                         disabled={uploadingCourse === course.courseName}
                       />
@@ -462,7 +512,9 @@ const CoursesOverviewTable = ({
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
                           className={`h-5 w-5 ${
-                            uploadingCourse === course.courseName ? "animate-spin" : ""
+                            uploadingCourse === course.courseName
+                              ? "animate-spin"
+                              : ""
                           }`}
                           viewBox="0 0 24 24"
                           fill="none"
@@ -524,7 +576,9 @@ const CoursesOverviewTable = ({
               </div>
               <div className="flex items-center space-x-2">
                 <button
-                  onClick={() => window.open(outlineUrls[selectedOutline], '_blank')}
+                  onClick={() =>
+                    window.open(outlineUrls[selectedOutline], "_blank")
+                  }
                   className="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-dark-border shadow-sm text-sm font-medium rounded-md text-gray-700 dark:text-dark-text-primary bg-white dark:bg-dark-bg-secondary hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                 >
                   <svg
@@ -565,7 +619,9 @@ const CoursesOverviewTable = ({
                     <polyline points="17 8 12 3 7 8"></polyline>
                     <line x1="12" y1="3" x2="12" y2="15"></line>
                   </svg>
-                  {uploadingCourse === selectedOutline ? "Uploading..." : "Reupload"}
+                  {uploadingCourse === selectedOutline
+                    ? "Uploading..."
+                    : "Reupload"}
                 </label>
                 <button
                   onClick={() => setSelectedOutline(null)}

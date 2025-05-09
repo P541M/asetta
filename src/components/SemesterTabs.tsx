@@ -15,7 +15,7 @@ import {
   writeBatch,
   limit,
 } from "firebase/firestore";
-import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 
 interface Semester {
   id: string;
@@ -34,7 +34,12 @@ interface DeleteConfirmationModalProps {
   semesterName: string;
 }
 
-const DeleteConfirmationModal = ({ isOpen, onClose, onConfirm, semesterName }: DeleteConfirmationModalProps) => {
+const DeleteConfirmationModal = ({
+  isOpen,
+  onClose,
+  onConfirm,
+  semesterName,
+}: DeleteConfirmationModalProps) => {
   if (!isOpen) return null;
 
   const handleModalClick = (e: React.MouseEvent) => {
@@ -43,7 +48,7 @@ const DeleteConfirmationModal = ({ isOpen, onClose, onConfirm, semesterName }: D
   };
 
   return (
-    <div 
+    <div
       className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[200]"
       onClick={handleModalClick}
     >
@@ -72,7 +77,8 @@ const DeleteConfirmationModal = ({ isOpen, onClose, onConfirm, semesterName }: D
           </button>
         </div>
         <p className="text-gray-600 mb-6">
-          Are you sure you want to delete the semester "{semesterName}" and all its assessments? This action cannot be undone.
+          Are you sure you want to delete the semester &ldquo;{semesterName}
+          &rdquo; and all its assessments? This action cannot be undone.
         </p>
         <div className="flex justify-end space-x-3">
           <button
@@ -112,7 +118,9 @@ const SemesterTabs = ({ selectedSemester, onSelect }: SemesterTabsProps) => {
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [showManageModal, setShowManageModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [semesterToDelete, setSemesterToDelete] = useState<Semester | null>(null);
+  const [semesterToDelete, setSemesterToDelete] = useState<Semester | null>(
+    null
+  );
 
   const dropdownRef = useRef<HTMLDivElement>(null);
   const newInputRef = useRef<HTMLInputElement>(null);
@@ -157,7 +165,7 @@ const SemesterTabs = ({ selectedSemester, onSelect }: SemesterTabsProps) => {
         showManageModal &&
         manageModalRef.current &&
         !manageModalRef.current.contains(event.target as Node) &&
-        !document.querySelector('.modal-open') // Don't close if another modal is open
+        !document.querySelector(".modal-open") // Don't close if another modal is open
       ) {
         setShowManageModal(false);
       }
@@ -264,23 +272,25 @@ const SemesterTabs = ({ selectedSemester, onSelect }: SemesterTabsProps) => {
       try {
         const semColRef = collection(db, "users", user.uid, "semesters");
         const snapshot = await getDocs(semColRef);
-        
+
         // Check if any semesters are missing the order field
-        const needsMigration = snapshot.docs.some(doc => !doc.data().hasOwnProperty('order'));
-        
+        const needsMigration = snapshot.docs.some(
+          (doc) => !doc.data().hasOwnProperty("order")
+        );
+
         if (needsMigration) {
           const batch = writeBatch(db);
           snapshot.docs.forEach((doc, index) => {
             const data = doc.data();
-            if (!data.hasOwnProperty('order')) {
+            if (!data.hasOwnProperty("order")) {
               batch.update(doc.ref, { order: index });
             }
           });
           await batch.commit();
-          console.log('Migration completed: Added order field to semesters');
+          console.log("Migration completed: Added order field to semesters");
         }
       } catch (error) {
-        console.error('Error during migration:', error);
+        console.error("Error during migration:", error);
       }
     };
 
@@ -303,7 +313,13 @@ const SemesterTabs = ({ selectedSemester, onSelect }: SemesterTabsProps) => {
 
     try {
       const batch = writeBatch(db);
-      const semDocRef = doc(db, "users", user.uid, "semesters", semesterToDelete.id);
+      const semDocRef = doc(
+        db,
+        "users",
+        user.uid,
+        "semesters",
+        semesterToDelete.id
+      );
       batch.delete(semDocRef);
 
       const assessmentsRef = collection(
@@ -334,7 +350,8 @@ const SemesterTabs = ({ selectedSemester, onSelect }: SemesterTabsProps) => {
 
       if (semesterToDelete.name === selectedSemester) {
         if (semesters.length > 1) {
-          const nextSemIndex = semesters.findIndex((s) => s.id === semesterToDelete.id) - 1;
+          const nextSemIndex =
+            semesters.findIndex((s) => s.id === semesterToDelete.id) - 1;
           const nextSem = semesters[nextSemIndex >= 0 ? nextSemIndex : 1];
           onSelect(nextSem.id === semesterToDelete.id ? "" : nextSem.name);
         } else {
@@ -444,7 +461,9 @@ const SemesterTabs = ({ selectedSemester, onSelect }: SemesterTabsProps) => {
   return (
     <div className="semester-tabs-container mb-6 bg-white dark:bg-dark-bg-secondary rounded-lg shadow-sm p-4 border border-gray-100 dark:border-dark-border transition-all duration-300">
       <div className="flex items-center justify-between mb-2">
-        <h2 className="text-base font-medium text-gray-700 dark:text-dark-text-primary">Semesters</h2>
+        <h2 className="text-base font-medium text-gray-700 dark:text-dark-text-primary">
+          Semesters
+        </h2>
         <div className="flex items-center">
           {/* Add button */}
           <button
@@ -642,13 +661,13 @@ const SemesterTabs = ({ selectedSemester, onSelect }: SemesterTabsProps) => {
       {/* Empty state when no semesters exist */}
       {semesters.length === 0 && !showAddInput && (
         <div className="text-center py-2 text-gray-500 dark:text-dark-text-tertiary text-sm">
-          <p>No semesters yet. Click "+" to add one.</p>
+          <p>No semesters yet. Click &ldquo;+&rdquo; to add one.</p>
         </div>
       )}
 
       {/* Manage Semesters Modal */}
       {showManageModal && (
-        <div 
+        <div
           className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-[150] modal-open"
           onClick={(e) => e.stopPropagation()}
         >
@@ -682,26 +701,32 @@ const SemesterTabs = ({ selectedSemester, onSelect }: SemesterTabsProps) => {
             <div className="max-h-64 overflow-y-auto border border-gray-200 dark:border-dark-border rounded-md">
               {semesters.length === 0 ? (
                 <div className="py-4 text-center text-gray-500 dark:text-dark-text-tertiary">
-                  No semesters yet. Add one using the "+" button.
+                  No semesters yet. Add one using the &ldquo;+&rdquo; button.
                 </div>
               ) : (
                 <DragDropContext onDragEnd={handleDragEnd}>
                   <Droppable droppableId="semesters">
                     {(provided) => (
-                      <ul 
+                      <ul
                         className="divide-y divide-gray-200 dark:divide-dark-border"
                         {...provided.droppableProps}
                         ref={provided.innerRef}
                       >
                         {semesters.map((sem, index) => (
-                          <Draggable key={sem.id} draggableId={sem.id} index={index}>
+                          <Draggable
+                            key={sem.id}
+                            draggableId={sem.id}
+                            index={index}
+                          >
                             {(provided, snapshot) => (
                               <li
                                 ref={provided.innerRef}
                                 {...provided.draggableProps}
                                 {...provided.dragHandleProps}
                                 className={`p-2 hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary flex items-center justify-between ${
-                                  snapshot.isDragging ? 'bg-gray-100 dark:bg-dark-bg-tertiary' : ''
+                                  snapshot.isDragging
+                                    ? "bg-gray-100 dark:bg-dark-bg-tertiary"
+                                    : ""
                                 }`}
                               >
                                 <div className="flex items-center">
@@ -717,8 +742,12 @@ const SemesterTabs = ({ selectedSemester, onSelect }: SemesterTabsProps) => {
                                     <input
                                       type="text"
                                       value={editingName}
-                                      onChange={(e) => setEditingName(e.target.value)}
-                                      onKeyDown={(e) => handleEditKeyPress(e, sem.id)}
+                                      onChange={(e) =>
+                                        setEditingName(e.target.value)
+                                      }
+                                      onKeyDown={(e) =>
+                                        handleEditKeyPress(e, sem.id)
+                                      }
                                       className="input text-sm py-1 px-2 w-40 dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border"
                                       autoFocus
                                     />
@@ -783,7 +812,9 @@ const SemesterTabs = ({ selectedSemester, onSelect }: SemesterTabsProps) => {
                                         </span>
                                       )}
                                       <button
-                                        onClick={() => handleEditStart(sem.id, sem.name)}
+                                        onClick={() =>
+                                          handleEditStart(sem.id, sem.name)
+                                        }
                                         className="text-gray-500 dark:text-dark-text-tertiary hover:text-indigo-600 dark:hover:text-indigo-400 p-1"
                                         title="Edit"
                                       >
@@ -822,7 +853,7 @@ const SemesterTabs = ({ selectedSemester, onSelect }: SemesterTabsProps) => {
           setSemesterToDelete(null);
         }}
         onConfirm={handleConfirmDelete}
-        semesterName={semesterToDelete?.name || ''}
+        semesterName={semesterToDelete?.name || ""}
       />
 
       <style jsx>{`
