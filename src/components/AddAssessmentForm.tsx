@@ -5,11 +5,13 @@ import { collection, addDoc } from "firebase/firestore";
 import { localToUTC } from "../utils/dateUtils";
 
 interface AddAssessmentFormProps {
+  semester: string;
   semesterId: string;
   onSuccess: () => void;
 }
 
 const AddAssessmentForm = ({
+  semester,
   semesterId,
   onSuccess,
 }: AddAssessmentFormProps) => {
@@ -100,6 +102,7 @@ const AddAssessmentForm = ({
           dueDate: utcDate,
           dueTime: utcTime,
           createdAt: new Date(),
+          semester,
         }
       );
       setFormSuccess(true);
@@ -133,7 +136,7 @@ const AddAssessmentForm = ({
         }`}
       >
         <h2 className="text-xl font-medium mb-6 dark:text-dark-text-primary">
-          Add Assessment Manually
+          Add Assessment for {semester}
         </h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
