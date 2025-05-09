@@ -177,7 +177,7 @@ export default async function handler(
         }
 
         // Upload to Supabase Storage
-        const { data: uploadData, error: uploadError } = await supabase.storage
+        const { error: uploadError } = await supabase.storage
           .from("outlines")
           .upload(`${userId}/${semesterId}/${fileName}`, pdfBuffer, {
             contentType: "application/pdf",
@@ -223,7 +223,7 @@ export default async function handler(
           } else {
             throw new Error("DeepSeek API not configured");
           }
-        } catch (aiError) {
+        } catch {
           console.warn(
             `AI extraction failed for ${fileName}, falling back to basic extraction`
           );
@@ -467,7 +467,9 @@ function extractTime(timeStr?: string): string | null {
   const timePattern = /(\d{1,2}:\d{2})\s*([APap][Mm])?/i;
   const match = timeStr.match(timePattern);
   if (match) {
-    let [hours, minutes] = match[1].split(":").map((num) => parseInt(num, 10));
+    const timeParts = match[1].split(":");
+    let hours = parseInt(timeParts[0], 10);
+    const minutes = parseInt(timeParts[1], 10);
     const period = match[2] ? match[2].toUpperCase() : "";
     if (period) {
       if (period === "PM" && hours < 12) hours += 12;
@@ -486,7 +488,9 @@ function extractTimeFromSection(section: string): string | null {
   if (match) {
     const timeStr = match[1] || match[3];
     const period = match[2] ? match[2].toUpperCase() : "";
-    let [hours, minutes] = timeStr.split(":").map((num) => parseInt(num, 10));
+    const timeParts = timeStr.split(":");
+    let hours = parseInt(timeParts[0], 10);
+    const minutes = parseInt(timeParts[1], 10);
     if (period) {
       if (period === "PM" && hours < 12) hours += 12;
       if (period === "AM" && hours === 12) hours = 0;
