@@ -1,4 +1,4 @@
-import { Assessment } from "../components/CalendarView";
+import { Assessment } from "../types/assessment";
 
 export function generateICSFile(
   assessments: Assessment[],
