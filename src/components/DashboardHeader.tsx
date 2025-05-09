@@ -200,4 +200,4 @@ const DashboardHeader = ({ onLogout }: DashboardHeaderProps) => {
   );
 };
 
-export default DashboardHeader; 
+export default DashboardHeader;
