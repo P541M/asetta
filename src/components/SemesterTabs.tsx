@@ -16,11 +16,22 @@ import {
   getDoc,
 } from "firebase/firestore";
 import {
-  DragDropContext,
-  Droppable,
-  Draggable,
-  DropResult,
-} from "react-beautiful-dnd";
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 
 interface Semester {
   id: string;
@@ -109,6 +120,74 @@ const DeleteConfirmationModal = ({
     </div>
   );
 };
+
+// New SortableSemester component for drag-and-drop
+function SortableSemester({ semester, isSelected, onEdit, onDelete }: { 
+  semester: Semester;
+  isSelected: boolean;
+  onEdit: (id: string, name: string) => void;
+  onDelete: (id: string) => void;
+}) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+  } = useSortable({ id: semester.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
+
+  return (
+    <div ref={setNodeRef} style={style} {...attributes} {...listeners} className="py-2 px-4 hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary flex items-center justify-between">
+      <span className={`font-medium ${isSelected ? "text-indigo-600 dark:text-indigo-400" : "dark:text-dark-text-primary"}`}>
+        {semester.name}
+      </span>
+      <div className="flex items-center space-x-2">
+        {isSelected && (
+          <span className="inline-block bg-indigo-100 dark:bg-indigo-900/30 text-indigo-800 dark:text-indigo-400 text-xs px-2 py-0.5 rounded-full mr-2">
+            Current
+          </span>
+        )}
+        <button
+          onClick={() => onEdit(semester.id, semester.name)}
+          className="text-gray-500 dark:text-dark-text-tertiary hover:text-indigo-600 dark:hover:text-indigo-400 p-1"
+          title="Edit"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-4 w-4"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+          >
+            <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+          </svg>
+        </button>
+        <button
+          onClick={() => onDelete(semester.id)}
+          className="text-gray-500 dark:text-dark-text-tertiary hover:text-red-600 dark:hover:text-red-400 p-1"
+          title="Delete"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-4 w-4"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+          >
+            <path
+              fillRule="evenodd"
+              d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
+              clipRule="evenodd"
+            />
+          </svg>
+        </button>
+      </div>
+    </div>
+  );
+}
 
 const SemesterTabs = ({ selectedSemester, onSelect }: SemesterTabsProps) => {
   const { user } = useAuth();
@@ -430,31 +509,38 @@ const SemesterTabs = ({ selectedSemester, onSelect }: SemesterTabsProps) => {
     }
   };
 
-  // Add a new function to handle drag end
-  const handleDragEnd = async (result: DropResult) => {
-    if (!result.destination || !user) return;
+  // Add dnd-kit sensors
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
 
-    const items = Array.from(semesters);
-    const [reorderedItem] = items.splice(result.source.index, 1);
-    items.splice(result.destination.index, 0, reorderedItem);
+  // Replace handleDragEnd with dnd-kit version
+  const handleDragEnd = async (event: DragEndEvent) => {
+    const { active, over } = event;
+    
+    if (!over || active.id === over.id) return;
 
-    setSemesters(items);
+    const oldIndex = semesters.findIndex((s) => s.id === active.id);
+    const newIndex = semesters.findIndex((s) => s.id === over.id);
 
-    // Update the order in Firestore
-    try {
-      const batch = writeBatch(db);
-      items.forEach((sem, index) => {
-        const semRef = doc(db, "users", user.uid, "semesters", sem.id);
-        batch.update(semRef, { order: index });
-      });
-      await batch.commit();
+    const newSemesters = arrayMove(semesters, oldIndex, newIndex);
+    setSemesters(newSemesters);
 
-      // If the first semester is different from the selected one, update the selection
-      if (items.length > 0 && items[0].name !== selectedSemester) {
-        onSelect(items[0].name);
+    // Update order in Firestore
+    if (user) {
+      try {
+        const batch = writeBatch(db);
+        newSemesters.forEach((sem, index) => {
+          const semRef = doc(db, "users", user.uid, "semesters", sem.id);
+          batch.update(semRef, { order: index });
+        });
+        await batch.commit();
+      } catch (error) {
+        console.error("Error updating semester order:", error);
       }
-    } catch (error) {
-      console.error("Error updating semester order:", error);
     }
   };
 
@@ -677,14 +763,8 @@ const SemesterTabs = ({ selectedSemester, onSelect }: SemesterTabsProps) => {
 
       {/* Manage Semesters Modal */}
       {showManageModal && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-[150] modal-open"
-          onClick={(e) => e.stopPropagation()}
-        >
-          <div
-            ref={manageModalRef}
-            className="bg-white dark:bg-dark-bg-secondary rounded-lg shadow-lg p-4 w-full max-w-sm animate-scale"
-          >
+        <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-[150] modal-open">
+          <div ref={manageModalRef} className="bg-white dark:bg-dark-bg-secondary rounded-lg shadow-lg p-4 w-full max-w-sm animate-scale">
             <div className="flex justify-between items-center mb-3">
               <h3 className="text-base font-medium text-gray-900 dark:text-dark-text-primary">
                 Manage Semesters
@@ -714,163 +794,26 @@ const SemesterTabs = ({ selectedSemester, onSelect }: SemesterTabsProps) => {
                   No semesters yet. Add one using the &ldquo;+&rdquo; button.
                 </div>
               ) : (
-                <DragDropContext onDragEnd={handleDragEnd}>
-                  <Droppable droppableId="semesters">
-                    {(provided) => (
-                      <ul
-                        className="divide-y divide-gray-200 dark:divide-dark-border"
-                        {...provided.droppableProps}
-                        ref={provided.innerRef}
-                      >
-                        {semesters.map((sem, index) => (
-                          <Draggable
-                            key={sem.id}
-                            draggableId={sem.id}
-                            index={index}
-                          >
-                            {(provided, snapshot) => (
-                              <li
-                                ref={provided.innerRef}
-                                {...provided.draggableProps}
-                                {...provided.dragHandleProps}
-                                className={`p-2 hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary flex items-center justify-between ${
-                                  snapshot.isDragging
-                                    ? "bg-gray-100 dark:bg-dark-bg-tertiary"
-                                    : ""
-                                }`}
-                              >
-                                <div className="flex items-center">
-                                  <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    className="h-4 w-4 mr-2 text-gray-400 dark:text-dark-text-tertiary"
-                                    viewBox="0 0 20 20"
-                                    fill="currentColor"
-                                  >
-                                    <path d="M7 2a2 2 0 1 0 .001 4.001A2 2 0 0 0 7 2zm0 6a2 2 0 1 0 .001 4.001A2 2 0 0 0 7 8zm0 6a2 2 0 1 0 .001 4.001A2 2 0 0 0 7 14zm6-8a2 2 0 1 0-.001-4.001A2 2 0 0 0 13 6zm0 2a2 2 0 1 0 .001 4.001A2 2 0 0 0 13 8zm0 6a2 2 0 1 0 .001 4.001A2 2 0 0 0 13 14z" />
-                                  </svg>
-                                  {editingId === sem.id ? (
-                                    <input
-                                      type="text"
-                                      value={editingName}
-                                      onChange={(e) =>
-                                        setEditingName(e.target.value)
-                                      }
-                                      onKeyDown={(e) =>
-                                        handleEditKeyPress(e, sem.id)
-                                      }
-                                      className="input text-sm py-1 px-2 w-40 dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border"
-                                      autoFocus
-                                    />
-                                  ) : (
-                                    <span
-                                      className={`font-medium ${
-                                        selectedSemester === sem.name
-                                          ? "text-indigo-600 dark:text-indigo-400"
-                                          : "dark:text-dark-text-primary"
-                                      }`}
-                                    >
-                                      {sem.name}
-                                    </span>
-                                  )}
-                                </div>
-
-                                <div className="flex items-center">
-                                  {editingId === sem.id ? (
-                                    <>
-                                      <button
-                                        onClick={() => handleEditSave(sem.id)}
-                                        className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 p-1"
-                                        title="Save"
-                                      >
-                                        <svg
-                                          xmlns="http://www.w3.org/2000/svg"
-                                          className="h-4 w-4"
-                                          viewBox="0 0 20 20"
-                                          fill="currentColor"
-                                        >
-                                          <path
-                                            fillRule="evenodd"
-                                            d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                                            clipRule="evenodd"
-                                          />
-                                        </svg>
-                                      </button>
-                                      <button
-                                        onClick={() => setEditingId(null)}
-                                        className="text-gray-600 dark:text-dark-text-tertiary hover:text-gray-800 dark:hover:text-dark-text-secondary p-1"
-                                        title="Cancel"
-                                      >
-                                        <svg
-                                          xmlns="http://www.w3.org/2000/svg"
-                                          className="h-4 w-4"
-                                          viewBox="0 0 20 20"
-                                          fill="currentColor"
-                                        >
-                                          <path
-                                            fillRule="evenodd"
-                                            d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                                            clipRule="evenodd"
-                                          />
-                                        </svg>
-                                      </button>
-                                    </>
-                                  ) : (
-                                    <>
-                                      {selectedSemester === sem.name && (
-                                        <span className="inline-block bg-indigo-100 dark:bg-indigo-900/30 text-indigo-800 dark:text-indigo-400 text-xs px-2 py-0.5 rounded-full mr-2">
-                                          Current
-                                        </span>
-                                      )}
-                                      <div className="flex items-center">
-                                        <button
-                                          onClick={() =>
-                                            handleEditStart(sem.id, sem.name)
-                                          }
-                                          className="text-gray-500 dark:text-dark-text-tertiary hover:text-indigo-600 dark:hover:text-indigo-400 p-1"
-                                          title="Edit"
-                                        >
-                                          <svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            className="h-4 w-4"
-                                            viewBox="0 0 20 20"
-                                            fill="currentColor"
-                                          >
-                                            <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
-                                          </svg>
-                                        </button>
-                                        <button
-                                          onClick={() =>
-                                            handleDeleteSemester(sem.id)
-                                          }
-                                          className="text-gray-500 dark:text-dark-text-tertiary hover:text-red-600 dark:hover:text-red-400 p-1 ml-1"
-                                          title="Delete"
-                                        >
-                                          <svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            className="h-4 w-4"
-                                            viewBox="0 0 20 20"
-                                            fill="currentColor"
-                                          >
-                                            <path
-                                              fillRule="evenodd"
-                                              d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
-                                              clipRule="evenodd"
-                                            />
-                                          </svg>
-                                        </button>
-                                      </div>
-                                    </>
-                                  )}
-                                </div>
-                              </li>
-                            )}
-                          </Draggable>
-                        ))}
-                        {provided.placeholder}
-                      </ul>
-                    )}
-                  </Droppable>
-                </DragDropContext>
+                <DndContext
+                  sensors={sensors}
+                  collisionDetection={closestCenter}
+                  onDragEnd={handleDragEnd}
+                >
+                  <SortableContext
+                    items={semesters.map(s => s.id)}
+                    strategy={verticalListSortingStrategy}
+                  >
+                    {semesters.map((semester) => (
+                      <SortableSemester
+                        key={semester.id}
+                        semester={semester}
+                        isSelected={selectedSemester === semester.name}
+                        onEdit={(id, name) => handleEditStart(id, name)}
+                        onDelete={(id) => handleDeleteSemester(id)}
+                      />
+                    ))}
+                  </SortableContext>
+                </DndContext>
               )}
             </div>
           </div>
