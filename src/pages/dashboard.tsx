@@ -20,7 +20,7 @@ import CoursesOverviewTable from "../components/CoursesOverviewTable";
 import CourseFilteredAssessments from "../components/CourseFilteredAssessments";
 import AddAssessmentForm from "../components/AddAssessmentForm";
 import CalendarView from "../components/CalendarView";
-import Header from "../components/Header";
+import DashboardHeader from "../components/DashboardHeader";
 
 interface Assessment {
   id: string;
@@ -259,7 +259,7 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-dark-bg-primary flex flex-col">
+    <div className="min-h-screen bg-gray-50 dark:bg-dark-bg-primary">
       <Head>
         <title>Kivo - Your Academic Dashboard</title>
         <meta
@@ -267,8 +267,8 @@ const Dashboard = () => {
           content="Manage your semesters, track assessments, and stay organized with Kivo."
         />
       </Head>
-      <Header onLogout={handleLogout} />
-      <div className="flex-grow p-4 md:p-6">
+      <DashboardHeader onLogout={handleLogout} />
+      <div className="p-4 md:p-6">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
             <div>
@@ -665,11 +665,6 @@ const Dashboard = () => {
           )}
         </div>
       </div>
-      <footer className="bg-white dark:bg-dark-bg-secondary border-t border-gray-100 dark:border-dark-border py-4 text-center text-sm text-gray-500 dark:text-dark-text-tertiary">
-        <div className="max-w-7xl mx-auto px-4">
-          <p>© {new Date().getFullYear()} Kivo. All rights reserved.</p>
-        </div>
-      </footer>
     </div>
   );
 };
