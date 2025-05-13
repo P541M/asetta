@@ -102,7 +102,12 @@ const Header = ({ onLogout }: HeaderProps) => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
             <div className="flex items-center">
-              <Link href="/" className="flex items-center group">
+              <a
+                href="https://kivo-landing-three.vercel.app"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center group"
+              >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   className="h-8 w-8 text-indigo-600 dark:text-indigo-400 transition-transform duration-300 group-hover:scale-110"
@@ -114,7 +119,7 @@ const Header = ({ onLogout }: HeaderProps) => {
                 <span className="ml-2 text-xl font-bold text-indigo-600 dark:text-indigo-400 transition-colors duration-300 group-hover:text-indigo-700 dark:group-hover:text-indigo-300 font-heading tracking-wide">
                   Kivo
                 </span>
-              </Link>
+              </a>
             </div>
             <div className="flex items-center space-x-4">
               {user ? (
