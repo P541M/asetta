@@ -43,7 +43,6 @@ const Header = ({ onLogout }: HeaderProps) => {
   // Handle click outside to close user dropdown
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      // Only close if click is outside both the dropdown and avatar button
       if (
         showDropdown &&
         dropdownRef.current &&
@@ -63,11 +62,7 @@ const Header = ({ onLogout }: HeaderProps) => {
   const handleLogout = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-
-    // Close dropdown before logging out
     setShowDropdown(false);
-
-    // Small delay to ensure dropdown closes before logout
     setTimeout(async () => {
       if (onLogout) {
         await onLogout();
@@ -188,7 +183,6 @@ const Header = ({ onLogout }: HeaderProps) => {
                           </div>
                         </div>
 
-                        {/* Settings option */}
                         <button
                           onClick={openSettings}
                           className="flex w-full items-center px-4 py-2 text-sm text-gray-700 dark:text-dark-text-primary hover:bg-gray-100 dark:hover:bg-dark-bg-tertiary transition-colors duration-150"
@@ -208,7 +202,6 @@ const Header = ({ onLogout }: HeaderProps) => {
                           Profile Settings
                         </button>
 
-                        {/* Logout option */}
                         <button
                           onClick={handleLogout}
                           className="flex w-full items-center px-4 py-2 text-sm text-gray-700 dark:text-dark-text-primary hover:bg-gray-100 dark:hover:bg-dark-bg-tertiary transition-colors duration-150 border-t border-gray-100 dark:border-dark-border"
@@ -244,7 +237,7 @@ const Header = ({ onLogout }: HeaderProps) => {
                       href="/register"
                       className="btn-primary text-sm px-4 py-2 shadow-sm hover:shadow transition-all duration-300 hover:-translate-y-0.5"
                     >
-                      Get Started
+                      Register
                     </Link>
                   </div>
                 </>
@@ -253,11 +246,7 @@ const Header = ({ onLogout }: HeaderProps) => {
           </div>
         </div>
       </header>
-
-      {/* Settings Modal */}
-      {showSettings && (
-        <UserSettings isOpen={showSettings} onClose={closeSettings} />
-      )}
+      {showSettings && <UserSettings isOpen={showSettings} onClose={closeSettings} />}
     </>
   );
 };
