@@ -104,8 +104,6 @@ const Header = ({ onLogout }: HeaderProps) => {
             <div className="flex items-center">
               <a
                 href="https://kivo-landing-three.vercel.app"
-                target="_blank"
-                rel="noopener noreferrer"
                 className="flex items-center group"
               >
                 <svg
