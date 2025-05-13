@@ -1,10 +1,6 @@
 @import "./rich-text-editor.css";
 
 /* globals.css */
-/* Google Fonts */
-@import url("https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap");
-@import url("https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap");
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -13,7 +9,7 @@
 @layer base {
   body {
     @apply bg-gray-50 text-gray-800;
-    font-family: "Outfit", sans-serif;
+    font-family: var(--font-outfit), "Outfit", sans-serif;
   }
   h1,
   h2,
@@ -22,7 +18,7 @@
   h5,
   h6 {
     @apply font-medium text-gray-900;
-    font-family: "Lexend", sans-serif;
+    font-family: var(--font-lexend), "Lexend", sans-serif;
   }
 }
 

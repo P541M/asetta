@@ -5,6 +5,20 @@ import "../styles/globals.css";
 import { AuthProvider } from "../contexts/AuthContext";
 import { ThemeProvider } from "../contexts/ThemeContext";
 import BetaAccessGate from "../components/BetaAccessGate";
+import { Outfit, Lexend } from "next/font/google";
+
+const outfit = Outfit({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  variable: "--font-outfit",
+  display: "swap",
+});
+const lexend = Lexend({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  variable: "--font-lexend",
+  display: "swap",
+});
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (
@@ -20,9 +34,11 @@ function MyApp({ Component, pageProps }: AppProps) {
           <meta charSet="utf-8" />
           <link rel="icon" href="/favicon.ico" />
         </Head>
-        <BetaAccessGate>
-          <Component {...pageProps} />
-        </BetaAccessGate>
+        <main className={`${outfit.variable} ${lexend.variable} font-body`}>
+          <BetaAccessGate>
+            <Component {...pageProps} />
+          </BetaAccessGate>
+        </main>
       </ThemeProvider>
     </AuthProvider>
   );
