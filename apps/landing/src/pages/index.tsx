@@ -32,7 +32,7 @@ export default function LandingPage() {
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link
-                  href="https://app.kivo.com/register"
+                  href="https://kivo-two.vercel.app/register"
                   className="btn-primary text-center py-3 px-8"
                 >
                   Get Started Free
@@ -240,7 +240,7 @@ export default function LandingPage() {
           </p>
           <div className="flex justify-center">
             <Link
-              href="https://app.kivo.com/register"
+              href="https://kivo-two.vercel.app/register"
               className="btn-primary py-3 px-8 text-lg inline-block"
             >
               Create Your Free Account

@@ -45,13 +45,13 @@ const Header = () => {
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-3">
               <Link
-                href="https://app.kivo.com/login"
+                href="https://kivo-two.vercel.app/login"
                 className="text-gray-700 hover:text-indigo-600 transition-colors duration-200 text-sm font-medium"
               >
                 Login
               </Link>
               <Link
-                href="https://app.kivo.com/register"
+                href="https://kivo-two.vercel.app/register"
                 className="btn-primary text-sm px-4 py-2 shadow-sm hover:shadow transition-all duration-300 hover:-translate-y-0.5"
               >
                 Get Started
