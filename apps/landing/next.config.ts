@@ -4,25 +4,25 @@ const nextConfig = {
   images: {
     remotePatterns: [
       {
-        protocol: 'http',
-        hostname: 'localhost',
+        protocol: "http",
+        hostname: "localhost",
       },
     ],
   },
   async redirects() {
     return [
       {
-        source: '/login',
-        destination: 'https://kivo-two.vercel.app/login',
+        source: "/login",
+        destination: "https://kivo-two.vercel.app/login",
         permanent: true,
       },
       {
-        source: '/register',
-        destination: 'https://kivo-two.vercel.app/register',
+        source: "/register",
+        destination: "https://kivo-two.vercel.app/register",
         permanent: true,
       },
     ];
   },
 };
 
-export default nextConfig; 
+export default nextConfig;

@@ -1,23 +1,38 @@
-import type { AppProps } from 'next/app';
-import Head from 'next/head';
-import { Outfit, Lexend } from 'next/font/google';
-import '../styles/globals.css';
+import type { AppProps } from "next/app";
+import Head from "next/head";
+import { Outfit, Lexend } from "next/font/google";
+import { useRouter } from "next/router";
+import { useEffect } from "react";
+import "../styles/globals.css";
 
 const outfit = Outfit({
-  subsets: ['latin'],
-  weight: ['300', '400', '500', '600', '700'],
-  variable: '--font-outfit',
-  display: 'swap',
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  variable: "--font-outfit",
+  display: "swap",
 });
 
 const lexend = Lexend({
-  subsets: ['latin'],
-  weight: ['300', '400', '500', '600', '700'],
-  variable: '--font-lexend',
-  display: 'swap',
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  variable: "--font-lexend",
+  display: "swap",
 });
 
 export default function App({ Component, pageProps }: AppProps) {
+  const router = useRouter();
+
+  useEffect(() => {
+    const handleRouteChange = (url: string) => {
+      console.log(`Route changed to: ${url}`);
+    };
+
+    router.events.on("routeChangeComplete", handleRouteChange);
+    return () => {
+      router.events.off("routeChangeComplete", handleRouteChange);
+    };
+  }, [router]);
+
   return (
     <>
       <Head>
@@ -35,4 +50,4 @@ export default function App({ Component, pageProps }: AppProps) {
       </main>
     </>
   );
-} 
+}

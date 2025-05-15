@@ -48,4 +48,4 @@ The landing page is designed to be deployed to a static hosting service like Ver
 
 ## License
 
-This project is proprietary and confidential. 
+This project is proprietary and confidential.
