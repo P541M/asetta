@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useState, useEffect, useRef } from "react";
 import UserSettings from "../settings/UserSettings";
+import { useRouter } from "next/router";
 
 interface HeaderProps {
   onLogout?: () => Promise<void>;
@@ -26,6 +27,7 @@ const Header = ({ onLogout }: HeaderProps) => {
   const [showSettings, setShowSettings] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const avatarRef = useRef<HTMLButtonElement>(null);
+  const router = useRouter();
 
   // Handle scroll events to add shadow and background change
   useEffect(() => {
@@ -77,12 +79,12 @@ const Header = ({ onLogout }: HeaderProps) => {
     setShowDropdown(!showDropdown);
   };
 
-  // Open settings modal
+  // Open settings page
   const openSettings = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     setShowDropdown(false);
-    setShowSettings(true);
+    router.push("/settings");
   };
 
   // Close settings modal
@@ -202,7 +204,7 @@ const Header = ({ onLogout }: HeaderProps) => {
                               clipRule="evenodd"
                             />
                           </svg>
-                          Profile Settings
+                          Settings
                         </button>
 
                         <button

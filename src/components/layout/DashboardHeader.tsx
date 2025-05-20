@@ -2,6 +2,7 @@ import { useAuth } from "../../contexts/AuthContext";
 import Image from "next/image";
 import { useState, useRef, useEffect } from "react";
 import UserSettings from "../settings/UserSettings";
+import { useRouter } from "next/router";
 
 interface DashboardHeaderProps {
   onLogout?: () => Promise<void>;
@@ -23,6 +24,7 @@ const DashboardHeader = ({ onLogout }: DashboardHeaderProps) => {
   const [showSettings, setShowSettings] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const avatarRef = useRef<HTMLButtonElement>(null);
+  const router = useRouter();
 
   // Handle click outside to close user dropdown
   useEffect(() => {
@@ -66,12 +68,12 @@ const DashboardHeader = ({ onLogout }: DashboardHeaderProps) => {
     setShowDropdown(!showDropdown);
   };
 
-  // Open settings modal
+  // Open settings page
   const openSettings = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     setShowDropdown(false);
-    setShowSettings(true);
+    router.push("/settings");
   };
 
   // Close settings modal
@@ -165,7 +167,7 @@ const DashboardHeader = ({ onLogout }: DashboardHeaderProps) => {
                     clipRule="evenodd"
                   />
                 </svg>
-                Profile Settings
+                Settings
               </button>
 
               {/* Logout option */}
