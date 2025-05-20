@@ -301,6 +301,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
   const [editingId, setEditingId] = useState<string | null>(null);
   const [showDaysTillDue, setShowDaysTillDue] = useState<boolean>(true);
   const [showWeight, setShowWeight] = useState<boolean>(true);
+  const [showNotes, setShowNotes] = useState<boolean>(true);
   const [editFormData, setEditFormData] = useState<Assessment>({
     id: "",
     courseName: "",
@@ -314,7 +315,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
   const [selectedAssessment, setSelectedAssessment] =
     useState<Assessment | null>(null);
   const [notesInput, setNotesInput] = useState<string>("");
-  const [showNotes, setShowNotes] = useState<string | null>(null);
+  const [showNotesModal, setShowNotesModal] = useState<string | null>(null);
   const [showLinkModal, setShowLinkModal] = useState(false);
   const [linkCallback, setLinkCallback] = useState<
     ((url: string, text: string) => void) | null
@@ -336,6 +337,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
           const userData = userSnapshot.data();
           setShowDaysTillDue(userData.showDaysTillDue ?? true);
           setShowWeight(userData.showWeight ?? true);
+          setShowNotes(userData.showNotes ?? true);
         }
       } catch (error) {
         console.error("Error fetching user preferences:", error);
@@ -353,6 +355,9 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
         }
         if ("showWeight" in event.detail) {
           setShowWeight(event.detail.showWeight);
+        }
+        if ("showNotes" in event.detail) {
+          setShowNotes(event.detail.showNotes);
         }
       }
     };
@@ -433,17 +438,17 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
         setDropdownOpenId(null);
       }
       if (
-        showNotes &&
+        showNotesModal &&
         event.target instanceof Node &&
         !document.getElementById(`notes-modal`)?.contains(event.target) &&
         !document.getElementById(`link-modal`)?.contains(event.target)
       ) {
-        setShowNotes(null);
+        setShowNotesModal(null);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [showNotes]);
+  }, [showNotesModal]);
 
   const filteredAssessments = assessments.filter((assessment) => {
     if (filter === "all") return true;
@@ -677,7 +682,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
   const handleNotesClick = (assessment: Assessment) => {
     setSelectedAssessment(assessment);
     setNotesInput(assessment.notes || "");
-    setShowNotes(assessment.id || null);
+    setShowNotesModal(assessment.id || null);
   };
 
   const handleSaveNotes = async () => {
@@ -926,7 +931,9 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                     </div>
                   </th>
                 )}
-                <th className="w-24 dark:text-dark-text-primary">Notes</th>
+                {showNotes && (
+                  <th className="w-24 dark:text-dark-text-primary">Notes</th>
+                )}
                 <th className="w-24 dark:text-dark-text-primary">Actions</th>
               </tr>
             </thead>
@@ -1194,35 +1201,37 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                         )}
                       </td>
                     )}
-                    <td>
-                      <button
-                        onClick={() => handleNotesClick(assessment)}
-                        className={`p-1.5 rounded ${
-                          assessment?.notes && assessment.notes.trim() !== ""
-                            ? "text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 hover:bg-indigo-50 dark:hover:bg-indigo-900/30"
-                            : "text-gray-400 dark:text-dark-text-tertiary hover:text-gray-600 dark:hover:text-dark-text-secondary hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary"
-                        }`}
-                        title={
-                          assessment?.notes && assessment.notes.trim() !== ""
-                            ? "Edit Notes"
-                            : "Add Notes"
-                        }
-                      >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="h-5 w-5"
-                          viewBox="0 0 20 20"
-                          fill="currentColor"
+                    {showNotes && (
+                      <td>
+                        <button
+                          onClick={() => handleNotesClick(assessment)}
+                          className={`p-1.5 rounded ${
+                            assessment?.notes && assessment.notes.trim() !== ""
+                              ? "text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 hover:bg-indigo-50 dark:hover:bg-indigo-900/30"
+                              : "text-gray-400 dark:text-dark-text-tertiary hover:text-gray-600 dark:hover:text-dark-text-secondary hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary"
+                          }`}
+                          title={
+                            assessment?.notes && assessment.notes.trim() !== ""
+                              ? "Edit Notes"
+                              : "Add Notes"
+                          }
                         >
-                          <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
-                          <path
-                            fillRule="evenodd"
-                            d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
-                      </button>
-                    </td>
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-5 w-5"
+                            viewBox="0 0 20 20"
+                            fill="currentColor"
+                          >
+                            <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
+                            <path
+                              fillRule="evenodd"
+                              d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                        </button>
+                      </td>
+                    )}
                     <td onClick={(e) => e.stopPropagation()}>
                       <div
                         className="relative inline-block"
@@ -1304,7 +1313,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
       )}
 
       {/* Notes Modal */}
-      {showNotes && selectedAssessment && (
+      {showNotesModal && selectedAssessment && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div
             id="notes-modal"
@@ -1384,7 +1393,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                 </button>
                 <button
                   onClick={() => {
-                    setShowNotes(null);
+                    setShowNotesModal(null);
                     setSelectedAssessment(null);
                   }}
                   className="inline-flex items-center p-1.5 border border-transparent rounded-md text-gray-400 dark:text-dark-text-tertiary hover:text-gray-500 dark:hover:text-dark-text-secondary hover:bg-gray-100 dark:hover:bg-dark-bg-tertiary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-indigo-400"
@@ -1423,7 +1432,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
             <div className="flex justify-end space-x-3">
               <button
                 onClick={() => {
-                  setShowNotes(null);
+                  setShowNotesModal(null);
                   setSelectedAssessment(null);
                 }}
                 className="btn-outline py-1.5 px-4"
@@ -1433,7 +1442,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
               <button
                 onClick={() => {
                   handleSaveNotes();
-                  setShowNotes(null);
+                  setShowNotesModal(null);
                 }}
                 className="btn-primary py-1.5 px-4"
               >

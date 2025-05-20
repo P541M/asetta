@@ -5,6 +5,8 @@ interface PreferencesSectionProps {
   setShowDaysTillDue: (show: boolean) => void;
   showWeight: boolean;
   setShowWeight: (show: boolean) => void;
+  showNotes: boolean;
+  setShowNotes: (show: boolean) => void;
   showStatsBar: boolean;
   setShowStatsBar: (show: boolean) => void;
 }
@@ -14,6 +16,8 @@ const PreferencesSection = ({
   setShowDaysTillDue,
   showWeight,
   setShowWeight,
+  showNotes,
+  setShowNotes,
   showStatsBar,
   setShowStatsBar,
 }: PreferencesSectionProps) => {
@@ -101,6 +105,33 @@ const PreferencesSection = ({
           <span
             className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
               showWeight ? "translate-x-6" : "translate-x-1"
+            }`}
+          />
+        </button>
+      </div>
+
+      <div className="border-t border-gray-200 dark:border-dark-border"></div>
+
+      {/* Show Notes Toggle */}
+      <div className="flex items-center justify-between py-4">
+        <div className="flex-1">
+          <h3 className="text-base font-medium text-gray-900 dark:text-dark-text-primary">
+            Show Notes Column
+          </h3>
+          <p className="mt-1 text-sm text-gray-500 dark:text-dark-text-tertiary">
+            Display the notes column for each assignment
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={() => setShowNotes(!showNotes)}
+          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 ${
+            showNotes ? "bg-indigo-600" : "bg-gray-200 dark:bg-dark-bg-tertiary"
+          }`}
+        >
+          <span
+            className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+              showNotes ? "translate-x-6" : "translate-x-1"
             }`}
           />
         </button>

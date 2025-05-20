@@ -1,14 +1,20 @@
 import { useRouter } from "next/router";
 import { useAuth } from "../contexts/AuthContext";
 import UserSettings from "../components/settings/UserSettings";
+import { useEffect } from "react";
 
 const SettingsPage = () => {
   const router = useRouter();
   const { user } = useAuth();
 
   // Redirect to login if not authenticated
+  useEffect(() => {
+    if (!user) {
+      router.push("/login");
+    }
+  }, [user, router]);
+
   if (!user) {
-    router.push("/login");
     return null;
   }
 

@@ -23,6 +23,7 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
   );
   const [showDaysTillDue, setShowDaysTillDue] = useState<boolean>(true);
   const [showWeight, setShowWeight] = useState<boolean>(true);
+  const [showNotes, setShowNotes] = useState<boolean>(true);
   const [showStatsBar, setShowStatsBar] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState({ text: "", type: "" });
@@ -53,6 +54,7 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
           setGraduationYear(userData.graduationYear || currentYear + 4);
           setShowDaysTillDue(userData.showDaysTillDue ?? true);
           setShowWeight(userData.showWeight ?? true);
+          setShowNotes(userData.showNotes ?? true);
           setShowStatsBar(userData.showStatsBar ?? false);
         }
       } catch (error) {
@@ -102,13 +104,14 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
         graduationYear: graduationYear,
         showDaysTillDue: showDaysTillDue,
         showWeight: showWeight,
+        showNotes: showNotes,
         showStatsBar: showStatsBar,
         updatedAt: new Date(),
       });
 
       // Trigger a custom event to notify other components of the preference change
       const event = new CustomEvent("userPreferencesUpdated", {
-        detail: { showDaysTillDue, showWeight, showStatsBar },
+        detail: { showDaysTillDue, showWeight, showNotes, showStatsBar },
       });
       window.dispatchEvent(event);
 
@@ -211,6 +214,8 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
             setShowDaysTillDue={setShowDaysTillDue}
             showWeight={showWeight}
             setShowWeight={setShowWeight}
+            showNotes={showNotes}
+            setShowNotes={setShowNotes}
             showStatsBar={showStatsBar}
             setShowStatsBar={setShowStatsBar}
           />
