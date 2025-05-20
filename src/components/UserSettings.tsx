@@ -351,7 +351,7 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
                         type="text"
                         value={displayName}
                         onChange={(e) => setDisplayName(e.target.value)}
-                        className="input hover:shadow-sm transition-all duration-200 dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border"
+                        className="input hover:shadow-sm transition-all duration-200 dark:bg-dark-input-bg dark:text-dark-input-text dark:border-dark-input-border dark:placeholder-dark-input-placeholder"
                         placeholder="Your name"
                       />
                     </div>
@@ -368,7 +368,7 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
                         type="text"
                         value={institution}
                         onChange={(e) => setInstitution(e.target.value)}
-                        className="input hover:shadow-sm transition-all duration-200 dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border"
+                        className="input hover:shadow-sm transition-all duration-200 dark:bg-dark-input-bg dark:text-dark-input-text dark:border-dark-input-border dark:placeholder-dark-input-placeholder"
                         placeholder="Your university or school"
                       />
                     </div>
@@ -385,7 +385,7 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
                         type="text"
                         value={studyProgram}
                         onChange={(e) => setStudyProgram(e.target.value)}
-                        className="input hover:shadow-sm transition-all duration-200 dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border"
+                        className="input hover:shadow-sm transition-all duration-200 dark:bg-dark-input-bg dark:text-dark-input-text dark:border-dark-input-border dark:placeholder-dark-input-placeholder"
                         placeholder="Your field of study"
                       />
                     </div>
@@ -406,7 +406,7 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
                         onChange={(e) =>
                           setGraduationYear(parseInt(e.target.value))
                         }
-                        className="input hover:shadow-sm transition-all duration-200 dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border"
+                        className="input hover:shadow-sm transition-all duration-200 dark:bg-dark-input-bg dark:text-dark-input-text dark:border-dark-input-border dark:placeholder-dark-input-placeholder"
                         placeholder="e.g., 2027"
                       />
                     </div>
@@ -426,9 +426,9 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
                       <button
                         type="button"
                         onClick={handleDarkModeToggle}
-                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 ${
+                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-dark-focus-ring focus:ring-offset-2 ${
                           isDarkMode
-                            ? "bg-indigo-600"
+                            ? "bg-dark-button-primary"
                             : "bg-gray-200 dark:bg-dark-bg-tertiary"
                         }`}
                       >
@@ -544,7 +544,7 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
                 <button
                   type="button"
                   onClick={onClose}
-                  className="btn-outline mr-2 dark:border-dark-border dark:text-dark-text-primary dark:hover:bg-dark-bg-secondary"
+                  className="btn-outline mr-2 dark:border-dark-border-primary dark:text-dark-text-primary dark:hover:bg-dark-hover-primary"
                   disabled={isSubmitting}
                 >
                   Cancel

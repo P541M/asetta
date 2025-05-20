@@ -61,15 +61,15 @@
 /* Custom styles */
 @layer components {
   .btn-primary {
-    @apply bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:bg-indigo-500 dark:hover:bg-indigo-600;
+    @apply bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:bg-dark-button-primary dark:hover:bg-dark-button-primary-hover dark:focus:ring-dark-focus-ring;
   }
 
   .btn-outline {
-    @apply border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:border-dark-border-primary dark:text-dark-text-primary dark:hover:bg-dark-bg-secondary;
+    @apply border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:border-dark-border-primary dark:text-dark-text-primary dark:hover:bg-dark-hover-primary dark:focus:ring-dark-focus-ring;
   }
 
   .input {
-    @apply w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-dark-bg-secondary dark:border-dark-border-primary dark:text-dark-text-primary dark:focus:ring-indigo-400;
+    @apply w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-dark-input-bg dark:border-dark-input-border dark:text-dark-input-text dark:placeholder-dark-input-placeholder dark:focus:ring-dark-focus-ring;
   }
 
   .form-label {
@@ -79,6 +79,111 @@
   .form-group {
     @apply mb-4;
   }
+}
+
+/* Table styles */
+.table-container {
+  @apply overflow-x-auto rounded-lg border border-gray-200 dark:border-dark-border-primary;
+}
+
+.table {
+  @apply min-w-full divide-y divide-gray-200 dark:divide-dark-border-primary;
+}
+
+.table-header {
+  @apply bg-gray-50 dark:bg-dark-bg-secondary;
+}
+
+.table-header-cell {
+  @apply px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-dark-text-tertiary;
+}
+
+.table-body {
+  @apply bg-white divide-y divide-gray-200 dark:bg-dark-bg-primary dark:divide-dark-border-primary;
+}
+
+.table-row {
+  @apply hover:bg-gray-50 dark:hover:bg-dark-hover-primary;
+}
+
+.table-cell {
+  @apply px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-dark-text-primary;
+}
+
+/* Card styles */
+.card {
+  @apply bg-white rounded-lg shadow-sm border border-gray-200 dark:bg-dark-bg-primary dark:border-dark-border-primary;
+}
+
+.card-header {
+  @apply px-6 py-4 border-b border-gray-200 dark:border-dark-border-primary;
+}
+
+.card-body {
+  @apply p-6;
+}
+
+/* Badge styles */
+.badge {
+  @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+}
+
+.badge-success {
+  @apply bg-green-100 text-green-800 dark:bg-dark-success-bg dark:text-dark-success-text;
+}
+
+.badge-warning {
+  @apply bg-yellow-100 text-yellow-800 dark:bg-dark-warning-bg dark:text-dark-warning-text;
+}
+
+.badge-danger {
+  @apply bg-red-100 text-red-800 dark:bg-dark-error-bg dark:text-dark-error-text;
+}
+
+/* Modal styles */
+.modal-overlay {
+  @apply fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50;
+}
+
+.modal-content {
+  @apply bg-white rounded-lg shadow-xl w-full max-w-md animate-scale dark:bg-dark-bg-primary;
+}
+
+.modal-header {
+  @apply flex justify-between items-center p-6 border-b border-gray-200 dark:border-dark-border-primary;
+}
+
+.modal-body {
+  @apply p-6;
+}
+
+.modal-footer {
+  @apply flex justify-end gap-2 p-6 border-t border-gray-200 dark:border-dark-border-primary;
+}
+
+/* Scrollbar styles */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-gray-100 dark:bg-dark-bg-secondary;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-gray-300 rounded-full hover:bg-gray-400 dark:bg-dark-bg-tertiary dark:hover:bg-dark-border-primary;
+}
+
+/* For Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: theme("colors.gray.300") theme("colors.gray.100");
+}
+
+.dark * {
+  scrollbar-color: theme("colors.dark.bg-tertiary")
+    theme("colors.dark.bg-secondary");
 }
 
 /* Animations */
@@ -110,79 +215,6 @@
   animation: scale 0.2s ease-out;
 }
 
-/* Scrollbar styles */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-::-webkit-scrollbar-track {
-  @apply bg-gray-100 dark:bg-dark-bg-secondary;
-}
-
-::-webkit-scrollbar-thumb {
-  @apply bg-gray-300 rounded-full hover:bg-gray-400 dark:bg-dark-bg-tertiary dark:hover:bg-dark-border-primary;
-}
-
-/* Table styles */
-.table-container {
-  @apply overflow-x-auto rounded-lg border border-gray-200 dark:border-dark-border-primary;
-}
-
-.table {
-  @apply min-w-full divide-y divide-gray-200 dark:divide-dark-border-primary;
-}
-
-.table-header {
-  @apply bg-gray-50 dark:bg-dark-bg-secondary;
-}
-
-.table-header-cell {
-  @apply px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-dark-text-tertiary;
-}
-
-.table-body {
-  @apply bg-white divide-y divide-gray-200 dark:bg-dark-bg-primary dark:divide-dark-border-primary;
-}
-
-.table-row {
-  @apply hover:bg-gray-50 dark:hover:bg-dark-bg-secondary;
-}
-
-.table-cell {
-  @apply px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-dark-text-primary;
-}
-
-/* Card styles */
-.card {
-  @apply bg-white rounded-lg shadow-sm border border-gray-200 dark:bg-dark-bg-primary dark:border-dark-border-primary;
-}
-
-.card-header {
-  @apply px-6 py-4 border-b border-gray-200 dark:border-dark-border-primary;
-}
-
-.card-body {
-  @apply p-6;
-}
-
-/* Badge styles */
-.badge {
-  @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
-}
-
-.badge-success {
-  @apply bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100;
-}
-
-.badge-warning {
-  @apply bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-100;
-}
-
-.badge-danger {
-  @apply bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100;
-}
-
 /* Stats bar styles */
 .stats-bar {
   @apply grid grid-cols-4 gap-4 mb-6;
@@ -199,24 +231,3 @@
 .stat-value {
   @apply mt-1 text-2xl font-semibold text-gray-900 dark:text-dark-text-primary;
 }
-
-/* Modal styles */
-.modal-overlay {
-  @apply fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50;
-}
-
-.modal-content {
-  @apply bg-white rounded-lg shadow-xl w-full max-w-md animate-scale dark:bg-dark-bg-primary;
-}
-
-.modal-header {
-  @apply flex justify-between items-center p-6 border-b border-gray-200 dark:border-dark-border-primary;
-}
-
-.modal-body {
-  @apply p-6;
-}
-
-.modal-footer {
-  @apply flex justify-end gap-2 p-6 border-t border-gray-200 dark:border-dark-border-primary;
-} 

@@ -46,14 +46,31 @@ export default {
           900: "#4c1d95",
         },
         dark: {
-          "bg-primary": "#000000", // Pure black background
-          "bg-secondary": "#121212", // Slightly lighter black
-          "bg-tertiary": "#1E1E1E", // Even lighter black
-          "text-primary": "#FFFFFF", // Pure white text
-          "text-secondary": "#E0E0E0", // Slightly dimmed white
-          "text-tertiary": "#A0A0A0", // More dimmed white
-          border: "#2A2A2A", // Dark gray border
-          "border-primary": "#333333", // Slightly lighter border
+          "bg-primary": "#121212", // Main background
+          "bg-secondary": "#1E1E1E", // Secondary background
+          "bg-tertiary": "#2D2D2D", // Tertiary background
+          "text-primary": "#FFFFFF", // Primary text
+          "text-secondary": "#E0E0E0", // Secondary text
+          "text-tertiary": "#A0A0A0", // Tertiary text
+          "border-primary": "#333333", // Primary border
+          "border-secondary": "#404040", // Secondary border
+          "hover-primary": "#2D2D2D", // Hover state
+          "hover-secondary": "#333333", // Secondary hover state
+          "focus-ring": "#4F46E5", // Focus ring color
+          "input-bg": "#1E1E1E", // Input background
+          "input-border": "#333333", // Input border
+          "input-text": "#FFFFFF", // Input text
+          "input-placeholder": "#A0A0A0", // Input placeholder
+          "button-primary": "#4F46E5", // Primary button
+          "button-primary-hover": "#4338CA", // Primary button hover
+          "button-secondary": "#2D2D2D", // Secondary button
+          "button-secondary-hover": "#333333", // Secondary button hover
+          "success-bg": "rgba(16, 185, 129, 0.1)", // Success background
+          "success-text": "#10B981", // Success text
+          "warning-bg": "rgba(245, 158, 11, 0.1)", // Warning background
+          "warning-text": "#F59E0B", // Warning text
+          "error-bg": "rgba(239, 68, 68, 0.1)", // Error background
+          "error-text": "#EF4444", // Error text
         },
       },
       borderRadius: {

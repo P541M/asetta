@@ -129,7 +129,7 @@ const AddAssessmentForm = ({
                 value={formData.courseName}
                 onChange={handleChange}
                 ref={courseNameRef}
-                className="input hover:shadow-sm transition-all duration-200 dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border"
+                className="input hover:shadow-sm transition-all duration-200 dark:bg-dark-input-bg dark:text-dark-input-text dark:border-dark-input-border dark:placeholder-dark-input-placeholder"
                 placeholder="e.g., CS101"
                 required
               />
@@ -147,7 +147,7 @@ const AddAssessmentForm = ({
                 name="assignmentName"
                 value={formData.assignmentName}
                 onChange={handleChange}
-                className="input hover:shadow-sm transition-all duration-200 dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border"
+                className="input hover:shadow-sm transition-all duration-200 dark:bg-dark-input-bg dark:text-dark-input-text dark:border-dark-input-border dark:placeholder-dark-input-placeholder"
                 placeholder="e.g., Midterm Exam"
                 required
               />
@@ -167,7 +167,7 @@ const AddAssessmentForm = ({
                 name="dueDate"
                 value={formData.dueDate}
                 onChange={handleChange}
-                className="input hover:shadow-sm transition-all duration-200 dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border"
+                className="input hover:shadow-sm transition-all duration-200 dark:bg-dark-input-bg dark:text-dark-input-text dark:border-dark-input-border dark:placeholder-dark-input-placeholder"
                 required
               />
             </div>
@@ -184,7 +184,7 @@ const AddAssessmentForm = ({
                 name="dueTime"
                 value={formData.dueTime}
                 onChange={handleChange}
-                className="input hover:shadow-sm transition-all duration-200 dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border"
+                className="input hover:shadow-sm transition-all duration-200 dark:bg-dark-input-bg dark:text-dark-input-text dark:border-dark-input-border dark:placeholder-dark-input-placeholder"
                 required
               />
             </div>
@@ -204,7 +204,7 @@ const AddAssessmentForm = ({
                 min="0"
                 max="100"
                 step="0.1"
-                className="input hover:shadow-sm transition-all duration-200 dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border"
+                className="input hover:shadow-sm transition-all duration-200 dark:bg-dark-input-bg dark:text-dark-input-text dark:border-dark-input-border dark:placeholder-dark-input-placeholder"
               />
             </div>
           </div>
@@ -221,7 +221,7 @@ const AddAssessmentForm = ({
                 name="status"
                 value={formData.status}
                 onChange={handleChange}
-                className="input hover:shadow-sm transition-all duration-200 dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border"
+                className="input hover:shadow-sm transition-all duration-200 dark:bg-dark-input-bg dark:text-dark-input-text dark:border-dark-input-border dark:placeholder-dark-input-placeholder"
               >
                 <optgroup
                   label="Planning"
@@ -361,14 +361,14 @@ const AddAssessmentForm = ({
             <div
               className={`mt-4 p-3 rounded-lg text-sm ${
                 message.type === "error"
-                  ? "bg-red-50 text-red-700 border border-red-100 dark:bg-red-900/20 dark:text-red-400 dark:border-red-900/30 animate-fade-in"
-                  : "bg-emerald-50 text-emerald-700 border border-emerald-100 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-900/30 animate-fade-in"
+                  ? "bg-red-50 text-red-700 border border-red-100 dark:bg-dark-error-bg dark:text-dark-error-text dark:border-dark-error-bg animate-fade-in"
+                  : "bg-emerald-50 text-emerald-700 border border-emerald-100 dark:bg-dark-success-bg dark:text-dark-success-text dark:border-dark-success-bg animate-fade-in"
               }`}
             >
               {message.type === "error" ? (
                 <div className="flex items-start">
                   <svg
-                    className="h-5 w-5 mr-2 mt-0.5 text-red-500 dark:text-red-400"
+                    className="h-5 w-5 mr-2 mt-0.5 text-red-500 dark:text-dark-error-text"
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 20 20"
                     fill="currentColor"
@@ -384,7 +384,7 @@ const AddAssessmentForm = ({
               ) : (
                 <div className="flex items-start">
                   <svg
-                    className="h-5 w-5 mr-2 mt-0.5 text-emerald-500 dark:text-emerald-400"
+                    className="h-5 w-5 mr-2 mt-0.5 text-emerald-500 dark:text-dark-success-text"
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 20 20"
                     fill="currentColor"
