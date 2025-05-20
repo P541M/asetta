@@ -12,9 +12,10 @@ import { useAuth } from "../contexts/AuthContext";
 import RichTextEditor from "./RichTextEditor";
 import { getFromLocalStorage, setToLocalStorage } from "../utils/localStorage";
 import {
-  utcToLocal,
+  formatLocalDate,
   formatLocalDateTime,
   getDaysUntil,
+  isUpcoming,
 } from "../utils/dateUtils";
 import { Assessment } from "../types/assessment";
 
@@ -390,9 +391,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
     dateStr: string,
     timeStr: string
   ): string => {
-    // Convert UTC to local for display
-    const { date, time } = utcToLocal(dateStr, timeStr);
-    return formatLocalDateTime(date, time);
+    return formatLocalDateTime(dateStr, timeStr);
   };
 
   const getDaysTillDue = (
@@ -403,9 +402,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
     const completedStatuses = ["Submitted", "Under Review", "Completed"];
     if (completedStatuses.includes(status)) return null;
 
-    // Convert UTC to local for calculation
-    const { date, time } = utcToLocal(dueDate, dueTime);
-    return getDaysUntil(date, time);
+    return getDaysUntil(dueDate, dueTime);
   };
 
   const formatDaysTillDue = (days: number | null): JSX.Element | null => {

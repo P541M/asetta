@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { db } from "../lib/firebase";
 import { collection, addDoc } from "firebase/firestore";
-import { localToUTC } from "../utils/dateUtils";
+import { localToUTC, formatLocalDate } from "../utils/dateUtils";
 
 interface AddAssessmentFormProps {
   semester: string;
@@ -63,60 +63,36 @@ const AddAssessmentForm = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user) {
-      setMessage({
-        text: "You must be logged in to add assessments",
-        type: "error",
-      });
-      return;
-    }
-    if (!formData.courseName.trim()) {
-      setMessage({ text: "Course name is required", type: "error" });
-      courseNameRef.current?.focus();
-      return;
-    }
-    if (!formData.assignmentName.trim()) {
-      setMessage({ text: "Assessment name is required", type: "error" });
-      return;
-    }
+    if (!user) return;
+
     setIsSubmitting(true);
     setMessage({ text: "", type: "" });
+
     try {
-      // Convert local date/time to UTC for storage
-      const { date: utcDate, time: utcTime } = localToUTC(
-        formData.dueDate,
-        formData.dueTime
+      const assessmentRef = collection(
+        db,
+        "users",
+        user.uid,
+        "semesters",
+        semesterId,
+        "assessments"
       );
 
-      await addDoc(
-        collection(
-          db,
-          "users",
-          user.uid,
-          "semesters",
-          semesterId,
-          "assessments"
-        ),
-        {
-          ...formData,
-          dueDate: utcDate,
-          dueTime: utcTime,
-          createdAt: new Date(),
-          semester,
-        }
-      );
-      setFormSuccess(true);
+      await addDoc(assessmentRef, {
+        ...formData,
+        createdAt: new Date(),
+      });
+
       setFormData({
         courseName: "",
         assignmentName: "",
         dueDate: getTodayDateString(),
-        dueTime: "23:59", // Reset to default
+        dueTime: "23:59",
         weight: 0,
         status: "Not started",
       });
-      setMessage({ text: "Assessment added successfully!", type: "success" });
-      onSuccess();
-      courseNameRef.current?.focus();
+      setFormSuccess(true);
+      onSuccess?.();
     } catch (error) {
       console.error("Error adding assessment:", error);
       setMessage({

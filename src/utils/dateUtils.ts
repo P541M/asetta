@@ -1,10 +1,9 @@
 /**
- * Date utility functions for consistent timezone handling
+ * Date utility functions for handling dates and times
  */
 
 /**
  * Converts a date string (YYYY-MM-DD) and time string (HH:MM) to a Date object
- * in the user's local timezone
  */
 export const parseLocalDateTime = (
   dateStr: string,
