@@ -3,7 +3,7 @@ import { useState } from "react";
 import Head from "next/head";
 import { auth } from "../lib/firebase";
 import { sendPasswordResetEmail } from "firebase/auth";
-import Header from "../components/Header";
+import Header from "../components/layout/Header";
 import Link from "next/link";
 
 const ResetPassword = () => {

@@ -1,7 +1,7 @@
-import { useAuth } from "../contexts/AuthContext";
+import { useAuth } from "../../contexts/AuthContext";
 import Image from "next/image";
 import { useState, useRef, useEffect } from "react";
-import UserSettings from "./UserSettings";
+import UserSettings from "../settings/UserSettings";
 
 interface DashboardHeaderProps {
   onLogout?: () => Promise<void>;

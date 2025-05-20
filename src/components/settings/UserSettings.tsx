@@ -1,10 +1,10 @@
 // components/UserSettings.tsx
 import { useState, useRef, useEffect } from "react";
-import { useAuth } from "../contexts/AuthContext";
-import { useTheme } from "../contexts/ThemeContext";
+import { useAuth } from "../../contexts/AuthContext";
+import { useTheme } from "../../contexts/ThemeContext";
 import { updateProfile } from "firebase/auth";
 import { doc, updateDoc, getDoc } from "firebase/firestore";
-import { db } from "../lib/firebase";
+import { db } from "../../lib/firebase";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import Image from "next/image";
 

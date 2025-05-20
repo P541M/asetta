@@ -1,9 +1,9 @@
 // components/Header.tsx
-import { useAuth } from "../contexts/AuthContext";
+import { useAuth } from "../../contexts/AuthContext";
 import Link from "next/link";
 import Image from "next/image";
 import { useState, useEffect, useRef } from "react";
-import UserSettings from "./UserSettings";
+import UserSettings from "../settings/UserSettings";
 
 interface HeaderProps {
   onLogout?: () => Promise<void>;
@@ -249,7 +249,9 @@ const Header = ({ onLogout }: HeaderProps) => {
           </div>
         </div>
       </header>
-      {showSettings && <UserSettings isOpen={showSettings} onClose={closeSettings} />}
+      {showSettings && (
+        <UserSettings isOpen={showSettings} onClose={closeSettings} />
+      )}
     </>
   );
 };

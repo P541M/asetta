@@ -2,7 +2,7 @@
 import { NextPage } from "next";
 import Head from "next/head";
 import Link from "next/link";
-import Header from "../components/Header";
+import Header from "../components/layout/Header";
 
 const Terms: NextPage = () => {
   return (

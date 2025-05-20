@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
-import { useAuth } from "../contexts/AuthContext";
-import { db } from "../lib/firebase";
+import { useAuth } from "../../contexts/AuthContext";
+import { db } from "../../lib/firebase";
 import { collection, addDoc } from "firebase/firestore";
 
 interface AddAssessmentFormProps {

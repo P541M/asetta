@@ -1,6 +1,6 @@
 // src/components/RegisterForm.tsx
 import { useState, useEffect } from "react";
-import { auth, db } from "../lib/firebase";
+import { auth, db } from "../../lib/firebase";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
 

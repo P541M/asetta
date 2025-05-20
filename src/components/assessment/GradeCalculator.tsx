@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { useAuth } from "../contexts/AuthContext";
-import { db } from "../lib/firebase";
+import { useAuth } from "../../contexts/AuthContext";
+import { db } from "../../lib/firebase";
 import {
   collection,
   query,
@@ -9,7 +9,7 @@ import {
   doc,
   updateDoc,
 } from "firebase/firestore";
-import { Assessment } from "../types/assessment";
+import { Assessment } from "../../types/assessment";
 
 interface GradeCalculatorProps {
   semesterId: string;

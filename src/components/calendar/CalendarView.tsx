@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef, KeyboardEvent, useCallback } from "react";
-import { useAuth } from "../contexts/AuthContext";
-import { db } from "../lib/firebase";
+import { useAuth } from "../../contexts/AuthContext";
+import { db } from "../../lib/firebase";
 import { collection, getDocs, query, updateDoc, doc } from "firebase/firestore";
-import { generateICSFile } from "../utils/icsGenerator";
+import { generateICSFile } from "../../utils/icsGenerator";
 import { DndContext, DragEndEvent } from "@dnd-kit/core";
 
 interface Assessment {

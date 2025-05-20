@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { useAuth } from "../contexts/AuthContext";
-import { db } from "../lib/firebase";
+import { useAuth } from "../../contexts/AuthContext";
+import { db } from "../../lib/firebase";
 import {
   collection,
   query,
@@ -10,11 +10,11 @@ import {
   writeBatch,
   where,
 } from "firebase/firestore";
-import { supabase } from "../lib/supabase";
+import { supabase } from "../../lib/supabase";
 import {
   formatLocalDate,
   isUpcoming as isDateUpcoming,
-} from "../utils/dateUtils";
+} from "../../utils/dateUtils";
 
 interface Assessment {
   id: string;

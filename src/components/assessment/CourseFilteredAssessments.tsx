@@ -1,11 +1,11 @@
-// src/components/CourseFilteredAssessments.tsx
+// src/components/assessment/CourseFilteredAssessments.tsx
 import { useState, useEffect } from "react";
-import { useAuth } from "../contexts/AuthContext";
-import { db } from "../lib/firebase";
+import { useAuth } from "../../contexts/AuthContext";
+import { db } from "../../lib/firebase";
 import { collection, query, where, getDocs } from "firebase/firestore";
-import AssessmentsTable from "./AssessmentsTable";
+import AssessmentsTable from "../tables/AssessmentsTable";
 import GradeCalculator from "./GradeCalculator";
-import { Assessment } from "../types/assessment";
+import { Assessment } from "../../types/assessment";
 
 interface CourseFilteredAssessmentsProps {
   semesterId: string;

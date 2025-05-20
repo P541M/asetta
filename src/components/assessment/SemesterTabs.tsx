@@ -1,7 +1,7 @@
 // components/SemesterTabs.tsx
 import { useState, useEffect, useRef } from "react";
-import { useAuth } from "../contexts/AuthContext";
-import { db } from "../lib/firebase";
+import { useAuth } from "../../contexts/AuthContext";
+import { db } from "../../lib/firebase";
 import {
   collection,
   onSnapshot,

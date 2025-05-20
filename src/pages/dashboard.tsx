@@ -13,14 +13,14 @@ import {
   doc,
   getDoc,
 } from "firebase/firestore";
-import SemesterTabs from "../components/SemesterTabs";
-import UploadForm from "../components/UploadForm";
-import AssessmentsTable from "../components/AssessmentsTable";
-import CoursesOverviewTable from "../components/CoursesOverviewTable";
-import CourseFilteredAssessments from "../components/CourseFilteredAssessments";
-import AddAssessmentForm from "../components/AddAssessmentForm";
-import CalendarView from "../components/CalendarView";
-import DashboardHeader from "../components/DashboardHeader";
+import SemesterTabs from "../components/assessment/SemesterTabs";
+import UploadForm from "../components/forms/UploadForm";
+import AssessmentsTable from "../components/tables/AssessmentsTable";
+import CoursesOverviewTable from "../components/tables/CoursesOverviewTable";
+import CourseFilteredAssessments from "../components/assessment/CourseFilteredAssessments";
+import AddAssessmentForm from "../components/forms/AddAssessmentForm";
+import CalendarView from "../components/calendar/CalendarView";
+import DashboardHeader from "../components/layout/DashboardHeader";
 
 interface Assessment {
   id: string;

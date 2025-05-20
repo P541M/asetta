@@ -1,6 +1,6 @@
 import React, { JSX } from "react";
 import { useState, useEffect, useRef } from "react";
-import { db } from "../lib/firebase";
+import { db } from "../../lib/firebase";
 import {
   doc,
   updateDoc,
@@ -8,11 +8,14 @@ import {
   getDoc,
   serverTimestamp,
 } from "firebase/firestore";
-import { useAuth } from "../contexts/AuthContext";
-import RichTextEditor from "./RichTextEditor";
-import { getFromLocalStorage, setToLocalStorage } from "../utils/localStorage";
-import { formatLocalDateTime, getDaysUntil } from "../utils/dateUtils";
-import { Assessment } from "../types/assessment";
+import { useAuth } from "../../contexts/AuthContext";
+import RichTextEditor from "../editor/RichTextEditor";
+import {
+  getFromLocalStorage,
+  setToLocalStorage,
+} from "../../utils/localStorage";
+import { formatLocalDateTime, getDaysUntil } from "../../utils/dateUtils";
+import { Assessment } from "../../types/assessment";
 
 interface AssessmentsTableProps {
   assessments: Assessment[];
