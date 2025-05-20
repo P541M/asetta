@@ -81,10 +81,10 @@ export default function PrivacyPage() {
                     contact us at:
                     <br />
                     <a
-                      href="mailto:privacy@kivo.com"
+                      href="mailto:videna.psalmeleazar@gmail.com"
                       className="text-indigo-600 hover:text-indigo-700 transition-colors duration-200 font-medium"
                     >
-                      privacy@kivo.com
+                      videna.psalmeleazar@gmail.com
                     </a>
                   </p>
                 </div>
