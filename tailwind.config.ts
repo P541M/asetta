@@ -46,14 +46,14 @@ export default {
           900: "#4c1d95",
         },
         dark: {
-          "bg-primary": "#111827", // Dark background
-          "bg-secondary": "#1F2937", // Slightly lighter background
-          "bg-tertiary": "#374151", // Even lighter background
-          "text-primary": "#F9FAFB", // Primary text color
-          "text-secondary": "#E5E7EB", // Secondary text color
-          "text-tertiary": "#9CA3AF", // Tertiary text color
-          border: "#374151", // Border color
-          "border-primary": "#4B5563", // Primary border color
+          "bg-primary": "#000000", // Pure black background
+          "bg-secondary": "#121212", // Slightly lighter black
+          "bg-tertiary": "#1E1E1E", // Even lighter black
+          "text-primary": "#FFFFFF", // Pure white text
+          "text-secondary": "#E0E0E0", // Slightly dimmed white
+          "text-tertiary": "#A0A0A0", // More dimmed white
+          border: "#2A2A2A", // Dark gray border
+          "border-primary": "#333333", // Slightly lighter border
         },
       },
       borderRadius: {
