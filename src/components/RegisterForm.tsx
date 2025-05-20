@@ -1,4 +1,4 @@
-// src/components/EnhancedRegisterForm.tsx
+// src/components/RegisterForm.tsx
 import { useState, useEffect } from "react";
 import { auth, db } from "../lib/firebase";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
@@ -20,7 +20,7 @@ interface PasswordCriteria {
   hasSpecialChar: boolean;
 }
 
-const EnhancedRegisterForm = ({
+const RegisterForm = ({
   onSuccess,
   onCancel,
   isSubmitting,
@@ -609,4 +609,4 @@ const EnhancedRegisterForm = ({
   );
 };
 
-export default EnhancedRegisterForm;
+export default RegisterForm;

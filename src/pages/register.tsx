@@ -22,6 +22,7 @@ const Register = () => {
     hasNumber: false,
     hasSpecialChar: false,
   });
+  const [passwordFocused, setPasswordFocused] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -156,113 +157,117 @@ const Register = () => {
                 className="w-full px-4 py-2.5 text-gray-900 placeholder-gray-400 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 disabled:bg-gray-50 disabled:text-gray-500"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                onFocus={() => setPasswordFocused(true)}
+                onBlur={() => setPasswordFocused(false)}
                 required
                 disabled={isSubmitting}
                 minLength={8}
                 aria-label="Password"
               />
-              <div className="mt-2 space-y-1">
-                <div className="flex items-center text-sm">
-                  <span
-                    className={`mr-2 ${
-                      passwordCriteria.minLength
-                        ? "text-green-500"
-                        : "text-gray-400"
-                    }`}
-                  >
-                    {passwordCriteria.minLength ? "✓" : "○"}
-                  </span>
-                  <span
-                    className={
-                      passwordCriteria.minLength
-                        ? "text-green-600"
-                        : "text-gray-500"
-                    }
-                  >
-                    At least 8 characters
-                  </span>
+              {(passwordFocused || password) && (
+                <div className="mt-2 space-y-1">
+                  <div className="flex items-center text-sm">
+                    <span
+                      className={`mr-2 ${
+                        passwordCriteria.minLength
+                          ? "text-green-500"
+                          : "text-gray-400"
+                      }`}
+                    >
+                      {passwordCriteria.minLength ? "✓" : "○"}
+                    </span>
+                    <span
+                      className={
+                        passwordCriteria.minLength
+                          ? "text-green-600"
+                          : "text-gray-500"
+                      }
+                    >
+                      At least 8 characters
+                    </span>
+                  </div>
+                  <div className="flex items-center text-sm">
+                    <span
+                      className={`mr-2 ${
+                        passwordCriteria.hasUppercase
+                          ? "text-green-500"
+                          : "text-gray-400"
+                      }`}
+                    >
+                      {passwordCriteria.hasUppercase ? "✓" : "○"}
+                    </span>
+                    <span
+                      className={
+                        passwordCriteria.hasUppercase
+                          ? "text-green-600"
+                          : "text-gray-500"
+                      }
+                    >
+                      One uppercase letter
+                    </span>
+                  </div>
+                  <div className="flex items-center text-sm">
+                    <span
+                      className={`mr-2 ${
+                        passwordCriteria.hasLowercase
+                          ? "text-green-500"
+                          : "text-gray-400"
+                      }`}
+                    >
+                      {passwordCriteria.hasLowercase ? "✓" : "○"}
+                    </span>
+                    <span
+                      className={
+                        passwordCriteria.hasLowercase
+                          ? "text-green-600"
+                          : "text-gray-500"
+                      }
+                    >
+                      One lowercase letter
+                    </span>
+                  </div>
+                  <div className="flex items-center text-sm">
+                    <span
+                      className={`mr-2 ${
+                        passwordCriteria.hasNumber
+                          ? "text-green-500"
+                          : "text-gray-400"
+                      }`}
+                    >
+                      {passwordCriteria.hasNumber ? "✓" : "○"}
+                    </span>
+                    <span
+                      className={
+                        passwordCriteria.hasNumber
+                          ? "text-green-600"
+                          : "text-gray-500"
+                      }
+                    >
+                      One number
+                    </span>
+                  </div>
+                  <div className="flex items-center text-sm">
+                    <span
+                      className={`mr-2 ${
+                        passwordCriteria.hasSpecialChar
+                          ? "text-green-500"
+                          : "text-gray-400"
+                      }`}
+                    >
+                      {passwordCriteria.hasSpecialChar ? "✓" : "○"}
+                    </span>
+                    <span
+                      className={
+                        passwordCriteria.hasSpecialChar
+                          ? "text-green-600"
+                          : "text-gray-500"
+                      }
+                    >
+                      One special character (!@#$%^&*(),.?&quot;:{}|&lt;&gt;)
+                    </span>
+                  </div>
                 </div>
-                <div className="flex items-center text-sm">
-                  <span
-                    className={`mr-2 ${
-                      passwordCriteria.hasUppercase
-                        ? "text-green-500"
-                        : "text-gray-400"
-                    }`}
-                  >
-                    {passwordCriteria.hasUppercase ? "✓" : "○"}
-                  </span>
-                  <span
-                    className={
-                      passwordCriteria.hasUppercase
-                        ? "text-green-600"
-                        : "text-gray-500"
-                    }
-                  >
-                    One uppercase letter
-                  </span>
-                </div>
-                <div className="flex items-center text-sm">
-                  <span
-                    className={`mr-2 ${
-                      passwordCriteria.hasLowercase
-                        ? "text-green-500"
-                        : "text-gray-400"
-                    }`}
-                  >
-                    {passwordCriteria.hasLowercase ? "✓" : "○"}
-                  </span>
-                  <span
-                    className={
-                      passwordCriteria.hasLowercase
-                        ? "text-green-600"
-                        : "text-gray-500"
-                    }
-                  >
-                    One lowercase letter
-                  </span>
-                </div>
-                <div className="flex items-center text-sm">
-                  <span
-                    className={`mr-2 ${
-                      passwordCriteria.hasNumber
-                        ? "text-green-500"
-                        : "text-gray-400"
-                    }`}
-                  >
-                    {passwordCriteria.hasNumber ? "✓" : "○"}
-                  </span>
-                  <span
-                    className={
-                      passwordCriteria.hasNumber
-                        ? "text-green-600"
-                        : "text-gray-500"
-                    }
-                  >
-                    One number
-                  </span>
-                </div>
-                <div className="flex items-center text-sm">
-                  <span
-                    className={`mr-2 ${
-                      passwordCriteria.hasSpecialChar
-                        ? "text-green-500"
-                        : "text-gray-400"
-                    }`}
-                  >
-                    {passwordCriteria.hasSpecialChar ? "✓" : "○"}
-                  </span>
-                  <span
-                    className={
-                      passwordCriteria.hasSpecialChar
-                        ? "text-green-600"
-                        : "text-gray-500"
-                    }
-                  >
-                    One special character (!@#$%^&*(),.?&quot;:{}|&lt;&gt;)
-                  </span>
-                </div>
-              </div>
+              )}
             </div>
             <div className="form-group">
               <label htmlFor="confirmPassword" className="form-label">
