@@ -12,10 +12,10 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen flex flex-col bg-white">
       <Head>
-        <title>Kivo - Simplify Your Academic Journey</title>
+        <title>Kivo - Your AI-Powered Academic Success Companion</title>
         <meta
           name="description"
-          content="Kivo is an all-in-one platform to help students manage assignments, track deadlines, and stay organized."
+          content="Kivo is a completely free AI-powered platform that helps students manage assignments, track deadlines, and stay organized throughout their academic journey."
         />
       </Head>
       <Header />
@@ -30,18 +30,18 @@ export default function LandingPage() {
           <div className="flex flex-col lg:flex-row items-center">
             <div className="lg:w-1/2 lg:pr-12 mb-10 lg:mb-0 animate-fade-in">
               <span className="inline-block mb-4 px-4 py-2 rounded-full bg-indigo-100 text-indigo-700 font-semibold text-sm shadow-sm animate-fade-in-down">
-                🚀 New for Students
+                🎓 100% Free for Students
               </span>
               <h1 className="text-5xl md:text-6xl font-extrabold text-gray-900 mb-8 font-heading tracking-tight leading-tight drop-shadow-lg">
-                Your Academic Journey,{" "}
+                Your Smart{" "}
                 <span className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600 animate-scale">
-                  Simplified
+                  Academic Assistant
                 </span>
               </h1>
               <p className="text-2xl text-gray-700 mb-10 leading-relaxed max-w-xl animate-fade-in">
-                Stay organized, meet deadlines, and focus on what matters
-                most—your education. Kivo brings clarity and confidence to your
-                student life.
+                Experience the future of academic organization with AI-powered
+                assessment tracking, smart deadline management, and personalized
+                insights—all completely free for students.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <div className="transform transition-transform duration-200 hover:scale-105">
@@ -104,11 +104,11 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-20 animate-fade-in">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">
-              Everything You Need
+              Smart Features for Student Success
             </h2>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              A comprehensive suite of tools designed to streamline your
-              academic experience.
+              Everything you need to excel in your studies, powered by advanced
+              AI technology.
             </p>
           </div>
 
@@ -116,28 +116,28 @@ export default function LandingPage() {
             {[
               {
                 icon: "M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2",
-                title: "Assignment Tracking",
+                title: "AI-Powered Assessment Tracking",
                 description:
-                  "Keep track of all your assignments, deadlines, and progress in one place.",
+                  "Automatically extract and organize assignments, exams, and projects from your course documents using advanced AI technology.",
               },
               {
                 icon: "M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z",
-                title: "Calendar Integration",
+                title: "Smart Deadline Management",
                 description:
-                  "Sync your academic schedule with your personal calendar for seamless planning.",
+                  "Never miss a deadline with AI-powered notifications and automated progress tracking for all your academic tasks.",
               },
               {
                 icon: "M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z",
-                title: "Progress Analytics",
+                title: "Personalized Insights",
                 description:
-                  "Visualize your academic progress and identify areas for improvement.",
+                  "Get AI-driven analytics and recommendations to optimize your study schedule and improve your academic performance.",
               },
             ].map((feature, index) => (
               <div
                 key={index}
                 className="group transform transition-all duration-300 hover:-translate-y-2"
               >
-                <div className="bg-white rounded-2xl p-8 shadow-sm hover:shadow-lg transition-shadow duration-300 border border-gray-100">
+                <div className="bg-white rounded-2xl p-8 shadow-sm hover:shadow-lg transition-shadow duration-300 border border-gray-100 h-full flex flex-col">
                   <div className="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center mb-6 group-hover:bg-indigo-100 transition-colors duration-300">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -157,7 +157,7 @@ export default function LandingPage() {
                   <h3 className="text-xl font-semibold text-gray-900 mb-3">
                     {feature.title}
                   </h3>
-                  <p className="text-gray-600 leading-relaxed">
+                  <p className="text-gray-600 leading-relaxed flex-grow">
                     {feature.description}
                   </p>
                 </div>
@@ -194,11 +194,12 @@ export default function LandingPage() {
       <section className="py-24 bg-gradient-to-br from-indigo-50 to-white animate-fade-in">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-4xl font-bold text-gray-900 mb-6">
-            Ready to Transform Your Academic Experience?
+            Start Your Academic Success Journey Today
           </h2>
           <p className="text-xl text-gray-600 mb-10 max-w-2xl mx-auto">
-            Join thousands of students who are using Kivo to stay organized and
-            boost their academic performance.
+            Join thousands of students who are using Kivo's AI-powered platform
+            to stay organized, meet deadlines, and achieve their academic
+            goals—all completely free.
           </p>
           <div className="flex justify-center transform transition-transform duration-200 hover:scale-105">
             <Link

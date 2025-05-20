@@ -61,7 +61,7 @@ export default function Contact() {
         <title>Contact Us - Kivo</title>
         <meta
           name="description"
-          content="Get in touch with the Kivo team. We're here to help you with any questions about our platform."
+          content="Get in touch with the Kivo team. We're here to help you make the most of your free AI-powered academic success platform."
         />
       </Head>
       <Header />
@@ -75,14 +75,15 @@ export default function Contact() {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center mb-12 animate-fade-in">
             <span className="inline-block mb-4 px-4 py-2 rounded-full bg-indigo-100 text-indigo-700 font-semibold text-sm shadow-sm animate-fade-in-down">
-              Get in Touch
+              Student Support
             </span>
             <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-6 font-heading tracking-tight leading-tight">
-              We'd Love to Hear from You
+              We're Here to Help You Succeed
             </h1>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Have questions about Kivo? Our team is here to help you get the
-              most out of your academic journey.
+              Have questions about our AI-powered features or need help getting
+              started? Our team is dedicated to supporting your academic
+              journey—all completely free.
             </p>
           </div>
 
@@ -142,7 +143,7 @@ export default function Contact() {
                       value={formData.email}
                       onChange={handleChange}
                       className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 focus:outline-none transition-all duration-200"
-                      placeholder="you@email.com"
+                      placeholder="your.student@email.com"
                       required
                     />
                   </div>
@@ -157,7 +158,7 @@ export default function Contact() {
                     onChange={handleChange}
                     className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 focus:outline-none transition-all duration-200"
                     rows={6}
-                    placeholder="How can we help you?"
+                    placeholder="How can we help you with your academic journey?"
                     required
                   />
                 </div>

@@ -3,8 +3,8 @@ import Link from "next/link";
 const footerLinks = {
   mainLinks: [
     { href: "/features", label: "Features" },
-    { href: "/pricing", label: "Pricing" },
     { href: "/contact", label: "Contact" },
+    { href: "/pricing", label: "Pricing?" },
   ],
   legalLinks: [
     { href: "/privacy", label: "Privacy Policy" },
@@ -33,10 +33,12 @@ const Footer = () => {
               </span>
             </Link>
             <p className="text-base text-gray-600 max-w-md leading-relaxed">
-              Kivo empowers teams to collaborate, innovate, and grow with a
-              seamless platform designed for productivity and security.
+              Kivo is your smart academic assistant. We help students stay
+              organized, track assignments, and manage deadlines—all completely
+              free. Join thousands of students who are achieving their academic
+              goals with Kivo.
             </p>
-            <div>
+            <div className="flex space-x-4">
               <a
                 href="https://linkedin.com"
                 target="_blank"
@@ -103,7 +105,8 @@ const Footer = () => {
         {/* Copyright */}
         <div className="mt-12 pt-8 border-t border-gray-100">
           <div className="text-gray-500 text-sm text-center">
-            © {new Date().getFullYear()} Kivo. All rights reserved.
+            © {new Date().getFullYear()} Kivo. All rights reserved. Made with ❤️
+            for students.
           </div>
         </div>
       </div>
