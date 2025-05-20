@@ -4,7 +4,6 @@ import Head from "next/head";
 import "../styles/globals.css";
 import { AuthProvider } from "../contexts/AuthContext";
 import { ThemeProvider } from "../contexts/ThemeContext";
-import BetaAccessGate from "../components/BetaAccessGate";
 import { Outfit, Lexend } from "next/font/google";
 
 const outfit = Outfit({
@@ -35,9 +34,7 @@ function MyApp({ Component, pageProps }: AppProps) {
           <link rel="icon" href="/favicon.ico" />
         </Head>
         <main className={`${outfit.variable} ${lexend.variable} font-body`}>
-          <BetaAccessGate>
-            <Component {...pageProps} />
-          </BetaAccessGate>
+          <Component {...pageProps} />
         </main>
       </ThemeProvider>
     </AuthProvider>
