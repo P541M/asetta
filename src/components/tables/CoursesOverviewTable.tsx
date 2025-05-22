@@ -362,7 +362,7 @@ const CoursesOverviewTable = ({
           <p>{error}</p>
         </div>
       ) : (
-        <div className="table-container rounded-xl border border-gray-100 dark:border-dark-border">
+        <div className="table-container rounded-lg border border-gray-100 dark:border-dark-border">
           <table className="data-table">
             <thead className="bg-gray-50 dark:bg-dark-bg-tertiary">
               <tr>

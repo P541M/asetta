@@ -287,7 +287,7 @@ const UploadForm = ({ semester, onUploadSuccess }: UploadFormProps) => {
   };
 
   return (
-    <div className="bg-white dark:bg-dark-bg-secondary rounded-xl shadow-sm border border-gray-100 dark:border-dark-border-primary p-6">
+    <div className="bg-white dark:bg-dark-bg-secondary rounded-lg shadow-sm border border-gray-100 dark:border-dark-border-primary p-6">
       <h2 className="text-xl font-medium mb-4 dark:text-white">
         Upload Course Outlines
       </h2>

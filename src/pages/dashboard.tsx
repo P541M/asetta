@@ -288,12 +288,12 @@ const Dashboard = () => {
           <SemesterTabs
             selectedSemester={selectedSemester}
             onSelect={setSelectedSemester}
-            className="bg-white dark:bg-dark-bg-secondary rounded-xl shadow-md border border-gray-100 dark:border-dark-border-primary"
+            className="bg-white dark:bg-dark-bg-secondary rounded-lg shadow-md border border-gray-100 dark:border-dark-border-primary"
           />
 
           {showStatsBar && (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 mb-8 mt-6">
-              <div className="bg-white dark:bg-dark-bg-secondary rounded-xl p-4 shadow-md hover:shadow-lg transition-all duration-300">
+              <div className="bg-white dark:bg-dark-bg-secondary rounded-lg p-4 shadow-md hover:shadow-lg transition-all duration-300">
                 <div className="flex items-center justify-between mb-2">
                   <p className="text-sm font-medium text-gray-600 dark:text-dark-text-secondary">
                     Total Assessments
@@ -303,7 +303,7 @@ const Dashboard = () => {
                   {stats.total}
                 </h3>
               </div>
-              <div className="bg-white dark:bg-dark-bg-secondary rounded-xl p-4 shadow-md hover:shadow-lg transition-all duration-300">
+              <div className="bg-white dark:bg-dark-bg-secondary rounded-lg p-4 shadow-md hover:shadow-lg transition-all duration-300">
                 <div className="flex items-center justify-between mb-2">
                   <p className="text-sm font-medium text-gray-600 dark:text-dark-text-secondary">
                     Not Started
@@ -313,7 +313,7 @@ const Dashboard = () => {
                   {stats.notStarted}
                 </h3>
               </div>
-              <div className="bg-white dark:bg-dark-bg-secondary rounded-xl p-4 shadow-md hover:shadow-lg transition-all duration-300">
+              <div className="bg-white dark:bg-dark-bg-secondary rounded-lg p-4 shadow-md hover:shadow-lg transition-all duration-300">
                 <div className="flex items-center justify-between mb-2">
                   <p className="text-sm font-medium text-gray-600 dark:text-dark-text-secondary">
                     In Progress
@@ -323,7 +323,7 @@ const Dashboard = () => {
                   {stats.inProgress}
                 </h3>
               </div>
-              <div className="bg-white dark:bg-dark-bg-secondary rounded-xl p-4 shadow-md hover:shadow-lg transition-all duration-300">
+              <div className="bg-white dark:bg-dark-bg-secondary rounded-lg p-4 shadow-md hover:shadow-lg transition-all duration-300">
                 <div className="flex items-center justify-between mb-2">
                   <p className="text-sm font-medium text-gray-600 dark:text-dark-text-secondary">
                     Submitted
@@ -333,7 +333,7 @@ const Dashboard = () => {
                   {stats.submitted}
                 </h3>
               </div>
-              <div className="bg-white dark:bg-dark-bg-secondary rounded-xl p-4 shadow-md hover:shadow-lg transition-all duration-300">
+              <div className="bg-white dark:bg-dark-bg-secondary rounded-lg p-4 shadow-md hover:shadow-lg transition-all duration-300">
                 <div className="flex items-center justify-between mb-2">
                   <p className="text-sm font-medium text-gray-600 dark:text-dark-text-secondary">
                     Upcoming
@@ -343,7 +343,7 @@ const Dashboard = () => {
                   {stats.upcomingDeadlines}
                 </h3>
               </div>
-              <div className="bg-white dark:bg-dark-bg-secondary rounded-xl p-4 shadow-md hover:shadow-lg transition-all duration-300">
+              <div className="bg-white dark:bg-dark-bg-secondary rounded-lg p-4 shadow-md hover:shadow-lg transition-all duration-300">
                 <div className="flex items-center justify-between mb-2">
                   <p className="text-sm font-medium text-gray-600 dark:text-dark-text-secondary">
                     Completion Rate
@@ -357,7 +357,7 @@ const Dashboard = () => {
           )}
 
           <div className="mt-8">
-            <div className="bg-white dark:bg-dark-bg-secondary rounded-xl p-1 shadow-md">
+            <div className="bg-white dark:bg-dark-bg-secondary rounded-lg p-1 shadow-md">
               {/* Desktop Navigation */}
               <div className="hidden md:flex space-x-2">
                 <button
@@ -365,7 +365,7 @@ const Dashboard = () => {
                     setActiveTab("courses");
                     setSelectedCourse(null);
                   }}
-                  className={`flex-1 px-6 py-3 font-medium text-sm transition-all duration-200 rounded-xl ${
+                  className={`flex-1 px-6 py-3 font-medium text-sm transition-all duration-200 rounded-lg ${
                     activeTab === "courses" && !selectedCourse
                       ? "bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 shadow-sm"
                       : "text-gray-600 dark:text-dark-text-secondary hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary"
@@ -388,7 +388,7 @@ const Dashboard = () => {
                     setActiveTab("assessments");
                     setSelectedCourse(null);
                   }}
-                  className={`flex-1 px-6 py-3 font-medium text-sm transition-all duration-200 rounded-xl ${
+                  className={`flex-1 px-6 py-3 font-medium text-sm transition-all duration-200 rounded-lg ${
                     activeTab === "assessments" && !selectedCourse
                       ? "bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 shadow-sm"
                       : "text-gray-600 dark:text-dark-text-secondary hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary"
@@ -412,7 +412,7 @@ const Dashboard = () => {
                 </button>
                 <button
                   onClick={() => setActiveTab("calendar")}
-                  className={`flex-1 px-6 py-3 font-medium text-sm transition-all duration-200 rounded-xl ${
+                  className={`flex-1 px-6 py-3 font-medium text-sm transition-all duration-200 rounded-lg ${
                     activeTab === "calendar"
                       ? "bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 shadow-sm"
                       : "text-gray-600 dark:text-dark-text-secondary hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary"
@@ -436,7 +436,7 @@ const Dashboard = () => {
                 </button>
                 <button
                   onClick={() => setActiveTab("add")}
-                  className={`flex-1 px-6 py-3 font-medium text-sm transition-all duration-200 rounded-xl ${
+                  className={`flex-1 px-6 py-3 font-medium text-sm transition-all duration-200 rounded-lg ${
                     activeTab === "add"
                       ? "bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 shadow-sm"
                       : "text-gray-600 dark:text-dark-text-secondary hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary"
@@ -467,7 +467,7 @@ const Dashboard = () => {
                     setActiveTab("courses");
                     setSelectedCourse(null);
                   }}
-                  className={`px-4 py-3 font-medium text-sm transition-all duration-200 rounded-xl ${
+                  className={`px-4 py-3 font-medium text-sm transition-all duration-200 rounded-lg ${
                     activeTab === "courses" && !selectedCourse
                       ? "bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 shadow-sm"
                       : "text-gray-600 dark:text-dark-text-secondary hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary"
@@ -490,7 +490,7 @@ const Dashboard = () => {
                     setActiveTab("assessments");
                     setSelectedCourse(null);
                   }}
-                  className={`px-4 py-3 font-medium text-sm transition-all duration-200 rounded-xl ${
+                  className={`px-4 py-3 font-medium text-sm transition-all duration-200 rounded-lg ${
                     activeTab === "assessments" && !selectedCourse
                       ? "bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 shadow-sm"
                       : "text-gray-600 dark:text-dark-text-secondary hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary"
@@ -514,7 +514,7 @@ const Dashboard = () => {
                 </button>
                 <button
                   onClick={() => setActiveTab("calendar")}
-                  className={`px-4 py-3 font-medium text-sm transition-all duration-200 rounded-xl ${
+                  className={`px-4 py-3 font-medium text-sm transition-all duration-200 rounded-lg ${
                     activeTab === "calendar"
                       ? "bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 shadow-sm"
                       : "text-gray-600 dark:text-dark-text-secondary hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary"
@@ -538,7 +538,7 @@ const Dashboard = () => {
                 </button>
                 <button
                   onClick={() => setActiveTab("add")}
-                  className={`px-4 py-3 font-medium text-sm transition-all duration-200 rounded-xl ${
+                  className={`px-4 py-3 font-medium text-sm transition-all duration-200 rounded-lg ${
                     activeTab === "add"
                       ? "bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 shadow-sm"
                       : "text-gray-600 dark:text-dark-text-secondary hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary"
@@ -564,7 +564,7 @@ const Dashboard = () => {
             </div>
 
             <div className="mt-6">
-              <div className="bg-white dark:bg-dark-bg-secondary rounded-xl shadow-md border border-gray-100 dark:border-dark-border-primary">
+              <div className="bg-white dark:bg-dark-bg-secondary rounded-lg shadow-md border border-gray-100 dark:border-dark-border-primary">
                 {activeTab === "courses" && !selectedCourse && (
                   <div className="animate-fade-in">
                     {isLoading ? (

@@ -71,7 +71,7 @@ const ResetPassword = () => {
             </p>
           </div>
 
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8 md:p-10">
+          <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-8 md:p-10">
             {message && (
               <div
                 className={`mb-6 p-3 ${
