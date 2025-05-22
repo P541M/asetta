@@ -43,7 +43,38 @@ export default function App({ Component, pageProps }: AppProps) {
         />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta charSet="utf-8" />
-        <link rel="icon" href="/favicon.ico" />
+
+        {/* Favicon */}
+        <link rel="icon" href="/images/favicon.ico" />
+        <link
+          rel="icon"
+          type="image/png"
+          sizes="32x32"
+          href="/images/favicon-32x32.png"
+        />
+        <link
+          rel="icon"
+          type="image/png"
+          sizes="16x16"
+          href="/images/favicon-16x16.png"
+        />
+
+        {/* Apple Touch Icon */}
+        <link rel="apple-touch-icon" href="/images/apple-touch-icon.png" />
+
+        {/* Android Chrome Icons */}
+        <link
+          rel="icon"
+          type="image/png"
+          sizes="192x192"
+          href="/images/android-chrome-192x192.png"
+        />
+        <link
+          rel="icon"
+          type="image/png"
+          sizes="512x512"
+          href="/images/android-chrome-512x512.png"
+        />
       </Head>
       <main className={`${outfit.variable} ${lexend.variable} font-body`}>
         <Component {...pageProps} />
