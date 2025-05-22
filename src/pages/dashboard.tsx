@@ -261,10 +261,10 @@ const Dashboard = () => {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-dark-bg-primary">
       <Head>
-        <title>Kivo - Your Academic Dashboard</title>
+        <title>Asetta - Your Academic Dashboard</title>
         <meta
           name="description"
-          content="Manage your semesters, track assessments, and stay organized with Kivo."
+          content="Manage your semesters, track assessments, and stay organized with Asetta."
         />
       </Head>
       <DashboardHeader onLogout={handleLogout} />
@@ -623,7 +623,7 @@ const Dashboard = () => {
                 </svg>
               </div>
               <h2 className="text-xl font-semibold mb-2 dark:text-dark-text-primary">
-                Welcome to Kivo
+                Welcome to Asetta
               </h2>
               <p className="text-gray-600 dark:text-dark-text-secondary mb-4">
                 Track your assignments, exams, and projects in one place.

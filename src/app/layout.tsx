@@ -7,7 +7,7 @@ import { useEffect } from "react";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Kivo - Student Assessment Tracker",
+  title: "Asetta - Student Assessment Tracker",
   description: "Track and manage your academic assessments with ease",
 };
 
@@ -18,9 +18,9 @@ export default function RootLayout({
 }) {
   useEffect(() => {
     // Check for saved dark mode preference
-    const darkMode = localStorage.getItem('darkMode') === 'true';
+    const darkMode = localStorage.getItem("darkMode") === "true";
     if (darkMode) {
-      document.documentElement.classList.add('dark');
+      document.documentElement.classList.add("dark");
     }
   }, []);
 
@@ -31,4 +31,4 @@ export default function RootLayout({
       </body>
     </html>
   );
-} 
+}

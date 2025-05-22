@@ -8,10 +8,10 @@ const Terms: NextPage = () => {
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
       <Head>
-        <title>Kivo - Terms of Service</title>
+        <title>Asetta - Terms of Service</title>
         <meta
           name="description"
-          content="Review Kivo's Terms of Service to understand the rules and guidelines for using our platform."
+          content="Review Asetta's Terms of Service to understand the rules and guidelines for using our platform."
         />
       </Head>
 
@@ -31,8 +31,8 @@ const Terms: NextPage = () => {
                 1. Acceptance of Terms
               </h2>
               <p>
-                Welcome to Kivo. By accessing or using our service, you agree to
-                be bound by these Terms of Service. If you disagree with any
+                Welcome to Asetta. By accessing or using our service, you agree
+                to be bound by these Terms of Service. If you disagree with any
                 part of the terms, you may not access the service.
               </p>
 
@@ -40,7 +40,7 @@ const Terms: NextPage = () => {
                 2. Description of Service
               </h2>
               <p>
-                Kivo provides a platform for students to organize their
+                Asetta provides a platform for students to organize their
                 coursework, track assignments, and manage academic deadlines.
                 The service may include features such as file uploads,
                 assignment tracking, and notifications.
@@ -84,14 +84,14 @@ const Terms: NextPage = () => {
               <ul className="list-disc pl-6 my-4 space-y-2">
                 <li>
                   You acknowledge that you are not transferring ownership of the
-                  content to Kivo
+                  content to Asetta
                 </li>
                 <li>
                   The original creator (typically the professor or educational
                   institution) retains all rights to the content
                 </li>
                 <li>
-                  Kivo acts solely as a storage and access platform, and does
+                  Asetta acts solely as a storage and access platform, and does
                   not claim ownership of any uploaded course materials
                 </li>
                 <li>
@@ -99,7 +99,7 @@ const Terms: NextPage = () => {
                   and share such content
                 </li>
                 <li>
-                  Kivo reserves the right to remove any content that infringes
+                  Asetta reserves the right to remove any content that infringes
                   on intellectual property rights or violates these terms
                 </li>
               </ul>
@@ -134,7 +134,7 @@ const Terms: NextPage = () => {
               </h2>
               <p>
                 The service and its original content, features, and
-                functionality are owned by Kivo and are protected by
+                functionality are owned by Asetta and are protected by
                 international copyright, trademark, and other intellectual
                 property laws.
               </p>
@@ -152,7 +152,7 @@ const Terms: NextPage = () => {
                 8. Limitation of Liability
               </h2>
               <p>
-                In no event shall Kivo, its directors, employees, partners,
+                In no event shall Asetta, its directors, employees, partners,
                 agents, suppliers, or affiliates be liable for any indirect,
                 incidental, special, consequential, or punitive damages,
                 including without limitation, loss of profits, data, use,
@@ -202,7 +202,7 @@ const Terms: NextPage = () => {
 
       <footer className="bg-white border-t border-gray-100 py-4 text-center text-sm text-gray-500">
         <div className="max-w-7xl mx-auto px-4">
-          <p>© {new Date().getFullYear()} Kivo. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} Asetta. All rights reserved.</p>
           <div className="mt-2">
             <Link
               href="/terms"

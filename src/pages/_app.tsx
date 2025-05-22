@@ -24,10 +24,10 @@ function MyApp({ Component, pageProps }: AppProps) {
     <AuthProvider>
       <ThemeProvider>
         <Head>
-          <title>Kivo - Academic Dashboard</title>
+          <title>Asetta - Academic Dashboard</title>
           <meta
             name="description"
-            content="Kivo helps students organize coursework, track assignments, and manage deadlines efficiently."
+            content="Asetta helps students organize coursework, track assignments, and manage deadlines efficiently."
           />
           <meta name="viewport" content="width=device-width, initial-scale=1" />
           <meta charSet="utf-8" />

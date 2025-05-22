@@ -8,10 +8,10 @@ const Privacy: NextPage = () => {
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
       <Head>
-        <title>Kivo - Privacy Policy</title>
+        <title>Asetta - Privacy Policy</title>
         <meta
           name="description"
-          content="Read Kivo's Privacy Policy to understand how we collect, use, and protect your information."
+          content="Read Asetta's Privacy Policy to understand how we collect, use, and protect your information."
         />
       </Head>
 
@@ -28,7 +28,7 @@ const Privacy: NextPage = () => {
               <p className="text-gray-700 mb-6">Last Updated: April 19, 2025</p>
 
               <p className="mb-6">
-                At Kivo, we take your privacy seriously. This Privacy Policy
+                At Asetta, we take your privacy seriously. This Privacy Policy
                 explains how we collect, use, disclose, and safeguard your
                 information when you use our service.
               </p>
@@ -120,8 +120,8 @@ const Privacy: NextPage = () => {
                 </li>
                 <li>To comply with legal obligations</li>
                 <li>
-                  To protect the rights, property, or safety of Kivo, our users,
-                  or others
+                  To protect the rights, property, or safety of Asetta, our
+                  users, or others
                 </li>
               </ul>
 
@@ -204,7 +204,7 @@ const Privacy: NextPage = () => {
 
       <footer className="bg-white border-t border-gray-100 py-4 text-center text-sm text-gray-500">
         <div className="max-w-7xl mx-auto px-4">
-          <p>© {new Date().getFullYear()} Kivo. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} Asetta. All rights reserved.</p>
           <div className="mt-2">
             <Link
               href="/terms"

@@ -54,10 +54,10 @@ const Login = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-gray-50 to-white p-4">
       <Head>
-        <title>Kivo - Sign In</title>
+        <title>Asetta - Sign In</title>
         <meta
           name="description"
-          content="Sign in to Kivo to manage your academic tasks."
+          content="Sign in to Asetta to manage your academic tasks."
         />
       </Head>
       <div className="w-full max-w-md">

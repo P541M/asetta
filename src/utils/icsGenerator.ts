@@ -8,7 +8,7 @@ export function generateICSFile(
   const icsContent = [
     "BEGIN:VCALENDAR",
     "VERSION:2.0",
-    `PRODID:-//Kivo//${semesterName} Calendar//EN`,
+    `PRODID:-//Asetta//${semesterName} Calendar//EN`,
     "CALSCALE:GREGORIAN",
   ];
 

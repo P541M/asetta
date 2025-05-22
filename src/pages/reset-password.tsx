@@ -54,10 +54,10 @@ const ResetPassword = () => {
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
       <Head>
-        <title>Kivo - Reset Password</title>
+        <title>Asetta - Reset Password</title>
         <meta
           name="description"
-          content="Reset your Kivo account password to regain access to your academic dashboard."
+          content="Reset your Asetta account password to regain access to your academic dashboard."
         />
       </Head>
       <Header />

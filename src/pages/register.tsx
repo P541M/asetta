@@ -84,10 +84,10 @@ const Register = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-gray-50 to-white p-4">
       <Head>
-        <title>Kivo - Sign Up</title>
+        <title>Asetta - Sign Up</title>
         <meta
           name="description"
-          content="Create your Kivo account to start managing your academic tasks."
+          content="Create your Asetta account to start managing your academic tasks."
         />
       </Head>
       <div className="w-full max-w-md">
@@ -96,7 +96,7 @@ const Register = () => {
             Create Your Account
           </h1>
           <p className="text-gray-600 mt-2">
-            Join Kivo to streamline your academic journey
+            Join Asetta to streamline your academic journey
           </p>
         </div>
 
