@@ -36,10 +36,10 @@ export default function App({ Component, pageProps }: AppProps) {
   return (
     <>
       <Head>
-        <title>Kivo - Simplify Your Academic Journey</title>
+        <title>Asetta - Simplify Your Academic Journey</title>
         <meta
           name="description"
-          content="Kivo is an all-in-one platform to help students manage assignments, track deadlines, and stay organized."
+          content="Asetta is an all-in-one platform to help students manage assignments, track deadlines, and stay organized."
         />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta charSet="utf-8" />

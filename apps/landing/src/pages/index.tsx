@@ -12,10 +12,10 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen flex flex-col bg-white">
       <Head>
-        <title>Kivo - Your AI-Powered Academic Success Companion</title>
+        <title>Asetta - Your AI-Powered Academic Success Companion</title>
         <meta
           name="description"
-          content="Kivo is a completely free AI-powered platform that helps students manage assignments, track deadlines, and stay organized throughout their academic journey."
+          content="Asetta is a completely free AI-powered platform that helps students manage assignments, track deadlines, and stay organized throughout their academic journey."
         />
       </Head>
       <Header />
@@ -83,7 +83,7 @@ export default function LandingPage() {
                 <div className="relative z-10">
                   <Image
                     src="/images/kivo-dashboard.png"
-                    alt="Kivo Dashboard Preview"
+                    alt="Asetta Dashboard Preview"
                     width={700}
                     height={400}
                     priority
@@ -197,9 +197,9 @@ export default function LandingPage() {
             Start Your Academic Success Journey Today
           </h2>
           <p className="text-xl text-gray-600 mb-10 max-w-2xl mx-auto">
-            Join thousands of students who are using Kivo's AI-powered platform
-            to stay organized, meet deadlines, and achieve their academic
-            goals—all completely free.
+            Join thousands of students who are using Asetta's AI-powered
+            platform to stay organized, meet deadlines, and achieve their
+            academic goals—all completely free.
           </p>
           <div className="flex justify-center transform transition-transform duration-200 hover:scale-105">
             <Link

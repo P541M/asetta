@@ -1,6 +1,6 @@
-# Kivo Landing Page
+# Asetta Landing Page
 
-This is the landing page for Kivo, an academic management platform. The landing page is built with Next.js, TypeScript, and Tailwind CSS.
+This is the landing page for Asetta, an academic management platform. The landing page is built with Next.js, TypeScript, and Tailwind CSS.
 
 ## Getting Started
 

@@ -6,10 +6,10 @@ export default function PrivacyPage() {
   return (
     <div className="min-h-screen bg-white flex flex-col">
       <Head>
-        <title>Privacy Policy - Kivo</title>
+        <title>Privacy Policy - Asetta</title>
         <meta
           name="description"
-          content="Privacy Policy for Kivo - Your trusted academic management platform"
+          content="Privacy Policy for Asetta - Your trusted academic management platform"
         />
       </Head>
       <Header />
@@ -33,9 +33,9 @@ export default function PrivacyPage() {
                     Introduction
                   </h2>
                   <p>
-                    At Kivo, we take your privacy seriously. This Privacy Policy
-                    explains how we collect, use, disclose, and safeguard your
-                    information when you use our platform.
+                    At Asetta, we take your privacy seriously. This Privacy
+                    Policy explains how we collect, use, disclose, and safeguard
+                    your information when you use our platform.
                   </p>
                   <h2 className="text-2xl font-bold text-indigo-700 mt-8 mb-4">
                     Information We Collect

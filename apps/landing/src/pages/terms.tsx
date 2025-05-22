@@ -6,10 +6,10 @@ export default function TermsPage() {
   return (
     <div className="min-h-screen bg-white flex flex-col">
       <Head>
-        <title>Terms of Service - Kivo</title>
+        <title>Terms of Service - Asetta</title>
         <meta
           name="description"
-          content="Terms of Service for Kivo - Your trusted academic management platform"
+          content="Terms of Service for Asetta - Your trusted academic management platform"
         />
       </Head>
       <Header />
@@ -33,8 +33,9 @@ export default function TermsPage() {
                     Agreement to Terms
                   </h2>
                   <p>
-                    By accessing and using Kivo, you agree to be bound by these
-                    Terms of Service and all applicable laws and regulations.
+                    By accessing and using Asetta, you agree to be bound by
+                    these Terms of Service and all applicable laws and
+                    regulations.
                   </p>
                   <h2 className="text-2xl font-bold text-indigo-700 mt-8 mb-4">
                     Use License
@@ -60,7 +61,7 @@ export default function TermsPage() {
                     Disclaimer
                   </h2>
                   <p>
-                    Kivo is provided "as is" without any warranties, expressed
+                    Asetta is provided "as is" without any warranties, expressed
                     or implied. We do not guarantee that the service will be
                     uninterrupted or error-free.
                   </p>
@@ -68,8 +69,8 @@ export default function TermsPage() {
                     Limitations
                   </h2>
                   <p>
-                    In no event shall Kivo be liable for any damages arising out
-                    of the use or inability to use the platform.
+                    In no event shall Asetta be liable for any damages arising
+                    out of the use or inability to use the platform.
                   </p>
                   <h2 className="text-2xl font-bold text-indigo-700 mt-8 mb-4">
                     Contact Information

@@ -6,10 +6,10 @@ export default function FeaturesPage() {
   return (
     <div className="min-h-screen bg-white flex flex-col">
       <Head>
-        <title>Features - Kivo</title>
+        <title>Features - Asetta</title>
         <meta
           name="description"
-          content="Discover Kivo's AI-powered features designed to help students excel in their academic journey—completely free."
+          content="Discover Asetta's AI-powered features designed to help students excel in their academic journey—completely free."
         />
       </Head>
       <Header />

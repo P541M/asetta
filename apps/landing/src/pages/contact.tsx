@@ -58,10 +58,10 @@ export default function Contact() {
   return (
     <div className="min-h-screen flex flex-col bg-white">
       <Head>
-        <title>Contact Us - Kivo</title>
+        <title>Contact Us - Asetta</title>
         <meta
           name="description"
-          content="Get in touch with the Kivo team. We're here to help you make the most of your free AI-powered academic success platform."
+          content="Get in touch with the Asetta team. We're here to help you make the most of your free AI-powered academic success platform."
         />
       </Head>
       <Header />

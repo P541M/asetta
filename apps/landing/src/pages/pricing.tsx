@@ -8,10 +8,10 @@ export default function PricingPage() {
   return (
     <div className="min-h-screen bg-white flex flex-col">
       <Head>
-        <title>Pricing - Kivo</title>
+        <title>Pricing - Asetta</title>
         <meta
           name="description"
-          content="Kivo is completely free for all students. Join us today!"
+          content="Asetta is completely free for all students. Join us today!"
         />
       </Head>
       <Header />
@@ -56,7 +56,7 @@ export default function PricingPage() {
               <p className="text-xl text-gray-600 mb-8">
                 We know you're already spending enough on textbooks and coffee.
                 <br />
-                That's why Kivo is and always will be completely free!
+                That's why Asetta is and always will be completely free!
               </p>
             </div>
 
