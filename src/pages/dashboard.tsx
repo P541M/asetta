@@ -46,7 +46,6 @@ const Dashboard = () => {
     "courses" | "assessments" | "add" | "upload" | "calendar"
   >("assessments");
   const [selectedCourse, setSelectedCourse] = useState<string | null>(null);
-  const [animateStatCards, setAnimateStatCards] = useState(false);
   const [showStatsBar, setShowStatsBar] = useState(false);
 
   const [stats, setStats] = useState({
@@ -157,8 +156,6 @@ const Dashboard = () => {
             upcomingDeadlines: upcomingCount,
             completionRate: completionRate,
           });
-          setAnimateStatCards(true);
-          setTimeout(() => setAnimateStatCards(false), 1000);
           setIsLoading(false);
         },
         (err) => {
@@ -322,90 +319,146 @@ const Dashboard = () => {
             <>
               {showStatsBar && (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 mb-6">
-                  <div
-                    className={`bg-white dark:bg-dark-bg-secondary rounded-xl shadow-sm p-4 border ${
-                      animateStatCards
-                        ? "border-primary-500"
-                        : "border-gray-100 dark:border-dark-border"
-                    } transition-colors duration-300 stat-card`}
-                  >
-                    <p className="text-sm text-gray-500 dark:text-dark-text-tertiary mb-1">
-                      Total Assessments
-                    </p>
-                    <h3 className="text-2xl font-bold text-primary-500 dark:text-primary-400">
+                  <div className="bg-white dark:bg-dark-bg-secondary rounded-lg p-4 border border-gray-100 dark:border-dark-border hover:shadow-md transition-all duration-300 group">
+                    <div className="flex items-center justify-between mb-2">
+                      <p className="text-sm font-medium text-gray-600 dark:text-dark-text-secondary">
+                        Total Assessments
+                      </p>
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-5 w-5 text-gray-400 dark:text-dark-text-tertiary group-hover:text-primary-500 dark:group-hover:text-primary-400 transition-colors"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                      >
+                        <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
+                        <path
+                          fillRule="evenodd"
+                          d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    </div>
+                    <h3 className="text-2xl font-bold text-gray-900 dark:text-dark-text-primary">
                       {stats.total}
                     </h3>
                   </div>
-                  <div
-                    className={`bg-white dark:bg-dark-bg-secondary rounded-xl shadow-sm p-4 border ${
-                      animateStatCards
-                        ? "border-primary-500"
-                        : "border-gray-100 dark:border-dark-border"
-                    } transition-colors duration-300 stat-card`}
-                  >
-                    <p className="text-sm text-gray-500 dark:text-dark-text-tertiary mb-1">
-                      Not Started
-                    </p>
-                    <h3 className="text-2xl font-bold text-primary-600 dark:text-primary-400">
+
+                  <div className="bg-white dark:bg-dark-bg-secondary rounded-lg p-4 border border-gray-100 dark:border-dark-border hover:shadow-md transition-all duration-300 group">
+                    <div className="flex items-center justify-between mb-2">
+                      <p className="text-sm font-medium text-gray-600 dark:text-dark-text-secondary">
+                        Not Started
+                      </p>
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-5 w-5 text-gray-400 dark:text-dark-text-tertiary group-hover:text-gray-600 dark:group-hover:text-gray-400 transition-colors"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    </div>
+                    <h3 className="text-2xl font-bold text-gray-900 dark:text-dark-text-primary">
                       {stats.notStarted}
                     </h3>
                   </div>
-                  <div
-                    className={`bg-white dark:bg-dark-bg-secondary rounded-xl shadow-sm p-4 border ${
-                      animateStatCards
-                        ? "border-primary-500"
-                        : "border-gray-100 dark:border-dark-border"
-                    } transition-colors duration-300 stat-card`}
-                  >
-                    <p className="text-sm text-gray-500 dark:text-dark-text-tertiary mb-1">
-                      In Progress
-                    </p>
-                    <h3 className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+
+                  <div className="bg-white dark:bg-dark-bg-secondary rounded-lg p-4 border border-gray-100 dark:border-dark-border hover:shadow-md transition-all duration-300 group">
+                    <div className="flex items-center justify-between mb-2">
+                      <p className="text-sm font-medium text-gray-600 dark:text-dark-text-secondary">
+                        In Progress
+                      </p>
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-5 w-5 text-gray-400 dark:text-dark-text-tertiary group-hover:text-blue-500 dark:group-hover:text-blue-400 transition-colors"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    </div>
+                    <h3 className="text-2xl font-bold text-gray-900 dark:text-dark-text-primary">
                       {stats.inProgress}
                     </h3>
                   </div>
-                  <div
-                    className={`bg-white dark:bg-dark-bg-secondary rounded-xl shadow-sm p-4 border ${
-                      animateStatCards
-                        ? "border-primary-500"
-                        : "border-gray-100 dark:border-dark-border"
-                    } transition-colors duration-300 stat-card`}
-                  >
-                    <p className="text-sm text-gray-500 dark:text-dark-text-tertiary mb-1">
-                      Submitted
-                    </p>
-                    <h3 className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">
+
+                  <div className="bg-white dark:bg-dark-bg-secondary rounded-lg p-4 border border-gray-100 dark:border-dark-border hover:shadow-md transition-all duration-300 group">
+                    <div className="flex items-center justify-between mb-2">
+                      <p className="text-sm font-medium text-gray-600 dark:text-dark-text-secondary">
+                        Submitted
+                      </p>
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-5 w-5 text-gray-400 dark:text-dark-text-tertiary group-hover:text-emerald-500 dark:group-hover:text-emerald-400 transition-colors"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    </div>
+                    <h3 className="text-2xl font-bold text-gray-900 dark:text-dark-text-primary">
                       {stats.submitted}
                     </h3>
                   </div>
-                  <div
-                    className={`bg-white dark:bg-dark-bg-secondary rounded-xl shadow-sm p-4 border ${
-                      animateStatCards
-                        ? "border-primary-500"
-                        : "border-gray-100 dark:border-dark-border"
-                    } transition-colors duration-300 stat-card`}
-                  >
-                    <p className="text-sm text-gray-500 dark:text-dark-text-tertiary mb-1">
-                      Due This Week
-                    </p>
-                    <h3 className="text-2xl font-bold text-amber-600 dark:text-amber-400">
-                      {stats.upcomingDeadlines}
-                    </h3>
-                    {stats.upcomingDeadlines > 0 && (
-                      <span className="inline-block w-2 h-2 bg-amber-500 dark:bg-amber-400 rounded-full animate-pulse mt-1"></span>
-                    )}
+
+                  <div className="bg-white dark:bg-dark-bg-secondary rounded-lg p-4 border border-gray-100 dark:border-dark-border hover:shadow-md transition-all duration-300 group">
+                    <div className="flex items-center justify-between mb-2">
+                      <p className="text-sm font-medium text-gray-600 dark:text-dark-text-secondary">
+                        Due This Week
+                      </p>
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-5 w-5 text-gray-400 dark:text-dark-text-tertiary group-hover:text-amber-500 dark:group-hover:text-amber-400 transition-colors"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    </div>
+                    <div className="flex items-center">
+                      <h3 className="text-2xl font-bold text-gray-900 dark:text-dark-text-primary">
+                        {stats.upcomingDeadlines}
+                      </h3>
+                      {stats.upcomingDeadlines > 0 && (
+                        <span className="ml-2 inline-block w-2 h-2 bg-amber-500 dark:bg-amber-400 rounded-full animate-pulse"></span>
+                      )}
+                    </div>
                   </div>
-                  <div
-                    className={`bg-white dark:bg-dark-bg-secondary rounded-xl shadow-sm p-4 border ${
-                      animateStatCards
-                        ? "border-primary-500"
-                        : "border-gray-100 dark:border-dark-border"
-                    } transition-colors duration-300 stat-card`}
-                  >
-                    <p className="text-sm text-gray-500 dark:text-dark-text-tertiary mb-1">
-                      Completion Rate
-                    </p>
-                    <h3 className="text-2xl font-bold text-purple-600 dark:text-purple-400">
+
+                  <div className="bg-white dark:bg-dark-bg-secondary rounded-lg p-4 border border-gray-100 dark:border-dark-border hover:shadow-md transition-all duration-300 group">
+                    <div className="flex items-center justify-between mb-2">
+                      <p className="text-sm font-medium text-gray-600 dark:text-dark-text-secondary">
+                        Completion Rate
+                      </p>
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-5 w-5 text-gray-400 dark:text-dark-text-tertiary group-hover:text-primary-500 dark:group-hover:text-primary-400 transition-colors"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    </div>
+                    <h3 className="text-2xl font-bold text-gray-900 dark:text-dark-text-primary">
                       {stats.completionRate}%
                     </h3>
                   </div>
