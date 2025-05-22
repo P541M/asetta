@@ -9,6 +9,11 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "Asetta - Student Assessment Tracker",
   description: "Track and manage your academic assessments with ease",
+  icons: {
+    icon: "/images/favicon.ico",
+    shortcut: "/images/favicon.ico",
+    apple: "/images/apple-touch-icon.png",
+  },
 };
 
 export default function RootLayout({
