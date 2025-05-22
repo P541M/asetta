@@ -325,6 +325,8 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
   const [assessmentToDelete, setAssessmentToDelete] =
     useState<Assessment | null>(null);
   const [showBulkDeleteModal, setShowBulkDeleteModal] = useState(false);
+  const [showBulkStatusUpdate, setShowBulkStatusUpdate] = useState(false);
+  const [selectedStatus, setSelectedStatus] = useState<string>("");
 
   // Fetch user preferences
   useEffect(() => {
@@ -684,6 +686,45 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
     handleDropdownToggle(null);
   };
 
+  // Add new function for bulk status update
+  const handleBulkStatusUpdate = async (newStatus: string) => {
+    if (!user || selectedRows.length === 0) return;
+
+    try {
+      for (const id of selectedRows) {
+        const assessmentRef = doc(
+          db,
+          "users",
+          user.uid,
+          "semesters",
+          semesterId,
+          "assessments",
+          id
+        );
+        await updateDoc(assessmentRef, {
+          status: newStatus,
+          updatedAt: serverTimestamp(),
+        });
+      }
+      setSelectedRows([]);
+      setShowBulkStatusUpdate(false);
+      setSelectedStatus("");
+      onStatusChange?.(selectedRows[0], newStatus);
+    } catch (error) {
+      console.error("Error performing bulk status update:", error);
+    }
+  };
+
+  const handleStatusSelect = (status: string) => {
+    setSelectedStatus(status);
+    setShowBulkStatusUpdate(true);
+  };
+
+  const handleCancelStatusUpdate = () => {
+    setShowBulkStatusUpdate(false);
+    setSelectedStatus("");
+  };
+
   return (
     <div className="px-6 pt-6">
       <div className="flex flex-col sm:flex-row justify-between mb-6 gap-4">
@@ -704,6 +745,70 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
           </div>
         )}
       </div>
+
+      {/* Bulk Actions Toolbar */}
+      {selectedRows.length > 0 && (
+        <div className="mb-4 p-3 bg-white dark:bg-dark-bg-secondary rounded-lg shadow-sm border border-gray-100 dark:border-dark-border-primary animate-fade-in">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <span className="text-sm font-medium text-gray-700 dark:text-dark-text-primary">
+                {selectedRows.length}{" "}
+                {selectedRows.length === 1 ? "item" : "items"} selected
+              </span>
+              <div className="flex items-center space-x-2">
+                {!showBulkStatusUpdate ? (
+                  <select
+                    onChange={(e) => handleStatusSelect(e.target.value)}
+                    className="input py-1.5 px-3 text-sm bg-white dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border"
+                    defaultValue=""
+                  >
+                    <option value="" disabled>
+                      Update Status
+                    </option>
+                    <option value="Not started">Not Started</option>
+                    <option value="In progress">In Progress</option>
+                    <option value="Submitted">Submitted</option>
+                  </select>
+                ) : (
+                  <div className="flex items-center space-x-2">
+                    <span className="text-sm text-gray-600 dark:text-dark-text-secondary">
+                      Update to:{" "}
+                      <span className="font-medium">{selectedStatus}</span>
+                    </span>
+                    <button
+                      onClick={() => handleBulkStatusUpdate(selectedStatus)}
+                      className="btn-primary py-1.5 px-3 text-sm"
+                    >
+                      Confirm
+                    </button>
+                    <button
+                      onClick={handleCancelStatusUpdate}
+                      className="btn-outline py-1.5 px-3 text-sm"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+            <div className="flex items-center space-x-2">
+              <button
+                onClick={() => setShowBulkDeleteModal(true)}
+                className="btn-danger py-1.5 px-3 text-sm"
+              >
+                Delete Selected
+              </button>
+              <button
+                onClick={() => setSelectedRows([])}
+                className="text-sm text-gray-500 dark:text-dark-text-tertiary hover:text-gray-700 dark:hover:text-dark-text-secondary"
+              >
+                Clear Selection
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {sortedAssessments.length === 0 ? (
         <div className="text-center py-10 text-gray-500 dark:text-dark-text-tertiary">
           <svg
