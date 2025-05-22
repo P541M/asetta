@@ -41,6 +41,7 @@ interface Semester {
 interface SemesterTabsProps {
   selectedSemester: string;
   onSelect: (semester: string) => void;
+  className?: string;
 }
 
 interface DeleteConfirmationModalProps {
@@ -333,7 +334,11 @@ function SortableSemester({
   );
 }
 
-const SemesterTabs = ({ selectedSemester, onSelect }: SemesterTabsProps) => {
+const SemesterTabs = ({
+  selectedSemester,
+  onSelect,
+  className = "",
+}: SemesterTabsProps) => {
   const { user } = useAuth();
   const [newSemester, setNewSemester] = useState("");
   const [semesters, setSemesters] = useState<Semester[]>([]);
@@ -674,7 +679,7 @@ const SemesterTabs = ({ selectedSemester, onSelect }: SemesterTabsProps) => {
   }
 
   return (
-    <div className="semester-tabs-container mb-6 bg-white dark:bg-dark-bg-secondary rounded-lg shadow-md">
+    <div className={`semester-tabs-container mb-6 ${className}`}>
       <div className="flex items-center justify-between px-4 py-2 border-b border-gray-100 dark:border-dark-border">
         <div className="flex items-center space-x-2">
           <h2 className="text-sm font-medium text-gray-700 dark:text-dark-text-primary">

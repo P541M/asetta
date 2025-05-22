@@ -318,7 +318,7 @@ const CoursesOverviewTable = ({
   if (error) return <div className="text-red-600">{error}</div>;
   if (courses.length === 0) {
     return (
-      <div className="bg-white dark:bg-dark-bg-secondary rounded-xl shadow-sm border border-gray-100 dark:border-dark-border-primary px-6 pt-6">
+      <div className="px-6 pt-6">
         <h2 className="text-xl font-medium text-gray-900 dark:text-dark-text-primary mb-6">
           Your Courses
         </h2>
@@ -349,7 +349,7 @@ const CoursesOverviewTable = ({
   }
 
   return (
-    <div className="bg-white dark:bg-dark-bg-secondary rounded-xl shadow-sm border border-gray-100 dark:border-dark-border-primary px-6 pt-6">
+    <div className="px-6 pt-6">
       <h2 className="text-xl font-medium text-gray-900 dark:text-dark-text-primary mb-6">
         Your Courses
       </h2>
@@ -362,7 +362,7 @@ const CoursesOverviewTable = ({
           <p>{error}</p>
         </div>
       ) : (
-        <div className="table-container rounded-lg shadow-sm border border-gray-100 dark:border-dark-border dark:bg-dark-bg-secondary">
+        <div className="table-container rounded-xl border border-gray-100 dark:border-dark-border">
           <table className="data-table">
             <thead className="bg-gray-50 dark:bg-dark-bg-tertiary">
               <tr>

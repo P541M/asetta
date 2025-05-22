@@ -289,7 +289,7 @@ const CalendarView = ({ selectedSemester, semesterId }: CalendarViewProps) => {
   // Loading skeleton
   if (isLoading) {
     return (
-      <div className="bg-white dark:bg-dark-bg-secondary rounded-xl shadow-sm border border-gray-100 dark:border-dark-border-primary p-6">
+      <div className="bg-white dark:bg-dark-bg-secondary rounded-xl shadow-md border border-gray-100 dark:border-dark-border-primary p-6">
         <div className="animate-pulse">
           <div className="flex justify-between items-center mb-6">
             <div className="h-8 w-32 bg-gray-200 dark:bg-dark-bg-tertiary rounded"></div>
@@ -313,7 +313,7 @@ const CalendarView = ({ selectedSemester, semesterId }: CalendarViewProps) => {
   }
 
   return (
-    <div className="bg-white dark:bg-dark-bg-secondary rounded-xl shadow-sm border border-gray-100 dark:border-dark-border-primary p-6">
+    <div className="p-6">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 space-y-4 md:space-y-0">
         <div>
           <h2 className="text-xl font-medium text-gray-900 dark:text-dark-text-primary">

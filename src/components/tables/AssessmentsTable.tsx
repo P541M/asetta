@@ -685,7 +685,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
   };
 
   return (
-    <div className="bg-white dark:bg-dark-bg-secondary rounded-xl shadow-sm border border-gray-100 dark:border-dark-border-primary px-6 pt-6">
+    <div className="px-6 pt-6">
       <div className="flex flex-col sm:flex-row justify-between mb-6 gap-4">
         <h2 className="text-xl font-medium text-gray-900 dark:text-dark-text-primary">
           Your Assessments
@@ -728,7 +728,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
           </p>
         </div>
       ) : (
-        <div className="table-container rounded-lg shadow-sm border border-gray-100 dark:border-dark-border dark:bg-dark-bg-secondary">
+        <div className="table-container rounded-xl border border-gray-100 dark:border-dark-border">
           <table className="data-table">
             <thead className="bg-gray-50 dark:bg-dark-bg-tertiary">
               <tr>
@@ -1124,7 +1124,6 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
           </table>
         </div>
       )}
-
       {/* Notes Modal */}
       {showNotesModal && selectedAssessment && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -1263,7 +1262,6 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
           </div>
         </div>
       )}
-
       {/* Link Modal */}
       <LinkModal
         isOpen={showLinkModal}
@@ -1273,7 +1271,6 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
         }}
         onAddLink={handleLinkSubmit}
       />
-
       {/* Delete Confirmation Modal */}
       <DeleteConfirmationModal
         isOpen={showDeleteModal}
@@ -1286,7 +1283,6 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
         }
         assessmentName={assessmentToDelete?.assignmentName || ""}
       />
-
       {/* Bulk Delete Confirmation Modal */}
       <BulkDeleteConfirmationModal
         isOpen={showBulkDeleteModal}
