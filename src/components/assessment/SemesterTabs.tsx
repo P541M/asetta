@@ -176,12 +176,18 @@ function SortableSemester({
     setEditValue(semester.name);
   };
 
-  const handleEditSave = (e: React.MouseEvent | React.KeyboardEvent) => {
-    e.stopPropagation();
+  const handleEditSave = async () => {
     if (editValue.trim() !== "") {
-      onEdit(semester.id, editValue.trim());
+      await onEdit(semester.id, editValue.trim());
+      setIsEditing(false);
     }
-    setIsEditing(false);
+  };
+
+  const handleEditSaveWithEvent = (
+    e: React.MouseEvent | React.KeyboardEvent
+  ) => {
+    e.stopPropagation();
+    handleEditSave();
   };
 
   const handleEditCancel = (e: React.MouseEvent) => {
@@ -193,10 +199,9 @@ function SortableSemester({
   const handleKeyDown = (e: React.KeyboardEvent) => {
     e.stopPropagation();
     if (e.key === "Enter") {
-      handleEditSave(e);
+      handleEditSave();
     } else if (e.key === "Escape") {
-      setIsEditing(false);
-      setEditValue(semester.name);
+      handleEditCancel(e as unknown as React.MouseEvent);
     }
   };
 
@@ -232,7 +237,7 @@ function SortableSemester({
             />
             <div className="flex items-center px-1">
               <button
-                onClick={handleEditSave}
+                onClick={handleEditSaveWithEvent}
                 className="p-1.5 text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 hover:bg-primary-50 dark:hover:bg-primary-900/20 rounded-md transition-colors"
                 title="Save"
               >
@@ -332,8 +337,6 @@ const SemesterTabs = ({ selectedSemester, onSelect }: SemesterTabsProps) => {
   const { user } = useAuth();
   const [newSemester, setNewSemester] = useState("");
   const [semesters, setSemesters] = useState<Semester[]>([]);
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [editingName, setEditingName] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
   const [showMoreOptions, setShowMoreOptions] = useState(false);
@@ -347,7 +350,6 @@ const SemesterTabs = ({ selectedSemester, onSelect }: SemesterTabsProps) => {
 
   const dropdownRef = useRef<HTMLDivElement>(null);
   const newInputRef = useRef<HTMLInputElement>(null);
-  const editInputRef = useRef<HTMLInputElement>(null);
   const addInputRef = useRef<HTMLDivElement>(null);
   const moreOptionsRef = useRef<HTMLDivElement>(null);
   const manageModalRef = useRef<HTMLDivElement>(null);
@@ -404,13 +406,6 @@ const SemesterTabs = ({ selectedSemester, onSelect }: SemesterTabsProps) => {
       newInputRef.current.focus();
     }
   }, [showAddInput]);
-
-  useEffect(() => {
-    if (editingId && editInputRef.current) {
-      editInputRef.current.focus();
-      editInputRef.current.select();
-    }
-  }, [editingId]);
 
   // Listen for changes to the user's semesters in Firestore
   useEffect(() => {
@@ -596,18 +591,12 @@ const SemesterTabs = ({ selectedSemester, onSelect }: SemesterTabsProps) => {
     }
   };
 
-  // Start editing a semester name
-  const handleEditStart = (id: string, currentName: string) => {
-    setEditingId(id);
-    setEditingName(currentName);
-  };
-
   // Update the semester name in Firestore
-  const handleEditSave = async (id: string) => {
-    if (!user || editingName.trim() === "") return;
+  const handleEditSave = async (id: string, newName: string) => {
+    if (!user) return;
 
     try {
-      const updatedName = editingName.trim();
+      const updatedName = newName.trim();
       const existingWithSameName = semesters.some(
         (sem) =>
           sem.id !== id && sem.name.toLowerCase() === updatedName.toLowerCase()
@@ -629,21 +618,13 @@ const SemesterTabs = ({ selectedSemester, onSelect }: SemesterTabsProps) => {
         onSelect(updatedName);
       }
 
-      setEditingId(null);
-      setEditingName("");
+      // Update local state
+      setSemesters((prev) =>
+        prev.map((sem) => (sem.id === id ? { ...sem, name: updatedName } : sem))
+      );
     } catch (error) {
       console.error("Error updating semester:", error);
       alert("Failed to update semester name. Please try again.");
-    }
-  };
-
-  // Handle Enter key press in edit input
-  const handleEditKeyPress = (e: React.KeyboardEvent, id: string) => {
-    if (e.key === "Enter") {
-      handleEditSave(id);
-    } else if (e.key === "Escape") {
-      setEditingId(null);
-      setEditingName("");
     }
   };
 
@@ -829,67 +810,16 @@ const SemesterTabs = ({ selectedSemester, onSelect }: SemesterTabsProps) => {
         <div className="flex items-center space-x-2 overflow-x-auto pb-1 hide-scrollbar scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-dark-bg-tertiary scrollbar-track-transparent">
           {semesters.map((sem) => (
             <div key={sem.id} className="flex-shrink-0">
-              {editingId === sem.id ? (
-                <div className="flex items-center bg-white dark:bg-dark-bg-secondary rounded-lg shadow-sm border border-gray-200 dark:border-dark-border p-1 animate-fade-in">
-                  <input
-                    type="text"
-                    value={editingName}
-                    onChange={(e) => setEditingName(e.target.value)}
-                    onKeyDown={(e) => handleEditKeyPress(e, sem.id)}
-                    ref={editInputRef}
-                    className="input text-sm py-1 px-1.5 dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border min-w-[120px]"
-                  />
-                  <div className="flex items-center px-1">
-                    <button
-                      onClick={() => handleEditSave(sem.id)}
-                      className="p-1.5 text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 hover:bg-primary-50 dark:hover:bg-primary-900/20 rounded-md transition-colors"
-                      title="Save"
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-4 w-4"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    </button>
-                    <button
-                      onClick={() => setEditingId(null)}
-                      className="p-1.5 text-gray-500 dark:text-dark-text-tertiary hover:text-gray-700 dark:hover:text-dark-text-secondary hover:bg-gray-100 dark:hover:bg-dark-bg-tertiary rounded-md transition-colors"
-                      title="Cancel"
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-4 w-4"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    </button>
-                  </div>
-                </div>
-              ) : (
-                <button
-                  onClick={() => onSelect(sem.name)}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-all duration-200 ${
-                    selectedSemester === sem.name
-                      ? "bg-primary-500 text-white shadow-sm hover:bg-primary-600 hover:shadow"
-                      : "bg-gray-100 dark:bg-dark-bg-tertiary text-gray-700 dark:text-dark-text-primary hover:bg-gray-200 dark:hover:bg-dark-bg-secondary"
-                  }`}
-                >
-                  {sem.name}
-                </button>
-              )}
+              <button
+                onClick={() => onSelect(sem.name)}
+                className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-all duration-200 ${
+                  selectedSemester === sem.name
+                    ? "bg-primary-500 text-white shadow-sm hover:bg-primary-600 hover:shadow"
+                    : "bg-gray-100 dark:bg-dark-bg-tertiary text-gray-700 dark:text-dark-text-primary hover:bg-gray-200 dark:hover:bg-dark-bg-secondary"
+                }`}
+              >
+                {sem.name}
+              </button>
             </div>
           ))}
         </div>
@@ -983,37 +913,13 @@ const SemesterTabs = ({ selectedSemester, onSelect }: SemesterTabsProps) => {
                         key={semester.id}
                         semester={semester}
                         isSelected={selectedSemester === semester.name}
-                        onEdit={(id, name) => handleEditStart(id, name)}
+                        onEdit={(id, name) => handleEditSave(id, name)}
                         onDelete={(id) => handleDeleteSemester(id)}
                       />
                     ))}
                   </SortableContext>
                 </DndContext>
               )}
-            </div>
-
-            <div className="mt-4 flex justify-end">
-              <button
-                onClick={() => {
-                  setShowManageModal(false);
-                  setShowAddInput(true);
-                }}
-                className="btn-primary text-sm py-1.5 px-3 flex items-center"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-4 w-4 mr-1"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-                Add Semester
-              </button>
             </div>
           </div>
         </div>
