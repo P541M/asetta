@@ -1,5 +1,3 @@
-import { useTheme } from "../../contexts/ThemeContext";
-
 interface PreferencesSectionProps {
   showDaysTillDue: boolean;
   setShowDaysTillDue: (show: boolean) => void;
@@ -9,6 +7,8 @@ interface PreferencesSectionProps {
   setShowNotes: (show: boolean) => void;
   showStatsBar: boolean;
   setShowStatsBar: (show: boolean) => void;
+  isDarkMode: boolean;
+  setIsDarkMode: (isDark: boolean) => void;
 }
 
 const PreferencesSection = ({
@@ -20,9 +20,9 @@ const PreferencesSection = ({
   setShowNotes,
   showStatsBar,
   setShowStatsBar,
+  isDarkMode,
+  setIsDarkMode,
 }: PreferencesSectionProps) => {
-  const { isDarkMode, toggleDarkMode } = useTheme();
-
   return (
     <div className="space-y-8">
       {/* Dark Mode Toggle */}
@@ -37,7 +37,7 @@ const PreferencesSection = ({
         </div>
         <button
           type="button"
-          onClick={toggleDarkMode}
+          onClick={() => setIsDarkMode(!isDarkMode)}
           className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 ${
             isDarkMode
               ? "bg-primary-600"
@@ -148,7 +148,7 @@ const PreferencesSection = ({
             Show Stats Bar
           </h3>
           <p className="mt-1 text-sm text-gray-500 dark:text-dark-text-tertiary">
-            Display the statistics bar above the assessments table
+            Display the statistics bar at the top of the page
           </p>
         </div>
         <button

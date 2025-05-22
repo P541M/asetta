@@ -7,6 +7,7 @@ import { db } from "../../lib/firebase";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import ProfileSection from "./ProfileSection";
 import PreferencesSection from "./PreferencesSection";
+import { useTheme } from "../../contexts/ThemeContext";
 
 interface UserSettingsProps {
   isOpen: boolean;
@@ -15,6 +16,7 @@ interface UserSettingsProps {
 
 const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
   const { user } = useAuth();
+  const { isDarkMode, setDarkMode } = useTheme();
   const [displayName, setDisplayName] = useState(user?.displayName || "");
   const [institution, setInstitution] = useState("");
   const [studyProgram, setStudyProgram] = useState("");
@@ -25,6 +27,7 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
   const [showWeight, setShowWeight] = useState<boolean>(true);
   const [showNotes, setShowNotes] = useState<boolean>(true);
   const [showStatsBar, setShowStatsBar] = useState<boolean>(false);
+  const [isDarkModeLocal, setIsDarkModeLocal] = useState(isDarkMode);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState({ text: "", type: "" });
   const [imagePreview, setImagePreview] = useState<string | null>(
@@ -35,8 +38,39 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
     "profile"
   );
 
+  // Store initial values for comparison
+  const [initialValues, setInitialValues] = useState({
+    displayName: "",
+    institution: "",
+    studyProgram: "",
+    graduationYear: 0,
+    showDaysTillDue: true,
+    showWeight: true,
+    showNotes: true,
+    showStatsBar: false,
+    photoURL: null as string | null,
+    isDarkMode: false,
+  });
+
   // Current year for graduation year input
   const currentYear = new Date().getFullYear();
+
+  // Check if there are any changes
+  const hasChanges = () => {
+    return (
+      displayName !== initialValues.displayName ||
+      institution !== initialValues.institution ||
+      studyProgram !== initialValues.studyProgram ||
+      graduationYear !== initialValues.graduationYear ||
+      showDaysTillDue !== initialValues.showDaysTillDue ||
+      showWeight !== initialValues.showWeight ||
+      showNotes !== initialValues.showNotes ||
+      showStatsBar !== initialValues.showStatsBar ||
+      imageFile !== null ||
+      imagePreview !== initialValues.photoURL ||
+      isDarkModeLocal !== initialValues.isDarkMode
+    );
+  };
 
   // Fetch user data when component mounts
   useEffect(() => {
@@ -49,13 +83,37 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
 
         if (userSnapshot.exists()) {
           const userData = userSnapshot.data();
-          setInstitution(userData.institution || "");
-          setStudyProgram(userData.studyProgram || "");
-          setGraduationYear(userData.graduationYear || currentYear + 4);
-          setShowDaysTillDue(userData.showDaysTillDue ?? true);
-          setShowWeight(userData.showWeight ?? true);
-          setShowNotes(userData.showNotes ?? true);
-          setShowStatsBar(userData.showStatsBar ?? false);
+          const newInstitution = userData.institution || "";
+          const newStudyProgram = userData.studyProgram || "";
+          const newGraduationYear = userData.graduationYear || currentYear + 4;
+          const newShowDaysTillDue = userData.showDaysTillDue ?? true;
+          const newShowWeight = userData.showWeight ?? true;
+          const newShowNotes = userData.showNotes ?? true;
+          const newShowStatsBar = userData.showStatsBar ?? false;
+
+          // Set current values
+          setInstitution(newInstitution);
+          setStudyProgram(newStudyProgram);
+          setGraduationYear(newGraduationYear);
+          setShowDaysTillDue(newShowDaysTillDue);
+          setShowWeight(newShowWeight);
+          setShowNotes(newShowNotes);
+          setShowStatsBar(newShowStatsBar);
+          setIsDarkModeLocal(isDarkMode);
+
+          // Set initial values
+          setInitialValues({
+            displayName: user.displayName || "",
+            institution: newInstitution,
+            studyProgram: newStudyProgram,
+            graduationYear: newGraduationYear,
+            showDaysTillDue: newShowDaysTillDue,
+            showWeight: newShowWeight,
+            showNotes: newShowNotes,
+            showStatsBar: newShowStatsBar,
+            photoURL: user.photoURL,
+            isDarkMode: isDarkMode,
+          });
         }
       } catch (error) {
         console.error("Error fetching user data:", error);
@@ -63,7 +121,7 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
     };
 
     fetchUserData();
-  }, [user, currentYear]);
+  }, [user, currentYear, isDarkMode]);
 
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
@@ -77,7 +135,7 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
       // Update profile data in Firebase Auth
       const updates: { displayName?: string; photoURL?: string } = {};
 
-      if (displayName !== user.displayName) {
+      if (displayName !== initialValues.displayName) {
         updates.displayName = displayName;
       }
 
@@ -109,6 +167,32 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
         updatedAt: new Date(),
       });
 
+      // Update dark mode if changed
+      if (isDarkModeLocal !== initialValues.isDarkMode) {
+        setDarkMode(isDarkModeLocal);
+      }
+
+      // Update initial values to match current values
+      setInitialValues({
+        displayName,
+        institution,
+        studyProgram,
+        graduationYear,
+        showDaysTillDue,
+        showWeight,
+        showNotes,
+        showStatsBar,
+        photoURL: imageFile
+          ? await getDownloadURL(
+              ref(getStorage(), `profile-images/${user.uid}`)
+            )
+          : imagePreview,
+        isDarkMode: isDarkModeLocal,
+      });
+
+      // Reset image file
+      setImageFile(null);
+
       // Trigger a custom event to notify other components of the preference change
       const event = new CustomEvent("userPreferencesUpdated", {
         detail: { showDaysTillDue, showWeight, showNotes, showStatsBar },
@@ -116,18 +200,35 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
       window.dispatchEvent(event);
 
       setMessage({
-        text: "Profile updated successfully!",
+        text: "Settings updated successfully!",
         type: "success",
       });
     } catch (error) {
       console.error("Error updating profile:", error);
       setMessage({
-        text: "Failed to update profile. Please try again.",
+        text: "Failed to update settings. Please try again.",
         type: "error",
       });
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  // Handle cancel
+  const handleCancel = () => {
+    // Reset all values to initial state
+    setDisplayName(initialValues.displayName);
+    setInstitution(initialValues.institution);
+    setStudyProgram(initialValues.studyProgram);
+    setGraduationYear(initialValues.graduationYear);
+    setShowDaysTillDue(initialValues.showDaysTillDue);
+    setShowWeight(initialValues.showWeight);
+    setShowNotes(initialValues.showNotes);
+    setShowStatsBar(initialValues.showStatsBar);
+    setImagePreview(initialValues.photoURL);
+    setImageFile(null);
+    setIsDarkModeLocal(initialValues.isDarkMode);
+    onClose();
   };
 
   if (!isOpen) return null;
@@ -145,7 +246,7 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
           </p>
         </div>
         <button
-          onClick={onClose}
+          onClick={handleCancel}
           className="text-gray-400 hover:text-gray-500 dark:text-dark-text-tertiary dark:hover:text-dark-text-secondary transition-colors"
         >
           <svg
@@ -218,6 +319,8 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
             setShowNotes={setShowNotes}
             showStatsBar={showStatsBar}
             setShowStatsBar={setShowStatsBar}
+            isDarkMode={isDarkModeLocal}
+            setIsDarkMode={setIsDarkModeLocal}
           />
         )}
 
@@ -235,21 +338,16 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
         )}
 
         {/* Action Buttons */}
-        <div className="mt-8 pt-6 border-t border-gray-200 dark:border-dark-border flex justify-end space-x-4">
-          <button
-            type="button"
-            onClick={onClose}
-            className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-dark-text-primary hover:text-gray-900 dark:hover:text-dark-text-secondary transition-colors"
-          >
-            Cancel
-          </button>
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="px-4 py-2 text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-          >
-            {isSubmitting ? "Saving..." : "Save Changes"}
-          </button>
+        <div className="mt-8 pt-6 border-t border-gray-200 dark:border-dark-border flex justify-end">
+          {hasChanges() && (
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="px-4 py-2 text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              {isSubmitting ? "Saving..." : "Save Changes"}
+            </button>
+          )}
         </div>
       </form>
     </div>
