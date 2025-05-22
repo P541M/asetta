@@ -258,26 +258,10 @@ const CalendarView = ({ selectedSemester, semesterId }: CalendarViewProps) => {
 
   // Status color mapping
   const getStatusColor = (status: string): string => {
-    switch (status) {
-      case "Submitted":
-        return "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-800 dark:text-emerald-400";
-      case "In progress":
-        return "bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400";
-      case "Draft":
-        return "bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-400";
-      case "Pending Submission":
-        return "bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-400";
-      case "Under Review":
-        return "bg-primary-100 dark:bg-primary-900/30 text-primary-800 dark:text-primary-400";
-      case "Needs Revision":
-        return "bg-amber-100 dark:bg-amber-900/30 text-amber-800 dark:text-amber-400";
-      case "Missed/Late":
-        return "bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400";
-      case "On Hold":
-        return "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-400";
-      default:
-        return "bg-gray-100 dark:bg-gray-900/30 text-gray-800 dark:text-gray-400";
+    if (status === "Submitted") {
+      return "text-emerald-600 dark:text-emerald-400";
     }
+    return "text-gray-800 dark:text-gray-400";
   };
 
   // Export calendar

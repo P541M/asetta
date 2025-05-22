@@ -418,14 +418,12 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
       );
     if (days === 0)
       return <span className="text-red-600 font-bold">Due today</span>;
-    if (days === 1)
-      return <span className="text-amber-600 font-bold">Due tomorrow</span>;
-    if (days <= 3)
-      return (
-        <span className="text-amber-600 font-medium">Due in {days} days</span>
-      );
     if (days <= 7)
-      return <span className="text-primary-600">Due in {days} days</span>;
+      return (
+        <span className="text-amber-600 font-medium">
+          {days === 1 ? "Due tomorrow" : `Due in ${days} days`}
+        </span>
+      );
     return <span className="text-gray-600">Due in {days} days</span>;
   };
 
@@ -637,7 +635,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
   };
 
   const handleSaveEdit = async (assessmentId: string) => {
-    if (!user || !assessmentId) return;
+    if (!user) return;
     try {
       const assessmentRef = doc(
         db,
@@ -657,26 +655,6 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
     } catch (error) {
       console.error("Error updating assessment:", error);
     }
-  };
-
-  const getDueDateStatus = (
-    dueDate: string,
-    dueTime: string,
-    status: string
-  ) => {
-    const completedStatuses = ["Submitted", "Under Review"];
-    if (completedStatuses.includes(status)) return "future";
-    const now = new Date();
-    const [year, month, day] = dueDate.split("-").map(Number);
-    const [hours, minutes] = dueTime.split(":").map(Number);
-    const due = new Date(year, month - 1, day, hours, minutes);
-    const diffDays = Math.ceil(
-      (due.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
-    );
-    if (diffDays < 0) return "overdue";
-    if (diffDays <= 3) return "urgent";
-    if (diffDays <= 7) return "upcoming";
-    return "future";
   };
 
   const handleNotesClick = (assessment: Assessment) => {
@@ -940,11 +918,6 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
             <tbody>
               {sortedAssessments.map((assessment, index) => {
                 if (!assessment) return null;
-                const dueDateStatus = getDueDateStatus(
-                  assessment.dueDate,
-                  assessment.dueTime,
-                  assessment.status
-                );
                 const daysTillDue = getDaysTillDue(
                   assessment.dueDate,
                   assessment.dueTime,
@@ -963,26 +936,9 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                         onChange={handleEditFormChange}
                         className="input py-1 px-2 text-sm transition-all duration-300 w-full dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border"
                       >
-                        <optgroup label="Planning">
-                          <option value="Not started">Not started</option>
-                          <option value="Draft">Draft</option>
-                        </optgroup>
-                        <optgroup label="Active Work">
-                          <option value="In progress">In progress</option>
-                          <option value="On Hold">On Hold</option>
-                          <option value="Needs Revision">Needs Revision</option>
-                        </optgroup>
-                        <optgroup label="Submission">
-                          <option value="Pending Submission">
-                            Pending Submission
-                          </option>
-                          <option value="Submitted">Submitted</option>
-                          <option value="Under Review">Under Review</option>
-                        </optgroup>
-                        <optgroup label="Other">
-                          <option value="Missed/Late">Missed/Late</option>
-                          <option value="Deferred">Deferred</option>
-                        </optgroup>
+                        <option value="Not started">Not Started</option>
+                        <option value="In progress">In Progress</option>
+                        <option value="Submitted">Submitted</option>
                       </select>
                     </td>
                     <td>
@@ -1081,17 +1037,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                 ) : (
                   <tr
                     key={assessment?.id || index}
-                    className={`transition-all duration-300 ${
-                      assessment?.status === "Submitted"
-                        ? "bg-emerald-50/40 dark:bg-emerald-900/20"
-                        : assessment?.status === "Missed/Late"
-                        ? "bg-red-50/50 dark:bg-red-900/20"
-                        : dueDateStatus === "overdue"
-                        ? "bg-red-50/40 dark:bg-red-900/20"
-                        : dueDateStatus === "urgent"
-                        ? "bg-amber-50/40 dark:bg-amber-900/20"
-                        : ""
-                    } hover:bg-gray-50/80 dark:hover:bg-dark-bg-tertiary`}
+                    className="transition-all duration-300 hover:bg-gray-50/80 dark:hover:bg-dark-bg-tertiary"
                   >
                     <td className="pl-4">
                       {assessment?.id && (
@@ -1114,26 +1060,9 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                         onClick={(e) => e.stopPropagation()}
                         className="input py-1 px-2 text-sm transition-all duration-300 w-full dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border"
                       >
-                        <optgroup label="Planning">
-                          <option value="Not started">Not started</option>
-                          <option value="Draft">Draft</option>
-                        </optgroup>
-                        <optgroup label="In Progress">
-                          <option value="In progress">In progress</option>
-                          <option value="On Hold">On Hold</option>
-                          <option value="Needs Revision">Needs Revision</option>
-                        </optgroup>
-                        <optgroup label="Submission">
-                          <option value="Pending Submission">
-                            Pending Submission
-                          </option>
-                          <option value="Submitted">Submitted</option>
-                          <option value="Under Review">Under Review</option>
-                        </optgroup>
-                        <optgroup label="Other">
-                          <option value="Missed/Late">Missed/Late</option>
-                          <option value="Deferred">Deferred</option>
-                        </optgroup>
+                        <option value="Not started">Not Started</option>
+                        <option value="In progress">In Progress</option>
+                        <option value="Submitted">Submitted</option>
                       </select>
                     </td>
                     <td className="font-medium whitespace-nowrap dark:text-dark-text-primary">
@@ -1154,24 +1083,6 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                         className={`${
                           assessment?.status === "Submitted"
                             ? "text-emerald-600 dark:text-emerald-400 font-medium"
-                            : assessment?.status === "Under Review"
-                            ? "text-primary-600 dark:text-primary-400 font-medium"
-                            : assessment?.status === "In progress"
-                            ? "text-blue-600 dark:text-blue-400 font-medium"
-                            : assessment?.status === "Draft"
-                            ? "text-purple-600 dark:text-purple-400 font-medium"
-                            : assessment?.status === "Pending Submission"
-                            ? "text-orange-600 dark:text-orange-400 font-medium"
-                            : assessment?.status === "Needs Revision"
-                            ? "text-amber-600 dark:text-amber-400 font-medium"
-                            : assessment?.status === "Missed/Late"
-                            ? "text-red-600 dark:text-red-400 font-medium"
-                            : assessment?.status === "On Hold"
-                            ? "text-yellow-600 dark:text-yellow-400 font-medium"
-                            : dueDateStatus === "overdue"
-                            ? "text-red-600 dark:text-red-400 font-medium"
-                            : dueDateStatus === "urgent"
-                            ? "text-amber-600 dark:text-amber-400 font-medium"
                             : "dark:text-dark-text-primary"
                         }`}
                       >
@@ -1342,8 +1253,6 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                     className={`px-2 py-1 rounded-full text-xs font-medium ${
                       selectedAssessment.status === "Submitted"
                         ? "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-800 dark:text-emerald-400"
-                        : selectedAssessment.status === "In progress"
-                        ? "bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400"
                         : "bg-gray-100 dark:bg-gray-900/30 text-gray-800 dark:text-gray-400"
                     }`}
                   >

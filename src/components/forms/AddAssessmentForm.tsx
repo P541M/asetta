@@ -223,86 +223,9 @@ const AddAssessmentForm = ({
                 onChange={handleChange}
                 className="input hover:shadow-sm transition-all duration-200 dark:bg-dark-input-bg dark:text-dark-input-text dark:border-dark-input-border dark:placeholder-dark-input-placeholder"
               >
-                <optgroup
-                  label="Planning"
-                  className="dark:bg-dark-bg-secondary dark:text-dark-text-primary"
-                >
-                  <option
-                    value="Not started"
-                    className="dark:bg-dark-bg-secondary dark:text-dark-text-primary"
-                  >
-                    Not started
-                  </option>
-                  <option
-                    value="Draft"
-                    className="dark:bg-dark-bg-secondary dark:text-dark-text-primary"
-                  >
-                    Draft
-                  </option>
-                </optgroup>
-                <optgroup
-                  label="Active Work"
-                  className="dark:bg-dark-bg-secondary dark:text-dark-text-primary"
-                >
-                  <option
-                    value="In progress"
-                    className="dark:bg-dark-bg-secondary dark:text-dark-text-primary"
-                  >
-                    In progress
-                  </option>
-                  <option
-                    value="On Hold"
-                    className="dark:bg-dark-bg-secondary dark:text-dark-text-primary"
-                  >
-                    On Hold
-                  </option>
-                  <option
-                    value="Needs Revision"
-                    className="dark:bg-dark-bg-secondary dark:text-dark-text-primary"
-                  >
-                    Needs Revision
-                  </option>
-                </optgroup>
-                <optgroup
-                  label="Submission"
-                  className="dark:bg-dark-bg-secondary dark:text-dark-text-primary"
-                >
-                  <option
-                    value="Pending Submission"
-                    className="dark:bg-dark-bg-secondary dark:text-dark-text-primary"
-                  >
-                    Pending Submission
-                  </option>
-                  <option
-                    value="Submitted"
-                    className="dark:bg-dark-bg-secondary dark:text-dark-text-primary"
-                  >
-                    Submitted
-                  </option>
-                  <option
-                    value="Under Review"
-                    className="dark:bg-dark-bg-secondary dark:text-dark-text-primary"
-                  >
-                    Under Review
-                  </option>
-                </optgroup>
-                <optgroup
-                  label="Other"
-                  className="dark:bg-dark-bg-secondary dark:text-dark-text-primary"
-                >
-                  <option
-                    value="Missed/Late"
-                    className="dark:bg-dark-bg-secondary dark:text-dark-text-primary"
-                  >
-                    Missed/Late
-                  </option>
-                  <option
-                    value="Deferred"
-                    className="dark:bg-dark-bg-secondary dark:text-dark-text-primary"
-                  >
-                    Deferred
-                  </option>
-                </optgroup>
+                <option value="Not started">Not Started</option>
+                <option value="In progress">In Progress</option>
+                <option value="Submitted">Submitted</option>
               </select>
             </div>
           </div>

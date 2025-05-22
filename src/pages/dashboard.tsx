@@ -51,12 +51,11 @@ const Dashboard = () => {
 
   const [stats, setStats] = useState({
     total: 0,
-    planning: 0,
-    active: 0,
-    submission: 0,
-    completed: 0,
-    problem: 0,
+    notStarted: 0,
+    inProgress: 0,
+    submitted: 0,
     upcomingDeadlines: 0,
+    completionRate: 0,
   });
 
   useEffect(() => {
@@ -131,41 +130,32 @@ const Dashboard = () => {
           const oneWeek = new Date();
           oneWeek.setDate(now.getDate() + 7);
           const totalCount = assessmentsList.length;
-          const planningCount = assessmentsList.filter(
-            (a) => a.status === "Not started" || a.status === "Draft"
+          const notStartedCount = assessmentsList.filter(
+            (a) => a.status === "Not started"
           ).length;
-          const activeCount = assessmentsList.filter(
-            (a) =>
-              a.status === "In progress" ||
-              a.status === "On Hold" ||
-              a.status === "Needs Revision"
+          const inProgressCount = assessmentsList.filter(
+            (a) => a.status === "In progress"
           ).length;
-          const submissionCount = assessmentsList.filter(
-            (a) =>
-              a.status === "Pending Submission" ||
-              a.status === "Submitted" ||
-              a.status === "Under Review"
-          ).length;
-          const completedCount = assessmentsList.filter(
-            (a) => a.status === "Completed"
-          ).length;
-          const problemCount = assessmentsList.filter(
-            (a) => a.status === "Missed/Late" || a.status === "Deferred"
+          const submittedCount = assessmentsList.filter(
+            (a) => a.status === "Submitted"
           ).length;
           const upcomingCount = assessmentsList.filter((a) => {
             const dueDate = new Date(a.dueDate);
             return (
-              dueDate > now && dueDate <= oneWeek && a.status !== "Completed"
+              dueDate > now && dueDate <= oneWeek && a.status !== "Submitted"
             );
           }).length;
+          const completionRate =
+            totalCount > 0
+              ? Math.round((submittedCount / totalCount) * 100)
+              : 0;
           setStats({
             total: totalCount,
-            planning: planningCount,
-            active: activeCount,
-            submission: submissionCount,
-            completed: completedCount,
-            problem: problemCount,
+            notStarted: notStartedCount,
+            inProgress: inProgressCount,
+            submitted: submittedCount,
             upcomingDeadlines: upcomingCount,
+            completionRate: completionRate,
           });
           setAnimateStatCards(true);
           setTimeout(() => setAnimateStatCards(false), 1000);
@@ -354,10 +344,10 @@ const Dashboard = () => {
                     } transition-colors duration-300 stat-card`}
                   >
                     <p className="text-sm text-gray-500 dark:text-dark-text-tertiary mb-1">
-                      Planning
+                      Not Started
                     </p>
                     <h3 className="text-2xl font-bold text-primary-600 dark:text-primary-400">
-                      {stats.planning}
+                      {stats.notStarted}
                     </h3>
                   </div>
                   <div
@@ -368,10 +358,10 @@ const Dashboard = () => {
                     } transition-colors duration-300 stat-card`}
                   >
                     <p className="text-sm text-gray-500 dark:text-dark-text-tertiary mb-1">
-                      Active Work
+                      In Progress
                     </p>
                     <h3 className="text-2xl font-bold text-blue-600 dark:text-blue-400">
-                      {stats.active}
+                      {stats.inProgress}
                     </h3>
                   </div>
                   <div
@@ -382,24 +372,10 @@ const Dashboard = () => {
                     } transition-colors duration-300 stat-card`}
                   >
                     <p className="text-sm text-gray-500 dark:text-dark-text-tertiary mb-1">
-                      Submission
-                    </p>
-                    <h3 className="text-2xl font-bold text-primary-600 dark:text-primary-400">
-                      {stats.submission}
-                    </h3>
-                  </div>
-                  <div
-                    className={`bg-white dark:bg-dark-bg-secondary rounded-xl shadow-sm p-4 border ${
-                      animateStatCards
-                        ? "border-primary-500"
-                        : "border-gray-100 dark:border-dark-border"
-                    } transition-colors duration-300 stat-card`}
-                  >
-                    <p className="text-sm text-gray-500 dark:text-dark-text-tertiary mb-1">
-                      Completed
+                      Submitted
                     </p>
                     <h3 className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">
-                      {stats.completed}
+                      {stats.submitted}
                     </h3>
                   </div>
                   <div
@@ -419,31 +395,19 @@ const Dashboard = () => {
                       <span className="inline-block w-2 h-2 bg-amber-500 dark:bg-amber-400 rounded-full animate-pulse mt-1"></span>
                     )}
                   </div>
-                </div>
-              )}
-              {stats.problem > 0 && (
-                <div className="mb-6">
                   <div
                     className={`bg-white dark:bg-dark-bg-secondary rounded-xl shadow-sm p-4 border ${
                       animateStatCards
-                        ? "border-red-500"
-                        : "border-red-100 dark:border-red-900/30"
+                        ? "border-primary-500"
+                        : "border-gray-100 dark:border-dark-border"
                     } transition-colors duration-300 stat-card`}
                   >
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-sm text-gray-500 dark:text-dark-text-tertiary mb-1">
-                          Attention Required
-                        </p>
-                        <h3 className="text-2xl font-bold text-red-600 dark:text-red-400">
-                          {stats.problem} assessment
-                          {stats.problem > 1 ? "s" : ""}
-                        </h3>
-                      </div>
-                      <div className="text-sm text-gray-600 dark:text-dark-text-tertiary">
-                        <p>Assessments marked as Missed/Late or Deferred</p>
-                      </div>
-                    </div>
+                    <p className="text-sm text-gray-500 dark:text-dark-text-tertiary mb-1">
+                      Completion Rate
+                    </p>
+                    <h3 className="text-2xl font-bold text-purple-600 dark:text-purple-400">
+                      {stats.completionRate}%
+                    </h3>
                   </div>
                 </div>
               )}
