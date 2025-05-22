@@ -722,7 +722,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
   };
 
   return (
-    <div className="bg-white dark:bg-dark-bg-secondary rounded-xl shadow-sm border border-gray-100 dark:border-dark-border-primary p-6">
+    <div className="bg-white dark:bg-dark-bg-secondary rounded-xl shadow-sm border border-gray-100 dark:border-dark-border-primary px-6 pt-6">
       <div className="flex flex-col sm:flex-row justify-between mb-6 gap-4">
         <h2 className="text-xl font-medium text-gray-900 dark:text-dark-text-primary">
           Your Assessments

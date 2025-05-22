@@ -258,9 +258,9 @@ const Dashboard = () => {
       <DashboardHeader onLogout={handleLogout} />
       <div className="p-4 md:p-6">
         <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
             <div>
-              <h1 className="text-xl font-semibold text-gray-900 dark:text-dark-text-primary">
+              <h1 className="text-2xl font-semibold text-gray-900 dark:text-dark-text-primary">
                 Dashboard
               </h1>
               <p className="text-sm text-gray-500 dark:text-dark-text-tertiary mt-1">
@@ -270,423 +270,281 @@ const Dashboard = () => {
               </p>
             </div>
           </div>
+
           <SemesterTabs
             selectedSemester={selectedSemester}
             onSelect={setSelectedSemester}
           />
-          {selectedSemester ? (
-            <>
-              {showStatsBar && (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 mb-6">
-                  <div className="bg-white dark:bg-dark-bg-secondary rounded-lg p-4 border border-gray-100 dark:border-dark-border hover:shadow-md transition-all duration-300 group">
-                    <div className="flex items-center justify-between mb-2">
-                      <p className="text-sm font-medium text-gray-600 dark:text-dark-text-secondary">
-                        Total Assessments
-                      </p>
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-5 w-5 text-gray-400 dark:text-dark-text-tertiary group-hover:text-primary-500 dark:group-hover:text-primary-400 transition-colors"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
-                      >
-                        <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
-                        <path
-                          fillRule="evenodd"
-                          d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    </div>
-                    <h3 className="text-2xl font-bold text-gray-900 dark:text-dark-text-primary">
-                      {stats.total}
-                    </h3>
-                  </div>
 
-                  <div className="bg-white dark:bg-dark-bg-secondary rounded-lg p-4 border border-gray-100 dark:border-dark-border hover:shadow-md transition-all duration-300 group">
-                    <div className="flex items-center justify-between mb-2">
-                      <p className="text-sm font-medium text-gray-600 dark:text-dark-text-secondary">
-                        Not Started
-                      </p>
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-5 w-5 text-gray-400 dark:text-dark-text-tertiary group-hover:text-gray-600 dark:group-hover:text-gray-400 transition-colors"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    </div>
-                    <h3 className="text-2xl font-bold text-gray-900 dark:text-dark-text-primary">
-                      {stats.notStarted}
-                    </h3>
-                  </div>
+          {showStatsBar && (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 mb-8 mt-6">
+              <div className="bg-white dark:bg-dark-bg-secondary rounded-lg p-4 hover:shadow-md transition-all duration-300">
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-sm font-medium text-gray-600 dark:text-dark-text-secondary">
+                    Total Assessments
+                  </p>
+                </div>
+                <h3 className="text-2xl font-bold text-gray-900 dark:text-dark-text-primary">
+                  {stats.total}
+                </h3>
+              </div>
+              <div className="bg-white dark:bg-dark-bg-secondary rounded-lg p-4 hover:shadow-md transition-all duration-300">
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-sm font-medium text-gray-600 dark:text-dark-text-secondary">
+                    Not Started
+                  </p>
+                </div>
+                <h3 className="text-2xl font-bold text-gray-900 dark:text-dark-text-primary">
+                  {stats.notStarted}
+                </h3>
+              </div>
+              <div className="bg-white dark:bg-dark-bg-secondary rounded-lg p-4 hover:shadow-md transition-all duration-300">
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-sm font-medium text-gray-600 dark:text-dark-text-secondary">
+                    In Progress
+                  </p>
+                </div>
+                <h3 className="text-2xl font-bold text-gray-900 dark:text-dark-text-primary">
+                  {stats.inProgress}
+                </h3>
+              </div>
+              <div className="bg-white dark:bg-dark-bg-secondary rounded-lg p-4 hover:shadow-md transition-all duration-300">
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-sm font-medium text-gray-600 dark:text-dark-text-secondary">
+                    Submitted
+                  </p>
+                </div>
+                <h3 className="text-2xl font-bold text-gray-900 dark:text-dark-text-primary">
+                  {stats.submitted}
+                </h3>
+              </div>
+              <div className="bg-white dark:bg-dark-bg-secondary rounded-lg p-4 hover:shadow-md transition-all duration-300">
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-sm font-medium text-gray-600 dark:text-dark-text-secondary">
+                    Upcoming
+                  </p>
+                </div>
+                <h3 className="text-2xl font-bold text-gray-900 dark:text-dark-text-primary">
+                  {stats.upcomingDeadlines}
+                </h3>
+              </div>
+              <div className="bg-white dark:bg-dark-bg-secondary rounded-lg p-4 hover:shadow-md transition-all duration-300">
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-sm font-medium text-gray-600 dark:text-dark-text-secondary">
+                    Completion Rate
+                  </p>
+                </div>
+                <h3 className="text-2xl font-bold text-gray-900 dark:text-dark-text-primary">
+                  {stats.completionRate}%
+                </h3>
+              </div>
+            </div>
+          )}
 
-                  <div className="bg-white dark:bg-dark-bg-secondary rounded-lg p-4 border border-gray-100 dark:border-dark-border hover:shadow-md transition-all duration-300 group">
-                    <div className="flex items-center justify-between mb-2">
-                      <p className="text-sm font-medium text-gray-600 dark:text-dark-text-secondary">
-                        In Progress
-                      </p>
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-5 w-5 text-gray-400 dark:text-dark-text-tertiary group-hover:text-blue-500 dark:group-hover:text-blue-400 transition-colors"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    </div>
-                    <h3 className="text-2xl font-bold text-gray-900 dark:text-dark-text-primary">
-                      {stats.inProgress}
-                    </h3>
-                  </div>
+          <div className="mt-8">
+            <div className="flex space-x-2 bg-white dark:bg-dark-bg-secondary rounded-lg p-1 shadow-sm">
+              <button
+                onClick={() => {
+                  setActiveTab("courses");
+                  setSelectedCourse(null);
+                }}
+                className={`flex-1 px-6 py-3 font-medium text-sm transition-all duration-200 rounded-md ${
+                  activeTab === "courses" && !selectedCourse
+                    ? "bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 shadow-sm"
+                    : "text-gray-600 dark:text-dark-text-secondary hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary"
+                }`}
+              >
+                <div className="flex items-center justify-center space-x-2">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3zM3.31 9.397L5 10.12v4.102a8.969 8.969 0 00-1.05-.174 1 1 0 01-.89-.89 11.115 11.115 0 01.25-3.762zM9.3 16.573A9.026 9.026 0 007 14.935v-3.957l1.818.78a3 3 0 002.364 0l5.508-2.361a11.026 11.026 0 01.25 3.762 1 1 0 01-.89.89 8.968 8.968 0 00-5.35 2.524 1 1 0 01-1.4 0zM6 18a1 1 0 001-1v-2.065a8.935 8.935 0 00-2-.712V17a1 1 0 001 1z" />
+                  </svg>
+                  <span>Courses</span>
+                </div>
+              </button>
+              <button
+                onClick={() => {
+                  setActiveTab("assessments");
+                  setSelectedCourse(null);
+                }}
+                className={`flex-1 px-6 py-3 font-medium text-sm transition-all duration-200 rounded-md ${
+                  activeTab === "assessments" && !selectedCourse
+                    ? "bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 shadow-sm"
+                    : "text-gray-600 dark:text-dark-text-secondary hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary"
+                }`}
+              >
+                <div className="flex items-center justify-center space-x-2">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6zm2 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1zm4 2a1 1 0 100-2H6a1 1 0 100 2h6z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                  <span>All Assessments</span>
+                </div>
+              </button>
+              <button
+                onClick={() => setActiveTab("calendar")}
+                className={`flex-1 px-6 py-3 font-medium text-sm transition-all duration-200 rounded-md ${
+                  activeTab === "calendar"
+                    ? "bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 shadow-sm"
+                    : "text-gray-600 dark:text-dark-text-secondary hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary"
+                }`}
+              >
+                <div className="flex items-center justify-center space-x-2">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6zm2 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1zm4 2a1 1 0 100-2H6a1 1 0 100 2h6z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                  <span>Calendar</span>
+                </div>
+              </button>
+              <button
+                onClick={() => setActiveTab("add")}
+                className={`flex-1 px-6 py-3 font-medium text-sm transition-all duration-200 rounded-md ${
+                  activeTab === "add"
+                    ? "bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 shadow-sm"
+                    : "text-gray-600 dark:text-dark-text-secondary hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary"
+                }`}
+              >
+                <div className="flex items-center justify-center space-x-2">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                  <span>Add Assessment</span>
+                </div>
+              </button>
+            </div>
 
-                  <div className="bg-white dark:bg-dark-bg-secondary rounded-lg p-4 border border-gray-100 dark:border-dark-border hover:shadow-md transition-all duration-300 group">
-                    <div className="flex items-center justify-between mb-2">
-                      <p className="text-sm font-medium text-gray-600 dark:text-dark-text-secondary">
-                        Submitted
-                      </p>
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-5 w-5 text-gray-400 dark:text-dark-text-tertiary group-hover:text-emerald-500 dark:group-hover:text-emerald-400 transition-colors"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
+            <div className="mt-6">
+              {activeTab === "courses" && !selectedCourse && (
+                <div className="animate-fade-in">
+                  {isLoading ? (
+                    <div className="flex justify-center py-8">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500"></div>
                     </div>
-                    <h3 className="text-2xl font-bold text-gray-900 dark:text-dark-text-primary">
-                      {stats.submitted}
-                    </h3>
-                  </div>
+                  ) : error ? (
+                    <div className="p-4 bg-red-50 rounded-lg text-red-700 animate-fade-in">
+                      <p>{error}</p>
+                    </div>
+                  ) : (
+                    <CoursesOverviewTable
+                      semesterId={selectedSemesterId}
+                      onSelectCourse={handleSelectCourse}
+                    />
+                  )}
+                </div>
+              )}
+              {activeTab === "assessments" && selectedCourse && (
+                <div className="animate-fade-in">
+                  <CourseFilteredAssessments
+                    semesterId={selectedSemesterId}
+                    selectedCourse={selectedCourse}
+                    onBack={handleClearCourseSelection}
+                  />
+                </div>
+              )}
+              {activeTab === "assessments" && !selectedCourse && (
+                <div className="animate-fade-in">
+                  {isLoading ? (
+                    <div className="flex justify-center py-8">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500"></div>
+                    </div>
+                  ) : error ? (
+                    <div className="p-4 bg-red-50 rounded-lg text-red-700 animate-fade-in">
+                      <p>{error}</p>
+                    </div>
+                  ) : (
+                    <AssessmentsTable
+                      assessments={assessments}
+                      semesterId={selectedSemesterId}
+                      onStatusChange={refreshAssessments}
+                    />
+                  )}
+                </div>
+              )}
+              {activeTab === "calendar" && (
+                <div className="animate-fade-in">
+                  <CalendarView
+                    selectedSemester={selectedSemester}
+                    semesterId={selectedSemesterId}
+                  />
+                </div>
+              )}
+              {activeTab === "add" && selectedSemesterId && (
+                <div className="animate-fade-in">
+                  <div className="bg-white dark:bg-dark-bg-secondary rounded-xl p-6">
+                    <h2 className="text-xl font-medium mb-6 dark:text-dark-text-primary">
+                      Add Assessment for {selectedSemester}
+                    </h2>
 
-                  <div className="bg-white dark:bg-dark-bg-secondary rounded-lg p-4 border border-gray-100 dark:border-dark-border hover:shadow-md transition-all duration-300 group">
-                    <div className="flex items-center justify-between mb-2">
-                      <p className="text-sm font-medium text-gray-600 dark:text-dark-text-secondary">
-                        Due This Week
-                      </p>
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-5 w-5 text-gray-400 dark:text-dark-text-tertiary group-hover:text-amber-500 dark:group-hover:text-amber-400 transition-colors"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
+                    <div className="flex space-x-4 mb-6">
+                      <button
+                        onClick={() => setAddMode("manual")}
+                        className={`flex-1 py-3 px-4 rounded-lg text-sm font-medium transition-all duration-200 ${
+                          addMode === "manual"
+                            ? "bg-primary-500 text-white shadow-md"
+                            : "bg-gray-50 dark:bg-dark-bg-tertiary text-gray-600 dark:text-dark-text-secondary hover:bg-gray-100 dark:hover:bg-dark-bg-hover"
+                        }`}
                       >
-                        <path
-                          fillRule="evenodd"
-                          d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
+                        Manual Entry
+                      </button>
+                      <button
+                        onClick={() => setAddMode("upload")}
+                        className={`flex-1 py-3 px-4 rounded-lg text-sm font-medium transition-all duration-200 ${
+                          addMode === "upload"
+                            ? "bg-primary-500 text-white shadow-md"
+                            : "bg-gray-50 dark:bg-dark-bg-tertiary text-gray-600 dark:text-dark-text-secondary hover:bg-gray-100 dark:hover:bg-dark-bg-hover"
+                        }`}
+                      >
+                        Upload File
+                      </button>
                     </div>
-                    <div className="flex items-center">
-                      <h3 className="text-2xl font-bold text-gray-900 dark:text-dark-text-primary">
-                        {stats.upcomingDeadlines}
-                      </h3>
-                      {stats.upcomingDeadlines > 0 && (
-                        <span className="ml-2 inline-block w-2 h-2 bg-amber-500 dark:bg-amber-400 rounded-full animate-pulse"></span>
-                      )}
-                    </div>
-                  </div>
 
-                  <div className="bg-white dark:bg-dark-bg-secondary rounded-lg p-4 border border-gray-100 dark:border-dark-border hover:shadow-md transition-all duration-300 group">
-                    <div className="flex items-center justify-between mb-2">
-                      <p className="text-sm font-medium text-gray-600 dark:text-dark-text-secondary">
-                        Completion Rate
-                      </p>
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-5 w-5 text-gray-400 dark:text-dark-text-tertiary group-hover:text-primary-500 dark:group-hover:text-primary-400 transition-colors"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    </div>
-                    <h3 className="text-2xl font-bold text-gray-900 dark:text-dark-text-primary">
-                      {stats.completionRate}%
-                    </h3>
+                    {addMode === "manual" ? (
+                      <AddAssessmentForm
+                        semester={selectedSemester}
+                        semesterId={selectedSemesterId}
+                        onSuccess={refreshAssessments}
+                      />
+                    ) : (
+                      <UploadForm
+                        semester={selectedSemester}
+                        onUploadSuccess={refreshAssessments}
+                      />
+                    )}
                   </div>
                 </div>
               )}
-              <div className="bg-white dark:bg-dark-bg-secondary rounded-xl shadow-sm border border-gray-100 dark:border-dark-border mb-6 overflow-hidden transition-all duration-300 hover:shadow-md">
-                <div className="border-b border-gray-100 dark:border-dark-border">
-                  <div className="flex flex-wrap">
-                    <button
-                      onClick={() => {
-                        setActiveTab("courses");
-                        setSelectedCourse(null);
-                      }}
-                      className={`px-5 py-4 font-medium text-sm tab dark:text-dark-text-primary ${
-                        activeTab === "courses" && !selectedCourse
-                          ? "active"
-                          : ""
-                      }`}
-                    >
-                      Courses
-                    </button>
-                    <button
-                      onClick={() => {
-                        setActiveTab("assessments");
-                        setSelectedCourse(null);
-                      }}
-                      className={`px-5 py-4 font-medium text-sm tab dark:text-dark-text-primary ${
-                        activeTab === "assessments" && !selectedCourse
-                          ? "active"
-                          : ""
-                      }`}
-                    >
-                      All Assessments
-                    </button>
-                    <button
-                      onClick={() => setActiveTab("calendar")}
-                      className={`px-5 py-4 font-medium text-sm tab dark:text-dark-text-primary ${
-                        activeTab === "calendar" ? "active" : ""
-                      }`}
-                    >
-                      Calendar
-                    </button>
-                    <button
-                      onClick={() => setActiveTab("add")}
-                      className={`px-5 py-4 font-medium text-sm tab dark:text-dark-text-primary ${
-                        activeTab === "add" ? "active" : ""
-                      }`}
-                    >
-                      Add Assessment
-                    </button>
-                  </div>
-                </div>
-                <div className="p-6">
-                  {activeTab === "courses" && !selectedCourse && (
-                    <div className="animate-fade-in">
-                      {isLoading ? (
-                        <div className="flex justify-center py-8">
-                          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500"></div>
-                        </div>
-                      ) : error ? (
-                        <div className="p-4 bg-red-50 rounded-lg text-red-700 animate-fade-in">
-                          <p>{error}</p>
-                        </div>
-                      ) : (
-                        <CoursesOverviewTable
-                          semesterId={selectedSemesterId}
-                          onSelectCourse={handleSelectCourse}
-                        />
-                      )}
-                    </div>
-                  )}
-                  {activeTab === "assessments" && selectedCourse && (
-                    <div className="animate-fade-in">
-                      <CourseFilteredAssessments
-                        semesterId={selectedSemesterId}
-                        selectedCourse={selectedCourse}
-                        onBack={handleClearCourseSelection}
-                      />
-                    </div>
-                  )}
-                  {activeTab === "assessments" && !selectedCourse && (
-                    <div className="animate-fade-in">
-                      {isLoading ? (
-                        <div className="flex justify-center py-8">
-                          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500"></div>
-                        </div>
-                      ) : error ? (
-                        <div className="p-4 bg-red-50 rounded-lg text-red-700 animate-fade-in">
-                          <p>{error}</p>
-                        </div>
-                      ) : (
-                        <AssessmentsTable
-                          assessments={assessments}
-                          semesterId={selectedSemesterId}
-                          onStatusChange={refreshAssessments}
-                        />
-                      )}
-                    </div>
-                  )}
-                  {activeTab === "calendar" && (
-                    <div className="animate-fade-in">
-                      <CalendarView
-                        selectedSemester={selectedSemester}
-                        semesterId={selectedSemesterId}
-                      />
-                    </div>
-                  )}
-                  {activeTab === "add" && selectedSemesterId && (
-                    <div className="animate-fade-in">
-                      <div className="bg-white dark:bg-dark-bg-secondary rounded-xl shadow-sm border border-gray-100 dark:border-dark-border-primary p-6">
-                        <h2 className="text-xl font-medium mb-6 dark:text-dark-text-primary">
-                          Add Assessment for {selectedSemester}
-                        </h2>
-
-                        <div className="flex space-x-4 mb-6">
-                          <button
-                            onClick={() => setAddMode("manual")}
-                            className={`flex-1 py-3 px-4 rounded-lg text-sm font-medium transition-all duration-200 ${
-                              addMode === "manual"
-                                ? "bg-primary-500 text-white shadow-md"
-                                : "bg-gray-50 dark:bg-dark-bg-tertiary text-gray-600 dark:text-dark-text-secondary hover:bg-gray-100 dark:hover:bg-dark-bg-hover"
-                            }`}
-                          >
-                            <div className="flex items-center justify-center">
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                className="h-5 w-5 mr-2"
-                                viewBox="0 0 20 20"
-                                fill="currentColor"
-                              >
-                                <path
-                                  fillRule="evenodd"
-                                  d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
-                                  clipRule="evenodd"
-                                />
-                              </svg>
-                              Quick Add
-                            </div>
-                          </button>
-                          <button
-                            onClick={() => setAddMode("upload")}
-                            className={`flex-1 py-3 px-4 rounded-lg text-sm font-medium transition-all duration-200 ${
-                              addMode === "upload"
-                                ? "bg-primary-500 text-white shadow-md"
-                                : "bg-gray-50 dark:bg-dark-bg-tertiary text-gray-600 dark:text-dark-text-secondary hover:bg-gray-100 dark:hover:bg-dark-bg-hover"
-                            }`}
-                          >
-                            <div className="flex items-center justify-center">
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                className="h-5 w-5 mr-2"
-                                viewBox="0 0 20 20"
-                                fill="currentColor"
-                              >
-                                <path
-                                  fillRule="evenodd"
-                                  d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z"
-                                  clipRule="evenodd"
-                                />
-                              </svg>
-                              Upload Outline
-                            </div>
-                          </button>
-                        </div>
-
-                        {addMode === "manual" ? (
-                          <AddAssessmentForm
-                            semester={selectedSemester}
-                            semesterId={selectedSemesterId}
-                            onSuccess={refreshAssessments}
-                          />
-                        ) : (
-                          <UploadForm
-                            semester={selectedSemester}
-                            onUploadSuccess={refreshAssessments}
-                          />
-                        )}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-              {(activeTab === "assessments" ||
-                activeTab === "courses" ||
-                activeTab === "calendar") &&
-                assessments.length > 0 && (
-                  <div className="flex justify-end mb-10">
-                    <button
-                      onClick={() => setActiveTab("add")}
-                      className="btn-primary flex items-center gap-2 shadow hover:shadow-md transition-all duration-300 hover:-translate-y-0.5"
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="16"
-                        height="16"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <line x1="12" y1="5" x2="12" y2="19"></line>
-                        <line x1="5" y1="12" x2="19" y2="12"></line>
-                      </svg>
-                      Add Assessment
-                    </button>
-                  </div>
-                )}
-            </>
-          ) : (
-            <div className="bg-white dark:bg-dark-bg-secondary rounded-xl shadow-sm border border-gray-100 dark:border-dark-border p-10 text-center">
-              <div className="mb-6">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-16 w-16 mx-auto text-primary-300 dark:text-primary-500"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
-                  />
-                </svg>
-              </div>
-              <h2 className="text-xl font-semibold mb-2 dark:text-dark-text-primary">
-                Welcome to Asetta
-              </h2>
-              <p className="text-gray-600 dark:text-dark-text-secondary mb-4">
-                Track your assignments, exams, and projects in one place.
-              </p>
-              <p className="text-gray-500 dark:text-dark-text-tertiary mb-6">
-                Please add a semester to get started tracking your assessments.
-              </p>
-              <button
-                onClick={() => {
-                  const semesterTabsElement = document.querySelector(
-                    ".semester-tabs-container"
-                  );
-                  if (semesterTabsElement) {
-                    const addButton = semesterTabsElement.querySelector(
-                      ".add-semester-button"
-                    );
-                    if (addButton) {
-                      (addButton as HTMLElement).click();
-                    }
-                  }
-                }}
-                className="btn-primary flex items-center mx-auto"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-4 w-4 mr-2"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-                Add Semester
-              </button>
             </div>
-          )}
+          </div>
         </div>
       </div>
     </div>
