@@ -487,7 +487,13 @@ const CalendarView = ({ selectedSemester, semesterId }: CalendarViewProps) => {
                           {assessment.assignmentName}
                         </span>
                         <span className="ml-2 text-[10px] font-medium opacity-75">
-                          {assessment.dueTime}
+                          {new Date(
+                            `2000-01-01T${assessment.dueTime}`
+                          ).toLocaleTimeString("en-US", {
+                            hour: "numeric",
+                            minute: "2-digit",
+                            hour12: true,
+                          })}
                         </span>
                       </div>
                     </div>

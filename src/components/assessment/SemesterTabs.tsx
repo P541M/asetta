@@ -674,16 +674,18 @@ const SemesterTabs = ({ selectedSemester, onSelect }: SemesterTabsProps) => {
   }
 
   return (
-    <div className="semester-tabs-container mb-6 bg-white dark:bg-dark-bg-secondary rounded-lg shadow-sm p-4 border border-gray-100 dark:border-dark-border transition-all duration-300">
-      <div className="flex items-center justify-between mb-2">
-        <h2 className="text-base font-medium text-gray-700 dark:text-dark-text-primary">
-          Semesters
-        </h2>
-        <div className="flex items-center">
+    <div className="semester-tabs-container mb-6 bg-white dark:bg-dark-bg-secondary rounded-lg shadow-md">
+      <div className="flex items-center justify-between px-4 py-2 border-b border-gray-100 dark:border-dark-border">
+        <div className="flex items-center space-x-2">
+          <h2 className="text-sm font-medium text-gray-700 dark:text-dark-text-primary">
+            Semesters
+          </h2>
+        </div>
+        <div className="flex items-center space-x-1">
           {/* Add button */}
           <button
             onClick={() => setShowAddInput(true)}
-            className="add-semester-button p-1.5 text-primary-600 dark:text-primary-400 hover:bg-primary-50 dark:hover:bg-dark-bg-tertiary rounded-md mr-1"
+            className="p-1.5 text-gray-500 dark:text-dark-text-tertiary hover:text-primary-600 dark:hover:text-primary-400 hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary rounded-md transition-colors"
             title="Add new semester"
           >
             <svg
@@ -704,7 +706,7 @@ const SemesterTabs = ({ selectedSemester, onSelect }: SemesterTabsProps) => {
           <div className="relative" ref={moreOptionsRef}>
             <button
               onClick={() => setShowMoreOptions(!showMoreOptions)}
-              className="p-1.5 text-gray-500 dark:text-dark-text-tertiary hover:bg-gray-100 dark:hover:bg-dark-bg-tertiary rounded-md"
+              className="p-1.5 text-gray-500 dark:text-dark-text-tertiary hover:text-primary-600 dark:hover:text-primary-400 hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary rounded-md transition-colors"
               title="More options"
             >
               <svg
@@ -718,26 +720,15 @@ const SemesterTabs = ({ selectedSemester, onSelect }: SemesterTabsProps) => {
             </button>
 
             {showMoreOptions && (
-              <div
-                className="absolute right-0 top-full mt-1 bg-white dark:bg-dark-bg-secondary border border-gray-100 dark:border-dark-border rounded-md shadow-sm z-20 animate-fade-in-down"
-                style={{ minWidth: "150px" }}
-              >
+              <div className="absolute right-0 top-full mt-1 bg-white dark:bg-dark-bg-secondary border border-gray-100 dark:border-dark-border rounded-md shadow-md z-20 animate-fade-in-down">
                 <button
                   onClick={() => {
-                    setShowManageModal(true);
                     setShowMoreOptions(false);
+                    setShowManageModal(true);
                   }}
-                  className="flex items-center w-full px-3 py-2 text-sm hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary text-left rounded-t-md transition-colors duration-150 whitespace-nowrap dark:text-dark-text-primary"
+                  className="w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-dark-text-primary hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary transition-colors"
                 >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-3.5 w-3.5 mr-2 text-gray-600 dark:text-dark-text-tertiary flex-shrink-0"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                  >
-                    <path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM14 11a1 1 0 011 1v1h1a1 1 0 110 2h-1v1a1 1 0 11-2 0v-1h-1a1 1 0 110-2h1v-1a1 1 0 011-1z" />
-                  </svg>
-                  <span>Manage Semesters</span>
+                  Manage Semesters
                 </button>
               </div>
             )}
@@ -745,32 +736,65 @@ const SemesterTabs = ({ selectedSemester, onSelect }: SemesterTabsProps) => {
         </div>
       </div>
 
-      {/* Add semester input field */}
+      {/* Semester tabs - horizontally scrollable */}
+      <div className="relative px-4 py-2">
+        <div className="flex items-center space-x-2 overflow-x-auto pb-1 hide-scrollbar scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-dark-bg-tertiary scrollbar-track-transparent">
+          {semesters.map((sem) => (
+            <div key={sem.id} className="flex-shrink-0">
+              <button
+                onClick={() => onSelect(sem.name)}
+                className={`px-3 py-1.5 rounded-md text-sm font-medium whitespace-nowrap transition-all duration-200 ${
+                  selectedSemester === sem.name
+                    ? "bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 shadow-sm"
+                    : "text-gray-600 dark:text-dark-text-secondary hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary"
+                }`}
+              >
+                {sem.name}
+              </button>
+            </div>
+          ))}
+        </div>
+        {semesters.length > 0 && (
+          <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-white dark:from-dark-bg-secondary pointer-events-none"></div>
+        )}
+      </div>
+
+      {/* Empty state when no semesters exist */}
+      {semesters.length === 0 && !showAddInput && (
+        <div className="text-center py-3 text-gray-500 dark:text-dark-text-tertiary text-sm">
+          <p>No semesters yet. Click &ldquo;+&rdquo; to add one.</p>
+        </div>
+      )}
+
+      {/* Add semester input */}
       {showAddInput && (
-        <div ref={addInputRef} className="mb-3 animate-fade-in">
-          <div className="flex space-x-2">
+        <div
+          className="px-4 py-2 border-t border-gray-100 dark:border-dark-border"
+          ref={addInputRef}
+        >
+          <div className="flex items-center space-x-2">
             <input
               type="text"
-              placeholder="Add new semester"
               value={newSemester}
               onChange={(e) => setNewSemester(e.target.value)}
+              placeholder="Enter semester name"
+              className="flex-1 px-3 py-1.5 text-sm border border-gray-200 dark:border-dark-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-400 focus:border-transparent dark:bg-dark-bg-tertiary dark:text-dark-text-primary"
               onKeyDown={(e) => {
-                if (e.key === "Enter") handleAddSemester();
-                if (e.key === "Escape") {
+                if (e.key === "Enter") {
+                  handleAddSemester();
+                } else if (e.key === "Escape") {
                   setShowAddInput(false);
                   setNewSemester("");
                 }
               }}
-              ref={newInputRef}
-              className="input text-sm py-1.5 px-3 flex-grow dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border"
             />
             <button
               onClick={handleAddSemester}
               disabled={isAdding || !newSemester.trim()}
-              className={`btn-primary text-sm py-1.5 px-3 ${
+              className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
                 isAdding || !newSemester.trim()
-                  ? "opacity-60 cursor-not-allowed"
-                  : ""
+                  ? "bg-gray-100 dark:bg-dark-bg-tertiary text-gray-400 dark:text-dark-text-tertiary cursor-not-allowed"
+                  : "bg-primary-500 text-white hover:bg-primary-600"
               }`}
             >
               {isAdding ? (
@@ -802,36 +826,6 @@ const SemesterTabs = ({ selectedSemester, onSelect }: SemesterTabsProps) => {
               )}
             </button>
           </div>
-        </div>
-      )}
-
-      {/* Semester tabs - horizontally scrollable */}
-      <div className="relative">
-        <div className="flex items-center space-x-2 overflow-x-auto pb-1 hide-scrollbar scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-dark-bg-tertiary scrollbar-track-transparent">
-          {semesters.map((sem) => (
-            <div key={sem.id} className="flex-shrink-0">
-              <button
-                onClick={() => onSelect(sem.name)}
-                className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-all duration-200 ${
-                  selectedSemester === sem.name
-                    ? "bg-primary-500 text-white shadow-sm hover:bg-primary-600 hover:shadow"
-                    : "bg-gray-100 dark:bg-dark-bg-tertiary text-gray-700 dark:text-dark-text-primary hover:bg-gray-200 dark:hover:bg-dark-bg-secondary"
-                }`}
-              >
-                {sem.name}
-              </button>
-            </div>
-          ))}
-        </div>
-        {semesters.length > 0 && (
-          <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-white dark:from-dark-bg-secondary pointer-events-none"></div>
-        )}
-      </div>
-
-      {/* Empty state when no semesters exist */}
-      {semesters.length === 0 && !showAddInput && (
-        <div className="text-center py-2 text-gray-500 dark:text-dark-text-tertiary text-sm">
-          <p>No semesters yet. Click &ldquo;+&rdquo; to add one.</p>
         </div>
       )}
 

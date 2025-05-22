@@ -533,43 +533,6 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
     }
   };
 
-  const handleBulkAction = async (action: "complete" | "delete" | "reset") => {
-    if (!user || selectedRows.length === 0) return;
-
-    if (action === "delete") {
-      setShowBulkDeleteModal(true);
-      return;
-    }
-
-    try {
-      for (const id of selectedRows) {
-        const assessmentRef = doc(
-          db,
-          "users",
-          user.uid,
-          "semesters",
-          semesterId,
-          "assessments",
-          id
-        );
-        if (action === "complete")
-          await updateDoc(assessmentRef, {
-            status: "Submitted",
-            updatedAt: new Date(),
-          });
-        else if (action === "reset")
-          await updateDoc(assessmentRef, {
-            status: "Not started",
-            updatedAt: new Date(),
-          });
-      }
-      setSelectedRows([]);
-      onStatusChange?.(selectedRows[0], "Reset");
-    } catch (error) {
-      console.error(`Error performing bulk ${action}:`, error);
-    }
-  };
-
   const handleConfirmBulkDelete = async () => {
     if (!user || selectedRows.length === 0) return;
 
@@ -727,80 +690,19 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
         <h2 className="text-xl font-medium text-gray-900 dark:text-dark-text-primary">
           Your Assessments
         </h2>
-        <div className="flex space-x-2 items-center">
-          <select
-            value={filter}
-            onChange={(e) => setFilter(e.target.value)}
-            className="input bg-white dark:bg-dark-bg-tertiary max-w-xs py-1.5 px-3 text-sm transition-all duration-300 hover:shadow-sm dark:text-dark-text-primary dark:border-dark-border"
-          >
-            <option value="all">All Tasks</option>
-            <option value="not_submitted">Not Submitted</option>
-            <option value="submitted">Submitted</option>
-          </select>
-          {selectedRows.length > 0 && (
-            <div className="flex items-center space-x-2 animate-fade-in">
-              <span className="text-sm text-gray-600 dark:text-dark-text-secondary">
-                {selectedRows.length} selected
-              </span>
-              <div className="flex items-center space-x-1">
-                <button
-                  onClick={() => handleBulkAction("complete")}
-                  className="p-1.5 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 rounded-md hover:bg-emerald-200 dark:hover:bg-emerald-900/50"
-                  title="Mark selected as submitted"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-4 w-4"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                </button>
-                <button
-                  onClick={() => handleBulkAction("reset")}
-                  className="p-1.5 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 rounded-md hover:bg-blue-200 dark:hover:bg-blue-900/50"
-                  title="Reset selected to 'Not started'"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-4 w-4"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                </button>
-                <button
-                  onClick={() => handleBulkAction("delete")}
-                  className="p-1.5 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 rounded-md hover:bg-red-200 dark:hover:bg-red-900/50"
-                  title="Delete selected"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-4 w-4"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
+        {sortedAssessments.length > 0 && (
+          <div className="flex space-x-2 items-center">
+            <select
+              value={filter}
+              onChange={(e) => setFilter(e.target.value)}
+              className="input bg-white dark:bg-dark-bg-tertiary max-w-xs py-1.5 px-3 text-sm transition-all duration-300 hover:shadow-sm dark:text-dark-text-primary dark:border-dark-border"
+            >
+              <option value="all">All Tasks</option>
+              <option value="not_submitted">Not Submitted</option>
+              <option value="submitted">Submitted</option>
+            </select>
+          </div>
+        )}
       </div>
       {sortedAssessments.length === 0 ? (
         <div className="text-center py-10 text-gray-500 dark:text-dark-text-tertiary">

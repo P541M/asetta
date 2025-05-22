@@ -315,207 +315,209 @@ const CoursesOverviewTable = ({
     setSelectedOutline(courseName);
   };
 
-  if (isLoading) return <div>Loading...</div>;
   if (error) return <div className="text-red-600">{error}</div>;
-  if (courses.length === 0) return <div>No courses found.</div>;
+  if (courses.length === 0) {
+    return (
+      <div className="bg-white dark:bg-dark-bg-secondary rounded-xl shadow-sm border border-gray-100 dark:border-dark-border-primary px-6 pt-6">
+        <h2 className="text-xl font-medium text-gray-900 dark:text-dark-text-primary mb-6">
+          Your Courses
+        </h2>
+        <div className="text-center py-10 text-gray-500 dark:text-dark-text-tertiary">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-12 w-12 mx-auto mb-4 text-gray-300 dark:text-dark-text-tertiary"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+            />
+          </svg>
+          <p className="text-lg font-medium mb-2 dark:text-dark-text-primary">
+            No courses yet
+          </p>
+          <p className="dark:text-dark-text-secondary">
+            Add your first assessment to get started with course tracking.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-white dark:bg-dark-bg-secondary rounded-xl shadow-sm border border-gray-100 dark:border-dark-border-primary px-6 pt-6">
       <h2 className="text-xl font-medium text-gray-900 dark:text-dark-text-primary mb-6">
         Your Courses
       </h2>
-      <div className="table-container rounded-lg shadow-sm border border-gray-100 dark:border-dark-border dark:bg-dark-bg-secondary">
-        <table className="data-table">
-          <thead className="bg-gray-50 dark:bg-dark-bg-tertiary">
-            <tr>
-              <th
-                onClick={() => handleSort("courseName")}
-                className="cursor-pointer w-48 dark:text-dark-text-primary dark:bg-dark-bg-tertiary"
-              >
-                <div className="flex items-center space-x-1 group">
-                  <span className="group-hover:text-primary-500 dark:group-hover:text-primary-400">
-                    Course
-                  </span>
-                  {sortField === "courseName" && (
-                    <span className="text-primary-500 dark:text-primary-400">
-                      {sortDirection === "asc" ? "↑" : "↓"}
+      {isLoading ? (
+        <div className="flex items-center justify-center py-12">
+          <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary-200 dark:border-primary-800 border-t-primary-500 dark:border-t-primary-400"></div>
+        </div>
+      ) : error ? (
+        <div className="p-4 bg-red-50 dark:bg-red-900/20 rounded-lg text-red-700 dark:text-red-400 animate-fade-in">
+          <p>{error}</p>
+        </div>
+      ) : (
+        <div className="table-container rounded-lg shadow-sm border border-gray-100 dark:border-dark-border dark:bg-dark-bg-secondary">
+          <table className="data-table">
+            <thead className="bg-gray-50 dark:bg-dark-bg-tertiary">
+              <tr>
+                <th
+                  onClick={() => handleSort("courseName")}
+                  className="cursor-pointer w-48 dark:text-dark-text-primary dark:bg-dark-bg-tertiary"
+                >
+                  <div className="flex items-center space-x-1 group">
+                    <span className="group-hover:text-primary-500 dark:group-hover:text-primary-400">
+                      Course
                     </span>
-                  )}
-                </div>
-              </th>
-              <th
-                onClick={() => handleSort("totalAssessments")}
-                className="cursor-pointer w-24 dark:text-dark-text-primary dark:bg-dark-bg-tertiary"
-              >
-                <div className="flex items-center space-x-1 group">
-                  <span className="group-hover:text-primary-500 dark:group-hover:text-primary-400">
-                    Total
-                  </span>
-                  {sortField === "totalAssessments" && (
-                    <span className="text-primary-500 dark:text-primary-400">
-                      {sortDirection === "asc" ? "↑" : "↓"}
-                    </span>
-                  )}
-                </div>
-              </th>
-              <th
-                onClick={() => handleSort("pendingAssessments")}
-                className="cursor-pointer w-24 dark:text-dark-text-primary dark:bg-dark-bg-tertiary"
-              >
-                <div className="flex items-center space-x-1 group">
-                  <span className="group-hover:text-primary-500 dark:group-hover:text-primary-400">
-                    Pending
-                  </span>
-                  {sortField === "pendingAssessments" && (
-                    <span className="text-primary-500 dark:text-primary-400">
-                      {sortDirection === "asc" ? "↑" : "↓"}
-                    </span>
-                  )}
-                </div>
-              </th>
-              <th
-                onClick={() => handleSort("progress")}
-                className="cursor-pointer w-32 dark:text-dark-text-primary dark:bg-dark-bg-tertiary"
-              >
-                <div className="flex items-center space-x-1 group">
-                  <span className="group-hover:text-primary-500 dark:group-hover:text-primary-400">
-                    Progress
-                  </span>
-                  {sortField === "progress" && (
-                    <span className="text-primary-500 dark:text-primary-400">
-                      {sortDirection === "asc" ? "↑" : "↓"}
-                    </span>
-                  )}
-                </div>
-              </th>
-              <th
-                onClick={() => handleSort("nextDueDate")}
-                className="cursor-pointer w-48 dark:text-dark-text-primary dark:bg-dark-bg-tertiary"
-              >
-                <div className="flex items-center space-x-1 group">
-                  <span className="group-hover:text-primary-500 dark:group-hover:text-primary-400">
-                    Next Due
-                  </span>
-                  {sortField === "nextDueDate" && (
-                    <span className="text-primary-500 dark:text-primary-400">
-                      {sortDirection === "asc" ? "↑" : "↓"}
-                    </span>
-                  )}
-                </div>
-              </th>
-              <th className="w-24 dark:text-dark-text-primary dark:bg-dark-bg-tertiary">
-                Outline
-              </th>
-              <th className="w-24 dark:text-dark-text-primary dark:bg-dark-bg-tertiary">
-                Actions
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {sortedCourses.map((course) => (
-              <tr key={course.courseName} className="dark:border-dark-border">
-                <td className="font-medium whitespace-nowrap dark:text-dark-text-primary">
-                  {course.courseName}
-                </td>
-                <td className="whitespace-nowrap dark:text-dark-text-primary">
-                  {course.totalAssessments}
-                </td>
-                <td className="whitespace-nowrap">
-                  {course.pendingAssessments > 0 ? (
-                    <span
-                      className={`font-medium ${
-                        course.pendingAssessments > 2
-                          ? "text-amber-600 dark:text-amber-400"
-                          : "dark:text-dark-text-primary"
-                      }`}
-                    >
-                      {course.pendingAssessments}
-                    </span>
-                  ) : (
-                    <span className="text-emerald-600 dark:text-emerald-400 font-medium">
-                      All done!
-                    </span>
-                  )}
-                </td>
-                <td>
-                  <div className="w-full bg-gray-200 dark:bg-dark-bg-tertiary rounded-full h-2.5">
-                    <div
-                      className="h-2.5 rounded-full bg-primary-500 dark:bg-primary-400"
-                      style={{ width: `${course.progress}%` }}
-                    ></div>
+                    {sortField === "courseName" && (
+                      <span className="text-primary-500 dark:text-primary-400">
+                        {sortDirection === "asc" ? "↑" : "↓"}
+                      </span>
+                    )}
                   </div>
-                  <span className="text-xs text-gray-500 dark:text-dark-text-tertiary mt-1 inline-block">
-                    {course.progress}% complete
-                  </span>
-                </td>
-                <td>
-                  {course.nextDueDate ? (
-                    <div>
-                      <div
-                        className={`font-medium whitespace-nowrap ${
-                          isUpcoming(course.nextDueDate)
+                </th>
+                <th
+                  onClick={() => handleSort("totalAssessments")}
+                  className="cursor-pointer w-24 dark:text-dark-text-primary dark:bg-dark-bg-tertiary"
+                >
+                  <div className="flex items-center space-x-1 group">
+                    <span className="group-hover:text-primary-500 dark:group-hover:text-primary-400">
+                      Total
+                    </span>
+                    {sortField === "totalAssessments" && (
+                      <span className="text-primary-500 dark:text-primary-400">
+                        {sortDirection === "asc" ? "↑" : "↓"}
+                      </span>
+                    )}
+                  </div>
+                </th>
+                <th
+                  onClick={() => handleSort("pendingAssessments")}
+                  className="cursor-pointer w-24 dark:text-dark-text-primary dark:bg-dark-bg-tertiary"
+                >
+                  <div className="flex items-center space-x-1 group">
+                    <span className="group-hover:text-primary-500 dark:group-hover:text-primary-400">
+                      Pending
+                    </span>
+                    {sortField === "pendingAssessments" && (
+                      <span className="text-primary-500 dark:text-primary-400">
+                        {sortDirection === "asc" ? "↑" : "↓"}
+                      </span>
+                    )}
+                  </div>
+                </th>
+                <th
+                  onClick={() => handleSort("progress")}
+                  className="cursor-pointer w-32 dark:text-dark-text-primary dark:bg-dark-bg-tertiary"
+                >
+                  <div className="flex items-center space-x-1 group">
+                    <span className="group-hover:text-primary-500 dark:group-hover:text-primary-400">
+                      Progress
+                    </span>
+                    {sortField === "progress" && (
+                      <span className="text-primary-500 dark:text-primary-400">
+                        {sortDirection === "asc" ? "↑" : "↓"}
+                      </span>
+                    )}
+                  </div>
+                </th>
+                <th
+                  onClick={() => handleSort("nextDueDate")}
+                  className="cursor-pointer w-48 dark:text-dark-text-primary dark:bg-dark-bg-tertiary"
+                >
+                  <div className="flex items-center space-x-1 group">
+                    <span className="group-hover:text-primary-500 dark:group-hover:text-primary-400">
+                      Next Due
+                    </span>
+                    {sortField === "nextDueDate" && (
+                      <span className="text-primary-500 dark:text-primary-400">
+                        {sortDirection === "asc" ? "↑" : "↓"}
+                      </span>
+                    )}
+                  </div>
+                </th>
+                <th className="w-24 dark:text-dark-text-primary dark:bg-dark-bg-tertiary">
+                  Outline
+                </th>
+                <th className="w-24 dark:text-dark-text-primary dark:bg-dark-bg-tertiary">
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {sortedCourses.map((course) => (
+                <tr key={course.courseName} className="dark:border-dark-border">
+                  <td className="font-medium whitespace-nowrap dark:text-dark-text-primary">
+                    {course.courseName}
+                  </td>
+                  <td className="whitespace-nowrap dark:text-dark-text-primary">
+                    {course.totalAssessments}
+                  </td>
+                  <td className="whitespace-nowrap">
+                    {course.pendingAssessments > 0 ? (
+                      <span
+                        className={`font-medium ${
+                          course.pendingAssessments > 2
                             ? "text-amber-600 dark:text-amber-400"
                             : "dark:text-dark-text-primary"
                         }`}
                       >
-                        {formatDate(course.nextDueDate)}
-                      </div>
-                      <div className="text-sm text-gray-500 dark:text-dark-text-tertiary truncate max-w-[200px]">
-                        {course.nextAssignment}
-                      </div>
-                    </div>
-                  ) : (
-                    <span className="text-gray-400 dark:text-dark-text-tertiary">
-                      -
-                    </span>
-                  )}
-                </td>
-                <td>
-                  {course.outlineUrl ? (
-                    <button
-                      onClick={() => handleViewOutline(course.courseName)}
-                      className="group flex items-center space-x-1 text-primary-500 hover:text-primary-600 dark:text-primary-400 dark:hover:text-primary-300 p-1.5 hover:bg-primary-50 dark:hover:bg-dark-bg-tertiary rounded transition-all duration-200"
-                      title="View Course Outline"
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-5 w-5"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                        <polyline points="14 2 14 8 20 8"></polyline>
-                        <line x1="16" y1="13" x2="8" y2="13"></line>
-                        <line x1="16" y1="17" x2="8" y2="17"></line>
-                        <polyline points="10 9 9 9 8 9"></polyline>
-                      </svg>
-                      <span className="text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                        View
+                        {course.pendingAssessments}
                       </span>
-                    </button>
-                  ) : (
-                    <label className="relative cursor-pointer group">
-                      <input
-                        type="file"
-                        accept="application/pdf"
-                        onChange={(e) =>
-                          handleOutlineUpload(e, course.courseName)
-                        }
-                        className="hidden"
-                        disabled={uploadingCourse === course.courseName}
-                      />
-                      <div className="flex items-center space-x-1 text-gray-400 group-hover:text-primary-500 dark:text-dark-text-tertiary dark:group-hover:text-primary-400 p-1.5 group-hover:bg-gray-50 dark:group-hover:bg-dark-bg-tertiary rounded transition-all duration-200">
+                    ) : (
+                      <span className="text-emerald-600 dark:text-emerald-400 font-medium">
+                        All done!
+                      </span>
+                    )}
+                  </td>
+                  <td>
+                    <div className="w-full bg-gray-200 dark:bg-dark-bg-tertiary rounded-full h-2.5">
+                      <div
+                        className="h-2.5 rounded-full bg-primary-500 dark:bg-primary-400"
+                        style={{ width: `${course.progress}%` }}
+                      ></div>
+                    </div>
+                    <span className="text-xs text-gray-500 dark:text-dark-text-tertiary mt-1 inline-block">
+                      {course.progress}% complete
+                    </span>
+                  </td>
+                  <td>
+                    {course.nextDueDate ? (
+                      <div>
+                        <div
+                          className={`font-medium whitespace-nowrap ${
+                            isUpcoming(course.nextDueDate)
+                              ? "text-amber-600 dark:text-amber-400"
+                              : "dark:text-dark-text-primary"
+                          }`}
+                        >
+                          {formatDate(course.nextDueDate)}
+                        </div>
+                        <div className="text-sm text-gray-500 dark:text-dark-text-tertiary truncate max-w-[200px]">
+                          {course.nextAssignment}
+                        </div>
+                      </div>
+                    ) : (
+                      <span className="text-gray-400 dark:text-dark-text-tertiary">
+                        -
+                      </span>
+                    )}
+                  </td>
+                  <td>
+                    {course.outlineUrl ? (
+                      <button
+                        onClick={() => handleViewOutline(course.courseName)}
+                        className="group flex items-center space-x-1 text-primary-500 hover:text-primary-600 dark:text-primary-400 dark:hover:text-primary-300 p-1.5 hover:bg-primary-50 dark:hover:bg-dark-bg-tertiary rounded transition-all duration-200"
+                        title="View Course Outline"
+                      >
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
-                          className={`h-5 w-5 ${
-                            uploadingCourse === course.courseName
-                              ? "animate-spin"
-                              : ""
-                          }`}
+                          className="h-5 w-5"
                           viewBox="0 0 24 24"
                           fill="none"
                           stroke="currentColor"
@@ -523,43 +525,80 @@ const CoursesOverviewTable = ({
                           strokeLinecap="round"
                           strokeLinejoin="round"
                         >
-                          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                          <polyline points="17 8 12 3 7 8"></polyline>
-                          <line x1="12" y1="3" x2="12" y2="15"></line>
+                          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                          <polyline points="14 2 14 8 20 8"></polyline>
+                          <line x1="16" y1="13" x2="8" y2="13"></line>
+                          <line x1="16" y1="17" x2="8" y2="17"></line>
+                          <polyline points="10 9 9 9 8 9"></polyline>
                         </svg>
                         <span className="text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                          Upload
+                          View
                         </span>
-                      </div>
-                    </label>
-                  )}
-                </td>
-                <td>
-                  <button
-                    onClick={() => onSelectCourse(course.courseName)}
-                    className="btn-primary py-1 px-3 text-sm hover:shadow-sm flex items-center"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-4 w-4 mr-1"
-                      viewBox="0 0 20 20"
-                      fill="currentColor"
+                      </button>
+                    ) : (
+                      <label className="relative cursor-pointer group">
+                        <input
+                          type="file"
+                          accept="application/pdf"
+                          onChange={(e) =>
+                            handleOutlineUpload(e, course.courseName)
+                          }
+                          className="hidden"
+                          disabled={uploadingCourse === course.courseName}
+                        />
+                        <div className="flex items-center space-x-1 text-gray-400 group-hover:text-primary-500 dark:text-dark-text-tertiary dark:group-hover:text-primary-400 p-1.5 group-hover:bg-gray-50 dark:group-hover:bg-dark-bg-tertiary rounded transition-all duration-200">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className={`h-5 w-5 ${
+                              uploadingCourse === course.courseName
+                                ? "animate-spin"
+                                : ""
+                            }`}
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          >
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="17 8 12 3 7 8"></polyline>
+                            <line x1="12" y1="3" x2="12" y2="15"></line>
+                          </svg>
+                          <span className="text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                            Upload
+                          </span>
+                        </div>
+                      </label>
+                    )}
+                  </td>
+                  <td>
+                    <button
+                      onClick={() => onSelectCourse(course.courseName)}
+                      className="btn-primary py-1 px-3 text-sm hover:shadow-sm flex items-center"
                     >
-                      <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
-                      <path
-                        fillRule="evenodd"
-                        d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                    View
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-4 w-4 mr-1"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                      >
+                        <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
+                        <path
+                          fillRule="evenodd"
+                          d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                      View
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
 
       {/* Outline Viewer Modal */}
       {selectedOutline && outlineUrls[selectedOutline] && (
