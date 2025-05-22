@@ -32,7 +32,7 @@ const Footer = () => {
             </p>
             <div className="flex space-x-4">
               <a
-                href="https://linkedin.com"
+                href="https://www.linkedin.com/company/asetta/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center text-gray-500 hover:text-primary-600 transition-colors group"
