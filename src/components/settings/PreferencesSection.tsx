@@ -38,9 +38,9 @@ const PreferencesSection = ({
         <button
           type="button"
           onClick={toggleDarkMode}
-          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 ${
+          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 ${
             isDarkMode
-              ? "bg-indigo-600"
+              ? "bg-primary-600"
               : "bg-gray-200 dark:bg-dark-bg-tertiary"
           }`}
         >
@@ -67,9 +67,9 @@ const PreferencesSection = ({
         <button
           type="button"
           onClick={() => setShowDaysTillDue(!showDaysTillDue)}
-          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 ${
+          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 ${
             showDaysTillDue
-              ? "bg-indigo-600"
+              ? "bg-primary-500"
               : "bg-gray-200 dark:bg-dark-bg-tertiary"
           }`}
         >
@@ -96,9 +96,9 @@ const PreferencesSection = ({
         <button
           type="button"
           onClick={() => setShowWeight(!showWeight)}
-          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 ${
+          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 ${
             showWeight
-              ? "bg-indigo-600"
+              ? "bg-primary-500"
               : "bg-gray-200 dark:bg-dark-bg-tertiary"
           }`}
         >
@@ -125,8 +125,10 @@ const PreferencesSection = ({
         <button
           type="button"
           onClick={() => setShowNotes(!showNotes)}
-          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 ${
-            showNotes ? "bg-indigo-600" : "bg-gray-200 dark:bg-dark-bg-tertiary"
+          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 ${
+            showNotes
+              ? "bg-primary-500"
+              : "bg-gray-200 dark:bg-dark-bg-tertiary"
           }`}
         >
           <span
@@ -152,9 +154,9 @@ const PreferencesSection = ({
         <button
           type="button"
           onClick={() => setShowStatsBar(!showStatsBar)}
-          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 ${
+          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 ${
             showStatsBar
-              ? "bg-indigo-600"
+              ? "bg-primary-500"
               : "bg-gray-200 dark:bg-dark-bg-tertiary"
           }`}
         >

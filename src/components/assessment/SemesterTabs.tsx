@@ -233,7 +233,7 @@ function SortableSemester({
             <div className="flex items-center px-1">
               <button
                 onClick={handleEditSave}
-                className="p-1.5 text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 rounded-md transition-colors"
+                className="p-1.5 text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 hover:bg-primary-50 dark:hover:bg-primary-900/20 rounded-md transition-colors"
                 title="Save"
               >
                 <svg
@@ -274,14 +274,14 @@ function SortableSemester({
             <span
               className={`font-medium ${
                 isSelected
-                  ? "text-indigo-600 dark:text-indigo-400"
+                  ? "text-primary-600 dark:text-primary-400"
                   : "dark:text-dark-text-primary"
               }`}
             >
               {semester.name}
             </span>
             {isSelected && (
-              <span className="inline-block bg-indigo-100 dark:bg-indigo-900/30 text-indigo-800 dark:text-indigo-400 text-xs px-2 py-0.5 rounded-full">
+              <span className="inline-block bg-primary-100 dark:bg-primary-900/30 text-primary-800 dark:text-primary-400 text-xs px-2 py-0.5 rounded-full">
                 Current
               </span>
             )}
@@ -292,7 +292,7 @@ function SortableSemester({
         <div className="flex items-center space-x-2">
           <button
             onClick={handleEditStart}
-            className="text-gray-500 dark:text-dark-text-tertiary hover:text-indigo-600 dark:hover:text-indigo-400 p-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-dark-bg-secondary transition-colors"
+            className="text-gray-500 dark:text-dark-text-tertiary hover:text-primary-600 dark:hover:text-primary-400 p-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-dark-bg-secondary transition-colors"
             title="Edit"
           >
             <svg
@@ -686,7 +686,7 @@ const SemesterTabs = ({ selectedSemester, onSelect }: SemesterTabsProps) => {
     return (
       <div className="mb-4 bg-white dark:bg-dark-bg-secondary rounded-lg shadow-sm p-4 border border-gray-100 dark:border-dark-border">
         <div className="flex justify-center py-2">
-          <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-indigo-600"></div>
+          <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary-600"></div>
         </div>
       </div>
     );
@@ -702,7 +702,7 @@ const SemesterTabs = ({ selectedSemester, onSelect }: SemesterTabsProps) => {
           {/* Add button */}
           <button
             onClick={() => setShowAddInput(true)}
-            className="add-semester-button p-1.5 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-dark-bg-tertiary rounded-md mr-1"
+            className="add-semester-button p-1.5 text-primary-600 dark:text-primary-400 hover:bg-primary-50 dark:hover:bg-dark-bg-tertiary rounded-md mr-1"
             title="Add new semester"
           >
             <svg
@@ -842,7 +842,7 @@ const SemesterTabs = ({ selectedSemester, onSelect }: SemesterTabsProps) => {
                   <div className="flex items-center px-1">
                     <button
                       onClick={() => handleEditSave(sem.id)}
-                      className="p-1.5 text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 rounded-md transition-colors"
+                      className="p-1.5 text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 hover:bg-primary-50 dark:hover:bg-primary-900/20 rounded-md transition-colors"
                       title="Save"
                     >
                       <svg
@@ -883,7 +883,7 @@ const SemesterTabs = ({ selectedSemester, onSelect }: SemesterTabsProps) => {
                   onClick={() => onSelect(sem.name)}
                   className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-all duration-200 ${
                     selectedSemester === sem.name
-                      ? "bg-indigo-500 text-white shadow-sm hover:bg-indigo-600 hover:shadow"
+                      ? "bg-primary-500 text-white shadow-sm hover:bg-primary-600 hover:shadow"
                       : "bg-gray-100 dark:bg-dark-bg-tertiary text-gray-700 dark:text-dark-text-primary hover:bg-gray-200 dark:hover:bg-dark-bg-secondary"
                   }`}
                 >
@@ -963,7 +963,7 @@ const SemesterTabs = ({ selectedSemester, onSelect }: SemesterTabsProps) => {
                       setShowManageModal(false);
                       setShowAddInput(true);
                     }}
-                    className="mt-2 text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 font-medium"
+                    className="mt-2 text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 font-medium"
                   >
                     Add your first semester
                   </button>

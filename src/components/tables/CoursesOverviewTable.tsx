@@ -333,11 +333,11 @@ const CoursesOverviewTable = ({
                 className="cursor-pointer w-48 dark:text-dark-text-primary dark:bg-dark-bg-tertiary"
               >
                 <div className="flex items-center space-x-1 group">
-                  <span className="group-hover:text-indigo-600 dark:group-hover:text-indigo-400">
+                  <span className="group-hover:text-primary-500 dark:group-hover:text-primary-400">
                     Course
                   </span>
                   {sortField === "courseName" && (
-                    <span className="text-indigo-600 dark:text-indigo-400">
+                    <span className="text-primary-500 dark:text-primary-400">
                       {sortDirection === "asc" ? "↑" : "↓"}
                     </span>
                   )}
@@ -348,11 +348,11 @@ const CoursesOverviewTable = ({
                 className="cursor-pointer w-24 dark:text-dark-text-primary dark:bg-dark-bg-tertiary"
               >
                 <div className="flex items-center space-x-1 group">
-                  <span className="group-hover:text-indigo-600 dark:group-hover:text-indigo-400">
+                  <span className="group-hover:text-primary-500 dark:group-hover:text-primary-400">
                     Total
                   </span>
                   {sortField === "totalAssessments" && (
-                    <span className="text-indigo-600 dark:text-indigo-400">
+                    <span className="text-primary-500 dark:text-primary-400">
                       {sortDirection === "asc" ? "↑" : "↓"}
                     </span>
                   )}
@@ -363,11 +363,11 @@ const CoursesOverviewTable = ({
                 className="cursor-pointer w-24 dark:text-dark-text-primary dark:bg-dark-bg-tertiary"
               >
                 <div className="flex items-center space-x-1 group">
-                  <span className="group-hover:text-indigo-600 dark:group-hover:text-indigo-400">
+                  <span className="group-hover:text-primary-500 dark:group-hover:text-primary-400">
                     Pending
                   </span>
                   {sortField === "pendingAssessments" && (
-                    <span className="text-indigo-600 dark:text-indigo-400">
+                    <span className="text-primary-500 dark:text-primary-400">
                       {sortDirection === "asc" ? "↑" : "↓"}
                     </span>
                   )}
@@ -378,11 +378,11 @@ const CoursesOverviewTable = ({
                 className="cursor-pointer w-32 dark:text-dark-text-primary dark:bg-dark-bg-tertiary"
               >
                 <div className="flex items-center space-x-1 group">
-                  <span className="group-hover:text-indigo-600 dark:group-hover:text-indigo-400">
+                  <span className="group-hover:text-primary-500 dark:group-hover:text-primary-400">
                     Progress
                   </span>
                   {sortField === "progress" && (
-                    <span className="text-indigo-600 dark:text-indigo-400">
+                    <span className="text-primary-500 dark:text-primary-400">
                       {sortDirection === "asc" ? "↑" : "↓"}
                     </span>
                   )}
@@ -393,11 +393,11 @@ const CoursesOverviewTable = ({
                 className="cursor-pointer w-48 dark:text-dark-text-primary dark:bg-dark-bg-tertiary"
               >
                 <div className="flex items-center space-x-1 group">
-                  <span className="group-hover:text-indigo-600 dark:group-hover:text-indigo-400">
+                  <span className="group-hover:text-primary-500 dark:group-hover:text-primary-400">
                     Next Due
                   </span>
                   {sortField === "nextDueDate" && (
-                    <span className="text-indigo-600 dark:text-indigo-400">
+                    <span className="text-primary-500 dark:text-primary-400">
                       {sortDirection === "asc" ? "↑" : "↓"}
                     </span>
                   )}
@@ -440,7 +440,7 @@ const CoursesOverviewTable = ({
                 <td>
                   <div className="w-full bg-gray-200 dark:bg-dark-bg-tertiary rounded-full h-2.5">
                     <div
-                      className="h-2.5 rounded-full bg-indigo-600 dark:bg-indigo-500"
+                      className="h-2.5 rounded-full bg-primary-500 dark:bg-primary-400"
                       style={{ width: `${course.progress}%` }}
                     ></div>
                   </div>
@@ -474,7 +474,7 @@ const CoursesOverviewTable = ({
                   {course.outlineUrl ? (
                     <button
                       onClick={() => handleViewOutline(course.courseName)}
-                      className="group flex items-center space-x-1 text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300 p-1.5 hover:bg-indigo-50 dark:hover:bg-dark-bg-tertiary rounded transition-all duration-200"
+                      className="group flex items-center space-x-1 text-primary-500 hover:text-primary-600 dark:text-primary-400 dark:hover:text-primary-300 p-1.5 hover:bg-primary-50 dark:hover:bg-dark-bg-tertiary rounded transition-all duration-200"
                       title="View Course Outline"
                     >
                       <svg
@@ -508,7 +508,7 @@ const CoursesOverviewTable = ({
                         className="hidden"
                         disabled={uploadingCourse === course.courseName}
                       />
-                      <div className="flex items-center space-x-1 text-gray-400 group-hover:text-indigo-600 dark:text-dark-text-tertiary dark:group-hover:text-indigo-400 p-1.5 group-hover:bg-gray-50 dark:group-hover:bg-dark-bg-tertiary rounded transition-all duration-200">
+                      <div className="flex items-center space-x-1 text-gray-400 group-hover:text-primary-500 dark:text-dark-text-tertiary dark:group-hover:text-primary-400 p-1.5 group-hover:bg-gray-50 dark:group-hover:bg-dark-bg-tertiary rounded transition-all duration-200">
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
                           className={`h-5 w-5 ${
@@ -579,7 +579,7 @@ const CoursesOverviewTable = ({
                   onClick={() =>
                     window.open(outlineUrls[selectedOutline], "_blank")
                   }
-                  className="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-dark-border shadow-sm text-sm font-medium rounded-md text-gray-700 dark:text-dark-text-primary bg-white dark:bg-dark-bg-secondary hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                  className="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-dark-border shadow-sm text-sm font-medium rounded-md text-gray-700 dark:text-dark-text-primary bg-white dark:bg-dark-bg-secondary hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -597,7 +597,7 @@ const CoursesOverviewTable = ({
                   </svg>
                   Open in New Tab
                 </button>
-                <label className="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-dark-border shadow-sm text-sm font-medium rounded-md text-gray-700 dark:text-dark-text-primary bg-white dark:bg-dark-bg-secondary hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 cursor-pointer">
+                <label className="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-dark-border shadow-sm text-sm font-medium rounded-md text-gray-700 dark:text-dark-text-primary bg-white dark:bg-dark-bg-secondary hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 cursor-pointer">
                   <input
                     type="file"
                     accept="application/pdf"
@@ -625,7 +625,7 @@ const CoursesOverviewTable = ({
                 </label>
                 <button
                   onClick={() => setSelectedOutline(null)}
-                  className="inline-flex items-center p-2 border border-transparent rounded-md text-gray-400 dark:text-dark-text-tertiary hover:text-gray-500 dark:hover:text-dark-text-secondary hover:bg-gray-100 dark:hover:bg-dark-bg-tertiary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                  className="inline-flex items-center p-2 border border-transparent rounded-md text-gray-400 dark:text-dark-text-tertiary hover:text-gray-500 dark:hover:text-dark-text-secondary hover:bg-gray-100 dark:hover:bg-dark-bg-tertiary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"

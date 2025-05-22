@@ -84,7 +84,7 @@ const LinkModal = ({ isOpen, onClose, onAddLink }: LinkModalProps) => {
               value={url}
               onChange={(e) => setUrl(e.target.value)}
               placeholder="https://example.com"
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
               required
             />
           </div>
@@ -101,7 +101,7 @@ const LinkModal = ({ isOpen, onClose, onAddLink }: LinkModalProps) => {
               value={text}
               onChange={(e) => setText(e.target.value)}
               placeholder="Display text"
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
             />
           </div>
           <div className="flex justify-end space-x-3">

@@ -268,7 +268,7 @@ const CalendarView = ({ selectedSemester, semesterId }: CalendarViewProps) => {
       case "Pending Submission":
         return "bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-400";
       case "Under Review":
-        return "bg-indigo-100 dark:bg-indigo-900/30 text-indigo-800 dark:text-indigo-400";
+        return "bg-primary-100 dark:bg-primary-900/30 text-primary-800 dark:text-primary-400";
       case "Needs Revision":
         return "bg-amber-100 dark:bg-amber-900/30 text-amber-800 dark:text-amber-400";
       case "Missed/Late":
@@ -384,7 +384,7 @@ const CalendarView = ({ selectedSemester, semesterId }: CalendarViewProps) => {
             </button>
             <button
               onClick={goToToday}
-              className="px-3 py-1.5 text-sm bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400 rounded-md hover:bg-indigo-200 dark:hover:bg-indigo-900/50 transition-colors"
+              className="px-3 py-1.5 text-sm bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-400 rounded-md hover:bg-primary-200 dark:hover:bg-primary-900/50 transition-colors"
             >
               Today
             </button>
@@ -410,7 +410,7 @@ const CalendarView = ({ selectedSemester, semesterId }: CalendarViewProps) => {
             </button>
             <button
               onClick={handleExportCalendar}
-              className="ml-2 px-3 py-1.5 text-sm bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors flex items-center"
+              className="ml-2 px-3 py-1.5 text-sm bg-primary-600 text-white rounded-md hover:bg-primary-700 transition-colors flex items-center"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -460,7 +460,7 @@ const CalendarView = ({ selectedSemester, semesterId }: CalendarViewProps) => {
                     : "bg-gray-50 dark:bg-dark-bg-tertiary"
                 } ${
                   day.isToday
-                    ? "ring-2 ring-indigo-500 dark:ring-indigo-400"
+                    ? "ring-2 ring-primary-500 dark:ring-primary-400"
                     : ""
                 } ${
                   day.assessments.length > 0
@@ -475,13 +475,15 @@ const CalendarView = ({ selectedSemester, semesterId }: CalendarViewProps) => {
                         ? "text-gray-900 dark:text-dark-text-primary"
                         : "text-gray-400 dark:text-dark-text-tertiary"
                     } ${
-                      day.isToday ? "text-indigo-600 dark:text-indigo-400" : ""
+                      day.isToday
+                        ? "text-primary-600 dark:text-primary-400"
+                        : ""
                     }`}
                   >
                     {day.date.getDate()}
                   </span>
                   {day.assessments.length > 0 && (
-                    <span className="flex h-5 w-5 items-center justify-center text-xs font-medium text-indigo-600 dark:text-indigo-400 bg-indigo-100 dark:bg-indigo-900/30 rounded-full">
+                    <span className="flex h-5 w-5 items-center justify-center text-xs font-medium text-primary-600 dark:text-primary-400 bg-primary-100 dark:bg-primary-900/30 rounded-full">
                       {day.assessments.length}
                     </span>
                   )}

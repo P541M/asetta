@@ -108,7 +108,7 @@ const Login = () => {
                 id="email"
                 type="email"
                 placeholder="you@example.com"
-                className="w-full px-4 py-2.5 text-gray-900 placeholder-gray-400 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 disabled:bg-gray-50 disabled:text-gray-500"
+                className="w-full px-4 py-2.5 text-gray-900 placeholder-gray-400 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200 disabled:bg-gray-50 disabled:text-gray-500"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -123,7 +123,7 @@ const Login = () => {
                 </label>
                 <Link
                   href="/reset-password"
-                  className="text-sm text-indigo-600 hover:text-indigo-800 transition-colors duration-200"
+                  className="text-sm text-primary-500 hover:text-primary-600 transition-colors duration-200"
                 >
                   Forgot password?
                 </Link>
@@ -132,7 +132,7 @@ const Login = () => {
                 id="password"
                 type="password"
                 placeholder="Your password"
-                className="w-full px-4 py-2.5 text-gray-900 placeholder-gray-400 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 disabled:bg-gray-50 disabled:text-gray-500"
+                className="w-full px-4 py-2.5 text-gray-900 placeholder-gray-400 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200 disabled:bg-gray-50 disabled:text-gray-500"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
@@ -144,7 +144,7 @@ const Login = () => {
             <button
               type="submit"
               disabled={isSubmitting}
-              className={`w-full flex items-center justify-center gap-2 py-2.5 px-4 border border-transparent rounded-lg text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200 ${
+              className={`w-full flex items-center justify-center gap-2 py-2.5 px-4 border border-transparent rounded-lg text-white bg-primary-500 hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-all duration-200 ${
                 isSubmitting ? "opacity-70 cursor-not-allowed" : ""
               }`}
               aria-label={isSubmitting ? "Signing in..." : "Sign in"}
@@ -193,7 +193,7 @@ const Login = () => {
           <button
             onClick={handleGoogleSignIn}
             disabled={isSubmitting}
-            className="w-full flex items-center justify-center gap-3 py-3 px-4 border border-gray-300 rounded-lg text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full flex items-center justify-center gap-3 py-3 px-4 border border-gray-300 rounded-lg text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -226,7 +226,7 @@ const Login = () => {
               Don&apos;t have an account?{" "}
               <Link
                 href="/register"
-                className="text-indigo-600 hover:text-indigo-800 font-medium transition-colors duration-200"
+                className="text-primary-500 hover:text-primary-600 font-medium transition-colors duration-200"
               >
                 Sign up
               </Link>

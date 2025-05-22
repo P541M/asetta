@@ -248,7 +248,7 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
   if (isLoading) {
     return (
       <div className="flex justify-center py-8">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
       </div>
     );
   }
@@ -275,7 +275,7 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
         {hasUnsavedChanges && (
           <button
             onClick={handleSaveChanges}
-            className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors"
+            className="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-colors"
           >
             Save Changes
           </button>
@@ -283,12 +283,12 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-        <div className="p-4 bg-indigo-50 dark:bg-dark-bg-tertiary rounded-lg">
+        <div className="p-4 bg-primary-50 dark:bg-dark-bg-tertiary rounded-lg">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-dark-text-primary mb-2">
             Current Grade
           </h3>
           {currentGrade !== null ? (
-            <div className="text-3xl font-bold text-indigo-600 dark:text-indigo-400">
+            <div className="text-3xl font-bold text-primary-600 dark:text-primary-400">
               {currentGrade.toFixed(1)}%
             </div>
           ) : (
@@ -297,11 +297,11 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
             </div>
           )}
         </div>
-        <div className="p-4 bg-indigo-50 dark:bg-dark-bg-tertiary rounded-lg">
+        <div className="p-4 bg-primary-50 dark:bg-dark-bg-tertiary rounded-lg">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-dark-text-primary mb-2">
             Course Weight
           </h3>
-          <div className="text-3xl font-bold text-indigo-600 dark:text-indigo-400">
+          <div className="text-3xl font-bold text-primary-600 dark:text-primary-400">
             {totalWeight}%
           </div>
         </div>
@@ -349,7 +349,7 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
                         onChange={(e) =>
                           handleWeightChange(assessment.id, e.target.value)
                         }
-                        className="w-20 px-2 py-1 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                        className="w-20 px-2 py-1 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                         placeholder="0-100"
                       />
                       <span className="ml-1 text-gray-500 dark:text-dark-text-tertiary">
@@ -368,7 +368,7 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
                         onChange={(e) =>
                           handleMarkChange(assessment.id, e.target.value)
                         }
-                        className="w-20 px-2 py-1 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                        className="w-20 px-2 py-1 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                         placeholder="0+"
                       />
                       <span className="ml-1 text-gray-500 dark:text-dark-text-tertiary">

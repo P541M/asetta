@@ -24,7 +24,7 @@ const Terms: NextPage = () => {
               Terms of Service
             </h1>
 
-            <div className="prose prose-indigo max-w-none">
+            <div className="prose prose-primary max-w-none">
               <p className="text-gray-700 mb-6">Last Updated: April 19, 2025</p>
 
               <h2 className="text-xl font-semibold mt-8 mb-4">
@@ -181,7 +181,7 @@ const Terms: NextPage = () => {
               <p>
                 <a
                   href="mailto:videna.psalmeleazar@gmail.com"
-                  className="text-indigo-600 hover:text-indigo-800"
+                  className="text-primary-500 hover:text-primary-600"
                 >
                   videna.psalmeleazar@gmail.com
                 </a>
@@ -191,7 +191,7 @@ const Terms: NextPage = () => {
             <div className="mt-10 pt-6 border-t border-gray-100">
               <Link
                 href="/"
-                className="text-indigo-600 hover:text-indigo-800 font-medium"
+                className="text-primary-500 hover:text-primary-600 font-medium"
               >
                 ← Back to Home
               </Link>
@@ -206,13 +206,13 @@ const Terms: NextPage = () => {
           <div className="mt-2">
             <Link
               href="/terms"
-              className="text-indigo-600 hover:text-indigo-800 mr-4"
+              className="text-primary-500 hover:text-primary-600 mr-4"
             >
               Terms of Service
             </Link>
             <Link
               href="/privacy"
-              className="text-indigo-600 hover:text-indigo-800"
+              className="text-primary-500 hover:text-primary-600"
             >
               Privacy Policy
             </Link>

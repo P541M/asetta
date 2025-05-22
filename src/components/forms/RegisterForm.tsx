@@ -565,7 +565,7 @@ const RegisterForm = ({
         <button
           type="button"
           onClick={onCancel}
-          className="text-indigo-600 hover:text-indigo-800 text-sm font-medium"
+          className="text-primary-600 hover:text-primary-800 text-sm font-medium"
         >
           Already have an account? Sign in
         </button>

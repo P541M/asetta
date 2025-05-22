@@ -172,7 +172,7 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
             onClick={() => setActiveTab("profile")}
             className={`flex-1 py-4 px-6 text-center border-b-2 font-medium text-sm transition-colors ${
               activeTab === "profile"
-                ? "border-indigo-500 text-indigo-600 dark:text-indigo-400 dark:border-indigo-400"
+                ? "border-primary-500 text-primary-600 dark:text-primary-400 dark:border-primary-400"
                 : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-dark-text-tertiary dark:hover:text-dark-text-secondary"
             }`}
           >
@@ -182,7 +182,7 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
             onClick={() => setActiveTab("preferences")}
             className={`flex-1 py-4 px-6 text-center border-b-2 font-medium text-sm transition-colors ${
               activeTab === "preferences"
-                ? "border-indigo-500 text-indigo-600 dark:text-indigo-400 dark:border-indigo-400"
+                ? "border-primary-500 text-primary-600 dark:text-primary-400 dark:border-primary-400"
                 : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-dark-text-tertiary dark:hover:text-dark-text-secondary"
             }`}
           >
@@ -246,7 +246,7 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="px-4 py-2 text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             {isSubmitting ? "Saving..." : "Save Changes"}
           </button>

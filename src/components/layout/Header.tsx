@@ -110,13 +110,13 @@ const Header = ({ onLogout }: HeaderProps) => {
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className="h-8 w-8 text-indigo-600 dark:text-indigo-400 transition-transform duration-300 group-hover:scale-110"
+                  className="h-8 w-8 text-primary-500 dark:text-primary-400 transition-transform duration-300 group-hover:scale-110"
                   viewBox="0 0 20 20"
                   fill="currentColor"
                 >
                   <path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3zM3.31 9.397L5 10.12v4.102a8.969 8.969 0 00-1.05-.174 1 1 0 01-.89-.89 11.115 11.115 0 01.25-3.762zM9.3 16.573A9.026 9.026 0 007 14.935v-3.957l1.818.78a3 3 0 002.364 0l5.508-2.361a11.026 11.026 0 01.25 3.762 1 1 0 01-.89.89 8.968 8.968 0 00-5.35 2.524 1 1 0 01-1.4 0zM6 18a1 1 0 001-1v-2.065a8.935 8.935 0 00-2-.712V17a1 1 0 001 1z" />
                 </svg>
-                <span className="ml-2 text-xl font-bold text-indigo-600 dark:text-indigo-400 transition-colors duration-300 group-hover:text-indigo-700 dark:group-hover:text-indigo-300 font-heading tracking-wide">
+                <span className="ml-2 text-xl font-bold text-primary-500 dark:text-primary-400 transition-colors duration-300 group-hover:text-primary-600 dark:group-hover:text-primary-300 font-heading tracking-wide">
                   Asetta
                 </span>
               </a>
@@ -128,7 +128,7 @@ const Header = ({ onLogout }: HeaderProps) => {
                     <button
                       ref={avatarRef}
                       onClick={toggleDropdown}
-                      className="flex items-center space-x-2 text-gray-600 dark:text-dark-text-secondary hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors duration-200 focus:outline-none"
+                      className="flex items-center space-x-2 text-gray-600 dark:text-dark-text-secondary hover:text-primary-600 dark:hover:text-primary-400 transition-colors duration-200 focus:outline-none"
                     >
                       {user.photoURL ? (
                         <div className="relative h-8 w-8">
@@ -142,7 +142,7 @@ const Header = ({ onLogout }: HeaderProps) => {
                           />
                         </div>
                       ) : (
-                        <div className="h-8 w-8 rounded-full bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-700">
+                        <div className="h-8 w-8 rounded-full bg-primary-100 dark:bg-primary-900/50 flex items-center justify-center text-primary-600 dark:text-primary-400 border border-primary-200 dark:border-primary-700">
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
                             className="h-5 w-5"
@@ -234,7 +234,7 @@ const Header = ({ onLogout }: HeaderProps) => {
                   <div className="flex items-center space-x-3">
                     <Link
                       href="/login"
-                      className="text-gray-700 dark:text-dark-text-primary hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors duration-200 text-sm font-medium"
+                      className="text-gray-700 dark:text-dark-text-primary hover:text-primary-600 dark:hover:text-primary-400 transition-colors duration-200 text-sm font-medium"
                     >
                       Login
                     </Link>

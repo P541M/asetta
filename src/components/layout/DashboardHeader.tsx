@@ -90,7 +90,7 @@ const DashboardHeader = ({ onLogout }: DashboardHeaderProps) => {
           <button
             ref={avatarRef}
             onClick={toggleDropdown}
-            className="flex items-center space-x-2 text-gray-600 dark:text-dark-text-secondary hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors duration-200 focus:outline-none bg-white dark:bg-dark-bg-secondary rounded-lg shadow-sm border border-gray-100 dark:border-dark-border px-3 py-2"
+            className="flex items-center space-x-2 text-gray-600 dark:text-dark-text-secondary hover:text-primary-600 dark:hover:text-primary-400 transition-colors duration-200 focus:outline-none bg-white dark:bg-dark-bg-secondary rounded-lg shadow-sm border border-gray-100 dark:border-dark-border px-3 py-2"
           >
             {user.photoURL ? (
               <div className="relative h-8 w-8">
@@ -104,7 +104,7 @@ const DashboardHeader = ({ onLogout }: DashboardHeaderProps) => {
                 />
               </div>
             ) : (
-              <div className="h-8 w-8 rounded-full bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-700">
+              <div className="h-8 w-8 rounded-full bg-primary-100 dark:bg-primary-900/50 flex items-center justify-center text-primary-600 dark:text-primary-400 border border-primary-200 dark:border-primary-700">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   className="h-5 w-5"

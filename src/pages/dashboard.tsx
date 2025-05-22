@@ -251,7 +251,7 @@ const Dashboard = () => {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="flex flex-col items-center animate-pulse">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500"></div>
           <p className="mt-4 text-gray-600">Loading...</p>
         </div>
       </div>
@@ -335,35 +335,35 @@ const Dashboard = () => {
                   <div
                     className={`bg-white dark:bg-dark-bg-secondary rounded-xl shadow-sm p-4 border ${
                       animateStatCards
-                        ? "border-indigo-500"
+                        ? "border-primary-500"
                         : "border-gray-100 dark:border-dark-border"
                     } transition-colors duration-300 stat-card`}
                   >
                     <p className="text-sm text-gray-500 dark:text-dark-text-tertiary mb-1">
                       Total Assessments
                     </p>
-                    <h3 className="text-2xl font-bold text-gray-900 dark:text-dark-text-primary">
+                    <h3 className="text-2xl font-bold text-primary-500 dark:text-primary-400">
                       {stats.total}
                     </h3>
                   </div>
                   <div
                     className={`bg-white dark:bg-dark-bg-secondary rounded-xl shadow-sm p-4 border ${
                       animateStatCards
-                        ? "border-indigo-500"
+                        ? "border-primary-500"
                         : "border-gray-100 dark:border-dark-border"
                     } transition-colors duration-300 stat-card`}
                   >
                     <p className="text-sm text-gray-500 dark:text-dark-text-tertiary mb-1">
                       Planning
                     </p>
-                    <h3 className="text-2xl font-bold text-gray-600 dark:text-dark-text-primary">
+                    <h3 className="text-2xl font-bold text-primary-600 dark:text-primary-400">
                       {stats.planning}
                     </h3>
                   </div>
                   <div
                     className={`bg-white dark:bg-dark-bg-secondary rounded-xl shadow-sm p-4 border ${
                       animateStatCards
-                        ? "border-indigo-500"
+                        ? "border-primary-500"
                         : "border-gray-100 dark:border-dark-border"
                     } transition-colors duration-300 stat-card`}
                   >
@@ -377,21 +377,21 @@ const Dashboard = () => {
                   <div
                     className={`bg-white dark:bg-dark-bg-secondary rounded-xl shadow-sm p-4 border ${
                       animateStatCards
-                        ? "border-indigo-500"
+                        ? "border-primary-500"
                         : "border-gray-100 dark:border-dark-border"
                     } transition-colors duration-300 stat-card`}
                   >
                     <p className="text-sm text-gray-500 dark:text-dark-text-tertiary mb-1">
                       Submission
                     </p>
-                    <h3 className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">
+                    <h3 className="text-2xl font-bold text-primary-600 dark:text-primary-400">
                       {stats.submission}
                     </h3>
                   </div>
                   <div
                     className={`bg-white dark:bg-dark-bg-secondary rounded-xl shadow-sm p-4 border ${
                       animateStatCards
-                        ? "border-indigo-500"
+                        ? "border-primary-500"
                         : "border-gray-100 dark:border-dark-border"
                     } transition-colors duration-300 stat-card`}
                   >
@@ -405,7 +405,7 @@ const Dashboard = () => {
                   <div
                     className={`bg-white dark:bg-dark-bg-secondary rounded-xl shadow-sm p-4 border ${
                       animateStatCards
-                        ? "border-indigo-500"
+                        ? "border-primary-500"
                         : "border-gray-100 dark:border-dark-border"
                     } transition-colors duration-300 stat-card`}
                   >
@@ -507,7 +507,7 @@ const Dashboard = () => {
                     <div className="animate-fade-in">
                       {isLoading ? (
                         <div className="flex justify-center py-8">
-                          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+                          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500"></div>
                         </div>
                       ) : error ? (
                         <div className="p-4 bg-red-50 rounded-lg text-red-700 animate-fade-in">
@@ -534,7 +534,7 @@ const Dashboard = () => {
                     <div className="animate-fade-in">
                       {isLoading ? (
                         <div className="flex justify-center py-8">
-                          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+                          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500"></div>
                         </div>
                       ) : error ? (
                         <div className="p-4 bg-red-50 rounded-lg text-red-700 animate-fade-in">
@@ -609,7 +609,7 @@ const Dashboard = () => {
               <div className="mb-6">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className="h-16 w-16 mx-auto text-indigo-300 dark:text-indigo-500"
+                  className="h-16 w-16 mx-auto text-primary-300 dark:text-primary-500"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"

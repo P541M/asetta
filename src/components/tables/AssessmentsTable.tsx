@@ -99,7 +99,7 @@ const LinkModal = ({ isOpen, onClose, onAddLink }: LinkModalProps) => {
               value={url}
               onChange={(e) => setUrl(e.target.value)}
               placeholder="https://example.com"
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
               required
             />
           </div>
@@ -116,7 +116,7 @@ const LinkModal = ({ isOpen, onClose, onAddLink }: LinkModalProps) => {
               value={text}
               onChange={(e) => setText(e.target.value)}
               placeholder="Display text"
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
             />
           </div>
           <div className="flex justify-end space-x-3">
@@ -425,7 +425,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
         <span className="text-amber-600 font-medium">Due in {days} days</span>
       );
     if (days <= 7)
-      return <span className="text-indigo-600">Due in {days} days</span>;
+      return <span className="text-primary-600">Due in {days} days</span>;
     return <span className="text-gray-600">Due in {days} days</span>;
   };
 
@@ -860,7 +860,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                       sortedAssessments.length > 0
                     }
                     onChange={toggleSelectAll}
-                    className="h-4 w-4 rounded border-gray-300 dark:border-dark-border text-indigo-600 dark:text-indigo-400 focus:ring-indigo-500 dark:focus:ring-indigo-400"
+                    className="h-4 w-4 rounded border-gray-300 dark:border-dark-border text-primary-500 dark:text-primary-400 focus:ring-primary-500 dark:focus:ring-primary-400"
                   />
                 </th>
                 <th className="w-32 dark:text-dark-text-primary">Status</th>
@@ -869,11 +869,11 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                   className="cursor-pointer w-48"
                 >
                   <div className="flex items-center space-x-1 group">
-                    <span className="group-hover:text-indigo-600 dark:group-hover:text-indigo-400 dark:text-dark-text-primary">
+                    <span className="group-hover:text-primary-500 dark:group-hover:text-primary-400 dark:text-dark-text-primary">
                       Course
                     </span>
                     {sortKey === "courseName" && (
-                      <span className="text-indigo-600 dark:text-indigo-400">
+                      <span className="text-primary-500 dark:text-primary-400">
                         {sortOrder === "asc" ? "↑" : "↓"}
                       </span>
                     )}
@@ -884,11 +884,11 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                   className="cursor-pointer w-56"
                 >
                   <div className="flex items-center space-x-1 group">
-                    <span className="group-hover:text-indigo-600 dark:group-hover:text-indigo-400 dark:text-dark-text-primary">
+                    <span className="group-hover:text-primary-500 dark:group-hover:text-primary-400 dark:text-dark-text-primary">
                       Task
                     </span>
                     {sortKey === "assignmentName" && (
-                      <span className="text-indigo-600 dark:text-indigo-400">
+                      <span className="text-primary-500 dark:text-primary-400">
                         {sortOrder === "asc" ? "↑" : "↓"}
                       </span>
                     )}
@@ -899,11 +899,11 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                   className="cursor-pointer w-48"
                 >
                   <div className="flex items-center space-x-1 group">
-                    <span className="group-hover:text-indigo-600 dark:group-hover:text-indigo-400 dark:text-dark-text-primary">
+                    <span className="group-hover:text-primary-500 dark:group-hover:text-primary-400 dark:text-dark-text-primary">
                       Due Date & Time
                     </span>
                     {sortKey === "dueDate" && (
-                      <span className="text-indigo-600 dark:text-indigo-400">
+                      <span className="text-primary-500 dark:text-primary-400">
                         {sortOrder === "asc" ? "↑" : "↓"}
                       </span>
                     )}
@@ -920,11 +920,11 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                     className="cursor-pointer w-24"
                   >
                     <div className="flex items-center space-x-1 group">
-                      <span className="group-hover:text-indigo-600 dark:group-hover:text-indigo-400 dark:text-dark-text-primary">
+                      <span className="group-hover:text-primary-500 dark:group-hover:text-primary-400 dark:text-dark-text-primary">
                         Weight
                       </span>
                       {sortKey === "weight" && (
-                        <span className="text-indigo-600 dark:text-indigo-400">
+                        <span className="text-primary-500 dark:text-primary-400">
                           {sortOrder === "asc" ? "↑" : "↓"}
                         </span>
                       )}
@@ -1100,7 +1100,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                           checked={selectedRows.includes(assessment.id)}
                           onChange={() => toggleRowSelection(assessment.id)}
                           onClick={(e) => e.stopPropagation()}
-                          className="h-4 w-4 rounded border-gray-300 dark:border-dark-border text-indigo-600 dark:text-indigo-400 focus:ring-indigo-500 dark:focus:ring-indigo-400"
+                          className="h-4 w-4 rounded border-gray-300 dark:border-dark-border text-primary-500 dark:text-primary-400 focus:ring-primary-500 dark:focus:ring-primary-400"
                         />
                       )}
                     </td>
@@ -1155,7 +1155,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                           assessment?.status === "Submitted"
                             ? "text-emerald-600 dark:text-emerald-400 font-medium"
                             : assessment?.status === "Under Review"
-                            ? "text-indigo-600 dark:text-indigo-400 font-medium"
+                            ? "text-primary-600 dark:text-primary-400 font-medium"
                             : assessment?.status === "In progress"
                             ? "text-blue-600 dark:text-blue-400 font-medium"
                             : assessment?.status === "Draft"
@@ -1207,7 +1207,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                           onClick={() => handleNotesClick(assessment)}
                           className={`p-1.5 rounded ${
                             assessment?.notes && assessment.notes.trim() !== ""
-                              ? "text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 hover:bg-indigo-50 dark:hover:bg-indigo-900/30"
+                              ? "text-primary-500 dark:text-primary-400 hover:text-primary-600 dark:hover:text-primary-300 hover:bg-primary-50 dark:hover:bg-primary-900/30"
                               : "text-gray-400 dark:text-dark-text-tertiary hover:text-gray-600 dark:hover:text-dark-text-secondary hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary"
                           }`}
                           title={
@@ -1366,7 +1366,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                     }\n\nNotes:\n${notesInput}`;
                     navigator.clipboard.writeText(text);
                   }}
-                  className="inline-flex items-center px-3 py-1.5 border border-gray-300 dark:border-dark-border shadow-sm text-sm font-medium rounded-md text-gray-700 dark:text-dark-text-primary bg-white dark:bg-dark-bg-tertiary hover:bg-gray-50 dark:hover:bg-dark-bg-secondary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-indigo-400"
+                  className="inline-flex items-center px-3 py-1.5 border border-gray-300 dark:border-dark-border shadow-sm text-sm font-medium rounded-md text-gray-700 dark:text-dark-text-primary bg-white dark:bg-dark-bg-tertiary hover:bg-gray-50 dark:hover:bg-dark-bg-secondary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:focus:ring-primary-400"
                   title="Copy Notes"
                 >
                   <svg
@@ -1396,7 +1396,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                     setShowNotesModal(null);
                     setSelectedAssessment(null);
                   }}
-                  className="inline-flex items-center p-1.5 border border-transparent rounded-md text-gray-400 dark:text-dark-text-tertiary hover:text-gray-500 dark:hover:text-dark-text-secondary hover:bg-gray-100 dark:hover:bg-dark-bg-tertiary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-indigo-400"
+                  className="inline-flex items-center p-1.5 border border-transparent rounded-md text-gray-400 dark:text-dark-text-tertiary hover:text-gray-500 dark:hover:text-dark-text-secondary hover:bg-gray-100 dark:hover:bg-dark-bg-tertiary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:focus:ring-primary-400"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"

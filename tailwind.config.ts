@@ -10,16 +10,16 @@ export default {
     extend: {
       colors: {
         primary: {
-          50: "#f5f3ff",
-          100: "#ede9fe",
-          200: "#ddd6fe",
-          300: "#c4b5fd",
-          400: "#a78bfa",
-          500: "#8b5cf6",
-          600: "#7c3aed",
-          700: "#6d28d9",
-          800: "#5b21b6",
-          900: "#4c1d95",
+          50: "#e6f7ff",
+          100: "#ccefff",
+          200: "#99dfff",
+          300: "#66cfff",
+          400: "#33bfff",
+          500: "#009cff",
+          600: "#008cff",
+          700: "#007cff",
+          800: "#006cff",
+          900: "#005cff",
         },
         secondary: {
           50: "#f9fafb",
@@ -34,16 +34,16 @@ export default {
           900: "#111827",
         },
         accent: {
-          50: "#f5f3ff",
-          100: "#ede9fe",
-          200: "#ddd6fe",
-          300: "#c4b5fd",
-          400: "#a78bfa",
-          500: "#8b5cf6",
-          600: "#7c3aed",
-          700: "#6d28d9",
-          800: "#5b21b6",
-          900: "#4c1d95",
+          50: "#e6f7ff",
+          100: "#ccefff",
+          200: "#99dfff",
+          300: "#66cfff",
+          400: "#33bfff",
+          500: "#009cff",
+          600: "#008cff",
+          700: "#007cff",
+          800: "#006cff",
+          900: "#005cff",
         },
         dark: {
           "bg-primary": "#121212", // Main background
@@ -56,13 +56,13 @@ export default {
           "border-secondary": "#404040", // Secondary border
           "hover-primary": "#2D2D2D", // Hover state
           "hover-secondary": "#333333", // Secondary hover state
-          "focus-ring": "#4F46E5", // Focus ring color
+          "focus-ring": "#009cff", // Focus ring color
           "input-bg": "#1E1E1E", // Input background
           "input-border": "#333333", // Input border
           "input-text": "#FFFFFF", // Input text
           "input-placeholder": "#A0A0A0", // Input placeholder
-          "button-primary": "#4F46E5", // Primary button
-          "button-primary-hover": "#4338CA", // Primary button hover
+          "button-primary": "#009cff", // Primary button
+          "button-primary-hover": "#008cff", // Primary button hover
           "button-secondary": "#2D2D2D", // Secondary button
           "button-secondary-hover": "#333333", // Secondary button hover
           "success-bg": "rgba(16, 185, 129, 0.1)", // Success background
