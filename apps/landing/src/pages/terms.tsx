@@ -29,7 +29,7 @@ export default function TermsPage() {
             <div className="prose prose-indigo max-w-none mx-auto">
               <div className="grid gap-10 md:grid-cols-2">
                 <div>
-                  <h2 className="text-2xl font-bold text-indigo-700 mb-4">
+                  <h2 className="text-2xl font-bold text-primary-700 mb-4">
                     Agreement to Terms
                   </h2>
                   <p>
@@ -37,7 +37,7 @@ export default function TermsPage() {
                     these Terms of Service and all applicable laws and
                     regulations.
                   </p>
-                  <h2 className="text-2xl font-bold text-indigo-700 mt-8 mb-4">
+                  <h2 className="text-2xl font-bold text-primary-700 mt-8 mb-4">
                     Use License
                   </h2>
                   <ul className="list-disc pl-5 text-gray-700">
@@ -46,7 +46,7 @@ export default function TermsPage() {
                     <li>Attempting to reverse engineer any software</li>
                     <li>Removing any copyright or proprietary notations</li>
                   </ul>
-                  <h2 className="text-2xl font-bold text-indigo-700 mt-8 mb-4">
+                  <h2 className="text-2xl font-bold text-primary-700 mt-8 mb-4">
                     User Responsibilities
                   </h2>
                   <ul className="list-disc pl-5 text-gray-700">
@@ -57,7 +57,7 @@ export default function TermsPage() {
                   </ul>
                 </div>
                 <div>
-                  <h2 className="text-2xl font-bold text-indigo-700 mb-4">
+                  <h2 className="text-2xl font-bold text-primary-700 mb-4">
                     Disclaimer
                   </h2>
                   <p>
@@ -65,14 +65,14 @@ export default function TermsPage() {
                     or implied. We do not guarantee that the service will be
                     uninterrupted or error-free.
                   </p>
-                  <h2 className="text-2xl font-bold text-indigo-700 mt-8 mb-4">
+                  <h2 className="text-2xl font-bold text-primary-700 mt-8 mb-4">
                     Limitations
                   </h2>
                   <p>
                     In no event shall Asetta be liable for any damages arising
                     out of the use or inability to use the platform.
                   </p>
-                  <h2 className="text-2xl font-bold text-indigo-700 mt-8 mb-4">
+                  <h2 className="text-2xl font-bold text-primary-700 mt-8 mb-4">
                     Contact Information
                   </h2>
                   <p>
@@ -81,7 +81,7 @@ export default function TermsPage() {
                     <br />
                     <a
                       href="mailto:videna.psalmeleazar@gmail.com"
-                      className="text-indigo-600 hover:text-indigo-700 transition-colors duration-200 font-medium"
+                      className="text-primary-600 hover:text-primary-700 transition-colors duration-200 font-medium"
                     >
                       videna.psalmeleazar@gmail.com
                     </a>

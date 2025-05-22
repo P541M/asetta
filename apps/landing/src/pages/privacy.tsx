@@ -29,7 +29,7 @@ export default function PrivacyPage() {
             <div className="prose prose-indigo max-w-none mx-auto">
               <div className="grid gap-10 md:grid-cols-2">
                 <div>
-                  <h2 className="text-2xl font-bold text-indigo-700 mb-4">
+                  <h2 className="text-2xl font-bold text-primary-700 mb-4">
                     Introduction
                   </h2>
                   <p>
@@ -37,7 +37,7 @@ export default function PrivacyPage() {
                     Policy explains how we collect, use, disclose, and safeguard
                     your information when you use our platform.
                   </p>
-                  <h2 className="text-2xl font-bold text-indigo-700 mt-8 mb-4">
+                  <h2 className="text-2xl font-bold text-primary-700 mt-8 mb-4">
                     Information We Collect
                   </h2>
                   <ul className="list-disc pl-5 text-gray-700">
@@ -45,7 +45,7 @@ export default function PrivacyPage() {
                     <li>Academic information (courses, assignments, grades)</li>
                     <li>Usage data and preferences</li>
                   </ul>
-                  <h2 className="text-2xl font-bold text-indigo-700 mt-8 mb-4">
+                  <h2 className="text-2xl font-bold text-primary-700 mt-8 mb-4">
                     How We Use Your Information
                   </h2>
                   <ul className="list-disc pl-5 text-gray-700">
@@ -56,7 +56,7 @@ export default function PrivacyPage() {
                   </ul>
                 </div>
                 <div>
-                  <h2 className="text-2xl font-bold text-indigo-700 mb-4">
+                  <h2 className="text-2xl font-bold text-primary-700 mb-4">
                     Data Security
                   </h2>
                   <p>
@@ -64,7 +64,7 @@ export default function PrivacyPage() {
                     personal information. However, no method of transmission
                     over the Internet is 100% secure.
                   </p>
-                  <h2 className="text-2xl font-bold text-indigo-700 mt-8 mb-4">
+                  <h2 className="text-2xl font-bold text-primary-700 mt-8 mb-4">
                     Your Rights
                   </h2>
                   <ul className="list-disc pl-5 text-gray-700">
@@ -73,7 +73,7 @@ export default function PrivacyPage() {
                     <li>Request deletion of your data</li>
                     <li>Opt-out of communications</li>
                   </ul>
-                  <h2 className="text-2xl font-bold text-indigo-700 mt-8 mb-4">
+                  <h2 className="text-2xl font-bold text-primary-700 mt-8 mb-4">
                     Contact Us
                   </h2>
                   <p>
@@ -82,7 +82,7 @@ export default function PrivacyPage() {
                     <br />
                     <a
                       href="mailto:videna.psalmeleazar@gmail.com"
-                      className="text-indigo-600 hover:text-indigo-700 transition-colors duration-200 font-medium"
+                      className="text-primary-600 hover:text-primary-700 transition-colors duration-200 font-medium"
                     >
                       videna.psalmeleazar@gmail.com
                     </a>

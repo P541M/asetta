@@ -66,15 +66,15 @@ export default function Contact() {
       </Head>
       <Header />
 
-      <section className="relative pt-36 pb-24 overflow-hidden bg-gradient-to-br from-indigo-50 via-purple-50 to-white">
+      <section className="relative pt-36 pb-24 overflow-hidden bg-gradient-to-br from-primary-50 via-primary-50 to-white">
         <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute -top-32 -left-32 w-[600px] h-[600px] bg-gradient-to-br from-indigo-200 via-indigo-100 to-transparent rounded-full blur-3xl opacity-60 animate-fade-in" />
-          <div className="absolute -bottom-32 -right-32 w-[500px] h-[500px] bg-gradient-to-tr from-purple-200 via-purple-100 to-transparent rounded-full blur-3xl opacity-60 animate-fade-in-delayed" />
+          <div className="absolute -top-32 -left-32 w-[600px] h-[600px] bg-gradient-to-br from-primary-200 via-primary-100 to-transparent rounded-full blur-3xl opacity-60 animate-fade-in" />
+          <div className="absolute -bottom-32 -right-32 w-[500px] h-[500px] bg-gradient-to-tr from-primary-200 via-primary-100 to-transparent rounded-full blur-3xl opacity-60 animate-fade-in-delayed" />
         </div>
 
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center mb-12 animate-fade-in">
-            <span className="inline-block mb-4 px-4 py-2 rounded-full bg-indigo-100 text-indigo-700 font-semibold text-sm shadow-sm animate-fade-in-down">
+            <span className="inline-block mb-4 px-4 py-2 rounded-full bg-primary-100 text-primary-700 font-semibold text-sm shadow-sm animate-fade-in-down">
               Student Support
             </span>
             <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-6 font-heading tracking-tight leading-tight">
@@ -128,7 +128,7 @@ export default function Contact() {
                       name="name"
                       value={formData.name}
                       onChange={handleChange}
-                      className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 focus:outline-none transition-all duration-200"
+                      className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-200 focus:border-primary-400 focus:outline-none transition-all duration-200"
                       placeholder="Your name"
                       required
                     />
@@ -142,7 +142,7 @@ export default function Contact() {
                       name="email"
                       value={formData.email}
                       onChange={handleChange}
-                      className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 focus:outline-none transition-all duration-200"
+                      className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-200 focus:border-primary-400 focus:outline-none transition-all duration-200"
                       placeholder="your.student@email.com"
                       required
                     />
@@ -156,7 +156,7 @@ export default function Contact() {
                     name="message"
                     value={formData.message}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 focus:outline-none transition-all duration-200"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-200 focus:border-primary-400 focus:outline-none transition-all duration-200"
                     rows={6}
                     placeholder="How can we help you with your academic journey?"
                     required
@@ -171,7 +171,7 @@ export default function Contact() {
                   <button
                     type="submit"
                     disabled={status.type === "loading"}
-                    className="w-full py-4 px-6 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl font-semibold hover:from-indigo-700 hover:to-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-70 disabled:cursor-not-allowed"
+                    className="w-full py-4 px-6 bg-gradient-to-r from-primary-500 to-primary-600 text-white rounded-xl font-semibold hover:from-primary-600 hover:to-primary-700 transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-70 disabled:cursor-not-allowed"
                   >
                     {status.type === "loading" ? (
                       <span className="flex items-center justify-center">
@@ -208,7 +208,7 @@ export default function Contact() {
             <div className="mt-8 text-center">
               <Link
                 href="/"
-                className="inline-flex items-center text-indigo-600 hover:text-indigo-700 font-medium transition-colors duration-200"
+                className="inline-flex items-center text-primary-600 hover:text-primary-700 font-medium transition-colors duration-200"
               >
                 <svg
                   className="w-5 h-5 mr-2"

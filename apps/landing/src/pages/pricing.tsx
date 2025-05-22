@@ -36,7 +36,7 @@ export default function PricingPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="bg-gradient-to-br from-indigo-50 to-white rounded-3xl p-8 md:p-12 shadow-xl"
+            className="bg-gradient-to-br from-primary-50 to-white rounded-3xl p-8 md:p-12 shadow-xl"
           >
             <div className="text-center mb-8">
               <motion.div
@@ -45,7 +45,7 @@ export default function PricingPage() {
                 transition={{ duration: 0.5, delay: 0.4 }}
                 className="inline-block mb-6"
               >
-                <span className="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-indigo-100 text-indigo-800">
+                <span className="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-primary-100 text-primary-800">
                   <span className="mr-2">🎓</span>
                   Student Special
                 </span>
@@ -61,7 +61,7 @@ export default function PricingPage() {
             </div>
 
             <div className="space-y-6 text-center">
-              <div className="text-6xl font-bold text-indigo-600 mb-4">$0</div>
+              <div className="text-6xl font-bold text-primary-600 mb-4">$0</div>
               <p className="text-gray-600 text-lg mb-8">
                 No hidden fees. No premium features. No catch.
                 <br />
@@ -75,7 +75,7 @@ export default function PricingPage() {
               >
                 <Link
                   href="https://kivo-two.vercel.app/register"
-                  className="inline-flex items-center justify-center px-8 py-4 text-lg font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors duration-200 shadow-lg hover:shadow-xl"
+                  className="inline-flex items-center justify-center px-8 py-4 text-lg font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700 transition-colors duration-200 shadow-lg hover:shadow-xl"
                 >
                   Join the Student Community
                   <svg

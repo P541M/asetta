@@ -21,20 +21,20 @@ export default function LandingPage() {
       <Header />
 
       {/* Hero Section */}
-      <section className="relative pt-36 pb-24 overflow-hidden bg-gradient-to-br from-indigo-50 via-purple-50 to-white">
+      <section className="relative pt-36 pb-24 overflow-hidden bg-gradient-to-br from-primary-50 via-primary-50 to-white">
         <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute -top-32 -left-32 w-[600px] h-[600px] bg-gradient-to-br from-indigo-200 via-indigo-100 to-transparent rounded-full blur-3xl opacity-60 animate-fade-in" />
-          <div className="absolute -bottom-32 -right-32 w-[500px] h-[500px] bg-gradient-to-tr from-purple-200 via-purple-100 to-transparent rounded-full blur-3xl opacity-60 animate-fade-in-delayed" />
+          <div className="absolute -top-32 -left-32 w-[600px] h-[600px] bg-gradient-to-br from-primary-200 via-primary-100 to-transparent rounded-full blur-3xl opacity-60 animate-fade-in" />
+          <div className="absolute -bottom-32 -right-32 w-[500px] h-[500px] bg-gradient-to-tr from-primary-200 via-primary-100 to-transparent rounded-full blur-3xl opacity-60 animate-fade-in-delayed" />
         </div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="flex flex-col lg:flex-row items-center">
             <div className="lg:w-1/2 lg:pr-12 mb-10 lg:mb-0 animate-fade-in">
-              <span className="inline-block mb-4 px-4 py-2 rounded-full bg-indigo-100 text-indigo-700 font-semibold text-sm shadow-sm animate-fade-in-down">
+              <span className="inline-block mb-4 px-4 py-2 rounded-full bg-primary-100 text-primary-700 font-semibold text-sm shadow-sm animate-fade-in-down">
                 🎓 100% Free for Students
               </span>
               <h1 className="text-5xl md:text-6xl font-extrabold text-gray-900 mb-8 font-heading tracking-tight leading-tight drop-shadow-lg">
                 Your Smart{" "}
-                <span className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600 animate-scale">
+                <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary-500 to-primary-600 animate-scale">
                   Academic Assistant
                 </span>
               </h1>
@@ -47,7 +47,7 @@ export default function LandingPage() {
                 <div className="transform transition-transform duration-200 hover:scale-105">
                   <Link
                     href="https://kivo-two.vercel.app/register"
-                    className="inline-flex items-center justify-center px-8 py-4 text-lg font-bold text-white bg-gradient-to-r from-indigo-600 to-purple-600 rounded-xl shadow-lg hover:shadow-2xl hover:from-indigo-700 hover:to-purple-700 transition-all duration-200 animate-fade-in"
+                    className="inline-flex items-center justify-center px-8 py-4 text-lg font-bold text-white bg-gradient-to-r from-primary-500 to-primary-600 rounded-xl shadow-lg hover:shadow-2xl hover:from-primary-600 hover:to-primary-700 transition-all duration-200 animate-fade-in"
                   >
                     Get Started Free
                     <svg
@@ -68,7 +68,7 @@ export default function LandingPage() {
                 <div className="transform transition-transform duration-200 hover:scale-105">
                   <Link
                     href="/features"
-                    className="inline-flex items-center justify-center px-8 py-4 text-lg font-bold text-indigo-600 bg-white border-2 border-indigo-200 rounded-xl shadow hover:bg-indigo-50 hover:border-indigo-400 transition-all duration-200 animate-fade-in"
+                    className="inline-flex items-center justify-center px-8 py-4 text-lg font-bold text-primary-500 bg-white border-2 border-primary-200 rounded-xl shadow hover:bg-primary-50 hover:border-primary-400 transition-all duration-200 animate-fade-in"
                   >
                     See All Features
                   </Link>
@@ -77,9 +77,9 @@ export default function LandingPage() {
             </div>
             <div className="lg:w-1/2 animate-fade-in-delayed flex justify-center">
               <div className="relative">
-                <div className="absolute inset-0 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl transform rotate-3 scale-105 opacity-10" />
-                <div className="absolute -top-6 -left-6 w-24 h-24 bg-indigo-200 rounded-full blur-2xl opacity-40 animate-fade-in" />
-                <div className="absolute -bottom-6 -right-6 w-20 h-20 bg-purple-200 rounded-full blur-2xl opacity-40 animate-fade-in-delayed" />
+                <div className="absolute inset-0 bg-gradient-to-r from-primary-500 to-primary-600 rounded-2xl transform rotate-3 scale-105 opacity-10" />
+                <div className="absolute -top-6 -left-6 w-24 h-24 bg-primary-200 rounded-full blur-2xl opacity-40 animate-fade-in" />
+                <div className="absolute -bottom-6 -right-6 w-20 h-20 bg-primary-200 rounded-full blur-2xl opacity-40 animate-fade-in-delayed" />
                 <div className="relative z-10">
                   <Image
                     src="/images/kivo-dashboard.png"
@@ -89,7 +89,7 @@ export default function LandingPage() {
                     priority
                     className="rounded-2xl shadow-2xl border-4 border-white/80 hover:scale-[1.02] transition-transform duration-300"
                   />
-                  <div className="absolute bottom-4 right-4 bg-white/80 px-4 py-2 rounded-lg shadow text-indigo-700 font-semibold text-sm animate-fade-in-down">
+                  <div className="absolute bottom-4 right-4 bg-white/80 px-4 py-2 rounded-lg shadow text-primary-700 font-semibold text-sm animate-fade-in-down">
                     Preview
                   </div>
                 </div>
@@ -138,10 +138,10 @@ export default function LandingPage() {
                 className="group transform transition-all duration-300 hover:-translate-y-2"
               >
                 <div className="bg-white rounded-2xl p-8 shadow-sm hover:shadow-lg transition-shadow duration-300 border border-gray-100 h-full flex flex-col">
-                  <div className="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center mb-6 group-hover:bg-indigo-100 transition-colors duration-300">
+                  <div className="w-12 h-12 bg-primary-50 rounded-xl flex items-center justify-center mb-6 group-hover:bg-primary-100 transition-colors duration-300">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
-                      className="h-6 w-6 text-indigo-600"
+                      className="h-6 w-6 text-primary-600"
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"
@@ -169,7 +169,7 @@ export default function LandingPage() {
           <div className="mt-16 text-center">
             <Link
               href="/features"
-              className="inline-flex items-center justify-center px-6 py-3 text-base font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors duration-200 shadow-sm hover:shadow-md"
+              className="inline-flex items-center justify-center px-6 py-3 text-base font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700 transition-colors duration-200 shadow-sm hover:shadow-md"
             >
               See All Features
               <svg
@@ -191,7 +191,7 @@ export default function LandingPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-24 bg-gradient-to-br from-indigo-50 to-white animate-fade-in">
+      <section className="py-24 bg-gradient-to-br from-primary-50 to-white animate-fade-in">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-4xl font-bold text-gray-900 mb-6">
             Start Your Academic Success Journey Today
@@ -204,7 +204,7 @@ export default function LandingPage() {
           <div className="flex justify-center transform transition-transform duration-200 hover:scale-105">
             <Link
               href="https://kivo-two.vercel.app/register"
-              className="inline-flex items-center justify-center px-8 py-4 text-lg font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors duration-200 shadow-lg hover:shadow-xl"
+              className="inline-flex items-center justify-center px-8 py-4 text-lg font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700 transition-colors duration-200 shadow-lg hover:shadow-xl"
             >
               Create Your Free Account
               <svg
