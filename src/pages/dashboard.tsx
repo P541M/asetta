@@ -43,10 +43,11 @@ const Dashboard = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<
-    "courses" | "assessments" | "add" | "upload" | "calendar"
+    "courses" | "assessments" | "add" | "calendar"
   >("assessments");
   const [selectedCourse, setSelectedCourse] = useState<string | null>(null);
   const [showStatsBar, setShowStatsBar] = useState(false);
+  const [addMode, setAddMode] = useState<"manual" | "upload">("manual");
 
   const [stats, setStats] = useState({
     total: 0,
@@ -268,48 +269,6 @@ const Dashboard = () => {
                   : "Select a semester to get started"}
               </p>
             </div>
-            <div className="flex items-center mt-4 md:mt-0 space-x-3">
-              {selectedSemester && (
-                <>
-                  <button
-                    onClick={() => setActiveTab("add")}
-                    className="btn-primary text-sm py-1.5 px-3 flex items-center"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-4 w-4 mr-1.5"
-                      viewBox="0 0 20 20"
-                      fill="currentColor"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                    Add Assessment
-                  </button>
-                  <button
-                    onClick={() => setActiveTab("upload")}
-                    className="btn-outline text-sm py-1.5 px-3 flex items-center"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-4 w-4 mr-1.5"
-                      viewBox="0 0 20 20"
-                      fill="currentColor"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                    Upload Outline
-                  </button>
-                </>
-              )}
-            </div>
           </div>
           <SemesterTabs
             selectedSemester={selectedSemester}
@@ -507,15 +466,7 @@ const Dashboard = () => {
                         activeTab === "add" ? "active" : ""
                       }`}
                     >
-                      Add Manually
-                    </button>
-                    <button
-                      onClick={() => setActiveTab("upload")}
-                      className={`px-5 py-4 font-medium text-sm tab dark:text-dark-text-primary ${
-                        activeTab === "upload" ? "active" : ""
-                      }`}
-                    >
-                      Upload Outline
+                      Add Assessment
                     </button>
                   </div>
                 </div>
@@ -576,19 +527,75 @@ const Dashboard = () => {
                   )}
                   {activeTab === "add" && selectedSemesterId && (
                     <div className="animate-fade-in">
-                      <AddAssessmentForm
-                        semester={selectedSemester}
-                        semesterId={selectedSemesterId}
-                        onSuccess={refreshAssessments}
-                      />
-                    </div>
-                  )}
-                  {activeTab === "upload" && (
-                    <div className="animate-fade-in">
-                      <UploadForm
-                        semester={selectedSemester}
-                        onUploadSuccess={refreshAssessments}
-                      />
+                      <div className="bg-white dark:bg-dark-bg-secondary rounded-xl shadow-sm border border-gray-100 dark:border-dark-border-primary p-6">
+                        <h2 className="text-xl font-medium mb-6 dark:text-dark-text-primary">
+                          Add Assessment for {selectedSemester}
+                        </h2>
+
+                        <div className="flex space-x-4 mb-6">
+                          <button
+                            onClick={() => setAddMode("manual")}
+                            className={`flex-1 py-3 px-4 rounded-lg text-sm font-medium transition-all duration-200 ${
+                              addMode === "manual"
+                                ? "bg-primary-500 text-white shadow-md"
+                                : "bg-gray-50 dark:bg-dark-bg-tertiary text-gray-600 dark:text-dark-text-secondary hover:bg-gray-100 dark:hover:bg-dark-bg-hover"
+                            }`}
+                          >
+                            <div className="flex items-center justify-center">
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="h-5 w-5 mr-2"
+                                viewBox="0 0 20 20"
+                                fill="currentColor"
+                              >
+                                <path
+                                  fillRule="evenodd"
+                                  d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
+                                  clipRule="evenodd"
+                                />
+                              </svg>
+                              Quick Add
+                            </div>
+                          </button>
+                          <button
+                            onClick={() => setAddMode("upload")}
+                            className={`flex-1 py-3 px-4 rounded-lg text-sm font-medium transition-all duration-200 ${
+                              addMode === "upload"
+                                ? "bg-primary-500 text-white shadow-md"
+                                : "bg-gray-50 dark:bg-dark-bg-tertiary text-gray-600 dark:text-dark-text-secondary hover:bg-gray-100 dark:hover:bg-dark-bg-hover"
+                            }`}
+                          >
+                            <div className="flex items-center justify-center">
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="h-5 w-5 mr-2"
+                                viewBox="0 0 20 20"
+                                fill="currentColor"
+                              >
+                                <path
+                                  fillRule="evenodd"
+                                  d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z"
+                                  clipRule="evenodd"
+                                />
+                              </svg>
+                              Upload Outline
+                            </div>
+                          </button>
+                        </div>
+
+                        {addMode === "manual" ? (
+                          <AddAssessmentForm
+                            semester={selectedSemester}
+                            semesterId={selectedSemesterId}
+                            onSuccess={refreshAssessments}
+                          />
+                        ) : (
+                          <UploadForm
+                            semester={selectedSemester}
+                            onUploadSuccess={refreshAssessments}
+                          />
+                        )}
+                      </div>
                     </div>
                   )}
                 </div>
