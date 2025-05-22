@@ -259,9 +259,12 @@ const CalendarView = ({ selectedSemester, semesterId }: CalendarViewProps) => {
   // Status color mapping
   const getStatusColor = (status: string): string => {
     if (status === "Submitted") {
-      return "text-emerald-600 dark:text-emerald-400";
+      return "bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800";
     }
-    return "text-gray-800 dark:text-gray-400";
+    if (status === "In progress") {
+      return "bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-800";
+    }
+    return "bg-gray-50 dark:bg-dark-bg-tertiary text-gray-800 dark:text-gray-400 border border-gray-200 dark:border-dark-border";
   };
 
   // Export calendar
@@ -340,7 +343,6 @@ const CalendarView = ({ selectedSemester, semesterId }: CalendarViewProps) => {
               <option value="Not started">Not Started</option>
               <option value="In progress">In Progress</option>
               <option value="Submitted">Submitted</option>
-              <option value="Under Review">Under Review</option>
             </select>
           </div>
 
@@ -431,20 +433,20 @@ const CalendarView = ({ selectedSemester, semesterId }: CalendarViewProps) => {
               </div>
             ))}
           </div>
-          <div className="grid grid-cols-7 auto-rows-fr bg-white dark:bg-dark-bg-secondary gap-px">
+          <div className="grid grid-cols-7 auto-rows-fr bg-white dark:bg-dark-bg-secondary border-l border-t dark:border-dark-border">
             {calendarDays.map((day, index) => (
               <div
                 key={index}
                 onClick={() =>
                   day.assessments.length > 0 && setSelectedDay(day)
                 }
-                className={`relative p-2 min-h-[120px] border border-gray-200 dark:border-dark-border transition-colors ${
+                className={`relative p-2 min-h-[120px] border-r border-b dark:border-dark-border transition-colors ${
                   day.isCurrentMonth
                     ? "bg-white dark:bg-dark-bg-secondary"
-                    : "bg-gray-50 dark:bg-dark-bg-tertiary"
+                    : "bg-gray-50/50 dark:bg-dark-bg-tertiary/50"
                 } ${
                   day.isToday
-                    ? "ring-2 ring-primary-500 dark:ring-primary-400"
+                    ? "ring-2 ring-primary-500 dark:ring-primary-400 ring-inset"
                     : ""
                 } ${
                   day.assessments.length > 0
@@ -472,19 +474,26 @@ const CalendarView = ({ selectedSemester, semesterId }: CalendarViewProps) => {
                     </span>
                   )}
                 </div>
-                <div className="space-y-1">
+                <div className="space-y-1.5">
                   {day.assessments.slice(0, 3).map((assessment) => (
                     <div
                       key={assessment.id}
-                      className={`text-xs px-1.5 py-0.5 rounded truncate ${getStatusColor(
+                      className={`text-xs px-2 py-1.5 rounded-md truncate ${getStatusColor(
                         assessment.status
-                      )}`}
+                      )} hover:shadow-sm transition-all duration-200`}
                     >
-                      {assessment.assignmentName}
+                      <div className="flex items-center justify-between">
+                        <span className="truncate font-medium">
+                          {assessment.assignmentName}
+                        </span>
+                        <span className="ml-2 text-[10px] font-medium opacity-75">
+                          {assessment.dueTime}
+                        </span>
+                      </div>
                     </div>
                   ))}
                   {day.assessments.length > 3 && (
-                    <div className="text-xs text-gray-500 dark:text-dark-text-tertiary font-medium">
+                    <div className="text-xs text-gray-500 dark:text-dark-text-tertiary font-medium bg-gray-50 dark:bg-dark-bg-tertiary px-2 py-1 rounded-md border border-gray-200 dark:border-dark-border">
                       +{day.assessments.length - 3} more
                     </div>
                   )}

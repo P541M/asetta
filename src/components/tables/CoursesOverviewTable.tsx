@@ -101,7 +101,7 @@ const CoursesOverviewTable = ({
 
         const courseStatsList: CourseStats[] = [];
         courseMap.forEach((assessments, courseName) => {
-          const completedStatuses = ["Submitted", "Under Review", "Completed"];
+          const completedStatuses = ["Submitted"];
           const completed = assessments.filter((a) =>
             completedStatuses.includes(a.status)
           );
