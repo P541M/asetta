@@ -342,7 +342,7 @@ const Dashboard = () => {
           )}
 
           <div className="mt-8">
-            <div className="bg-white dark:bg-dark-bg-secondary rounded-lg p-1 shadow-sm">
+            <div className="bg-white dark:bg-dark-bg-secondary rounded-lg p-1 shadow-md">
               {/* Desktop Navigation */}
               <div className="hidden md:flex space-x-2">
                 <button
@@ -556,24 +556,28 @@ const Dashboard = () => {
                       <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500"></div>
                     </div>
                   ) : error ? (
-                    <div className="p-4 bg-red-50 rounded-lg text-red-700 animate-fade-in">
+                    <div className="p-4 bg-red-50 rounded-lg text-red-700 animate-fade-in shadow-sm">
                       <p>{error}</p>
                     </div>
                   ) : (
-                    <CoursesOverviewTable
-                      semesterId={selectedSemesterId}
-                      onSelectCourse={handleSelectCourse}
-                    />
+                    <div className="bg-white dark:bg-dark-bg-secondary rounded-lg shadow-md">
+                      <CoursesOverviewTable
+                        semesterId={selectedSemesterId}
+                        onSelectCourse={handleSelectCourse}
+                      />
+                    </div>
                   )}
                 </div>
               )}
               {activeTab === "assessments" && selectedCourse && (
                 <div className="animate-fade-in">
-                  <CourseFilteredAssessments
-                    semesterId={selectedSemesterId}
-                    selectedCourse={selectedCourse}
-                    onBack={handleClearCourseSelection}
-                  />
+                  <div className="bg-white dark:bg-dark-bg-secondary rounded-lg shadow-md">
+                    <CourseFilteredAssessments
+                      semesterId={selectedSemesterId}
+                      selectedCourse={selectedCourse}
+                      onBack={handleClearCourseSelection}
+                    />
+                  </div>
                 </div>
               )}
               {activeTab === "assessments" && !selectedCourse && (
@@ -583,29 +587,33 @@ const Dashboard = () => {
                       <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500"></div>
                     </div>
                   ) : error ? (
-                    <div className="p-4 bg-red-50 rounded-lg text-red-700 animate-fade-in">
+                    <div className="p-4 bg-red-50 rounded-lg text-red-700 animate-fade-in shadow-sm">
                       <p>{error}</p>
                     </div>
                   ) : (
-                    <AssessmentsTable
-                      assessments={assessments}
-                      semesterId={selectedSemesterId}
-                      onStatusChange={refreshAssessments}
-                    />
+                    <div className="bg-white dark:bg-dark-bg-secondary rounded-lg shadow-md">
+                      <AssessmentsTable
+                        assessments={assessments}
+                        semesterId={selectedSemesterId}
+                        onStatusChange={refreshAssessments}
+                      />
+                    </div>
                   )}
                 </div>
               )}
               {activeTab === "calendar" && (
                 <div className="animate-fade-in">
-                  <CalendarView
-                    selectedSemester={selectedSemester}
-                    semesterId={selectedSemesterId}
-                  />
+                  <div className="bg-white dark:bg-dark-bg-secondary rounded-lg shadow-md">
+                    <CalendarView
+                      selectedSemester={selectedSemester}
+                      semesterId={selectedSemesterId}
+                    />
+                  </div>
                 </div>
               )}
               {activeTab === "add" && selectedSemesterId && (
                 <div className="animate-fade-in">
-                  <div className="bg-white dark:bg-dark-bg-secondary rounded-xl p-6">
+                  <div className="bg-white dark:bg-dark-bg-secondary rounded-lg shadow-md p-6">
                     <h2 className="text-xl font-medium mb-6 dark:text-dark-text-primary">
                       Add Assessment for {selectedSemester}
                     </h2>
@@ -615,7 +623,7 @@ const Dashboard = () => {
                         onClick={() => setAddMode("manual")}
                         className={`flex-1 py-3 px-4 rounded-lg text-sm font-medium transition-all duration-200 ${
                           addMode === "manual"
-                            ? "bg-primary-500 text-white shadow-md"
+                            ? "bg-primary-500 text-white shadow-sm"
                             : "bg-gray-50 dark:bg-dark-bg-tertiary text-gray-600 dark:text-dark-text-secondary hover:bg-gray-100 dark:hover:bg-dark-bg-hover"
                         }`}
                       >
@@ -625,7 +633,7 @@ const Dashboard = () => {
                         onClick={() => setAddMode("upload")}
                         className={`flex-1 py-3 px-4 rounded-lg text-sm font-medium transition-all duration-200 ${
                           addMode === "upload"
-                            ? "bg-primary-500 text-white shadow-md"
+                            ? "bg-primary-500 text-white shadow-sm"
                             : "bg-gray-50 dark:bg-dark-bg-tertiary text-gray-600 dark:text-dark-text-secondary hover:bg-gray-100 dark:hover:bg-dark-bg-hover"
                         }`}
                       >
