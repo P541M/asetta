@@ -113,7 +113,7 @@ const CourseFilteredAssessments = ({
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-center pt-6 px-6">
         <button
           onClick={onBack}
           className="text-primary-600 dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300 font-medium"
