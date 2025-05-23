@@ -236,22 +236,23 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
       {/* Header */}
-      <div className="flex justify-between items-center mb-12">
+      <div className="flex justify-between items-center mb-8">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-dark-text-primary">
+          <h2 className="text-3xl font-bold bg-gradient-to-r from-primary-600 to-primary-400 bg-clip-text text-transparent">
             Settings
           </h2>
-          <p className="mt-1 text-sm text-gray-500 dark:text-dark-text-tertiary">
+          <p className="text-sm text-gray-500 dark:text-dark-text-tertiary mt-1">
             Manage your account settings and preferences
           </p>
         </div>
         <button
           onClick={handleCancel}
-          className="text-gray-400 hover:text-gray-500 dark:text-dark-text-tertiary dark:hover:text-dark-text-secondary transition-colors"
+          className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-dark-bg-secondary transition-colors"
+          aria-label="Close settings"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            className="h-6 w-6"
+            className="h-6 w-6 text-gray-400 hover:text-gray-500 dark:text-dark-text-tertiary dark:hover:text-dark-text-secondary"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -266,34 +267,65 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
         </button>
       </div>
 
-      {/* Tabs */}
-      <div className="border-b border-gray-200 dark:border-dark-border mb-8">
-        <nav className="flex">
+      {/* Navigation */}
+      <div className="bg-white dark:bg-dark-bg-secondary rounded-lg p-1 shadow-md mb-8">
+        <div className="flex space-x-2">
           <button
             onClick={() => setActiveTab("profile")}
-            className={`flex-1 py-4 px-6 text-center border-b-2 font-medium text-sm transition-colors ${
+            className={`flex-1 px-6 py-3 font-medium text-sm transition-all duration-200 rounded-lg ${
               activeTab === "profile"
-                ? "border-primary-500 text-primary-600 dark:text-primary-400 dark:border-primary-400"
-                : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-dark-text-tertiary dark:hover:text-dark-text-secondary"
+                ? "bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 shadow-sm"
+                : "text-gray-600 dark:text-dark-text-secondary hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary"
             }`}
           >
-            Profile
+            <div className="flex items-center justify-center space-x-2">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
+                  clipRule="evenodd"
+                />
+              </svg>
+              <span>Profile</span>
+            </div>
           </button>
           <button
             onClick={() => setActiveTab("preferences")}
-            className={`flex-1 py-4 px-6 text-center border-b-2 font-medium text-sm transition-colors ${
+            className={`flex-1 px-6 py-3 font-medium text-sm transition-all duration-200 rounded-lg ${
               activeTab === "preferences"
-                ? "border-primary-500 text-primary-600 dark:text-primary-400 dark:border-primary-400"
-                : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-dark-text-tertiary dark:hover:text-dark-text-secondary"
+                ? "bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 shadow-sm"
+                : "text-gray-600 dark:text-dark-text-secondary hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary"
             }`}
           >
-            Preferences
+            <div className="flex items-center justify-center space-x-2">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z"
+                  clipRule="evenodd"
+                />
+              </svg>
+              <span>Preferences</span>
+            </div>
           </button>
-        </nav>
+        </div>
       </div>
 
       {/* Content */}
-      <form onSubmit={handleSubmit}>
+      <form
+        onSubmit={handleSubmit}
+        className="bg-white dark:bg-dark-bg-primary rounded-2xl shadow-sm p-6"
+      >
         {activeTab === "profile" ? (
           <ProfileSection
             displayName={displayName}
@@ -327,7 +359,7 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
         {/* Status Message */}
         {message.text && (
           <div
-            className={`mt-4 p-4 rounded-md ${
+            className={`mt-6 p-4 rounded-xl ${
               message.type === "success"
                 ? "bg-green-50 text-green-800 dark:bg-green-900/20 dark:text-green-400"
                 : "bg-red-50 text-red-800 dark:bg-red-900/20 dark:text-red-400"
@@ -338,16 +370,25 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
         )}
 
         {/* Action Buttons */}
-        <div className="mt-8 pt-6 border-t border-gray-200 dark:border-dark-border flex justify-end">
-          {hasChanges() && (
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="px-4 py-2 text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-            >
-              {isSubmitting ? "Saving..." : "Save Changes"}
-            </button>
-          )}
+        <div className="mt-8 flex justify-end space-x-4">
+          <button
+            type="button"
+            onClick={handleCancel}
+            className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-dark-text-secondary hover:text-gray-900 dark:hover:text-dark-text-primary transition-colors"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            disabled={!hasChanges() || isSubmitting}
+            className={`px-4 py-2 text-sm font-medium text-white rounded-lg transition-all duration-200 ${
+              hasChanges() && !isSubmitting
+                ? "bg-primary-600 hover:bg-primary-700 shadow-sm hover:shadow"
+                : "bg-gray-300 dark:bg-dark-bg-tertiary cursor-not-allowed"
+            }`}
+          >
+            {isSubmitting ? "Saving..." : "Save Changes"}
+          </button>
         </div>
       </form>
     </div>

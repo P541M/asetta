@@ -25,66 +25,66 @@
 /* Custom component classes */
 @layer components {
   .card {
-    @apply bg-white rounded-lg shadow-sm p-6 border border-gray-100;
+    @apply bg-white rounded-lg shadow-sm p-6 border border-gray-100 dark:bg-dark-bg-secondary dark:border-dark-border-primary;
   }
   .btn {
     @apply px-4 py-2 rounded-md font-medium inline-flex items-center justify-center;
   }
   .btn-primary {
-    @apply bg-primary-500 text-white btn shadow-sm;
+    @apply bg-primary-500 text-white btn shadow-sm hover:bg-primary-600 dark:bg-dark-button-primary dark:hover:bg-dark-button-primary-hover;
   }
   .btn-secondary {
-    @apply bg-gray-200 text-gray-800 btn shadow-sm;
+    @apply bg-gray-200 text-gray-800 btn shadow-sm dark:bg-dark-button-secondary dark:text-dark-text-primary dark:hover:bg-dark-button-secondary-hover;
   }
   .btn-accent {
-    @apply bg-primary-500 text-white btn shadow-sm;
+    @apply bg-primary-500 text-white btn shadow-sm dark:bg-dark-button-primary dark:hover:bg-dark-button-primary-hover;
   }
   .btn-success {
-    @apply bg-emerald-500 text-white btn shadow-sm;
+    @apply bg-emerald-500 text-white btn shadow-sm dark:bg-emerald-600 dark:hover:bg-emerald-700;
   }
   .btn-danger {
-    @apply bg-red-500 text-white btn shadow-sm;
+    @apply bg-red-500 text-white btn shadow-sm dark:bg-red-600 dark:hover:bg-red-700;
   }
   .btn-outline {
-    @apply border border-primary-300 text-primary-600 btn shadow-sm;
+    @apply border border-primary-300 text-primary-600 btn shadow-sm dark:border-dark-border-primary dark:text-dark-text-primary dark:hover:bg-dark-hover-primary;
   }
   .input {
-    @apply w-full p-2.5 rounded-md border border-gray-300 focus:ring-2 focus:ring-primary-300 focus:border-primary-300 outline-none;
+    @apply w-full p-2.5 rounded-md border border-gray-300 focus:ring-2 focus:ring-primary-300 focus:border-primary-300 outline-none dark:bg-dark-input-bg dark:border-dark-input-border dark:text-dark-input-text dark:placeholder-dark-input-placeholder dark:focus:ring-dark-focus-ring;
   }
   .form-group {
     @apply mb-4;
   }
   .form-label {
-    @apply block text-sm font-medium text-gray-700 mb-1;
+    @apply block text-sm font-medium text-gray-700 mb-1 dark:text-dark-text-primary;
   }
   .badge {
     @apply px-2 py-0.5 text-xs font-medium rounded-full;
   }
   .badge-primary {
-    @apply bg-primary-100 text-primary-800 badge;
+    @apply bg-primary-100 text-primary-800 badge dark:bg-primary-900 dark:text-primary-100;
   }
   .badge-success {
-    @apply bg-emerald-100 text-emerald-800 badge;
+    @apply bg-emerald-100 text-emerald-800 badge dark:bg-emerald-900 dark:text-emerald-100;
   }
   .badge-warning {
-    @apply bg-amber-100 text-amber-800 badge;
+    @apply bg-amber-100 text-amber-800 badge dark:bg-amber-900 dark:text-amber-100;
   }
   .badge-danger {
-    @apply bg-red-100 text-red-800 badge;
+    @apply bg-red-100 text-red-800 badge dark:bg-red-900 dark:text-red-100;
   }
   .shadow-soft {
-    @apply shadow-md;
+    @apply shadow-md dark:shadow-none dark:border dark:border-dark-border-primary;
   }
   .navbar {
-    @apply bg-white border-b border-gray-100 py-4 sticky top-0 z-10 backdrop-blur-sm bg-white/90;
+    @apply bg-white border-b border-gray-100 py-4 sticky top-0 z-10 backdrop-blur-sm bg-white/90 dark:bg-dark-bg-secondary dark:border-dark-border-primary;
   }
   .logo {
-    @apply text-primary-600 font-bold text-xl;
+    @apply text-primary-600 font-bold text-xl dark:text-primary-400;
     font-family: "Lexend", sans-serif;
     letter-spacing: 0.025em;
   }
   .table-container {
-    @apply overflow-x-auto -mx-6 rounded-lg;
+    @apply overflow-x-auto -mx-6 rounded-lg dark:border dark:border-dark-border-primary;
   }
   .data-table {
     @apply w-full border-collapse;
@@ -93,13 +93,13 @@
     @apply p-3 text-left bg-gray-50 border-b border-gray-200 font-medium text-gray-700 dark:bg-dark-bg-tertiary dark:border-dark-border-primary dark:text-dark-text-primary;
   }
   .data-table td {
-    @apply p-3 border-b border-gray-100 dark:border-dark-border-primary;
+    @apply p-3 border-b border-gray-100 dark:border-dark-border-primary dark:text-dark-text-secondary;
   }
   .tab {
-    @apply relative px-5 py-4 font-medium text-sm;
+    @apply relative px-5 py-4 font-medium text-sm dark:text-dark-text-primary;
   }
   .tab.active::after {
-    @apply absolute bottom-0 left-0 right-0 h-0.5 bg-primary-500;
+    @apply absolute bottom-0 left-0 right-0 h-0.5 bg-primary-500 dark:bg-primary-400;
     content: "";
   }
   .tab:not(.active)::after {
@@ -107,7 +107,7 @@
     content: "";
   }
   .stat-card {
-    @apply bg-white rounded-lg shadow-sm p-4 border border-gray-100 cursor-default;
+    @apply bg-white rounded-lg shadow-sm p-4 border border-gray-100 cursor-default dark:bg-dark-bg-secondary dark:border-dark-border-primary;
   }
   .font-heading {
     font-family: "Lexend", sans-serif;

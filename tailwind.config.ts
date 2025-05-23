@@ -46,31 +46,31 @@ export default {
           900: "#005cff",
         },
         dark: {
-          "bg-primary": "#121212", // Main background
-          "bg-secondary": "#1E1E1E", // Secondary background
-          "bg-tertiary": "#2D2D2D", // Tertiary background
-          "text-primary": "#FFFFFF", // Primary text
-          "text-secondary": "#E0E0E0", // Secondary text
-          "text-tertiary": "#A0A0A0", // Tertiary text
-          "border-primary": "#333333", // Primary border
-          "border-secondary": "#404040", // Secondary border
-          "hover-primary": "#2D2D2D", // Hover state
-          "hover-secondary": "#333333", // Secondary hover state
-          "focus-ring": "#009cff", // Focus ring color
-          "input-bg": "#1E1E1E", // Input background
-          "input-border": "#333333", // Input border
-          "input-text": "#FFFFFF", // Input text
-          "input-placeholder": "#A0A0A0", // Input placeholder
-          "button-primary": "#009cff", // Primary button
-          "button-primary-hover": "#008cff", // Primary button hover
-          "button-secondary": "#2D2D2D", // Secondary button
-          "button-secondary-hover": "#333333", // Secondary button hover
-          "success-bg": "rgba(16, 185, 129, 0.1)", // Success background
-          "success-text": "#10B981", // Success text
-          "warning-bg": "rgba(245, 158, 11, 0.1)", // Warning background
-          "warning-text": "#F59E0B", // Warning text
-          "error-bg": "rgba(239, 68, 68, 0.1)", // Error background
-          "error-text": "#EF4444", // Error text
+          "bg-primary": "#0A0A0A", // Darker main background for better contrast
+          "bg-secondary": "#1A1A1A", // Slightly lighter secondary background
+          "bg-tertiary": "#2A2A2A", // Adjusted tertiary background
+          "text-primary": "#FFFFFF", // Keep white for primary text
+          "text-secondary": "#E5E5E5", // Brighter secondary text
+          "text-tertiary": "#B0B0B0", // Brighter tertiary text
+          "border-primary": "#404040", // Brighter border color
+          "border-secondary": "#505050", // Brighter secondary border
+          "hover-primary": "#2A2A2A", // Adjusted hover state
+          "hover-secondary": "#3A3A3A", // Adjusted secondary hover
+          "focus-ring": "#009cff", // Keep focus ring color
+          "input-bg": "#1A1A1A", // Adjusted input background
+          "input-border": "#404040", // Brighter input border
+          "input-text": "#FFFFFF", // Keep white for input text
+          "input-placeholder": "#B0B0B0", // Brighter placeholder text
+          "button-primary": "#009cff", // Keep primary button color
+          "button-primary-hover": "#008cff", // Keep primary button hover
+          "button-secondary": "#2A2A2A", // Adjusted secondary button
+          "button-secondary-hover": "#3A3A3A", // Adjusted secondary button hover
+          "success-bg": "rgba(16, 185, 129, 0.15)", // Slightly more visible success background
+          "success-text": "#10B981", // Keep success text
+          "warning-bg": "rgba(245, 158, 11, 0.15)", // Slightly more visible warning background
+          "warning-text": "#F59E0B", // Keep warning text
+          "error-bg": "rgba(239, 68, 68, 0.15)", // Slightly more visible error background
+          "error-text": "#EF4444", // Keep error text
         },
       },
       borderRadius: {

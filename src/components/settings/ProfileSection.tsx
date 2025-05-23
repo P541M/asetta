@@ -71,73 +71,77 @@ const ProfileSection = ({
 
   return (
     <div className="space-y-8">
-      {/* Profile Picture Section */}
-      <div className="flex flex-col items-center">
-        <div className="relative group">
-          <div className="h-40 w-40 rounded-full overflow-hidden bg-gray-100 dark:bg-dark-bg-tertiary ring-4 ring-white dark:ring-dark-bg-secondary shadow-lg">
+      {/* Profile Picture */}
+      <div className="flex flex-col items-center space-y-4">
+        <div className="relative">
+          <div className="w-32 h-32 rounded-full overflow-hidden bg-gray-100 dark:bg-dark-bg-secondary">
             {imagePreview ? (
-              <div className="relative h-40 w-40">
-                <Image
-                  src={imagePreview}
-                  alt="Profile"
-                  width={160}
-                  height={160}
-                  className="object-cover"
-                />
-              </div>
+              <Image
+                src={imagePreview}
+                alt="Profile"
+                width={128}
+                height={128}
+                className="w-full h-full object-cover"
+              />
             ) : (
-              <div className="h-full w-full bg-primary-100 dark:bg-primary-900/20 flex items-center justify-center text-primary-600 dark:text-primary-400">
+              <div className="w-full h-full flex items-center justify-center text-gray-400 dark:text-dark-text-tertiary">
                 <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-20 w-20"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
+                  className="w-16 h-16"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
                 >
                   <path
-                    fillRule="evenodd"
-                    d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
-                    clipRule="evenodd"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={1.5}
+                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
                   />
                 </svg>
               </div>
             )}
-            <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-opacity rounded-full flex items-center justify-center">
-              <button
-                type="button"
-                onClick={handleChooseImage}
-                className="opacity-0 group-hover:opacity-100 transition-opacity bg-white dark:bg-dark-bg-secondary text-gray-700 dark:text-dark-text-primary p-3 rounded-full shadow-lg hover:bg-gray-50 dark:hover:bg-dark-hover-primary"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-6 w-6"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                >
-                  <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
-                </svg>
-              </button>
-            </div>
           </div>
+          <label
+            htmlFor="profile-picture"
+            className="absolute bottom-0 right-0 p-2 bg-primary-600 text-white rounded-full cursor-pointer hover:bg-primary-700 transition-colors shadow-lg"
+            onClick={handleChooseImage}
+          >
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
+              />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"
+              />
+            </svg>
+          </label>
           <input
+            id="profile-picture"
             type="file"
-            ref={fileInputRef}
-            onChange={handleImageSelect}
-            className="hidden"
             accept="image/*"
+            className="hidden"
+            onChange={handleImageSelect}
           />
         </div>
-        <button
-          type="button"
-          onClick={handleChooseImage}
-          className="mt-4 text-sm font-medium text-primary-600 dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300 transition-colors"
-        >
-          Change profile picture
-        </button>
+        <p className="text-sm text-gray-500 dark:text-dark-text-tertiary">
+          Click the camera icon to change your profile picture
+        </p>
       </div>
 
-      {/* Form Fields */}
+      {/* Profile Information */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="space-y-1">
+        <div className="space-y-2">
           <label
             htmlFor="displayName"
             className="block text-sm font-medium text-gray-700 dark:text-dark-text-primary"
@@ -149,12 +153,12 @@ const ProfileSection = ({
             type="text"
             value={displayName}
             onChange={(e) => setDisplayName(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 dark:border-dark-input-border rounded-md shadow-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-dark-input-bg dark:text-dark-input-text transition-colors"
+            className="w-full px-4 py-2.5 border border-gray-300 dark:border-dark-input-border rounded-xl shadow-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-dark-input-bg dark:text-dark-input-text transition-all duration-200"
             placeholder="Your name"
           />
         </div>
 
-        <div className="space-y-1">
+        <div className="space-y-2">
           <label
             htmlFor="institution"
             className="block text-sm font-medium text-gray-700 dark:text-dark-text-primary"
@@ -166,12 +170,12 @@ const ProfileSection = ({
             type="text"
             value={institution}
             onChange={(e) => setInstitution(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 dark:border-dark-input-border rounded-md shadow-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-dark-input-bg dark:text-dark-input-text transition-colors"
+            className="w-full px-4 py-2.5 border border-gray-300 dark:border-dark-input-border rounded-xl shadow-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-dark-input-bg dark:text-dark-input-text transition-all duration-200"
             placeholder="Your university or school"
           />
         </div>
 
-        <div className="space-y-1">
+        <div className="space-y-2">
           <label
             htmlFor="studyProgram"
             className="block text-sm font-medium text-gray-700 dark:text-dark-text-primary"
@@ -183,12 +187,12 @@ const ProfileSection = ({
             type="text"
             value={studyProgram}
             onChange={(e) => setStudyProgram(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 dark:border-dark-input-border rounded-md shadow-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-dark-input-bg dark:text-dark-input-text transition-colors"
-            placeholder="Your field of study"
+            className="w-full px-4 py-2.5 border border-gray-300 dark:border-dark-input-border rounded-xl shadow-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-dark-input-bg dark:text-dark-input-text transition-all duration-200"
+            placeholder="Your study program"
           />
         </div>
 
-        <div className="space-y-1">
+        <div className="space-y-2">
           <label
             htmlFor="graduationYear"
             className="block text-sm font-medium text-gray-700 dark:text-dark-text-primary"
@@ -202,8 +206,7 @@ const ProfileSection = ({
             max={currentYear + 10}
             value={graduationYear}
             onChange={(e) => setGraduationYear(parseInt(e.target.value))}
-            className="w-full px-3 py-2 border border-gray-300 dark:border-dark-input-border rounded-md shadow-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-dark-input-bg dark:text-dark-input-text transition-colors"
-            placeholder="e.g., 2027"
+            className="w-full px-4 py-2.5 border border-gray-300 dark:border-dark-input-border rounded-xl shadow-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-dark-input-bg dark:text-dark-input-text transition-all duration-200"
           />
         </div>
       </div>
