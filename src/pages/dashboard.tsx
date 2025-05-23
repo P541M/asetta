@@ -274,7 +274,7 @@ const Dashboard = () => {
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
             <div>
-              <h2 className="text-3xl font-bold bg-gradient-to-r from-primary-600 to-primary-400 bg-clip-text text-transparent">
+              <h2 className="text-3xl font-bold text-primary-600 ">
                 Dashboard
               </h2>
               <p className="text-sm text-gray-500 dark:text-dark-text-tertiary mt-1">

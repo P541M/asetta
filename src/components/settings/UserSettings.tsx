@@ -238,9 +238,7 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
       {/* Header */}
       <div className="flex justify-between items-center mb-8">
         <div>
-          <h2 className="text-3xl font-bold bg-gradient-to-r from-primary-600 to-primary-400 bg-clip-text text-transparent">
-            Settings
-          </h2>
+          <h2 className="text-3xl font-bold  text-primary-600 ">Settings</h2>
           <p className="text-sm text-gray-500 dark:text-dark-text-tertiary mt-1">
             Manage your account settings and preferences
           </p>
