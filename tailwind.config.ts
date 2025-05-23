@@ -33,44 +33,32 @@ export default {
           800: "#1f2937",
           900: "#111827",
         },
-        accent: {
-          50: "#e6f7ff",
-          100: "#ccefff",
-          200: "#99dfff",
-          300: "#66cfff",
-          400: "#33bfff",
-          500: "#009cff",
-          600: "#008cff",
-          700: "#007cff",
-          800: "#006cff",
-          900: "#005cff",
-        },
         dark: {
-          "bg-primary": "#0A0A0A", // Darker main background for better contrast
-          "bg-secondary": "#1A1A1A", // Slightly lighter secondary background
-          "bg-tertiary": "#2A2A2A", // Adjusted tertiary background
-          "text-primary": "#FFFFFF", // Keep white for primary text
-          "text-secondary": "#E5E5E5", // Brighter secondary text
-          "text-tertiary": "#B0B0B0", // Brighter tertiary text
-          "border-primary": "#404040", // Brighter border color
-          "border-secondary": "#505050", // Brighter secondary border
-          "hover-primary": "#2A2A2A", // Adjusted hover state
-          "hover-secondary": "#3A3A3A", // Adjusted secondary hover
-          "focus-ring": "#009cff", // Keep focus ring color
-          "input-bg": "#1A1A1A", // Adjusted input background
-          "input-border": "#404040", // Brighter input border
-          "input-text": "#FFFFFF", // Keep white for input text
-          "input-placeholder": "#B0B0B0", // Brighter placeholder text
-          "button-primary": "#009cff", // Keep primary button color
-          "button-primary-hover": "#008cff", // Keep primary button hover
-          "button-secondary": "#2A2A2A", // Adjusted secondary button
-          "button-secondary-hover": "#3A3A3A", // Adjusted secondary button hover
-          "success-bg": "rgba(16, 185, 129, 0.15)", // Slightly more visible success background
-          "success-text": "#10B981", // Keep success text
-          "warning-bg": "rgba(245, 158, 11, 0.15)", // Slightly more visible warning background
-          "warning-text": "#F59E0B", // Keep warning text
-          "error-bg": "rgba(239, 68, 68, 0.15)", // Slightly more visible error background
-          "error-text": "#EF4444", // Keep error text
+          "bg-primary": "#0A0A0A",
+          "bg-secondary": "#1A1A1A",
+          "bg-tertiary": "#2A2A2A",
+          "text-primary": "#FFFFFF",
+          "text-secondary": "#E5E5E5",
+          "text-tertiary": "#B0B0B0",
+          "border-primary": "#404040",
+          "border-secondary": "#505050",
+          "hover-primary": "#2A2A2A",
+          "hover-secondary": "#3A3A3A",
+          "focus-ring": "#009cff",
+          "input-bg": "#1A1A1A",
+          "input-border": "#404040",
+          "input-text": "#FFFFFF",
+          "input-placeholder": "#B0B0B0",
+          "button-primary": "#009cff",
+          "button-primary-hover": "#008cff",
+          "button-secondary": "#2A2A2A",
+          "button-secondary-hover": "#3A3A3A",
+          "success-bg": "rgba(16, 185, 129, 0.15)",
+          "success-text": "#10B981",
+          "warning-bg": "rgba(245, 158, 11, 0.15)",
+          "warning-text": "#F59E0B",
+          "error-bg": "rgba(239, 68, 68, 0.15)",
+          "error-text": "#EF4444",
         },
       },
       borderRadius: {

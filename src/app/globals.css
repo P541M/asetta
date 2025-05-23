@@ -16,8 +16,6 @@
     --secondary-foreground: 222.2 47.4% 11.2%;
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 199 100% 50%;
-    --accent-foreground: 222.2 47.4% 11.2%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
     --border: 214.3 31.8% 91.4%;
@@ -39,8 +37,6 @@
     --secondary-foreground: 210 40% 98%;
     --muted: 217.2 32.6% 17.5%;
     --muted-foreground: 215 20.2% 65.1%;
-    --accent: 199 100% 50%;
-    --accent-foreground: 210 40% 98%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
     --border: 217.2 32.6% 17.5%;
@@ -58,18 +54,21 @@
   }
 }
 
-/* Custom styles */
 @layer components {
+  .btn {
+    @apply px-4 py-2 rounded-lg font-medium inline-flex items-center justify-center transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2;
+  }
+
   .btn-primary {
-    @apply bg-primary-500 text-white px-4 py-2 rounded-lg hover:bg-primary-600 transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:bg-dark-button-primary dark:hover:bg-dark-button-primary-hover dark:focus:ring-dark-focus-ring;
+    @apply btn bg-primary-500 text-white hover:bg-primary-600 dark:bg-dark-button-primary dark:hover:bg-dark-button-primary-hover;
   }
 
   .btn-outline {
-    @apply border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:border-dark-border-primary dark:text-dark-text-primary dark:hover:bg-dark-hover-primary dark:focus:ring-dark-focus-ring;
+    @apply btn border border-gray-300 text-gray-700 hover:bg-gray-50 dark:border-dark-border-primary dark:text-dark-text-primary dark:hover:bg-dark-hover-primary;
   }
 
   .input {
-    @apply w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-dark-input-bg dark:border-dark-input-border dark:text-dark-input-text dark:placeholder-dark-input-placeholder dark:focus:ring-dark-focus-ring;
+    @apply w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-dark-input-bg dark:border-dark-input-border dark:text-dark-input-text dark:placeholder-dark-input-placeholder;
   }
 
   .form-label {
@@ -79,6 +78,59 @@
   .form-group {
     @apply mb-4;
   }
+
+  .card {
+    @apply bg-white rounded-lg shadow-sm border border-gray-200 dark:bg-dark-bg-primary dark:border-dark-border-primary;
+  }
+
+  .card-header {
+    @apply px-6 py-4 border-b border-gray-200 dark:border-dark-border-primary;
+  }
+
+  .card-body {
+    @apply p-6;
+  }
+
+  .badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+
+  .badge-success {
+    @apply bg-green-100 text-green-800 dark:bg-dark-success-bg dark:text-dark-success-text;
+  }
+
+  .badge-warning {
+    @apply bg-yellow-100 text-yellow-800 dark:bg-dark-warning-bg dark:text-dark-warning-text;
+  }
+
+  .badge-danger {
+    @apply bg-red-100 text-red-800 dark:bg-dark-error-bg dark:text-dark-error-text;
+  }
+}
+
+/* Scrollbar styles */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-gray-100 dark:bg-dark-bg-secondary;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-gray-300 rounded-full hover:bg-gray-400 dark:bg-dark-bg-tertiary dark:hover:bg-dark-border-primary;
+}
+
+/* For Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: theme("colors.gray.300") theme("colors.gray.100");
+}
+
+.dark * {
+  scrollbar-color: theme("colors.dark.bg-tertiary")
+    theme("colors.dark.bg-secondary");
 }
 
 /* Table styles */
@@ -110,36 +162,6 @@
   @apply px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-dark-text-primary;
 }
 
-/* Card styles */
-.card {
-  @apply bg-white rounded-lg shadow-sm border border-gray-200 dark:bg-dark-bg-primary dark:border-dark-border-primary;
-}
-
-.card-header {
-  @apply px-6 py-4 border-b border-gray-200 dark:border-dark-border-primary;
-}
-
-.card-body {
-  @apply p-6;
-}
-
-/* Badge styles */
-.badge {
-  @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
-}
-
-.badge-success {
-  @apply bg-green-100 text-green-800 dark:bg-dark-success-bg dark:text-dark-success-text;
-}
-
-.badge-warning {
-  @apply bg-yellow-100 text-yellow-800 dark:bg-dark-warning-bg dark:text-dark-warning-text;
-}
-
-.badge-danger {
-  @apply bg-red-100 text-red-800 dark:bg-dark-error-bg dark:text-dark-error-text;
-}
-
 /* Modal styles */
 .modal-overlay {
   @apply fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50;
@@ -159,31 +181,6 @@
 
 .modal-footer {
   @apply flex justify-end gap-2 p-6 border-t border-gray-200 dark:border-dark-border-primary;
-}
-
-/* Scrollbar styles */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-::-webkit-scrollbar-track {
-  @apply bg-gray-100 dark:bg-dark-bg-secondary;
-}
-
-::-webkit-scrollbar-thumb {
-  @apply bg-gray-300 rounded-full hover:bg-gray-400 dark:bg-dark-bg-tertiary dark:hover:bg-dark-border-primary;
-}
-
-/* For Firefox */
-* {
-  scrollbar-width: thin;
-  scrollbar-color: theme("colors.gray.300") theme("colors.gray.100");
-}
-
-.dark * {
-  scrollbar-color: theme("colors.dark.bg-tertiary")
-    theme("colors.dark.bg-secondary");
 }
 
 /* Animations */
