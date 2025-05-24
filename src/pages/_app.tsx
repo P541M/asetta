@@ -1,7 +1,7 @@
 // src/pages/_app.tsx
 import type { AppProps } from "next/app";
 import Head from "next/head";
-import "../styles/globals.css";
+import "../app/globals.css";
 import { AuthProvider } from "../contexts/AuthContext";
 import { ThemeProvider } from "../contexts/ThemeContext";
 import { Outfit, Lexend } from "next/font/google";

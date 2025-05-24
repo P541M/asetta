@@ -1,0 +1,50 @@
+/* Form Components */
+.form-group {
+  @apply mb-4;
+}
+
+.form-label {
+  @apply block text-sm font-medium text-light-text-primary mb-1 dark:text-dark-text-primary;
+}
+
+.input {
+  @apply w-full p-2.5 rounded-md border border-light-input-border focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none bg-light-input-bg text-light-input-text placeholder-light-input-placeholder dark:bg-dark-input-bg dark:border-dark-input-border dark:text-dark-input-text dark:placeholder-dark-input-placeholder;
+}
+
+/* Form Message Styles */
+.form-message {
+  @apply mt-4 p-3 rounded-lg text-sm animate-fade-in;
+}
+
+.form-message.error {
+  @apply bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300 border border-red-100 dark:border-red-800;
+}
+
+.form-message.success {
+  @apply bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300 border border-emerald-100 dark:border-emerald-800;
+}
+
+/* Password Strength Indicator */
+.password-strength {
+  @apply flex items-center space-x-1;
+}
+
+.password-strength-bar {
+  @apply h-1.5 w-2 rounded-full;
+}
+
+.password-strength-bar.weak {
+  @apply text-red-500;
+}
+
+.password-strength-bar.medium {
+  @apply text-yellow-500;
+}
+
+.password-strength-bar.strong {
+  @apply text-green-500;
+}
+
+.password-strength-bar.inactive {
+  @apply bg-gray-200;
+}
