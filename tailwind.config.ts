@@ -61,7 +61,7 @@ export default {
           "error-text": "#DC2626",
         },
         dark: {
-          "bg-primary": "#0A0A0A",
+          "bg-primary": "#131313",
           "bg-secondary": "#1A1A1A",
           "bg-tertiary": "#2A2A2A",
           "text-primary": "#FFFFFF",

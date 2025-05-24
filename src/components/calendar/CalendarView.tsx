@@ -264,7 +264,7 @@ const CalendarView = ({ selectedSemester, semesterId }: CalendarViewProps) => {
     if (status === "In progress") {
       return "bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-800";
     }
-    return "bg-gray-50 dark:bg-dark-bg-tertiary text-gray-800 dark:text-gray-400 border border-gray-200 dark:border-dark-border";
+    return "bg-gray-50 dark:bg-dark-bg-tertiary text-gray-800 dark:text-gray-400 border border-gray-200 dark:border-dark-border-primary";
   };
 
   // Export calendar
@@ -332,12 +332,12 @@ const CalendarView = ({ selectedSemester, semesterId }: CalendarViewProps) => {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Search assessments..."
-              className="input py-1.5 px-3 text-sm w-48 dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border"
+              className="input py-1.5 px-3 text-sm w-48 dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border-primary"
             />
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="input py-1.5 px-3 text-sm dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border"
+              className="input py-1.5 px-3 text-sm dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border-primary"
             >
               <option value="all">All Status</option>
               <option value="Not started">Not Started</option>
@@ -433,14 +433,14 @@ const CalendarView = ({ selectedSemester, semesterId }: CalendarViewProps) => {
               </div>
             ))}
           </div>
-          <div className="grid grid-cols-7 auto-rows-fr bg-white dark:bg-dark-bg-secondary border-l border-t dark:border-dark-border">
+          <div className="grid grid-cols-7 auto-rows-fr bg-white dark:bg-dark-bg-secondary border-l border-t dark:border-dark-border-primary">
             {calendarDays.map((day, index) => (
               <div
                 key={index}
                 onClick={() =>
                   day.assessments.length > 0 && setSelectedDay(day)
                 }
-                className={`relative p-2 min-h-[120px] border-r border-b dark:border-dark-border transition-colors ${
+                className={`relative p-2 min-h-[120px] border-r border-b dark:border-dark-border-primary transition-colors ${
                   day.isCurrentMonth
                     ? "bg-white dark:bg-dark-bg-secondary"
                     : "bg-gray-50/50 dark:bg-dark-bg-tertiary/50"
@@ -499,7 +499,7 @@ const CalendarView = ({ selectedSemester, semesterId }: CalendarViewProps) => {
                     </div>
                   ))}
                   {day.assessments.length > 3 && (
-                    <div className="text-xs text-gray-500 dark:text-dark-text-tertiary font-medium bg-gray-50 dark:bg-dark-bg-tertiary px-2 py-1 rounded-md border border-gray-200 dark:border-dark-border">
+                    <div className="text-xs text-gray-500 dark:text-dark-text-tertiary font-medium bg-gray-50 dark:bg-dark-bg-tertiary px-2 py-1 rounded-md border border-gray-200 dark:border-dark-border-primary">
                       +{day.assessments.length - 3} more
                     </div>
                   )}
@@ -551,7 +551,7 @@ const CalendarView = ({ selectedSemester, semesterId }: CalendarViewProps) => {
               {selectedDay.assessments.map((assessment) => (
                 <div
                   key={assessment.id}
-                  className="p-4 rounded-lg border border-gray-200 dark:border-dark-border bg-white dark:bg-dark-bg-tertiary hover:shadow-sm transition-shadow"
+                  className="p-4 rounded-lg border border-gray-200 dark:border-dark-border-primary bg-white dark:bg-dark-bg-tertiary hover:shadow-sm transition-shadow"
                 >
                   <div className="flex justify-between items-start">
                     <div>

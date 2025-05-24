@@ -308,7 +308,7 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
       </div>
 
       <div className="overflow-x-auto">
-        <div className="rounded-lg border border-gray-200 dark:border-dark-border overflow-hidden">
+        <div className="rounded-lg border border-gray-200 dark:border-dark-border-primary overflow-hidden">
           <table className="min-w-full divide-y divide-gray-200 dark:divide-dark-border">
             <thead className="bg-gray-50 dark:bg-dark-bg-tertiary">
               <tr>
@@ -349,7 +349,7 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
                         onChange={(e) =>
                           handleWeightChange(assessment.id, e.target.value)
                         }
-                        className="w-20 px-2 py-1 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                        className="w-20 px-2 py-1 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border-primary [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                         placeholder="0-100"
                       />
                       <span className="ml-1 text-gray-500 dark:text-dark-text-tertiary">
@@ -368,7 +368,7 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
                         onChange={(e) =>
                           handleMarkChange(assessment.id, e.target.value)
                         }
-                        className="w-20 px-2 py-1 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                        className="w-20 px-2 py-1 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border-primary [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                         placeholder="0+"
                       />
                       <span className="ml-1 text-gray-500 dark:text-dark-text-tertiary">

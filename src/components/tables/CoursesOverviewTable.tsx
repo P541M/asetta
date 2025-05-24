@@ -362,7 +362,7 @@ const CoursesOverviewTable = ({
           <p>{error}</p>
         </div>
       ) : (
-        <div className="table-container rounded-lg border border-gray-100 dark:border-dark-border">
+        <div className="table-container rounded-lg border border-gray-100 dark:border-dark-border-primary">
           <table className="data-table">
             <thead className="bg-gray-50 dark:bg-dark-bg-tertiary">
               <tr>
@@ -451,7 +451,10 @@ const CoursesOverviewTable = ({
             </thead>
             <tbody>
               {sortedCourses.map((course) => (
-                <tr key={course.courseName} className="dark:border-dark-border">
+                <tr
+                  key={course.courseName}
+                  className="dark:border-dark-border-primary"
+                >
                   <td className="font-medium whitespace-nowrap dark:text-dark-text-primary">
                     {course.courseName}
                   </td>
@@ -604,7 +607,7 @@ const CoursesOverviewTable = ({
       {selectedOutline && outlineUrls[selectedOutline] && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white dark:bg-dark-bg-secondary rounded-lg shadow-xl w-[80vw] h-[95vh] flex flex-col">
-            <div className="p-4 border-b border-gray-100 dark:border-dark-border flex items-center justify-between">
+            <div className="p-4 border-b border-gray-100 dark:border-dark-border-primary flex items-center justify-between">
               <div>
                 <h3 className="text-xl font-semibold text-gray-900 dark:text-dark-text-primary">
                   {selectedOutline} Course Outline
@@ -618,7 +621,7 @@ const CoursesOverviewTable = ({
                   onClick={() =>
                     window.open(outlineUrls[selectedOutline], "_blank")
                   }
-                  className="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-dark-border shadow-sm text-sm font-medium rounded-md text-gray-700 dark:text-dark-text-primary bg-white dark:bg-dark-bg-secondary hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+                  className="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-dark-border-primary shadow-sm text-sm font-medium rounded-md text-gray-700 dark:text-dark-text-primary bg-white dark:bg-dark-bg-secondary hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -636,7 +639,7 @@ const CoursesOverviewTable = ({
                   </svg>
                   Open in New Tab
                 </button>
-                <label className="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-dark-border shadow-sm text-sm font-medium rounded-md text-gray-700 dark:text-dark-text-primary bg-white dark:bg-dark-bg-secondary hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 cursor-pointer">
+                <label className="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-dark-border-primary shadow-sm text-sm font-medium rounded-md text-gray-700 dark:text-dark-text-primary bg-white dark:bg-dark-bg-secondary hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 cursor-pointer">
                   <input
                     type="file"
                     accept="application/pdf"

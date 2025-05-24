@@ -95,7 +95,7 @@ const Header = ({ onLogout }: HeaderProps) => {
   return (
     <>
       <header
-        className={`bg-white dark:bg-dark-bg-secondary border-b border-gray-100 dark:border-dark-border sticky top-0 z-50 transition-all duration-300 ${
+        className={`bg-white dark:bg-dark-bg-secondary border-b border-gray-100 dark:border-dark-border-primary sticky top-0 z-50 transition-all duration-300 ${
           scrolled
             ? "shadow-md backdrop-blur-sm bg-white/95 dark:bg-dark-bg-secondary/95"
             : "bg-white dark:bg-dark-bg-secondary"
@@ -137,7 +137,7 @@ const Header = ({ onLogout }: HeaderProps) => {
                             alt={user.displayName || "User"}
                             width={32}
                             height={32}
-                            className="rounded-full object-cover border border-gray-200 dark:border-dark-border"
+                            className="rounded-full object-cover border border-gray-200 dark:border-dark-border-primary"
                             loader={avatarLoader}
                           />
                         </div>
@@ -179,9 +179,9 @@ const Header = ({ onLogout }: HeaderProps) => {
                     {showDropdown && (
                       <div
                         ref={dropdownRef}
-                        className="absolute right-0 mt-2 w-48 bg-white dark:bg-dark-bg-secondary rounded-md shadow-lg py-1 z-10 animate-fade-in-down border border-gray-100 dark:border-dark-border"
+                        className="absolute right-0 mt-2 w-48 bg-white dark:bg-dark-bg-secondary rounded-md shadow-lg py-1 z-10 animate-fade-in-down border border-gray-100 dark:border-dark-border-primary"
                       >
-                        <div className="px-4 py-2 text-sm text-gray-500 dark:text-dark-text-tertiary border-b border-gray-100 dark:border-dark-border">
+                        <div className="px-4 py-2 text-sm text-gray-500 dark:text-dark-text-tertiary border-b border-gray-100 dark:border-dark-border-primary">
                           Signed in as
                           <div className="font-medium text-gray-900 dark:text-dark-text-primary truncate">
                             {user.email}
@@ -209,7 +209,7 @@ const Header = ({ onLogout }: HeaderProps) => {
 
                         <button
                           onClick={handleLogout}
-                          className="flex w-full items-center px-4 py-2 text-sm text-gray-700 dark:text-dark-text-primary hover:bg-gray-100 dark:hover:bg-dark-bg-tertiary transition-colors duration-150 border-t border-gray-100 dark:border-dark-border"
+                          className="flex w-full items-center px-4 py-2 text-sm text-gray-700 dark:text-dark-text-primary hover:bg-gray-100 dark:hover:bg-dark-bg-tertiary transition-colors duration-150 border-t border-gray-100 dark:border-dark-border-primary"
                         >
                           <svg
                             xmlns="http://www.w3.org/2000/svg"

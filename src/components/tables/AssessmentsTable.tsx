@@ -736,7 +736,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
             <select
               value={filter}
               onChange={(e) => setFilter(e.target.value)}
-              className="input bg-white dark:bg-dark-bg-tertiary max-w-xs py-1.5 px-3 text-sm transition-all duration-300 hover:shadow-sm dark:text-dark-text-primary dark:border-dark-border"
+              className="input bg-white dark:bg-dark-bg-tertiary max-w-xs py-1.5 px-3 text-sm transition-all duration-300 hover:shadow-sm dark:text-dark-text-primary dark:border-dark-border-primary"
             >
               <option value="all">All Tasks</option>
               <option value="not_submitted">Not Submitted</option>
@@ -759,7 +759,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                 {!showBulkStatusUpdate ? (
                   <select
                     onChange={(e) => handleStatusSelect(e.target.value)}
-                    className="input py-1.5 px-3 text-sm bg-white dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border"
+                    className="input py-1.5 px-3 text-sm bg-white dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border-primary"
                     defaultValue=""
                   >
                     <option value="" disabled>
@@ -833,7 +833,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
           </p>
         </div>
       ) : (
-        <div className="table-container rounded-lg border border-gray-100 dark:border-dark-border">
+        <div className="table-container rounded-lg border border-gray-100 dark:border-dark-border-primary">
           <table className="data-table">
             <thead className="bg-gray-50 dark:bg-dark-bg-tertiary">
               <tr>
@@ -845,7 +845,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                       sortedAssessments.length > 0
                     }
                     onChange={toggleSelectAll}
-                    className="h-4 w-4 rounded border-gray-300 dark:border-dark-border text-primary-500 dark:text-primary-400 focus:ring-primary-500 dark:focus:ring-primary-400"
+                    className="h-4 w-4 rounded border-gray-300 dark:border-dark-border-primary text-primary-500 dark:text-primary-400 focus:ring-primary-500 dark:focus:ring-primary-400"
                   />
                 </th>
                 <th className="w-32 dark:text-dark-text-primary">Status</th>
@@ -941,7 +941,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                         name="status"
                         value={editFormData.status}
                         onChange={handleEditFormChange}
-                        className="input py-1 px-2 text-sm transition-all duration-300 w-full dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border"
+                        className="input py-1 px-2 text-sm transition-all duration-300 w-full dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border-primary"
                       >
                         <option value="Not started">Not Started</option>
                         <option value="In progress">In Progress</option>
@@ -954,7 +954,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                         name="courseName"
                         value={editFormData.courseName}
                         onChange={handleEditFormChange}
-                        className="input py-1 px-2 text-sm w-full dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border"
+                        className="input py-1 px-2 text-sm w-full dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border-primary"
                       />
                     </td>
                     <td>
@@ -963,7 +963,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                         name="assignmentName"
                         value={editFormData.assignmentName}
                         onChange={handleEditFormChange}
-                        className="input py-1 px-2 text-sm w-full dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border"
+                        className="input py-1 px-2 text-sm w-full dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border-primary"
                       />
                     </td>
                     <td>
@@ -973,14 +973,14 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                           name="dueDate"
                           value={editFormData.dueDate}
                           onChange={handleEditFormChange}
-                          className="input py-1 px-2 text-sm w-2/3 dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border"
+                          className="input py-1 px-2 text-sm w-2/3 dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border-primary"
                         />
                         <input
                           type="time"
                           name="dueTime"
                           value={editFormData.dueTime}
                           onChange={handleEditFormChange}
-                          className="input py-1 px-2 text-sm w-1/3 dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border"
+                          className="input py-1 px-2 text-sm w-1/3 dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border-primary"
                         />
                       </div>
                     </td>
@@ -998,7 +998,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                         min="0"
                         max="100"
                         step="0.1"
-                        className="input py-1 px-2 text-sm w-full dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border"
+                        className="input py-1 px-2 text-sm w-full dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border-primary"
                       />
                     </td>
                     <td></td>
@@ -1053,7 +1053,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                           checked={selectedRows.includes(assessment.id)}
                           onChange={() => toggleRowSelection(assessment.id)}
                           onClick={(e) => e.stopPropagation()}
-                          className="h-4 w-4 rounded border-gray-300 dark:border-dark-border text-primary-500 dark:text-primary-400 focus:ring-primary-500 dark:focus:ring-primary-400"
+                          className="h-4 w-4 rounded border-gray-300 dark:border-dark-border-primary text-primary-500 dark:text-primary-400 focus:ring-primary-500 dark:focus:ring-primary-400"
                         />
                       )}
                     </td>
@@ -1065,7 +1065,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                           handleStatusChange(assessment.id, e.target.value)
                         }
                         onClick={(e) => e.stopPropagation()}
-                        className="input py-1 px-2 text-sm transition-all duration-300 w-full dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border"
+                        className="input py-1 px-2 text-sm transition-all duration-300 w-full dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border-primary"
                       >
                         <option value="Not started">Not Started</option>
                         <option value="In progress">In Progress</option>
@@ -1281,7 +1281,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                     }\n\nNotes:\n${notesInput}`;
                     navigator.clipboard.writeText(text);
                   }}
-                  className="inline-flex items-center px-3 py-1.5 border border-gray-300 dark:border-dark-border shadow-sm text-sm font-medium rounded-md text-gray-700 dark:text-dark-text-primary bg-white dark:bg-dark-bg-tertiary hover:bg-gray-50 dark:hover:bg-dark-bg-secondary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:focus:ring-primary-400"
+                  className="inline-flex items-center px-3 py-1.5 border border-gray-300 dark:border-dark-border-primary shadow-sm text-sm font-medium rounded-md text-gray-700 dark:text-dark-text-primary bg-white dark:bg-dark-bg-tertiary hover:bg-gray-50 dark:hover:bg-dark-bg-secondary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:focus:ring-primary-400"
                   title="Copy Notes"
                 >
                   <svg
@@ -1329,7 +1329,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                 </button>
               </div>
             </div>
-            <div className="flex-1 mb-4 border rounded-lg overflow-hidden dark:border-dark-border">
+            <div className="flex-1 mb-4 border rounded-lg overflow-hidden dark:border-dark-border-primary">
               <RichTextEditor
                 content={notesInput}
                 onChange={setNotesInput}

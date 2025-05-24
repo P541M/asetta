@@ -233,7 +233,7 @@ function SortableSemester({
               value={editValue}
               onChange={(e) => setEditValue(e.target.value)}
               onKeyDown={handleKeyDown}
-              className="input text-sm py-1 px-2 dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border flex-grow min-w-0"
+              className="input text-sm py-1 px-2 dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border-primary flex-grow min-w-0"
               onClick={(e) => e.stopPropagation()}
             />
             <div className="flex items-center px-1">
@@ -670,7 +670,7 @@ const SemesterTabs = ({
 
   if (isLoading) {
     return (
-      <div className="mb-4 bg-white dark:bg-dark-bg-secondary rounded-lg shadow-sm p-4 border border-gray-100 dark:border-dark-border">
+      <div className="mb-4 bg-white dark:bg-dark-bg-secondary rounded-lg shadow-sm p-4 border border-gray-100 dark:border-dark-border-primary">
         <div className="flex justify-center py-2">
           <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary-600"></div>
         </div>
@@ -680,7 +680,7 @@ const SemesterTabs = ({
 
   return (
     <div className={`semester-tabs-container mb-6 ${className}`}>
-      <div className="flex items-center justify-between px-4 py-2 border-b border-gray-100 dark:border-dark-border">
+      <div className="flex items-center justify-between px-4 py-2 border-b border-gray-100 dark:border-dark-border-primary">
         <div className="flex items-center space-x-2">
           <h2 className="text-sm font-medium text-gray-700 dark:text-dark-text-primary">
             Semesters
@@ -725,7 +725,7 @@ const SemesterTabs = ({
             </button>
 
             {showMoreOptions && (
-              <div className="absolute right-0 top-full mt-1 bg-white dark:bg-dark-bg-secondary border border-gray-100 dark:border-dark-border rounded-md shadow-md z-20 animate-fade-in-down">
+              <div className="absolute right-0 top-full mt-1 bg-white dark:bg-dark-bg-secondary border border-gray-100 dark:border-dark-border-primary rounded-md shadow-md z-20 animate-fade-in-down">
                 <button
                   onClick={() => {
                     setShowMoreOptions(false);
@@ -774,7 +774,7 @@ const SemesterTabs = ({
       {/* Add semester input */}
       {showAddInput && (
         <div
-          className="px-4 py-2 border-t border-gray-100 dark:border-dark-border"
+          className="px-4 py-2 border-t border-gray-100 dark:border-dark-border-primary"
           ref={addInputRef}
         >
           <div className="flex items-center space-x-2">
@@ -783,7 +783,7 @@ const SemesterTabs = ({
               value={newSemester}
               onChange={(e) => setNewSemester(e.target.value)}
               placeholder="Enter semester name"
-              className="flex-1 px-3 py-1.5 text-sm border border-gray-200 dark:border-dark-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-400 focus:border-transparent dark:bg-dark-bg-tertiary dark:text-dark-text-primary"
+              className="flex-1 px-3 py-1.5 text-sm border border-gray-200 dark:border-dark-border-primary rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-400 focus:border-transparent dark:bg-dark-bg-tertiary dark:text-dark-text-primary"
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
                   handleAddSemester();
@@ -869,7 +869,7 @@ const SemesterTabs = ({
               to modify.
             </p>
 
-            <div className="max-h-64 overflow-y-auto border border-gray-200 dark:border-dark-border rounded-md">
+            <div className="max-h-64 overflow-y-auto border border-gray-200 dark:border-dark-border-primary rounded-md">
               {semesters.length === 0 ? (
                 <div className="py-8 text-center text-gray-500 dark:text-dark-text-tertiary">
                   <svg
