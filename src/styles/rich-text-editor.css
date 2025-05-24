@@ -1,5 +1,5 @@
 .rich-text-editor {
-  @apply bg-white;
+  @apply bg-light-bg-primary dark:bg-dark-bg-primary;
 }
 
 .rich-text-editor .ProseMirror {
@@ -19,18 +19,18 @@
 }
 
 .rich-text-editor .ProseMirror a {
-  @apply text-primary-500 hover:text-primary-600 underline;
+  @apply text-light-button-primary hover:text-light-button-primary-hover underline dark:text-dark-button-primary dark:hover:bg-dark-button-primary-hover;
 }
 
 .rich-text-editor .ProseMirror p.is-editor-empty:first-child::before {
-  @apply text-gray-400 float-left h-0 pointer-events-none;
+  @apply text-light-text-tertiary float-left h-0 pointer-events-none dark:text-dark-text-tertiary;
   content: attr(data-placeholder);
 }
 
 .rich-text-editor .toolbar button {
-  @apply text-gray-600 hover:text-gray-900 transition-colors;
+  @apply text-light-text-tertiary hover:text-light-text-primary transition-colors dark:text-dark-text-tertiary dark:hover:text-dark-text-primary;
 }
 
 .rich-text-editor .toolbar button.is-active {
-  @apply text-primary-500 bg-primary-50;
+  @apply text-light-button-primary bg-light-button-primary/10 dark:text-dark-button-primary dark:bg-dark-button-primary/10;
 }
