@@ -251,10 +251,12 @@ const Dashboard = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="flex flex-col items-center animate-pulse">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500"></div>
-          <p className="mt-4 text-gray-600">Loading...</p>
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-dark-bg-primary">
+        <div className="flex flex-col items-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+          <p className="mt-4 text-gray-600 dark:text-dark-text-secondary">
+            Loading...
+          </p>
         </div>
       </div>
     );
@@ -569,7 +571,7 @@ const Dashboard = () => {
                   <div className="animate-fade-in">
                     {isLoading ? (
                       <div className="flex justify-center py-8">
-                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500"></div>
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500 dark:border-primary-400"></div>
                       </div>
                     ) : error ? (
                       <div className="p-4 bg-red-50 rounded-md text-red-700 animate-fade-in shadow-sm">
@@ -596,7 +598,7 @@ const Dashboard = () => {
                   <div className="animate-fade-in">
                     {isLoading ? (
                       <div className="flex justify-center py-8">
-                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500"></div>
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500 dark:border-primary-400"></div>
                       </div>
                     ) : error ? (
                       <div className="p-4 bg-red-50 rounded-md text-red-700 animate-fade-in shadow-sm">
