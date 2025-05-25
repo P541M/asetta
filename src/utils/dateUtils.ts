@@ -54,7 +54,7 @@ export const getDaysUntil = (
 ): number => {
   const dueDate = parseLocalDateTime(dateStr, timeStr);
   const now = new Date();
-  return Math.round(
+  return Math.floor(
     (dueDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
   );
 };
