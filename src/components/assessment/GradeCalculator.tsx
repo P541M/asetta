@@ -10,11 +10,7 @@ import {
   updateDoc,
 } from "firebase/firestore";
 import { Assessment } from "../../types/assessment";
-
-interface GradeCalculatorProps {
-  semesterId: string;
-  selectedCourse: string;
-}
+import { GradeCalculatorProps } from "../../types/course";
 
 const GradeCalculator: React.FC<GradeCalculatorProps> = ({
   semesterId,

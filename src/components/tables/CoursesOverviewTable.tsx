@@ -15,32 +15,8 @@ import {
   formatLocalDate,
   isUpcoming as isDateUpcoming,
 } from "../../utils/dateUtils";
-
-interface Assessment {
-  id: string;
-  courseName: string;
-  assignmentName: string;
-  dueDate: string;
-  dueTime: string;
-  weight: number;
-  status: string;
-}
-
-interface CourseStats {
-  courseName: string;
-  totalAssessments: number;
-  pendingAssessments: number;
-  completedAssessments: number;
-  nextDueDate: string | null;
-  nextAssignment: string | null;
-  progress: number;
-  outlineUrl?: string;
-}
-
-interface CoursesOverviewTableProps {
-  semesterId: string;
-  onSelectCourse: (courseName: string) => void;
-}
+import { CourseStats, CoursesOverviewTableProps } from "../../types/course";
+import { Assessment } from "../../types/assessment";
 
 const CoursesOverviewTable = ({
   semesterId,

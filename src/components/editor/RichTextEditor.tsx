@@ -17,13 +17,7 @@ import {
   MdUndo,
   MdRedo,
 } from "react-icons/md";
-
-interface RichTextEditorProps {
-  content: string;
-  onChange: (content: string) => void;
-  placeholder?: string;
-  onAddLink?: (callback: (url: string, text: string) => void) => void;
-}
+import { RichTextEditorProps } from "../../types/editor";
 
 interface LinkModalProps {
   isOpen: boolean;

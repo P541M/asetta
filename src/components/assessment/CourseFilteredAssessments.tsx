@@ -6,12 +6,7 @@ import { collection, query, where, getDocs } from "firebase/firestore";
 import AssessmentsTable from "../tables/AssessmentsTable";
 import GradeCalculator from "./GradeCalculator";
 import { Assessment } from "../../types/assessment";
-
-interface CourseFilteredAssessmentsProps {
-  semesterId: string;
-  selectedCourse: string;
-  onBack: () => void;
-}
+import { CourseFilteredAssessmentsProps } from "../../types/course";
 
 const CourseFilteredAssessments = ({
   semesterId,

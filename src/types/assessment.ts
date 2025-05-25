@@ -9,3 +9,15 @@ export interface Assessment {
   notes?: string;
   mark?: number | null;
 }
+
+export interface AddAssessmentFormProps {
+  semester: string;
+  semesterId: string;
+  onSuccess: () => void;
+}
+
+export interface AssessmentsTableProps {
+  assessments: Assessment[];
+  semesterId: string;
+  onStatusChange?: (assessmentId: string, newStatus: string) => void;
+}

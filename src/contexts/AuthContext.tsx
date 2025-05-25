@@ -9,12 +9,7 @@ import {
 import { User, onAuthStateChanged, signOut } from "firebase/auth";
 import { auth, db } from "../lib/firebase";
 import { doc, getDoc, setDoc } from "firebase/firestore";
-
-interface AuthContextType {
-  user: User | null;
-  loading: boolean;
-  logout: () => Promise<void>;
-}
+import { AuthContextType } from "../types/context";
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
@@ -37,7 +32,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         const userDoc = await getDoc(userRef);
 
         if (!userDoc.exists()) {
-          // Create a new document if it doesn’t exist
+          // Create a new document if it doesn't exist
           const defaultSettings = {
             displayName: usr.displayName || usr.email?.split("@")[0] || "User",
             email: usr.email || "",

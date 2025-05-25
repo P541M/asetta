@@ -1,20 +1,11 @@
 // components/UploadForm.tsx
 import { useState, useRef, useEffect } from "react";
 import { useAuth } from "../../contexts/AuthContext";
-
-interface UploadFormProps {
-  semester: string;
-  onUploadSuccess: (semester: string) => void;
-}
-
-type UploadStatus = "idle" | "uploading" | "processing" | "success" | "error";
-
-interface FileProgress {
-  name: string;
-  size: number;
-  progress: number; // 0-100
-  status: UploadStatus;
-}
+import {
+  UploadFormProps,
+  UploadStatus,
+  FileProgress,
+} from "../../types/upload";
 
 const UploadForm = ({ semester, onUploadSuccess }: UploadFormProps) => {
   const { user } = useAuth();

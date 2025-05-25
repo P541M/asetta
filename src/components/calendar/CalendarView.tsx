@@ -4,28 +4,8 @@ import { db } from "../../lib/firebase";
 import { collection, getDocs, query, updateDoc, doc } from "firebase/firestore";
 import { generateICSFile } from "../../utils/icsGenerator";
 import { DndContext, DragEndEvent } from "@dnd-kit/core";
-
-interface Assessment {
-  id: string;
-  courseName: string;
-  assignmentName: string;
-  dueDate: string;
-  dueTime: string;
-  weight: number;
-  status: string;
-}
-
-interface Day {
-  date: Date;
-  isCurrentMonth: boolean;
-  isToday: boolean;
-  assessments: Assessment[];
-}
-
-interface CalendarViewProps {
-  selectedSemester: string;
-  semesterId: string;
-}
+import { Assessment } from "../../types/assessment";
+import { Day, CalendarViewProps } from "../../types/calendar";
 
 const CalendarView = ({ selectedSemester, semesterId }: CalendarViewProps) => {
   const { user } = useAuth();

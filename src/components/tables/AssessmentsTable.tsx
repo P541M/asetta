@@ -15,14 +15,8 @@ import {
   setToLocalStorage,
 } from "../../utils/localStorage";
 import { formatLocalDateTime, getDaysUntil } from "../../utils/dateUtils";
-import { Assessment } from "../../types/assessment";
+import { Assessment, AssessmentsTableProps } from "../../types/assessment";
 import ConfirmationModal from "../common/ConfirmationModal";
-
-interface AssessmentsTableProps {
-  assessments: Assessment[];
-  semesterId: string;
-  onStatusChange?: (assessmentId: string, newStatus: string) => void;
-}
 
 interface LinkModalProps {
   isOpen: boolean;

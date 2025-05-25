@@ -3,22 +3,7 @@ import { useState, useEffect } from "react";
 import { auth, db } from "../../lib/firebase";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
-
-interface RegisterFormProps {
-  onSuccess: () => void;
-  onCancel: () => void;
-  isSubmitting: boolean;
-  setIsSubmitting: (value: boolean) => void;
-  setError: (error: string | null) => void;
-}
-
-interface PasswordCriteria {
-  minLength: boolean;
-  hasUppercase: boolean;
-  hasLowercase: boolean;
-  hasNumber: boolean;
-  hasSpecialChar: boolean;
-}
+import { RegisterFormProps, PasswordCriteria } from "../../types/auth";
 
 const RegisterForm = ({
   onSuccess,

@@ -33,13 +33,8 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Semester } from "@/types/semester";
+import { SemesterTabsProps } from "@/types/course";
 import ConfirmationModal from "../common/ConfirmationModal";
-
-interface SemesterTabsProps {
-  selectedSemester: string;
-  onSelect: (semester: string) => void;
-  className?: string;
-}
 
 // Add drag handle component
 const DragHandle = () => (

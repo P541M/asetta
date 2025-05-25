@@ -21,18 +21,7 @@ import CourseFilteredAssessments from "../components/assessment/CourseFilteredAs
 import AddAssessmentForm from "../components/forms/AddAssessmentForm";
 import CalendarView from "../components/calendar/CalendarView";
 import DashboardHeader from "../components/layout/DashboardHeader";
-
-interface Assessment {
-  id: string;
-  title: string;
-  dueDate: string;
-  status: string;
-  notes?: string;
-  courseName: string;
-  assignmentName: string;
-  dueTime: string;
-  weight: number;
-}
+import { Assessment } from "../types/assessment";
 
 const Dashboard = () => {
   const { user, loading, logout } = useAuth();
