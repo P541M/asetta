@@ -1,5 +1,5 @@
 // components/SemesterTabs.tsx
-import { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import { db } from "../../lib/firebase";
 import {
@@ -32,95 +32,14 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-
-interface Semester {
-  id: string;
-  name: string;
-}
+import { Semester } from "@/types/semester";
+import ConfirmationModal from "../common/ConfirmationModal";
 
 interface SemesterTabsProps {
   selectedSemester: string;
   onSelect: (semester: string) => void;
   className?: string;
 }
-
-interface DeleteConfirmationModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onConfirm: () => void;
-  semesterName: string;
-}
-
-const DeleteConfirmationModal = ({
-  isOpen,
-  onClose,
-  onConfirm,
-  semesterName,
-}: DeleteConfirmationModalProps) => {
-  if (!isOpen) return null;
-
-  const handleModalClick = (e: React.MouseEvent) => {
-    // Prevent click from propagating to elements behind the modal
-    e.stopPropagation();
-  };
-
-  return (
-    <div
-      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[200]"
-      onClick={handleModalClick}
-    >
-      <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md animate-scale">
-        <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-medium text-gray-900">Confirm Delete</h3>
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onClose();
-            }}
-            className="text-gray-400 hover:text-gray-500"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-            >
-              <path
-                fillRule="evenodd"
-                d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                clipRule="evenodd"
-              />
-            </svg>
-          </button>
-        </div>
-        <p className="text-gray-600 mb-6">
-          Are you sure you want to delete the semester &ldquo;{semesterName}
-          &rdquo; and all its assessments? This action cannot be undone.
-        </p>
-        <div className="flex justify-end space-x-3">
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onClose();
-            }}
-            className="btn-outline py-1.5 px-4"
-          >
-            Cancel
-          </button>
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onConfirm();
-            }}
-            className="btn-danger py-1.5 px-4"
-          >
-            Delete
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-};
 
 // Add drag handle component
 const DragHandle = () => (
@@ -925,14 +844,33 @@ const SemesterTabs = ({
       )}
 
       {/* Delete Confirmation Modal */}
-      <DeleteConfirmationModal
+      <ConfirmationModal
         isOpen={showDeleteModal}
         onClose={() => {
           setShowDeleteModal(false);
           setSemesterToDelete(null);
         }}
         onConfirm={handleConfirmDelete}
-        semesterName={semesterToDelete?.name || ""}
+        title="Confirm Delete"
+        message={`Are you sure you want to delete the semester "${semesterToDelete?.name}" and all its assessments? This action cannot be undone.`}
+        confirmText="Delete"
+        variant="danger"
+        icon={
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-6 w-6"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+            />
+          </svg>
+        }
       />
 
       <style jsx>{`

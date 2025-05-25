@@ -16,6 +16,7 @@ import {
 } from "../../utils/localStorage";
 import { formatLocalDateTime, getDaysUntil } from "../../utils/dateUtils";
 import { Assessment } from "../../types/assessment";
+import ConfirmationModal from "../common/ConfirmationModal";
 
 interface AssessmentsTableProps {
   assessments: Assessment[];
@@ -29,26 +30,14 @@ interface LinkModalProps {
   onAddLink: (url: string, text: string) => void;
 }
 
-interface DeleteConfirmationModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onConfirm: () => void;
-  assessmentName: string;
-}
-
-interface BulkDeleteConfirmationModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onConfirm: () => void;
-  count: number;
-}
-
 const LinkModal = ({ isOpen, onClose, onAddLink }: LinkModalProps) => {
   const [url, setUrl] = useState("");
   const [text, setText] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = (e?: React.FormEvent) => {
+    if (e) {
+      e.preventDefault();
+    }
     if (url) {
       onAddLink(url, text || url);
       setUrl("");
@@ -60,36 +49,17 @@ const LinkModal = ({ isOpen, onClose, onAddLink }: LinkModalProps) => {
   if (!isOpen) return null;
 
   return (
-    <div
-      id="link-modal"
-      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[100]"
-    >
-      <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md animate-scale">
-        <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-medium text-gray-900">Add Link</h3>
-          <button
-            onClick={onClose}
-            className="text-gray-400 hover:text-gray-500"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-            >
-              <path
-                fillRule="evenodd"
-                d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                clipRule="evenodd"
-              />
-            </svg>
-          </button>
-        </div>
+    <ConfirmationModal
+      isOpen={isOpen}
+      onClose={onClose}
+      onConfirm={handleSubmit}
+      title="Add Link"
+      message={
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label
               htmlFor="url"
-              className="block text-sm font-medium text-gray-700"
+              className="block text-sm font-medium text-gray-700 dark:text-dark-text-secondary"
             >
               URL
             </label>
@@ -99,14 +69,14 @@ const LinkModal = ({ isOpen, onClose, onAddLink }: LinkModalProps) => {
               value={url}
               onChange={(e) => setUrl(e.target.value)}
               placeholder="https://example.com"
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+              className="mt-1 block w-full rounded-md border-gray-300 dark:border-dark-border-primary shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm dark:bg-dark-bg-tertiary dark:text-dark-text-primary"
               required
             />
           </div>
           <div>
             <label
               htmlFor="text"
-              className="block text-sm font-medium text-gray-700"
+              className="block text-sm font-medium text-gray-700 dark:text-dark-text-secondary"
             >
               Link Text (optional)
             </label>
@@ -116,168 +86,30 @@ const LinkModal = ({ isOpen, onClose, onAddLink }: LinkModalProps) => {
               value={text}
               onChange={(e) => setText(e.target.value)}
               placeholder="Display text"
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+              className="mt-1 block w-full rounded-md border-gray-300 dark:border-dark-border-primary shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm dark:bg-dark-bg-tertiary dark:text-dark-text-primary"
             />
           </div>
-          <div className="flex justify-end space-x-3">
-            <button
-              type="button"
-              onClick={onClose}
-              className="btn-outline py-1.5 px-4"
-            >
-              Cancel
-            </button>
-            <button type="submit" className="btn-primary py-1.5 px-4">
-              Add Link
-            </button>
-          </div>
         </form>
-      </div>
-    </div>
-  );
-};
-
-const DeleteConfirmationModal = ({
-  isOpen,
-  onClose,
-  onConfirm,
-  assessmentName,
-}: DeleteConfirmationModalProps) => {
-  if (!isOpen) return null;
-
-  const handleModalClick = (e: React.MouseEvent) => {
-    // Prevent click from propagating to elements behind the modal
-    e.stopPropagation();
-  };
-
-  return (
-    <div
-      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[200] modal-open"
-      onClick={handleModalClick}
-    >
-      <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md animate-scale">
-        <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-medium text-gray-900">Confirm Delete</h3>
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onClose();
-            }}
-            className="text-gray-400 hover:text-gray-500"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-            >
-              <path
-                fillRule="evenodd"
-                d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                clipRule="evenodd"
-              />
-            </svg>
-          </button>
-        </div>
-        <p className="text-gray-600 mb-6">
-          Are you sure you want to delete &ldquo;{assessmentName}&rdquo;? This
-          action cannot be undone.
-        </p>
-        <div className="flex justify-end space-x-3">
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onClose();
-            }}
-            className="btn-outline py-1.5 px-4"
-          >
-            Cancel
-          </button>
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onConfirm();
-            }}
-            className="btn-danger py-1.5 px-4"
-          >
-            Delete
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-const BulkDeleteConfirmationModal = ({
-  isOpen,
-  onClose,
-  onConfirm,
-  count,
-}: BulkDeleteConfirmationModalProps) => {
-  if (!isOpen) return null;
-
-  const handleModalClick = (e: React.MouseEvent) => {
-    // Prevent click from propagating to elements behind the modal
-    e.stopPropagation();
-  };
-
-  return (
-    <div
-      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[200] modal-open"
-      onClick={handleModalClick}
-    >
-      <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md animate-scale">
-        <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-medium text-gray-900">
-            Confirm Bulk Delete
-          </h3>
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onClose();
-            }}
-            className="text-gray-400 hover:text-gray-500"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-            >
-              <path
-                fillRule="evenodd"
-                d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                clipRule="evenodd"
-              />
-            </svg>
-          </button>
-        </div>
-        <p className="text-gray-600 mb-6">
-          Are you sure you want to delete {count} selected assessment
-          {count === 1 ? "" : "s"}? This action cannot be undone.
-        </p>
-        <div className="flex justify-end space-x-3">
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onClose();
-            }}
-            className="btn-outline py-1.5 px-4"
-          >
-            Cancel
-          </button>
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onConfirm();
-            }}
-            className="btn-danger py-1.5 px-4"
-          >
-            Delete
-          </button>
-        </div>
-      </div>
-    </div>
+      }
+      confirmText="Add Link"
+      variant="primary"
+      icon={
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="h-6 w-6"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"
+          />
+        </svg>
+      }
+    />
   );
 };
 
@@ -1377,7 +1209,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
         onAddLink={handleLinkSubmit}
       />
       {/* Delete Confirmation Modal */}
-      <DeleteConfirmationModal
+      <ConfirmationModal
         isOpen={showDeleteModal}
         onClose={() => {
           setShowDeleteModal(false);
@@ -1386,14 +1218,56 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
         onConfirm={() =>
           assessmentToDelete && handleDeleteAssessment(assessmentToDelete)
         }
-        assessmentName={assessmentToDelete?.assignmentName || ""}
+        title="Confirm Delete"
+        message={`Are you sure you want to delete "${assessmentToDelete?.assignmentName}"? This action cannot be undone.`}
+        confirmText="Delete"
+        variant="danger"
+        icon={
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-6 w-6"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+            />
+          </svg>
+        }
       />
       {/* Bulk Delete Confirmation Modal */}
-      <BulkDeleteConfirmationModal
+      <ConfirmationModal
         isOpen={showBulkDeleteModal}
         onClose={() => setShowBulkDeleteModal(false)}
         onConfirm={handleConfirmBulkDelete}
-        count={selectedRows.length}
+        title="Confirm Bulk Delete"
+        message={`Are you sure you want to delete ${
+          selectedRows.length
+        } selected assessment${
+          selectedRows.length === 1 ? "" : "s"
+        }? This action cannot be undone.`}
+        confirmText="Delete"
+        variant="danger"
+        icon={
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-6 w-6"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+            />
+          </svg>
+        }
       />
     </div>
   );
