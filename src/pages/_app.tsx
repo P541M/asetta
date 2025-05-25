@@ -5,7 +5,6 @@ import "../app/globals.css";
 import { AuthProvider } from "../contexts/AuthContext";
 import { ThemeProvider } from "../contexts/ThemeContext";
 import { Outfit, Lexend } from "next/font/google";
-import Script from "next/script";
 
 const outfit = Outfit({
   subsets: ["latin"],
@@ -64,20 +63,6 @@ function MyApp({ Component, pageProps }: AppProps) {
           />
           <meta name="theme-color" content="#ffffff" />
         </Head>
-        <Script id="theme-script" strategy="beforeInteractive">
-          {`
-            (function() {
-              try {
-                const storedTheme = localStorage.getItem('theme');
-                const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-                const theme = storedTheme || systemTheme;
-                document.documentElement.classList.toggle('dark', theme === 'dark');
-              } catch (e) {
-                console.error('Error setting initial theme:', e);
-              }
-            })();
-          `}
-        </Script>
         <main className={`${outfit.variable} ${lexend.variable} font-body`}>
           <Component {...pageProps} />
         </main>
