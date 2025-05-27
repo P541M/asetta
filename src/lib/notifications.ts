@@ -59,13 +59,15 @@ export async function checkAndSendNotifications() {
         // Check if we should send a notification
         if (daysUntilDue === preferences.notificationDaysBefore) {
           const subject = `Assessment Reminder: ${assessment.title}`;
-          const message = `Reminder: "${
-            assessment.title
-          }" is due in ${daysUntilDue} day${daysUntilDue === 1 ? "" : "s"}`;
 
           // Send email notification if enabled
           if (preferences.emailNotifications && preferences.email) {
-            await sendEmail(preferences.email, subject, message);
+            await sendEmail(
+              preferences.email,
+              subject,
+              assessment.title,
+              daysUntilDue
+            );
           }
         }
       }
