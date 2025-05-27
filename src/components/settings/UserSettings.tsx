@@ -7,9 +7,13 @@ import { db } from "../../lib/firebase";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import ProfileSection from "./ProfileSection";
 import PreferencesSection from "./PreferencesSection";
+import NotificationsSection from "./NotificationsSection";
+import SettingsHeader from "./SettingsHeader";
+import SettingsNavigation from "./SettingsNavigation";
+import SettingsActions from "./SettingsActions";
+import SettingsMessage from "./SettingsMessage";
 import { useTheme } from "../../contexts/ThemeContext";
 import { isValidEmail, isValidPhoneNumber } from "../../lib/notifications";
-import NotificationsSection from "./NotificationsSection";
 
 interface UserSettingsProps {
   isOpen: boolean;
@@ -31,7 +35,10 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
   const [showStatsBar, setShowStatsBar] = useState<boolean>(false);
   const [isDarkModeLocal, setIsDarkModeLocal] = useState(isDarkMode);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [message, setMessage] = useState({ text: "", type: "" });
+  const [message, setMessage] = useState<{
+    text: string;
+    type: "success" | "error";
+  }>({ text: "", type: "success" });
   const [imagePreview, setImagePreview] = useState<string | null>(
     user?.photoURL || null
   );
@@ -190,7 +197,7 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
     }
 
     setIsSubmitting(true);
-    setMessage({ text: "", type: "" });
+    setMessage({ text: "", type: "success" });
 
     try {
       // Update profile data in Firebase Auth
@@ -322,115 +329,9 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
-      {/* Header */}
-      <div className="flex justify-between items-center mb-8">
-        <div>
-          <h2 className="text-3xl font-bold  text-primary-600 ">Settings</h2>
-          <p className="text-sm text-gray-500 dark:text-dark-text-tertiary mt-1">
-            Manage your account settings and preferences
-          </p>
-        </div>
-        <button
-          onClick={handleCancel}
-          className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-dark-bg-secondary transition-colors"
-          aria-label="Close settings"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-6 w-6 text-gray-400 hover:text-gray-500 dark:text-dark-text-tertiary dark:hover:text-dark-text-secondary"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={1.5}
-              d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"
-            />
-          </svg>
-        </button>
-      </div>
+      <SettingsHeader onClose={onClose} />
+      <SettingsNavigation activeTab={activeTab} setActiveTab={setActiveTab} />
 
-      {/* Navigation */}
-      <div className="bg-white dark:bg-dark-bg-secondary rounded-lg p-1 shadow-md mb-8">
-        <div className="flex space-x-2">
-          <button
-            onClick={() => setActiveTab("profile")}
-            className={`flex-1 px-6 py-3 font-medium text-sm transition-all duration-200 rounded-lg ${
-              activeTab === "profile"
-                ? "bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 shadow-sm"
-                : "text-gray-600 dark:text-dark-text-secondary hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary"
-            }`}
-          >
-            <div className="flex items-center justify-center space-x-2">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
-                  clipRule="evenodd"
-                />
-              </svg>
-              <span>Profile</span>
-            </div>
-          </button>
-          <button
-            onClick={() => setActiveTab("preferences")}
-            className={`flex-1 px-6 py-3 font-medium text-sm transition-all duration-200 rounded-lg ${
-              activeTab === "preferences"
-                ? "bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 shadow-sm"
-                : "text-gray-600 dark:text-dark-text-secondary hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary"
-            }`}
-          >
-            <div className="flex items-center justify-center space-x-2">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z"
-                  clipRule="evenodd"
-                />
-              </svg>
-              <span>Preferences</span>
-            </div>
-          </button>
-          <button
-            onClick={() => setActiveTab("notifications")}
-            className={`flex-1 px-6 py-3 font-medium text-sm transition-all duration-200 rounded-lg ${
-              activeTab === "notifications"
-                ? "bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 shadow-sm"
-                : "text-gray-600 dark:text-dark-text-secondary hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary"
-            }`}
-          >
-            <div className="flex items-center justify-center space-x-2">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z"
-                  clipRule="evenodd"
-                />
-              </svg>
-              <span>Notifications</span>
-            </div>
-          </button>
-        </div>
-      </div>
-
-      {/* Content */}
       <form
         onSubmit={handleSubmit}
         className="bg-white dark:bg-dark-bg-primary rounded-2xl shadow-sm p-6"
@@ -480,40 +381,13 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
           />
         )}
 
-        {/* Status Message */}
-        {message.text && (
-          <div
-            className={`mt-6 p-4 rounded-xl ${
-              message.type === "success"
-                ? "bg-green-50 text-green-800 dark:bg-green-900/20 dark:text-green-400"
-                : "bg-red-50 text-red-800 dark:bg-red-900/20 dark:text-red-400"
-            }`}
-          >
-            {message.text}
-          </div>
-        )}
-
-        {/* Action Buttons */}
-        <div className="mt-8 flex justify-end space-x-4">
-          <button
-            type="button"
-            onClick={handleCancel}
-            className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-dark-text-secondary hover:text-gray-900 dark:hover:text-dark-text-primary transition-colors"
-          >
-            Cancel
-          </button>
-          <button
-            type="submit"
-            disabled={!hasChanges() || isSubmitting}
-            className={`px-4 py-2 text-sm font-medium text-white rounded-lg transition-all duration-200 ${
-              hasChanges() && !isSubmitting
-                ? "bg-primary-600 hover:bg-primary-700 shadow-sm hover:shadow"
-                : "bg-gray-300 dark:bg-dark-bg-tertiary cursor-not-allowed"
-            }`}
-          >
-            {isSubmitting ? "Saving..." : "Save Changes"}
-          </button>
-        </div>
+        <SettingsMessage text={message.text} type={message.type} />
+        <SettingsActions
+          onCancel={handleCancel}
+          onSubmit={handleSubmit}
+          hasChanges={hasChanges()}
+          isSubmitting={isSubmitting}
+        />
       </form>
     </div>
   );

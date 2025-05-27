@@ -10,5 +10,5 @@ export interface ProfileSectionProps {
   imagePreview: string | null;
   setImagePreview: (preview: string | null) => void;
   setImageFile: (file: File | null) => void;
-  setMessage: (message: { text: string; type: string }) => void;
+  setMessage: (message: { text: string; type: "success" | "error" }) => void;
 }
