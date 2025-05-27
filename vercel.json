@@ -7,7 +7,7 @@
     }
   ],
   "functions": {
-    "api/cron/notifications.ts": {
+    "src/pages/api/cron/notifications.ts": {
       "memory": 1024,
       "maxDuration": 10
     }
