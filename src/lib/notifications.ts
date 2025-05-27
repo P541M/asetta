@@ -62,6 +62,9 @@ export async function checkAndSendNotifications() {
 
           // Send email notification if enabled
           if (preferences.emailNotifications && preferences.email) {
+            console.log(
+              `Sending notification for assessment "${assessment.title}" due in ${daysUntilDue} days`
+            );
             await sendEmail(
               preferences.email,
               subject,
