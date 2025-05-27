@@ -31,7 +31,7 @@ export function generateICSFile(
       assessment.dueDate,
       incrementHour(assessment.dueTime)
     );
-    const uid = `${assessment.id}@kivo.app`; // Unique identifier
+    const uid = `${assessment.id}@asetta.app`; // Unique identifier
     const summary = `${assessment.courseName}: ${assessment.assignmentName}`;
     const description = `Weight: ${assessment.weight}%\nStatus: ${assessment.status}`;
 
