@@ -1,12 +1,30 @@
 export interface PreferencesSectionProps {
   showDaysTillDue: boolean;
-  setShowDaysTillDue: (show: boolean) => void;
+  setShowDaysTillDue: (value: boolean) => void;
   showWeight: boolean;
-  setShowWeight: (show: boolean) => void;
+  setShowWeight: (value: boolean) => void;
   showNotes: boolean;
-  setShowNotes: (show: boolean) => void;
+  setShowNotes: (value: boolean) => void;
   showStatsBar: boolean;
-  setShowStatsBar: (show: boolean) => void;
+  setShowStatsBar: (value: boolean) => void;
   isDarkMode: boolean;
-  setIsDarkMode: (isDark: boolean) => void;
+  setIsDarkMode: (value: boolean) => void;
+}
+
+export interface NotificationPreferences {
+  emailNotifications: boolean;
+  smsNotifications: boolean;
+  notificationDaysBefore: number;
+  email: string;
+  phoneNumber: string;
+  hasConsentedToNotifications: boolean;
+}
+
+export interface NotificationPreferencesProps extends NotificationPreferences {
+  setEmailNotifications: (value: boolean) => void;
+  setSmsNotifications: (value: boolean) => void;
+  setNotificationDaysBefore: (value: number) => void;
+  setEmail: (value: string) => void;
+  setPhoneNumber: (value: string) => void;
+  setHasConsentedToNotifications: (value: boolean) => void;
 }

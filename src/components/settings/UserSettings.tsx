@@ -8,6 +8,8 @@ import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import ProfileSection from "./ProfileSection";
 import PreferencesSection from "./PreferencesSection";
 import { useTheme } from "../../contexts/ThemeContext";
+import { isValidEmail, isValidPhoneNumber } from "../../lib/notifications";
+import NotificationsSection from "./NotificationsSection";
 
 interface UserSettingsProps {
   isOpen: boolean;
@@ -34,9 +36,19 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
     user?.photoURL || null
   );
   const [imageFile, setImageFile] = useState<File | null>(null);
-  const [activeTab, setActiveTab] = useState<"profile" | "preferences">(
-    "profile"
-  );
+  const [activeTab, setActiveTab] = useState<
+    "profile" | "preferences" | "notifications"
+  >("profile");
+
+  // Notification preferences
+  const [emailNotifications, setEmailNotifications] = useState<boolean>(false);
+  const [smsNotifications, setSmsNotifications] = useState<boolean>(false);
+  const [notificationDaysBefore, setNotificationDaysBefore] =
+    useState<number>(1);
+  const [email, setEmail] = useState<string>("");
+  const [phoneNumber, setPhoneNumber] = useState<string>("");
+  const [hasConsentedToNotifications, setHasConsentedToNotifications] =
+    useState<boolean>(false);
 
   // Store initial values for comparison
   const [initialValues, setInitialValues] = useState({
@@ -50,6 +62,12 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
     showStatsBar: false,
     photoURL: null as string | null,
     isDarkMode: false,
+    emailNotifications: false,
+    smsNotifications: false,
+    notificationDaysBefore: 1,
+    email: "",
+    phoneNumber: "",
+    hasConsentedToNotifications: false,
   });
 
   // Current year for graduation year input
@@ -68,7 +86,13 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
       showStatsBar !== initialValues.showStatsBar ||
       imageFile !== null ||
       imagePreview !== initialValues.photoURL ||
-      isDarkModeLocal !== initialValues.isDarkMode
+      isDarkModeLocal !== initialValues.isDarkMode ||
+      emailNotifications !== initialValues.emailNotifications ||
+      smsNotifications !== initialValues.smsNotifications ||
+      notificationDaysBefore !== initialValues.notificationDaysBefore ||
+      email !== initialValues.email ||
+      phoneNumber !== initialValues.phoneNumber ||
+      hasConsentedToNotifications !== initialValues.hasConsentedToNotifications
     );
   };
 
@@ -90,6 +114,14 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
           const newShowWeight = userData.showWeight ?? true;
           const newShowNotes = userData.showNotes ?? true;
           const newShowStatsBar = userData.showStatsBar ?? false;
+          const newEmailNotifications = userData.emailNotifications ?? false;
+          const newSmsNotifications = userData.smsNotifications ?? false;
+          const newNotificationDaysBefore =
+            userData.notificationDaysBefore ?? 1;
+          const newEmail = userData.email || "";
+          const newPhoneNumber = userData.phoneNumber || "";
+          const newHasConsentedToNotifications =
+            userData.hasConsentedToNotifications ?? false;
 
           // Set current values
           setInstitution(newInstitution);
@@ -100,6 +132,12 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
           setShowNotes(newShowNotes);
           setShowStatsBar(newShowStatsBar);
           setIsDarkModeLocal(isDarkMode);
+          setEmailNotifications(newEmailNotifications);
+          setSmsNotifications(newSmsNotifications);
+          setNotificationDaysBefore(newNotificationDaysBefore);
+          setEmail(newEmail);
+          setPhoneNumber(newPhoneNumber);
+          setHasConsentedToNotifications(newHasConsentedToNotifications);
 
           // Set initial values
           setInitialValues({
@@ -113,6 +151,12 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
             showStatsBar: newShowStatsBar,
             photoURL: user.photoURL,
             isDarkMode: isDarkMode,
+            emailNotifications: newEmailNotifications,
+            smsNotifications: newSmsNotifications,
+            notificationDaysBefore: newNotificationDaysBefore,
+            email: newEmail,
+            phoneNumber: newPhoneNumber,
+            hasConsentedToNotifications: newHasConsentedToNotifications,
           });
         }
       } catch (error) {
@@ -127,6 +171,23 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) return;
+
+    // Validate email and phone number if notifications are enabled
+    if (emailNotifications && email && !isValidEmail(email)) {
+      setMessage({
+        text: "Please enter a valid email address",
+        type: "error",
+      });
+      return;
+    }
+
+    if (smsNotifications && phoneNumber && !isValidPhoneNumber(phoneNumber)) {
+      setMessage({
+        text: "Please enter a valid phone number",
+        type: "error",
+      });
+      return;
+    }
 
     setIsSubmitting(true);
     setMessage({ text: "", type: "" });
@@ -164,6 +225,12 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
         showWeight: showWeight,
         showNotes: showNotes,
         showStatsBar: showStatsBar,
+        emailNotifications: emailNotifications,
+        smsNotifications: smsNotifications,
+        notificationDaysBefore: notificationDaysBefore,
+        email: email,
+        phoneNumber: phoneNumber,
+        hasConsentedToNotifications: hasConsentedToNotifications,
         updatedAt: new Date(),
       });
 
@@ -188,6 +255,12 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
             )
           : imagePreview,
         isDarkMode: isDarkModeLocal,
+        emailNotifications,
+        smsNotifications,
+        notificationDaysBefore,
+        email,
+        phoneNumber,
+        hasConsentedToNotifications,
       });
 
       // Reset image file
@@ -195,7 +268,15 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
 
       // Trigger a custom event to notify other components of the preference change
       const event = new CustomEvent("userPreferencesUpdated", {
-        detail: { showDaysTillDue, showWeight, showNotes, showStatsBar },
+        detail: {
+          showDaysTillDue,
+          showWeight,
+          showNotes,
+          showStatsBar,
+          emailNotifications,
+          smsNotifications,
+          notificationDaysBefore,
+        },
       });
       window.dispatchEvent(event);
 
@@ -228,6 +309,12 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
     setImagePreview(initialValues.photoURL);
     setImageFile(null);
     setIsDarkModeLocal(initialValues.isDarkMode);
+    setEmailNotifications(initialValues.emailNotifications);
+    setSmsNotifications(initialValues.smsNotifications);
+    setNotificationDaysBefore(initialValues.notificationDaysBefore);
+    setEmail(initialValues.email);
+    setPhoneNumber(initialValues.phoneNumber);
+    setHasConsentedToNotifications(initialValues.hasConsentedToNotifications);
     onClose();
   };
 
@@ -316,6 +403,30 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
               <span>Preferences</span>
             </div>
           </button>
+          <button
+            onClick={() => setActiveTab("notifications")}
+            className={`flex-1 px-6 py-3 font-medium text-sm transition-all duration-200 rounded-lg ${
+              activeTab === "notifications"
+                ? "bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 shadow-sm"
+                : "text-gray-600 dark:text-dark-text-secondary hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary"
+            }`}
+          >
+            <div className="flex items-center justify-center space-x-2">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z"
+                  clipRule="evenodd"
+                />
+              </svg>
+              <span>Notifications</span>
+            </div>
+          </button>
         </div>
       </div>
 
@@ -339,7 +450,7 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
             setImageFile={setImageFile}
             setMessage={setMessage}
           />
-        ) : (
+        ) : activeTab === "preferences" ? (
           <PreferencesSection
             showDaysTillDue={showDaysTillDue}
             setShowDaysTillDue={setShowDaysTillDue}
@@ -351,6 +462,21 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
             setShowStatsBar={setShowStatsBar}
             isDarkMode={isDarkModeLocal}
             setIsDarkMode={setIsDarkModeLocal}
+          />
+        ) : (
+          <NotificationsSection
+            emailNotifications={emailNotifications}
+            setEmailNotifications={setEmailNotifications}
+            smsNotifications={smsNotifications}
+            setSmsNotifications={setSmsNotifications}
+            notificationDaysBefore={notificationDaysBefore}
+            setNotificationDaysBefore={setNotificationDaysBefore}
+            email={email}
+            setEmail={setEmail}
+            phoneNumber={phoneNumber}
+            setPhoneNumber={setPhoneNumber}
+            hasConsentedToNotifications={hasConsentedToNotifications}
+            setHasConsentedToNotifications={setHasConsentedToNotifications}
           />
         )}
 
