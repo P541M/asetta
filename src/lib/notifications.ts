@@ -3,10 +3,8 @@ import { collection, query, where, getDocs } from "firebase/firestore";
 
 interface NotificationPreferences {
   emailNotifications: boolean;
-  smsNotifications: boolean;
   notificationDaysBefore: number;
   email: string;
-  phoneNumber: string;
   hasConsentedToNotifications: boolean;
 }
 
@@ -38,10 +36,8 @@ export async function checkAndSendNotifications() {
       const userData = userDoc.data();
       const preferences: NotificationPreferences = {
         emailNotifications: userData.emailNotifications || false,
-        smsNotifications: userData.smsNotifications || false,
         notificationDaysBefore: userData.notificationDaysBefore || 1,
         email: userData.email || "",
-        phoneNumber: userData.phoneNumber || "",
         hasConsentedToNotifications:
           userData.hasConsentedToNotifications || false,
       };
@@ -69,11 +65,6 @@ export async function checkAndSendNotifications() {
           if (preferences.emailNotifications && preferences.email) {
             await sendEmailNotification(preferences.email, message);
           }
-
-          // Send SMS notification if enabled
-          if (preferences.smsNotifications && preferences.phoneNumber) {
-            await sendSMSNotification(preferences.phoneNumber, message);
-          }
         }
       }
     }
@@ -86,12 +77,6 @@ async function sendEmailNotification(email: string, message: string) {
   // TODO: Implement email sending using your preferred email service
   // For example, you could use SendGrid, AWS SES, or other email services
   console.log(`Sending email to ${email}: ${message}`);
-}
-
-async function sendSMSNotification(phoneNumber: string, message: string) {
-  // TODO: Implement SMS sending using your preferred SMS service
-  // For example, you could use Twilio, AWS SNS, or other SMS services
-  console.log(`Sending SMS to ${phoneNumber}: ${message}`);
 }
 
 // Function to validate email format

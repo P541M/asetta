@@ -13,7 +13,6 @@ import SettingsNavigation from "./SettingsNavigation";
 import SettingsActions from "./SettingsActions";
 import SettingsMessage from "./SettingsMessage";
 import { useTheme } from "../../contexts/ThemeContext";
-import { isValidEmail, isValidPhoneNumber } from "../../lib/notifications";
 
 interface UserSettingsProps {
   isOpen: boolean;
@@ -49,11 +48,9 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
 
   // Notification preferences
   const [emailNotifications, setEmailNotifications] = useState<boolean>(false);
-  const [smsNotifications, setSmsNotifications] = useState<boolean>(false);
   const [notificationDaysBefore, setNotificationDaysBefore] =
     useState<number>(1);
   const [email, setEmail] = useState<string>("");
-  const [phoneNumber, setPhoneNumber] = useState<string>("");
   const [hasConsentedToNotifications, setHasConsentedToNotifications] =
     useState<boolean>(false);
 
@@ -70,10 +67,8 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
     photoURL: null as string | null,
     isDarkMode: false,
     emailNotifications: false,
-    smsNotifications: false,
     notificationDaysBefore: 1,
     email: "",
-    phoneNumber: "",
     hasConsentedToNotifications: false,
   });
 
@@ -95,10 +90,8 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
       imagePreview !== initialValues.photoURL ||
       isDarkModeLocal !== initialValues.isDarkMode ||
       emailNotifications !== initialValues.emailNotifications ||
-      smsNotifications !== initialValues.smsNotifications ||
       notificationDaysBefore !== initialValues.notificationDaysBefore ||
       email !== initialValues.email ||
-      phoneNumber !== initialValues.phoneNumber ||
       hasConsentedToNotifications !== initialValues.hasConsentedToNotifications
     );
   };
@@ -122,11 +115,9 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
           const newShowNotes = userData.showNotes ?? true;
           const newShowStatsBar = userData.showStatsBar ?? false;
           const newEmailNotifications = userData.emailNotifications ?? false;
-          const newSmsNotifications = userData.smsNotifications ?? false;
           const newNotificationDaysBefore =
             userData.notificationDaysBefore ?? 1;
           const newEmail = userData.email || "";
-          const newPhoneNumber = userData.phoneNumber || "";
           const newHasConsentedToNotifications =
             userData.hasConsentedToNotifications ?? false;
 
@@ -140,10 +131,8 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
           setShowStatsBar(newShowStatsBar);
           setIsDarkModeLocal(isDarkMode);
           setEmailNotifications(newEmailNotifications);
-          setSmsNotifications(newSmsNotifications);
           setNotificationDaysBefore(newNotificationDaysBefore);
           setEmail(newEmail);
-          setPhoneNumber(newPhoneNumber);
           setHasConsentedToNotifications(newHasConsentedToNotifications);
 
           // Set initial values
@@ -159,10 +148,8 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
             photoURL: user.photoURL,
             isDarkMode: isDarkMode,
             emailNotifications: newEmailNotifications,
-            smsNotifications: newSmsNotifications,
             notificationDaysBefore: newNotificationDaysBefore,
             email: newEmail,
-            phoneNumber: newPhoneNumber,
             hasConsentedToNotifications: newHasConsentedToNotifications,
           });
         }
@@ -179,18 +166,10 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
     e.preventDefault();
     if (!user) return;
 
-    // Validate email and phone number if notifications are enabled
+    // Validate email if notifications are enabled
     if (emailNotifications && email && !isValidEmail(email)) {
       setMessage({
         text: "Please enter a valid email address",
-        type: "error",
-      });
-      return;
-    }
-
-    if (smsNotifications && phoneNumber && !isValidPhoneNumber(phoneNumber)) {
-      setMessage({
-        text: "Please enter a valid phone number",
         type: "error",
       });
       return;
@@ -233,10 +212,8 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
         showNotes: showNotes,
         showStatsBar: showStatsBar,
         emailNotifications: emailNotifications,
-        smsNotifications: smsNotifications,
         notificationDaysBefore: notificationDaysBefore,
         email: email,
-        phoneNumber: phoneNumber,
         hasConsentedToNotifications: hasConsentedToNotifications,
         updatedAt: new Date(),
       });
@@ -263,10 +240,8 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
           : imagePreview,
         isDarkMode: isDarkModeLocal,
         emailNotifications,
-        smsNotifications,
         notificationDaysBefore,
         email,
-        phoneNumber,
         hasConsentedToNotifications,
       });
 
@@ -281,7 +256,6 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
           showNotes,
           showStatsBar,
           emailNotifications,
-          smsNotifications,
           notificationDaysBefore,
         },
       });
@@ -317,13 +291,17 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
     setImageFile(null);
     setIsDarkModeLocal(initialValues.isDarkMode);
     setEmailNotifications(initialValues.emailNotifications);
-    setSmsNotifications(initialValues.smsNotifications);
     setNotificationDaysBefore(initialValues.notificationDaysBefore);
     setEmail(initialValues.email);
-    setPhoneNumber(initialValues.phoneNumber);
     setHasConsentedToNotifications(initialValues.hasConsentedToNotifications);
     onClose();
   };
+
+  // Function to validate email format
+  function isValidEmail(email: string): boolean {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  }
 
   if (!isOpen) return null;
 
@@ -368,14 +346,10 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
           <NotificationsSection
             emailNotifications={emailNotifications}
             setEmailNotifications={setEmailNotifications}
-            smsNotifications={smsNotifications}
-            setSmsNotifications={setSmsNotifications}
             notificationDaysBefore={notificationDaysBefore}
             setNotificationDaysBefore={setNotificationDaysBefore}
             email={email}
             setEmail={setEmail}
-            phoneNumber={phoneNumber}
-            setPhoneNumber={setPhoneNumber}
             hasConsentedToNotifications={hasConsentedToNotifications}
             setHasConsentedToNotifications={setHasConsentedToNotifications}
           />

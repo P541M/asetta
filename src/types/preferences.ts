@@ -13,18 +13,14 @@ export interface PreferencesSectionProps {
 
 export interface NotificationPreferences {
   emailNotifications: boolean;
-  smsNotifications: boolean;
   notificationDaysBefore: number;
   email: string;
-  phoneNumber: string;
   hasConsentedToNotifications: boolean;
 }
 
 export interface NotificationPreferencesProps extends NotificationPreferences {
   setEmailNotifications: (value: boolean) => void;
-  setSmsNotifications: (value: boolean) => void;
   setNotificationDaysBefore: (value: number) => void;
   setEmail: (value: string) => void;
-  setPhoneNumber: (value: string) => void;
   setHasConsentedToNotifications: (value: boolean) => void;
 }
