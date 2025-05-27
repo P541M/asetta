@@ -1,5 +1,6 @@
 import { db } from "./firebase";
 import { collection, query, where, getDocs } from "firebase/firestore";
+import { sendEmail } from "./email";
 
 interface NotificationPreferences {
   emailNotifications: boolean;
@@ -57,13 +58,14 @@ export async function checkAndSendNotifications() {
 
         // Check if we should send a notification
         if (daysUntilDue === preferences.notificationDaysBefore) {
+          const subject = `Assessment Reminder: ${assessment.title}`;
           const message = `Reminder: "${
             assessment.title
           }" is due in ${daysUntilDue} day${daysUntilDue === 1 ? "" : "s"}`;
 
           // Send email notification if enabled
           if (preferences.emailNotifications && preferences.email) {
-            await sendEmailNotification(preferences.email, message);
+            await sendEmail(preferences.email, subject, message);
           }
         }
       }
@@ -71,12 +73,6 @@ export async function checkAndSendNotifications() {
   } catch (error) {
     console.error("Error checking and sending notifications:", error);
   }
-}
-
-async function sendEmailNotification(email: string, message: string) {
-  // TODO: Implement email sending using your preferred email service
-  // For example, you could use SendGrid, AWS SES, or other email services
-  console.log(`Sending email to ${email}: ${message}`);
 }
 
 // Function to validate email format
