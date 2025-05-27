@@ -1,4 +1,5 @@
 import { NotificationPreferencesProps } from "../../types/preferences";
+import { useState } from "react";
 
 const NotificationsSection = ({
   emailNotifications,
@@ -10,6 +11,25 @@ const NotificationsSection = ({
   hasConsentedToNotifications,
   setHasConsentedToNotifications,
 }: NotificationPreferencesProps) => {
+  const [isCustomDays, setIsCustomDays] = useState(false);
+  const [customDays, setCustomDays] = useState(notificationDaysBefore);
+
+  const handleDaysChange = (value: string) => {
+    if (value === "custom") {
+      setIsCustomDays(true);
+      setNotificationDaysBefore(customDays);
+    } else {
+      setIsCustomDays(false);
+      setNotificationDaysBefore(Number(value));
+    }
+  };
+
+  const handleCustomDaysChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = Math.max(1, Math.min(30, parseInt(e.target.value) || 1));
+    setCustomDays(value);
+    setNotificationDaysBefore(value);
+  };
+
   return (
     <div className="space-y-6">
       {/* Consent Checkbox */}
@@ -97,17 +117,35 @@ const NotificationsSection = ({
             </label>
             <select
               id="notification-days"
-              value={notificationDaysBefore}
-              onChange={(e) =>
-                setNotificationDaysBefore(Number(e.target.value))
+              value={
+                isCustomDays ? "custom" : notificationDaysBefore.toString()
               }
+              onChange={(e) => handleDaysChange(e.target.value)}
               className="w-full px-4 py-2.5 border border-gray-300 dark:border-dark-input-border rounded-xl shadow-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-dark-input-bg dark:text-dark-input-text transition-all duration-200"
             >
-              <option value={1}>1 day before</option>
-              <option value={2}>2 days before</option>
-              <option value={3}>3 days before</option>
-              <option value={7}>1 week before</option>
+              <option value="1">1 day before</option>
+              <option value="2">2 days before</option>
+              <option value="3">3 days before</option>
+              <option value="7">1 week before</option>
+              <option value="custom">Custom number of days</option>
             </select>
+
+            {isCustomDays && (
+              <div className="mt-2">
+                <input
+                  type="number"
+                  min="1"
+                  max="30"
+                  value={customDays}
+                  onChange={handleCustomDaysChange}
+                  className="w-full px-4 py-2.5 border border-gray-300 dark:border-dark-input-border rounded-xl shadow-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-dark-input-bg dark:text-dark-input-text transition-all duration-200"
+                  placeholder="Enter number of days (1-30)"
+                />
+                <p className="mt-1 text-sm text-gray-500 dark:text-dark-text-tertiary">
+                  Choose between 1 and 30 days
+                </p>
+              </div>
+            )}
           </div>
         </>
       )}
