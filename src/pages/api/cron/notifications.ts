@@ -25,6 +25,5 @@ export default async function handler(
 
 // This is the configuration for the Vercel Cron Job
 export const config = {
-  runtime: "edge",
   regions: ["iad1"], // Use the region closest to your users
 };
