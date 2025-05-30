@@ -1,6 +1,4 @@
 import nodemailer from "nodemailer";
-import fs from "fs";
-import path from "path";
 
 // Create a transporter using Gmail
 const transporter = nodemailer.createTransport({
@@ -15,15 +13,6 @@ function generateEmailHTML(
   assessmentTitle: string,
   daysUntilDue: number
 ): string {
-  // Convert logo to base64
-  const logoPath = path.join(
-    process.cwd(),
-    "public",
-    "images",
-    "Asetta_Logo_NEW_W.png"
-  );
-  const logoBase64 = fs.readFileSync(logoPath, { encoding: "base64" });
-
   return `
     <!DOCTYPE html>
     <html>
@@ -35,7 +24,7 @@ function generateEmailHTML(
           body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             line-height: 1.6;
-            color: #1F2937;
+            color: #111827;
             margin: 0;
             padding: 0;
             background-color: #F9FAFB;
@@ -44,30 +33,25 @@ function generateEmailHTML(
             max-width: 600px;
             margin: 20px auto;
             padding: 0;
-            background-color: #ffffff;
+            background-color: #FFFFFF;
             border-radius: 12px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            box-shadow: 0 2px 15px -3px rgba(0, 0, 0, 0.07), 0 10px 20px -2px rgba(0, 0, 0, 0.04);
           }
           .header {
-            background-color: #1E40AF;
+            background-color: #009cff;
             color: white;
             padding: 24px;
             text-align: center;
             border-radius: 12px 12px 0 0;
           }
-          .logo {
-            max-width: 150px;
-            height: auto;
-            margin-bottom: 16px;
-          }
           .content {
             padding: 32px;
-            background-color: #ffffff;
+            background-color: #FFFFFF;
           }
           .assessment-title {
             font-size: 24px;
             font-weight: 600;
-            color: #1F2937;
+            color: #111827;
             margin-bottom: 16px;
           }
           .due-date {
@@ -80,17 +64,17 @@ function generateEmailHTML(
           .days-remaining {
             font-size: 32px;
             font-weight: 700;
-            color: #1E40AF;
+            color: #009cff;
             margin-top: 8px;
           }
           .message {
-            color: #4B5563;
+            color: #374151;
             font-size: 16px;
             margin: 16px 0;
           }
           .button {
             display: inline-block;
-            background-color: #1E40AF;
+            background-color: #009cff;
             color: white;
             padding: 12px 24px;
             border-radius: 6px;
@@ -108,7 +92,7 @@ function generateEmailHTML(
             border-radius: 0 0 12px 12px;
           }
           .highlight {
-            color: #1E40AF;
+            color: #009cff;
             font-weight: 500;
           }
           @media (max-width: 640px) {
@@ -128,21 +112,20 @@ function generateEmailHTML(
       <body>
         <div class="container">
           <div class="header">
-            <img src="data:image/png;base64,${logoBase64}" alt="Asetta Logo" class="logo">
             <h1 style="margin: 0; font-size: 24px; font-weight: 600;">Assessment Reminder</h1>
           </div>
           <div class="content">
             <div class="assessment-title">${assessmentTitle}</div>
             <p class="message">Hey there! 👋 Just a friendly heads up about your upcoming assessment. We want to make sure you have everything you need to succeed!</p>
             <div class="due-date">
-              <p style="margin: 0; color: #4B5563;">Time remaining:</p>
+              <p style="margin: 0; color: #374151;">Time remaining:</p>
               <div class="days-remaining">${daysUntilDue} day${
     daysUntilDue === 1 ? "" : "s"
   }</div>
             </div>
             <p class="message">Need a quick refresher on the details? <a href="${
               process.env.NEXT_PUBLIC_APP_URL
-            }/assessments" class="highlight">Check it out in Asetta</a> ✨</p>
+            }/dashboard" class="highlight">Check it out in Asetta</a> ✨</p>
             <p class="message" style="margin-top: 24px; font-style: italic;">You've got this! 💪</p>
           </div>
           <div class="footer">
