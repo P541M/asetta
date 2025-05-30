@@ -1,5 +1,5 @@
 import { NotificationPreferencesProps } from "../../types/preferences";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const NotificationsSection = ({
   emailNotifications,
@@ -13,6 +13,15 @@ const NotificationsSection = ({
 }: NotificationPreferencesProps) => {
   const [isCustomDays, setIsCustomDays] = useState(false);
   const [customDays, setCustomDays] = useState(notificationDaysBefore);
+
+  // Update isCustomDays when notificationDaysBefore changes
+  useEffect(() => {
+    const isCustom = ![1, 2, 3, 7].includes(notificationDaysBefore);
+    setIsCustomDays(isCustom);
+    if (isCustom) {
+      setCustomDays(notificationDaysBefore);
+    }
+  }, [notificationDaysBefore]);
 
   const handleDaysChange = (value: string) => {
     if (value === "custom") {
@@ -108,7 +117,7 @@ const NotificationsSection = ({
           )}
 
           {/* Notification Days Before */}
-          <div className="mb-4">
+          <div className="space-y-2">
             <label
               htmlFor="notification-days"
               className="block text-sm font-medium text-gray-700 dark:text-dark-text-primary mb-1"
@@ -127,7 +136,11 @@ const NotificationsSection = ({
               <option value="2">2 days before</option>
               <option value="3">3 days before</option>
               <option value="7">1 week before</option>
-              <option value="custom">Custom number of days</option>
+              <option value="custom">
+                {isCustomDays
+                  ? `${customDays} days before`
+                  : "Custom number of days"}
+              </option>
             </select>
 
             {isCustomDays && (
