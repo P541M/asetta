@@ -19,10 +19,12 @@ export default function Index() {
 
   // Show loading state while checking auth
   return (
-    <div className="min-h-screen flex items-center justify-center bg-white dark:bg-gray-900">
+    <div className="min-h-screen flex items-center justify-center bg-white dark:bg-dark-bg-primary">
       <div className="flex flex-col items-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
-        <p className="mt-4 text-gray-600 dark:text-gray-300">Loading...</p>
+        <p className="mt-4 text-gray-600 dark:text-dark-text-secondary">
+          Loading...
+        </p>
       </div>
     </div>
   );
