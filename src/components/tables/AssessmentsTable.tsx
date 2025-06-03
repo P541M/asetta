@@ -833,131 +833,139 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
       )}
       {/* Notes Modal */}
       {showNotesModal && selectedAssessment && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 overflow-hidden">
           <div
             id="notes-modal"
-            className="bg-white dark:bg-dark-bg-secondary rounded-lg shadow-lg p-6 w-full max-w-4xl h-[90vh] flex flex-col animate-scale"
+            className="bg-white dark:bg-dark-bg-secondary rounded-lg shadow-lg w-full max-w-4xl max-h-[90vh] flex flex-col animate-scale"
           >
-            <div className="flex justify-between items-center mb-4">
-              <div>
-                <h3 className="text-xl font-medium text-gray-900 dark:text-dark-text-primary">
-                  Notes for {selectedAssessment.assignmentName}
-                </h3>
-                <p className="text-md text-gray-500 dark:text-dark-text-tertiary">
-                  {selectedAssessment.courseName}
-                </p>
-                <div className="mt-2 flex items-center space-x-4 text-md">
-                  <span className="text-gray-600 dark:text-dark-text-secondary">
-                    Due:{" "}
-                    {formatDateTimeForDisplay(
-                      selectedAssessment.dueDate,
-                      selectedAssessment.dueTime
-                    )}
-                  </span>
-                  <span className="text-gray-600 dark:text-dark-text-secondary">
-                    Weight: {selectedAssessment.weight}%
-                  </span>
-                  <span
-                    className={`px-2 py-1 rounded-full text-xs font-medium ${
-                      selectedAssessment.status === "Submitted"
-                        ? "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-800 dark:text-emerald-400"
-                        : "bg-gray-100 dark:bg-gray-900/30 text-gray-800 dark:text-gray-400"
-                    }`}
+            <div className="flex-none p-6 border-b border-gray-200 dark:border-dark-border-primary">
+              <div className="flex justify-between items-center">
+                <div>
+                  <h3 className="text-xl font-medium text-gray-900 dark:text-dark-text-primary">
+                    Notes for {selectedAssessment.assignmentName}
+                  </h3>
+                  <p className="text-md text-gray-500 dark:text-dark-text-tertiary">
+                    {selectedAssessment.courseName}
+                  </p>
+                  <div className="mt-2 flex items-center space-x-4 text-md">
+                    <span className="text-gray-600 dark:text-dark-text-secondary">
+                      Due:{" "}
+                      {formatDateTimeForDisplay(
+                        selectedAssessment.dueDate,
+                        selectedAssessment.dueTime
+                      )}
+                    </span>
+                    <span className="text-gray-600 dark:text-dark-text-secondary">
+                      Weight: {selectedAssessment.weight}%
+                    </span>
+                    <span
+                      className={`px-2 py-1 rounded-full text-xs font-medium ${
+                        selectedAssessment.status === "Submitted"
+                          ? "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-800 dark:text-emerald-400"
+                          : "bg-gray-100 dark:bg-gray-900/30 text-gray-800 dark:text-gray-400"
+                      }`}
+                    >
+                      {selectedAssessment.status}
+                    </span>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <button
+                    onClick={() => {
+                      const text = `Assignment: ${
+                        selectedAssessment.assignmentName
+                      }\nCourse: ${
+                        selectedAssessment.courseName
+                      }\nDue: ${formatDateTimeForDisplay(
+                        selectedAssessment.dueDate,
+                        selectedAssessment.dueTime
+                      )}\nWeight: ${selectedAssessment.weight}%\nStatus: ${
+                        selectedAssessment.status
+                      }\n\nNotes:\n${notesInput}`;
+                      navigator.clipboard.writeText(text);
+                    }}
+                    className="inline-flex items-center px-3 py-1.5 border border-gray-300 dark:border-dark-border-primary shadow-sm text-md font-medium rounded-md text-gray-700 dark:text-dark-text-primary bg-white dark:bg-dark-bg-tertiary hover:bg-gray-50 dark:hover:bg-dark-bg-secondary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:focus:ring-primary-400"
+                    title="Copy Notes"
                   >
-                    {selectedAssessment.status}
-                  </span>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-4 w-4 mr-1.5"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <rect
+                        x="9"
+                        y="9"
+                        width="13"
+                        height="13"
+                        rx="2"
+                        ry="2"
+                      ></rect>
+                      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                    </svg>
+                    Copy
+                  </button>
+                  <button
+                    onClick={() => {
+                      setShowNotesModal(null);
+                      setSelectedAssessment(null);
+                    }}
+                    className="inline-flex items-center p-1.5 border border-transparent rounded-md text-gray-400 dark:text-dark-text-tertiary hover:text-gray-500 dark:hover:text-dark-text-secondary hover:bg-gray-100 dark:hover:bg-dark-bg-tertiary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:focus:ring-primary-400"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-5 w-5"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <line x1="18" y1="6" x2="6" y2="18"></line>
+                      <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                  </button>
                 </div>
               </div>
-              <div className="flex items-center space-x-2">
-                <button
-                  onClick={() => {
-                    const text = `Assignment: ${
-                      selectedAssessment.assignmentName
-                    }\nCourse: ${
-                      selectedAssessment.courseName
-                    }\nDue: ${formatDateTimeForDisplay(
-                      selectedAssessment.dueDate,
-                      selectedAssessment.dueTime
-                    )}\nWeight: ${selectedAssessment.weight}%\nStatus: ${
-                      selectedAssessment.status
-                    }\n\nNotes:\n${notesInput}`;
-                    navigator.clipboard.writeText(text);
-                  }}
-                  className="inline-flex items-center px-3 py-1.5 border border-gray-300 dark:border-dark-border-primary shadow-sm text-md font-medium rounded-md text-gray-700 dark:text-dark-text-primary bg-white dark:bg-dark-bg-tertiary hover:bg-gray-50 dark:hover:bg-dark-bg-secondary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:focus:ring-primary-400"
-                  title="Copy Notes"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-4 w-4 mr-1.5"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <rect
-                      x="9"
-                      y="9"
-                      width="13"
-                      height="13"
-                      rx="2"
-                      ry="2"
-                    ></rect>
-                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-                  </svg>
-                  Copy
-                </button>
+            </div>
+            <div className="flex-1 min-h-0 overflow-y-auto">
+              <div className="p-6">
+                <div className="border rounded-lg overflow-hidden dark:border-dark-border-primary">
+                  <RichTextEditor
+                    content={notesInput}
+                    onChange={setNotesInput}
+                    onAddLink={handleAddLink}
+                    placeholder={`Add your notes here...`}
+                  />
+                </div>
+              </div>
+            </div>
+            <div className="flex-none p-6 border-t border-gray-200 dark:border-dark-border-primary">
+              <div className="flex justify-end space-x-3">
                 <button
                   onClick={() => {
                     setShowNotesModal(null);
                     setSelectedAssessment(null);
                   }}
-                  className="inline-flex items-center p-1.5 border border-transparent rounded-md text-gray-400 dark:text-dark-text-tertiary hover:text-gray-500 dark:hover:text-dark-text-secondary hover:bg-gray-100 dark:hover:bg-dark-bg-tertiary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:focus:ring-primary-400"
+                  className="btn-outline py-1.5 px-4"
                 >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <line x1="18" y1="6" x2="6" y2="18"></line>
-                    <line x1="6" y1="6" x2="18" y2="18"></line>
-                  </svg>
+                  Cancel
+                </button>
+                <button
+                  onClick={() => {
+                    handleSaveNotes();
+                    setShowNotesModal(null);
+                  }}
+                  className="btn-primary py-1.5 px-4"
+                >
+                  Save Notes
                 </button>
               </div>
-            </div>
-            <div className="flex-1 mb-4 border rounded-lg overflow-hidden dark:border-dark-border-primary">
-              <RichTextEditor
-                content={notesInput}
-                onChange={setNotesInput}
-                onAddLink={handleAddLink}
-                placeholder={`Add your notes here...`}
-              />
-            </div>
-            <div className="flex justify-end space-x-3">
-              <button
-                onClick={() => {
-                  setShowNotesModal(null);
-                  setSelectedAssessment(null);
-                }}
-                className="btn-outline py-1.5 px-4"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={() => {
-                  handleSaveNotes();
-                  setShowNotesModal(null);
-                }}
-                className="btn-primary py-1.5 px-4"
-              >
-                Save Notes
-              </button>
             </div>
           </div>
         </div>
