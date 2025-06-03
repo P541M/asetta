@@ -1,5 +1,5 @@
 .rich-text-editor {
-  @apply bg-light-bg-primary dark:bg-dark-bg-primary;
+  @apply bg-transparent;
 }
 
 .rich-text-editor .ProseMirror {
@@ -25,6 +25,10 @@
 .rich-text-editor .ProseMirror p.is-editor-empty:first-child::before {
   @apply text-light-text-tertiary float-left h-0 pointer-events-none dark:text-dark-text-tertiary;
   content: attr(data-placeholder);
+}
+
+.rich-text-editor .toolbar {
+  @apply bg-light-bg-primary dark:bg-dark-bg-primary border-b border-gray-200 dark:border-dark-border-primary p-2 flex flex-wrap gap-2;
 }
 
 .rich-text-editor .toolbar button {

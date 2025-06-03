@@ -44,12 +44,14 @@ const LinkModal = ({ isOpen, onClose, onAddLink }: LinkModalProps) => {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[100]">
-      <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md animate-scale">
+      <div className="bg-white dark:bg-dark-bg-secondary rounded-lg shadow-lg p-6 w-full max-w-md animate-scale">
         <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-medium text-gray-900">Add Link</h3>
+          <h3 className="text-lg font-medium text-gray-900 dark:text-dark-text-primary">
+            Add Link
+          </h3>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-500"
+            className="text-gray-400 hover:text-gray-500 dark:text-dark-text-tertiary dark:hover:text-dark-text-secondary"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -69,7 +71,7 @@ const LinkModal = ({ isOpen, onClose, onAddLink }: LinkModalProps) => {
           <div>
             <label
               htmlFor="url"
-              className="block text-sm font-medium text-gray-700"
+              className="block text-sm font-medium text-gray-700 dark:text-dark-text-secondary"
             >
               URL
             </label>
@@ -79,14 +81,14 @@ const LinkModal = ({ isOpen, onClose, onAddLink }: LinkModalProps) => {
               value={url}
               onChange={(e) => setUrl(e.target.value)}
               placeholder="https://example.com"
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+              className="mt-1 block w-full rounded-md border-gray-300 dark:border-dark-border-primary shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm dark:bg-dark-bg-tertiary dark:text-dark-text-primary"
               required
             />
           </div>
           <div>
             <label
               htmlFor="text"
-              className="block text-sm font-medium text-gray-700"
+              className="block text-sm font-medium text-gray-700 dark:text-dark-text-secondary"
             >
               Link Text (optional)
             </label>
@@ -96,7 +98,7 @@ const LinkModal = ({ isOpen, onClose, onAddLink }: LinkModalProps) => {
               value={text}
               onChange={(e) => setText(e.target.value)}
               placeholder="Display text"
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+              className="mt-1 block w-full rounded-md border-gray-300 dark:border-dark-border-primary shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm dark:bg-dark-bg-tertiary dark:text-dark-text-primary"
             />
           </div>
           <div className="flex justify-end space-x-3">
@@ -173,11 +175,13 @@ const RichTextEditor = ({
 
   return (
     <div className="rich-text-editor">
-      <div className="toolbar border-b border-gray-200 p-2 flex flex-wrap gap-2">
+      <div className="toolbar border-b border-gray-200 dark:border-dark-border-primary p-2 flex flex-wrap gap-2">
         <button
           onClick={() => editor.chain().focus().toggleBold().run()}
-          className={`p-1.5 rounded hover:bg-gray-100 ${
-            editor.isActive("bold") ? "bg-gray-100" : ""
+          className={`p-1.5 rounded hover:bg-gray-100 dark:hover:bg-dark-bg-tertiary ${
+            editor.isActive("bold")
+              ? "bg-gray-100 dark:bg-dark-bg-tertiary"
+              : ""
           }`}
           title="Bold"
         >
@@ -185,8 +189,10 @@ const RichTextEditor = ({
         </button>
         <button
           onClick={() => editor.chain().focus().toggleItalic().run()}
-          className={`p-1.5 rounded hover:bg-gray-100 ${
-            editor.isActive("italic") ? "bg-gray-100" : ""
+          className={`p-1.5 rounded hover:bg-gray-100 dark:hover:bg-dark-bg-tertiary ${
+            editor.isActive("italic")
+              ? "bg-gray-100 dark:bg-dark-bg-tertiary"
+              : ""
           }`}
           title="Italic"
         >
@@ -194,8 +200,10 @@ const RichTextEditor = ({
         </button>
         <button
           onClick={() => editor.chain().focus().toggleBulletList().run()}
-          className={`p-1.5 rounded hover:bg-gray-100 ${
-            editor.isActive("bulletList") ? "bg-gray-100" : ""
+          className={`p-1.5 rounded hover:bg-gray-100 dark:hover:bg-dark-bg-tertiary ${
+            editor.isActive("bulletList")
+              ? "bg-gray-100 dark:bg-dark-bg-tertiary"
+              : ""
           }`}
           title="Bullet List"
         >
@@ -203,8 +211,10 @@ const RichTextEditor = ({
         </button>
         <button
           onClick={() => editor.chain().focus().toggleOrderedList().run()}
-          className={`p-1.5 rounded hover:bg-gray-100 ${
-            editor.isActive("orderedList") ? "bg-gray-100" : ""
+          className={`p-1.5 rounded hover:bg-gray-100 dark:hover:bg-dark-bg-tertiary ${
+            editor.isActive("orderedList")
+              ? "bg-gray-100 dark:bg-dark-bg-tertiary"
+              : ""
           }`}
           title="Numbered List"
         >
@@ -212,8 +222,10 @@ const RichTextEditor = ({
         </button>
         <button
           onClick={() => editor.chain().focus().setTextAlign("left").run()}
-          className={`p-1.5 rounded hover:bg-gray-100 ${
-            editor.isActive({ textAlign: "left" }) ? "bg-gray-100" : ""
+          className={`p-1.5 rounded hover:bg-gray-100 dark:hover:bg-dark-bg-tertiary ${
+            editor.isActive({ textAlign: "left" })
+              ? "bg-gray-100 dark:bg-dark-bg-tertiary"
+              : ""
           }`}
           title="Align Left"
         >
@@ -221,8 +233,10 @@ const RichTextEditor = ({
         </button>
         <button
           onClick={() => editor.chain().focus().setTextAlign("center").run()}
-          className={`p-1.5 rounded hover:bg-gray-100 ${
-            editor.isActive({ textAlign: "center" }) ? "bg-gray-100" : ""
+          className={`p-1.5 rounded hover:bg-gray-100 dark:hover:bg-dark-bg-tertiary ${
+            editor.isActive({ textAlign: "center" })
+              ? "bg-gray-100 dark:bg-dark-bg-tertiary"
+              : ""
           }`}
           title="Align Center"
         >
@@ -230,8 +244,10 @@ const RichTextEditor = ({
         </button>
         <button
           onClick={() => editor.chain().focus().setTextAlign("right").run()}
-          className={`p-1.5 rounded hover:bg-gray-100 ${
-            editor.isActive({ textAlign: "right" }) ? "bg-gray-100" : ""
+          className={`p-1.5 rounded hover:bg-gray-100 dark:hover:bg-dark-bg-tertiary ${
+            editor.isActive({ textAlign: "right" })
+              ? "bg-gray-100 dark:bg-dark-bg-tertiary"
+              : ""
           }`}
           title="Align Right"
         >
@@ -239,7 +255,7 @@ const RichTextEditor = ({
         </button>
         <button
           onClick={() => editor.chain().focus().undo().run()}
-          className={`p-1.5 rounded hover:bg-gray-100 ${
+          className={`p-1.5 rounded hover:bg-gray-100 dark:hover:bg-dark-bg-tertiary ${
             !editor.can().undo() ? "opacity-50 cursor-not-allowed" : ""
           }`}
           title="Undo"
@@ -249,7 +265,7 @@ const RichTextEditor = ({
         </button>
         <button
           onClick={() => editor.chain().focus().redo().run()}
-          className={`p-1.5 rounded hover:bg-gray-100 ${
+          className={`p-1.5 rounded hover:bg-gray-100 dark:hover:bg-dark-bg-tertiary ${
             !editor.can().redo() ? "opacity-50 cursor-not-allowed" : ""
           }`}
           title="Redo"
@@ -259,8 +275,10 @@ const RichTextEditor = ({
         </button>
         <button
           onClick={handleAddLink}
-          className={`p-1.5 rounded hover:bg-gray-100 ${
-            editor.isActive("link") ? "bg-gray-100" : ""
+          className={`p-1.5 rounded hover:bg-gray-100 dark:hover:bg-dark-bg-tertiary ${
+            editor.isActive("link")
+              ? "bg-gray-100 dark:bg-dark-bg-tertiary"
+              : ""
           }`}
           title="Add Link"
         >

@@ -18,95 +18,6 @@ import { formatLocalDateTime, getDaysUntil } from "../../utils/dateUtils";
 import { Assessment, AssessmentsTableProps } from "../../types/assessment";
 import ConfirmationModal from "../common/ConfirmationModal";
 
-interface LinkModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onAddLink: (url: string, text: string) => void;
-}
-
-const LinkModal = ({ isOpen, onClose, onAddLink }: LinkModalProps) => {
-  const [url, setUrl] = useState("");
-  const [text, setText] = useState("");
-
-  const handleSubmit = (e?: React.FormEvent) => {
-    if (e) {
-      e.preventDefault();
-    }
-    if (url) {
-      onAddLink(url, text || url);
-      setUrl("");
-      setText("");
-      onClose();
-    }
-  };
-
-  if (!isOpen) return null;
-
-  return (
-    <ConfirmationModal
-      isOpen={isOpen}
-      onClose={onClose}
-      onConfirm={handleSubmit}
-      title="Add Link"
-      message={
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label
-              htmlFor="url"
-              className="block text-md font-medium text-gray-700 dark:text-dark-text-secondary"
-            >
-              URL
-            </label>
-            <input
-              type="url"
-              id="url"
-              value={url}
-              onChange={(e) => setUrl(e.target.value)}
-              placeholder="https://example.com"
-              className="mt-1 block w-full rounded-md border-gray-300 dark:border-dark-border-primary shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-md dark:bg-dark-bg-tertiary dark:text-dark-text-primary"
-              required
-            />
-          </div>
-          <div>
-            <label
-              htmlFor="text"
-              className="block text-md font-medium text-gray-700 dark:text-dark-text-secondary"
-            >
-              Link Text (optional)
-            </label>
-            <input
-              type="text"
-              id="text"
-              value={text}
-              onChange={(e) => setText(e.target.value)}
-              placeholder="Display text"
-              className="mt-1 block w-full rounded-md border-gray-300 dark:border-dark-border-primary shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-md dark:bg-dark-bg-tertiary dark:text-dark-text-primary"
-            />
-          </div>
-        </form>
-      }
-      confirmText="Add Link"
-      variant="primary"
-      icon={
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="h-6 w-6"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"
-          />
-        </svg>
-      }
-    />
-  );
-};
-
 const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
   assessments,
   semesterId,
@@ -141,10 +52,6 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
     useState<Assessment | null>(null);
   const [notesInput, setNotesInput] = useState<string>("");
   const [showNotesModal, setShowNotesModal] = useState<string | null>(null);
-  const [showLinkModal, setShowLinkModal] = useState(false);
-  const [linkCallback, setLinkCallback] = useState<
-    ((url: string, text: string) => void) | null
-  >(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [assessmentToDelete, setAssessmentToDelete] =
@@ -461,15 +368,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
   };
 
   const handleAddLink = (callback: (url: string, text: string) => void) => {
-    setLinkCallback(() => callback);
-    setShowLinkModal(true);
-  };
-
-  const handleLinkSubmit = (url: string, text: string) => {
-    if (linkCallback) {
-      linkCallback(url, text);
-      setLinkCallback(null);
-    }
+    callback("", "");
   };
 
   const handleDeleteClick = (assessment: Assessment) => {
@@ -1063,15 +962,6 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
           </div>
         </div>
       )}
-      {/* Link Modal */}
-      <LinkModal
-        isOpen={showLinkModal}
-        onClose={() => {
-          setShowLinkModal(false);
-          setLinkCallback(null);
-        }}
-        onAddLink={handleLinkSubmit}
-      />
       {/* Delete Confirmation Modal */}
       <ConfirmationModal
         isOpen={showDeleteModal}
