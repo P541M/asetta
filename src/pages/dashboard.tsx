@@ -284,7 +284,7 @@ const Dashboard = () => {
 
           {showStatsBar && (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 mb-8 mt-6">
-              <div className="bg-white dark:bg-dark-bg-secondary rounded-lg p-4 shadow-md hover:shadow-lg transition-all duration-300">
+              <div className="bg-white dark:bg-dark-bg-secondary rounded-lg p-4 shadow-md">
                 <div className="flex items-center justify-between mb-2">
                   <p className="text-sm font-medium text-gray-600 dark:text-dark-text-secondary">
                     Total Assessments
@@ -294,7 +294,7 @@ const Dashboard = () => {
                   {stats.total}
                 </h3>
               </div>
-              <div className="bg-white dark:bg-dark-bg-secondary rounded-lg p-4 shadow-md hover:shadow-lg transition-all duration-300">
+              <div className="bg-white dark:bg-dark-bg-secondary rounded-lg p-4 shadow-md">
                 <div className="flex items-center justify-between mb-2">
                   <p className="text-sm font-medium text-gray-600 dark:text-dark-text-secondary">
                     Not Started
@@ -304,7 +304,7 @@ const Dashboard = () => {
                   {stats.notStarted}
                 </h3>
               </div>
-              <div className="bg-white dark:bg-dark-bg-secondary rounded-lg p-4 shadow-md hover:shadow-lg transition-all duration-300">
+              <div className="bg-white dark:bg-dark-bg-secondary rounded-lg p-4 shadow-md">
                 <div className="flex items-center justify-between mb-2">
                   <p className="text-sm font-medium text-gray-600 dark:text-dark-text-secondary">
                     In Progress
@@ -314,7 +314,7 @@ const Dashboard = () => {
                   {stats.inProgress}
                 </h3>
               </div>
-              <div className="bg-white dark:bg-dark-bg-secondary rounded-lg p-4 shadow-md hover:shadow-lg transition-all duration-300">
+              <div className="bg-white dark:bg-dark-bg-secondary rounded-lg p-4 shadow-md">
                 <div className="flex items-center justify-between mb-2">
                   <p className="text-sm font-medium text-gray-600 dark:text-dark-text-secondary">
                     Submitted
@@ -324,7 +324,7 @@ const Dashboard = () => {
                   {stats.submitted}
                 </h3>
               </div>
-              <div className="bg-white dark:bg-dark-bg-secondary rounded-lg p-4 shadow-md hover:shadow-lg transition-all duration-300">
+              <div className="bg-white dark:bg-dark-bg-secondary rounded-lg p-4 shadow-md">
                 <div className="flex items-center justify-between mb-2">
                   <p className="text-sm font-medium text-gray-600 dark:text-dark-text-secondary">
                     Upcoming
@@ -334,7 +334,7 @@ const Dashboard = () => {
                   {stats.upcomingDeadlines}
                 </h3>
               </div>
-              <div className="bg-white dark:bg-dark-bg-secondary rounded-lg p-4 shadow-md hover:shadow-lg transition-all duration-300">
+              <div className="bg-white dark:bg-dark-bg-secondary rounded-lg p-4 shadow-md">
                 <div className="flex items-center justify-between mb-2">
                   <p className="text-sm font-medium text-gray-600 dark:text-dark-text-secondary">
                     Completion Rate
