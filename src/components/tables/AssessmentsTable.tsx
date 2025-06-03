@@ -1037,14 +1037,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                 content={notesInput}
                 onChange={setNotesInput}
                 onAddLink={handleAddLink}
-                placeholder={`Add your notes here...
-
-• Key concepts and definitions
-• Important formulas
-• Questions for class
-• Resources to review
-• Progress updates
-• Feedback received`}
+                placeholder={`Add your notes here...`}
               />
             </div>
             <div className="flex justify-end space-x-3">

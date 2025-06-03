@@ -3,19 +3,19 @@
 }
 
 .rich-text-editor .ProseMirror {
-  @apply min-h-[200px] outline-none;
+  @apply min-h-[200px] outline-none focus:outline-none focus:ring-0 text-light-text-primary dark:text-dark-text-primary;
 }
 
 .rich-text-editor .ProseMirror p {
-  @apply mb-4;
+  @apply mb-4 text-light-text-primary dark:text-dark-text-primary;
 }
 
 .rich-text-editor .ProseMirror ul {
-  @apply list-disc pl-4 mb-4;
+  @apply list-disc pl-4 mb-4 text-light-text-primary dark:text-dark-text-primary;
 }
 
 .rich-text-editor .ProseMirror ol {
-  @apply list-decimal pl-4 mb-4;
+  @apply list-decimal pl-4 mb-4 text-light-text-primary dark:text-dark-text-primary;
 }
 
 .rich-text-editor .ProseMirror a {
@@ -31,6 +31,14 @@
   @apply text-light-text-tertiary hover:text-light-text-primary transition-colors dark:text-dark-text-tertiary dark:hover:text-dark-text-primary;
 }
 
+.rich-text-editor .toolbar button svg {
+  @apply text-inherit;
+}
+
 .rich-text-editor .toolbar button.is-active {
   @apply text-light-button-primary bg-light-button-primary/10 dark:text-dark-button-primary dark:bg-dark-button-primary/10;
+}
+
+.rich-text-editor .toolbar button.is-active svg {
+  @apply text-inherit;
 }

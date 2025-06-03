@@ -18,6 +18,7 @@ import {
   MdRedo,
 } from "react-icons/md";
 import { RichTextEditorProps } from "../../types/editor";
+import "./rich-text-editor.css";
 
 interface LinkModalProps {
   isOpen: boolean;
