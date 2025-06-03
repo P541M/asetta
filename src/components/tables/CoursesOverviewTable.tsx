@@ -26,8 +26,6 @@ const CoursesOverviewTable = ({
   const [courses, setCourses] = useState<CourseStats[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [sortField, setSortField] = useState<keyof CourseStats>("courseName");
-  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
   const [uploadingCourse, setUploadingCourse] = useState<string | null>(null);
   const [selectedOutline, setSelectedOutline] = useState<string | null>(null);
   const [outlineUrls, setOutlineUrls] = useState<Record<string, string>>({});
@@ -142,35 +140,13 @@ const CoursesOverviewTable = ({
     fetchCourseData();
   }, [user, semesterId]);
 
-  const handleSort = (field: keyof CourseStats) => {
-    if (field === sortField) {
-      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
-    } else {
-      setSortField(field);
-      setSortDirection("asc");
-    }
-  };
-
   const sortedCourses = [...courses].sort((a, b) => {
-    if (sortField === "nextDueDate") {
-      if (!a.nextDueDate && !b.nextDueDate) return 0;
-      if (!a.nextDueDate) return sortDirection === "asc" ? 1 : -1;
-      if (!b.nextDueDate) return sortDirection === "asc" ? -1 : 1;
-      const dateA = new Date(a.nextDueDate);
-      const dateB = new Date(b.nextDueDate);
-      return sortDirection === "asc"
-        ? dateA.getTime() - dateB.getTime()
-        : dateB.getTime() - dateA.getTime();
-    }
-    const fieldA = a[sortField];
-    const fieldB = b[sortField];
-    if (fieldA === null || fieldA === undefined)
-      return sortDirection === "asc" ? 1 : -1;
-    if (fieldB === null || fieldB === undefined)
-      return sortDirection === "asc" ? -1 : 1;
-    if (fieldA < fieldB) return sortDirection === "asc" ? -1 : 1;
-    if (fieldA > fieldB) return sortDirection === "asc" ? 1 : -1;
-    return 0;
+    if (!a.nextDueDate && !b.nextDueDate) return 0;
+    if (!a.nextDueDate) return 1;
+    if (!b.nextDueDate) return -1;
+    const dateA = new Date(a.nextDueDate);
+    const dateB = new Date(b.nextDueDate);
+    return dateA.getTime() - dateB.getTime();
   });
 
   const formatDate = (dateStr: string | null) => {
@@ -294,7 +270,7 @@ const CoursesOverviewTable = ({
   if (error) return <div className="text-red-600">{error}</div>;
   if (courses.length === 0) {
     return (
-      <div className="px-6 pt-6">
+      <div className="p-6">
         <h2 className="text-xl font-medium text-gray-900 dark:text-dark-text-primary mb-6">
           Your Courses
         </h2>
@@ -325,7 +301,7 @@ const CoursesOverviewTable = ({
   }
 
   return (
-    <div className="px-6 pt-6">
+    <div className="p-6">
       <h2 className="text-xl font-medium text-gray-900 dark:text-dark-text-primary mb-6">
         Your Courses
       </h2>
@@ -338,106 +314,60 @@ const CoursesOverviewTable = ({
           <p>{error}</p>
         </div>
       ) : (
-        <div className="table-container rounded-lg border border-gray-100 dark:border-dark-border-primary">
-          <table className="data-table">
-            <thead className="bg-gray-50 dark:bg-dark-bg-tertiary">
-              <tr>
-                <th
-                  onClick={() => handleSort("courseName")}
-                  className="cursor-pointer w-48 dark:text-dark-text-primary dark:bg-dark-bg-tertiary"
-                >
-                  <div className="flex items-center space-x-1 group">
-                    <span className="group-hover:text-primary-500 dark:group-hover:text-primary-400">
-                      Course
-                    </span>
-                    {sortField === "courseName" && (
-                      <span className="text-primary-500 dark:text-primary-400">
-                        {sortDirection === "asc" ? "↑" : "↓"}
-                      </span>
-                    )}
+        <div className="space-y-2">
+          {/* Headers */}
+          <div className="grid grid-cols-12 gap-4 px-4 py-3 bg-gray-50/50 dark:bg-dark-bg-tertiary/30 rounded-lg">
+            <div className="col-span-12 lg:col-span-2 flex items-center">
+              <span className="text-xs font-medium text-gray-500 dark:text-dark-text-tertiary uppercase tracking-wider">
+                Course
+              </span>
+            </div>
+            <div className="col-span-12 lg:col-span-1 flex items-center">
+              <span className="text-xs font-medium text-gray-500 dark:text-dark-text-tertiary uppercase tracking-wider">
+                Total
+              </span>
+            </div>
+            <div className="col-span-12 lg:col-span-1 flex items-center">
+              <span className="text-xs font-medium text-gray-500 dark:text-dark-text-tertiary uppercase tracking-wider">
+                Pending
+              </span>
+            </div>
+            <div className="col-span-12 lg:col-span-3 flex items-center">
+              <span className="text-xs font-medium text-gray-500 dark:text-dark-text-tertiary uppercase tracking-wider">
+                Progress
+              </span>
+            </div>
+            <div className="col-span-12 lg:col-span-4 flex items-center">
+              <span className="text-xs font-medium text-gray-500 dark:text-dark-text-tertiary uppercase tracking-wider">
+                Next Due
+              </span>
+            </div>
+            <div className="col-span-12 lg:col-span-1 flex items-center justify-end">
+              <span className="text-xs font-medium text-gray-500 dark:text-dark-text-tertiary uppercase tracking-wider">
+                Actions
+              </span>
+            </div>
+          </div>
+
+          {/* Course Cards */}
+          <div className="space-y-2">
+            {sortedCourses.map((course) => (
+              <div
+                key={course.courseName}
+                className="bg-white dark:bg-dark-bg-secondary rounded-lg shadow-sm border border-gray-100 dark:border-dark-border-primary transition-all duration-300 p-3"
+              >
+                <div className="grid grid-cols-12 gap-4 items-center">
+                  <div className="col-span-12 lg:col-span-2">
+                    <h3 className="font-medium text-gray-900 dark:text-dark-text-primary text-md">
+                      {course.courseName}
+                    </h3>
                   </div>
-                </th>
-                <th
-                  onClick={() => handleSort("totalAssessments")}
-                  className="cursor-pointer w-24 dark:text-dark-text-primary dark:bg-dark-bg-tertiary"
-                >
-                  <div className="flex items-center space-x-1 group">
-                    <span className="group-hover:text-primary-500 dark:group-hover:text-primary-400">
-                      Total
+                  <div className="col-span-12 lg:col-span-1">
+                    <span className="text-gray-700 dark:text-dark-text-secondary text-md">
+                      {course.totalAssessments}
                     </span>
-                    {sortField === "totalAssessments" && (
-                      <span className="text-primary-500 dark:text-primary-400">
-                        {sortDirection === "asc" ? "↑" : "↓"}
-                      </span>
-                    )}
                   </div>
-                </th>
-                <th
-                  onClick={() => handleSort("pendingAssessments")}
-                  className="cursor-pointer w-24 dark:text-dark-text-primary dark:bg-dark-bg-tertiary"
-                >
-                  <div className="flex items-center space-x-1 group">
-                    <span className="group-hover:text-primary-500 dark:group-hover:text-primary-400">
-                      Pending
-                    </span>
-                    {sortField === "pendingAssessments" && (
-                      <span className="text-primary-500 dark:text-primary-400">
-                        {sortDirection === "asc" ? "↑" : "↓"}
-                      </span>
-                    )}
-                  </div>
-                </th>
-                <th
-                  onClick={() => handleSort("progress")}
-                  className="cursor-pointer w-32 dark:text-dark-text-primary dark:bg-dark-bg-tertiary"
-                >
-                  <div className="flex items-center space-x-1 group">
-                    <span className="group-hover:text-primary-500 dark:group-hover:text-primary-400">
-                      Progress
-                    </span>
-                    {sortField === "progress" && (
-                      <span className="text-primary-500 dark:text-primary-400">
-                        {sortDirection === "asc" ? "↑" : "↓"}
-                      </span>
-                    )}
-                  </div>
-                </th>
-                <th
-                  onClick={() => handleSort("nextDueDate")}
-                  className="cursor-pointer w-48 dark:text-dark-text-primary dark:bg-dark-bg-tertiary"
-                >
-                  <div className="flex items-center space-x-1 group">
-                    <span className="group-hover:text-primary-500 dark:group-hover:text-primary-400">
-                      Next Due
-                    </span>
-                    {sortField === "nextDueDate" && (
-                      <span className="text-primary-500 dark:text-primary-400">
-                        {sortDirection === "asc" ? "↑" : "↓"}
-                      </span>
-                    )}
-                  </div>
-                </th>
-                <th className="w-24 dark:text-dark-text-primary dark:bg-dark-bg-tertiary">
-                  Outline
-                </th>
-                <th className="w-24 dark:text-dark-text-primary dark:bg-dark-bg-tertiary">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {sortedCourses.map((course) => (
-                <tr
-                  key={course.courseName}
-                  className="dark:border-dark-border-primary"
-                >
-                  <td className="font-medium whitespace-nowrap dark:text-dark-text-primary">
-                    {course.courseName}
-                  </td>
-                  <td className="whitespace-nowrap dark:text-dark-text-primary">
-                    {course.totalAssessments}
-                  </td>
-                  <td className="whitespace-nowrap">
+                  <div className="col-span-12 lg:col-span-1">
                     {course.pendingAssessments > 0 ? (
                       <span
                         className={`font-medium ${
@@ -453,9 +383,9 @@ const CoursesOverviewTable = ({
                         All done!
                       </span>
                     )}
-                  </td>
-                  <td>
-                    <div className="w-full bg-gray-200 dark:bg-dark-bg-tertiary rounded-full h-2.5">
+                  </div>
+                  <div className="col-span-12 lg:col-span-3">
+                    <div className="max-w-[200px] bg-gray-200 dark:bg-dark-bg-tertiary rounded-full h-2.5">
                       <div
                         className="h-2.5 rounded-full bg-primary-500 dark:bg-primary-400"
                         style={{ width: `${course.progress}%` }}
@@ -464,8 +394,8 @@ const CoursesOverviewTable = ({
                     <span className="text-xs text-gray-500 dark:text-dark-text-tertiary mt-1 inline-block">
                       {course.progress}% complete
                     </span>
-                  </td>
-                  <td>
+                  </div>
+                  <div className="col-span-12 lg:col-span-4">
                     {course.nextDueDate ? (
                       <div>
                         <div
@@ -486,36 +416,30 @@ const CoursesOverviewTable = ({
                         -
                       </span>
                     )}
-                  </td>
-                  <td>
+                  </div>
+                  <div className="col-span-12 lg:col-span-1 flex items-center justify-end space-x-2">
                     {course.outlineUrl ? (
                       <button
                         onClick={() => handleViewOutline(course.courseName)}
-                        className="group flex items-center space-x-1 text-primary-500 hover:text-primary-600 dark:text-primary-400 dark:hover:text-primary-300 p-1.5 hover:bg-primary-50 dark:hover:bg-dark-bg-tertiary rounded transition-all duration-200"
+                        className="text-gray-500 dark:text-dark-text-tertiary hover:text-gray-700 dark:hover:text-dark-text-secondary p-1 hover:bg-gray-100 dark:hover:bg-dark-bg-tertiary rounded-md transition-colors"
                         title="View Course Outline"
                       >
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
-                          className="h-5 w-5"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
+                          className="h-4 w-4"
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
                         >
-                          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                          <polyline points="14 2 14 8 20 8"></polyline>
-                          <line x1="16" y1="13" x2="8" y2="13"></line>
-                          <line x1="16" y1="17" x2="8" y2="17"></line>
-                          <polyline points="10 9 9 9 8 9"></polyline>
+                          <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
+                          <path
+                            fillRule="evenodd"
+                            d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z"
+                            clipRule="evenodd"
+                          />
                         </svg>
-                        <span className="text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                          View
-                        </span>
                       </button>
                     ) : (
-                      <label className="relative cursor-pointer group">
+                      <label className="relative cursor-pointer">
                         <input
                           type="file"
                           accept="application/pdf"
@@ -525,40 +449,33 @@ const CoursesOverviewTable = ({
                           className="hidden"
                           disabled={uploadingCourse === course.courseName}
                         />
-                        <div className="flex items-center space-x-1 text-gray-400 group-hover:text-primary-500 dark:text-dark-text-tertiary dark:group-hover:text-primary-400 p-1.5 group-hover:bg-gray-50 dark:group-hover:bg-dark-bg-tertiary rounded transition-all duration-200">
+                        <div className="text-gray-500 dark:text-dark-text-tertiary hover:text-gray-700 dark:hover:text-dark-text-secondary p-1 hover:bg-gray-100 dark:hover:bg-dark-bg-tertiary rounded-md transition-colors">
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
-                            className={`h-5 w-5 ${
+                            className={`h-4 w-4 ${
                               uploadingCourse === course.courseName
                                 ? "animate-spin"
                                 : ""
                             }`}
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
+                            viewBox="0 0 20 20"
+                            fill="currentColor"
                           >
-                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                            <polyline points="17 8 12 3 7 8"></polyline>
-                            <line x1="12" y1="3" x2="12" y2="15"></line>
+                            <path
+                              fillRule="evenodd"
+                              d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z"
+                              clipRule="evenodd"
+                            />
                           </svg>
-                          <span className="text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                            Upload
-                          </span>
                         </div>
                       </label>
                     )}
-                  </td>
-                  <td>
                     <button
                       onClick={() => onSelectCourse(course.courseName)}
-                      className="btn-primary py-1 px-3 text-sm hover:shadow-sm flex items-center"
+                      className="text-gray-500 dark:text-dark-text-tertiary hover:text-gray-700 dark:hover:text-dark-text-secondary p-1 hover:bg-gray-100 dark:hover:bg-dark-bg-tertiary rounded-md transition-colors"
                     >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
-                        className="h-4 w-4 mr-1"
+                        className="h-4 w-4"
                         viewBox="0 0 20 20"
                         fill="currentColor"
                       >
@@ -569,105 +486,108 @@ const CoursesOverviewTable = ({
                           clipRule="evenodd"
                         />
                       </svg>
-                      View
                     </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       )}
 
       {/* Outline Viewer Modal */}
       {selectedOutline && outlineUrls[selectedOutline] && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-dark-bg-secondary rounded-lg shadow-xl w-[80vw] h-[95vh] flex flex-col">
-            <div className="p-4 border-b border-gray-100 dark:border-dark-border-primary flex items-center justify-between">
-              <div>
-                <h3 className="text-xl font-semibold text-gray-900 dark:text-dark-text-primary">
-                  {selectedOutline} Course Outline
-                </h3>
-                <p className="text-sm text-gray-500 dark:text-dark-text-tertiary">
-                  View and navigate through the course outline
-                </p>
-              </div>
-              <div className="flex items-center space-x-2">
-                <button
-                  onClick={() =>
-                    window.open(outlineUrls[selectedOutline], "_blank")
-                  }
-                  className="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-dark-border-primary shadow-sm text-sm font-medium rounded-md text-gray-700 dark:text-dark-text-primary bg-white dark:bg-dark-bg-secondary hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-4 w-4 mr-1.5"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-[2px] flex items-center justify-center z-[9999] animate-fade-in">
+          <div className="bg-white dark:bg-dark-bg-secondary rounded-lg shadow-lg w-full max-w-4xl max-h-[90vh] flex flex-col">
+            <div className="flex-none p-6 border-b border-gray-200 dark:border-dark-border-primary">
+              <div className="flex justify-between items-center">
+                <div>
+                  <h3 className="text-xl font-medium text-gray-900 dark:text-dark-text-primary">
+                    {selectedOutline} Course Outline
+                  </h3>
+                  <p className="text-md text-gray-500 dark:text-dark-text-tertiary">
+                    View and navigate through the course outline
+                  </p>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <button
+                    onClick={() =>
+                      window.open(outlineUrls[selectedOutline], "_blank")
+                    }
+                    className="inline-flex items-center px-3 py-1.5 border border-gray-300 dark:border-dark-border-primary shadow-sm text-md font-medium rounded-md text-gray-700 dark:text-dark-text-primary bg-white dark:bg-dark-bg-tertiary hover:bg-gray-50 dark:hover:bg-dark-bg-secondary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
                   >
-                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                    <polyline points="15 3 21 3 21 9"></polyline>
-                    <line x1="10" y1="14" x2="21" y2="3"></line>
-                  </svg>
-                  Open in New Tab
-                </button>
-                <label className="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-dark-border-primary shadow-sm text-sm font-medium rounded-md text-gray-700 dark:text-dark-text-primary bg-white dark:bg-dark-bg-secondary hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 cursor-pointer">
-                  <input
-                    type="file"
-                    accept="application/pdf"
-                    onChange={(e) => handleOutlineUpload(e, selectedOutline)}
-                    className="hidden"
-                    disabled={uploadingCourse === selectedOutline}
-                  />
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-4 w-4 mr-1.5"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-4 w-4 mr-1.5"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                      <polyline points="15 3 21 3 21 9"></polyline>
+                      <line x1="10" y1="14" x2="21" y2="3"></line>
+                    </svg>
+                    Open in New Tab
+                  </button>
+                  <label className="inline-flex items-center px-3 py-1.5 border border-gray-300 dark:border-dark-border-primary shadow-sm text-md font-medium rounded-md text-gray-700 dark:text-dark-text-primary bg-white dark:bg-dark-bg-tertiary hover:bg-gray-50 dark:hover:bg-dark-bg-secondary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 cursor-pointer">
+                    <input
+                      type="file"
+                      accept="application/pdf"
+                      onChange={(e) => handleOutlineUpload(e, selectedOutline)}
+                      className="hidden"
+                      disabled={uploadingCourse === selectedOutline}
+                    />
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-4 w-4 mr-1.5"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                      <polyline points="17 8 12 3 7 8"></polyline>
+                      <line x1="12" y1="3" x2="12" y2="15"></line>
+                    </svg>
+                    {uploadingCourse === selectedOutline
+                      ? "Uploading..."
+                      : "Reupload"}
+                  </label>
+                  <button
+                    onClick={() => setSelectedOutline(null)}
+                    className="inline-flex items-center p-1.5 border border-transparent rounded-md text-gray-400 dark:text-dark-text-tertiary hover:text-gray-500 dark:hover:text-dark-text-secondary hover:bg-gray-100 dark:hover:bg-dark-bg-tertiary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
                   >
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                    <polyline points="17 8 12 3 7 8"></polyline>
-                    <line x1="12" y1="3" x2="12" y2="15"></line>
-                  </svg>
-                  {uploadingCourse === selectedOutline
-                    ? "Uploading..."
-                    : "Reupload"}
-                </label>
-                <button
-                  onClick={() => setSelectedOutline(null)}
-                  className="inline-flex items-center p-2 border border-transparent rounded-md text-gray-400 dark:text-dark-text-tertiary hover:text-gray-500 dark:hover:text-dark-text-secondary hover:bg-gray-100 dark:hover:bg-dark-bg-tertiary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <line x1="18" y1="6" x2="6" y2="18"></line>
-                    <line x1="6" y1="6" x2="18" y2="18"></line>
-                  </svg>
-                </button>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-5 w-5"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <line x1="18" y1="6" x2="6" y2="18"></line>
+                      <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                  </button>
+                </div>
               </div>
             </div>
-            <div className="flex-1 p-4 overflow-hidden">
-              <div className="w-full h-full bg-gray-50 dark:bg-dark-bg-tertiary rounded-lg overflow-hidden">
-                <iframe
-                  src={outlineUrls[selectedOutline]}
-                  className="w-full h-full"
-                  title={`${selectedOutline} Course Outline`}
-                />
+            <div className="flex-1 min-h-0 overflow-y-auto">
+              <div className="p-6">
+                <div className="w-full h-full bg-gray-50 dark:bg-dark-bg-tertiary rounded-lg overflow-hidden">
+                  <iframe
+                    src={outlineUrls[selectedOutline]}
+                    className="w-full h-full"
+                    title={`${selectedOutline} Course Outline`}
+                  />
+                </div>
               </div>
             </div>
           </div>
