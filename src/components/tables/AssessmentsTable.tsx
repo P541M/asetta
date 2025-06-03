@@ -1,4 +1,4 @@
-import React, { JSX } from "react";
+import React from "react";
 import { useState, useEffect, useRef } from "react";
 import { db } from "../../lib/firebase";
 import {
@@ -53,7 +53,7 @@ const LinkModal = ({ isOpen, onClose, onAddLink }: LinkModalProps) => {
           <div>
             <label
               htmlFor="url"
-              className="block text-sm font-medium text-gray-700 dark:text-dark-text-secondary"
+              className="block text-md font-medium text-gray-700 dark:text-dark-text-secondary"
             >
               URL
             </label>
@@ -63,14 +63,14 @@ const LinkModal = ({ isOpen, onClose, onAddLink }: LinkModalProps) => {
               value={url}
               onChange={(e) => setUrl(e.target.value)}
               placeholder="https://example.com"
-              className="mt-1 block w-full rounded-md border-gray-300 dark:border-dark-border-primary shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm dark:bg-dark-bg-tertiary dark:text-dark-text-primary"
+              className="mt-1 block w-full rounded-md border-gray-300 dark:border-dark-border-primary shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-md dark:bg-dark-bg-tertiary dark:text-dark-text-primary"
               required
             />
           </div>
           <div>
             <label
               htmlFor="text"
-              className="block text-sm font-medium text-gray-700 dark:text-dark-text-secondary"
+              className="block text-md font-medium text-gray-700 dark:text-dark-text-secondary"
             >
               Link Text (optional)
             </label>
@@ -80,7 +80,7 @@ const LinkModal = ({ isOpen, onClose, onAddLink }: LinkModalProps) => {
               value={text}
               onChange={(e) => setText(e.target.value)}
               placeholder="Display text"
-              className="mt-1 block w-full rounded-md border-gray-300 dark:border-dark-border-primary shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm dark:bg-dark-bg-tertiary dark:text-dark-text-primary"
+              className="mt-1 block w-full rounded-md border-gray-300 dark:border-dark-border-primary shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-md dark:bg-dark-bg-tertiary dark:text-dark-text-primary"
             />
           </div>
         </form>
@@ -113,16 +113,15 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
   onStatusChange,
 }) => {
   const { user } = useAuth();
-  const [sortKey, setSortKey] = useState<keyof Assessment>(() =>
+  const [sortKey] = useState<keyof Assessment>(() =>
     getFromLocalStorage<keyof Assessment>("assessmentSortKey", "dueDate")
   );
-  const [sortOrder, setSortOrder] = useState<"asc" | "desc">(() =>
+  const [sortOrder] = useState<"asc" | "desc">(() =>
     getFromLocalStorage<"asc" | "desc">("assessmentSortOrder", "asc")
   );
   const [filter, setFilter] = useState<string>(() =>
     getFromLocalStorage<string>("assessmentFilter", "all")
   );
-  const [dropdownOpenId, setDropdownOpenId] = useState<string | null>(null);
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [showDaysTillDue, setShowDaysTillDue] = useState<boolean>(true);
@@ -236,40 +235,20 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
     return getDaysUntil(dueDate, dueTime);
   };
 
-  const formatDaysTillDue = (days: number | null): JSX.Element | null => {
-    if (days === null) return null;
-    if (days < 0)
-      return (
-        <span className="text-red-600 font-medium">
-          {Math.abs(days)} {Math.abs(days) === 1 ? "day" : "days"} overdue
-        </span>
-      );
-    if (days === 0)
-      return <span className="text-red-600 font-bold">Due today</span>;
-    if (days <= 7)
-      return (
-        <span className="text-amber-600 font-medium">
-          {days === 1 ? "Due tomorrow" : `Due in ${days} days`}
-        </span>
-      );
-    return <span className="text-gray-600">Due in {days} days</span>;
-  };
-
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
         dropdownRef.current &&
         !dropdownRef.current.contains(event.target as Node)
       ) {
-        setDropdownOpenId(null);
-      }
-      if (
-        showNotesModal &&
-        event.target instanceof Node &&
-        !document.getElementById(`notes-modal`)?.contains(event.target) &&
-        !document.getElementById(`link-modal`)?.contains(event.target)
-      ) {
-        setShowNotesModal(null);
+        if (
+          showNotesModal &&
+          event.target instanceof Node &&
+          !document.getElementById(`notes-modal`)?.contains(event.target) &&
+          !document.getElementById(`link-modal`)?.contains(event.target)
+        ) {
+          setShowNotesModal(null);
+        }
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
@@ -299,15 +278,6 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
     }
     return 0;
   });
-
-  const handleSort = (key: keyof Assessment) => {
-    if (sortKey === key) {
-      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
-    } else {
-      setSortKey(key);
-      setSortOrder("asc");
-    }
-  };
 
   const handleStatusChange = async (
     assessmentId: string,
@@ -502,14 +472,9 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
     }
   };
 
-  const handleDropdownToggle = (id: string | null) => {
-    setDropdownOpenId(id);
-  };
-
   const handleDeleteClick = (assessment: Assessment) => {
     setAssessmentToDelete(assessment);
     setShowDeleteModal(true);
-    handleDropdownToggle(null);
   };
 
   // Add new function for bulk status update
@@ -562,7 +527,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
             <select
               value={filter}
               onChange={(e) => setFilter(e.target.value)}
-              className="input bg-white dark:bg-dark-bg-tertiary max-w-xs py-1.5 px-3 text-sm transition-all duration-300 hover:shadow-sm dark:text-dark-text-primary dark:border-dark-border-primary"
+              className="input bg-white dark:bg-dark-bg-tertiary max-w-xs py-1.5 px-3 text-md transition-all duration-300 hover:shadow-sm dark:text-dark-text-primary dark:border-dark-border-primary"
             >
               <option value="all">All Tasks</option>
               <option value="not_submitted">Not Submitted</option>
@@ -577,7 +542,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
         <div className="mb-4 p-3 bg-white dark:bg-dark-bg-secondary rounded-lg shadow-sm border border-gray-100 dark:border-dark-border-primary animate-fade-in">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <span className="text-sm font-medium text-gray-700 dark:text-dark-text-primary">
+              <span className="text-md font-medium text-gray-700 dark:text-dark-text-primary">
                 {selectedRows.length}{" "}
                 {selectedRows.length === 1 ? "item" : "items"} selected
               </span>
@@ -585,7 +550,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                 {!showBulkStatusUpdate ? (
                   <select
                     onChange={(e) => handleStatusSelect(e.target.value)}
-                    className="input py-1.5 px-3 text-sm bg-white dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border-primary"
+                    className="input py-1.5 px-3 text-md bg-white dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border-primary"
                     defaultValue=""
                   >
                     <option value="" disabled>
@@ -597,19 +562,19 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                   </select>
                 ) : (
                   <div className="flex items-center space-x-2">
-                    <span className="text-sm text-gray-600 dark:text-dark-text-secondary">
+                    <span className="text-md text-gray-600 dark:text-dark-text-secondary">
                       Update to:{" "}
                       <span className="font-medium">{selectedStatus}</span>
                     </span>
                     <button
                       onClick={() => handleBulkStatusUpdate(selectedStatus)}
-                      className="btn-primary py-1.5 px-3 text-sm"
+                      className="btn-primary py-1.5 px-3 text-md"
                     >
                       Confirm
                     </button>
                     <button
                       onClick={handleCancelStatusUpdate}
-                      className="btn-outline py-1.5 px-3 text-sm"
+                      className="btn-outline py-1.5 px-3 text-md"
                     >
                       Cancel
                     </button>
@@ -620,13 +585,13 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
             <div className="flex items-center space-x-2">
               <button
                 onClick={() => setShowBulkDeleteModal(true)}
-                className="btn-danger py-1.5 px-3 text-sm"
+                className="btn-danger py-1.5 px-3 text-md"
               >
                 Delete Selected
               </button>
               <button
                 onClick={() => setSelectedRows([])}
-                className="text-sm text-gray-500 dark:text-dark-text-tertiary hover:text-gray-700 dark:hover:text-dark-text-secondary"
+                className="text-md text-gray-500 dark:text-dark-text-tertiary hover:text-gray-700 dark:hover:text-dark-text-secondary"
               >
                 Clear Selection
               </button>
@@ -659,400 +624,312 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
           </p>
         </div>
       ) : (
-        <div className="table-container rounded-lg border border-gray-100 dark:border-dark-border-primary">
-          <table className="data-table">
-            <thead className="bg-gray-50 dark:bg-dark-bg-tertiary">
-              <tr>
-                <th className="w-10">
-                  <input
-                    type="checkbox"
-                    checked={
-                      selectedRows.length === sortedAssessments.length &&
-                      sortedAssessments.length > 0
-                    }
-                    onChange={toggleSelectAll}
-                    className="h-4 w-4 rounded border-gray-300 dark:border-dark-border-primary text-primary-500 dark:text-primary-400 focus:ring-primary-500 dark:focus:ring-primary-400"
-                  />
-                </th>
-                <th className="w-32 dark:text-dark-text-primary">Status</th>
-                <th
-                  onClick={() => handleSort("courseName")}
-                  className="cursor-pointer w-48"
-                >
-                  <div className="flex items-center space-x-1 group">
-                    <span className="group-hover:text-primary-500 dark:group-hover:text-primary-400 dark:text-dark-text-primary">
-                      Course
-                    </span>
-                    {sortKey === "courseName" && (
-                      <span className="text-primary-500 dark:text-primary-400">
-                        {sortOrder === "asc" ? "↑" : "↓"}
-                      </span>
-                    )}
-                  </div>
-                </th>
-                <th
-                  onClick={() => handleSort("assignmentName")}
-                  className="cursor-pointer w-56"
-                >
-                  <div className="flex items-center space-x-1 group">
-                    <span className="group-hover:text-primary-500 dark:group-hover:text-primary-400 dark:text-dark-text-primary">
-                      Task
-                    </span>
-                    {sortKey === "assignmentName" && (
-                      <span className="text-primary-500 dark:text-primary-400">
-                        {sortOrder === "asc" ? "↑" : "↓"}
-                      </span>
-                    )}
-                  </div>
-                </th>
-                <th
-                  onClick={() => handleSort("dueDate")}
-                  className="cursor-pointer w-48"
-                >
-                  <div className="flex items-center space-x-1 group">
-                    <span className="group-hover:text-primary-500 dark:group-hover:text-primary-400 dark:text-dark-text-primary">
-                      Due Date & Time
-                    </span>
-                    {sortKey === "dueDate" && (
-                      <span className="text-primary-500 dark:text-primary-400">
-                        {sortOrder === "asc" ? "↑" : "↓"}
-                      </span>
-                    )}
-                  </div>
-                </th>
-                {showDaysTillDue && (
-                  <th className="w-32 dark:text-dark-text-primary">
-                    Days Till Due
-                  </th>
-                )}
+        <div className="space-y-2">
+          {/* Headers */}
+          <div className="grid grid-cols-12 gap-2 px-4 py-3 bg-gray-50/50 dark:bg-dark-bg-tertiary/30 rounded-lg">
+            <div className="col-span-12 lg:col-span-2 flex items-center space-x-3">
+              <input
+                type="checkbox"
+                checked={
+                  selectedRows.length === sortedAssessments.length &&
+                  sortedAssessments.length > 0
+                }
+                onChange={toggleSelectAll}
+                className="h-4 w-4 rounded border-gray-300 dark:border-dark-border-primary text-primary-500 dark:text-primary-400 focus:ring-primary-500 dark:focus:ring-primary-400"
+              />
+              <span className="text-xs font-medium text-gray-500 dark:text-dark-text-tertiary uppercase tracking-wider">
+                Status
+              </span>
+            </div>
+            <div className="col-span-12 lg:col-span-2 flex items-center">
+              <span className="text-xs font-medium text-gray-500 dark:text-dark-text-tertiary uppercase tracking-wider">
+                Course
+              </span>
+            </div>
+            <div className="col-span-12 lg:col-span-4 flex items-center">
+              <span className="text-xs font-medium text-gray-500 dark:text-dark-text-tertiary uppercase tracking-wider">
+                Task
+              </span>
+            </div>
+            <div className="col-span-12 lg:col-span-4 flex items-center justify-between">
+              <span className="text-xs font-medium text-gray-500 dark:text-dark-text-tertiary uppercase tracking-wider">
+                Due Date
+              </span>
+              <div className="flex items-center space-x-4">
                 {showWeight && (
-                  <th
-                    onClick={() => handleSort("weight")}
-                    className="cursor-pointer w-24"
-                  >
-                    <div className="flex items-center space-x-1 group">
-                      <span className="group-hover:text-primary-500 dark:group-hover:text-primary-400 dark:text-dark-text-primary">
-                        Weight
-                      </span>
-                      {sortKey === "weight" && (
-                        <span className="text-primary-500 dark:text-primary-400">
-                          {sortOrder === "asc" ? "↑" : "↓"}
-                        </span>
-                      )}
-                    </div>
-                  </th>
+                  <span className="text-xs font-medium text-gray-500 dark:text-dark-text-tertiary uppercase tracking-wider">
+                    Weight
+                  </span>
                 )}
-                {showNotes && (
-                  <th className="w-24 dark:text-dark-text-primary">Notes</th>
-                )}
-                <th className="w-24 dark:text-dark-text-primary">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {sortedAssessments.map((assessment, index) => {
-                if (!assessment) return null;
-                const daysTillDue = getDaysTillDue(
-                  assessment.dueDate,
-                  assessment.dueTime,
-                  assessment.status
-                );
-                return editingId === assessment.id ? (
-                  <tr
-                    key={`editing-${assessment.id}`}
-                    className="bg-blue-50/50 dark:bg-blue-900/20 animate-fade-in"
-                  >
-                    <td className="w-10"></td>
-                    <td>
+                <span className="text-xs font-medium text-gray-500 dark:text-dark-text-tertiary uppercase tracking-wider">
+                  Actions
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Assessment Cards */}
+          <div className="space-y-2">
+            {sortedAssessments.map((assessment) => {
+              if (!assessment) return null;
+              const daysTillDue = getDaysTillDue(
+                assessment.dueDate,
+                assessment.dueTime,
+                assessment.status
+              );
+              return editingId === assessment.id ? (
+                <div
+                  key={`editing-${assessment.id}`}
+                  className="bg-white dark:bg-dark-bg-secondary rounded-lg shadow-sm border border-gray-100 dark:border-dark-border-primary transition-all duration-300 p-3 animate-fade-in"
+                >
+                  <div className="grid grid-cols-12 gap-2">
+                    <div className="col-span-12 lg:col-span-2 flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        checked={selectedRows.includes(assessment.id)}
+                        onChange={() => toggleRowSelection(assessment.id)}
+                        className="h-4 w-4 rounded border-gray-300 dark:border-dark-border-primary text-primary-500 dark:text-primary-400 focus:ring-primary-500 dark:focus:ring-primary-400"
+                      />
                       <select
                         name="status"
                         value={editFormData.status}
                         onChange={handleEditFormChange}
-                        className="input py-1 px-2 text-sm transition-all duration-300 w-full dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border-primary"
+                        className="input py-1 px-2 text-md transition-all duration-300 w-full dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border-primary rounded-md"
                       >
                         <option value="Not started">Not Started</option>
                         <option value="In progress">In Progress</option>
                         <option value="Submitted">Submitted</option>
                       </select>
-                    </td>
-                    <td>
+                    </div>
+                    <div className="col-span-12 lg:col-span-2">
                       <input
                         type="text"
                         name="courseName"
                         value={editFormData.courseName}
                         onChange={handleEditFormChange}
-                        className="input py-1 px-2 text-sm w-full dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border-primary"
+                        placeholder="Course Name"
+                        className="input py-1 px-2 text-md w-full dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border-primary rounded-md"
                       />
-                    </td>
-                    <td>
+                    </div>
+                    <div className="col-span-12 lg:col-span-4">
                       <input
                         type="text"
                         name="assignmentName"
                         value={editFormData.assignmentName}
                         onChange={handleEditFormChange}
-                        className="input py-1 px-2 text-sm w-full dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border-primary"
+                        placeholder="Assignment Name"
+                        className="input py-1 px-2 text-md w-full dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border-primary rounded-md"
                       />
-                    </td>
-                    <td>
-                      <div className="flex space-x-2">
-                        <input
-                          type="date"
-                          name="dueDate"
-                          value={editFormData.dueDate}
-                          onChange={handleEditFormChange}
-                          className="input py-1 px-2 text-sm w-2/3 dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border-primary"
-                        />
-                        <input
-                          type="time"
-                          name="dueTime"
-                          value={editFormData.dueTime}
-                          onChange={handleEditFormChange}
-                          className="input py-1 px-2 text-sm w-1/3 dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border-primary"
-                        />
-                      </div>
-                    </td>
-                    <td>
-                      <span className="text-gray-400 dark:text-dark-text-tertiary text-sm italic">
-                        Will update on save
-                      </span>
-                    </td>
-                    <td>
+                    </div>
+                    <div className="col-span-12 lg:col-span-4 flex items-center space-x-2">
                       <input
-                        type="number"
-                        name="weight"
-                        value={editFormData.weight}
+                        type="date"
+                        name="dueDate"
+                        value={editFormData.dueDate}
                         onChange={handleEditFormChange}
-                        min="0"
-                        max="100"
-                        step="0.1"
-                        className="input py-1 px-2 text-sm w-full dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border-primary"
+                        className="input py-1 px-2 text-md w-2/3 dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border-primary rounded-md"
                       />
-                    </td>
-                    <td></td>
-                    <td>
-                      <div className="flex items-center space-x-2">
-                        <button
-                          onClick={() => handleSaveEdit(assessment.id!)}
-                          className="text-emerald-600 dark:text-emerald-400 hover:text-emerald-800 dark:hover:text-emerald-300 p-1.5 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 rounded"
-                        >
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="h-5 w-5"
-                            viewBox="0 0 20 20"
-                            fill="currentColor"
-                          >
-                            <path
-                              fillRule="evenodd"
-                              d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                              clipRule="evenodd"
-                            />
-                          </svg>
-                        </button>
-                        <button
-                          onClick={handleCancelEdit}
-                          className="text-gray-600 dark:text-dark-text-tertiary hover:text-gray-800 dark:hover:text-dark-text-secondary p-1.5 hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary rounded"
-                        >
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="h-5 w-5"
-                            viewBox="0 0 20 20"
-                            fill="currentColor"
-                          >
-                            <path
-                              fillRule="evenodd"
-                              d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                              clipRule="evenodd"
-                            />
-                          </svg>
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ) : (
-                  <tr
-                    key={assessment?.id || index}
-                    className="transition-all duration-300 hover:bg-gray-50/80 dark:hover:bg-dark-bg-tertiary"
-                  >
-                    <td className="pl-4">
-                      {assessment?.id && (
+                      <input
+                        type="time"
+                        name="dueTime"
+                        value={editFormData.dueTime}
+                        onChange={handleEditFormChange}
+                        className="input py-1 px-2 text-md w-1/3 dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border-primary rounded-md"
+                      />
+                    </div>
+                    {showWeight && (
+                      <div className="col-span-12 lg:col-span-2">
                         <input
-                          type="checkbox"
-                          checked={selectedRows.includes(assessment.id)}
-                          onChange={() => toggleRowSelection(assessment.id)}
-                          onClick={(e) => e.stopPropagation()}
-                          className="h-4 w-4 rounded border-gray-300 dark:border-dark-border-primary text-primary-500 dark:text-primary-400 focus:ring-primary-500 dark:focus:ring-primary-400"
+                          type="number"
+                          name="weight"
+                          value={editFormData.weight}
+                          onChange={handleEditFormChange}
+                          min="0"
+                          max="100"
+                          step="0.1"
+                          placeholder="Weight"
+                          className="input py-1 px-2 text-md w-full dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border-primary rounded-md"
                         />
-                      )}
-                    </td>
-                    <td>
+                      </div>
+                    )}
+                    <div className="col-span-12 lg:col-span-2 flex items-center space-x-2">
+                      <button
+                        onClick={() => handleSaveEdit(assessment.id!)}
+                        className="text-emerald-600 dark:text-emerald-400 hover:text-emerald-800 dark:hover:text-emerald-300 p-1.5 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 rounded-md transition-colors"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-4 w-4"
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                      </button>
+                      <button
+                        onClick={handleCancelEdit}
+                        className="text-gray-600 dark:text-dark-text-tertiary hover:text-gray-800 dark:hover:text-dark-text-secondary p-1.5 hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary rounded-md transition-colors"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-4 w-4"
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div
+                  key={assessment.id}
+                  className="bg-white dark:bg-dark-bg-secondary rounded-lg shadow-sm border border-gray-100 dark:border-dark-border-primary transition-all duration-300 p-3"
+                >
+                  <div className="grid grid-cols-12 gap-2 items-center">
+                    <div className="col-span-12 lg:col-span-2 flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        checked={selectedRows.includes(assessment.id)}
+                        onChange={() => toggleRowSelection(assessment.id)}
+                        className="h-4 w-4 rounded border-gray-300 dark:border-dark-border-primary text-primary-500 dark:text-primary-400 focus:ring-primary-500 dark:focus:ring-primary-400"
+                      />
                       <select
-                        value={assessment?.status || "Not started"}
+                        value={assessment.status}
                         onChange={(e) =>
-                          assessment?.id &&
-                          handleStatusChange(assessment.id, e.target.value)
+                          handleStatusChange(assessment.id!, e.target.value)
                         }
-                        onClick={(e) => e.stopPropagation()}
-                        className="input py-1 px-2 text-sm transition-all duration-300 w-full dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border-primary"
+                        className="py-1 px-3 text-md rounded-full transition-all duration-300 bg-white dark:bg-dark-bg-tertiary text-gray-700 dark:text-dark-text-primary border border-gray-200 dark:border-dark-border-primary appearance-none pr-8 relative"
+                        style={{
+                          backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236B7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`,
+                          backgroundPosition: "right 0.5rem center",
+                          backgroundRepeat: "no-repeat",
+                          backgroundSize: "1.5em 1.5em",
+                        }}
                       >
                         <option value="Not started">Not Started</option>
                         <option value="In progress">In Progress</option>
                         <option value="Submitted">Submitted</option>
                       </select>
-                    </td>
-                    <td className="font-medium whitespace-nowrap dark:text-dark-text-primary">
-                      {assessment?.courseName}
-                    </td>
-                    <td>
-                      <div className="flex items-center">
+                    </div>
+                    <div className="col-span-12 lg:col-span-2">
+                      <h3 className="font-medium text-gray-900 dark:text-dark-text-primary text-md">
+                        {assessment.courseName}
+                      </h3>
+                    </div>
+                    <div className="col-span-12 lg:col-span-4">
+                      <p className="text-gray-700 dark:text-dark-text-secondary text-md">
+                        {assessment.assignmentName}
+                      </p>
+                    </div>
+                    <div className="col-span-12 lg:col-span-4 flex items-center justify-between">
+                      <div className="flex flex-col space-y-0.5">
                         <span
-                          className="truncate max-w-[240px] dark:text-dark-text-primary"
-                          title={assessment?.assignmentName}
+                          className={`text-md ${
+                            assessment.status === "Submitted"
+                              ? "text-emerald-600 dark:text-emerald-400"
+                              : assessment.status === "In progress"
+                              ? "text-amber-600 dark:text-amber-400"
+                              : "text-gray-600 dark:text-gray-400"
+                          }`}
                         >
-                          {assessment?.assignmentName}
-                        </span>
-                      </div>
-                    </td>
-                    <td className="whitespace-nowrap">
-                      <span
-                        className={`${
-                          assessment?.status === "Submitted"
-                            ? "text-emerald-600 dark:text-emerald-400 font-medium"
-                            : "dark:text-dark-text-primary"
-                        }`}
-                      >
-                        {assessment?.dueDate &&
-                          assessment?.dueTime &&
-                          formatDateTimeForDisplay(
+                          {formatDateTimeForDisplay(
                             assessment.dueDate,
                             assessment.dueTime
                           )}
-                      </span>
-                    </td>
-                    {showDaysTillDue && (
-                      <td className="whitespace-nowrap">
-                        {formatDaysTillDue(daysTillDue)}
-                      </td>
-                    )}
-                    {showWeight && (
-                      <td className="whitespace-nowrap">
-                        {assessment?.weight ? (
-                          <span className="font-medium dark:text-dark-text-primary">
-                            {assessment.weight}%
-                          </span>
-                        ) : (
-                          <span className="text-gray-400 dark:text-dark-text-tertiary">
-                            -
-                          </span>
-                        )}
-                      </td>
-                    )}
-                    {showNotes && (
-                      <td>
-                        <button
-                          onClick={() => handleNotesClick(assessment)}
-                          className={`p-1.5 rounded ${
-                            assessment?.notes && assessment.notes.trim() !== ""
-                              ? "text-primary-500 dark:text-primary-400 hover:text-primary-600 dark:hover:text-primary-300 hover:bg-primary-50 dark:hover:bg-primary-900/30"
-                              : "text-gray-400 dark:text-dark-text-tertiary hover:text-gray-600 dark:hover:text-dark-text-secondary hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary"
-                          }`}
-                          title={
-                            assessment?.notes && assessment.notes.trim() !== ""
-                              ? "Edit Notes"
-                              : "Add Notes"
-                          }
-                        >
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="h-5 w-5"
-                            viewBox="0 0 20 20"
-                            fill="currentColor"
+                        </span>
+                        {showDaysTillDue && daysTillDue !== null && (
+                          <span
+                            className={`text-xs ${
+                              daysTillDue <= 3
+                                ? "text-red-600 dark:text-red-400"
+                                : daysTillDue <= 7
+                                ? "text-amber-600 dark:text-amber-400"
+                                : "text-gray-500 dark:text-dark-text-tertiary"
+                            }`}
                           >
-                            <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
-                            <path
-                              fillRule="evenodd"
-                              d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z"
-                              clipRule="evenodd"
-                            />
-                          </svg>
-                        </button>
-                      </td>
-                    )}
-                    <td onClick={(e) => e.stopPropagation()}>
-                      <div
-                        className="relative inline-block"
-                        ref={
-                          dropdownOpenId === assessment?.id ? dropdownRef : null
-                        }
-                      >
-                        <button
-                          onClick={() =>
-                            handleDropdownToggle(
-                              dropdownOpenId === assessment?.id
-                                ? null
-                                : assessment?.id || null
-                            )
-                          }
-                          className="text-gray-500 dark:text-dark-text-tertiary hover:text-gray-700 dark:hover:text-dark-text-secondary p-1.5 hover:bg-gray-100 dark:hover:bg-dark-bg-tertiary rounded-full"
-                        >
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="h-5 w-5"
-                            viewBox="0 0 20 20"
-                            fill="currentColor"
-                          >
-                            <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
-                          </svg>
-                        </button>
-                        {dropdownOpenId === assessment?.id && (
-                          <div className="absolute right-0 z-10 mt-2 w-36 rounded-md bg-white dark:bg-dark-bg-secondary shadow-lg ring-1 ring-black ring-opacity-5 dark:ring-dark-border">
-                            <div className="py-1">
-                              <button
-                                onClick={() => {
-                                  handleDropdownToggle(null);
-                                  handleEditClick(assessment);
-                                }}
-                                className="flex w-full items-center px-4 py-2 text-sm text-gray-700 dark:text-dark-text-primary hover:bg-gray-100 dark:hover:bg-dark-bg-tertiary"
-                              >
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  className="h-4 w-4 mr-2 text-blue-500 dark:text-blue-400"
-                                  viewBox="0 0 20 20"
-                                  fill="currentColor"
-                                >
-                                  <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
-                                </svg>
-                                Edit
-                              </button>
-                              <button
-                                onClick={() => {
-                                  handleDropdownToggle(null);
-                                  handleDeleteClick(assessment);
-                                }}
-                                className="flex w-full items-center px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-dark-bg-tertiary"
-                              >
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  className="h-4 w-4 mr-2 text-red-500 dark:text-red-400"
-                                  viewBox="0 0 20 20"
-                                  fill="currentColor"
-                                >
-                                  <path
-                                    fillRule="evenodd"
-                                    d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
-                                    clipRule="evenodd"
-                                  />
-                                </svg>
-                                Delete
-                              </button>
-                            </div>
-                          </div>
+                            {daysTillDue === 0
+                              ? "Due today"
+                              : daysTillDue === 1
+                              ? "Due tomorrow"
+                              : `${daysTillDue} days left`}
+                          </span>
                         )}
                       </div>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+                      <div className="flex items-center space-x-3">
+                        {showWeight && assessment.weight > 0 && (
+                          <span className="text-md font-medium text-gray-600 dark:text-dark-text-secondary">
+                            {assessment.weight}%
+                          </span>
+                        )}
+                        <div className="flex items-center space-x-1">
+                          {showNotes && (
+                            <button
+                              onClick={() => handleNotesClick(assessment)}
+                              className="text-gray-500 dark:text-dark-text-tertiary hover:text-gray-700 dark:hover:text-dark-text-secondary p-1 hover:bg-gray-100 dark:hover:bg-dark-bg-tertiary rounded-md transition-colors"
+                            >
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="h-4 w-4"
+                                viewBox="0 0 20 20"
+                                fill="currentColor"
+                              >
+                                <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
+                                <path
+                                  fillRule="evenodd"
+                                  d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z"
+                                  clipRule="evenodd"
+                                />
+                              </svg>
+                            </button>
+                          )}
+                          <button
+                            onClick={() => handleEditClick(assessment)}
+                            className="text-gray-500 dark:text-dark-text-tertiary hover:text-gray-700 dark:hover:text-dark-text-secondary p-1 hover:bg-gray-100 dark:hover:bg-dark-bg-tertiary rounded-md transition-colors"
+                          >
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              className="h-4 w-4"
+                              viewBox="0 0 20 20"
+                              fill="currentColor"
+                            >
+                              <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                            </svg>
+                          </button>
+                          <button
+                            onClick={() => handleDeleteClick(assessment)}
+                            className="text-gray-500 dark:text-dark-text-tertiary hover:text-red-600 dark:hover:text-red-400 p-1 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-md transition-colors"
+                          >
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              className="h-4 w-4"
+                              viewBox="0 0 20 20"
+                              fill="currentColor"
+                            >
+                              <path
+                                fillRule="evenodd"
+                                d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
+                                clipRule="evenodd"
+                              />
+                            </svg>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </div>
       )}
       {/* Notes Modal */}
@@ -1067,10 +944,10 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                 <h3 className="text-xl font-medium text-gray-900 dark:text-dark-text-primary">
                   Notes for {selectedAssessment.assignmentName}
                 </h3>
-                <p className="text-sm text-gray-500 dark:text-dark-text-tertiary">
+                <p className="text-md text-gray-500 dark:text-dark-text-tertiary">
                   {selectedAssessment.courseName}
                 </p>
-                <div className="mt-2 flex items-center space-x-4 text-sm">
+                <div className="mt-2 flex items-center space-x-4 text-md">
                   <span className="text-gray-600 dark:text-dark-text-secondary">
                     Due:{" "}
                     {formatDateTimeForDisplay(
@@ -1107,7 +984,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                     }\n\nNotes:\n${notesInput}`;
                     navigator.clipboard.writeText(text);
                   }}
-                  className="inline-flex items-center px-3 py-1.5 border border-gray-300 dark:border-dark-border-primary shadow-sm text-sm font-medium rounded-md text-gray-700 dark:text-dark-text-primary bg-white dark:bg-dark-bg-tertiary hover:bg-gray-50 dark:hover:bg-dark-bg-secondary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:focus:ring-primary-400"
+                  className="inline-flex items-center px-3 py-1.5 border border-gray-300 dark:border-dark-border-primary shadow-sm text-md font-medium rounded-md text-gray-700 dark:text-dark-text-primary bg-white dark:bg-dark-bg-tertiary hover:bg-gray-50 dark:hover:bg-dark-bg-secondary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:focus:ring-primary-400"
                   title="Copy Notes"
                 >
                   <svg
