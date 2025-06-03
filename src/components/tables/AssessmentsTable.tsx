@@ -833,10 +833,10 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
       )}
       {/* Notes Modal */}
       {showNotesModal && selectedAssessment && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 overflow-hidden">
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-[2px] flex items-center justify-center z-[9999] animate-fade-in">
           <div
             id="notes-modal"
-            className="bg-white dark:bg-dark-bg-secondary rounded-lg shadow-lg w-full max-w-4xl max-h-[90vh] flex flex-col animate-scale"
+            className="bg-white dark:bg-dark-bg-secondary rounded-lg shadow-lg w-full max-w-4xl max-h-[90vh] flex flex-col"
           >
             <div className="flex-none p-6 border-b border-gray-200 dark:border-dark-border-primary">
               <div className="flex justify-between items-center">
