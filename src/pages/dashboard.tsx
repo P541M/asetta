@@ -279,7 +279,7 @@ const Dashboard = () => {
           <SemesterTabs
             selectedSemester={selectedSemester}
             onSelect={setSelectedSemester}
-            className="bg-white dark:bg-dark-bg-secondary rounded-lg shadow-md border border-gray-100 dark:border-dark-border-primary"
+            className="bg-white dark:bg-dark-bg-secondary rounded-lg shadow-md"
           />
 
           {showStatsBar && (
@@ -571,7 +571,7 @@ const Dashboard = () => {
             </div>
 
             <div className="mt-6">
-              <div className="bg-white dark:bg-dark-bg-secondary rounded-lg shadow-md border border-gray-100 dark:border-dark-border-primary">
+              <div className="bg-white dark:bg-dark-bg-secondary rounded-lg shadow-md">
                 {activeTab === "courses" && !selectedCourse && (
                   <div className="animate-fade-in">
                     {isLoading ? (

@@ -707,7 +707,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                         onChange={(e) =>
                           handleStatusChange(assessment.id!, e.target.value)
                         }
-                        className="py-1 px-3 text-md rounded-full transition-all duration-300 bg-white dark:bg-dark-bg-tertiary text-gray-700 dark:text-dark-text-primary border border-gray-200 dark:border-dark-border-primary appearance-none pr-8 relative"
+                        className="py-0.5 px-3 text-md rounded-lg transition-all duration-300 bg-white dark:bg-dark-bg-tertiary text-gray-700 dark:text-dark-text-primary border border-gray-200 dark:border-dark-border-primary appearance-none pr-8 relative"
                         style={{
                           backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236B7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`,
                           backgroundPosition: "right 0.5rem center",
