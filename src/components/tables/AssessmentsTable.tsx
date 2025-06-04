@@ -774,7 +774,16 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                           {showNotes && (
                             <button
                               onClick={() => handleNotesClick(assessment)}
-                              className="text-gray-500 dark:text-dark-text-tertiary hover:text-gray-700 dark:hover:text-dark-text-secondary p-1 hover:bg-gray-100 dark:hover:bg-dark-bg-tertiary rounded-md transition-colors"
+                              className={`text-gray-500 dark:text-dark-text-tertiary hover:text-gray-700 dark:hover:text-dark-text-secondary p-1 hover:bg-gray-100 dark:hover:bg-dark-bg-tertiary rounded-md transition-colors ${
+                                assessment.notes
+                                  ? "text-primary-500 dark:text-primary-400"
+                                  : ""
+                              }`}
+                              title={
+                                assessment.notes
+                                  ? "View/Edit Notes"
+                                  : "Add Notes"
+                              }
                             >
                               <svg
                                 xmlns="http://www.w3.org/2000/svg"
