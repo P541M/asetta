@@ -316,7 +316,7 @@ const CoursesOverviewTable = ({
       ) : (
         <div className="space-y-2">
           {/* Headers */}
-          <div className="grid grid-cols-12 gap-4 px-4 py-3 bg-gray-50/50 dark:bg-dark-bg-tertiary/30 rounded-lg">
+          <div className="grid grid-cols-12 gap-2 px-4 py-3 bg-gray-50/50 dark:bg-dark-bg-tertiary/30 rounded-lg">
             <div className="col-span-12 lg:col-span-2 flex items-center">
               <span className="text-xs font-medium text-gray-500 dark:text-dark-text-tertiary uppercase tracking-wider">
                 Course
@@ -356,7 +356,7 @@ const CoursesOverviewTable = ({
                 key={course.courseName}
                 className="bg-white dark:bg-dark-bg-secondary rounded-lg shadow-sm border border-gray-100 dark:border-dark-border-primary transition-all duration-300 p-3"
               >
-                <div className="grid grid-cols-12 gap-4 items-center">
+                <div className="grid grid-cols-12 gap-2 items-center">
                   <div className="col-span-12 lg:col-span-2">
                     <h3 className="font-medium text-gray-900 dark:text-dark-text-primary text-md">
                       {course.courseName}
