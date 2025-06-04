@@ -152,23 +152,6 @@
     letter-spacing: 0.025em;
   }
 
-  /* Table Components */
-  .table-container {
-    @apply overflow-x-auto -mx-6 rounded-lg dark:border dark:border-dark-border-primary;
-  }
-
-  .data-table {
-    @apply w-full border-collapse;
-  }
-
-  .data-table th {
-    @apply p-3 text-left bg-light-bg-secondary border-b border-light-border-primary font-medium text-light-text-primary dark:bg-dark-bg-tertiary dark:border-dark-border-primary dark:text-dark-text-primary;
-  }
-
-  .data-table td {
-    @apply p-3 border-b border-light-border-primary dark:border-dark-border-primary dark:text-dark-text-secondary;
-  }
-
   /* Tab Components */
   .tab {
     @apply relative px-5 py-4 font-medium text-sm text-light-text-primary dark:text-dark-text-primary;
