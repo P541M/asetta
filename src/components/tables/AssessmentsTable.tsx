@@ -525,7 +525,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
       ) : (
         <div className="space-y-2">
           {/* Headers */}
-          <div className="grid grid-cols-12 gap-2 px-4 py-3 bg-gray-50/50 dark:bg-dark-bg-tertiary/30 rounded-lg">
+          <div className="grid grid-cols-12 gap-2 px-4 py-3 bg-gray-100/50 dark:bg-dark-bg-tertiary/50 rounded-lg">
             <div className="col-span-12 lg:col-span-2 flex items-center space-x-3">
               <input
                 type="checkbox"
@@ -579,7 +579,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
               return editingId === assessment.id ? (
                 <div
                   key={`editing-${assessment.id}`}
-                  className="bg-white dark:bg-dark-bg-secondary rounded-lg shadow-sm border border-gray-100 dark:border-dark-border-primary transition-all duration-300 p-3 animate-fade-in"
+                  className="bg-gray-50/50 dark:bg-dark-bg-tertiary/30 rounded-lg transition-all duration-300 p-3 animate-fade-in"
                 >
                   <div className="grid grid-cols-12 gap-2">
                     <div className="col-span-12 lg:col-span-2 flex items-center space-x-2">
@@ -692,7 +692,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
               ) : (
                 <div
                   key={assessment.id}
-                  className="bg-white dark:bg-dark-bg-secondary rounded-lg shadow-sm border border-gray-100 dark:border-dark-border-primary transition-all duration-300 p-3"
+                  className="bg-gray-50/50 dark:bg-dark-bg-tertiary/30 rounded-lg transition-all duration-300 p-3"
                 >
                   <div className="grid grid-cols-12 gap-2 items-center">
                     <div className="col-span-12 lg:col-span-2 flex items-center space-x-2">
