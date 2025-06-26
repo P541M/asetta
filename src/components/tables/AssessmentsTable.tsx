@@ -136,7 +136,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
     dueTime: string,
     status: string
   ): number | null => {
-    const completedStatuses = ["Submitted", "Under Review", "Completed"];
+    const completedStatuses = ["Submitted", "Under Review", "Completed", "Missed"];
     if (completedStatuses.includes(status)) return null;
 
     return getDaysUntil(dueDate, dueTime);
@@ -421,19 +421,17 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
         <h2 className="text-xl font-medium text-gray-900 dark:text-dark-text-primary">
           Your Assessments
         </h2>
-        {sortedAssessments.length > 0 && (
-          <div className="flex space-x-2 items-center">
-            <select
-              value={filter}
-              onChange={(e) => setFilter(e.target.value)}
-              className="input bg-white dark:bg-dark-bg-tertiary max-w-xs py-1.5 px-3 text-md transition-all duration-300 hover:shadow-sm dark:text-dark-text-primary dark:border-dark-border-primary"
-            >
-              <option value="all">All Tasks</option>
-              <option value="not_submitted">Not Submitted</option>
-              <option value="submitted">Submitted</option>
-            </select>
-          </div>
-        )}
+        <div className="flex space-x-2 items-center">
+          <select
+            value={filter}
+            onChange={(e) => setFilter(e.target.value)}
+            className="input bg-white dark:bg-dark-bg-tertiary max-w-xs py-1.5 px-3 text-md transition-all duration-300 hover:shadow-sm dark:text-dark-text-primary dark:border-dark-border-primary"
+          >
+            <option value="all">All Tasks</option>
+            <option value="not_submitted">Not Submitted</option>
+            <option value="submitted">Submitted</option>
+          </select>
+        </div>
       </div>
 
       {/* Bulk Actions Toolbar */}
@@ -458,6 +456,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                     <option value="Not started">Not Started</option>
                     <option value="In progress">In Progress</option>
                     <option value="Submitted">Submitted</option>
+                    <option value="Missed">Missed</option>
                   </select>
                 ) : (
                   <div className="flex items-center space-x-2">
@@ -598,6 +597,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                         <option value="Not started">Not Started</option>
                         <option value="In progress">In Progress</option>
                         <option value="Submitted">Submitted</option>
+                        <option value="Missed">Missed</option>
                       </select>
                     </div>
                     <div className="col-span-12 lg:col-span-2">
@@ -718,6 +718,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                         <option value="Not started">Not Started</option>
                         <option value="In progress">In Progress</option>
                         <option value="Submitted">Submitted</option>
+                        <option value="Missed">Missed</option>
                       </select>
                     </div>
                     <div className="col-span-12 lg:col-span-2">
@@ -738,6 +739,8 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                               ? "text-emerald-600 dark:text-emerald-400"
                               : assessment.status === "In progress"
                               ? "text-amber-600 dark:text-amber-400"
+                              : assessment.status === "Missed"
+                              ? "text-red-600 dark:text-red-400"
                               : "text-gray-600 dark:text-gray-400"
                           }`}
                         >
@@ -871,6 +874,10 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                       className={`px-2 py-1 rounded-full text-xs font-medium ${
                         selectedAssessment.status === "Submitted"
                           ? "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-800 dark:text-emerald-400"
+                          : selectedAssessment.status === "In progress"
+                          ? "bg-amber-100 dark:bg-amber-900/30 text-amber-800 dark:text-amber-400"
+                          : selectedAssessment.status === "Missed"
+                          ? "bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400"
                           : "bg-gray-100 dark:bg-gray-900/30 text-gray-800 dark:text-gray-400"
                       }`}
                     >

@@ -103,6 +103,7 @@ export default {
       animation: {
         "fade-in": "fadeIn 0.3s ease-in-out",
         "fade-in-down": "fadeInDown 0.3s ease-in-out",
+        "bounce-light": "bounceLight 1s ease-in-out infinite",
         scale: "scale 0.3s ease-in-out",
         pulse: "pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite",
       },
@@ -118,6 +119,10 @@ export default {
         scale: {
           "0%": { transform: "scale(0.95)", opacity: "0" },
           "100%": { transform: "scale(1)", opacity: "1" },
+        },
+        bounceLight: {
+          "0%, 100%": { transform: "translateY(0)" },
+          "50%": { transform: "translateY(-4px)" },
         },
       },
     },

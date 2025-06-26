@@ -221,6 +221,7 @@ const AddAssessmentForm = ({
                 <option value="Not started">Not Started</option>
                 <option value="In progress">In Progress</option>
                 <option value="Submitted">Submitted</option>
+                <option value="Missed">Missed</option>
               </select>
             </div>
           </div>
