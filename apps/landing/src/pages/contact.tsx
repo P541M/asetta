@@ -56,7 +56,7 @@ export default function Contact() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-white">
+    <div className="min-h-screen bg-gradient-to-br from-white via-primary-50/20 to-white flex flex-col">
       <Head>
         <title>Contact Us - Asetta</title>
         <meta
@@ -66,28 +66,37 @@ export default function Contact() {
       </Head>
       <Header />
 
-      <section className="relative pt-36 pb-24 overflow-hidden bg-gradient-to-br from-primary-50 via-primary-50 to-white">
+      <main className="flex-grow pt-32 pb-24 relative overflow-hidden">
+        {/* Background Elements */}
         <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute -top-32 -left-32 w-[600px] h-[600px] bg-gradient-to-br from-primary-200 via-primary-100 to-transparent rounded-full blur-3xl opacity-60 animate-fade-in" />
-          <div className="absolute -bottom-32 -right-32 w-[500px] h-[500px] bg-gradient-to-tr from-primary-200 via-primary-100 to-transparent rounded-full blur-3xl opacity-60 animate-fade-in-delayed" />
+          <div className="absolute -top-24 -left-24 w-96 h-96 bg-gradient-to-br from-primary-100/20 to-transparent rounded-full blur-3xl" />
+          <div className="absolute -bottom-24 -right-24 w-80 h-80 bg-gradient-to-tr from-primary-100/15 to-transparent rounded-full blur-3xl" />
         </div>
 
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="text-center mb-12 animate-fade-in">
-            <span className="inline-block mb-4 px-4 py-2 rounded-full bg-primary-100 text-primary-700 font-semibold text-sm shadow-sm animate-fade-in-down">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          {/* Hero Section */}
+          <div className="text-center mb-16 animate-fade-in">
+            <span className="inline-flex items-center px-4 py-2 rounded-full bg-primary-100 text-primary-700 font-semibold text-sm border border-primary-200/50 mb-6">
+              <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
+                <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
+              </svg>
               Student Support
             </span>
-            <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-6 font-heading tracking-tight leading-tight">
-              We're Here to Help You Succeed
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-gray-900 mb-8 font-heading tracking-tight leading-tight">
+              We're Here to{" "}
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary-600 to-primary-800">
+                Help You Succeed
+              </span>
             </h1>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Have questions about our AI-powered features or need help getting
-              started? Our team is dedicated to supporting your academic
-              journey—all completely free.
+            <p className="text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+              Have questions about our AI-powered features or need help getting started? Our team is dedicated to supporting your academic journey—all completely free.
             </p>
           </div>
 
-          <div className="bg-white rounded-2xl shadow-xl p-8 md:p-12 border border-gray-100 animate-fade-in">
+          {/* Contact Form Section */}
+          <div className="animate-fade-in-up">
+            <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 md:p-12 shadow-xl border border-gray-200/50 max-w-4xl mx-auto">
             {status.type === "success" ? (
               <div className="text-center py-8">
                 <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-100 mb-4">
@@ -111,16 +120,16 @@ export default function Contact() {
                 <p className="text-gray-600 mb-6">{status.message}</p>
                 <button
                   onClick={() => setStatus({ type: "idle", message: "" })}
-                  className="inline-flex items-center justify-center px-6 py-3 text-base font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700 transition-colors duration-200"
+                  className="inline-flex items-center justify-center px-8 py-4 text-lg font-bold text-white bg-gradient-to-r from-primary-600 to-primary-700 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
                 >
                   Send Another Message
                 </button>
               </div>
             ) : (
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="transform transition-all duration-200 hover:scale-[1.02]">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+              <form onSubmit={handleSubmit} className="space-y-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <div className="group">
+                    <label className="block text-lg font-semibold text-gray-900 mb-3">
                       Name
                     </label>
                     <input
@@ -128,13 +137,13 @@ export default function Contact() {
                       name="name"
                       value={formData.name}
                       onChange={handleChange}
-                      className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-200 focus:border-primary-400 focus:outline-none transition-all duration-200"
+                      className="w-full px-6 py-4 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-primary-200 focus:border-primary-400 focus:outline-none transition-all duration-300 text-lg bg-white/80 backdrop-blur-sm hover:bg-white group-hover:border-primary-300"
                       placeholder="Your name"
                       required
                     />
                   </div>
-                  <div className="transform transition-all duration-200 hover:scale-[1.02]">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <div className="group">
+                    <label className="block text-lg font-semibold text-gray-900 mb-3">
                       Email
                     </label>
                     <input
@@ -142,21 +151,21 @@ export default function Contact() {
                       name="email"
                       value={formData.email}
                       onChange={handleChange}
-                      className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-200 focus:border-primary-400 focus:outline-none transition-all duration-200"
+                      className="w-full px-6 py-4 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-primary-200 focus:border-primary-400 focus:outline-none transition-all duration-300 text-lg bg-white/80 backdrop-blur-sm hover:bg-white group-hover:border-primary-300"
                       placeholder="your.student@email.com"
                       required
                     />
                   </div>
                 </div>
-                <div className="transform transition-all duration-200 hover:scale-[1.02]">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                <div className="group">
+                  <label className="block text-lg font-semibold text-gray-900 mb-3">
                     Message
                   </label>
                   <textarea
                     name="message"
                     value={formData.message}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-200 focus:border-primary-400 focus:outline-none transition-all duration-200"
+                    className="w-full px-6 py-4 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-primary-200 focus:border-primary-400 focus:outline-none transition-all duration-300 text-lg bg-white/80 backdrop-blur-sm hover:bg-white group-hover:border-primary-300 resize-none"
                     rows={6}
                     placeholder="How can we help you with your academic journey?"
                     required
@@ -167,11 +176,11 @@ export default function Contact() {
                     {status.message}
                   </div>
                 )}
-                <div className="transform transition-transform duration-200 hover:scale-105">
+                <div className="group">
                   <button
                     type="submit"
                     disabled={status.type === "loading"}
-                    className="w-full py-4 px-6 bg-gradient-to-r from-primary-500 to-primary-600 text-white rounded-xl font-semibold hover:from-primary-600 hover:to-primary-700 transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-70 disabled:cursor-not-allowed"
+                    className="w-full py-5 px-8 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-2xl font-bold text-lg hover:from-primary-700 hover:to-primary-800 transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-1 disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none"
                   >
                     {status.type === "loading" ? (
                       <span className="flex items-center justify-center">
@@ -205,13 +214,13 @@ export default function Contact() {
               </form>
             )}
 
-            <div className="mt-8 text-center">
+            <div className="mt-12 text-center">
               <Link
                 href="/"
-                className="inline-flex items-center text-primary-600 hover:text-primary-700 font-medium transition-colors duration-200"
+                className="group inline-flex items-center text-primary-600 hover:text-primary-700 font-semibold text-lg transition-all duration-300"
               >
                 <svg
-                  className="w-5 h-5 mr-2"
+                  className="w-5 h-5 mr-2 group-hover:-translate-x-1 transition-transform duration-300"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -226,9 +235,10 @@ export default function Contact() {
                 Back to Home
               </Link>
             </div>
+            </div>
           </div>
         </div>
-      </section>
+      </main>
 
       <Footer />
     </div>
