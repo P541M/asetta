@@ -14,67 +14,86 @@ const footerLinks = {
 
 const Footer = () => {
   return (
-    <footer className="bg-gradient-to-br from-gray-50 via-gray-25 to-white border-t border-gray-200/50 pt-20 pb-10 relative overflow-hidden">
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-primary-50/20 via-transparent to-transparent"></div>
+    <footer className="relative bg-gradient-to-br from-gray-50/80 via-white to-primary-50/30 border-t border-gray-200/30 pt-24 pb-12 overflow-hidden">
+      {/* Enhanced Background Elements */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute -top-24 -left-24 w-96 h-96 bg-gradient-to-br from-primary-100/20 to-transparent rounded-full blur-3xl" />
+        <div className="absolute -bottom-24 -right-24 w-80 h-80 bg-gradient-to-tr from-primary-100/15 to-transparent rounded-full blur-3xl" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-primary-50/10 via-transparent to-transparent"></div>
+      </div>
+      
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-          {/* Logo & Description */}
-          <div className="space-y-6">
-            <Link href="/" className="inline-flex items-center group">
-              <span className="text-3xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-primary-600 to-primary-700 group-hover:from-primary-700 group-hover:to-primary-800 transition-all duration-300 tracking-tight">
-                Asetta
-              </span>
-            </Link>
-            <p className="text-lg text-gray-700 max-w-md leading-relaxed font-medium">
-              Asetta is your smart academic assistant. We help students stay
-              organized, track assignments, and manage deadlines—all completely
-              free. Join thousands of students who are achieving their academic
-              goals with Asetta.
-            </p>
-            <div className="flex space-x-6">
-              <a
-                href="https://www.linkedin.com/company/asetta/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group inline-flex items-center px-4 py-2 text-gray-600 hover:text-primary-600 transition-all duration-300 hover:bg-primary-50 rounded-lg"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="currentColor"
-                  viewBox="0 0 24 24"
-                  className="h-6 w-6 group-hover:scale-110 transition-transform duration-300"
+        {/* Main Footer Content */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 lg:gap-16 mb-16">
+          {/* Brand Section */}
+          <div className="lg:col-span-1 space-y-8">
+            <div className="space-y-6">
+              <Link href="/" className="group inline-block">
+                <span className="text-3xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-primary-600 to-primary-800 group-hover:from-primary-700 group-hover:to-primary-900 transition-all duration-300 tracking-tight">
+                  Asetta
+                </span>
+                <div className="w-0 h-0.5 bg-gradient-to-r from-primary-600 to-primary-800 group-hover:w-full transition-all duration-500 mt-1"></div>
+              </Link>
+              
+              <p className="text-gray-600 leading-relaxed text-lg max-w-sm">
+                Your smart academic assistant. Helping students stay organized, track assignments, and achieve their goals—completely free.
+              </p>
+            </div>
+
+            {/* Social Links */}
+            <div className="space-y-4">
+              <h4 className="text-sm font-semibold text-gray-900 uppercase tracking-wider">
+                Connect With Us
+              </h4>
+              <div className="flex space-x-4">
+                <a
+                  href="https://www.linkedin.com/company/asetta/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group flex items-center justify-center w-12 h-12 bg-white border border-gray-200 rounded-xl text-gray-600 hover:text-white hover:border-blue-600 hover:bg-blue-600 transition-all duration-300 shadow-sm hover:shadow-md"
                 >
-                  <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-10h3v10zm-1.5-11.268c-.966 0-1.75-.784-1.75-1.75s.784-1.75 1.75-1.75 1.75.784 1.75 1.75-.784 1.75-1.75 1.75zm15.5 11.268h-3v-5.604c0-1.337-.025-3.063-1.868-3.063-1.868 0-2.154 1.459-2.154 2.968v5.699h-3v-10h2.881v1.367h.041c.401-.761 1.379-1.563 2.841-1.563 3.039 0 3.6 2.001 3.6 4.601v5.595z" />
-                </svg>
-                <span className="ml-3 text-sm font-semibold">LinkedIn</span>
-              </a>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                    className="group-hover:scale-110 transition-transform duration-300"
+                  >
+                    <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                  </svg>
+                </a>
+              </div>
             </div>
           </div>
 
-          {/* Quick Links & Legal */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
-            <div>
-              <h4 className="text-xl font-bold text-gray-900 mb-6">
-                Quick Links
+          {/* Navigation Links */}
+          <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-3 gap-8 lg:gap-12">
+            {/* Quick Links */}
+            <div className="space-y-6">
+              <h4 className="text-sm font-semibold text-gray-900 uppercase tracking-wider">
+                Product
               </h4>
               <ul className="space-y-4">
                 {footerLinks.mainLinks.map((link) => (
                   <li key={link.href}>
                     <Link
                       href={link.href}
-                      className="text-gray-600 hover:text-primary-600 transition-all duration-300 inline-flex items-center group font-medium text-base hover:bg-primary-50 px-2 py-1 rounded-lg -ml-2"
+                      className="group relative text-gray-600 hover:text-primary-600 transition-all duration-300 text-base font-medium"
                     >
-                      <span className="group-hover:translate-x-2 transition-transform duration-300">
+                      <span className="group-hover:translate-x-1 transition-transform duration-300 inline-block">
                         {link.label}
                       </span>
+                      <div className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary-600 group-hover:w-full transition-all duration-300"></div>
                     </Link>
                   </li>
                 ))}
               </ul>
             </div>
 
-            <div>
-              <h4 className="text-xl font-bold text-gray-900 mb-6">
+            {/* Legal Links */}
+            <div className="space-y-6">
+              <h4 className="text-sm font-semibold text-gray-900 uppercase tracking-wider">
                 Legal
               </h4>
               <ul className="space-y-4">
@@ -82,24 +101,65 @@ const Footer = () => {
                   <li key={link.href}>
                     <Link
                       href={link.href}
-                      className="text-gray-600 hover:text-primary-600 transition-all duration-300 inline-flex items-center group font-medium text-base hover:bg-primary-50 px-2 py-1 rounded-lg -ml-2"
+                      className="group relative text-gray-600 hover:text-primary-600 transition-all duration-300 text-base font-medium"
                     >
-                      <span className="group-hover:translate-x-2 transition-transform duration-300">
+                      <span className="group-hover:translate-x-1 transition-transform duration-300 inline-block">
                         {link.label}
                       </span>
+                      <div className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary-600 group-hover:w-full transition-all duration-300"></div>
                     </Link>
                   </li>
                 ))}
               </ul>
             </div>
+
+            {/* CTA Section */}
+            <div className="space-y-6">
+              <h4 className="text-sm font-semibold text-gray-900 uppercase tracking-wider">
+                Get Started
+              </h4>
+              <div className="space-y-4">
+                <p className="text-gray-600 text-sm leading-relaxed">
+                  Ready to boost your academic productivity?
+                </p>
+                <Link
+                  href="https://kivo-two.vercel.app/register"
+                  className="group inline-flex items-center px-6 py-3 text-sm font-bold text-white bg-gradient-to-r from-primary-600 to-primary-700 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5"
+                >
+                  <span className="relative z-10">Start Free</span>
+                  <svg
+                    className="w-4 h-4 ml-2 group-hover:translate-x-0.5 transition-transform duration-300"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M17 8l4 4m0 0l-4 4m4-4H3"
+                    />
+                  </svg>
+                </Link>
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Copyright */}
-        <div className="mt-16 pt-8 border-t border-gray-200/60">
-          <div className="text-gray-600 text-base text-center font-medium">
-            © {new Date().getFullYear()} Asetta. All rights reserved. Made with{" "}
-            <span className="text-red-500 animate-pulse">❤️</span> for students.
+        {/* Bottom Section */}
+        <div className="border-t border-gray-300/50 pt-8">
+          <div className="flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0">
+            {/* Copyright */}
+            <div className="text-gray-500 text-sm font-medium">
+              © {new Date().getFullYear()} Asetta. All rights reserved.
+            </div>
+            
+            {/* Made with love */}
+            <div className="flex items-center text-sm text-gray-500 font-medium">
+              <span>Made with</span>
+              <span className="mx-2 text-red-500 animate-pulse text-base">❤️</span>
+              <span>for students</span>
+            </div>
           </div>
         </div>
       </div>
