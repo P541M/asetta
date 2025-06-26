@@ -58,52 +58,75 @@ const Header = () => {
     <motion.header
       initial={{ y: -100 }}
       animate={{ y: 0 }}
-      transition={{ duration: 0.5 }}
-      className={`fixed w-full top-0 z-50 transition-all duration-300 ${
-        scrolled ? "bg-white/80 backdrop-blur-md shadow-sm" : "bg-transparent"
+      transition={{ duration: 0.6, ease: "easeOut" }}
+      className={`fixed w-full top-0 z-50 transition-all duration-500 ${
+        scrolled 
+          ? "bg-white/90 backdrop-blur-xl shadow-lg border-b border-gray-200/50" 
+          : "bg-white/70 backdrop-blur-md border-b border-white/20"
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-20">
+          {/* Logo */}
           <motion.div
             className="flex items-center"
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
           >
-            <Link href="/" className="inline-flex items-center group">
-              <span className="text-2xl font-extrabold text-primary-600 group-hover:text-primary-700 transition-colors tracking-tight">
+            <Link href="/" className="group relative">
+              <span className="text-2xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-primary-600 to-primary-800 group-hover:from-primary-700 group-hover:to-primary-900 transition-all duration-300 tracking-tight">
                 Asetta
               </span>
+              <div className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-primary-600 to-primary-800 group-hover:w-full transition-all duration-300"></div>
             </Link>
           </motion.div>
 
-          <nav className="hidden md:flex items-center space-x-8">
+          {/* Desktop Navigation */}
+          <nav className="hidden md:flex items-center space-x-1">
             <Link
               href="/features"
-              className="text-gray-600 hover:text-primary-500 transition-colors duration-200 text-sm font-medium"
+              className="relative px-4 py-2 text-gray-700 hover:text-primary-600 transition-all duration-300 text-sm font-semibold rounded-lg hover:bg-primary-50/80 group"
             >
               Features
+              <div className="absolute bottom-0 left-1/2 w-0 h-0.5 bg-primary-600 group-hover:w-1/2 group-hover:left-1/4 transition-all duration-300"></div>
             </Link>
             <Link
               href="/pricing"
-              className="text-gray-600 hover:text-primary-500 transition-colors duration-200 text-sm font-medium"
+              className="relative px-4 py-2 text-gray-700 hover:text-primary-600 transition-all duration-300 text-sm font-semibold rounded-lg hover:bg-primary-50/80 group"
             >
               Pricing?
+              <div className="absolute bottom-0 left-1/2 w-0 h-0.5 bg-primary-600 group-hover:w-1/2 group-hover:left-1/4 transition-all duration-300"></div>
             </Link>
             <Link
+              href="/contact"
+              className="relative px-4 py-2 text-gray-700 hover:text-primary-600 transition-all duration-300 text-sm font-semibold rounded-lg hover:bg-primary-50/80 group"
+            >
+              Contact
+              <div className="absolute bottom-0 left-1/2 w-0 h-0.5 bg-primary-600 group-hover:w-1/2 group-hover:left-1/4 transition-all duration-300"></div>
+            </Link>
+            
+            <div className="h-6 w-px bg-gray-300 mx-3"></div>
+            
+            <Link
               href="https://kivo-two.vercel.app/login"
-              className="text-gray-600 hover:text-primary-500 transition-colors duration-200 text-sm font-medium"
+              className="px-4 py-2 text-gray-700 hover:text-primary-600 transition-all duration-300 text-sm font-semibold rounded-lg hover:bg-gray-50"
             >
               Login
             </Link>
-            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+            
+            <motion.div 
+              whileHover={{ scale: 1.02, y: -1 }} 
+              whileTap={{ scale: 0.98 }}
+              className="ml-2"
+            >
               <Link
                 href="https://kivo-two.vercel.app/register"
-                className="inline-flex items-center justify-center px-6 py-2.5 text-sm font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700 transition-colors duration-200 shadow-sm hover:shadow-md"
+                className="group relative inline-flex items-center justify-center px-6 py-2.5 text-sm font-bold text-white bg-gradient-to-r from-primary-600 to-primary-700 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden"
               >
-                Get Started
+                <span className="absolute inset-0 bg-gradient-to-r from-primary-700 to-primary-800 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
+                <span className="relative z-10">Get Started</span>
                 <svg
-                  className="w-4 h-4 ml-2"
+                  className="w-4 h-4 ml-2 relative z-10 group-hover:translate-x-0.5 transition-transform duration-300"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -119,89 +142,121 @@ const Header = () => {
             </motion.div>
           </nav>
 
-          {/* Mobile menu button */}
+          {/* Mobile Menu Button */}
           <div className="md:hidden" ref={menuRef}>
-            <button
+            <motion.button
               type="button"
-              className="text-gray-600 hover:text-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-200 focus:ring-offset-2 rounded-lg p-2 transition-colors duration-200"
+              className={`relative p-3 rounded-xl transition-all duration-300 ${
+                mobileMenuOpen
+                  ? "bg-primary-50 text-primary-600 shadow-md"
+                  : "text-gray-700 hover:text-primary-600 hover:bg-primary-50/50"
+              }`}
               aria-label="Toggle menu"
               aria-expanded={mobileMenuOpen}
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              whileTap={{ scale: 0.95 }}
             >
               <motion.svg
                 className="h-6 w-6"
                 fill="none"
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                strokeWidth="2"
+                strokeWidth="2.5"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
-                animate={{ rotate: mobileMenuOpen ? 45 : 0 }}
-                transition={{ duration: 0.2 }}
+                animate={{ rotate: mobileMenuOpen ? 180 : 0 }}
+                transition={{ duration: 0.3, ease: "easeInOut" }}
               >
                 {mobileMenuOpen ? (
                   <motion.path
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
+                    initial={{ pathLength: 0 }}
+                    animate={{ pathLength: 1 }}
+                    transition={{ duration: 0.3 }}
                     d="M6 18L18 6M6 6l12 12"
                   />
                 ) : (
-                  <motion.path
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    d="M4 6h16M4 12h16M4 18h16"
-                  />
+                  <motion.g
+                    initial={{ pathLength: 0 }}
+                    animate={{ pathLength: 1 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <path d="M4 6h16" />
+                    <path d="M4 12h16" />
+                    <path d="M4 18h16" />
+                  </motion.g>
                 )}
               </motion.svg>
-            </button>
+            </motion.button>
 
-            {/* Mobile menu dropdown */}
+            {/* Enhanced Mobile Menu Dropdown */}
             <AnimatePresence>
               {mobileMenuOpen && (
                 <motion.div
-                  initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                  initial={{ opacity: 0, y: -20, scale: 0.95 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: -10, scale: 0.95 }}
-                  transition={{ duration: 0.2 }}
-                  className="absolute top-full left-0 right-0 mt-2 mx-4 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50"
+                  transition={{ duration: 0.3, ease: "easeOut" }}
+                  className="absolute top-full left-0 right-0 mt-3 mx-4 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-200/50 py-6 z-50"
                 >
-                  <div className="flex flex-col space-y-1 px-2">
+                  <div className="flex flex-col space-y-2 px-4">
                     <Link
                       href="/features"
-                      className="block px-4 py-3 text-gray-600 hover:text-primary-500 hover:bg-primary-50 rounded-lg transition-colors duration-200 text-sm font-medium"
+                      className="group flex items-center px-4 py-3.5 text-gray-700 hover:text-primary-600 hover:bg-primary-50/80 rounded-xl transition-all duration-300 text-base font-semibold"
                       onClick={() => setMobileMenuOpen(false)}
                     >
-                      Features
+                      <span className="group-hover:translate-x-1 transition-transform duration-300">Features</span>
                     </Link>
                     <Link
                       href="/pricing"
-                      className="block px-4 py-3 text-gray-600 hover:text-primary-500 hover:bg-primary-50 rounded-lg transition-colors duration-200 text-sm font-medium"
+                      className="group flex items-center px-4 py-3.5 text-gray-700 hover:text-primary-600 hover:bg-primary-50/80 rounded-xl transition-all duration-300 text-base font-semibold"
                       onClick={() => setMobileMenuOpen(false)}
                     >
-                      Pricing?
+                      <span className="group-hover:translate-x-1 transition-transform duration-300">Pricing?</span>
                     </Link>
                     <Link
                       href="/contact"
-                      className="block px-4 py-3 text-gray-600 hover:text-primary-500 hover:bg-primary-50 rounded-lg transition-colors duration-200 text-sm font-medium"
+                      className="group flex items-center px-4 py-3.5 text-gray-700 hover:text-primary-600 hover:bg-primary-50/80 rounded-xl transition-all duration-300 text-base font-semibold"
                       onClick={() => setMobileMenuOpen(false)}
                     >
-                      Contact
+                      <span className="group-hover:translate-x-1 transition-transform duration-300">Contact</span>
                     </Link>
-                    <div className="h-px bg-gray-200 my-2" />
+                    
+                    <div className="h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent my-4" />
+                    
                     <Link
                       href="https://kivo-two.vercel.app/login"
-                      className="block px-4 py-3 text-gray-600 hover:text-primary-500 hover:bg-primary-50 rounded-lg transition-colors duration-200 text-sm font-medium"
+                      className="group flex items-center px-4 py-3.5 text-gray-700 hover:text-primary-600 hover:bg-gray-50/80 rounded-xl transition-all duration-300 text-base font-semibold"
                       onClick={() => setMobileMenuOpen(false)}
                     >
-                      Login
+                      <span className="group-hover:translate-x-1 transition-transform duration-300">Login</span>
                     </Link>
-                    <Link
-                      href="https://kivo-two.vercel.app/register"
-                      className="block mx-2 my-1 px-4 py-3 text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 rounded-lg transition-colors duration-200 text-center"
-                      onClick={() => setMobileMenuOpen(false)}
+                    
+                    <motion.div
+                      className="pt-2"
+                      whileTap={{ scale: 0.98 }}
                     >
-                      Get Started
-                    </Link>
+                      <Link
+                        href="https://kivo-two.vercel.app/register"
+                        className="group relative flex items-center justify-center mx-2 px-6 py-4 text-base font-bold text-white bg-gradient-to-r from-primary-600 to-primary-700 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden"
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        <span className="absolute inset-0 bg-gradient-to-r from-primary-700 to-primary-800 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
+                        <span className="relative z-10">Get Started</span>
+                        <svg
+                          className="w-5 h-5 ml-2 relative z-10 group-hover:translate-x-1 transition-transform duration-300"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M17 8l4 4m0 0l-4 4m4-4H3"
+                          />
+                        </svg>
+                      </Link>
+                    </motion.div>
                   </div>
                 </motion.div>
               )}
