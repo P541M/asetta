@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useAuth } from "../../contexts/AuthContext";
-import { db } from "../../lib/firebase";
-import { collection, addDoc } from "firebase/firestore";
+import { addDoc } from "firebase/firestore";
+import { getAssessmentsRef } from "../../lib/firebaseUtils";
 import { AddAssessmentFormProps } from "../../types/assessment";
 
 const AddAssessmentForm = ({
@@ -63,14 +63,7 @@ const AddAssessmentForm = ({
     setMessage({ text: "", type: "" });
 
     try {
-      const assessmentRef = collection(
-        db,
-        "users",
-        user.uid,
-        "semesters",
-        semesterId,
-        "assessments"
-      );
+      const assessmentRef = getAssessmentsRef(user.uid, semesterId);
 
       await addDoc(assessmentRef, {
         ...formData,

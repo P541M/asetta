@@ -1,14 +1,8 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../../contexts/AuthContext";
-import { db } from "../../lib/firebase";
-import {
-  collection,
-  query,
-  where,
-  getDocs,
-  doc,
-  updateDoc,
-} from "firebase/firestore";
+import { updateDoc } from "firebase/firestore";
+import { useAssessments } from "../../hooks/useAssessments";
+import { getAssessmentDocRef } from "../../lib/firebaseUtils";
 import { Assessment } from "../../types/assessment";
 import { GradeCalculatorProps } from "../../types/course";
 
@@ -17,99 +11,64 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
   selectedCourse,
 }) => {
   const { user } = useAuth();
-  const [assessments, setAssessments] = useState<Assessment[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [currentGrade, setCurrentGrade] = useState<number | null>(null);
   const [totalWeight, setTotalWeight] = useState<number>(0);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
+  
+  const {
+    assessments: fetchedAssessments,
+    loading: isLoading,
+    error,
+    refetch
+  } = useAssessments(semesterId, { courseName: selectedCourse });
+  
+  const [assessments, setAssessments] = useState<Assessment[]>([]);
 
   useEffect(() => {
-    const fetchAssessments = async () => {
-      if (!user || !semesterId || !selectedCourse) {
-        setAssessments([]);
-        return;
-      }
+    // Sort assessments by due date when fetched assessments change
+    const sortedAssessments = [...fetchedAssessments].sort((a, b) => {
+      const dateA = new Date(`${a.dueDate}T${a.dueTime}`);
+      const dateB = new Date(`${b.dueDate}T${b.dueTime}`);
+      return dateA.getTime() - dateB.getTime();
+    });
+    
+    setAssessments(sortedAssessments);
 
-      setIsLoading(true);
-      setError(null);
+    // Calculate total weight of all assessments
+    const total = sortedAssessments.reduce(
+      (sum, assessment) => sum + assessment.weight,
+      0
+    );
+    setTotalWeight(total);
 
-      try {
-        const assessmentsRef = collection(
-          db,
-          "users",
-          user.uid,
-          "semesters",
-          semesterId,
-          "assessments"
-        );
-
-        const q = query(
-          assessmentsRef,
-          where("courseName", "==", selectedCourse)
-        );
-
-        const querySnapshot = await getDocs(q);
-        const assessmentsList: Assessment[] = [];
-
-        querySnapshot.forEach((doc) => {
-          assessmentsList.push({
-            id: doc.id,
-            ...(doc.data() as Omit<Assessment, "id">),
-          });
-        });
-
-        // Sort assessments by due date
-        const sortedAssessments = assessmentsList.sort((a, b) => {
-          const dateA = new Date(`${a.dueDate}T${a.dueTime}`);
-          const dateB = new Date(`${b.dueDate}T${b.dueTime}`);
-          return dateA.getTime() - dateB.getTime();
-        });
-
-        setAssessments(sortedAssessments);
-
-        // Calculate total weight of all assessments
-        const total = sortedAssessments.reduce(
-          (sum, assessment) => sum + assessment.weight,
-          0
-        );
-        setTotalWeight(total);
-
-        // Calculate current grade based on completed assessments
-        const completedAssessments = sortedAssessments.filter(
-          (a) =>
-            a.status === "Submitted" && a.mark !== null && a.mark !== undefined
-        );
-        if (completedAssessments.length > 0) {
-          const weightedSum = completedAssessments.reduce((sum, assessment) => {
-            if (assessment.mark === null || assessment.mark === undefined)
-              return sum;
-            return sum + (assessment.mark * assessment.weight) / 100;
-          }, 0);
-          const completedWeight = completedAssessments.reduce(
-            (sum, assessment) => {
-              if (assessment.mark === null || assessment.mark === undefined)
-                return sum;
-              return sum + assessment.weight;
-            },
-            0
-          );
-          setCurrentGrade(
-            completedWeight > 0 ? (weightedSum / completedWeight) * 100 : 0
-          );
-        } else {
-          setCurrentGrade(null);
-        }
-      } catch (err) {
-        console.error("Error fetching course assessments:", err);
-        setError("Failed to load assessments for this course.");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchAssessments();
-  }, [user, semesterId, selectedCourse]);
+    // Calculate current grade based on completed assessments
+    const completedAssessments = sortedAssessments.filter(
+      (a) =>
+        a.status === "Submitted" && a.mark !== null && a.mark !== undefined
+    );
+    if (completedAssessments.length > 0) {
+      const weightedSum = completedAssessments.reduce((sum, assessment) => {
+        if (assessment.mark === null || assessment.mark === undefined)
+          return sum;
+        return sum + (assessment.mark * assessment.weight) / 100;
+      }, 0);
+      const completedWeight = completedAssessments.reduce(
+        (sum, assessment) => {
+          if (assessment.mark === null || assessment.mark === undefined)
+            return sum;
+          return sum + assessment.weight;
+        },
+        0
+      );
+      setCurrentGrade(
+        completedWeight > 0 ? (weightedSum / completedWeight) * 100 : 0
+      );
+    } else {
+      setCurrentGrade(null);
+    }
+  }, [fetchedAssessments]);
 
   const handleMarkChange = (assessmentId: string, value: string) => {
     // Allow empty string to clear the mark, use null instead of undefined
@@ -206,21 +165,14 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
   const handleSaveChanges = async () => {
     if (!user || !semesterId || !hasUnsavedChanges) return;
 
-    setIsLoading(true);
-    setError(null);
+    setIsSaving(true);
+    setSaveError(null);
 
     try {
       // Update all assessments in Firestore
       for (const assessment of assessments) {
-        const assessmentRef = doc(
-          db,
-          "users",
-          user.uid,
-          "semesters",
-          semesterId,
-          "assessments",
-          assessment.id
-        );
+        if (!assessment.id) continue;
+        const assessmentRef = getAssessmentDocRef(user.uid, semesterId, assessment.id);
 
         // Convert undefined mark to null for Firestore
         const mark = assessment.mark === undefined ? null : assessment.mark;
@@ -233,11 +185,12 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
       }
 
       setHasUnsavedChanges(false);
+      refetch(); // Refresh data from the server
     } catch (err) {
       console.error("Error saving assessment changes:", err);
-      setError("Failed to save changes. Please try again.");
+      setSaveError("Failed to save changes. Please try again.");
     } finally {
-      setIsLoading(false);
+      setIsSaving(false);
     }
   };
 
@@ -271,12 +224,21 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
         {hasUnsavedChanges && (
           <button
             onClick={handleSaveChanges}
-            className="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-colors"
+            disabled={isSaving}
+            className={`px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-colors ${
+              isSaving ? 'opacity-70 cursor-not-allowed' : ''
+            }`}
           >
-            Save Changes
+            {isSaving ? 'Saving...' : 'Save Changes'}
           </button>
         )}
       </div>
+
+      {saveError && (
+        <div className="mb-4 p-4 bg-red-50 dark:bg-red-900/20 rounded-lg text-red-700 dark:text-red-400 animate-fade-in">
+          <p>{saveError}</p>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
         <div className="p-4 bg-primary-50 dark:bg-dark-bg-tertiary rounded-lg">
@@ -343,7 +305,7 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
                         step="0.1"
                         value={assessment.weight}
                         onChange={(e) =>
-                          handleWeightChange(assessment.id, e.target.value)
+                          assessment.id && handleWeightChange(assessment.id, e.target.value)
                         }
                         className="w-20 px-2 py-1 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border-primary [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                         placeholder="0-100"
@@ -362,7 +324,7 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
                         step="0.1"
                         value={assessment.mark ?? ""}
                         onChange={(e) =>
-                          handleMarkChange(assessment.id, e.target.value)
+                          assessment.id && handleMarkChange(assessment.id, e.target.value)
                         }
                         className="w-20 px-2 py-1 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border-primary [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                         placeholder="0+"

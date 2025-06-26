@@ -1,13 +1,15 @@
 export interface Assessment {
-  id: string;
+  id?: string; // Made optional since it may not exist during creation
   courseName: string;
   assignmentName: string;
   dueDate: string;
   dueTime: string;
   weight: number;
-  status: string;
+  status: 'Not started' | 'In progress' | 'Submitted' | 'Missed'; // More specific typing
   notes?: string;
   mark?: number | null;
+  createdAt?: Date | FirebaseFirestore.Timestamp; // Firebase timestamp
+  updatedAt?: Date | FirebaseFirestore.Timestamp; // Firebase timestamp
 }
 
 export interface AddAssessmentFormProps {

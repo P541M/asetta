@@ -1,11 +1,8 @@
 // src/components/assessment/CourseFilteredAssessments.tsx
-import { useState, useEffect } from "react";
-import { useAuth } from "../../contexts/AuthContext";
-import { db } from "../../lib/firebase";
-import { collection, query, where, getDocs } from "firebase/firestore";
+import { useState } from "react";
+import { useAssessments } from "../../hooks/useAssessments";
 import AssessmentsTable from "../tables/AssessmentsTable";
 import GradeCalculator from "./GradeCalculator";
-import { Assessment } from "../../types/assessment";
 import { CourseFilteredAssessmentsProps } from "../../types/course";
 
 const CourseFilteredAssessments = ({
@@ -13,97 +10,19 @@ const CourseFilteredAssessments = ({
   selectedCourse,
   onBack,
 }: CourseFilteredAssessmentsProps) => {
-  const { user } = useAuth();
-  const [assessments, setAssessments] = useState<Assessment[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [showGradeCalculator, setShowGradeCalculator] = useState(false);
-
-  useEffect(() => {
-    const fetchAssessments = async () => {
-      if (!user || !semesterId || !selectedCourse) {
-        setAssessments([]);
-        return;
-      }
-
-      setIsLoading(true);
-      setError(null);
-
-      try {
-        const assessmentsRef = collection(
-          db,
-          "users",
-          user.uid,
-          "semesters",
-          semesterId,
-          "assessments"
-        );
-
-        // Query for the specific course
-        const q = query(
-          assessmentsRef,
-          where("courseName", "==", selectedCourse)
-        );
-
-        const querySnapshot = await getDocs(q);
-        const assessmentsList: Assessment[] = [];
-
-        querySnapshot.forEach((doc) => {
-          assessmentsList.push({
-            id: doc.id,
-            ...(doc.data() as Omit<Assessment, "id">),
-          });
-        });
-
-        setAssessments(assessmentsList);
-      } catch (err) {
-        console.error("Error fetching course assessments:", err);
-        setError("Failed to load assessments for this course.");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchAssessments();
-  }, [user, semesterId, selectedCourse]);
+  
+  const { 
+    assessments, 
+    loading: isLoading, 
+    error, 
+    refetch 
+  } = useAssessments(semesterId, { 
+    courseName: selectedCourse 
+  });
 
   const handleStatusChange = () => {
-    // Refetch assessments when status changes
-    const fetchAssessments = async () => {
-      if (!user || !semesterId || !selectedCourse) return;
-
-      try {
-        const assessmentsRef = collection(
-          db,
-          "users",
-          user.uid,
-          "semesters",
-          semesterId,
-          "assessments"
-        );
-
-        const q = query(
-          assessmentsRef,
-          where("courseName", "==", selectedCourse)
-        );
-
-        const querySnapshot = await getDocs(q);
-        const assessmentsList: Assessment[] = [];
-
-        querySnapshot.forEach((doc) => {
-          assessmentsList.push({
-            id: doc.id,
-            ...(doc.data() as Omit<Assessment, "id">),
-          });
-        });
-
-        setAssessments(assessmentsList);
-      } catch (err) {
-        console.error("Error refreshing course assessments:", err);
-      }
-    };
-
-    fetchAssessments();
+    refetch();
   };
 
   return (

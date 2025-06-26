@@ -1,13 +1,12 @@
 import React from "react";
 import { useState, useEffect, useRef } from "react";
-import { db } from "../../lib/firebase";
 import {
-  doc,
   updateDoc,
   deleteDoc,
   getDoc,
   serverTimestamp,
 } from "firebase/firestore";
+import { getAssessmentDocRef, getUserDocRef } from "../../lib/firebaseUtils";
 import { useAuth } from "../../contexts/AuthContext";
 import RichTextEditor from "../editor/RichTextEditor";
 import {
@@ -65,7 +64,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
     const fetchUserPreferences = async () => {
       if (!user) return;
       try {
-        const userDocRef = doc(db, "users", user.uid);
+        const userDocRef = getUserDocRef(user.uid);
         const userSnapshot = await getDoc(userDocRef);
         if (userSnapshot.exists()) {
           const userData = userSnapshot.data();
@@ -193,15 +192,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
     if (!user || !assessmentId) return;
 
     try {
-      const assessmentRef = doc(
-        db,
-        "users",
-        user.uid,
-        "semesters",
-        semesterId,
-        "assessments",
-        assessmentId
-      );
+      const assessmentRef = getAssessmentDocRef(user.uid, semesterId, assessmentId);
       await updateDoc(assessmentRef, {
         status: newStatus,
         updatedAt: serverTimestamp(),
@@ -218,15 +209,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
     if (!user || !assessment.id) return;
 
     try {
-      const assessmentRef = doc(
-        db,
-        "users",
-        user.uid,
-        "semesters",
-        semesterId,
-        "assessments",
-        assessment.id
-      );
+      const assessmentRef = getAssessmentDocRef(user.uid, semesterId, assessment.id);
       await deleteDoc(assessmentRef);
       if (onStatusChange) {
         onStatusChange(assessment.id, "Deleted");
@@ -243,15 +226,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
 
     try {
       for (const id of selectedRows) {
-        const assessmentRef = doc(
-          db,
-          "users",
-          user.uid,
-          "semesters",
-          semesterId,
-          "assessments",
-          id
-        );
+        const assessmentRef = getAssessmentDocRef(user.uid, semesterId, id);
         await deleteDoc(assessmentRef);
       }
       setSelectedRows([]);
@@ -305,15 +280,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
   const handleSaveEdit = async (assessmentId: string) => {
     if (!user) return;
     try {
-      const assessmentRef = doc(
-        db,
-        "users",
-        user.uid,
-        "semesters",
-        semesterId,
-        "assessments",
-        assessmentId
-      );
+      const assessmentRef = getAssessmentDocRef(user.uid, semesterId, assessmentId);
       await updateDoc(assessmentRef, {
         ...editFormData,
         updatedAt: new Date(),
@@ -334,15 +301,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
   const handleSaveNotes = async () => {
     if (!user || !selectedAssessment?.id) return;
     try {
-      const assessmentRef = doc(
-        db,
-        "users",
-        user.uid,
-        "semesters",
-        semesterId,
-        "assessments",
-        selectedAssessment.id
-      );
+      const assessmentRef = getAssessmentDocRef(user.uid, semesterId, selectedAssessment.id);
 
       // Strip HTML tags and whitespace to check if content is truly empty
       const strippedContent = notesInput.replace(/<[^>]*>/g, "").trim();
@@ -361,7 +320,9 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
 
       await updateDoc(assessmentRef, updateData);
       setSelectedAssessment(null);
-      onStatusChange?.(selectedAssessment.id, selectedAssessment.status);
+      if (selectedAssessment.id) {
+        onStatusChange?.(selectedAssessment.id, selectedAssessment.status);
+      }
     } catch (error) {
       console.error("Error saving notes:", error);
     }
@@ -382,15 +343,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
 
     try {
       for (const id of selectedRows) {
-        const assessmentRef = doc(
-          db,
-          "users",
-          user.uid,
-          "semesters",
-          semesterId,
-          "assessments",
-          id
-        );
+        const assessmentRef = getAssessmentDocRef(user.uid, semesterId, id);
         await updateDoc(assessmentRef, {
           status: newStatus,
           updatedAt: serverTimestamp(),
@@ -584,8 +537,8 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                     <div className="col-span-12 lg:col-span-2 flex items-center space-x-2">
                       <input
                         type="checkbox"
-                        checked={selectedRows.includes(assessment.id)}
-                        onChange={() => toggleRowSelection(assessment.id)}
+                        checked={selectedRows.includes(assessment.id || '')}
+                        onChange={() => toggleRowSelection(assessment.id || '')}
                         className="h-4 w-4 rounded border-gray-300 dark:border-dark-border-primary text-primary-500 dark:text-primary-400 focus:ring-primary-500 dark:focus:ring-primary-400"
                       />
                       <select
@@ -653,7 +606,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                     )}
                     <div className="col-span-12 lg:col-span-2 flex items-center space-x-2">
                       <button
-                        onClick={() => handleSaveEdit(assessment.id!)}
+                        onClick={() => assessment.id && handleSaveEdit(assessment.id)}
                         className="text-emerald-600 dark:text-emerald-400 hover:text-emerald-800 dark:hover:text-emerald-300 p-1.5 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 rounded-md transition-colors"
                       >
                         <svg
@@ -698,14 +651,14 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                     <div className="col-span-12 lg:col-span-2 flex items-center space-x-2">
                       <input
                         type="checkbox"
-                        checked={selectedRows.includes(assessment.id)}
-                        onChange={() => toggleRowSelection(assessment.id)}
+                        checked={selectedRows.includes(assessment.id || '')}
+                        onChange={() => toggleRowSelection(assessment.id || '')}
                         className="h-4 w-4 rounded border-gray-300 dark:border-dark-border-primary text-primary-500 dark:text-primary-400 focus:ring-primary-500 dark:focus:ring-primary-400"
                       />
                       <select
                         value={assessment.status}
                         onChange={(e) =>
-                          handleStatusChange(assessment.id!, e.target.value)
+                          assessment.id && handleStatusChange(assessment.id, e.target.value)
                         }
                         className="py-0.5 px-3 text-md rounded-lg transition-all duration-300 bg-white dark:bg-dark-bg-tertiary text-gray-700 dark:text-dark-text-primary border border-gray-200 dark:border-dark-border-primary appearance-none pr-8 relative"
                         style={{

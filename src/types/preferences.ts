@@ -11,16 +11,13 @@ export interface PreferencesSectionProps {
   setIsDarkMode: (value: boolean) => void;
 }
 
-export interface NotificationPreferences {
+export interface NotificationPreferencesProps {
   emailNotifications: boolean;
-  notificationDaysBefore: number;
-  email: string;
-  hasConsentedToNotifications: boolean;
-}
-
-export interface NotificationPreferencesProps extends NotificationPreferences {
   setEmailNotifications: (value: boolean) => void;
+  notificationDaysBefore: number;
   setNotificationDaysBefore: (value: number) => void;
+  email: string;
   setEmail: (value: string) => void;
+  hasConsentedToNotifications: boolean;
   setHasConsentedToNotifications: (value: boolean) => void;
 }
