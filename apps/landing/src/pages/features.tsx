@@ -35,7 +35,7 @@ export default function FeaturesPage() {
                 Academic Success
               </span>
             </h1>
-            <p className="text-xl md:text-2xl text-gray-600 max-w-4xl mx-auto leading-relaxed">
+            <p className="text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
               Experience the future of academic organization with our intelligent AI technology, designed to help you stay on top of your studies—all completely free.
             </p>
           </div>
@@ -128,7 +128,7 @@ export default function FeaturesPage() {
                   Academic Journey?
                 </span>
               </h2>
-              <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
+              <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
                 Join thousands of students who are already using Asetta to stay organized and achieve their academic goals.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">

@@ -85,7 +85,7 @@ export default function PricingPage() {
                     <span className="text-8xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-green-600 to-primary-600">$0</span>
                     <span className="text-2xl font-bold text-gray-500 ml-2">/forever</span>
                   </div>
-                  <p className="text-gray-600 text-xl mb-12 max-w-2xl mx-auto leading-relaxed">
+                  <p className="text-gray-600 text-xl mb-12 max-w-3xl mx-auto leading-relaxed">
                     No hidden fees. No premium features. No catch.
                     <br />
                     Just a simple, powerful tool to help you ace your studies! 📚✨
