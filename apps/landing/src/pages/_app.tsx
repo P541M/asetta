@@ -24,7 +24,7 @@ export default function App({ Component, pageProps }: AppProps) {
 
   useEffect(() => {
     const handleRouteChange = (url: string) => {
-      console.log(`Route changed to: ${url}`);
+      // Route change tracking for analytics (if needed)
     };
 
     router.events.on("routeChangeComplete", handleRouteChange);

@@ -111,7 +111,7 @@ export default function Contact() {
                 <p className="text-gray-600 mb-6">{status.message}</p>
                 <button
                   onClick={() => setStatus({ type: "idle", message: "" })}
-                  className="inline-flex items-center justify-center px-6 py-3 text-base font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors duration-200"
+                  className="inline-flex items-center justify-center px-6 py-3 text-base font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700 transition-colors duration-200"
                 >
                   Send Another Message
                 </button>
