@@ -36,12 +36,14 @@ interface DashboardLayoutProps {
   }) => React.ReactNode;
   title?: string;
   description?: string;
+  forceSemesterId?: string;
 }
 
 const DashboardLayout = ({
   children,
   title = "Asetta - Your Academic Dashboard",
   description = "Manage your semesters, track assessments, and stay organized with Asetta.",
+  forceSemesterId,
 }: DashboardLayoutProps) => {
   const { user, loading, logout } = useAuth();
   const router = useRouter();
@@ -69,7 +71,34 @@ const DashboardLayout = ({
 
   useEffect(() => {
     const findSemesterId = async () => {
-      if (!user || !selectedSemester) {
+      if (!user) {
+        setSelectedSemesterId("");
+        setSelectedSemester("");
+        return;
+      }
+
+      // If forceSemesterId is provided, use it directly
+      if (forceSemesterId) {
+        try {
+          const semesterRef = doc(db, "users", user.uid, "semesters", forceSemesterId);
+          const semesterSnap = await getDoc(semesterRef);
+          if (semesterSnap.exists()) {
+            setSelectedSemesterId(forceSemesterId);
+            setSelectedSemester(semesterSnap.data().name);
+          } else {
+            setSelectedSemesterId("");
+            setSelectedSemester("");
+          }
+        } catch (err) {
+          console.error("Error finding forced semester:", err);
+          setSelectedSemesterId("");
+          setSelectedSemester("");
+        }
+        return;
+      }
+
+      // Original logic for when no forceSemesterId is provided
+      if (!selectedSemester) {
         setSelectedSemesterId("");
         return;
       }
@@ -88,7 +117,7 @@ const DashboardLayout = ({
       }
     };
     findSemesterId();
-  }, [selectedSemester, user]);
+  }, [selectedSemester, user, forceSemesterId]);
 
   useEffect(() => {
     if (!user || !selectedSemesterId) {
@@ -337,9 +366,12 @@ const DashboardLayout = ({
               {/* Desktop Navigation */}
               <div className="hidden md:flex space-x-2">
                 <button
-                  onClick={() => router.push("/dashboard/courses")}
+                  onClick={() => {
+                    const path = selectedSemesterId ? `/dashboard/${selectedSemesterId}/courses` : "/dashboard/courses";
+                    router.push(path);
+                  }}
                   className={`flex-1 px-6 py-3 font-medium text-sm transition-all duration-200 rounded-lg ${
-                    router.pathname === "/dashboard/courses"
+                    router.pathname === "/dashboard/courses" || router.pathname === "/dashboard/[semester]/courses"
                       ? "bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 shadow-sm"
                       : "text-gray-600 dark:text-dark-text-secondary hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary"
                   }`}
@@ -362,9 +394,12 @@ const DashboardLayout = ({
                   </div>
                 </button>
                 <button
-                  onClick={() => router.push("/dashboard/assessments")}
+                  onClick={() => {
+                    const path = selectedSemesterId ? `/dashboard/${selectedSemesterId}/assessments` : "/dashboard/assessments";
+                    router.push(path);
+                  }}
                   className={`flex-1 px-6 py-3 font-medium text-sm transition-all duration-200 rounded-lg ${
-                    router.pathname === "/dashboard/assessments"
+                    router.pathname === "/dashboard/assessments" || router.pathname === "/dashboard/[semester]/assessments"
                       ? "bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 shadow-sm"
                       : "text-gray-600 dark:text-dark-text-secondary hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary"
                   }`}
@@ -386,9 +421,12 @@ const DashboardLayout = ({
                   </div>
                 </button>
                 <button
-                  onClick={() => router.push("/dashboard/grades")}
+                  onClick={() => {
+                    const path = selectedSemesterId ? `/dashboard/${selectedSemesterId}/grades` : "/dashboard/grades";
+                    router.push(path);
+                  }}
                   className={`flex-1 px-6 py-3 font-medium text-sm transition-all duration-200 rounded-lg ${
-                    router.pathname === "/dashboard/grades"
+                    router.pathname === "/dashboard/grades" || router.pathname === "/dashboard/[semester]/grades"
                       ? "bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 shadow-sm"
                       : "text-gray-600 dark:text-dark-text-secondary hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary"
                   }`}
@@ -410,9 +448,12 @@ const DashboardLayout = ({
                   </div>
                 </button>
                 <button
-                  onClick={() => router.push("/dashboard/calendar")}
+                  onClick={() => {
+                    const path = selectedSemesterId ? `/dashboard/${selectedSemesterId}/calendar` : "/dashboard/calendar";
+                    router.push(path);
+                  }}
                   className={`flex-1 px-6 py-3 font-medium text-sm transition-all duration-200 rounded-lg ${
-                    router.pathname === "/dashboard/calendar"
+                    router.pathname === "/dashboard/calendar" || router.pathname === "/dashboard/[semester]/calendar"
                       ? "bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 shadow-sm"
                       : "text-gray-600 dark:text-dark-text-secondary hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary"
                   }`}
@@ -437,9 +478,12 @@ const DashboardLayout = ({
                   </div>
                 </button>
                 <button
-                  onClick={() => router.push("/dashboard/add")}
+                  onClick={() => {
+                    const path = selectedSemesterId ? `/dashboard/${selectedSemesterId}/add` : "/dashboard/add";
+                    router.push(path);
+                  }}
                   className={`flex-1 px-6 py-3 font-medium text-sm transition-all duration-200 rounded-lg ${
-                    router.pathname === "/dashboard/add"
+                    router.pathname === "/dashboard/add" || router.pathname === "/dashboard/[semester]/add"
                       ? "bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 shadow-sm"
                       : "text-gray-600 dark:text-dark-text-secondary hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary"
                   }`}
@@ -466,9 +510,12 @@ const DashboardLayout = ({
               <div className="md:hidden">
                 <div className="grid grid-cols-3 gap-1 mb-1">
                 <button
-                  onClick={() => router.push("/dashboard/courses")}
+                  onClick={() => {
+                    const path = selectedSemesterId ? `/dashboard/${selectedSemesterId}/courses` : "/dashboard/courses";
+                    router.push(path);
+                  }}
                   className={`px-3 py-3 font-medium text-sm transition-all duration-200 rounded-lg ${
-                    router.pathname === "/dashboard/courses"
+                    router.pathname === "/dashboard/courses" || router.pathname === "/dashboard/[semester]/courses"
                       ? "bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 shadow-sm"
                       : "text-gray-600 dark:text-dark-text-secondary hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary"
                   }`}
@@ -491,9 +538,12 @@ const DashboardLayout = ({
                   </div>
                 </button>
                 <button
-                  onClick={() => router.push("/dashboard/assessments")}
+                  onClick={() => {
+                    const path = selectedSemesterId ? `/dashboard/${selectedSemesterId}/assessments` : "/dashboard/assessments";
+                    router.push(path);
+                  }}
                   className={`px-3 py-3 font-medium text-sm transition-all duration-200 rounded-lg ${
-                    router.pathname === "/dashboard/assessments"
+                    router.pathname === "/dashboard/assessments" || router.pathname === "/dashboard/[semester]/assessments"
                       ? "bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 shadow-sm"
                       : "text-gray-600 dark:text-dark-text-secondary hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary"
                   }`}
@@ -515,9 +565,12 @@ const DashboardLayout = ({
                   </div>
                 </button>
                 <button
-                  onClick={() => router.push("/dashboard/grades")}
+                  onClick={() => {
+                    const path = selectedSemesterId ? `/dashboard/${selectedSemesterId}/grades` : "/dashboard/grades";
+                    router.push(path);
+                  }}
                   className={`px-3 py-3 font-medium text-sm transition-all duration-200 rounded-lg ${
-                    router.pathname === "/dashboard/grades"
+                    router.pathname === "/dashboard/grades" || router.pathname === "/dashboard/[semester]/grades"
                       ? "bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 shadow-sm"
                       : "text-gray-600 dark:text-dark-text-secondary hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary"
                   }`}
@@ -541,9 +594,12 @@ const DashboardLayout = ({
                 </div>
                 <div className="grid grid-cols-2 gap-1">
                 <button
-                  onClick={() => router.push("/dashboard/calendar")}
+                  onClick={() => {
+                    const path = selectedSemesterId ? `/dashboard/${selectedSemesterId}/calendar` : "/dashboard/calendar";
+                    router.push(path);
+                  }}
                   className={`px-3 py-3 font-medium text-sm transition-all duration-200 rounded-lg ${
-                    router.pathname === "/dashboard/calendar"
+                    router.pathname === "/dashboard/calendar" || router.pathname === "/dashboard/[semester]/calendar"
                       ? "bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 shadow-sm"
                       : "text-gray-600 dark:text-dark-text-secondary hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary"
                   }`}
@@ -568,9 +624,12 @@ const DashboardLayout = ({
                   </div>
                 </button>
                 <button
-                  onClick={() => router.push("/dashboard/add")}
+                  onClick={() => {
+                    const path = selectedSemesterId ? `/dashboard/${selectedSemesterId}/add` : "/dashboard/add";
+                    router.push(path);
+                  }}
                   className={`px-3 py-3 font-medium text-sm transition-all duration-200 rounded-lg ${
-                    router.pathname === "/dashboard/add"
+                    router.pathname === "/dashboard/add" || router.pathname === "/dashboard/[semester]/add"
                       ? "bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 shadow-sm"
                       : "text-gray-600 dark:text-dark-text-secondary hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary"
                   }`}

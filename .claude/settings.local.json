@@ -12,7 +12,8 @@
       "Bash(timeout 8 npm run dev)",
       "Bash(rg:*)",
       "Bash(rm:*)",
-      "Bash(npx next build:*)"
+      "Bash(npx next build:*)",
+      "Bash(find:*)"
     ],
     "deny": []
   }

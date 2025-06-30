@@ -25,7 +25,7 @@ const CourseFilteredAssessments = ({
   };
 
   const handleCalculateGrades = () => {
-    router.push(`/dashboard/grades?course=${encodeURIComponent(selectedCourse)}`);
+    router.push(`/dashboard/${semesterId}/grades?course=${encodeURIComponent(selectedCourse)}`);
   };
 
   return (

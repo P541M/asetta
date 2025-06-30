@@ -1,5 +1,6 @@
 // components/SemesterTabs.tsx
 import React, { useState, useEffect, useRef } from "react";
+import { useRouter } from "next/router";
 import { useAuth } from "../../contexts/AuthContext";
 import { db } from "../../lib/firebase";
 import {
@@ -254,6 +255,7 @@ const SemesterTabs = ({
   className = "",
 }: SemesterTabsProps) => {
   const { user } = useAuth();
+  const router = useRouter();
   const [newSemester, setNewSemester] = useState("");
   const [semesters, setSemesters] = useState<Semester[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -390,11 +392,8 @@ const SemesterTabs = ({
         order: currentHighestOrder + 1,
       });
 
-      // Select the newly created semester
-      const newSemesterDoc = await getDoc(docRef);
-      if (newSemesterDoc.exists()) {
-        onSelect(newSemesterDoc.data().name);
-      }
+      // Navigate to the newly created semester's assessments page
+      router.push(`/dashboard/${docRef.id}/assessments`);
       setNewSemester("");
       setShowAddInput(false);
     } catch (error) {
@@ -547,6 +546,32 @@ const SemesterTabs = ({
     }
   };
 
+  // Handle semester selection with navigation
+  const handleSemesterSelect = (semesterName: string) => {
+    const semester = semesters.find(s => s.name === semesterName);
+    if (semester) {
+      // Check if we're already on a semester-specific page
+      const currentPath = router.asPath;
+      if (currentPath.startsWith('/dashboard/') && currentPath.includes('/')) {
+        // We're on a semester page, navigate to the same page but for the new semester
+        const pathParts = currentPath.split('/');
+        if (pathParts.length >= 4) {
+          // Replace the semester ID with the new one
+          pathParts[2] = semester.id;
+          router.push(pathParts.join('/'));
+        } else {
+          // Navigate to semester assessments (default landing)
+          router.push(`/dashboard/${semester.id}/assessments`);
+        }
+      } else {
+        // Navigate to semester assessments (default landing)
+        router.push(`/dashboard/${semester.id}/assessments`);
+      }
+    }
+    // Still call onSelect for backward compatibility
+    onSelect(semesterName);
+  };
+
   // Add dnd-kit sensors
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -661,7 +686,7 @@ const SemesterTabs = ({
           {semesters.map((sem) => (
             <div key={sem.id} className="flex-shrink-0">
               <button
-                onClick={() => onSelect(sem.name)}
+                onClick={() => handleSemesterSelect(sem.name)}
                 className={`px-3 py-1.5 rounded-md text-sm font-medium whitespace-nowrap transition-all duration-200 ${
                   selectedSemester === sem.name
                     ? "bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 shadow-sm"
