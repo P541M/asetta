@@ -1,16 +1,15 @@
 // src/components/assessment/CourseFilteredAssessments.tsx
-import { useState } from "react";
 import { useAssessments } from "../../hooks/useAssessments";
 import AssessmentsTable from "../tables/AssessmentsTable";
-import GradeCalculator from "./GradeCalculator";
 import { CourseFilteredAssessmentsProps } from "../../types/course";
+import { useRouter } from "next/router";
 
 const CourseFilteredAssessments = ({
   semesterId,
   selectedCourse,
   onBack,
 }: CourseFilteredAssessmentsProps) => {
-  const [showGradeCalculator, setShowGradeCalculator] = useState(false);
+  const router = useRouter();
   
   const { 
     assessments, 
@@ -25,6 +24,10 @@ const CourseFilteredAssessments = ({
     refetch();
   };
 
+  const handleCalculateGrades = () => {
+    router.push(`/dashboard/grades?course=${encodeURIComponent(selectedCourse)}`);
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center pt-6 px-6">
@@ -34,22 +37,18 @@ const CourseFilteredAssessments = ({
         >
           ← Back to All Courses
         </button>
-        <button
-          onClick={() => setShowGradeCalculator(!showGradeCalculator)}
-          className="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 transition-colors"
-        >
-          {showGradeCalculator
-            ? "Hide Grade Calculator"
-            : "Show Grade Calculator"}
-        </button>
+        <div className="flex items-center space-x-3">
+          <span className="text-sm text-gray-600 dark:text-dark-text-secondary">
+            {selectedCourse}
+          </span>
+          <button
+            onClick={handleCalculateGrades}
+            className="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 transition-colors"
+          >
+            Calculate Grades
+          </button>
+        </div>
       </div>
-
-      {showGradeCalculator && (
-        <GradeCalculator
-          semesterId={semesterId}
-          selectedCourse={selectedCourse}
-        />
-      )}
 
       {isLoading ? (
         <div className="flex items-center justify-center py-12">

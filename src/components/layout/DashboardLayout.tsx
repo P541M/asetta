@@ -386,6 +386,30 @@ const DashboardLayout = ({
                   </div>
                 </button>
                 <button
+                  onClick={() => router.push("/dashboard/grades")}
+                  className={`flex-1 px-6 py-3 font-medium text-sm transition-all duration-200 rounded-lg ${
+                    router.pathname === "/dashboard/grades"
+                      ? "bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 shadow-sm"
+                      : "text-gray-600 dark:text-dark-text-secondary hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary"
+                  }`}
+                >
+                  <div className="flex items-center justify-center space-x-2">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-5 w-5"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                    </svg>
+                    <span>Grades</span>
+                  </div>
+                </button>
+                <button
                   onClick={() => router.push("/dashboard/calendar")}
                   className={`flex-1 px-6 py-3 font-medium text-sm transition-all duration-200 rounded-lg ${
                     router.pathname === "/dashboard/calendar"
@@ -439,19 +463,20 @@ const DashboardLayout = ({
               </div>
 
               {/* Mobile Navigation */}
-              <div className="md:hidden grid grid-cols-2 gap-2">
+              <div className="md:hidden">
+                <div className="grid grid-cols-3 gap-1 mb-1">
                 <button
                   onClick={() => router.push("/dashboard/courses")}
-                  className={`px-4 py-3 font-medium text-sm transition-all duration-200 rounded-lg ${
+                  className={`px-3 py-3 font-medium text-sm transition-all duration-200 rounded-lg ${
                     router.pathname === "/dashboard/courses"
                       ? "bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 shadow-sm"
                       : "text-gray-600 dark:text-dark-text-secondary hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary"
                   }`}
                 >
-                  <div className="flex items-center justify-center space-x-2">
+                  <div className="flex flex-col items-center space-y-1">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
-                      className="h-5 w-5"
+                      className="h-4 w-4"
                       viewBox="0 0 24 24"
                       fill="none"
                       stroke="currentColor"
@@ -462,21 +487,21 @@ const DashboardLayout = ({
                       <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
                       <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
                     </svg>
-                    <span>Courses</span>
+                    <span className="text-xs">Courses</span>
                   </div>
                 </button>
                 <button
                   onClick={() => router.push("/dashboard/assessments")}
-                  className={`px-4 py-3 font-medium text-sm transition-all duration-200 rounded-lg ${
+                  className={`px-3 py-3 font-medium text-sm transition-all duration-200 rounded-lg ${
                     router.pathname === "/dashboard/assessments"
                       ? "bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 shadow-sm"
                       : "text-gray-600 dark:text-dark-text-secondary hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary"
                   }`}
                 >
-                  <div className="flex items-center justify-center space-x-2">
+                  <div className="flex flex-col items-center space-y-1">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
-                      className="h-5 w-5"
+                      className="h-4 w-4"
                       viewBox="0 0 20 20"
                       fill="currentColor"
                     >
@@ -486,21 +511,47 @@ const DashboardLayout = ({
                         clipRule="evenodd"
                       />
                     </svg>
-                    <span>Assessments</span>
+                    <span className="text-xs">Assessments</span>
                   </div>
                 </button>
                 <button
+                  onClick={() => router.push("/dashboard/grades")}
+                  className={`px-3 py-3 font-medium text-sm transition-all duration-200 rounded-lg ${
+                    router.pathname === "/dashboard/grades"
+                      ? "bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 shadow-sm"
+                      : "text-gray-600 dark:text-dark-text-secondary hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary"
+                  }`}
+                >
+                  <div className="flex flex-col items-center space-y-1">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-4 w-4"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                    </svg>
+                    <span className="text-xs">Grades</span>
+                  </div>
+                </button>
+                </div>
+                <div className="grid grid-cols-2 gap-1">
+                <button
                   onClick={() => router.push("/dashboard/calendar")}
-                  className={`px-4 py-3 font-medium text-sm transition-all duration-200 rounded-lg ${
+                  className={`px-3 py-3 font-medium text-sm transition-all duration-200 rounded-lg ${
                     router.pathname === "/dashboard/calendar"
                       ? "bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 shadow-sm"
                       : "text-gray-600 dark:text-dark-text-secondary hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary"
                   }`}
                 >
-                  <div className="flex items-center justify-center space-x-2">
+                  <div className="flex flex-col items-center space-y-1">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
-                      className="h-5 w-5"
+                      className="h-4 w-4"
                       viewBox="0 0 24 24"
                       fill="none"
                       stroke="currentColor"
@@ -513,21 +564,21 @@ const DashboardLayout = ({
                       <line x1="8" y1="2" x2="8" y2="6" />
                       <line x1="3" y1="10" x2="21" y2="10" />
                     </svg>
-                    <span>Calendar</span>
+                    <span className="text-xs">Calendar</span>
                   </div>
                 </button>
                 <button
                   onClick={() => router.push("/dashboard/add")}
-                  className={`px-4 py-3 font-medium text-sm transition-all duration-200 rounded-lg ${
+                  className={`px-3 py-3 font-medium text-sm transition-all duration-200 rounded-lg ${
                     router.pathname === "/dashboard/add"
                       ? "bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 shadow-sm"
                       : "text-gray-600 dark:text-dark-text-secondary hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary"
                   }`}
                 >
-                  <div className="flex items-center justify-center space-x-2">
+                  <div className="flex flex-col items-center space-y-1">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
-                      className="h-5 w-5"
+                      className="h-4 w-4"
                       viewBox="0 0 20 20"
                       fill="currentColor"
                     >
@@ -537,9 +588,10 @@ const DashboardLayout = ({
                         clipRule="evenodd"
                       />
                     </svg>
-                    <span>Add</span>
+                    <span className="text-xs">Add</span>
                   </div>
                 </button>
+                </div>
               </div>
             </div>
 
