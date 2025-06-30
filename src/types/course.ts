@@ -23,7 +23,6 @@ export interface CourseStats {
   nextDueDate: string | null;
   nextAssignment: string | null;
   progress: number;
-  outlineUrl?: string;
 }
 
 export interface CoursesOverviewTableProps {

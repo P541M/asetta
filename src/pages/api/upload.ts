@@ -3,7 +3,6 @@ import formidable, { IncomingForm, Fields, Files } from "formidable";
 import fs from "fs";
 import pdfParse from "pdf-parse";
 import { getAdmin } from "../../lib/firebase-admin";
-import { supabase } from "../../lib/supabase";
 
 export const config = {
   api: {
@@ -18,7 +17,6 @@ interface Assessment {
   dueTime: string;
   weight: number;
   status: string;
-  outlineUrl?: string;
 }
 
 async function extractAssessmentsAI(text: string): Promise<string> {
@@ -176,26 +174,6 @@ export default async function handler(
           continue;
         }
 
-        // Upload to Supabase Storage
-        const { error: uploadError } = await supabase.storage
-          .from("outlines")
-          .upload(`${userId}/${semesterId}/${fileName}`, pdfBuffer, {
-            contentType: "application/pdf",
-            upsert: true,
-            cacheControl: "3600",
-          });
-
-        if (uploadError) {
-          throw uploadError;
-        }
-
-        // Get the public URL
-        const {
-          data: { publicUrl },
-        } = supabase.storage
-          .from("outlines")
-          .getPublicUrl(`${userId}/${semesterId}/${fileName}`);
-
         let assessments: Assessment[] = [];
         try {
           if (process.env.DEEPSEEK_API_KEY) {
@@ -218,7 +196,6 @@ export default async function handler(
                   ? assessment.weight
                   : parseFloat(assessment.weight) || 0,
               status: "Not started",
-              outlineUrl: publicUrl,
             }));
           } else {
             throw new Error("DeepSeek API not configured");
@@ -227,12 +204,7 @@ export default async function handler(
           console.warn(
             `AI extraction failed for ${fileName}, falling back to basic extraction`
           );
-          assessments = extractAssessmentsBasic(extractedText).map(
-            (assessment) => ({
-              ...assessment,
-              outlineUrl: publicUrl,
-            })
-          );
+          assessments = extractAssessmentsBasic(extractedText);
         }
 
         if (assessments.length === 0) {
@@ -243,19 +215,8 @@ export default async function handler(
             dueTime: "23:59",
             weight: 0,
             status: "Not started",
-            outlineUrl: publicUrl,
           });
         }
-
-        await adminDb.collection(`users/${userId}/documents`).add({
-          fileName,
-          uploadDate: new Date(),
-          semester,
-          text: extractedText.slice(0, 5000),
-          outlineUrl: publicUrl,
-          fileSize: pdfBuffer.length,
-          status: "processed",
-        });
 
         const assessmentsRef = adminDb.collection(
           `users/${userId}/semesters/${semesterId}/assessments`

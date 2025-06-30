@@ -5,12 +5,7 @@ import {
   collection,
   query,
   getDocs,
-  doc,
-  setDoc,
-  writeBatch,
-  where,
 } from "firebase/firestore";
-import { supabase } from "../../lib/supabase";
 import {
   formatLocalDate,
   isUpcoming as isDateUpcoming,
@@ -26,9 +21,6 @@ const CoursesOverviewTable = ({
   const [courses, setCourses] = useState<CourseStats[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [uploadingCourse, setUploadingCourse] = useState<string | null>(null);
-  const [selectedOutline, setSelectedOutline] = useState<string | null>(null);
-  const [outlineUrls, setOutlineUrls] = useState<Record<string, string>>({});
 
   useEffect(() => {
     const fetchCourseData = async () => {
@@ -63,15 +55,6 @@ const CoursesOverviewTable = ({
           courseMap.get(assessment.courseName)?.push(assessment);
         });
 
-        const coursesRef = collection(db, "users", user.uid, "courses");
-        const coursesSnapshot = await getDocs(query(coursesRef));
-        const courseOutlines: Record<string, string> = {};
-        coursesSnapshot.forEach((doc) => {
-          const data = doc.data();
-          if (data.semesterId === semesterId) {
-            courseOutlines[data.courseName] = data.outlineUrl;
-          }
-        });
 
         const courseStatsList: CourseStats[] = [];
         courseMap.forEach((assessments, courseName) => {
@@ -123,12 +106,10 @@ const CoursesOverviewTable = ({
               assessments.length > 0
                 ? Math.round((completed.length / assessments.length) * 100)
                 : 0,
-            outlineUrl: courseOutlines[courseName],
           });
         });
 
         setCourses(courseStatsList);
-        setOutlineUrls(courseOutlines);
       } catch (err) {
         console.error("Error fetching course data:", err);
         setError("Failed to load course overview data.");
@@ -158,114 +139,6 @@ const CoursesOverviewTable = ({
     return isDateUpcoming(dateStr);
   };
 
-  const handleOutlineUpload = async (
-    e: React.ChangeEvent<HTMLInputElement>,
-    courseName: string
-  ) => {
-    if (!user || !e.target.files || !e.target.files[0]) return;
-    setUploadingCourse(courseName);
-    setError(null);
-
-    try {
-      const file = e.target.files[0];
-      if (!file) {
-        throw new Error("No file selected");
-      }
-
-      // Validate file type
-      if (file.type !== "application/pdf") {
-        throw new Error("Please upload a PDF file");
-      }
-
-      // Validate file size (max 10MB)
-      const maxSize = 10 * 1024 * 1024; // 10MB in bytes
-      if (file.size > maxSize) {
-        throw new Error("File size must be less than 10MB");
-      }
-
-      // Create a safe filename with timestamp to prevent collisions
-      const timestamp = new Date().getTime();
-      const safeFilename = `${timestamp}_${file.name.replace(
-        /[^a-zA-Z0-9.-]/g,
-        "_"
-      )}`;
-      const filePath = `${user.uid}/${semesterId}/${safeFilename}`;
-
-      // Upload to Supabase Storage
-      const { data: uploadData, error: uploadError } = await supabase.storage
-        .from("outlines")
-        .upload(filePath, file, {
-          contentType: "application/pdf",
-          upsert: true,
-          cacheControl: "3600",
-        });
-
-      if (uploadError) throw uploadError;
-      if (!uploadData) throw new Error("Upload failed - no data received");
-
-      // Get the public URL
-      const {
-        data: { publicUrl },
-      } = supabase.storage.from("outlines").getPublicUrl(filePath);
-
-      // Update the course document
-      const courseRef = doc(db, "users", user.uid, "courses", courseName);
-      await setDoc(courseRef, {
-        courseName,
-        semesterId,
-        outlineUrl: publicUrl,
-        updatedAt: new Date(),
-        fileName: safeFilename,
-        fileSize: file.size,
-        uploadDate: new Date(),
-      });
-
-      // Update all assessments for this course with the new outline URL
-      const assessmentsRef = collection(
-        db,
-        "users",
-        user.uid,
-        "semesters",
-        semesterId,
-        "assessments"
-      );
-      const q = query(assessmentsRef, where("courseName", "==", courseName));
-      const querySnapshot = await getDocs(q);
-
-      const batch = writeBatch(db);
-      querySnapshot.forEach((doc) => {
-        batch.update(doc.ref, {
-          outlineUrl: publicUrl,
-          outlineUpdatedAt: new Date(),
-        });
-      });
-      await batch.commit();
-
-      // Update local state
-      setOutlineUrls((prev) => ({
-        ...prev,
-        [courseName]: publicUrl,
-      }));
-
-      setCourses((prev) =>
-        prev.map((course) =>
-          course.courseName === courseName
-            ? { ...course, outlineUrl: publicUrl }
-            : course
-        )
-      );
-    } catch (err) {
-      console.error("Error uploading outline:", err);
-      setError(err instanceof Error ? err.message : "Failed to upload outline");
-    } finally {
-      setUploadingCourse(null);
-      if (e.target) e.target.value = "";
-    }
-  };
-
-  const handleViewOutline = (courseName: string) => {
-    setSelectedOutline(courseName);
-  };
 
   if (error) return <div className="text-red-600">{error}</div>;
   if (courses.length === 0) {
@@ -417,59 +290,7 @@ const CoursesOverviewTable = ({
                       </span>
                     )}
                   </div>
-                  <div className="col-span-12 lg:col-span-1 flex items-center justify-end space-x-2">
-                    {course.outlineUrl ? (
-                      <button
-                        onClick={() => handleViewOutline(course.courseName)}
-                        className="text-gray-500 dark:text-dark-text-tertiary hover:text-gray-700 dark:hover:text-dark-text-secondary p-1 hover:bg-gray-100 dark:hover:bg-dark-bg-tertiary rounded-md transition-colors"
-                        title="View Course Outline"
-                      >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="h-4 w-4"
-                          viewBox="0 0 20 20"
-                          fill="currentColor"
-                        >
-                          <path d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" />
-                          <path
-                            d="M6 8h8M6 12h8M6 16h4"
-                            stroke="currentColor"
-                            strokeWidth="1"
-                            fill="none"
-                          />
-                        </svg>
-                      </button>
-                    ) : (
-                      <label className="relative cursor-pointer">
-                        <input
-                          type="file"
-                          accept="application/pdf"
-                          onChange={(e) =>
-                            handleOutlineUpload(e, course.courseName)
-                          }
-                          className="hidden"
-                          disabled={uploadingCourse === course.courseName}
-                        />
-                        <div className="text-gray-500 dark:text-dark-text-tertiary hover:text-gray-700 dark:hover:text-dark-text-secondary p-1 hover:bg-gray-100 dark:hover:bg-dark-bg-tertiary rounded-md transition-colors">
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className={`h-4 w-4 ${
-                              uploadingCourse === course.courseName
-                                ? "animate-spin"
-                                : ""
-                            }`}
-                            viewBox="0 0 20 20"
-                            fill="currentColor"
-                          >
-                            <path
-                              fillRule="evenodd"
-                              d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z"
-                              clipRule="evenodd"
-                            />
-                          </svg>
-                        </div>
-                      </label>
-                    )}
+                  <div className="col-span-12 lg:col-span-1 flex items-center justify-end">
                     <button
                       onClick={() => onSelectCourse(course.courseName)}
                       className="text-gray-500 dark:text-dark-text-tertiary hover:text-gray-700 dark:hover:text-dark-text-secondary p-1 hover:bg-gray-100 dark:hover:bg-dark-bg-tertiary rounded-md transition-colors"
@@ -496,104 +317,6 @@ const CoursesOverviewTable = ({
         </div>
       )}
 
-      {/* Outline Viewer Modal */}
-      {selectedOutline && outlineUrls[selectedOutline] && (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-[2px] flex items-center justify-center z-[9999] animate-fade-in">
-          <div className="bg-white dark:bg-dark-bg-secondary rounded-lg shadow-lg w-full max-w-4xl max-h-[90vh] flex flex-col">
-            <div className="flex-none p-6 border-b border-gray-200 dark:border-dark-border-primary">
-              <div className="flex justify-between items-center">
-                <div>
-                  <h3 className="text-xl font-medium text-gray-900 dark:text-dark-text-primary">
-                    {selectedOutline} Course Outline
-                  </h3>
-                  <p className="text-md text-gray-500 dark:text-dark-text-tertiary">
-                    View and navigate through the course outline
-                  </p>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <button
-                    onClick={() =>
-                      window.open(outlineUrls[selectedOutline], "_blank")
-                    }
-                    className="inline-flex items-center px-3 py-1.5 border border-gray-300 dark:border-dark-border-primary shadow-sm text-md font-medium rounded-md text-gray-700 dark:text-dark-text-primary bg-white dark:bg-dark-bg-tertiary hover:bg-gray-50 dark:hover:bg-dark-bg-secondary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-4 w-4 mr-1.5"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                      <polyline points="15 3 21 3 21 9"></polyline>
-                      <line x1="10" y1="14" x2="21" y2="3"></line>
-                    </svg>
-                    Open in New Tab
-                  </button>
-                  <label className="inline-flex items-center px-3 py-1.5 border border-gray-300 dark:border-dark-border-primary shadow-sm text-md font-medium rounded-md text-gray-700 dark:text-dark-text-primary bg-white dark:bg-dark-bg-tertiary hover:bg-gray-50 dark:hover:bg-dark-bg-secondary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 cursor-pointer">
-                    <input
-                      type="file"
-                      accept="application/pdf"
-                      onChange={(e) => handleOutlineUpload(e, selectedOutline)}
-                      className="hidden"
-                      disabled={uploadingCourse === selectedOutline}
-                    />
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-4 w-4 mr-1.5"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                      <polyline points="17 8 12 3 7 8"></polyline>
-                      <line x1="12" y1="3" x2="12" y2="15"></line>
-                    </svg>
-                    {uploadingCourse === selectedOutline
-                      ? "Uploading..."
-                      : "Reupload"}
-                  </label>
-                  <button
-                    onClick={() => setSelectedOutline(null)}
-                    className="inline-flex items-center p-1.5 border border-transparent rounded-md text-gray-400 dark:text-dark-text-tertiary hover:text-gray-500 dark:hover:text-dark-text-secondary hover:bg-gray-100 dark:hover:bg-dark-bg-tertiary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-5 w-5"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <line x1="18" y1="6" x2="6" y2="18"></line>
-                      <line x1="6" y1="6" x2="18" y2="18"></line>
-                    </svg>
-                  </button>
-                </div>
-              </div>
-            </div>
-            <div className="flex-1 min-h-0 overflow-y-auto">
-              <div className="p-6">
-                <div className="w-full h-full bg-gray-50 dark:bg-dark-bg-tertiary rounded-lg overflow-hidden">
-                  <iframe
-                    src={outlineUrls[selectedOutline]}
-                    className="w-full h-full"
-                    title={`${selectedOutline} Course Outline`}
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
