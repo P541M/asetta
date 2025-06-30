@@ -14,7 +14,6 @@ import {
   getDocs,
   writeBatch,
   limit,
-  getDoc,
 } from "firebase/firestore";
 import {
   DndContext,
