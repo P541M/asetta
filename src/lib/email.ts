@@ -144,7 +144,27 @@ export async function sendEmail(
   assessmentTitle: string,
   daysUntilDue: number
 ) {
+  console.log("📧 Attempting to send email:", {
+    to: `${to.substring(0, 3)}***`,
+    subject,
+    assessmentTitle,
+    daysUntilDue,
+  });
+
+  // Validate environment variables
+  if (!process.env.EMAIL_USER) {
+    throw new Error("EMAIL_USER environment variable is not set");
+  }
+  if (!process.env.EMAIL_APP_PASSWORD) {
+    throw new Error("EMAIL_APP_PASSWORD environment variable is not set");
+  }
+
   try {
+    // Test transporter connection
+    console.log("🔍 Testing email transporter connection...");
+    await transporter.verify();
+    console.log("✅ Email transporter connection verified");
+
     const html = generateEmailHTML(assessmentTitle, daysUntilDue);
 
     const mailOptions = {
@@ -157,11 +177,37 @@ export async function sendEmail(
       html,
     };
 
+    console.log("📤 Sending email with options:", {
+      from: mailOptions.from,
+      to: `${to.substring(0, 3)}***`,
+      subject: mailOptions.subject,
+      textLength: mailOptions.text.length,
+      htmlLength: mailOptions.html.length,
+    });
+
     const info = await transporter.sendMail(mailOptions);
-    console.log("Email sent successfully:", info.messageId);
+    console.log("✅ Email sent successfully:", {
+      messageId: info.messageId,
+      response: info.response,
+      accepted: info.accepted,
+      rejected: info.rejected,
+    });
     return true;
   } catch (error) {
-    console.error("Error sending email:", error);
+    const emailError = error as { 
+      message?: string; 
+      code?: string; 
+      command?: string; 
+      response?: string; 
+      responseCode?: number; 
+    };
+    console.error("❌ Detailed email error:", {
+      error: emailError.message || String(error),
+      code: emailError.code,
+      command: emailError.command,
+      response: emailError.response,
+      responseCode: emailError.responseCode,
+    });
     throw error;
   }
 }
