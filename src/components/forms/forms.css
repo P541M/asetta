@@ -24,27 +24,3 @@
   @apply bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300 border border-emerald-100 dark:border-emerald-800;
 }
 
-/* Password Strength Indicator */
-.password-strength {
-  @apply flex items-center space-x-1;
-}
-
-.password-strength-bar {
-  @apply h-1.5 w-2 rounded-full;
-}
-
-.password-strength-bar.weak {
-  @apply text-red-500;
-}
-
-.password-strength-bar.medium {
-  @apply text-yellow-500;
-}
-
-.password-strength-bar.strong {
-  @apply text-green-500;
-}
-
-.password-strength-bar.inactive {
-  @apply bg-gray-200;
-}

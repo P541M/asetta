@@ -15,7 +15,8 @@
       "Bash(npx next build:*)",
       "Bash(find:*)",
       "Bash(timeout 30s npm run dev)",
-      "Bash(node:*)"
+      "Bash(node:*)",
+      "Bash(mv:*)"
     ],
     "deny": []
   }

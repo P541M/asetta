@@ -4,10 +4,6 @@ export interface CourseFilteredAssessmentsProps {
   onBack: () => void;
 }
 
-export interface GradeCalculatorProps {
-  semesterId: string;
-  selectedCourse: string;
-}
 
 export interface SemesterTabsProps {
   selectedSemester: string;

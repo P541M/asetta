@@ -1,47 +1,11 @@
 import { useRouter } from "next/router";
-import DashboardLayout from "../../../components/layout/DashboardLayout";
-import CoursesOverviewTable from "../../../components/tables/CoursesOverviewTable";
+import CoursesPage from "../../../components/pages/CoursesPage";
 
 const SemesterCoursesPage = () => {
   const router = useRouter();
   const { semester: semesterId } = router.query;
 
-  const handleSelectCourse = (courseName: string) => {
-    if (semesterId) {
-      router.push(`/dashboard/${semesterId}/assessments?course=${encodeURIComponent(courseName)}`);
-    }
-  };
-
-  return (
-    <DashboardLayout
-      title="Courses - Asetta"
-      description="View course overview and statistics for this semester."
-      forceSemesterId={semesterId as string}
-    >
-      {({
-        selectedSemesterId,
-        isLoading,
-        error,
-      }) => (
-        <div className="animate-fade-in">
-          {isLoading ? (
-            <div className="flex justify-center py-8">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500 dark:border-primary-400"></div>
-            </div>
-          ) : error ? (
-            <div className="p-4 bg-red-50 rounded-md text-red-700 animate-fade-in shadow-sm">
-              <p>{error}</p>
-            </div>
-          ) : (
-            <CoursesOverviewTable
-              semesterId={selectedSemesterId}
-              onSelectCourse={handleSelectCourse}
-            />
-          )}
-        </div>
-      )}
-    </DashboardLayout>
-  );
+  return <CoursesPage forceSemesterId={semesterId as string} />;
 };
 
 export default SemesterCoursesPage;
