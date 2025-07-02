@@ -400,101 +400,135 @@ const GradeCalculatorEnhanced: React.FC<GradeCalculatorEnhancedProps> = ({
             Edit weights and marks to calculate your grade
           </p>
         </div>
-        <div className="overflow-x-auto">
-          <table className="min-w-full">
-            <thead>
-              <tr className="border-b border-gray-200 dark:border-dark-border-primary">
-                <th className="px-6 py-3 text-left text-sm font-medium text-gray-600 dark:text-dark-text-secondary">
-                  Assessment
-                </th>
-                <th className="px-6 py-3 text-left text-sm font-medium text-gray-600 dark:text-dark-text-secondary w-20">
-                  Status
-                </th>
-                <th className="px-6 py-3 text-left text-sm font-medium text-gray-600 dark:text-dark-text-secondary w-24">
-                  Weight
-                </th>
-                <th className="px-6 py-3 text-left text-sm font-medium text-gray-600 dark:text-dark-text-secondary w-24">
-                  Mark
-                </th>
-                <th className="px-6 py-3 text-left text-sm font-medium text-gray-600 dark:text-dark-text-secondary w-24">
-                  Points
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {assessments.map((assessment, index) => {
-                const status = getAssessmentStatus(assessment);
-                const contribution = assessment.mark && assessment.weight 
-                  ? ((assessment.mark * assessment.weight) / 100).toFixed(1)
-                  : "0.0";
+        
+        <div className="p-6">
+          {assessments.length === 0 ? (
+            <div className="text-center py-10 text-gray-500 dark:text-dark-text-tertiary">
+              <svg
+                className="mx-auto h-12 w-12 text-gray-400 mb-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                />
+              </svg>
+              <h3 className="text-lg font-medium mb-2 dark:text-dark-text-primary">
+                No assessments found
+              </h3>
+              <p>
+                This course doesn&apos;t have any assessments yet.
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {/* Headers */}
+              <div className="grid grid-cols-12 gap-4 px-4 py-3 bg-gray-100/50 dark:bg-dark-bg-tertiary/50 rounded-lg">
+                <div className="col-span-12 lg:col-span-4 flex items-center">
+                  <span className="text-xs font-medium text-gray-500 dark:text-dark-text-tertiary uppercase tracking-wider">
+                    Assessment
+                  </span>
+                </div>
+                <div className="col-span-12 lg:col-span-2 flex items-center">
+                  <span className="text-xs font-medium text-gray-500 dark:text-dark-text-tertiary uppercase tracking-wider">
+                    Status
+                  </span>
+                </div>
+                <div className="col-span-12 lg:col-span-2 flex items-center">
+                  <span className="text-xs font-medium text-gray-500 dark:text-dark-text-tertiary uppercase tracking-wider">
+                    Weight
+                  </span>
+                </div>
+                <div className="col-span-12 lg:col-span-2 flex items-center">
+                  <span className="text-xs font-medium text-gray-500 dark:text-dark-text-tertiary uppercase tracking-wider">
+                    Mark
+                  </span>
+                </div>
+                <div className="col-span-12 lg:col-span-2 flex items-center">
+                  <span className="text-xs font-medium text-gray-500 dark:text-dark-text-tertiary uppercase tracking-wider">
+                    Points
+                  </span>
+                </div>
+              </div>
 
-                return (
-                  <tr
-                    key={assessment.id}
-                    className={`${
-                      index !== assessments.length - 1 
-                        ? "border-b border-gray-100 dark:border-dark-border-primary" 
-                        : ""
-                    } hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary/50 transition-colors`}
-                  >
-                    <td className="px-6 py-4">
-                      <div className="text-sm font-medium text-gray-900 dark:text-dark-text-primary">
-                        {assessment.assignmentName}
+              {/* Assessment Cards */}
+              <div className="space-y-3">
+                {assessments.map((assessment) => {
+                  const status = getAssessmentStatus(assessment);
+                  const contribution = assessment.mark && assessment.weight 
+                    ? ((assessment.mark * assessment.weight) / 100).toFixed(1)
+                    : "0.0";
+
+                  return (
+                    <div
+                      key={assessment.id}
+                      className="bg-gray-50/50 dark:bg-dark-bg-tertiary/30 rounded-lg transition-all duration-300 p-4 hover:bg-gray-100/50 dark:hover:bg-dark-bg-tertiary/50"
+                    >
+                      <div className="grid grid-cols-12 gap-4 items-center">
+                        <div className="col-span-12 lg:col-span-4">
+                          <h3 className="font-medium text-gray-900 dark:text-dark-text-primary text-sm">
+                            {assessment.assignmentName}
+                          </h3>
+                          <p className="text-xs text-gray-500 dark:text-dark-text-tertiary mt-1">
+                            Due: {new Date(assessment.dueDate).toLocaleDateString()}
+                          </p>
+                        </div>
+                        <div className="col-span-12 lg:col-span-2">
+                          <span
+                            className={`inline-flex items-center justify-center w-6 h-6 rounded-full text-xs ${status.bgColor} ${status.color}`}
+                            title={assessment.status}
+                          >
+                            {status.icon}
+                          </span>
+                        </div>
+                        <div className="col-span-12 lg:col-span-2">
+                          <div className="flex items-center space-x-2">
+                            <input
+                              type="number"
+                              min="0"
+                              max="100"
+                              step="0.1"
+                              value={assessment.weight}
+                              onChange={(e) =>
+                                assessment.id && handleWeightChange(assessment.id, e.target.value)
+                              }
+                              className="input w-16 px-2 py-1 text-sm hover:shadow-sm transition-all duration-200 dark:bg-dark-input-bg dark:text-dark-input-text dark:border-dark-input-border [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                            />
+                            <span className="text-xs text-gray-500 dark:text-dark-text-tertiary">%</span>
+                          </div>
+                        </div>
+                        <div className="col-span-12 lg:col-span-2">
+                          <div className="flex items-center space-x-2">
+                            <input
+                              type="number"
+                              min="0"
+                              step="0.1"
+                              value={assessment.mark ?? ""}
+                              onChange={(e) =>
+                                assessment.id && handleMarkChange(assessment.id, e.target.value)
+                              }
+                              className="input w-16 px-2 py-1 text-sm hover:shadow-sm transition-all duration-200 dark:bg-dark-input-bg dark:text-dark-input-text dark:border-dark-input-border [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                              placeholder="--"
+                            />
+                            <span className="text-xs text-gray-500 dark:text-dark-text-tertiary">%</span>
+                          </div>
+                        </div>
+                        <div className="col-span-12 lg:col-span-2">
+                          <span className="text-sm font-medium text-gray-900 dark:text-dark-text-primary">
+                            {contribution}
+                          </span>
+                        </div>
                       </div>
-                      <div className="text-xs text-gray-500 dark:text-dark-text-tertiary mt-1">
-                        Due: {new Date(assessment.dueDate).toLocaleDateString()}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span
-                        className={`inline-flex items-center justify-center w-5 h-5 rounded-full text-xs ${status.bgColor} ${status.color}`}
-                        title={assessment.status}
-                      >
-                        {status.icon}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="flex items-center space-x-1">
-                        <input
-                          type="number"
-                          min="0"
-                          max="100"
-                          step="0.1"
-                          value={assessment.weight}
-                          onChange={(e) =>
-                            assessment.id && handleWeightChange(assessment.id, e.target.value)
-                          }
-                          className="input w-16 px-2 py-1 text-sm hover:shadow-sm transition-all duration-200 dark:bg-dark-input-bg dark:text-dark-input-text dark:border-dark-input-border [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                        />
-                        <span className="text-xs text-gray-500 dark:text-dark-text-tertiary">%</span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="flex items-center space-x-1">
-                        <input
-                          type="number"
-                          min="0"
-                          step="0.1"
-                          value={assessment.mark ?? ""}
-                          onChange={(e) =>
-                            assessment.id && handleMarkChange(assessment.id, e.target.value)
-                          }
-                          className="input w-16 px-2 py-1 text-sm hover:shadow-sm transition-all duration-200 dark:bg-dark-input-bg dark:text-dark-input-text dark:border-dark-input-border [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                          placeholder="--"
-                        />
-                        <span className="text-xs text-gray-500 dark:text-dark-text-tertiary">%</span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className="text-sm font-medium text-gray-900 dark:text-dark-text-primary">
-                        {contribution}
-                      </span>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
