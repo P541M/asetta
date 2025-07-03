@@ -8,7 +8,8 @@ export type UploadStatus =
   | "uploading"
   | "processing"
   | "success"
-  | "error";
+  | "error"
+  | "rate_limited";
 
 export interface FileProgress {
   name: string;

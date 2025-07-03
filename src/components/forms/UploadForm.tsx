@@ -1,6 +1,7 @@
 import { useState, useRef } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import { UploadFormProps, UploadStatus, FileProgress } from "../../types/upload";
+import RateLimitNotice from "../ui/RateLimitNotice";
 
 const UploadForm = ({ semester, onUploadSuccess }: UploadFormProps) => {
   const { user } = useAuth();
@@ -9,6 +10,7 @@ const UploadForm = ({ semester, onUploadSuccess }: UploadFormProps) => {
   const [uploadStatus, setUploadStatus] = useState<UploadStatus>("idle");
   const [message, setMessage] = useState<string>("");
   const [error, setError] = useState<string>("");
+  const [retryAfter, setRetryAfter] = useState<number>(120);
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFiles = Array.from(e.target.files || []);
@@ -64,13 +66,35 @@ const UploadForm = ({ semester, onUploadSuccess }: UploadFormProps) => {
         }
         onUploadSuccess(semester);
       } else {
-        throw new Error(result.error || "Upload failed");
+        // Check if it's a rate limit error
+        if (response.status === 429 || result.error === "RATE_LIMITED") {
+          setUploadStatus("rate_limited");
+          setRetryAfter(result.retryAfter || 120);
+          setError(result.message || "Servers are busy. Please wait and try again.");
+        } else {
+          throw new Error(result.error || "Upload failed");
+        }
       }
     } catch (err) {
       console.error("Upload error:", err);
-      setUploadStatus("error");
-      setError(err instanceof Error ? err.message : "Upload failed");
+      // Check if it's a network-level rate limit
+      if (err instanceof Error && (err.message.includes('429') || err.message.includes('rate limit'))) {
+        setUploadStatus("rate_limited");
+        setRetryAfter(120);
+        setError("Servers are busy. Please wait and try again.");
+      } else {
+        setUploadStatus("error");
+        setError(err instanceof Error ? err.message : "Upload failed");
+      }
     }
+  };
+
+  const handleRetry = () => {
+    setUploadStatus("idle");
+    setError("");
+    setMessage("");
+    // Don't clear files on retry, user wants to retry the same files
+    handleUpload();
   };
 
   const handleReset = () => {
@@ -78,6 +102,7 @@ const UploadForm = ({ semester, onUploadSuccess }: UploadFormProps) => {
     setUploadStatus("idle");
     setMessage("");
     setError("");
+    setRetryAfter(120);
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
@@ -167,7 +192,13 @@ const UploadForm = ({ semester, onUploadSuccess }: UploadFormProps) => {
           </div>
         )}
 
-        {error && (
+        {uploadStatus === "rate_limited" ? (
+          <RateLimitNotice 
+            onRetry={handleRetry}
+            retryAfter={retryAfter}
+            autoRetry={true}
+          />
+        ) : error && (
           <div className="p-4 bg-red-50 dark:bg-red-900/20 rounded-md">
             <p className="text-sm text-red-700 dark:text-red-400">{error}</p>
           </div>
@@ -176,7 +207,7 @@ const UploadForm = ({ semester, onUploadSuccess }: UploadFormProps) => {
         <div className="flex space-x-3">
           <button
             onClick={handleUpload}
-            disabled={files.length === 0 || uploadStatus === "uploading" || !user}
+            disabled={files.length === 0 || uploadStatus === "uploading" || uploadStatus === "rate_limited" || !user}
             className="flex-1 bg-primary-500 text-white py-2 px-4 rounded-md hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             {uploadStatus === "uploading" ? (
@@ -194,7 +225,7 @@ const UploadForm = ({ semester, onUploadSuccess }: UploadFormProps) => {
               onClick={handleReset}
               className="px-4 py-2 border border-gray-300 dark:border-dark-border-primary rounded-md text-sm font-medium text-gray-700 dark:text-dark-text-primary bg-white dark:bg-dark-bg-tertiary hover:bg-gray-50 dark:hover:bg-dark-bg-secondary focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-colors"
             >
-              Clear
+              {uploadStatus === "rate_limited" ? "Cancel & Clear" : "Clear"}
             </button>
           )}
         </div>

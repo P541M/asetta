@@ -16,7 +16,8 @@
       "Bash(find:*)",
       "Bash(timeout 30s npm run dev)",
       "Bash(node:*)",
-      "Bash(mv:*)"
+      "Bash(mv:*)",
+      "Bash(npm install:*)"
     ],
     "deny": []
   }

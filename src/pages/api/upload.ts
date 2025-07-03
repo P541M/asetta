@@ -3,6 +3,7 @@ import formidable, { IncomingForm, Fields, Files } from "formidable";
 import fs from "fs";
 import pdfParse from "pdf-parse";
 import { getAdmin } from "../../lib/firebase-admin";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 export const config = {
   api: {
@@ -20,12 +21,14 @@ interface Assessment {
 }
 
 async function extractAssessmentsAI(text: string): Promise<string> {
-  const deepseekEndpoint = process.env.DEEPSEEK_ENDPOINT;
-  const deepseekApiKey = process.env.DEEPSEEK_API_KEY;
+  const geminiApiKey = process.env.GEMINI_API_KEY;
 
-  if (!deepseekEndpoint || !deepseekApiKey) {
-    throw new Error("DeepSeek API not configured");
+  if (!geminiApiKey) {
+    throw new Error("Gemini API not configured");
   }
+
+  const genAI = new GoogleGenerativeAI(geminiApiKey);
+  const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
   const prompt = `
     You are an AI assistant that extracts assessment information from course outlines.
@@ -47,26 +50,20 @@ async function extractAssessmentsAI(text: string): Promise<string> {
     Respond with ONLY a valid JSON array of assessment objects. No other explanation or text.
   `;
 
-  const response = await fetch(deepseekEndpoint, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${deepseekApiKey}`,
-    },
-    body: JSON.stringify({
-      model: "deepseek-chat",
-      messages: [{ role: "user", content: prompt }],
-      temperature: 0.2,
-      max_tokens: 4000,
-    }),
-  });
-
-  if (!response.ok) {
-    throw new Error(`DeepSeek API error: ${response.status}`);
+  try {
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    return response.text();
+  } catch (error: unknown) {
+    // Handle rate limiting specifically
+    const errorMessage = error instanceof Error ? error.message : '';
+    const errorObj = error as { status?: number };
+    const errorStatus = errorObj.status;
+    if (errorStatus === 429 || errorMessage.includes('429') || errorMessage.includes('quota') || errorMessage.includes('rate limit')) {
+      throw new Error('RATE_LIMITED');
+    }
+    throw error;
   }
-
-  const aiResponse = await response.json();
-  return aiResponse.choices[0].message.content;
 }
 
 export default async function handler(
@@ -176,7 +173,7 @@ export default async function handler(
 
         let assessments: Assessment[] = [];
         try {
-          if (process.env.DEEPSEEK_API_KEY) {
+          if (process.env.GEMINI_API_KEY) {
             const aiContent = await extractAssessmentsAI(extractedText);
             const jsonMatch = aiContent.match(/\[[\s\S]*\]/);
             const jsonString = jsonMatch ? jsonMatch[0] : aiContent;
@@ -198,9 +195,15 @@ export default async function handler(
               status: "Not started",
             }));
           } else {
-            throw new Error("DeepSeek API not configured");
+            throw new Error("Gemini API not configured");
           }
-        } catch {
+        } catch (error: unknown) {
+          const errorMessage = error instanceof Error ? error.message : '';
+          if (errorMessage === 'RATE_LIMITED') {
+            failedFiles++;
+            errors.push(`Rate limit exceeded: ${fileName}. Please wait a moment and try again.`);
+            continue;
+          }
           console.warn(
             `AI extraction failed for ${fileName}, falling back to basic extraction`
           );
@@ -241,12 +244,26 @@ export default async function handler(
       }
     }
 
+    // Check if any files failed due to rate limiting
+    const hasRateLimitErrors = errors.some(error => error.includes('Rate limit exceeded'));
+    
+    if (hasRateLimitErrors && processedFiles === 0) {
+      // All files failed due to rate limiting
+      return res.status(429).json({
+        success: false,
+        error: "RATE_LIMITED",
+        message: "Our servers are currently busy processing requests. Please wait 1-2 minutes and try again.",
+        retryAfter: 120, // seconds
+      });
+    }
+
     return res.status(200).json({
       success: true,
       message: `Processed ${processedFiles} file(s), extracted ${totalAssessments} assessments. ${
         failedFiles > 0 ? `Failed to process ${failedFiles} file(s).` : ""
       }`,
       errors: errors.length > 0 ? errors : undefined,
+      hasRateLimitErrors,
     });
   } catch (error) {
     console.error("Processing error:", error);
