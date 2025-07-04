@@ -105,7 +105,7 @@ const Header = ({ onLogout }: HeaderProps) => {
           <div className="flex justify-between items-center py-4">
             <div className="flex items-center">
               <a
-                href="https://kivo-landing-three.vercel.app"
+                href="https://asetta-landing.vercel.app"
                 className="flex items-center group"
               >
                 <svg
