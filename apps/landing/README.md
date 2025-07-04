@@ -51,23 +51,27 @@ asetta-landing/
 ## 🚀 Getting Started
 
 ### Prerequisites
-- Node.js 18+ 
+
+- Node.js 18+
 - npm or yarn
 
 ### Installation
 
 1. **Clone the repository**
+
    ```bash
    git clone <repository-url>
    cd asetta-landing
    ```
 
 2. **Install dependencies**
+
    ```bash
    npm install
    ```
 
 3. **Set up environment variables**
+
    ```bash
    # Create .env.local file with:
    EMAIL_USER=your_gmail@gmail.com
@@ -75,6 +79,7 @@ asetta-landing/
    ```
 
 4. **Run the development server**
+
    ```bash
    npm run dev
    ```
@@ -101,16 +106,19 @@ npm run lint
 ## 🎨 Design System
 
 ### Color Palette
+
 - **Primary**: Custom blue gradient scale (50-900)
 - **Secondary**: Gray scale for text and backgrounds
 - **Usage**: Defined in `tailwind.config.ts` as `primary-*` and `secondary-*`
 
 ### Typography
+
 - **Body Font**: Outfit (weights: 300-700)
 - **Heading Font**: Lexend (weights: 300-700)
 - **Implementation**: CSS variables in `_app.tsx`
 
 ### Animations
+
 - **Custom**: `fade-in`, `fade-in-down`, `scale` animations
 - **Motion**: Framer Motion for interactive elements
 - **Hover Effects**: Consistent throughout the application
@@ -118,13 +126,16 @@ npm run lint
 ## 🔗 External Integrations
 
 ### Application Redirects
-- `/login` → `https://kivo-two.vercel.app/login`
-- `/register` → `https://kivo-two.vercel.app/register`
+
+- `/login` → `https://asetta.vercel.app/login`
+- `/register` → `https://asetta.vercel.app/register`
 
 ### Social Media
+
 - LinkedIn: `https://www.linkedin.com/company/asetta/`
 
 ### Email Configuration
+
 - Service: Gmail SMTP
 - Contact form sends to: `videna.psalmeleazar@gmail.com`
 - Requires Gmail app password for authentication
@@ -132,24 +143,28 @@ npm run lint
 ## 🌐 Deployment
 
 ### Vercel (Recommended)
+
 ```bash
 npm run build
 # Deploy to Vercel
 ```
 
 ### Netlify
+
 ```bash
 npm run build
 # Deploy dist folder to Netlify
 ```
 
 ### Environment Variables for Production
+
 - `EMAIL_USER`: Gmail account for contact form
 - `EMAIL_PASS`: Gmail app password
 
 ## 🎯 Content Strategy
 
 The landing page positions Asetta as:
+
 - **100% Free** academic assistant for students
 - **AI-Powered** with smart features:
   - Assessment tracking from documents
@@ -160,6 +175,7 @@ The landing page positions Asetta as:
 ## 📧 Contact
 
 For questions or support:
+
 - Email: videna.psalmeleazar@gmail.com
 - LinkedIn: [Asetta Company Page](https://www.linkedin.com/company/asetta/)
 

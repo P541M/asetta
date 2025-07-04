@@ -13,12 +13,12 @@ const nextConfig = {
     return [
       {
         source: "/login",
-        destination: "https://kivo-two.vercel.app/login",
+        destination: "https://asetta.vercel.app/login",
         permanent: true,
       },
       {
         source: "/register",
-        destination: "https://kivo-two.vercel.app/register",
+        destination: "https://asetta.vercel.app/register",
         permanent: true,
       },
     ];

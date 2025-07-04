@@ -27,7 +27,7 @@ export default function LandingPage() {
           <div className="absolute -top-24 -left-24 w-96 h-96 bg-gradient-to-br from-primary-100/20 to-transparent rounded-full blur-3xl" />
           <div className="absolute -bottom-24 -right-24 w-80 h-80 bg-gradient-to-tr from-primary-100/15 to-transparent rounded-full blur-3xl" />
         </div>
-        
+
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           {/* Content Section */}
           <div className="text-center mb-16 lg:mb-20">
@@ -36,7 +36,7 @@ export default function LandingPage() {
                 <span className="w-2 h-2 bg-primary-500 rounded-full mr-2 animate-pulse"></span>
                 100% Free for Students
               </span>
-              
+
               <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold text-gray-900 font-heading tracking-tight leading-tight animate-fade-in">
                 Your Smart{" "}
                 <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary-600 to-primary-800">
@@ -44,23 +44,35 @@ export default function LandingPage() {
                 </span>{" "}
                 Assistant
               </h1>
-              
+
               <p className="text-lg sm:text-xl lg:text-2xl text-gray-600 leading-relaxed max-w-3xl mx-auto animate-fade-in-up">
-                AI-powered organization that adapts to your study habits. Track assignments, manage deadlines, and boost productivity—effortlessly.
+                AI-powered organization that adapts to your study habits. Track
+                assignments, manage deadlines, and boost
+                productivity—effortlessly.
               </p>
             </div>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center mt-8 lg:mt-10 animate-fade-in-up">
               <Link
-                href="https://kivo-two.vercel.app/register"
+                href="https://asetta.vercel.app/register"
                 className="group inline-flex items-center justify-center px-8 py-4 text-lg font-bold text-white bg-gradient-to-r from-primary-600 to-primary-700 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
               >
                 Get Started Free
-                <svg className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                <svg
+                  className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M17 8l4 4m0 0l-4 4m4-4H3"
+                  />
                 </svg>
               </Link>
-              
+
               <Link
                 href="/features"
                 className="inline-flex items-center justify-center px-8 py-4 text-lg font-bold text-gray-700 bg-white border-2 border-gray-200 rounded-2xl shadow-lg hover:shadow-xl hover:border-primary-300 transition-all duration-300 hover:-translate-y-1"
@@ -71,14 +83,30 @@ export default function LandingPage() {
 
             <div className="flex flex-col sm:flex-row items-center justify-center space-y-2 sm:space-y-0 sm:space-x-8 mt-8 text-sm text-gray-500 animate-fade-in-up">
               <div className="flex items-center">
-                <svg className="w-4 h-4 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                <svg
+                  className="w-4 h-4 text-green-500 mr-2"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                    clipRule="evenodd"
+                  />
                 </svg>
                 No credit card required
               </div>
               <div className="flex items-center">
-                <svg className="w-4 h-4 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                <svg
+                  className="w-4 h-4 text-green-500 mr-2"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                    clipRule="evenodd"
+                  />
                 </svg>
                 Setup in 2 minutes
               </div>
@@ -105,7 +133,10 @@ export default function LandingPage() {
       </section>
 
       {/* Features Section */}
-      <section id="features" className="py-32 bg-gradient-to-b from-white via-gray-50/50 to-white relative overflow-hidden">
+      <section
+        id="features"
+        className="py-32 bg-gradient-to-b from-white via-gray-50/50 to-white relative overflow-hidden"
+      >
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-primary-50/30 via-transparent to-transparent"></div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center mb-24 animate-fade-in-up">
@@ -148,7 +179,7 @@ export default function LandingPage() {
               <div
                 key={index}
                 className={`group transform transition-all duration-500 hover:-translate-y-3 hover:scale-105 animate-fade-in-up`}
-                style={{animationDelay: `${index * 0.2}s`}}
+                style={{ animationDelay: `${index * 0.2}s` }}
               >
                 <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-lg hover:shadow-2xl transition-all duration-500 border border-gray-200/50 hover:border-primary-200 h-full flex flex-col relative overflow-hidden group-hover:bg-white">
                   <div className="absolute inset-0 bg-gradient-to-br from-primary-50/30 via-transparent to-primary-50/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
@@ -213,8 +244,11 @@ export default function LandingPage() {
       <section className="py-32 bg-gradient-to-br from-primary-50 via-primary-25 to-white relative overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary-100/40 via-transparent to-transparent"></div>
         <div className="absolute -top-24 -left-24 w-96 h-96 bg-gradient-to-br from-primary-200 to-primary-100 rounded-full blur-3xl opacity-30 animate-float"></div>
-        <div className="absolute -bottom-24 -right-24 w-80 h-80 bg-gradient-to-br from-primary-150 to-primary-50 rounded-full blur-3xl opacity-40 animate-float" style={{animationDelay: '2s'}}></div>
-        
+        <div
+          className="absolute -bottom-24 -right-24 w-80 h-80 bg-gradient-to-br from-primary-150 to-primary-50 rounded-full blur-3xl opacity-40 animate-float"
+          style={{ animationDelay: "2s" }}
+        ></div>
+
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
           <div className="animate-fade-in-up">
             <span className="inline-block mb-6 px-6 py-3 rounded-full bg-gradient-to-r from-primary-100 to-primary-50 text-primary-700 font-bold text-sm shadow-lg border border-primary-200/50 backdrop-blur-sm">
@@ -234,7 +268,7 @@ export default function LandingPage() {
             </p>
             <div className="flex justify-center group transform transition-all duration-300 hover:scale-105 hover:-translate-y-2">
               <Link
-                href="https://kivo-two.vercel.app/register"
+                href="https://asetta.vercel.app/register"
                 className="inline-flex items-center justify-center px-12 py-6 text-xl font-bold text-white bg-gradient-to-r from-primary-600 via-primary-700 to-primary-800 rounded-2xl shadow-2xl hover:shadow-3xl transition-all duration-300 relative overflow-hidden animate-scale-delayed"
               >
                 <span className="absolute inset-0 bg-gradient-to-r from-primary-700 via-primary-800 to-primary-900 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
@@ -255,7 +289,8 @@ export default function LandingPage() {
               </Link>
             </div>
             <p className="mt-8 text-sm text-gray-500 font-medium">
-              No credit card required • Forever free for students • Setup in under 2 minutes
+              No credit card required • Forever free for students • Setup in
+              under 2 minutes
             </p>
           </div>
         </div>

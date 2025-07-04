@@ -60,8 +60,8 @@ const Header = () => {
       animate={{ y: 0 }}
       transition={{ duration: 0.6, ease: "easeOut" }}
       className={`fixed w-full top-0 z-50 transition-all duration-500 ${
-        scrolled 
-          ? "bg-white/90 backdrop-blur-xl shadow-lg border-b border-gray-200/50" 
+        scrolled
+          ? "bg-white/90 backdrop-blur-xl shadow-lg border-b border-gray-200/50"
           : "bg-white/70 backdrop-blur-md border-b border-white/20"
       }`}
     >
@@ -104,23 +104,23 @@ const Header = () => {
               Contact
               <div className="absolute bottom-0 left-1/2 w-0 h-0.5 bg-primary-600 group-hover:w-1/2 group-hover:left-1/4 transition-all duration-300"></div>
             </Link>
-            
+
             <div className="h-6 w-px bg-gray-300 mx-3"></div>
-            
+
             <Link
-              href="https://kivo-two.vercel.app/login"
+              href="https://asetta.vercel.app/login"
               className="px-4 py-2 text-gray-700 hover:text-primary-600 transition-all duration-300 text-sm font-semibold rounded-lg hover:bg-gray-50"
             >
               Login
             </Link>
-            
-            <motion.div 
-              whileHover={{ scale: 1.02, y: -1 }} 
+
+            <motion.div
+              whileHover={{ scale: 1.02, y: -1 }}
               whileTap={{ scale: 0.98 }}
               className="ml-2"
             >
               <Link
-                href="https://kivo-two.vercel.app/register"
+                href="https://asetta.vercel.app/register"
                 className="group relative inline-flex items-center justify-center px-6 py-2.5 text-sm font-bold text-white bg-gradient-to-r from-primary-600 to-primary-700 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden"
               >
                 <span className="absolute inset-0 bg-gradient-to-r from-primary-700 to-primary-800 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
@@ -204,39 +204,44 @@ const Header = () => {
                       className="group flex items-center px-4 py-3.5 text-gray-700 hover:text-primary-600 hover:bg-primary-50/80 rounded-xl transition-all duration-300 text-base font-semibold"
                       onClick={() => setMobileMenuOpen(false)}
                     >
-                      <span className="group-hover:translate-x-1 transition-transform duration-300">Features</span>
+                      <span className="group-hover:translate-x-1 transition-transform duration-300">
+                        Features
+                      </span>
                     </Link>
                     <Link
                       href="/pricing"
                       className="group flex items-center px-4 py-3.5 text-gray-700 hover:text-primary-600 hover:bg-primary-50/80 rounded-xl transition-all duration-300 text-base font-semibold"
                       onClick={() => setMobileMenuOpen(false)}
                     >
-                      <span className="group-hover:translate-x-1 transition-transform duration-300">Pricing?</span>
+                      <span className="group-hover:translate-x-1 transition-transform duration-300">
+                        Pricing?
+                      </span>
                     </Link>
                     <Link
                       href="/contact"
                       className="group flex items-center px-4 py-3.5 text-gray-700 hover:text-primary-600 hover:bg-primary-50/80 rounded-xl transition-all duration-300 text-base font-semibold"
                       onClick={() => setMobileMenuOpen(false)}
                     >
-                      <span className="group-hover:translate-x-1 transition-transform duration-300">Contact</span>
+                      <span className="group-hover:translate-x-1 transition-transform duration-300">
+                        Contact
+                      </span>
                     </Link>
-                    
+
                     <div className="h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent my-4" />
-                    
+
                     <Link
-                      href="https://kivo-two.vercel.app/login"
+                      href="https://asetta.vercel.app/login"
                       className="group flex items-center px-4 py-3.5 text-gray-700 hover:text-primary-600 hover:bg-gray-50/80 rounded-xl transition-all duration-300 text-base font-semibold"
                       onClick={() => setMobileMenuOpen(false)}
                     >
-                      <span className="group-hover:translate-x-1 transition-transform duration-300">Login</span>
+                      <span className="group-hover:translate-x-1 transition-transform duration-300">
+                        Login
+                      </span>
                     </Link>
-                    
-                    <motion.div
-                      className="pt-2"
-                      whileTap={{ scale: 0.98 }}
-                    >
+
+                    <motion.div className="pt-2" whileTap={{ scale: 0.98 }}>
                       <Link
-                        href="https://kivo-two.vercel.app/register"
+                        href="https://asetta.vercel.app/register"
                         className="group relative flex items-center justify-center mx-2 px-6 py-4 text-base font-bold text-white bg-gradient-to-r from-primary-600 to-primary-700 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden"
                         onClick={() => setMobileMenuOpen(false)}
                       >

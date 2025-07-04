@@ -36,7 +36,9 @@ export default function FeaturesPage() {
               </span>
             </h1>
             <p className="text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-              Experience the future of academic organization with our intelligent AI technology, designed to help you stay on top of your studies—all completely free.
+              Experience the future of academic organization with our
+              intelligent AI technology, designed to help you stay on top of
+              your studies—all completely free.
             </p>
           </div>
 
@@ -83,11 +85,11 @@ export default function FeaturesPage() {
               <div
                 key={index}
                 className={`group transform transition-all duration-500 hover:-translate-y-3 hover:scale-105 animate-fade-in-up`}
-                style={{animationDelay: `${index * 0.1}s`}}
+                style={{ animationDelay: `${index * 0.1}s` }}
               >
                 <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-lg hover:shadow-2xl transition-all duration-500 border border-gray-200/50 hover:border-primary-200 h-full flex flex-col relative overflow-hidden group-hover:bg-white">
                   <div className="absolute inset-0 bg-gradient-to-br from-primary-50/30 via-transparent to-primary-50/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                  
+
                   <div className="relative z-10">
                     <div className="w-16 h-16 bg-gradient-to-br from-primary-100 to-primary-50 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 group-hover:bg-gradient-to-br group-hover:from-primary-200 group-hover:to-primary-100 transition-all duration-300 shadow-md">
                       <svg
@@ -105,11 +107,11 @@ export default function FeaturesPage() {
                         />
                       </svg>
                     </div>
-                    
+
                     <h3 className="text-2xl font-bold text-gray-900 mb-4 group-hover:text-primary-900 transition-colors duration-300 font-heading">
                       {feature.title}
                     </h3>
-                    
+
                     <p className="text-gray-600 leading-relaxed flex-grow text-lg group-hover:text-gray-700 transition-colors duration-300">
                       {feature.description}
                     </p>
@@ -129,16 +131,27 @@ export default function FeaturesPage() {
                 </span>
               </h2>
               <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
-                Join thousands of students who are already using Asetta to stay organized and achieve their academic goals.
+                Join thousands of students who are already using Asetta to stay
+                organized and achieve their academic goals.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <a
-                  href="https://kivo-two.vercel.app/register"
+                  href="https://asetta.vercel.app/register"
                   className="group inline-flex items-center justify-center px-10 py-4 text-lg font-bold text-white bg-gradient-to-r from-primary-600 to-primary-700 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
                 >
                   Get Started Free
-                  <svg className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                  <svg
+                    className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M17 8l4 4m0 0l-4 4m4-4H3"
+                    />
                   </svg>
                 </a>
                 <Link
