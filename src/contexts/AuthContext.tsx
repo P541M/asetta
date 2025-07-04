@@ -43,6 +43,30 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             lastLogin: new Date(),
           };
           await setDoc(userRef, defaultSettings);
+
+          // Send welcome email for new Google OAuth users (non-blocking)
+          try {
+            const response = await fetch('/api/welcome-email', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                displayName: defaultSettings.displayName,
+                email: defaultSettings.email,
+                institution: defaultSettings.institution,
+                studyProgram: defaultSettings.studyProgram,
+              }),
+            });
+
+            if (response.ok) {
+              console.log('✅ Welcome email sent successfully for Google OAuth user');
+            } else {
+              console.warn('⚠️ Welcome email failed to send for Google OAuth user');
+            }
+          } catch (emailError) {
+            console.warn('⚠️ Welcome email error for Google OAuth user:', emailError);
+          }
         } else {
           // Update lastLogin if document already exists
           await setDoc(userRef, { lastLogin: new Date() }, { merge: true });

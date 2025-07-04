@@ -142,6 +142,30 @@ const RegisterForm = ({
         lastLogin: new Date(),
       });
 
+      // Send welcome email (non-blocking)
+      try {
+        const response = await fetch('/api/welcome-email', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            displayName: formData.displayName,
+            email: formData.email,
+            institution: formData.institution,
+            studyProgram: formData.studyProgram,
+          }),
+        });
+
+        if (response.ok) {
+          console.log('✅ Welcome email sent successfully');
+        } else {
+          console.warn('⚠️ Welcome email failed to send, but registration was successful');
+        }
+      } catch (emailError) {
+        console.warn('⚠️ Welcome email error (registration still successful):', emailError);
+      }
+
       onSuccess();
     } catch (error) {
       if (error instanceof Error) {
