@@ -300,12 +300,9 @@ export async function sendWelcomeEmail(
   institution?: string,
   studyProgram?: string
 ) {
-  console.log("📧 Attempting to send welcome email:", {
-    to: `${email.substring(0, 3)}***`,
-    displayName,
-    institution,
-    studyProgram,
-  });
+  if (process.env.NODE_ENV === 'development') {
+    console.log("📧 Attempting to send welcome email");
+  }
 
   // Validate environment variables
   if (!process.env.EMAIL_USER) {
@@ -317,9 +314,13 @@ export async function sendWelcomeEmail(
 
   try {
     // Test transporter connection
-    console.log("🔍 Testing email transporter connection...");
+    if (process.env.NODE_ENV === 'development') {
+      console.log("🔍 Testing email transporter connection...");
+    }
     await transporter.verify();
-    console.log("✅ Email transporter connection verified");
+    if (process.env.NODE_ENV === 'development') {
+      console.log("✅ Email transporter connection verified");
+    }
 
     const html = generateWelcomeEmailHTML(displayName, email, institution, studyProgram);
 
@@ -331,21 +332,14 @@ export async function sendWelcomeEmail(
       html,
     };
 
-    console.log("📤 Sending welcome email with options:", {
-      from: mailOptions.from,
-      to: `${email.substring(0, 3)}***`,
-      subject: mailOptions.subject,
-      textLength: mailOptions.text.length,
-      htmlLength: mailOptions.html.length,
-    });
+    if (process.env.NODE_ENV === 'development') {
+      console.log("📤 Sending welcome email");
+    }
 
-    const info = await transporter.sendMail(mailOptions);
-    console.log("✅ Welcome email sent successfully:", {
-      messageId: info.messageId,
-      response: info.response,
-      accepted: info.accepted,
-      rejected: info.rejected,
-    });
+    await transporter.sendMail(mailOptions);
+    if (process.env.NODE_ENV === 'development') {
+      console.log("✅ Welcome email sent successfully");
+    }
     return true;
   } catch (error) {
     const emailError = error as { 
@@ -355,13 +349,13 @@ export async function sendWelcomeEmail(
       response?: string; 
       responseCode?: number; 
     };
-    console.error("❌ Detailed welcome email error:", {
-      error: emailError.message || String(error),
-      code: emailError.code,
-      command: emailError.command,
-      response: emailError.response,
-      responseCode: emailError.responseCode,
-    });
+    console.error("❌ Welcome email sending failed");
+    if (process.env.NODE_ENV === 'development') {
+      console.error("Welcome email error details:", {
+        error: emailError.message || String(error),
+        code: emailError.code,
+      });
+    }
     throw error;
   }
 }
@@ -372,12 +366,9 @@ export async function sendEmail(
   assessmentTitle: string,
   daysUntilDue: number
 ) {
-  console.log("📧 Attempting to send email:", {
-    to: `${to.substring(0, 3)}***`,
-    subject,
-    assessmentTitle,
-    daysUntilDue,
-  });
+  if (process.env.NODE_ENV === 'development') {
+    console.log("📧 Attempting to send assessment email");
+  }
 
   // Validate environment variables
   if (!process.env.EMAIL_USER) {
@@ -389,9 +380,13 @@ export async function sendEmail(
 
   try {
     // Test transporter connection
-    console.log("🔍 Testing email transporter connection...");
+    if (process.env.NODE_ENV === 'development') {
+      console.log("🔍 Testing email transporter connection...");
+    }
     await transporter.verify();
-    console.log("✅ Email transporter connection verified");
+    if (process.env.NODE_ENV === 'development') {
+      console.log("✅ Email transporter connection verified");
+    }
 
     const html = generateEmailHTML(assessmentTitle, daysUntilDue);
 
@@ -405,21 +400,14 @@ export async function sendEmail(
       html,
     };
 
-    console.log("📤 Sending email with options:", {
-      from: mailOptions.from,
-      to: `${to.substring(0, 3)}***`,
-      subject: mailOptions.subject,
-      textLength: mailOptions.text.length,
-      htmlLength: mailOptions.html.length,
-    });
+    if (process.env.NODE_ENV === 'development') {
+      console.log("📤 Sending assessment email");
+    }
 
-    const info = await transporter.sendMail(mailOptions);
-    console.log("✅ Email sent successfully:", {
-      messageId: info.messageId,
-      response: info.response,
-      accepted: info.accepted,
-      rejected: info.rejected,
-    });
+    await transporter.sendMail(mailOptions);
+    if (process.env.NODE_ENV === 'development') {
+      console.log("✅ Assessment email sent successfully");
+    }
     return true;
   } catch (error) {
     const emailError = error as { 
@@ -429,13 +417,13 @@ export async function sendEmail(
       response?: string; 
       responseCode?: number; 
     };
-    console.error("❌ Detailed email error:", {
-      error: emailError.message || String(error),
-      code: emailError.code,
-      command: emailError.command,
-      response: emailError.response,
-      responseCode: emailError.responseCode,
-    });
+    console.error("❌ Assessment email sending failed");
+    if (process.env.NODE_ENV === 'development') {
+      console.error("Assessment email error details:", {
+        error: emailError.message || String(error),
+        code: emailError.code,
+      });
+    }
     throw error;
   }
 }

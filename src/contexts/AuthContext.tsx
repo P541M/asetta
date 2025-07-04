@@ -60,12 +60,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             });
 
             if (response.ok) {
-              console.log('✅ Welcome email sent successfully for Google OAuth user');
+              if (process.env.NODE_ENV === 'development') {
+                console.log('✅ Welcome email sent successfully for Google OAuth user');
+              }
             } else {
-              console.warn('⚠️ Welcome email failed to send for Google OAuth user');
+              if (process.env.NODE_ENV === 'development') {
+                console.warn('⚠️ Welcome email failed to send for Google OAuth user');
+              }
             }
-          } catch (emailError) {
-            console.warn('⚠️ Welcome email error for Google OAuth user:', emailError);
+          } catch {
+            if (process.env.NODE_ENV === 'development') {
+              console.warn('⚠️ Welcome email error for Google OAuth user');
+            }
           }
         } else {
           // Update lastLogin if document already exists

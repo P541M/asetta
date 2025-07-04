@@ -158,12 +158,18 @@ const RegisterForm = ({
         });
 
         if (response.ok) {
-          console.log('✅ Welcome email sent successfully');
+          if (process.env.NODE_ENV === 'development') {
+            console.log('✅ Welcome email sent successfully');
+          }
         } else {
-          console.warn('⚠️ Welcome email failed to send, but registration was successful');
+          if (process.env.NODE_ENV === 'development') {
+            console.warn('⚠️ Welcome email failed to send, but registration was successful');
+          }
         }
-      } catch (emailError) {
-        console.warn('⚠️ Welcome email error (registration still successful):', emailError);
+      } catch {
+        if (process.env.NODE_ENV === 'development') {
+          console.warn('⚠️ Welcome email error (registration still successful)');
+        }
       }
 
       onSuccess();

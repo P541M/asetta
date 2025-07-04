@@ -32,12 +32,9 @@ export default async function handler(
   }
 
   try {
-    console.log('📧 Welcome email API called:', {
-      displayName,
-      email: `${email.substring(0, 3)}***`,
-      institution,
-      studyProgram
-    });
+    if (process.env.NODE_ENV === 'development') {
+      console.log('📧 Welcome email API called');
+    }
 
     await sendWelcomeEmail(displayName, email, institution, studyProgram);
     
@@ -46,7 +43,7 @@ export default async function handler(
       message: 'Welcome email sent successfully' 
     });
   } catch (error) {
-    console.error('❌ Welcome email API error:', error);
+    console.error('❌ Welcome email API error');
     
     // Check if it's an email service error
     const emailError = error as { 
