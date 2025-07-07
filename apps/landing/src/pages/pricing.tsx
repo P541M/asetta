@@ -97,7 +97,7 @@ export default function PricingPage() {
                     className="inline-block"
                   >
                     <Link
-                      href="https://kivo-two.vercel.app/register"
+                      href="https://asetta.vercel.app/register"
                       className="group inline-flex items-center justify-center px-10 py-5 text-xl font-bold text-white bg-gradient-to-r from-primary-600 to-primary-700 rounded-2xl hover:from-primary-700 hover:to-primary-800 transition-all duration-300 shadow-lg hover:shadow-xl"
                     >
                       Join the Student Community
