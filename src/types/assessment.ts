@@ -21,5 +21,5 @@ export interface AddAssessmentFormProps {
 export interface AssessmentsTableProps {
   assessments: Assessment[];
   semesterId: string;
-  onStatusChange?: (assessmentId: string, newStatus: string) => void;
+  onStatusChange?: (assessmentId: string, newStatus: 'Not started' | 'In progress' | 'Submitted' | 'Missed') => void;
 }

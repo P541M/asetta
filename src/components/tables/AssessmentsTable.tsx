@@ -193,7 +193,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
 
   const handleStatusChange = async (
     assessmentId: string,
-    newStatus: string
+    newStatus: 'Not started' | 'In progress' | 'Submitted' | 'Missed'
   ) => {
     if (!user || !assessmentId) return;
 
@@ -228,9 +228,8 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
     try {
       const assessmentRef = getAssessmentDocRef(user.uid, semesterId, assessment.id);
       await deleteDoc(assessmentRef);
-      if (onStatusChange) {
-        onStatusChange(assessment.id, "Deleted");
-      }
+      // Remove from local state after successful deletion
+      setLocalAssessments(prev => prev.filter(a => a.id !== assessment.id));
       setShowDeleteModal(false);
       setAssessmentToDelete(null);
     } catch (error) {
@@ -246,9 +245,10 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
         const assessmentRef = getAssessmentDocRef(user.uid, semesterId, id);
         await deleteDoc(assessmentRef);
       }
+      // Remove deleted assessments from local state
+      setLocalAssessments(prev => prev.filter(a => !selectedRows.includes(a.id || '')));
       setSelectedRows([]);
       setShowBulkDeleteModal(false);
-      onStatusChange?.(selectedRows[0], "Deleted");
     } catch (error) {
       console.error("Error performing bulk delete:", error);
     }
@@ -355,7 +355,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
   };
 
   // Add new function for bulk status update
-  const handleBulkStatusUpdate = async (newStatus: string) => {
+  const handleBulkStatusUpdate = async (newStatus: 'Not started' | 'In progress' | 'Submitted' | 'Missed') => {
     if (!user || selectedRows.length === 0) return;
 
     try {
@@ -366,10 +366,17 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
           updatedAt: serverTimestamp(),
         });
       }
+      // Update local state optimistically
+      setLocalAssessments(prev => 
+        prev.map(assessment => 
+          selectedRows.includes(assessment.id || '') 
+            ? { ...assessment, status: newStatus }
+            : assessment
+        )
+      );
       setSelectedRows([]);
       setShowBulkStatusUpdate(false);
       setSelectedStatus("");
-      onStatusChange?.(selectedRows[0], newStatus);
     } catch (error) {
       console.error("Error performing bulk status update:", error);
     }
@@ -435,7 +442,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                       <span className="font-medium">{selectedStatus}</span>
                     </span>
                     <button
-                      onClick={() => handleBulkStatusUpdate(selectedStatus)}
+                      onClick={() => handleBulkStatusUpdate(selectedStatus as 'Not started' | 'In progress' | 'Submitted' | 'Missed')}
                       className="btn-primary py-1.5 px-3 text-sm"
                     >
                       Confirm
@@ -675,7 +682,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                       <select
                         value={assessment.status}
                         onChange={(e) =>
-                          assessment.id && handleStatusChange(assessment.id, e.target.value)
+                          assessment.id && handleStatusChange(assessment.id, e.target.value as 'Not started' | 'In progress' | 'Submitted' | 'Missed')
                         }
                         className="py-0.5 px-3 text-md rounded-lg transition-all duration-300 bg-white dark:bg-dark-bg-tertiary text-gray-700 dark:text-dark-text-primary border border-gray-200 dark:border-dark-border-primary appearance-none pr-8 relative"
                         style={{
