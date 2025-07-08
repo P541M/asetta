@@ -6,6 +6,7 @@ import { generateICSFile } from "../../utils/icsGenerator";
 import { DndContext, DragEndEvent } from "@dnd-kit/core";
 import { Assessment } from "../../types/assessment";
 import { Day, CalendarViewProps } from "../../types/calendar";
+import { SkeletonLoader } from "../ui";
 
 const CalendarView = ({ selectedSemester, semesterId }: CalendarViewProps) => {
   const { user } = useAuth();
@@ -269,25 +270,8 @@ const CalendarView = ({ selectedSemester, semesterId }: CalendarViewProps) => {
   // Loading skeleton
   if (isLoading) {
     return (
-      <div className="bg-white dark:bg-dark-bg-secondary rounded-lg shadow-md border border-gray-100 dark:border-dark-border-primary p-6">
-        <div className="animate-pulse">
-          <div className="flex justify-between items-center mb-6">
-            <div className="h-8 w-32 bg-gray-200 dark:bg-dark-bg-tertiary rounded"></div>
-            <div className="flex space-x-2">
-              <div className="h-8 w-8 bg-gray-200 dark:bg-dark-bg-tertiary rounded-full"></div>
-              <div className="h-8 w-8 bg-gray-200 dark:bg-dark-bg-tertiary rounded-full"></div>
-              <div className="h-8 w-20 bg-gray-200 dark:bg-dark-bg-tertiary rounded"></div>
-            </div>
-          </div>
-          <div className="grid grid-cols-7 gap-px bg-gray-200 dark:bg-dark-bg-tertiary">
-            {Array.from({ length: 42 }).map((_, i) => (
-              <div
-                key={i}
-                className="aspect-square bg-white dark:bg-dark-bg-secondary"
-              ></div>
-            ))}
-          </div>
-        </div>
+      <div className="p-6">
+        <SkeletonLoader type="calendar" />
       </div>
     );
   }
@@ -299,7 +283,7 @@ const CalendarView = ({ selectedSemester, semesterId }: CalendarViewProps) => {
           <h2 className="text-xl font-medium text-gray-900 dark:text-dark-text-primary">
             Calendar View
           </h2>
-          <p className="text-sm text-gray-500 dark:text-dark-text-tertiary">
+          <p className="text-sm text-light-text-tertiary dark:text-dark-text-tertiary">
             {monthNames[currentMonth.getMonth()]} {currentMonth.getFullYear()}
           </p>
         </div>
@@ -312,12 +296,12 @@ const CalendarView = ({ selectedSemester, semesterId }: CalendarViewProps) => {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Search assessments..."
-              className="input py-1.5 px-3 text-sm w-48 dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border-primary"
+              className="input py-1.5 px-3 text-sm w-48"
             />
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="input py-1.5 px-3 text-sm dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border-primary"
+              className="input py-1.5 px-3 text-sm"
             >
               <option value="all">All Status</option>
               <option value="Not started">Not Started</option>
@@ -330,12 +314,12 @@ const CalendarView = ({ selectedSemester, semesterId }: CalendarViewProps) => {
           <div className="flex items-center space-x-2">
             <button
               onClick={previousMonth}
-              className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-dark-bg-tertiary transition-colors"
+              className="p-2 rounded-full hover:bg-light-hover-primary dark:hover:bg-dark-hover-primary transition-colors"
               title="Previous Month"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5 text-gray-600 dark:text-dark-text-tertiary"
+                className="h-5 w-5 text-light-text-tertiary dark:text-dark-text-tertiary"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -350,18 +334,18 @@ const CalendarView = ({ selectedSemester, semesterId }: CalendarViewProps) => {
             </button>
             <button
               onClick={goToToday}
-              className="px-3 py-1.5 text-sm bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-400 rounded-md hover:bg-primary-200 dark:hover:bg-primary-900/50 transition-colors"
+              className="px-3 py-1.5 text-sm bg-light-button-primary/10 dark:bg-dark-button-primary/10 text-light-button-primary dark:text-dark-button-primary rounded-md hover:bg-light-button-primary/20 dark:hover:bg-dark-button-primary/20 transition-colors"
             >
               Today
             </button>
             <button
               onClick={nextMonth}
-              className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-dark-bg-tertiary transition-colors"
+              className="p-2 rounded-full hover:bg-light-hover-primary dark:hover:bg-dark-hover-primary transition-colors"
               title="Next Month"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5 text-gray-600 dark:text-dark-text-tertiary"
+                className="h-5 w-5 text-light-text-tertiary dark:text-dark-text-tertiary"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -376,7 +360,7 @@ const CalendarView = ({ selectedSemester, semesterId }: CalendarViewProps) => {
             </button>
             <button
               onClick={handleExportCalendar}
-              className="ml-2 px-3 py-1.5 text-sm bg-primary-600 text-white rounded-md hover:bg-primary-700 transition-colors flex items-center"
+              className="btn-primary ml-2 px-3 py-1.5 text-sm flex items-center"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -492,11 +476,12 @@ const CalendarView = ({ selectedSemester, semesterId }: CalendarViewProps) => {
 
       {/* Day detail modal */}
       {selectedDay && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white dark:bg-dark-bg-secondary rounded-lg shadow-lg p-6 w-full max-w-2xl animate-scale">
-            <div className="flex justify-between items-center mb-4">
-              <div>
-                <h3 className="text-lg font-medium text-gray-900 dark:text-dark-text-primary">
+        <div className="modal-backdrop z-50">
+          <div className="modal-container w-full max-w-2xl">
+            <div className="modal-header">
+              <div className="flex justify-between items-center">
+                <div>
+                  <h3 className="text-lg font-medium text-light-text-primary dark:text-dark-text-primary">
                   {selectedDay.date.toLocaleDateString(undefined, {
                     weekday: "long",
                     month: "long",
@@ -504,15 +489,15 @@ const CalendarView = ({ selectedSemester, semesterId }: CalendarViewProps) => {
                     year: "numeric",
                   })}
                 </h3>
-                <p className="text-sm text-gray-500 dark:text-dark-text-tertiary">
-                  {selectedDay.assessments.length} assessment
-                  {selectedDay.assessments.length !== 1 ? "s" : ""}
-                </p>
-              </div>
-              <button
-                onClick={() => setSelectedDay(null)}
-                className="text-gray-400 dark:text-dark-text-tertiary hover:text-gray-500 dark:hover:text-dark-text-secondary"
-              >
+                  <p className="text-sm text-light-text-tertiary dark:text-dark-text-tertiary">
+                    {selectedDay.assessments.length} assessment
+                    {selectedDay.assessments.length !== 1 ? "s" : ""}
+                  </p>
+                </div>
+                <button
+                  onClick={() => setSelectedDay(null)}
+                  className="text-light-text-tertiary dark:text-dark-text-tertiary hover:text-light-text-secondary dark:hover:text-dark-text-secondary"
+                >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   className="h-5 w-5"
@@ -525,20 +510,21 @@ const CalendarView = ({ selectedSemester, semesterId }: CalendarViewProps) => {
                     clipRule="evenodd"
                   />
                 </svg>
-              </button>
+                </button>
+              </div>
             </div>
-            <div className="space-y-3 max-h-[60vh] overflow-y-auto">
+            <div className="modal-content space-y-3 max-h-[60vh] overflow-y-auto">
               {selectedDay.assessments.map((assessment) => (
                 <div
                   key={assessment.id}
-                  className="p-4 rounded-lg border border-gray-200 dark:border-dark-border-primary bg-white dark:bg-dark-bg-tertiary hover:shadow-sm transition-shadow"
+                  className="p-4 rounded-lg border border-light-border-primary dark:border-dark-border-primary bg-light-bg-primary dark:bg-dark-bg-tertiary hover:shadow-sm transition-shadow"
                 >
                   <div className="flex justify-between items-start">
                     <div>
-                      <h4 className="text-base font-medium text-gray-900 dark:text-dark-text-primary">
+                      <h4 className="text-base font-medium text-light-text-primary dark:text-dark-text-primary">
                         {assessment.assignmentName}
                       </h4>
-                      <p className="text-sm text-gray-500 dark:text-dark-text-tertiary">
+                      <p className="text-sm text-light-text-tertiary dark:text-dark-text-tertiary font-medium">
                         {assessment.courseName}
                       </p>
                     </div>
@@ -550,7 +536,7 @@ const CalendarView = ({ selectedSemester, semesterId }: CalendarViewProps) => {
                       {assessment.status}
                     </span>
                   </div>
-                  <div className="mt-2 text-sm text-gray-600 dark:text-dark-text-secondary">
+                  <div className="mt-2 text-sm text-light-text-secondary dark:text-dark-text-secondary">
                     <p>
                       Due:{" "}
                       {formatDateTime(selectedDay.date, assessment.dueTime)}

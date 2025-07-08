@@ -16,7 +16,7 @@ const SettingsActions = ({
       <button
         type="button"
         onClick={onCancel}
-        className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-dark-text-secondary hover:text-gray-900 dark:hover:text-dark-text-primary transition-colors"
+        className="px-4 py-2 text-sm font-medium text-light-text-secondary dark:text-dark-text-secondary hover:text-light-text-primary dark:hover:text-dark-text-primary transition-colors"
       >
         Cancel
       </button>
@@ -26,8 +26,8 @@ const SettingsActions = ({
         onClick={onSubmit}
         className={`px-4 py-2 text-sm font-medium text-white rounded-lg transition-all duration-200 ${
           hasChanges && !isSubmitting
-            ? "bg-primary-600 hover:bg-primary-700 shadow-sm hover:shadow"
-            : "bg-gray-300 dark:bg-dark-bg-tertiary cursor-not-allowed"
+            ? "bg-light-button-primary hover:bg-light-button-primary-hover dark:bg-dark-button-primary dark:hover:bg-dark-button-primary-hover shadow-sm hover:shadow"
+            : "bg-light-border-primary dark:bg-dark-border-primary cursor-not-allowed"
         }`}
       >
         {isSubmitting ? "Saving..." : "Save Changes"}

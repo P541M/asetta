@@ -92,13 +92,13 @@ const AddAssessmentForm = ({
   };
 
   return (
-    <div className="bg-white dark:bg-dark-bg-secondary rounded-lg shadow-sm border border-gray-100 dark:border-dark-border-primary p-6">
+    <div className="card p-6">
       <div
         className={`transition-all duration-300 ${
           formSuccess ? "form-success" : ""
         }`}
       >
-        <h2 className="text-xl font-medium mb-6 dark:text-dark-text-primary">
+        <h2 className="text-xl font-semibold mb-6 text-light-text-primary dark:text-dark-text-primary">
           Add Assessment for {semester}
         </h2>
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -117,7 +117,7 @@ const AddAssessmentForm = ({
                 value={formData.courseName}
                 onChange={handleChange}
                 ref={courseNameRef}
-                className="input hover:shadow-sm transition-all duration-200 dark:bg-dark-input-bg dark:text-dark-input-text dark:border-dark-input-border dark:placeholder-dark-input-placeholder"
+                className="input"
                 placeholder="e.g., CS101"
                 required
               />
@@ -135,7 +135,7 @@ const AddAssessmentForm = ({
                 name="assignmentName"
                 value={formData.assignmentName}
                 onChange={handleChange}
-                className="input hover:shadow-sm transition-all duration-200 dark:bg-dark-input-bg dark:text-dark-input-text dark:border-dark-input-border dark:placeholder-dark-input-placeholder"
+                className="input"
                 placeholder="e.g., Midterm Exam"
                 required
               />
@@ -155,7 +155,7 @@ const AddAssessmentForm = ({
                 name="dueDate"
                 value={formData.dueDate}
                 onChange={handleChange}
-                className="input hover:shadow-sm transition-all duration-200 dark:bg-dark-input-bg dark:text-dark-input-text dark:border-dark-input-border dark:placeholder-dark-input-placeholder"
+                className="input"
                 required
               />
             </div>
@@ -172,7 +172,7 @@ const AddAssessmentForm = ({
                 name="dueTime"
                 value={formData.dueTime}
                 onChange={handleChange}
-                className="input hover:shadow-sm transition-all duration-200 dark:bg-dark-input-bg dark:text-dark-input-text dark:border-dark-input-border dark:placeholder-dark-input-placeholder"
+                className="input"
                 required
               />
             </div>
@@ -192,7 +192,7 @@ const AddAssessmentForm = ({
                 min="0"
                 max="100"
                 step="0.1"
-                className="input hover:shadow-sm transition-all duration-200 dark:bg-dark-input-bg dark:text-dark-input-text dark:border-dark-input-border dark:placeholder-dark-input-placeholder"
+                className="input"
               />
             </div>
           </div>
@@ -209,7 +209,7 @@ const AddAssessmentForm = ({
                 name="status"
                 value={formData.status}
                 onChange={handleChange}
-                className="input hover:shadow-sm transition-all duration-200 dark:bg-dark-input-bg dark:text-dark-input-text dark:border-dark-input-border dark:placeholder-dark-input-placeholder"
+                className="input"
               >
                 <option value="Not started">Not Started</option>
                 <option value="In progress">In Progress</option>
@@ -222,7 +222,7 @@ const AddAssessmentForm = ({
             <button
               type="submit"
               disabled={isSubmitting}
-              className={`btn-primary px-6 shadow hover:shadow-md transition-all duration-150 ${
+              className={`btn-primary px-6 ${
                 isSubmitting ? "opacity-70 cursor-not-allowed" : ""
               }`}
             >
@@ -271,16 +271,16 @@ const AddAssessmentForm = ({
           </div>
           {message.text && (
             <div
-              className={`mt-4 p-3 rounded-lg text-sm ${
+              className={`mt-4 p-4 rounded-lg text-sm animate-fade-in-up ${
                 message.type === "error"
-                  ? "bg-red-50 text-red-700 border border-red-100 dark:bg-dark-error-bg dark:text-dark-error-text dark:border-dark-error-bg animate-fade-in"
-                  : "bg-emerald-50 text-emerald-700 border border-emerald-100 dark:bg-dark-success-bg dark:text-dark-success-text dark:border-dark-success-bg animate-fade-in"
+                  ? "bg-light-error-bg border border-light-error-bg text-light-error-text dark:bg-dark-error-bg dark:text-dark-error-text dark:border-dark-error-bg"
+                  : "bg-light-success-bg border border-light-success-bg text-light-success-text dark:bg-dark-success-bg dark:text-dark-success-text dark:border-dark-success-bg"
               }`}
             >
               {message.type === "error" ? (
                 <div className="flex items-start">
                   <svg
-                    className="h-5 w-5 mr-2 mt-0.5 text-red-500 dark:text-dark-error-text"
+                    className="h-5 w-5 mr-3 mt-0.5 text-light-error-text dark:text-dark-error-text flex-shrink-0"
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 20 20"
                     fill="currentColor"
@@ -291,12 +291,12 @@ const AddAssessmentForm = ({
                       clipRule="evenodd"
                     />
                   </svg>
-                  <span>{message.text}</span>
+                  <span className="font-medium">{message.text}</span>
                 </div>
               ) : (
                 <div className="flex items-start">
                   <svg
-                    className="h-5 w-5 mr-2 mt-0.5 text-emerald-500 dark:text-dark-success-text"
+                    className="h-5 w-5 mr-3 mt-0.5 text-light-success-text dark:text-dark-success-text flex-shrink-0"
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 20 20"
                     fill="currentColor"
@@ -307,7 +307,7 @@ const AddAssessmentForm = ({
                       clipRule="evenodd"
                     />
                   </svg>
-                  <span>{message.text}</span>
+                  <span className="font-medium">{message.text}</span>
                 </div>
               )}
             </div>

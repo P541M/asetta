@@ -43,35 +43,37 @@ const LinkModal = ({ isOpen, onClose, onAddLink }: LinkModalProps) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[100]">
-      <div className="bg-white dark:bg-dark-bg-secondary rounded-lg shadow-lg p-6 w-full max-w-md animate-scale">
-        <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-medium text-gray-900 dark:text-dark-text-primary">
-            Add Link
-          </h3>
-          <button
-            onClick={onClose}
-            className="text-gray-400 hover:text-gray-500 dark:text-dark-text-tertiary dark:hover:text-dark-text-secondary"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5"
-              viewBox="0 0 20 20"
-              fill="currentColor"
+    <div className="modal-backdrop">
+      <div className="modal-container w-full max-w-md">
+        <div className="modal-header">
+          <div className="flex justify-between items-center">
+            <h3 className="text-lg font-medium text-light-text-primary dark:text-dark-text-primary">
+              Add Link
+            </h3>
+            <button
+              onClick={onClose}
+              className="text-light-text-tertiary dark:text-dark-text-tertiary hover:text-light-text-secondary dark:hover:text-dark-text-secondary"
             >
-              <path
-                fillRule="evenodd"
-                d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                clipRule="evenodd"
-              />
-            </svg>
-          </button>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            </button>
+          </div>
         </div>
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="modal-content space-y-4">
           <div>
             <label
               htmlFor="url"
-              className="block text-sm font-medium text-gray-700 dark:text-dark-text-secondary"
+              className="block text-sm font-medium text-light-text-secondary dark:text-dark-text-secondary"
             >
               URL
             </label>
@@ -88,7 +90,7 @@ const LinkModal = ({ isOpen, onClose, onAddLink }: LinkModalProps) => {
           <div>
             <label
               htmlFor="text"
-              className="block text-sm font-medium text-gray-700 dark:text-dark-text-secondary"
+              className="block text-sm font-medium text-light-text-secondary dark:text-dark-text-secondary"
             >
               Link Text (optional)
             </label>
@@ -101,7 +103,7 @@ const LinkModal = ({ isOpen, onClose, onAddLink }: LinkModalProps) => {
               className="mt-1 block w-full rounded-md border-gray-300 dark:border-dark-border-primary shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm dark:bg-dark-bg-tertiary dark:text-dark-text-primary"
             />
           </div>
-          <div className="flex justify-end space-x-3">
+          <div className="modal-footer">
             <button
               type="button"
               onClick={onClose}

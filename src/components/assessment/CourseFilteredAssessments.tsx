@@ -33,17 +33,17 @@ const CourseFilteredAssessments = ({
       <div className="flex justify-between items-center pt-6 px-6">
         <button
           onClick={onBack}
-          className="text-primary-600 dark:text-primary-400 hover:text-primary-800 dark:hover:text-primary-300 font-medium"
+          className="text-light-button-primary dark:text-dark-button-primary hover:text-light-button-primary-hover dark:hover:text-dark-button-primary-hover font-medium"
         >
           ← Back to All Courses
         </button>
         <div className="flex items-center space-x-3">
-          <span className="text-sm text-gray-600 dark:text-dark-text-secondary">
+          <span className="text-sm text-light-text-primary dark:text-dark-text-primary font-medium">
             {selectedCourse}
           </span>
           <button
             onClick={handleCalculateGrades}
-            className="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 transition-colors"
+            className="btn-primary px-4 py-2"
           >
             Calculate Grades
           </button>

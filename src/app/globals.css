@@ -4,44 +4,22 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-    --primary: 199 100% 50%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 199 100% 50%;
-    --radius: 0.5rem;
-  }
-
-  .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 199 100% 50%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 199 100% 50%;
+    /* Design tokens */
+    --radius-sm: 0.375rem;
+    --radius-md: 0.5rem;
+    --radius-lg: 0.75rem;
+    --radius-xl: 1rem;
+    
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    
+    --spacing-xs: 0.25rem;
+    --spacing-sm: 0.5rem;
+    --spacing-md: 1rem;
+    --spacing-lg: 1.5rem;
+    --spacing-xl: 2rem;
+    --spacing-2xl: 3rem;
   }
 }
 
@@ -50,16 +28,32 @@
     @apply border-light-border-primary dark:border-dark-border-primary;
   }
   body {
-    @apply bg-light-bg-secondary text-light-text-primary;
+    @apply bg-light-bg-secondary text-light-text-primary dark:bg-dark-bg-primary dark:text-dark-text-primary;
     font-family: var(--font-outfit), "Outfit", sans-serif;
+    line-height: 1.6;
   }
-  h1,
-  h2,
-  h3,
-  h4,
-  h5,
+  h1 {
+    @apply text-3xl font-semibold text-light-text-primary dark:text-dark-text-primary leading-tight;
+    font-family: var(--font-lexend), "Lexend", sans-serif;
+  }
+  h2 {
+    @apply text-2xl font-semibold text-light-text-primary dark:text-dark-text-primary leading-tight;
+    font-family: var(--font-lexend), "Lexend", sans-serif;
+  }
+  h3 {
+    @apply text-xl font-medium text-light-text-primary dark:text-dark-text-primary leading-tight;
+    font-family: var(--font-lexend), "Lexend", sans-serif;
+  }
+  h4 {
+    @apply text-lg font-medium text-light-text-primary dark:text-dark-text-primary leading-tight;
+    font-family: var(--font-lexend), "Lexend", sans-serif;
+  }
+  h5 {
+    @apply text-base font-medium text-light-text-primary dark:text-dark-text-primary leading-tight;
+    font-family: var(--font-lexend), "Lexend", sans-serif;
+  }
   h6 {
-    @apply font-medium text-light-text-primary;
+    @apply text-sm font-medium text-light-text-primary dark:text-dark-text-primary leading-tight;
     font-family: var(--font-lexend), "Lexend", sans-serif;
   }
 }
@@ -67,53 +61,49 @@
 @layer components {
   /* Base Components */
   .btn {
-    @apply px-4 py-2 rounded-md font-medium inline-flex items-center justify-center transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2;
+    @apply px-4 py-2.5 rounded-lg font-medium inline-flex items-center justify-center transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-light-button-primary focus:ring-offset-2 dark:focus:ring-dark-button-primary dark:focus:ring-offset-dark-bg-secondary;
   }
 
   .btn-primary {
-    @apply bg-light-button-primary text-white btn shadow-sm hover:bg-light-button-primary-hover dark:bg-dark-button-primary dark:hover:bg-dark-button-primary-hover;
+    @apply bg-light-button-primary text-white btn hover:bg-light-button-primary-hover dark:bg-dark-button-primary dark:hover:bg-dark-button-primary-hover;
   }
 
   .btn-secondary {
-    @apply bg-light-button-secondary text-light-text-primary btn shadow-sm hover:bg-light-button-secondary-hover dark:bg-dark-button-secondary dark:text-dark-text-primary dark:hover:bg-dark-button-secondary-hover;
-  }
-
-  .btn-accent {
-    @apply bg-light-button-primary text-white btn shadow-sm hover:bg-light-button-primary-hover dark:bg-dark-button-primary dark:hover:bg-dark-button-primary-hover;
+    @apply bg-light-button-secondary text-light-text-primary btn hover:bg-light-button-secondary-hover dark:bg-dark-button-secondary dark:text-dark-text-primary dark:hover:bg-dark-button-secondary-hover;
   }
 
   .btn-success {
-    @apply bg-light-success-text text-white btn shadow-sm hover:bg-light-success-text/90 dark:bg-dark-success-text dark:hover:bg-dark-success-text/90;
+    @apply bg-light-success-text text-white btn hover:bg-light-success-text/90 dark:bg-dark-success-text dark:hover:bg-dark-success-text/90;
   }
 
   .btn-danger {
-    @apply bg-light-error-text text-white btn shadow-sm hover:bg-light-error-text/90 dark:bg-dark-error-text dark:hover:bg-dark-error-text/90;
+    @apply bg-light-error-text text-white btn hover:bg-light-error-text/90 dark:bg-dark-error-text dark:hover:bg-dark-error-text/90;
   }
 
   .btn-outline {
-    @apply border border-light-border-primary text-light-text-primary btn shadow-sm hover:bg-light-hover-primary dark:border-dark-border-primary dark:text-dark-text-primary dark:hover:bg-dark-hover-primary;
+    @apply border border-light-border-primary text-light-text-primary btn hover:bg-light-hover-primary dark:border-dark-border-primary dark:text-dark-text-primary dark:hover:bg-dark-hover-primary;
   }
 
   /* Form Components */
   .input {
-    @apply w-full p-2.5 rounded-md border border-light-input-border focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none bg-light-input-bg text-light-input-text placeholder-light-input-placeholder dark:bg-dark-input-bg dark:border-dark-input-border dark:text-dark-input-text dark:placeholder-dark-input-placeholder;
+    @apply w-full p-3 rounded-lg border border-light-input-border focus:ring-2 focus:ring-light-button-primary focus:border-light-button-primary outline-none bg-light-input-bg text-light-input-text placeholder-light-input-placeholder transition-all duration-200 dark:bg-dark-input-bg dark:border-dark-input-border dark:text-dark-input-text dark:placeholder-dark-input-placeholder dark:focus:ring-dark-button-primary dark:focus:border-dark-button-primary;
   }
 
   .form-group {
-    @apply mb-4;
+    @apply mb-6;
   }
 
   .form-label {
-    @apply block text-sm font-medium text-light-text-primary mb-1 dark:text-dark-text-primary;
+    @apply block text-sm font-medium text-light-text-primary mb-2 dark:text-dark-text-primary;
   }
 
   /* Card Components */
   .card {
-    @apply bg-light-bg-primary rounded-lg shadow-sm p-6 border border-light-border-primary dark:bg-dark-bg-secondary dark:border-dark-border-primary;
+    @apply bg-light-bg-primary rounded-xl border border-light-border-primary dark:bg-dark-bg-secondary dark:border-dark-border-primary;
   }
 
   .card-header {
-    @apply px-6 py-4 border-b border-light-border-primary dark:border-dark-border-primary;
+    @apply px-6 py-5 border-b border-light-border-primary dark:border-dark-border-primary;
   }
 
   .card-body {
@@ -122,7 +112,7 @@
 
   /* Badge Components */
   .badge {
-    @apply px-2 py-0.5 text-xs font-medium rounded-full;
+    @apply px-2.5 py-1 text-xs font-medium rounded-full;
   }
 
   .badge-primary {
@@ -143,7 +133,7 @@
 
   /* Layout Components */
   .navbar {
-    @apply bg-light-bg-primary border-b border-light-border-primary py-4 sticky top-0 z-10 backdrop-blur-sm bg-light-bg-primary/90 dark:bg-dark-bg-secondary dark:border-dark-border-primary;
+    @apply bg-light-bg-primary/95 border-b border-light-border-primary py-4 sticky top-0 z-10 backdrop-blur-md dark:bg-dark-bg-secondary/95 dark:border-dark-border-primary;
   }
 
   .logo {
@@ -154,7 +144,11 @@
 
   /* Tab Components */
   .tab {
-    @apply relative px-5 py-4 font-medium text-sm text-light-text-primary dark:text-dark-text-primary;
+    @apply relative px-6 py-4 font-medium text-sm text-light-text-secondary dark:text-dark-text-secondary transition-all duration-200 hover:text-light-text-primary dark:hover:text-dark-text-primary;
+  }
+
+  .tab.active {
+    @apply text-light-button-primary dark:text-dark-button-primary;
   }
 
   .tab.active::after {
@@ -162,33 +156,28 @@
     content: "";
   }
 
-  .tab:not(.active)::after {
-    @apply absolute bottom-0 left-0 right-0 h-0.5 bg-transparent;
-    content: "";
-  }
-
   /* Stats Components */
   .stats-bar {
-    @apply grid grid-cols-4 gap-4 mb-6;
+    @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 mb-8;
   }
 
   .stat-card {
-    @apply bg-light-bg-primary rounded-lg shadow-sm p-4 border border-light-border-primary cursor-default dark:bg-dark-bg-secondary dark:border-dark-border-primary;
+    @apply bg-light-bg-primary rounded-xl p-5 border border-light-border-primary cursor-default dark:bg-dark-bg-secondary dark:border-dark-border-primary;
   }
 
   .stat-label {
-    @apply text-sm font-medium text-light-text-tertiary dark:text-dark-text-tertiary;
+    @apply text-sm font-medium text-light-text-tertiary dark:text-dark-text-tertiary mb-2;
   }
 
   .stat-value {
-    @apply mt-1 text-2xl font-semibold text-light-text-primary dark:text-dark-text-primary;
+    @apply text-2xl font-bold text-light-text-primary dark:text-dark-text-primary;
   }
 }
 
 /* Scrollbar styles */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
@@ -196,7 +185,7 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-light-bg-tertiary dark:bg-dark-bg-tertiary hover:bg-light-border-primary dark:hover:bg-dark-border-primary;
+  @apply bg-light-bg-tertiary dark:bg-dark-bg-tertiary hover:bg-light-border-primary dark:hover:bg-dark-border-primary rounded-full;
 }
 
 /* For Firefox */
@@ -209,4 +198,44 @@
 .dark * {
   scrollbar-color: theme("colors.dark.bg-tertiary")
     theme("colors.dark.bg-secondary");
+}
+
+/* Utility classes for improved spacing */
+.space-y-6 > :not(:first-child) {
+  margin-top: 1.5rem;
+}
+
+.space-y-8 > :not(:first-child) {
+  margin-top: 2rem;
+}
+
+/* Improved transitions */
+.transition-theme {
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+/* Focus states */
+.focus-visible {
+  @apply focus:ring-2 focus:ring-light-button-primary focus:ring-offset-2 dark:focus:ring-dark-button-primary dark:focus:ring-offset-dark-bg-secondary;
+}
+
+/* Modal Components */
+.modal-backdrop {
+  @apply fixed inset-0 bg-black/40 backdrop-blur-[2px] flex items-center justify-center z-[9999] animate-fade-in;
+}
+
+.modal-container {
+  @apply bg-light-bg-primary dark:bg-dark-bg-secondary rounded-xl shadow-lg mx-4 animate-scale-in;
+}
+
+.modal-header {
+  @apply px-6 py-4 border-b border-light-border-primary dark:border-dark-border-primary;
+}
+
+.modal-content {
+  @apply p-6;
+}
+
+.modal-footer {
+  @apply px-6 py-4 border-t border-light-border-primary dark:border-dark-border-primary flex justify-end space-x-3;
 }

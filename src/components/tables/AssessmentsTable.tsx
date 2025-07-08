@@ -23,6 +23,12 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
   onStatusChange,
 }) => {
   const { user } = useAuth();
+  const [localAssessments, setLocalAssessments] = useState<Assessment[]>(assessments);
+  
+  // Update local assessments when props change
+  useEffect(() => {
+    setLocalAssessments(assessments);
+  }, [assessments]);
   const [sortKey] = useState<keyof Assessment>(() =>
     getFromLocalStorage<keyof Assessment>("assessmentSortKey", "dueDate")
   );
@@ -161,7 +167,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [showNotesModal]);
 
-  const filteredAssessments = assessments.filter((assessment) => {
+  const filteredAssessments = localAssessments.filter((assessment) => {
     if (filter === "all") return true;
     if (filter === "not_submitted") return assessment.status !== "Submitted";
     if (filter === "submitted") return assessment.status === "Submitted";
@@ -191,6 +197,15 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
   ) => {
     if (!user || !assessmentId) return;
 
+    // Optimistic update: Update UI immediately
+    setLocalAssessments(prev => 
+      prev.map(assessment => 
+        assessment.id === assessmentId 
+          ? { ...assessment, status: newStatus }
+          : assessment
+      )
+    );
+
     try {
       const assessmentRef = getAssessmentDocRef(user.uid, semesterId, assessmentId);
       await updateDoc(assessmentRef, {
@@ -202,6 +217,8 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
       }
     } catch (error) {
       console.error("Error updating assessment status:", error);
+      // Revert optimistic update on error
+      setLocalAssessments(assessments);
     }
   };
 
@@ -400,7 +417,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                 {!showBulkStatusUpdate ? (
                   <select
                     onChange={(e) => handleStatusSelect(e.target.value)}
-                    className="input py-1.5 px-3 text-md bg-white dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border-primary"
+                    className="input py-1.5 px-3 text-sm"
                     defaultValue=""
                   >
                     <option value="" disabled>
@@ -413,19 +430,19 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                   </select>
                 ) : (
                   <div className="flex items-center space-x-2">
-                    <span className="text-md text-gray-600 dark:text-dark-text-secondary">
+                    <span className="text-sm text-light-text-secondary dark:text-dark-text-secondary">
                       Update to:{" "}
                       <span className="font-medium">{selectedStatus}</span>
                     </span>
                     <button
                       onClick={() => handleBulkStatusUpdate(selectedStatus)}
-                      className="btn-primary py-1.5 px-3 text-md"
+                      className="btn-primary py-1.5 px-3 text-sm"
                     >
                       Confirm
                     </button>
                     <button
                       onClick={handleCancelStatusUpdate}
-                      className="btn-outline py-1.5 px-3 text-md"
+                      className="btn-outline py-1.5 px-3 text-sm"
                     >
                       Cancel
                     </button>
@@ -436,13 +453,13 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
             <div className="flex items-center space-x-2">
               <button
                 onClick={() => setShowBulkDeleteModal(true)}
-                className="btn-danger py-1.5 px-3 text-md"
+                className="btn-danger py-1.5 px-3 text-sm"
               >
                 Delete Selected
               </button>
               <button
                 onClick={() => setSelectedRows([])}
-                className="text-md text-gray-500 dark:text-dark-text-tertiary hover:text-gray-700 dark:hover:text-dark-text-secondary"
+                className="text-sm text-light-text-tertiary dark:text-dark-text-tertiary hover:text-light-text-secondary dark:hover:text-dark-text-secondary"
               >
                 Clear Selection
               </button>
@@ -467,10 +484,10 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
               d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
             />
           </svg>
-          <p className="text-lg font-medium mb-2 dark:text-dark-text-primary">
+          <p className="text-base font-medium mb-2 text-light-text-primary dark:text-dark-text-primary">
             No assessments found
           </p>
-          <p className="dark:text-dark-text-secondary">
+          <p className="text-light-text-secondary dark:text-dark-text-secondary">
             Upload a course outline or add assessments manually to get started.
           </p>
         </div>
@@ -675,12 +692,12 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                       </select>
                     </div>
                     <div className="col-span-12 lg:col-span-2">
-                      <h3 className="font-medium text-gray-900 dark:text-dark-text-primary text-md">
+                      <h3 className="font-medium text-light-text-primary dark:text-dark-text-primary text-sm">
                         {assessment.courseName}
                       </h3>
                     </div>
                     <div className="col-span-12 lg:col-span-4">
-                      <p className="text-gray-700 dark:text-dark-text-secondary text-md">
+                      <p className="text-light-text-secondary dark:text-dark-text-secondary text-base">
                         {assessment.assignmentName}
                       </p>
                     </div>
@@ -798,29 +815,29 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
       )}
       {/* Notes Modal */}
       {showNotesModal && selectedAssessment && (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-[2px] flex items-center justify-center z-[9999] animate-fade-in">
+        <div className="modal-backdrop">
           <div
             id="notes-modal"
-            className="bg-white dark:bg-dark-bg-secondary rounded-lg shadow-lg w-full max-w-4xl max-h-[90vh] flex flex-col"
+            className="modal-container w-full max-w-4xl max-h-[90vh] flex flex-col"
           >
-            <div className="flex-none p-6 border-b border-gray-200 dark:border-dark-border-primary">
+            <div className="modal-header">
               <div className="flex justify-between items-center">
                 <div>
-                  <h3 className="text-xl font-medium text-gray-900 dark:text-dark-text-primary">
+                  <h3 className="text-xl font-medium text-light-text-primary dark:text-dark-text-primary">
                     Notes for {selectedAssessment.assignmentName}
                   </h3>
-                  <p className="text-md text-gray-500 dark:text-dark-text-tertiary">
+                  <p className="text-sm text-light-text-tertiary dark:text-dark-text-tertiary font-medium">
                     {selectedAssessment.courseName}
                   </p>
-                  <div className="mt-2 flex items-center space-x-4 text-md">
-                    <span className="text-gray-600 dark:text-dark-text-secondary">
+                  <div className="mt-2 flex items-center space-x-4 text-sm">
+                    <span className="text-light-text-secondary dark:text-dark-text-secondary">
                       Due:{" "}
                       {formatDateTimeForDisplay(
                         selectedAssessment.dueDate,
                         selectedAssessment.dueTime
                       )}
                     </span>
-                    <span className="text-gray-600 dark:text-dark-text-secondary">
+                    <span className="text-light-text-secondary dark:text-dark-text-secondary">
                       Weight: {selectedAssessment.weight}%
                     </span>
                     <span
@@ -853,7 +870,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                       }\n\nNotes:\n${notesInput}`;
                       navigator.clipboard.writeText(text);
                     }}
-                    className="inline-flex items-center px-3 py-1.5 border border-gray-300 dark:border-dark-border-primary shadow-sm text-md font-medium rounded-md text-gray-700 dark:text-dark-text-primary bg-white dark:bg-dark-bg-tertiary hover:bg-gray-50 dark:hover:bg-dark-bg-secondary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:focus:ring-primary-400"
+                    className="btn-outline px-3 py-1.5 text-sm"
                     title="Copy Notes"
                   >
                     <svg
@@ -883,7 +900,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                       setShowNotesModal(null);
                       setSelectedAssessment(null);
                     }}
-                    className="inline-flex items-center p-1.5 border border-transparent rounded-md text-gray-400 dark:text-dark-text-tertiary hover:text-gray-500 dark:hover:text-dark-text-secondary hover:bg-gray-100 dark:hover:bg-dark-bg-tertiary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:focus:ring-primary-400"
+                    className="inline-flex items-center p-1.5 border border-transparent rounded-md text-light-text-tertiary dark:text-dark-text-tertiary hover:text-light-text-secondary dark:hover:text-dark-text-secondary hover:bg-light-hover-primary dark:hover:bg-dark-hover-primary transition-colors"
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -902,39 +919,35 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                 </div>
               </div>
             </div>
-            <div className="flex-1 min-h-0 overflow-y-auto">
-              <div className="p-6">
-                <div className="border rounded-lg overflow-hidden dark:border-dark-border-primary">
-                  <RichTextEditor
-                    content={notesInput}
-                    onChange={setNotesInput}
-                    onAddLink={handleAddLink}
-                    placeholder={`Add your notes here...`}
-                  />
-                </div>
+            <div className="modal-content flex-1 min-h-0 overflow-y-auto">
+              <div className="border rounded-lg overflow-hidden border-light-border-primary dark:border-dark-border-primary">
+                <RichTextEditor
+                  content={notesInput}
+                  onChange={setNotesInput}
+                  onAddLink={handleAddLink}
+                  placeholder={`Add your notes here...`}
+                />
               </div>
             </div>
-            <div className="flex-none p-6 border-t border-gray-200 dark:border-dark-border-primary">
-              <div className="flex justify-end space-x-3">
-                <button
-                  onClick={() => {
-                    setShowNotesModal(null);
-                    setSelectedAssessment(null);
-                  }}
-                  className="btn-outline py-1.5 px-4"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={() => {
-                    handleSaveNotes();
-                    setShowNotesModal(null);
-                  }}
-                  className="btn-primary py-1.5 px-4"
-                >
-                  Save Notes
-                </button>
-              </div>
+            <div className="modal-footer flex-none">
+              <button
+                onClick={() => {
+                  setShowNotesModal(null);
+                  setSelectedAssessment(null);
+                }}
+                className="btn-outline py-1.5 px-4"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  handleSaveNotes();
+                  setShowNotesModal(null);
+                }}
+                className="btn-primary py-1.5 px-4"
+              >
+                Save Notes
+              </button>
             </div>
           </div>
         </div>

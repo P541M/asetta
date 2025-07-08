@@ -41,18 +41,18 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
     switch (variant) {
       case "danger":
         return {
-          button: "bg-red-500 hover:bg-red-600 focus:ring-red-500",
-          icon: "text-red-500",
+          button: "bg-light-error-text hover:bg-light-error-text/90 focus:ring-light-error-text dark:bg-dark-error-text dark:hover:bg-dark-error-text/90 dark:focus:ring-dark-error-text",
+          icon: "text-light-error-text dark:text-dark-error-text",
         };
       case "warning":
         return {
-          button: "bg-yellow-500 hover:bg-yellow-600 focus:ring-yellow-500",
-          icon: "text-yellow-500",
+          button: "bg-light-warning-text hover:bg-light-warning-text/90 focus:ring-light-warning-text dark:bg-dark-warning-text dark:hover:bg-dark-warning-text/90 dark:focus:ring-dark-warning-text",
+          icon: "text-light-warning-text dark:text-dark-warning-text",
         };
       default:
         return {
-          button: "bg-primary-500 hover:bg-primary-600 focus:ring-primary-500",
-          icon: "text-primary-500",
+          button: "bg-light-button-primary hover:bg-light-button-primary-hover focus:ring-light-button-primary dark:bg-dark-button-primary dark:hover:bg-dark-button-primary-hover dark:focus:ring-dark-button-primary",
+          icon: "text-light-button-primary dark:text-dark-button-primary",
         };
     }
   };
@@ -61,14 +61,14 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
 
   return (
     <div
-      className="fixed inset-0 bg-black/40 backdrop-blur-[2px] flex items-center justify-center z-[9999] animate-fade-in"
+      className="modal-backdrop"
       onClick={onClose}
     >
       <div
-        className="bg-white dark:bg-dark-bg-primary rounded-lg shadow-lg w-full max-w-sm mx-4"
+        className="modal-container w-full max-w-sm"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="p-6">
+        <div className="modal-content">
           <div className="flex items-start gap-4">
             {icon && (
               <div className={`flex-shrink-0 ${variantClasses.icon}`}>
@@ -76,27 +76,27 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
               </div>
             )}
             <div className="flex-1 min-w-0">
-              <h3 className="text-base font-medium text-gray-900 dark:text-dark-text-primary">
+              <h3 className="text-base font-medium text-light-text-primary dark:text-dark-text-primary">
                 {title}
               </h3>
-              <div className="mt-1 text-sm text-gray-500 dark:text-dark-text-secondary">
+              <div className="mt-1 text-sm text-light-text-secondary dark:text-dark-text-secondary">
                 {message}
               </div>
             </div>
           </div>
         </div>
-        <div className="px-6 py-4 bg-gray-50 dark:bg-dark-bg-secondary rounded-b-lg flex justify-end gap-3">
+        <div className="modal-footer bg-light-bg-tertiary dark:bg-dark-bg-tertiary rounded-b-xl">
           <button
             type="button"
             onClick={onClose}
-            className="px-3 py-1.5 text-sm font-medium text-gray-700 dark:text-dark-text-secondary hover:text-gray-900 dark:hover:text-dark-text-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:focus:ring-primary-400 transition-colors"
+            className="btn-outline px-3 py-1.5 text-sm"
           >
             {cancelText}
           </button>
           <button
             type="button"
             onClick={onConfirm}
-            className={`px-3 py-1.5 text-sm font-medium text-white rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-dark-bg-primary transition-colors ${variantClasses.button}`}
+            className={`px-3 py-1.5 text-sm font-medium text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors ${variantClasses.button}`}
           >
             {confirmText}
           </button>

@@ -40,7 +40,7 @@ import ConfirmationModal from "../common/ConfirmationModal";
 const DragHandle = () => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
-    className="h-4 w-4 text-gray-400 dark:text-dark-text-tertiary cursor-move"
+    className="h-4 w-4 text-light-text-tertiary dark:text-dark-text-tertiary cursor-move"
     fill="none"
     viewBox="0 0 24 24"
     stroke="currentColor"
@@ -129,9 +129,9 @@ function SortableSemester({
     <div
       ref={setNodeRef}
       style={style}
-      className={`py-2 px-4 hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary flex items-center justify-between ${
+      className={`py-2 px-4 hover:bg-light-hover-primary dark:hover:bg-dark-hover-primary flex items-center justify-between ${
         isDragging
-          ? "bg-gray-50 dark:bg-dark-bg-tertiary shadow-lg rounded-lg"
+          ? "bg-light-hover-primary dark:bg-dark-hover-primary shadow-lg rounded-lg"
           : ""
       }`}
     >
@@ -147,13 +147,13 @@ function SortableSemester({
               value={editValue}
               onChange={(e) => setEditValue(e.target.value)}
               onKeyDown={handleKeyDown}
-              className="input text-sm py-1 px-2 dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border-primary flex-grow min-w-0"
+              className="input text-sm py-1 px-2 flex-grow min-w-0"
               onClick={(e) => e.stopPropagation()}
             />
             <div className="flex items-center px-1">
               <button
                 onClick={handleEditSaveWithEvent}
-                className="p-1.5 text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 hover:bg-primary-50 dark:hover:bg-primary-900/20 rounded-md transition-colors"
+                className="p-1.5 text-light-button-primary dark:text-dark-button-primary hover:text-light-button-primary-hover dark:hover:text-dark-button-primary-hover hover:bg-light-button-primary/10 dark:hover:bg-dark-button-primary/10 rounded-md transition-colors"
                 title="Save"
               >
                 <svg
@@ -171,7 +171,7 @@ function SortableSemester({
               </button>
               <button
                 onClick={handleEditCancel}
-                className="p-1.5 text-gray-500 dark:text-dark-text-tertiary hover:text-gray-700 dark:hover:text-dark-text-secondary hover:bg-gray-100 dark:hover:bg-dark-bg-tertiary rounded-md transition-colors ml-1"
+                className="p-1.5 text-light-text-tertiary dark:text-dark-text-tertiary hover:text-light-text-secondary dark:hover:text-dark-text-secondary hover:bg-light-hover-primary dark:hover:bg-dark-hover-primary rounded-md transition-colors ml-1"
                 title="Cancel"
               >
                 <svg
@@ -194,17 +194,13 @@ function SortableSemester({
             <span
               className={`font-medium ${
                 isSelected
-                  ? "text-primary-600 dark:text-primary-400"
+                  ? "text-light-button-primary dark:text-dark-button-primary"
                   : "dark:text-dark-text-primary"
               }`}
             >
               {semester.name}
             </span>
-            {isSelected && (
-              <span className="inline-block bg-primary-100 dark:bg-primary-900/30 text-primary-800 dark:text-primary-400 text-xs px-2 py-0.5 rounded-full">
-                Current
-              </span>
-            )}
+            {isSelected && <span className="badge-primary">Current</span>}
           </>
         )}
       </div>
@@ -212,7 +208,7 @@ function SortableSemester({
         <div className="flex items-center space-x-2">
           <button
             onClick={handleEditStart}
-            className="text-gray-500 dark:text-dark-text-tertiary hover:text-primary-600 dark:hover:text-primary-400 p-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-dark-bg-secondary transition-colors"
+            className="text-light-text-tertiary dark:text-dark-text-tertiary hover:text-light-button-primary dark:hover:text-dark-button-primary p-1.5 rounded-md hover:bg-light-hover-primary dark:hover:bg-dark-hover-primary transition-colors"
             title="Edit"
           >
             <svg
@@ -226,7 +222,7 @@ function SortableSemester({
           </button>
           <button
             onClick={() => onDelete(semester.id)}
-            className="text-gray-500 dark:text-dark-text-tertiary hover:text-red-600 dark:hover:text-red-400 p-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-dark-bg-secondary transition-colors"
+            className="text-light-text-tertiary dark:text-dark-text-tertiary hover:text-light-error-text dark:hover:text-dark-error-text p-1.5 rounded-md hover:bg-light-hover-primary dark:hover:bg-dark-hover-primary transition-colors"
             title="Delete"
           >
             <svg
@@ -547,17 +543,17 @@ const SemesterTabs = ({
 
   // Handle semester selection with navigation
   const handleSemesterSelect = (semesterName: string) => {
-    const semester = semesters.find(s => s.name === semesterName);
+    const semester = semesters.find((s) => s.name === semesterName);
     if (semester) {
       // Check if we're already on a semester-specific page
       const currentPath = router.asPath;
-      if (currentPath.startsWith('/dashboard/') && currentPath.includes('/')) {
+      if (currentPath.startsWith("/dashboard/") && currentPath.includes("/")) {
         // We're on a semester page, navigate to the same page but for the new semester
-        const pathParts = currentPath.split('/');
+        const pathParts = currentPath.split("/");
         if (pathParts.length >= 4) {
           // Replace the semester ID with the new one
           pathParts[2] = semester.id;
-          router.push(pathParts.join('/'));
+          router.push(pathParts.join("/"));
         } else {
           // Navigate to semester assessments (default landing)
           router.push(`/dashboard/${semester.id}/assessments`);
@@ -628,7 +624,7 @@ const SemesterTabs = ({
           {/* Add button */}
           <button
             onClick={() => setShowAddInput(true)}
-            className="p-1.5 text-gray-500 dark:text-dark-text-tertiary hover:text-primary-600 dark:hover:text-primary-400 hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary rounded-md transition-colors"
+            className="p-1.5 text-light-text-tertiary dark:text-dark-text-tertiary hover:text-light-button-primary dark:hover:text-dark-button-primary hover:bg-light-hover-primary dark:hover:bg-dark-hover-primary rounded-md transition-colors"
             title="Add new semester"
           >
             <svg
@@ -649,7 +645,7 @@ const SemesterTabs = ({
           <div className="relative" ref={moreOptionsRef}>
             <button
               onClick={() => setShowMoreOptions(!showMoreOptions)}
-              className="p-1.5 text-gray-500 dark:text-dark-text-tertiary hover:text-primary-600 dark:hover:text-primary-400 hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary rounded-md transition-colors"
+              className="p-1.5 text-light-text-tertiary dark:text-dark-text-tertiary hover:text-light-button-primary dark:hover:text-dark-button-primary hover:bg-light-hover-primary dark:hover:bg-dark-hover-primary rounded-md transition-colors"
               title="More options"
             >
               <svg
@@ -686,10 +682,10 @@ const SemesterTabs = ({
             <div key={sem.id} className="flex-shrink-0">
               <button
                 onClick={() => handleSemesterSelect(sem.name)}
-                className={`px-3 py-1.5 rounded-md text-sm font-medium whitespace-nowrap transition-all duration-200 ${
+                className={`px-3 py-1.5 rounded-lg text-sm font-medium whitespace-nowrap transition-all duration-200 ${
                   selectedSemester === sem.name
-                    ? "bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 shadow-sm"
-                    : "text-gray-600 dark:text-dark-text-secondary hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary"
+                    ? "bg-light-button-primary/10 text-light-button-primary dark:bg-dark-button-primary/10 dark:text-dark-button-primary"
+                    : "text-light-text-secondary dark:text-dark-text-secondary hover:bg-light-hover-primary dark:hover:bg-dark-hover-primary hover:text-light-text-primary dark:hover:text-dark-text-primary"
                 }`}
               >
                 {sem.name}
@@ -774,89 +770,88 @@ const SemesterTabs = ({
 
       {/* Manage Semesters Modal */}
       {showManageModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-[150] modal-open">
-          <div
-            ref={manageModalRef}
-            className="bg-white dark:bg-dark-bg-secondary rounded-lg shadow-lg p-4 w-full max-w-sm animate-scale"
-          >
-            <div className="flex justify-between items-center mb-3">
-              <h3 className="text-base font-medium text-gray-900 dark:text-dark-text-primary">
-                Manage Semesters
-              </h3>
-              <button
-                onClick={() => setShowManageModal(false)}
-                className="text-gray-400 dark:text-dark-text-tertiary hover:text-gray-600 dark:hover:text-dark-text-secondary p-1 hover:bg-gray-100 dark:hover:bg-dark-bg-tertiary rounded-md transition-colors"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
+        <div className="modal-backdrop z-[150] modal-open">
+          <div ref={manageModalRef} className="modal-container w-full max-w-sm">
+            <div className="modal-header">
+              <div className="flex justify-between items-center">
+                <h3 className="text-base font-medium text-light-text-primary dark:text-dark-text-primary">
+                  Manage Semesters
+                </h3>
+                <button
+                  onClick={() => setShowManageModal(false)}
+                  className="text-light-text-tertiary dark:text-dark-text-tertiary hover:text-light-text-secondary dark:hover:text-dark-text-secondary p-1 hover:bg-light-hover-primary dark:hover:bg-dark-hover-primary rounded-md transition-colors"
                 >
-                  <path
-                    fillRule="evenodd"
-                    d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-              </button>
-            </div>
-
-            <p className="text-sm text-gray-500 dark:text-dark-text-tertiary mb-3">
-              Drag and drop to reorder semesters. Click the edit or delete icons
-              to modify.
-            </p>
-
-            <div className="max-h-64 overflow-y-auto border border-gray-200 dark:border-dark-border-primary rounded-md">
-              {semesters.length === 0 ? (
-                <div className="py-8 text-center text-gray-500 dark:text-dark-text-tertiary">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    className="h-8 w-8 mx-auto mb-2 text-gray-400 dark:text-dark-text-tertiary"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
+                    className="h-5 w-5"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
                   >
                     <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+                      fillRule="evenodd"
+                      d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                      clipRule="evenodd"
                     />
                   </svg>
-                  <p>No semesters yet</p>
-                  <button
-                    onClick={() => {
-                      setShowManageModal(false);
-                      setShowAddInput(true);
-                    }}
-                    className="mt-2 text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 font-medium"
-                  >
-                    Add your first semester
-                  </button>
-                </div>
-              ) : (
-                <DndContext
-                  sensors={sensors}
-                  collisionDetection={closestCenter}
-                  onDragEnd={handleDragEnd}
-                >
-                  <SortableContext
-                    items={semesters.map((s) => s.id)}
-                    strategy={verticalListSortingStrategy}
-                  >
-                    {semesters.map((semester) => (
-                      <SortableSemester
-                        key={semester.id}
-                        semester={semester}
-                        isSelected={selectedSemester === semester.name}
-                        onEdit={(id, name) => handleEditSave(id, name)}
-                        onDelete={(id) => handleDeleteSemester(id)}
+                </button>
+              </div>
+            </div>
+            <div className="modal-content">
+              <p className="text-sm text-light-text-tertiary dark:text-dark-text-tertiary mb-4">
+                Drag and drop to reorder semesters. Click the edit or delete
+                icons to modify.
+              </p>
+              <div className="max-h-64 overflow-y-auto border border-light-border-primary dark:border-dark-border-primary rounded-md">
+                {semesters.length === 0 ? (
+                  <div className="py-8 text-center text-light-text-tertiary dark:text-dark-text-tertiary">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-8 w-8 mx-auto mb-2 text-light-text-tertiary dark:text-dark-text-tertiary"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
                       />
-                    ))}
-                  </SortableContext>
-                </DndContext>
-              )}
+                    </svg>
+                    <p>No semesters yet</p>
+                    <button
+                      onClick={() => {
+                        setShowManageModal(false);
+                        setShowAddInput(true);
+                      }}
+                      className="mt-2 text-light-button-primary dark:text-dark-button-primary hover:text-light-button-primary-hover dark:hover:text-dark-button-primary-hover font-medium"
+                    >
+                      Add your first semester
+                    </button>
+                  </div>
+                ) : (
+                  <DndContext
+                    sensors={sensors}
+                    collisionDetection={closestCenter}
+                    onDragEnd={handleDragEnd}
+                  >
+                    <SortableContext
+                      items={semesters.map((s) => s.id)}
+                      strategy={verticalListSortingStrategy}
+                    >
+                      {semesters.map((semester) => (
+                        <SortableSemester
+                          key={semester.id}
+                          semester={semester}
+                          isSelected={selectedSemester === semester.name}
+                          onEdit={(id, name) => handleEditSave(id, name)}
+                          onDelete={(id) => handleDeleteSemester(id)}
+                        />
+                      ))}
+                    </SortableContext>
+                  </DndContext>
+                )}
+              </div>
             </div>
           </div>
         </div>

@@ -10,8 +10,8 @@ const SettingsMessage = ({ text, type }: SettingsMessageProps) => {
     <div
       className={`mt-6 p-4 rounded-xl ${
         type === "success"
-          ? "bg-green-50 text-green-800 dark:bg-green-900/20 dark:text-green-400"
-          : "bg-red-50 text-red-800 dark:bg-red-900/20 dark:text-red-400"
+          ? "bg-light-success-bg text-light-success-text dark:bg-dark-success-bg dark:text-dark-success-text"
+          : "bg-light-error-bg text-light-error-text dark:bg-dark-error-bg dark:text-dark-error-text"
       }`}
     >
       {text}

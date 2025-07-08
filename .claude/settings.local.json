@@ -17,7 +17,9 @@
       "Bash(timeout 30s npm run dev)",
       "Bash(node:*)",
       "Bash(mv:*)",
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "Bash(sed:*)",
+      "Bash(dos2unix:*)"
     ],
     "deny": []
   }

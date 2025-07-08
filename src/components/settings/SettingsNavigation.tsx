@@ -10,14 +10,14 @@ const SettingsNavigation = ({
   setActiveTab,
 }: SettingsNavigationProps) => {
   return (
-    <div className="bg-white dark:bg-dark-bg-secondary rounded-lg p-1 shadow-md mb-8">
+    <div className="bg-light-bg-primary dark:bg-dark-bg-secondary rounded-lg p-1 shadow-md mb-8">
       <div className="flex space-x-2">
         <button
           onClick={() => setActiveTab("profile")}
           className={`flex-1 px-6 py-3 font-medium text-sm transition-all duration-200 rounded-lg ${
             activeTab === "profile"
-              ? "bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 shadow-sm"
-              : "text-gray-600 dark:text-dark-text-secondary hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary"
+              ? "bg-light-button-primary/10 dark:bg-dark-button-primary/10 text-light-button-primary dark:text-dark-button-primary shadow-sm"
+              : "text-light-text-secondary dark:text-dark-text-secondary hover:bg-light-hover-primary dark:hover:bg-dark-hover-primary"
           }`}
         >
           <div className="flex items-center justify-center space-x-2">
@@ -40,8 +40,8 @@ const SettingsNavigation = ({
           onClick={() => setActiveTab("preferences")}
           className={`flex-1 px-6 py-3 font-medium text-sm transition-all duration-200 rounded-lg ${
             activeTab === "preferences"
-              ? "bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 shadow-sm"
-              : "text-gray-600 dark:text-dark-text-secondary hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary"
+              ? "bg-light-button-primary/10 dark:bg-dark-button-primary/10 text-light-button-primary dark:text-dark-button-primary shadow-sm"
+              : "text-light-text-secondary dark:text-dark-text-secondary hover:bg-light-hover-primary dark:hover:bg-dark-hover-primary"
           }`}
         >
           <div className="flex items-center justify-center space-x-2">
@@ -64,8 +64,8 @@ const SettingsNavigation = ({
           onClick={() => setActiveTab("notifications")}
           className={`flex-1 px-6 py-3 font-medium text-sm transition-all duration-200 rounded-lg ${
             activeTab === "notifications"
-              ? "bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 shadow-sm"
-              : "text-gray-600 dark:text-dark-text-secondary hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary"
+              ? "bg-light-button-primary/10 dark:bg-dark-button-primary/10 text-light-button-primary dark:text-dark-button-primary shadow-sm"
+              : "text-light-text-secondary dark:text-dark-text-secondary hover:bg-light-hover-primary dark:hover:bg-dark-hover-primary"
           }`}
         >
           <div className="flex items-center justify-center space-x-2">

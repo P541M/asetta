@@ -144,7 +144,7 @@ const CoursesOverviewTable = ({
   if (courses.length === 0) {
     return (
       <div className="p-6">
-        <h2 className="text-xl font-medium text-gray-900 dark:text-dark-text-primary mb-6">
+        <h2 className="text-xl font-semibold text-light-text-primary dark:text-dark-text-primary mb-6">
           Your Courses
         </h2>
         <div className="text-center py-10 text-gray-500 dark:text-dark-text-tertiary">
@@ -162,10 +162,10 @@ const CoursesOverviewTable = ({
               d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
             />
           </svg>
-          <p className="text-lg font-medium mb-2 dark:text-dark-text-primary">
+          <p className="text-base font-medium mb-2 text-light-text-primary dark:text-dark-text-primary">
             No courses yet
           </p>
-          <p className="dark:text-dark-text-secondary">
+          <p className="text-light-text-secondary dark:text-dark-text-secondary">
             Add your first assessment to get started with course tracking.
           </p>
         </div>
@@ -191,32 +191,32 @@ const CoursesOverviewTable = ({
           {/* Headers */}
           <div className="grid grid-cols-12 gap-2 px-4 py-3 bg-gray-100/50 dark:bg-dark-bg-tertiary/50 rounded-lg">
             <div className="col-span-12 lg:col-span-2 flex items-center">
-              <span className="text-xs font-medium text-gray-500 dark:text-dark-text-tertiary uppercase tracking-wider">
+              <span className="text-xs font-medium text-light-text-tertiary dark:text-dark-text-tertiary uppercase tracking-wider">
                 Course
               </span>
             </div>
             <div className="col-span-12 lg:col-span-1 flex items-center">
-              <span className="text-xs font-medium text-gray-500 dark:text-dark-text-tertiary uppercase tracking-wider">
+              <span className="text-xs font-medium text-light-text-tertiary dark:text-dark-text-tertiary uppercase tracking-wider">
                 Total
               </span>
             </div>
             <div className="col-span-12 lg:col-span-1 flex items-center">
-              <span className="text-xs font-medium text-gray-500 dark:text-dark-text-tertiary uppercase tracking-wider">
+              <span className="text-xs font-medium text-light-text-tertiary dark:text-dark-text-tertiary uppercase tracking-wider">
                 Pending
               </span>
             </div>
             <div className="col-span-12 lg:col-span-3 flex items-center">
-              <span className="text-xs font-medium text-gray-500 dark:text-dark-text-tertiary uppercase tracking-wider">
+              <span className="text-xs font-medium text-light-text-tertiary dark:text-dark-text-tertiary uppercase tracking-wider">
                 Progress
               </span>
             </div>
             <div className="col-span-12 lg:col-span-4 flex items-center">
-              <span className="text-xs font-medium text-gray-500 dark:text-dark-text-tertiary uppercase tracking-wider">
+              <span className="text-xs font-medium text-light-text-tertiary dark:text-dark-text-tertiary uppercase tracking-wider">
                 Next Due
               </span>
             </div>
             <div className="col-span-12 lg:col-span-1 flex items-center justify-end">
-              <span className="text-xs font-medium text-gray-500 dark:text-dark-text-tertiary uppercase tracking-wider">
+              <span className="text-xs font-medium text-light-text-tertiary dark:text-dark-text-tertiary uppercase tracking-wider">
                 Actions
               </span>
             </div>
@@ -231,28 +231,28 @@ const CoursesOverviewTable = ({
               >
                 <div className="grid grid-cols-12 gap-2 items-center">
                   <div className="col-span-12 lg:col-span-2">
-                    <h3 className="font-medium text-gray-900 dark:text-dark-text-primary text-md">
+                    <h3 className="font-medium text-light-text-primary dark:text-dark-text-primary text-sm">
                       {course.courseName}
                     </h3>
                   </div>
                   <div className="col-span-12 lg:col-span-1">
-                    <span className="text-gray-700 dark:text-dark-text-secondary text-md">
+                    <span className="text-light-text-secondary dark:text-dark-text-secondary text-sm">
                       {course.totalAssessments}
                     </span>
                   </div>
                   <div className="col-span-12 lg:col-span-1">
                     {course.pendingAssessments > 0 ? (
                       <span
-                        className={`font-medium ${
+                        className={`font-medium text-sm ${
                           course.pendingAssessments > 2
-                            ? "text-amber-600 dark:text-amber-400"
-                            : "dark:text-dark-text-primary"
+                            ? "text-light-warning-text dark:text-dark-warning-text"
+                            : "text-light-text-primary dark:text-dark-text-primary"
                         }`}
                       >
                         {course.pendingAssessments}
                       </span>
                     ) : (
-                      <span className="text-emerald-600 dark:text-emerald-400 font-medium">
+                      <span className="text-light-success-text dark:text-dark-success-text font-medium text-sm">
                         All done!
                       </span>
                     )}
@@ -264,7 +264,7 @@ const CoursesOverviewTable = ({
                         style={{ width: `${course.progress}%` }}
                       ></div>
                     </div>
-                    <span className="text-xs text-gray-500 dark:text-dark-text-tertiary mt-1 inline-block">
+                    <span className="text-xs text-light-text-tertiary dark:text-dark-text-tertiary mt-1 inline-block">
                       {course.progress}% complete
                     </span>
                   </div>
@@ -280,12 +280,12 @@ const CoursesOverviewTable = ({
                         >
                           {formatDate(course.nextDueDate)}
                         </div>
-                        <div className="text-sm text-gray-500 dark:text-dark-text-tertiary truncate max-w-[200px]">
+                        <div className="text-sm text-light-text-tertiary dark:text-dark-text-tertiary truncate max-w-[200px]">
                           {course.nextAssignment}
                         </div>
                       </div>
                     ) : (
-                      <span className="text-gray-400 dark:text-dark-text-tertiary">
+                      <span className="text-light-text-tertiary dark:text-dark-text-tertiary">
                         -
                       </span>
                     )}
@@ -293,7 +293,7 @@ const CoursesOverviewTable = ({
                   <div className="col-span-12 lg:col-span-1 flex items-center justify-end">
                     <button
                       onClick={() => onSelectCourse(course.courseName)}
-                      className="text-gray-500 dark:text-dark-text-tertiary hover:text-gray-700 dark:hover:text-dark-text-secondary p-1 hover:bg-gray-100 dark:hover:bg-dark-bg-tertiary rounded-md transition-colors"
+                      className="text-light-text-tertiary dark:text-dark-text-tertiary hover:text-light-text-secondary dark:hover:text-dark-text-secondary p-1 hover:bg-light-hover-primary dark:hover:bg-dark-hover-primary rounded-md transition-colors"
                     >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"

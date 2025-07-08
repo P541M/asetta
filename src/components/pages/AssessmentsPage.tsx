@@ -3,7 +3,7 @@ import { useRouter } from "next/router";
 import DashboardLayout from "../layout/DashboardLayout";
 import AssessmentsTable from "../tables/AssessmentsTable";
 import CourseFilteredAssessments from "../assessment/CourseFilteredAssessments";
-import { LoadingSpinner, ErrorMessage } from "../ui";
+import { ErrorMessage, SkeletonLoader } from "../ui";
 
 interface AssessmentsPageProps {
   forceSemesterId?: string;
@@ -68,10 +68,8 @@ const AssessmentsPage = ({ forceSemesterId }: AssessmentsPageProps) => {
             />
           ) : (
             <>
-              {isLoading ? (
-                <div className="flex justify-center py-8">
-                  <LoadingSpinner />
-                </div>
+              {isLoading && assessments.length === 0 ? (
+                <SkeletonLoader type="table" rows={5} />
               ) : error ? (
                 <ErrorMessage message={error} />
               ) : (

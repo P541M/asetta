@@ -265,10 +265,10 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
       {/* Header with Save Button */}
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h3 className="text-lg font-medium text-gray-900 dark:text-dark-text-primary">
+          <h3 className="text-base font-medium text-light-text-primary dark:text-dark-text-primary">
             {selectedCourse}
           </h3>
-          <p className="text-sm text-gray-500 dark:text-dark-text-tertiary mt-1">
+          <p className="text-sm text-light-text-tertiary dark:text-dark-text-tertiary mt-1">
             Grade calculator and progress tracking
           </p>
         </div>
@@ -294,7 +294,7 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
         {/* Current Grade */}
         <div className="bg-white dark:bg-dark-bg-secondary border border-gray-200 dark:border-dark-border-primary rounded-lg p-6">
           <div className="flex items-center justify-between mb-3">
-            <h3 className="font-medium text-gray-900 dark:text-dark-text-primary">
+            <h3 className="font-medium text-light-text-primary dark:text-dark-text-primary">
               Current Grade
             </h3>
             {currentGradeInfo && (

@@ -124,7 +124,11 @@ const DashboardLayout = ({
       setAssessments([]);
       return;
     }
-    setIsLoading(true);
+    
+    // Only show loading spinner on initial load or when there's no previous data
+    if (assessments.length === 0) {
+      setIsLoading(true);
+    }
     setError(null);
     const assessmentsRef = collection(
       db,
@@ -157,7 +161,7 @@ const DashboardLayout = ({
             };
           });
           setAssessments(assessmentsList);
-
+    
           const now = new Date();
           const oneWeek = new Date();
           oneWeek.setDate(now.getDate() + 7);
@@ -195,7 +199,7 @@ const DashboardLayout = ({
           console.error("Error fetching assessments:", err);
           setError("Failed to load assessments. Please try again.");
           setIsLoading(false);
-        }
+            }
       );
     } catch (error) {
       console.error("Error setting up assessments listener:", error);
@@ -208,7 +212,7 @@ const DashboardLayout = ({
         unsubscribe();
       }
     };
-  }, [selectedSemesterId, user]);
+  }, [selectedSemesterId, user, assessments.length]);
 
   useEffect(() => {
     const fetchUserPreferences = async () => {
@@ -259,10 +263,10 @@ const DashboardLayout = ({
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-dark-bg-primary">
+      <div className="min-h-screen flex items-center justify-center bg-light-bg-secondary dark:bg-dark-bg-primary">
         <div className="flex flex-col items-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
-          <p className="mt-4 text-gray-600 dark:text-dark-text-secondary">
+          <div className="animate-spin rounded-full h-12 w-12 border-2 border-light-button-primary border-t-transparent dark:border-dark-button-primary dark:border-t-transparent"></div>
+          <p className="mt-4 text-light-text-secondary dark:text-dark-text-secondary">
             Loading...
           </p>
         </div>
@@ -271,7 +275,7 @@ const DashboardLayout = ({
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-dark-bg-primary">
+    <div className="min-h-screen bg-light-bg-secondary dark:bg-dark-bg-primary transition-theme">
       <Head>
         <title>{title}</title>
         <meta name="description" content={description} />
@@ -281,8 +285,8 @@ const DashboardLayout = ({
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
             <div>
-              <h2 className="text-3xl font-bold text-primary-600">Dashboard</h2>
-              <p className="text-sm text-gray-500 dark:text-dark-text-tertiary mt-1">
+              <h1 className="text-3xl font-bold text-light-button-primary dark:text-dark-button-primary">Dashboard</h1>
+              <p className="text-sm text-light-text-secondary dark:text-dark-text-secondary mt-2">
                 {selectedSemester
                   ? `Viewing ${selectedSemester} semester`
                   : "Select a semester to get started"}
@@ -293,76 +297,40 @@ const DashboardLayout = ({
           <SemesterTabs
             selectedSemester={selectedSemester}
             onSelect={setSelectedSemester}
-            className="bg-white dark:bg-dark-bg-secondary rounded-lg shadow-md"
+            className="bg-light-bg-primary dark:bg-dark-bg-secondary rounded-xl border border-light-border-primary dark:border-dark-border-primary"
           />
 
           {showStatsBar && (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 mb-8 mt-6">
-              <div className="bg-white dark:bg-dark-bg-secondary rounded-lg p-4 shadow-md">
-                <div className="flex items-center justify-between mb-2">
-                  <p className="text-sm font-medium text-gray-600 dark:text-dark-text-secondary">
-                    Total Assessments
-                  </p>
-                </div>
-                <h3 className="text-2xl font-bold text-gray-900 dark:text-dark-text-primary">
-                  {stats.total}
-                </h3>
+            <div className="stats-bar mt-6">
+              <div className="stat-card">
+                <p className="stat-label">Total Assessments</p>
+                <h3 className="stat-value">{stats.total}</h3>
               </div>
-              <div className="bg-white dark:bg-dark-bg-secondary rounded-lg p-4 shadow-md">
-                <div className="flex items-center justify-between mb-2">
-                  <p className="text-sm font-medium text-gray-600 dark:text-dark-text-secondary">
-                    Not Started
-                  </p>
-                </div>
-                <h3 className="text-2xl font-bold text-gray-900 dark:text-dark-text-primary">
-                  {stats.notStarted}
-                </h3>
+              <div className="stat-card">
+                <p className="stat-label">Not Started</p>
+                <h3 className="stat-value">{stats.notStarted}</h3>
               </div>
-              <div className="bg-white dark:bg-dark-bg-secondary rounded-lg p-4 shadow-md">
-                <div className="flex items-center justify-between mb-2">
-                  <p className="text-sm font-medium text-gray-600 dark:text-dark-text-secondary">
-                    In Progress
-                  </p>
-                </div>
-                <h3 className="text-2xl font-bold text-gray-900 dark:text-dark-text-primary">
-                  {stats.inProgress}
-                </h3>
+              <div className="stat-card">
+                <p className="stat-label">In Progress</p>
+                <h3 className="stat-value">{stats.inProgress}</h3>
               </div>
-              <div className="bg-white dark:bg-dark-bg-secondary rounded-lg p-4 shadow-md">
-                <div className="flex items-center justify-between mb-2">
-                  <p className="text-sm font-medium text-gray-600 dark:text-dark-text-secondary">
-                    Submitted
-                  </p>
-                </div>
-                <h3 className="text-2xl font-bold text-gray-900 dark:text-dark-text-primary">
-                  {stats.submitted}
-                </h3>
+              <div className="stat-card">
+                <p className="stat-label">Submitted</p>
+                <h3 className="stat-value">{stats.submitted}</h3>
               </div>
-              <div className="bg-white dark:bg-dark-bg-secondary rounded-lg p-4 shadow-md">
-                <div className="flex items-center justify-between mb-2">
-                  <p className="text-sm font-medium text-gray-600 dark:text-dark-text-secondary">
-                    Upcoming
-                  </p>
-                </div>
-                <h3 className="text-2xl font-bold text-gray-900 dark:text-dark-text-primary">
-                  {stats.upcomingDeadlines}
-                </h3>
+              <div className="stat-card">
+                <p className="stat-label">Upcoming</p>
+                <h3 className="stat-value">{stats.upcomingDeadlines}</h3>
               </div>
-              <div className="bg-white dark:bg-dark-bg-secondary rounded-lg p-4 shadow-md">
-                <div className="flex items-center justify-between mb-2">
-                  <p className="text-sm font-medium text-gray-600 dark:text-dark-text-secondary">
-                    Completion Rate
-                  </p>
-                </div>
-                <h3 className="text-2xl font-bold text-gray-900 dark:text-dark-text-primary">
-                  {stats.completionRate}%
-                </h3>
+              <div className="stat-card">
+                <p className="stat-label">Completion Rate</p>
+                <h3 className="stat-value">{stats.completionRate}%</h3>
               </div>
             </div>
           )}
 
           <div className="mt-8">
-            <div className="bg-white dark:bg-dark-bg-secondary rounded-lg p-1 shadow-md">
+            <div className="bg-light-bg-primary dark:bg-dark-bg-secondary rounded-xl p-1 border border-light-border-primary dark:border-dark-border-primary">
               {/* Desktop Navigation */}
               <div className="hidden md:flex space-x-2">
                 <button
@@ -372,8 +340,8 @@ const DashboardLayout = ({
                   }}
                   className={`flex-1 px-6 py-3 font-medium text-sm transition-all duration-200 rounded-lg ${
                     router.pathname === "/dashboard/courses" || router.pathname === "/dashboard/[semester]/courses"
-                      ? "bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 shadow-sm"
-                      : "text-gray-600 dark:text-dark-text-secondary hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary"
+                      ? "bg-light-button-primary/10 text-light-button-primary dark:bg-dark-button-primary/10 dark:text-dark-button-primary"
+                      : "text-light-text-secondary dark:text-dark-text-secondary hover:bg-light-hover-primary dark:hover:bg-dark-hover-primary hover:text-light-text-primary dark:hover:text-dark-text-primary"
                   }`}
                 >
                   <div className="flex items-center justify-center space-x-2">
@@ -400,8 +368,8 @@ const DashboardLayout = ({
                   }}
                   className={`flex-1 px-6 py-3 font-medium text-sm transition-all duration-200 rounded-lg ${
                     router.pathname === "/dashboard/assessments" || router.pathname === "/dashboard/[semester]/assessments"
-                      ? "bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 shadow-sm"
-                      : "text-gray-600 dark:text-dark-text-secondary hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary"
+                      ? "bg-light-button-primary/10 text-light-button-primary dark:bg-dark-button-primary/10 dark:text-dark-button-primary"
+                      : "text-light-text-secondary dark:text-dark-text-secondary hover:bg-light-hover-primary dark:hover:bg-dark-hover-primary hover:text-light-text-primary dark:hover:text-dark-text-primary"
                   }`}
                 >
                   <div className="flex items-center justify-center space-x-2">
@@ -427,8 +395,8 @@ const DashboardLayout = ({
                   }}
                   className={`flex-1 px-6 py-3 font-medium text-sm transition-all duration-200 rounded-lg ${
                     router.pathname === "/dashboard/grades" || router.pathname === "/dashboard/[semester]/grades"
-                      ? "bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 shadow-sm"
-                      : "text-gray-600 dark:text-dark-text-secondary hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary"
+                      ? "bg-light-button-primary/10 text-light-button-primary dark:bg-dark-button-primary/10 dark:text-dark-button-primary"
+                      : "text-light-text-secondary dark:text-dark-text-secondary hover:bg-light-hover-primary dark:hover:bg-dark-hover-primary hover:text-light-text-primary dark:hover:text-dark-text-primary"
                   }`}
                 >
                   <div className="flex items-center justify-center space-x-2">
@@ -454,8 +422,8 @@ const DashboardLayout = ({
                   }}
                   className={`flex-1 px-6 py-3 font-medium text-sm transition-all duration-200 rounded-lg ${
                     router.pathname === "/dashboard/calendar" || router.pathname === "/dashboard/[semester]/calendar"
-                      ? "bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 shadow-sm"
-                      : "text-gray-600 dark:text-dark-text-secondary hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary"
+                      ? "bg-light-button-primary/10 text-light-button-primary dark:bg-dark-button-primary/10 dark:text-dark-button-primary"
+                      : "text-light-text-secondary dark:text-dark-text-secondary hover:bg-light-hover-primary dark:hover:bg-dark-hover-primary hover:text-light-text-primary dark:hover:text-dark-text-primary"
                   }`}
                 >
                   <div className="flex items-center justify-center space-x-2">
@@ -484,8 +452,8 @@ const DashboardLayout = ({
                   }}
                   className={`flex-1 px-6 py-3 font-medium text-sm transition-all duration-200 rounded-lg ${
                     router.pathname === "/dashboard/add" || router.pathname === "/dashboard/[semester]/add"
-                      ? "bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 shadow-sm"
-                      : "text-gray-600 dark:text-dark-text-secondary hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary"
+                      ? "bg-light-button-primary/10 text-light-button-primary dark:bg-dark-button-primary/10 dark:text-dark-button-primary"
+                      : "text-light-text-secondary dark:text-dark-text-secondary hover:bg-light-hover-primary dark:hover:bg-dark-hover-primary hover:text-light-text-primary dark:hover:text-dark-text-primary"
                   }`}
                 >
                   <div className="flex items-center justify-center space-x-2">
@@ -516,8 +484,8 @@ const DashboardLayout = ({
                   }}
                   className={`px-3 py-3 font-medium text-sm transition-all duration-200 rounded-lg ${
                     router.pathname === "/dashboard/courses" || router.pathname === "/dashboard/[semester]/courses"
-                      ? "bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 shadow-sm"
-                      : "text-gray-600 dark:text-dark-text-secondary hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary"
+                      ? "bg-light-button-primary/10 text-light-button-primary dark:bg-dark-button-primary/10 dark:text-dark-button-primary"
+                      : "text-light-text-secondary dark:text-dark-text-secondary hover:bg-light-hover-primary dark:hover:bg-dark-hover-primary hover:text-light-text-primary dark:hover:text-dark-text-primary"
                   }`}
                 >
                   <div className="flex flex-col items-center space-y-1">
@@ -544,8 +512,8 @@ const DashboardLayout = ({
                   }}
                   className={`px-3 py-3 font-medium text-sm transition-all duration-200 rounded-lg ${
                     router.pathname === "/dashboard/assessments" || router.pathname === "/dashboard/[semester]/assessments"
-                      ? "bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 shadow-sm"
-                      : "text-gray-600 dark:text-dark-text-secondary hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary"
+                      ? "bg-light-button-primary/10 text-light-button-primary dark:bg-dark-button-primary/10 dark:text-dark-button-primary"
+                      : "text-light-text-secondary dark:text-dark-text-secondary hover:bg-light-hover-primary dark:hover:bg-dark-hover-primary hover:text-light-text-primary dark:hover:text-dark-text-primary"
                   }`}
                 >
                   <div className="flex flex-col items-center space-y-1">
@@ -571,8 +539,8 @@ const DashboardLayout = ({
                   }}
                   className={`px-3 py-3 font-medium text-sm transition-all duration-200 rounded-lg ${
                     router.pathname === "/dashboard/grades" || router.pathname === "/dashboard/[semester]/grades"
-                      ? "bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 shadow-sm"
-                      : "text-gray-600 dark:text-dark-text-secondary hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary"
+                      ? "bg-light-button-primary/10 text-light-button-primary dark:bg-dark-button-primary/10 dark:text-dark-button-primary"
+                      : "text-light-text-secondary dark:text-dark-text-secondary hover:bg-light-hover-primary dark:hover:bg-dark-hover-primary hover:text-light-text-primary dark:hover:text-dark-text-primary"
                   }`}
                 >
                   <div className="flex flex-col items-center space-y-1">
@@ -600,8 +568,8 @@ const DashboardLayout = ({
                   }}
                   className={`px-3 py-3 font-medium text-sm transition-all duration-200 rounded-lg ${
                     router.pathname === "/dashboard/calendar" || router.pathname === "/dashboard/[semester]/calendar"
-                      ? "bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 shadow-sm"
-                      : "text-gray-600 dark:text-dark-text-secondary hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary"
+                      ? "bg-light-button-primary/10 text-light-button-primary dark:bg-dark-button-primary/10 dark:text-dark-button-primary"
+                      : "text-light-text-secondary dark:text-dark-text-secondary hover:bg-light-hover-primary dark:hover:bg-dark-hover-primary hover:text-light-text-primary dark:hover:text-dark-text-primary"
                   }`}
                 >
                   <div className="flex flex-col items-center space-y-1">
@@ -630,8 +598,8 @@ const DashboardLayout = ({
                   }}
                   className={`px-3 py-3 font-medium text-sm transition-all duration-200 rounded-lg ${
                     router.pathname === "/dashboard/add" || router.pathname === "/dashboard/[semester]/add"
-                      ? "bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 shadow-sm"
-                      : "text-gray-600 dark:text-dark-text-secondary hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary"
+                      ? "bg-light-button-primary/10 text-light-button-primary dark:bg-dark-button-primary/10 dark:text-dark-button-primary"
+                      : "text-light-text-secondary dark:text-dark-text-secondary hover:bg-light-hover-primary dark:hover:bg-dark-hover-primary hover:text-light-text-primary dark:hover:text-dark-text-primary"
                   }`}
                 >
                   <div className="flex flex-col items-center space-y-1">
@@ -655,7 +623,7 @@ const DashboardLayout = ({
             </div>
 
             <div className="mt-6">
-              <div className="bg-white dark:bg-dark-bg-secondary rounded-lg shadow-md">
+              <div className="bg-light-bg-primary dark:bg-dark-bg-secondary rounded-xl border border-light-border-primary dark:border-dark-border-primary">
                 {children({
                   selectedSemester,
                   selectedSemesterId,
