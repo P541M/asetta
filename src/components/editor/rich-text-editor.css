@@ -28,7 +28,7 @@
 }
 
 .rich-text-editor .toolbar {
-  @apply bg-light-bg-primary dark:bg-dark-bg-primary border-b border-gray-200 dark:border-dark-border-primary p-2 flex flex-wrap gap-2;
+  @apply bg-light-bg-primary dark:bg-dark-bg-primary border-b border-light-border-primary dark:border-dark-border-primary p-2 flex flex-wrap gap-2;
 }
 
 .rich-text-editor .toolbar button {

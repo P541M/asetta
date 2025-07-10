@@ -8,7 +8,7 @@
 }
 
 .input {
-  @apply w-full p-2.5 rounded-md border border-light-input-border focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none bg-light-input-bg text-light-input-text placeholder-light-input-placeholder dark:bg-dark-input-bg dark:border-dark-input-border dark:text-dark-input-text dark:placeholder-dark-input-placeholder;
+  @apply w-full p-2.5 rounded-md border border-light-input-border focus:ring-2 focus:ring-light-focus-ring dark:focus:ring-dark-focus-ring focus:border-transparent outline-none bg-light-input-bg text-light-input-text placeholder-light-input-placeholder dark:bg-dark-input-bg dark:border-dark-input-border dark:text-dark-input-text dark:placeholder-dark-input-placeholder;
 }
 
 /* Form Message Styles */
@@ -17,10 +17,10 @@
 }
 
 .form-message.error {
-  @apply bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300 border border-red-100 dark:border-red-800;
+  @apply bg-light-error-bg dark:bg-dark-error-bg text-light-error-text dark:text-dark-error-text border border-light-error-text/20 dark:border-dark-error-text/20;
 }
 
 .form-message.success {
-  @apply bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300 border border-emerald-100 dark:border-emerald-800;
+  @apply bg-light-success-bg dark:bg-dark-success-bg text-light-success-text dark:text-dark-success-text border border-light-success-text/20 dark:border-dark-success-text/20;
 }
 

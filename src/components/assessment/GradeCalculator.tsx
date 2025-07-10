@@ -315,19 +315,19 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
     const dueDate = new Date(`${assessment.dueDate}T${assessment.dueTime}`);
 
     if (assessment.status === "Submitted") {
-      return { icon: "✓", color: "text-green-600", bgColor: "bg-green-100" };
+      return { icon: "✓", color: "text-light-status-submitted-text dark:text-dark-status-submitted-text", bgColor: "bg-light-status-submitted-bg dark:bg-dark-status-submitted-bg" };
     } else if (dueDate < now) {
-      return { icon: "!", color: "text-red-600", bgColor: "bg-red-100" };
+      return { icon: "!", color: "text-light-status-overdue-text dark:text-dark-status-overdue-text", bgColor: "bg-light-status-overdue-bg dark:bg-dark-status-overdue-bg" };
     } else {
-      return { icon: "○", color: "text-yellow-600", bgColor: "bg-yellow-100" };
+      return { icon: "○", color: "text-light-status-pending-text dark:text-dark-status-pending-text", bgColor: "bg-light-status-pending-bg dark:bg-dark-status-pending-bg" };
     }
   };
 
   const getProgressBarColor = (percentage: number) => {
-    if (percentage >= 85) return "bg-green-500";
-    if (percentage >= 70) return "bg-blue-500";
-    if (percentage >= 60) return "bg-yellow-500";
-    return "bg-red-500";
+    if (percentage >= 85) return "bg-light-performance-excellent-bg dark:bg-dark-performance-excellent-bg";
+    if (percentage >= 70) return "bg-light-performance-good-bg dark:bg-dark-performance-good-bg";
+    if (percentage >= 60) return "bg-light-performance-average-bg dark:bg-dark-performance-average-bg";
+    return "bg-light-performance-poor-bg dark:bg-dark-performance-poor-bg";
   };
 
   if (!selectedCourse) {
@@ -335,7 +335,7 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
       <EmptyState
         icon={
           <svg
-            className="mx-auto h-12 w-12 text-gray-400 mb-4"
+            className="mx-auto h-12 w-12 text-light-text-tertiary dark:text-dark-text-tertiary mb-4"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -350,7 +350,7 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
         }
         title="No course selected"
         description="Select a course from the dropdown to view grade calculations."
-        className="py-10 text-gray-500 dark:text-dark-text-tertiary"
+        className="py-10 text-light-text-tertiary dark:text-dark-text-tertiary"
       />
     );
   }
@@ -397,7 +397,7 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
       </div>
 
       {saveError && (
-        <div className="p-4 bg-red-50 dark:bg-red-900/20 rounded-md text-red-700 dark:text-red-400 animate-fade-in shadow-sm">
+        <div className="p-4 bg-light-error-bg dark:bg-dark-error-bg rounded-md text-light-error-text dark:text-dark-error-text animate-fade-in shadow-sm">
           <p>{saveError}</p>
         </div>
       )}
@@ -405,7 +405,7 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
       {/* Grade Overview Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {/* Current Grade */}
-        <div className="bg-white dark:bg-dark-bg-secondary border border-gray-200 dark:border-dark-border-primary rounded-lg p-6">
+        <div className="bg-light-bg-primary dark:bg-dark-bg-secondary border border-light-border-primary dark:border-dark-border-primary rounded-lg p-6">
           <div className="flex items-center justify-between mb-3">
             <h3 className="font-medium text-light-text-primary dark:text-dark-text-primary">
               Current Grade
@@ -420,10 +420,10 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
           </div>
           {currentGrade !== null ? (
             <div className="space-y-3">
-              <div className="text-2xl font-semibold text-gray-900 dark:text-dark-text-primary">
+              <div className="text-2xl font-semibold text-light-text-primary dark:text-dark-text-primary">
                 {currentGrade.toFixed(1)}%
               </div>
-              <div className="w-full bg-gray-100 dark:bg-dark-bg-tertiary rounded-full h-1.5">
+              <div className="w-full bg-light-bg-tertiary dark:bg-dark-bg-tertiary rounded-full h-1.5">
                 <div
                   className={`h-1.5 rounded-full transition-all duration-300 ${getProgressBarColor(
                     currentGrade
@@ -432,40 +432,40 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
                 ></div>
               </div>
               {currentGradeInfo && (
-                <p className="text-sm text-gray-500 dark:text-dark-text-tertiary">
+                <p className="text-sm text-light-text-tertiary dark:text-dark-text-tertiary">
                   GPA: {currentGradeInfo.gpa}
                 </p>
               )}
             </div>
           ) : (
-            <div className="text-gray-500 dark:text-dark-text-tertiary text-sm">
+            <div className="text-light-text-tertiary dark:text-dark-text-tertiary text-sm">
               No completed assessments yet
             </div>
           )}
         </div>
 
         {/* Course Weight */}
-        <div className="bg-white dark:bg-dark-bg-secondary border border-gray-200 dark:border-dark-border-primary rounded-lg p-6">
-          <h3 className="font-medium text-gray-900 dark:text-dark-text-primary mb-3">
+        <div className="bg-light-bg-primary dark:bg-dark-bg-secondary border border-light-border-primary dark:border-dark-border-primary rounded-lg p-6">
+          <h3 className="font-medium text-light-text-primary dark:text-dark-text-primary mb-3">
             Course Weight
           </h3>
           <div className="space-y-3">
-            <div className="text-2xl font-semibold text-gray-900 dark:text-dark-text-primary">
+            <div className="text-2xl font-semibold text-light-text-primary dark:text-dark-text-primary">
               {totalWeight}%
             </div>
-            <div className="w-full bg-gray-100 dark:bg-dark-bg-tertiary rounded-full h-1.5">
+            <div className="w-full bg-light-bg-tertiary dark:bg-dark-bg-tertiary rounded-full h-1.5">
               <div
                 className={`h-1.5 rounded-full transition-all duration-300 ${
                   totalWeight === 100
-                    ? "bg-green-500"
+                    ? "bg-light-performance-excellent-bg dark:bg-dark-performance-excellent-bg"
                     : totalWeight >= 90
-                    ? "bg-yellow-500"
-                    : "bg-red-500"
+                    ? "bg-light-performance-average-bg dark:bg-dark-performance-average-bg"
+                    : "bg-light-performance-poor-bg dark:bg-dark-performance-poor-bg"
                 }`}
                 style={{ width: `${Math.min(totalWeight, 100)}%` }}
               ></div>
             </div>
-            <p className="text-sm text-gray-500 dark:text-dark-text-tertiary">
+            <p className="text-sm text-light-text-tertiary dark:text-dark-text-tertiary">
               {totalWeight === 100
                 ? "Complete"
                 : totalWeight > 100
@@ -476,8 +476,8 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
         </div>
 
         {/* Target Grade & Projection */}
-        <div className="bg-white dark:bg-dark-bg-secondary border border-gray-200 dark:border-dark-border-primary rounded-lg p-6">
-          <h3 className="font-medium text-gray-900 dark:text-dark-text-primary mb-3">
+        <div className="bg-light-bg-primary dark:bg-dark-bg-secondary border border-light-border-primary dark:border-dark-border-primary rounded-lg p-6">
+          <h3 className="font-medium text-light-text-primary dark:text-dark-text-primary mb-3">
             Target Grade
           </h3>
           <div className="space-y-3">
@@ -492,23 +492,23 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
                 }
                 className="input w-16 px-2 py-1 text-sm hover:shadow-sm transition-all duration-200 dark:bg-dark-input-bg dark:text-dark-input-text dark:border-dark-input-border"
               />
-              <span className="text-gray-500 dark:text-dark-text-tertiary text-sm">
+              <span className="text-light-text-tertiary dark:text-dark-text-tertiary text-sm">
                 %
               </span>
             </div>
             {requiredGrade !== null && (
               <div className="text-sm">
-                <p className="text-gray-700 dark:text-dark-text-secondary">
+                <p className="text-light-text-secondary dark:text-dark-text-secondary">
                   Need avg of{" "}
                   <span
                     className={`font-medium ${
-                      requiredGrade > 100 ? "text-red-600" : "text-green-600"
+                      requiredGrade > 100 ? "text-light-status-overdue-text dark:text-dark-status-overdue-text" : "text-light-status-submitted-text dark:text-dark-status-submitted-text"
                     }`}
                   >
                     {requiredGrade.toFixed(1)}%
                   </span>
                 </p>
-                <p className="text-gray-500 dark:text-dark-text-tertiary">
+                <p className="text-light-text-tertiary dark:text-dark-text-tertiary">
                   on remaining assessments
                 </p>
               </div>
@@ -518,12 +518,12 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
       </div>
 
       {/* Assessment Breakdown */}
-      <div className="bg-white dark:bg-dark-bg-secondary border border-gray-200 dark:border-dark-border-primary rounded-lg">
-        <div className="px-6 py-4 border-b border-gray-200 dark:border-dark-border-primary">
-          <h3 className="font-medium text-gray-900 dark:text-dark-text-primary">
+      <div className="bg-light-bg-primary dark:bg-dark-bg-secondary border border-light-border-primary dark:border-dark-border-primary rounded-lg">
+        <div className="px-6 py-4 border-b border-light-border-primary dark:border-dark-border-primary">
+          <h3 className="font-medium text-light-text-primary dark:text-dark-text-primary">
             Assessment Breakdown
           </h3>
-          <p className="text-sm text-gray-500 dark:text-dark-text-tertiary mt-1">
+          <p className="text-sm text-light-text-tertiary dark:text-dark-text-tertiary mt-1">
             Edit weights and marks to calculate your grade
           </p>
         </div>
@@ -533,7 +533,7 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
             <EmptyState
               icon={
                 <svg
-                  className="mx-auto h-12 w-12 text-gray-400 mb-4"
+                  className="mx-auto h-12 w-12 text-light-text-tertiary dark:text-dark-text-tertiary mb-4"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -548,34 +548,34 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
               }
               title="No assessments found"
               description="This course doesn't have any assessments yet."
-              className="py-10 text-gray-500 dark:text-dark-text-tertiary"
+              className="py-10 text-light-text-tertiary dark:text-dark-text-tertiary"
             />
           ) : (
             <div className="space-y-4">
               {/* Headers */}
-              <div className="grid grid-cols-12 gap-4 px-4 py-3 bg-gray-100/50 dark:bg-dark-bg-tertiary/50 rounded-lg">
+              <div className="grid grid-cols-12 gap-4 px-4 py-3 bg-light-bg-secondary/50 dark:bg-dark-bg-tertiary/50 rounded-lg">
                 <div className="col-span-12 lg:col-span-4 flex items-center">
-                  <span className="text-xs font-medium text-gray-500 dark:text-dark-text-tertiary uppercase tracking-wider">
+                  <span className="text-xs font-medium text-light-text-tertiary dark:text-dark-text-tertiary uppercase tracking-wider">
                     Assessment
                   </span>
                 </div>
                 <div className="col-span-12 lg:col-span-2 flex items-center">
-                  <span className="text-xs font-medium text-gray-500 dark:text-dark-text-tertiary uppercase tracking-wider">
+                  <span className="text-xs font-medium text-light-text-tertiary dark:text-dark-text-tertiary uppercase tracking-wider">
                     Status
                   </span>
                 </div>
                 <div className="col-span-12 lg:col-span-2 flex items-center">
-                  <span className="text-xs font-medium text-gray-500 dark:text-dark-text-tertiary uppercase tracking-wider">
+                  <span className="text-xs font-medium text-light-text-tertiary dark:text-dark-text-tertiary uppercase tracking-wider">
                     Weight
                   </span>
                 </div>
                 <div className="col-span-12 lg:col-span-2 flex items-center">
-                  <span className="text-xs font-medium text-gray-500 dark:text-dark-text-tertiary uppercase tracking-wider">
+                  <span className="text-xs font-medium text-light-text-tertiary dark:text-dark-text-tertiary uppercase tracking-wider">
                     Mark
                   </span>
                 </div>
                 <div className="col-span-12 lg:col-span-2 flex items-center">
-                  <span className="text-xs font-medium text-gray-500 dark:text-dark-text-tertiary uppercase tracking-wider">
+                  <span className="text-xs font-medium text-light-text-tertiary dark:text-dark-text-tertiary uppercase tracking-wider">
                     Points
                   </span>
                 </div>
@@ -593,14 +593,14 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
                   return (
                     <div
                       key={assessment.id}
-                      className="bg-gray-50/50 dark:bg-dark-bg-tertiary/30 rounded-lg transition-all duration-300 p-4 hover:bg-gray-100/50 dark:hover:bg-dark-bg-tertiary/50"
+                      className="bg-light-bg-secondary/50 dark:bg-dark-bg-tertiary/30 rounded-lg transition-all duration-300 p-4 hover:bg-light-hover-primary/50 dark:hover:bg-dark-hover-primary/50"
                     >
                       <div className="grid grid-cols-12 gap-4 items-center">
                         <div className="col-span-12 lg:col-span-4">
-                          <h3 className="font-medium text-gray-900 dark:text-dark-text-primary text-sm">
+                          <h3 className="font-medium text-light-text-primary dark:text-dark-text-primary text-sm">
                             {assessment.assignmentName}
                           </h3>
-                          <p className="text-xs text-gray-500 dark:text-dark-text-tertiary mt-1">
+                          <p className="text-xs text-light-text-tertiary dark:text-dark-text-tertiary mt-1">
                             Due:{" "}
                             {new Date(assessment.dueDate).toLocaleDateString()}
                           </p>
@@ -630,7 +630,7 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
                               }
                               className="input w-16 px-2 py-1 text-sm hover:shadow-sm transition-all duration-200 dark:bg-dark-input-bg dark:text-dark-input-text dark:border-dark-input-border [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                             />
-                            <span className="text-xs text-gray-500 dark:text-dark-text-tertiary">
+                            <span className="text-xs text-light-text-tertiary dark:text-dark-text-tertiary">
                               %
                             </span>
                           </div>
@@ -649,13 +649,13 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
                               className="input w-16 px-2 py-1 text-sm hover:shadow-sm transition-all duration-200 dark:bg-dark-input-bg dark:text-dark-input-text dark:border-dark-input-border [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                               placeholder="--"
                             />
-                            <span className="text-xs text-gray-500 dark:text-dark-text-tertiary">
+                            <span className="text-xs text-light-text-tertiary dark:text-dark-text-tertiary">
                               %
                             </span>
                           </div>
                         </div>
                         <div className="col-span-12 lg:col-span-2">
-                          <span className="text-sm font-medium text-gray-900 dark:text-dark-text-primary">
+                          <span className="text-sm font-medium text-light-text-primary dark:text-dark-text-primary">
                             {contribution}
                           </span>
                         </div>

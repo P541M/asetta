@@ -147,10 +147,10 @@ const CoursesOverviewTable = ({
         <h2 className="text-xl font-semibold text-light-text-primary dark:text-dark-text-primary mb-6">
           Your Courses
         </h2>
-        <div className="text-center py-10 text-gray-500 dark:text-dark-text-tertiary">
+        <div className="text-center py-10 text-light-text-tertiary dark:text-dark-text-tertiary">
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            className="h-12 w-12 mx-auto mb-4 text-gray-300 dark:text-dark-text-tertiary"
+            className="h-12 w-12 mx-auto mb-4 text-light-text-tertiary dark:text-dark-text-tertiary"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -175,12 +175,12 @@ const CoursesOverviewTable = ({
 
   return (
     <div className="p-6">
-      <h2 className="text-xl font-medium text-gray-900 dark:text-dark-text-primary mb-6">
+      <h2 className="text-xl font-medium text-light-text-primary dark:text-dark-text-primary mb-6">
         Your Courses
       </h2>
       {isLoading ? (
         <div className="flex items-center justify-center py-12">
-          <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary-200 dark:border-primary-800 border-t-primary-500 dark:border-t-primary-400"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-4 border-light-border-secondary dark:border-dark-border-secondary border-t-light-button-primary dark:border-t-dark-button-primary"></div>
         </div>
       ) : error ? (
         <div className="p-4 bg-light-error-bg dark:bg-dark-error-bg rounded-lg text-light-error-text dark:text-dark-error-text animate-fade-in">
@@ -189,7 +189,7 @@ const CoursesOverviewTable = ({
       ) : (
         <div className="space-y-2">
           {/* Headers */}
-          <div className="grid grid-cols-12 gap-2 px-4 py-3 bg-gray-100/50 dark:bg-dark-bg-tertiary/50 rounded-lg">
+          <div className="grid grid-cols-12 gap-2 px-4 py-3 bg-light-bg-secondary/50 dark:bg-dark-bg-tertiary/50 rounded-lg">
             <div className="col-span-12 lg:col-span-2 flex items-center">
               <span className="text-xs font-medium text-light-text-tertiary dark:text-dark-text-tertiary uppercase tracking-wider">
                 Course
@@ -227,7 +227,7 @@ const CoursesOverviewTable = ({
             {sortedCourses.map((course) => (
               <div
                 key={course.courseName}
-                className="bg-gray-50/50 dark:bg-dark-bg-tertiary/30 rounded-lg transition-all duration-300 p-3"
+                className="bg-light-bg-secondary/50 dark:bg-dark-bg-tertiary/30 rounded-lg transition-all duration-300 p-3"
               >
                 <div className="grid grid-cols-12 gap-2 items-center">
                   <div className="col-span-12 lg:col-span-2">
@@ -258,9 +258,9 @@ const CoursesOverviewTable = ({
                     )}
                   </div>
                   <div className="col-span-12 lg:col-span-3">
-                    <div className="max-w-[200px] bg-gray-200 dark:bg-dark-bg-tertiary rounded-full h-2.5">
+                    <div className="max-w-[200px] bg-light-bg-tertiary dark:bg-dark-bg-tertiary rounded-full h-2.5">
                       <div
-                        className="h-2.5 rounded-full bg-primary-500 dark:bg-primary-400"
+                        className="h-2.5 rounded-full bg-light-button-primary dark:bg-dark-button-primary"
                         style={{ width: `${course.progress}%` }}
                       ></div>
                     </div>
@@ -274,7 +274,7 @@ const CoursesOverviewTable = ({
                         <div
                           className={`font-medium whitespace-nowrap ${
                             isUpcoming(course.nextDueDate)
-                              ? "text-amber-600 dark:text-amber-400"
+                              ? "text-light-warning-text dark:text-dark-warning-text"
                               : "dark:text-dark-text-primary"
                           }`}
                         >

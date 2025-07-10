@@ -102,11 +102,11 @@ const Register = () => {
 
         <div className="bg-light-bg-primary dark:bg-dark-bg-secondary rounded-2xl shadow-sm border border-light-border-primary dark:border-dark-border-primary p-8">
           {error && (
-            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg shadow-sm">
+            <div className="mb-6 p-4 bg-light-error-bg dark:bg-dark-error-bg border border-light-error-text/20 dark:border-dark-error-text/20 rounded-lg shadow-sm">
               <div className="flex items-start">
                 <div className="flex-shrink-0">
                   <svg
-                    className="h-5 w-5 text-red-400"
+                    className="h-5 w-5 text-light-error-text dark:text-dark-error-text"
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 20 20"
                     fill="currentColor"
@@ -120,10 +120,10 @@ const Register = () => {
                   </svg>
                 </div>
                 <div className="ml-3">
-                  <h3 className="text-sm font-medium text-red-800">
+                  <h3 className="text-sm font-medium text-light-error-text dark:text-dark-error-text">
                     Registration Error
                   </h3>
-                  <div className="mt-1 text-sm text-red-700">{error}</div>
+                  <div className="mt-1 text-sm text-light-error-text dark:text-dark-error-text">{error}</div>
                 </div>
               </div>
             </div>
@@ -138,7 +138,7 @@ const Register = () => {
                 id="email"
                 type="email"
                 placeholder="you@example.com"
-                className="w-full px-4 py-2.5 text-gray-900 placeholder-gray-400 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200 disabled:bg-gray-50 disabled:text-gray-500"
+                className="w-full px-4 py-2.5 text-light-input-text dark:text-dark-input-text placeholder-light-input-placeholder dark:placeholder-dark-input-placeholder bg-light-input-bg dark:bg-dark-input-bg border border-light-input-border dark:border-dark-input-border rounded-lg focus:outline-none focus:ring-2 focus:ring-light-focus-ring dark:focus:ring-dark-focus-ring focus:border-light-focus-ring dark:focus:border-dark-focus-ring transition-all duration-200 disabled:bg-light-disabled-bg dark:disabled:bg-dark-disabled-bg disabled:text-light-disabled-text dark:disabled:text-dark-disabled-text"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -154,7 +154,7 @@ const Register = () => {
                 id="password"
                 type="password"
                 placeholder="Create a password"
-                className="w-full px-4 py-2.5 text-gray-900 placeholder-gray-400 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200 disabled:bg-gray-50 disabled:text-gray-500"
+                className="w-full px-4 py-2.5 text-light-input-text dark:text-dark-input-text placeholder-light-input-placeholder dark:placeholder-dark-input-placeholder bg-light-input-bg dark:bg-dark-input-bg border border-light-input-border dark:border-dark-input-border rounded-lg focus:outline-none focus:ring-2 focus:ring-light-focus-ring dark:focus:ring-dark-focus-ring focus:border-light-focus-ring dark:focus:border-dark-focus-ring transition-all duration-200 disabled:bg-light-disabled-bg dark:disabled:bg-dark-disabled-bg disabled:text-light-disabled-text dark:disabled:text-dark-disabled-text"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 onFocus={() => setPasswordFocused(true)}
@@ -170,8 +170,8 @@ const Register = () => {
                     <span
                       className={`mr-2 ${
                         passwordCriteria.minLength
-                          ? "text-green-500"
-                          : "text-gray-400"
+                          ? "text-light-status-submitted-text dark:text-dark-status-submitted-text"
+                          : "text-light-text-tertiary dark:text-dark-text-tertiary"
                       }`}
                     >
                       {passwordCriteria.minLength ? "✓" : "○"}
@@ -179,8 +179,8 @@ const Register = () => {
                     <span
                       className={
                         passwordCriteria.minLength
-                          ? "text-green-600"
-                          : "text-gray-500"
+                          ? "text-light-status-submitted-text dark:text-dark-status-submitted-text"
+                          : "text-light-text-tertiary dark:text-dark-text-tertiary"
                       }
                     >
                       At least 8 characters
@@ -190,8 +190,8 @@ const Register = () => {
                     <span
                       className={`mr-2 ${
                         passwordCriteria.hasUppercase
-                          ? "text-green-500"
-                          : "text-gray-400"
+                          ? "text-light-status-submitted-text dark:text-dark-status-submitted-text"
+                          : "text-light-text-tertiary dark:text-dark-text-tertiary"
                       }`}
                     >
                       {passwordCriteria.hasUppercase ? "✓" : "○"}
@@ -199,8 +199,8 @@ const Register = () => {
                     <span
                       className={
                         passwordCriteria.hasUppercase
-                          ? "text-green-600"
-                          : "text-gray-500"
+                          ? "text-light-status-submitted-text dark:text-dark-status-submitted-text"
+                          : "text-light-text-tertiary dark:text-dark-text-tertiary"
                       }
                     >
                       One uppercase letter
@@ -210,8 +210,8 @@ const Register = () => {
                     <span
                       className={`mr-2 ${
                         passwordCriteria.hasLowercase
-                          ? "text-green-500"
-                          : "text-gray-400"
+                          ? "text-light-status-submitted-text dark:text-dark-status-submitted-text"
+                          : "text-light-text-tertiary dark:text-dark-text-tertiary"
                       }`}
                     >
                       {passwordCriteria.hasLowercase ? "✓" : "○"}
@@ -219,8 +219,8 @@ const Register = () => {
                     <span
                       className={
                         passwordCriteria.hasLowercase
-                          ? "text-green-600"
-                          : "text-gray-500"
+                          ? "text-light-status-submitted-text dark:text-dark-status-submitted-text"
+                          : "text-light-text-tertiary dark:text-dark-text-tertiary"
                       }
                     >
                       One lowercase letter
@@ -230,8 +230,8 @@ const Register = () => {
                     <span
                       className={`mr-2 ${
                         passwordCriteria.hasNumber
-                          ? "text-green-500"
-                          : "text-gray-400"
+                          ? "text-light-status-submitted-text dark:text-dark-status-submitted-text"
+                          : "text-light-text-tertiary dark:text-dark-text-tertiary"
                       }`}
                     >
                       {passwordCriteria.hasNumber ? "✓" : "○"}
@@ -239,8 +239,8 @@ const Register = () => {
                     <span
                       className={
                         passwordCriteria.hasNumber
-                          ? "text-green-600"
-                          : "text-gray-500"
+                          ? "text-light-status-submitted-text dark:text-dark-status-submitted-text"
+                          : "text-light-text-tertiary dark:text-dark-text-tertiary"
                       }
                     >
                       One number
@@ -250,8 +250,8 @@ const Register = () => {
                     <span
                       className={`mr-2 ${
                         passwordCriteria.hasSpecialChar
-                          ? "text-green-500"
-                          : "text-gray-400"
+                          ? "text-light-status-submitted-text dark:text-dark-status-submitted-text"
+                          : "text-light-text-tertiary dark:text-dark-text-tertiary"
                       }`}
                     >
                       {passwordCriteria.hasSpecialChar ? "✓" : "○"}
@@ -259,8 +259,8 @@ const Register = () => {
                     <span
                       className={
                         passwordCriteria.hasSpecialChar
-                          ? "text-green-600"
-                          : "text-gray-500"
+                          ? "text-light-status-submitted-text dark:text-dark-status-submitted-text"
+                          : "text-light-text-tertiary dark:text-dark-text-tertiary"
                       }
                     >
                       One special character (!@#$%^&*(),.?&quot;:{}|&lt;&gt;)
@@ -277,7 +277,7 @@ const Register = () => {
                 id="confirmPassword"
                 type="password"
                 placeholder="Confirm your password"
-                className="w-full px-4 py-2.5 text-gray-900 placeholder-gray-400 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200 disabled:bg-gray-50 disabled:text-gray-500"
+                className="w-full px-4 py-2.5 text-light-input-text dark:text-dark-input-text placeholder-light-input-placeholder dark:placeholder-dark-input-placeholder bg-light-input-bg dark:bg-dark-input-bg border border-light-input-border dark:border-dark-input-border rounded-lg focus:outline-none focus:ring-2 focus:ring-light-focus-ring dark:focus:ring-dark-focus-ring focus:border-light-focus-ring dark:focus:border-dark-focus-ring transition-all duration-200 disabled:bg-light-disabled-bg dark:disabled:bg-dark-disabled-bg disabled:text-light-disabled-text dark:disabled:text-dark-disabled-text"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 required
@@ -289,7 +289,7 @@ const Register = () => {
             <button
               type="submit"
               disabled={isSubmitting}
-              className={`w-full flex items-center justify-center gap-2 py-2.5 px-4 border border-transparent rounded-lg text-white bg-primary-500 hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-all duration-200 ${
+              className={`w-full flex items-center justify-center gap-2 py-2.5 px-4 border border-transparent rounded-lg text-white bg-light-button-primary hover:bg-light-button-primary-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-light-focus-ring dark:bg-dark-button-primary dark:hover:bg-dark-button-primary-hover dark:focus:ring-dark-focus-ring transition-all duration-200 ${
                 isSubmitting ? "opacity-70 cursor-not-allowed" : ""
               }`}
               aria-label={isSubmitting ? "Signing up..." : "Sign up"}
@@ -326,10 +326,10 @@ const Register = () => {
 
           <div className="relative my-6">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-200"></div>
+              <div className="w-full border-t border-light-border-primary dark:border-dark-border-primary"></div>
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-white text-gray-500">
+              <span className="px-2 bg-light-bg-primary dark:bg-dark-bg-primary text-light-text-tertiary dark:text-dark-text-tertiary">
                 Or continue with Google
               </span>
             </div>
@@ -338,7 +338,7 @@ const Register = () => {
           <button
             onClick={handleGoogleSignIn}
             disabled={isSubmitting}
-            className="w-full flex items-center justify-center gap-3 py-3 px-4 border border-gray-300 rounded-lg text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full flex items-center justify-center gap-3 py-3 px-4 border border-light-border-primary dark:border-dark-border-primary rounded-lg text-light-text-primary dark:text-dark-text-primary bg-light-bg-primary dark:bg-dark-bg-primary hover:bg-light-hover-primary dark:hover:bg-dark-hover-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-light-focus-ring dark:focus:ring-dark-focus-ring transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -367,11 +367,11 @@ const Register = () => {
           </button>
 
           <div className="mt-6 text-center">
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-light-text-secondary dark:text-dark-text-secondary">
               Already have an account?{" "}
               <Link
                 href="/login"
-                className="text-primary-500 hover:text-primary-600 font-medium transition-colors duration-200"
+                className="text-light-button-primary hover:text-light-button-primary-hover dark:text-dark-button-primary dark:hover:text-dark-button-primary-hover font-medium transition-colors duration-200"
               >
                 Sign in
               </Link>
