@@ -208,7 +208,7 @@ const UploadForm = ({ semester, onUploadSuccess }: UploadFormProps) => {
           <button
             onClick={handleUpload}
             disabled={files.length === 0 || uploadStatus === "uploading" || uploadStatus === "rate_limited" || !user}
-            className="flex-1 bg-primary-500 text-white py-2 px-4 rounded-md hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="flex-1 bg-light-button-primary text-white py-2 px-4 rounded-md hover:bg-light-button-primary-hover dark:bg-dark-button-primary dark:hover:bg-dark-button-primary-hover focus:outline-none focus:ring-2 focus:ring-light-focus-ring dark:focus:ring-dark-focus-ring focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             {uploadStatus === "uploading" ? (
               <div className="flex items-center justify-center">

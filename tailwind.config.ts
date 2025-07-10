@@ -9,6 +9,7 @@ export default {
   theme: {
     extend: {
       colors: {
+        //We need to get rid of these old colours.
         primary: {
           50: "#e6f7ff",
           100: "#ccefff",
@@ -21,6 +22,7 @@ export default {
           800: "#006cff",
           900: "#005cff",
         },
+        //We need to get rid of these old colours.
         secondary: {
           50: "#f9fafb",
           100: "#f3f4f6",
@@ -98,8 +100,10 @@ export default {
           "input-border": "#2A2A2A",
           "input-text": "#FAFAFA",
           "input-placeholder": "#808080",
+
           "button-primary": "#F59E0B",
           "button-primary-hover": "#D97706",
+          
           "button-secondary": "#202020",
           "button-secondary-hover": "#2A2A2A",
           "success-bg": "rgba(16, 185, 129, 0.15)",

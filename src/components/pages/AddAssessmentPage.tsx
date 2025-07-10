@@ -38,7 +38,7 @@ const AddAssessmentPage = ({ forceSemesterId }: AddAssessmentPageProps) => {
                   onClick={() => setAddMode("manual")}
                   className={`flex-1 py-3 px-4 rounded-md text-sm font-medium transition-all duration-200 ${
                     addMode === "manual"
-                      ? "bg-primary-500 text-white shadow-sm"
+                      ? "bg-light-button-primary text-white shadow-sm dark:bg-dark-button-primary"
                       : "bg-gray-50 dark:bg-dark-bg-tertiary text-gray-600 dark:text-dark-text-secondary hover:bg-gray-100 dark:hover:bg-dark-bg-hover"
                   }`}
                 >
@@ -48,7 +48,7 @@ const AddAssessmentPage = ({ forceSemesterId }: AddAssessmentPageProps) => {
                   onClick={() => setAddMode("upload")}
                   className={`flex-1 py-3 px-4 rounded-md text-sm font-medium transition-all duration-200 ${
                     addMode === "upload"
-                      ? "bg-primary-500 text-white shadow-sm"
+                      ? "bg-light-button-primary text-white shadow-sm dark:bg-dark-button-primary"
                       : "bg-gray-50 dark:bg-dark-bg-tertiary text-gray-600 dark:text-dark-text-secondary hover:bg-gray-100 dark:hover:bg-dark-bg-hover"
                   }`}
                 >

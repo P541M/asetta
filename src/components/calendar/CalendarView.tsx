@@ -410,7 +410,7 @@ const CalendarView = ({ selectedSemester, semesterId }: CalendarViewProps) => {
                     : "bg-gray-50/50 dark:bg-dark-bg-tertiary/50"
                 } ${
                   day.isToday
-                    ? "ring-2 ring-primary-500 dark:ring-primary-400 ring-inset"
+                    ? "ring-2 ring-light-button-primary dark:ring-dark-button-primary ring-inset"
                     : ""
                 } ${
                   day.assessments.length > 0
@@ -426,7 +426,7 @@ const CalendarView = ({ selectedSemester, semesterId }: CalendarViewProps) => {
                         : "text-gray-400 dark:text-dark-text-tertiary"
                     } ${
                       day.isToday
-                        ? "text-primary-600 dark:text-primary-400"
+                        ? "text-light-button-primary dark:text-dark-button-primary"
                         : ""
                     }`}
                   >
