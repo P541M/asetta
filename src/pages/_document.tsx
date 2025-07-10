@@ -4,7 +4,12 @@ import Script from "next/script";
 export default function Document() {
   return (
     <Html lang="en">
-      <Head />
+      <Head>
+        <link
+          href="https://fonts.googleapis.com/css2?family=Onest:wght@300;400;500;600;700&display=swap"
+          rel="stylesheet"
+        />
+      </Head>
       <body>
         <Script id="theme-script" strategy="beforeInteractive">
           {`

@@ -151,8 +151,8 @@ export default {
         'none': 'none',
       },
       fontFamily: {
-        sans: ["Outfit", "Inter", "system-ui", "sans-serif"],
-        heading: ["Lexend", "Inter", "system-ui", "sans-serif"],
+        sans: ["Onest", "system-ui", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "Roboto", "sans-serif"],
+        heading: ["Onest", "system-ui", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "Roboto", "sans-serif"],
       },
       animation: {
         "fade-in": "fadeIn 0.3s ease-in-out",
