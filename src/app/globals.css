@@ -29,32 +29,32 @@
   }
   body {
     @apply bg-light-bg-secondary text-light-text-primary dark:bg-dark-bg-primary dark:text-dark-text-primary;
-    font-family: var(--font-outfit), "Outfit", sans-serif;
+    font-family: "Manrope", sans-serif;
     line-height: 1.6;
   }
   h1 {
     @apply text-3xl font-semibold text-light-text-primary dark:text-dark-text-primary leading-tight;
-    font-family: var(--font-lexend), "Lexend", sans-serif;
+    font-family: "Manrope", sans-serif;
   }
   h2 {
     @apply text-2xl font-semibold text-light-text-primary dark:text-dark-text-primary leading-tight;
-    font-family: var(--font-lexend), "Lexend", sans-serif;
+    font-family: "Manrope", sans-serif;
   }
   h3 {
     @apply text-xl font-medium text-light-text-primary dark:text-dark-text-primary leading-tight;
-    font-family: var(--font-lexend), "Lexend", sans-serif;
+    font-family: "Manrope", sans-serif;
   }
   h4 {
     @apply text-lg font-medium text-light-text-primary dark:text-dark-text-primary leading-tight;
-    font-family: var(--font-lexend), "Lexend", sans-serif;
+    font-family: "Manrope", sans-serif;
   }
   h5 {
     @apply text-base font-medium text-light-text-primary dark:text-dark-text-primary leading-tight;
-    font-family: var(--font-lexend), "Lexend", sans-serif;
+    font-family: "Manrope", sans-serif;
   }
   h6 {
     @apply text-sm font-medium text-light-text-primary dark:text-dark-text-primary leading-tight;
-    font-family: var(--font-lexend), "Lexend", sans-serif;
+    font-family: "Manrope", sans-serif;
   }
 }
 
@@ -138,7 +138,7 @@
 
   .logo {
     @apply text-light-button-primary font-bold text-xl dark:text-dark-button-primary;
-    font-family: "Lexend", sans-serif;
+    font-family: "Manrope", sans-serif;
     letter-spacing: 0.025em;
   }
 
