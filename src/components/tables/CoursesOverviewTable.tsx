@@ -140,7 +140,7 @@ const CoursesOverviewTable = ({
   };
 
 
-  if (error) return <div className="text-red-600">{error}</div>;
+  if (error) return <div className="text-light-error-text dark:text-dark-error-text">{error}</div>;
   if (courses.length === 0) {
     return (
       <div className="p-6">
@@ -183,7 +183,7 @@ const CoursesOverviewTable = ({
           <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary-200 dark:border-primary-800 border-t-primary-500 dark:border-t-primary-400"></div>
         </div>
       ) : error ? (
-        <div className="p-4 bg-red-50 dark:bg-red-900/20 rounded-lg text-red-700 dark:text-red-400 animate-fade-in">
+        <div className="p-4 bg-light-error-bg dark:bg-dark-error-bg rounded-lg text-light-error-text dark:text-dark-error-text animate-fade-in">
           <p>{error}</p>
         </div>
       ) : (

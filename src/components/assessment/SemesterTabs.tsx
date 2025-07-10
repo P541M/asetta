@@ -604,9 +604,9 @@ const SemesterTabs = ({
 
   if (isLoading) {
     return (
-      <div className="mb-4 bg-white dark:bg-dark-bg-secondary rounded-lg shadow-sm p-4 border border-gray-100 dark:border-dark-border-primary">
+      <div className="mb-4 bg-light-bg-primary dark:bg-dark-bg-secondary rounded-lg shadow-sm p-4 border border-light-border-primary dark:border-dark-border-primary">
         <div className="flex justify-center py-2">
-          <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary-600"></div>
+          <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-light-button-primary dark:border-dark-button-primary"></div>
         </div>
       </div>
     );
@@ -614,9 +614,9 @@ const SemesterTabs = ({
 
   return (
     <div className={`semester-tabs-container mb-6 ${className}`}>
-      <div className="flex items-center justify-between px-4 py-2 border-b border-gray-100 dark:border-dark-border-primary">
+      <div className="flex items-center justify-between px-4 py-2 border-b border-light-border-primary dark:border-dark-border-primary">
         <div className="flex items-center space-x-2">
-          <h2 className="text-sm font-medium text-gray-700 dark:text-dark-text-primary">
+          <h2 className="text-sm font-medium text-light-text-primary dark:text-dark-text-primary">
             Semesters
           </h2>
         </div>
@@ -659,13 +659,13 @@ const SemesterTabs = ({
             </button>
 
             {showMoreOptions && (
-              <div className="absolute right-0 top-full mt-1 bg-white dark:bg-dark-bg-secondary border border-gray-100 dark:border-dark-border-primary rounded-md shadow-md z-20 animate-fade-in-down">
+              <div className="absolute right-0 top-full mt-1 bg-light-bg-primary dark:bg-dark-bg-secondary border border-light-border-primary dark:border-dark-border-primary rounded-md shadow-md z-20 animate-fade-in-down">
                 <button
                   onClick={() => {
                     setShowMoreOptions(false);
                     setShowManageModal(true);
                   }}
-                  className="w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-dark-text-primary hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary transition-colors"
+                  className="w-full px-4 py-2 text-left text-sm text-light-text-primary dark:text-dark-text-primary hover:bg-light-hover-primary dark:hover:bg-dark-hover-primary transition-colors"
                 >
                   Manage Semesters
                 </button>
@@ -693,14 +693,11 @@ const SemesterTabs = ({
             </div>
           ))}
         </div>
-        {semesters.length > 0 && (
-          <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-white dark:from-dark-bg-secondary pointer-events-none"></div>
-        )}
       </div>
 
       {/* Empty state when no semesters exist */}
       {semesters.length === 0 && !showAddInput && (
-        <div className="text-center py-3 text-gray-500 dark:text-dark-text-tertiary text-sm">
+        <div className="text-center py-3 text-light-text-tertiary dark:text-dark-text-tertiary text-sm">
           <p>No semesters yet. Click &ldquo;+&rdquo; to add one.</p>
         </div>
       )}
@@ -708,7 +705,7 @@ const SemesterTabs = ({
       {/* Add semester input */}
       {showAddInput && (
         <div
-          className="px-4 py-2 border-t border-gray-100 dark:border-dark-border-primary"
+          className="px-4 py-2 border-t border-light-border-primary dark:border-dark-border-primary"
           ref={addInputRef}
         >
           <div className="flex items-center space-x-2">
@@ -717,7 +714,7 @@ const SemesterTabs = ({
               value={newSemester}
               onChange={(e) => setNewSemester(e.target.value)}
               placeholder="Enter semester name"
-              className="flex-1 px-3 py-1.5 text-sm border border-gray-200 dark:border-dark-border-primary rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-400 focus:border-transparent dark:bg-dark-bg-tertiary dark:text-dark-text-primary"
+              className="flex-1 px-3 py-1.5 text-sm border border-light-border-primary dark:border-dark-border-primary rounded-md focus:outline-none focus:ring-2 focus:ring-light-focus-ring dark:focus:ring-dark-focus-ring focus:border-transparent bg-light-input-bg dark:bg-dark-input-bg text-light-input-text dark:text-dark-input-text"
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
                   handleAddSemester();
@@ -732,8 +729,8 @@ const SemesterTabs = ({
               disabled={isAdding || !newSemester.trim()}
               className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
                 isAdding || !newSemester.trim()
-                  ? "bg-gray-100 dark:bg-dark-bg-tertiary text-gray-400 dark:text-dark-text-tertiary cursor-not-allowed"
-                  : "bg-primary-500 text-white hover:bg-primary-600"
+                  ? "bg-light-bg-tertiary dark:bg-dark-bg-tertiary text-light-text-tertiary dark:text-dark-text-tertiary cursor-not-allowed"
+                  : "bg-light-button-primary text-white hover:bg-light-button-primary-hover dark:bg-dark-button-primary dark:hover:bg-dark-button-primary-hover"
               }`}
             >
               {isAdding ? (

@@ -6,7 +6,7 @@ import Header from "../components/layout/Header";
 
 const Terms: NextPage = () => {
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
+    <div className="min-h-screen flex flex-col bg-light-bg-secondary dark:bg-dark-bg-primary">
       <Head>
         <title>Asetta - Terms of Service</title>
         <meta
@@ -19,13 +19,13 @@ const Terms: NextPage = () => {
 
       <main className="flex-grow pt-10 pb-20">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-6">
+          <div className="bg-light-bg-primary dark:bg-dark-bg-secondary rounded-lg shadow-sm border border-light-border-primary dark:border-dark-border-primary p-8">
+            <h1 className="text-3xl font-bold text-light-text-primary dark:text-dark-text-primary mb-6">
               Terms of Service
             </h1>
 
             <div className="prose prose-primary max-w-none">
-              <p className="text-gray-700 mb-6">Last Updated: April 19, 2025</p>
+              <p className="text-light-text-secondary dark:text-dark-text-secondary mb-6">Last Updated: April 19, 2025</p>
 
               <h2 className="text-xl font-semibold mt-8 mb-4">
                 1. Acceptance of Terms

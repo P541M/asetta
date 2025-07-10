@@ -35,25 +35,105 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
     loading: isLoading,
     error,
     refetch,
-  } = useAssessments(semesterId, selectedCourse ? { courseName: selectedCourse } : {});
+  } = useAssessments(
+    semesterId,
+    selectedCourse ? { courseName: selectedCourse } : {}
+  );
 
   const [assessments, setAssessments] = useState<Assessment[]>([]);
 
   // Grade scale configuration
   const getGradeInfo = (percentage: number): GradeInfo => {
-    if (percentage >= 90) return { letter: "A+", gpa: 4.0, color: "text-green-600", bgColor: "bg-green-100" };
-    if (percentage >= 85) return { letter: "A", gpa: 4.0, color: "text-green-600", bgColor: "bg-green-100" };
-    if (percentage >= 80) return { letter: "A-", gpa: 3.7, color: "text-green-500", bgColor: "bg-green-50" };
-    if (percentage >= 77) return { letter: "B+", gpa: 3.3, color: "text-blue-600", bgColor: "bg-blue-100" };
-    if (percentage >= 73) return { letter: "B", gpa: 3.0, color: "text-blue-600", bgColor: "bg-blue-100" };
-    if (percentage >= 70) return { letter: "B-", gpa: 2.7, color: "text-blue-500", bgColor: "bg-blue-50" };
-    if (percentage >= 67) return { letter: "C+", gpa: 2.3, color: "text-yellow-600", bgColor: "bg-yellow-100" };
-    if (percentage >= 63) return { letter: "C", gpa: 2.0, color: "text-yellow-600", bgColor: "bg-yellow-100" };
-    if (percentage >= 60) return { letter: "C-", gpa: 1.7, color: "text-yellow-500", bgColor: "bg-yellow-50" };
-    if (percentage >= 57) return { letter: "D+", gpa: 1.3, color: "text-orange-600", bgColor: "bg-orange-100" };
-    if (percentage >= 53) return { letter: "D", gpa: 1.0, color: "text-orange-600", bgColor: "bg-orange-100" };
-    if (percentage >= 50) return { letter: "D-", gpa: 0.7, color: "text-red-500", bgColor: "bg-red-50" };
-    return { letter: "F", gpa: 0.0, color: "text-red-600", bgColor: "bg-red-100" };
+    if (percentage >= 90)
+      return {
+        letter: "A+",
+        gpa: 4.0,
+        color: "text-light-grade-a-text dark:text-dark-grade-a-text",
+        bgColor: "bg-light-grade-a-bg dark:bg-dark-grade-a-bg",
+      };
+    if (percentage >= 85)
+      return {
+        letter: "A",
+        gpa: 4.0,
+        color: "text-light-grade-a-text dark:text-dark-grade-a-text",
+        bgColor: "bg-light-grade-a-bg dark:bg-dark-grade-a-bg",
+      };
+    if (percentage >= 80)
+      return {
+        letter: "A-",
+        gpa: 3.7,
+        color: "text-light-grade-a-text dark:text-dark-grade-a-text",
+        bgColor: "bg-light-grade-a-bg dark:bg-dark-grade-a-bg",
+      };
+    if (percentage >= 77)
+      return {
+        letter: "B+",
+        gpa: 3.3,
+        color: "text-light-grade-b-text dark:text-dark-grade-b-text",
+        bgColor: "bg-light-grade-b-bg dark:bg-dark-grade-b-bg",
+      };
+    if (percentage >= 73)
+      return {
+        letter: "B",
+        gpa: 3.0,
+        color: "text-light-grade-b-text dark:text-dark-grade-b-text",
+        bgColor: "bg-light-grade-b-bg dark:bg-dark-grade-b-bg",
+      };
+    if (percentage >= 70)
+      return {
+        letter: "B-",
+        gpa: 2.7,
+        color: "text-light-grade-b-text dark:text-dark-grade-b-text",
+        bgColor: "bg-light-grade-b-bg dark:bg-dark-grade-b-bg",
+      };
+    if (percentage >= 67)
+      return {
+        letter: "C+",
+        gpa: 2.3,
+        color: "text-light-grade-c-text dark:text-dark-grade-c-text",
+        bgColor: "bg-light-grade-c-bg dark:bg-dark-grade-c-bg",
+      };
+    if (percentage >= 63)
+      return {
+        letter: "C",
+        gpa: 2.0,
+        color: "text-light-grade-c-text dark:text-dark-grade-c-text",
+        bgColor: "bg-light-grade-c-bg dark:bg-dark-grade-c-bg",
+      };
+    if (percentage >= 60)
+      return {
+        letter: "C-",
+        gpa: 1.7,
+        color: "text-light-grade-c-text dark:text-dark-grade-c-text",
+        bgColor: "bg-light-grade-c-bg dark:bg-dark-grade-c-bg",
+      };
+    if (percentage >= 57)
+      return {
+        letter: "D+",
+        gpa: 1.3,
+        color: "text-light-grade-d-text dark:text-dark-grade-d-text",
+        bgColor: "bg-light-grade-d-bg dark:bg-dark-grade-d-bg",
+      };
+    if (percentage >= 53)
+      return {
+        letter: "D",
+        gpa: 1.0,
+        color: "text-light-grade-d-text dark:text-dark-grade-d-text",
+        bgColor: "bg-light-grade-d-bg dark:bg-dark-grade-d-bg",
+      };
+    if (percentage >= 50)
+      return {
+        letter: "D-",
+        gpa: 0.7,
+        color: "text-light-grade-f-text dark:text-dark-grade-f-text",
+        bgColor: "bg-light-grade-f-bg dark:bg-dark-grade-f-bg",
+      };
+    return {
+      letter: "F",
+      gpa: 0.0,
+      color: "text-light-grade-f-text dark:text-dark-grade-f-text",
+      bgColor: "bg-light-grade-f-bg dark:bg-dark-grade-f-bg",
+    };
   };
 
   useEffect(() => {
@@ -65,7 +145,10 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
 
     setAssessments(sortedAssessments);
 
-    const total = sortedAssessments.reduce((sum, assessment) => sum + assessment.weight, 0);
+    const total = sortedAssessments.reduce(
+      (sum, assessment) => sum + assessment.weight,
+      0
+    );
     setTotalWeight(total);
 
     const completedAssessments = sortedAssessments.filter(
@@ -74,14 +157,18 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
 
     if (completedAssessments.length > 0) {
       const weightedSum = completedAssessments.reduce((sum, assessment) => {
-        if (assessment.mark === null || assessment.mark === undefined) return sum;
+        if (assessment.mark === null || assessment.mark === undefined)
+          return sum;
         return sum + (assessment.mark * assessment.weight) / 100;
       }, 0);
       const completedWeight = completedAssessments.reduce((sum, assessment) => {
-        if (assessment.mark === null || assessment.mark === undefined) return sum;
+        if (assessment.mark === null || assessment.mark === undefined)
+          return sum;
         return sum + assessment.weight;
       }, 0);
-      setCurrentGrade(completedWeight > 0 ? (weightedSum / completedWeight) * 100 : 0);
+      setCurrentGrade(
+        completedWeight > 0 ? (weightedSum / completedWeight) * 100 : 0
+      );
     } else {
       setCurrentGrade(null);
     }
@@ -98,17 +185,20 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
       )
     );
 
-    recalculateGrade(assessments.map((assessment) =>
-      assessment.id === assessmentId
-        ? { ...assessment, mark, status: "Submitted" }
-        : assessment
-    ));
+    recalculateGrade(
+      assessments.map((assessment) =>
+        assessment.id === assessmentId
+          ? { ...assessment, mark, status: "Submitted" }
+          : assessment
+      )
+    );
 
     setHasUnsavedChanges(true);
   };
 
   const handleWeightChange = (assessmentId: string, value: string) => {
-    const newWeight = value === "" ? 0 : Math.min(100, Math.max(0, parseFloat(value) || 0));
+    const newWeight =
+      value === "" ? 0 : Math.min(100, Math.max(0, parseFloat(value) || 0));
 
     setAssessments((prevAssessments) =>
       prevAssessments.map((assessment) =>
@@ -124,7 +214,10 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
         : assessment
     );
 
-    const total = updatedAssessments.reduce((sum, assessment) => sum + assessment.weight, 0);
+    const total = updatedAssessments.reduce(
+      (sum, assessment) => sum + assessment.weight,
+      0
+    );
     setTotalWeight(total);
 
     recalculateGrade(updatedAssessments);
@@ -138,14 +231,18 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
 
     if (completedAssessments.length > 0) {
       const weightedSum = completedAssessments.reduce((sum, assessment) => {
-        if (assessment.mark === null || assessment.mark === undefined) return sum;
+        if (assessment.mark === null || assessment.mark === undefined)
+          return sum;
         return sum + (assessment.mark * assessment.weight) / 100;
       }, 0);
       const completedWeight = completedAssessments.reduce((sum, assessment) => {
-        if (assessment.mark === null || assessment.mark === undefined) return sum;
+        if (assessment.mark === null || assessment.mark === undefined)
+          return sum;
         return sum + assessment.weight;
       }, 0);
-      setCurrentGrade(completedWeight > 0 ? (weightedSum / completedWeight) * 100 : 0);
+      setCurrentGrade(
+        completedWeight > 0 ? (weightedSum / completedWeight) * 100 : 0
+      );
     }
   };
 
@@ -159,16 +256,25 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
 
     if (remainingAssessments.length === 0) return null;
 
-    const currentWeightedSum = completedAssessments.reduce((sum, assessment) => {
-      if (assessment.mark === null || assessment.mark === undefined) return sum;
-      return sum + (assessment.mark * assessment.weight) / 100;
-    }, 0);
+    const currentWeightedSum = completedAssessments.reduce(
+      (sum, assessment) => {
+        if (assessment.mark === null || assessment.mark === undefined)
+          return sum;
+        return sum + (assessment.mark * assessment.weight) / 100;
+      },
+      0
+    );
 
-    const remainingWeight = remainingAssessments.reduce((sum, assessment) => sum + assessment.weight, 0);
+    const remainingWeight = remainingAssessments.reduce(
+      (sum, assessment) => sum + assessment.weight,
+      0
+    );
     const targetWeightedSum = (targetGrade * totalWeight) / 100;
     const requiredWeightedSum = targetWeightedSum - currentWeightedSum;
 
-    return remainingWeight > 0 ? (requiredWeightedSum / remainingWeight) * 100 : 0;
+    return remainingWeight > 0
+      ? (requiredWeightedSum / remainingWeight) * 100
+      : 0;
   };
 
   const handleSaveChanges = async () => {
@@ -180,7 +286,11 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
     try {
       for (const assessment of assessments) {
         if (!assessment.id) continue;
-        const assessmentRef = getAssessmentDocRef(user.uid, semesterId, assessment.id);
+        const assessmentRef = getAssessmentDocRef(
+          user.uid,
+          semesterId,
+          assessment.id
+        );
         const mark = assessment.mark === undefined ? null : assessment.mark;
 
         await updateDoc(assessmentRef, {
@@ -203,7 +313,7 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
   const getAssessmentStatus = (assessment: Assessment) => {
     const now = new Date();
     const dueDate = new Date(`${assessment.dueDate}T${assessment.dueTime}`);
-    
+
     if (assessment.status === "Submitted") {
       return { icon: "✓", color: "text-green-600", bgColor: "bg-green-100" };
     } else if (dueDate < now) {
@@ -257,7 +367,8 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
     return <ErrorMessage message={error} />;
   }
 
-  const currentGradeInfo = currentGrade !== null ? getGradeInfo(currentGrade) : null;
+  const currentGradeInfo =
+    currentGrade !== null ? getGradeInfo(currentGrade) : null;
   const requiredGrade = calculateRequiredGrade();
 
   return (
@@ -276,7 +387,9 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
           <button
             onClick={handleSaveChanges}
             disabled={isSaving}
-            className={`btn-primary ${isSaving ? "opacity-70 cursor-not-allowed" : ""}`}
+            className={`btn-primary ${
+              isSaving ? "opacity-70 cursor-not-allowed" : ""
+            }`}
           >
             {isSaving ? "Saving..." : "Save Changes"}
           </button>
@@ -312,7 +425,9 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
               </div>
               <div className="w-full bg-gray-100 dark:bg-dark-bg-tertiary rounded-full h-1.5">
                 <div
-                  className={`h-1.5 rounded-full transition-all duration-300 ${getProgressBarColor(currentGrade)}`}
+                  className={`h-1.5 rounded-full transition-all duration-300 ${getProgressBarColor(
+                    currentGrade
+                  )}`}
                   style={{ width: `${Math.min(currentGrade, 100)}%` }}
                 ></div>
               </div>
@@ -341,13 +456,21 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
             <div className="w-full bg-gray-100 dark:bg-dark-bg-tertiary rounded-full h-1.5">
               <div
                 className={`h-1.5 rounded-full transition-all duration-300 ${
-                  totalWeight === 100 ? "bg-green-500" : totalWeight >= 90 ? "bg-yellow-500" : "bg-red-500"
+                  totalWeight === 100
+                    ? "bg-green-500"
+                    : totalWeight >= 90
+                    ? "bg-yellow-500"
+                    : "bg-red-500"
                 }`}
                 style={{ width: `${Math.min(totalWeight, 100)}%` }}
               ></div>
             </div>
             <p className="text-sm text-gray-500 dark:text-dark-text-tertiary">
-              {totalWeight === 100 ? "Complete" : totalWeight > 100 ? "Over 100%" : `${100 - totalWeight}% remaining`}
+              {totalWeight === 100
+                ? "Complete"
+                : totalWeight > 100
+                ? "Over 100%"
+                : `${100 - totalWeight}% remaining`}
             </p>
           </div>
         </div>
@@ -364,16 +487,24 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
                 min="0"
                 max="100"
                 value={targetGrade}
-                onChange={(e) => setTargetGrade(parseFloat(e.target.value) || 0)}
+                onChange={(e) =>
+                  setTargetGrade(parseFloat(e.target.value) || 0)
+                }
                 className="input w-16 px-2 py-1 text-sm hover:shadow-sm transition-all duration-200 dark:bg-dark-input-bg dark:text-dark-input-text dark:border-dark-input-border"
               />
-              <span className="text-gray-500 dark:text-dark-text-tertiary text-sm">%</span>
+              <span className="text-gray-500 dark:text-dark-text-tertiary text-sm">
+                %
+              </span>
             </div>
             {requiredGrade !== null && (
               <div className="text-sm">
                 <p className="text-gray-700 dark:text-dark-text-secondary">
                   Need avg of{" "}
-                  <span className={`font-medium ${requiredGrade > 100 ? "text-red-600" : "text-green-600"}`}>
+                  <span
+                    className={`font-medium ${
+                      requiredGrade > 100 ? "text-red-600" : "text-green-600"
+                    }`}
+                  >
                     {requiredGrade.toFixed(1)}%
                   </span>
                 </p>
@@ -396,7 +527,7 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
             Edit weights and marks to calculate your grade
           </p>
         </div>
-        
+
         <div className="p-6">
           {assessments.length === 0 ? (
             <EmptyState
@@ -454,9 +585,10 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
               <div className="space-y-3">
                 {assessments.map((assessment) => {
                   const status = getAssessmentStatus(assessment);
-                  const contribution = assessment.mark && assessment.weight 
-                    ? ((assessment.mark * assessment.weight) / 100).toFixed(1)
-                    : "0.0";
+                  const contribution =
+                    assessment.mark && assessment.weight
+                      ? ((assessment.mark * assessment.weight) / 100).toFixed(1)
+                      : "0.0";
 
                   return (
                     <div
@@ -469,7 +601,8 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
                             {assessment.assignmentName}
                           </h3>
                           <p className="text-xs text-gray-500 dark:text-dark-text-tertiary mt-1">
-                            Due: {new Date(assessment.dueDate).toLocaleDateString()}
+                            Due:{" "}
+                            {new Date(assessment.dueDate).toLocaleDateString()}
                           </p>
                         </div>
                         <div className="col-span-12 lg:col-span-2">
@@ -489,11 +622,17 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
                               step="0.1"
                               value={assessment.weight}
                               onChange={(e) =>
-                                assessment.id && handleWeightChange(assessment.id, e.target.value)
+                                assessment.id &&
+                                handleWeightChange(
+                                  assessment.id,
+                                  e.target.value
+                                )
                               }
                               className="input w-16 px-2 py-1 text-sm hover:shadow-sm transition-all duration-200 dark:bg-dark-input-bg dark:text-dark-input-text dark:border-dark-input-border [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                             />
-                            <span className="text-xs text-gray-500 dark:text-dark-text-tertiary">%</span>
+                            <span className="text-xs text-gray-500 dark:text-dark-text-tertiary">
+                              %
+                            </span>
                           </div>
                         </div>
                         <div className="col-span-12 lg:col-span-2">
@@ -504,12 +643,15 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
                               step="0.1"
                               value={assessment.mark ?? ""}
                               onChange={(e) =>
-                                assessment.id && handleMarkChange(assessment.id, e.target.value)
+                                assessment.id &&
+                                handleMarkChange(assessment.id, e.target.value)
                               }
                               className="input w-16 px-2 py-1 text-sm hover:shadow-sm transition-all duration-200 dark:bg-dark-input-bg dark:text-dark-input-text dark:border-dark-input-border [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                               placeholder="--"
                             />
-                            <span className="text-xs text-gray-500 dark:text-dark-text-tertiary">%</span>
+                            <span className="text-xs text-gray-500 dark:text-dark-text-tertiary">
+                              %
+                            </span>
                           </div>
                         </div>
                         <div className="col-span-12 lg:col-span-2">

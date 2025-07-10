@@ -187,8 +187,8 @@ const UploadForm = ({ semester, onUploadSuccess }: UploadFormProps) => {
         )}
 
         {message && (
-          <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-md">
-            <p className="text-sm text-green-700 dark:text-green-400">{message}</p>
+          <div className="p-4 bg-light-success-bg dark:bg-dark-success-bg rounded-md">
+            <p className="text-sm text-light-success-text dark:text-dark-success-text">{message}</p>
           </div>
         )}
 
@@ -199,8 +199,8 @@ const UploadForm = ({ semester, onUploadSuccess }: UploadFormProps) => {
             autoRetry={true}
           />
         ) : error && (
-          <div className="p-4 bg-red-50 dark:bg-red-900/20 rounded-md">
-            <p className="text-sm text-red-700 dark:text-red-400">{error}</p>
+          <div className="p-4 bg-light-error-bg dark:bg-dark-error-bg rounded-md">
+            <p className="text-sm text-light-error-text dark:text-dark-error-text">{error}</p>
           </div>
         )}
 

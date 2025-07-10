@@ -50,17 +50,17 @@ const NotificationsSection = ({
               type="checkbox"
               checked={hasConsentedToNotifications}
               onChange={(e) => setHasConsentedToNotifications(e.target.checked)}
-              className="h-4 w-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500"
+              className="h-4 w-4 text-light-button-primary dark:text-dark-button-primary border-light-border-primary dark:border-dark-border-primary rounded focus:ring-light-focus-ring dark:focus:ring-dark-focus-ring"
             />
           </div>
           <div className="ml-3 text-sm">
             <label
               htmlFor="notification-consent"
-              className="font-medium text-gray-700 dark:text-dark-text-primary"
+              className="font-medium text-light-text-primary dark:text-dark-text-primary"
             >
               I consent to receive notifications about upcoming due dates
             </label>
-            <p className="text-gray-500 dark:text-dark-text-tertiary">
+            <p className="text-light-text-tertiary dark:text-dark-text-tertiary">
               By enabling notifications, you agree to receive reminders about
               upcoming assessments via email.
             </p>
@@ -71,22 +71,22 @@ const NotificationsSection = ({
       {hasConsentedToNotifications && (
         <>
           {/* Email Notifications */}
-          <div className="flex items-center justify-between p-4 rounded-xl bg-gray-50 dark:bg-dark-bg-secondary hover:bg-gray-100 dark:hover:bg-dark-bg-tertiary transition-colors">
+          <div className="flex items-center justify-between p-4 rounded-xl bg-light-bg-secondary dark:bg-dark-bg-secondary hover:bg-light-hover-primary dark:hover:bg-dark-hover-primary transition-colors">
             <div className="flex-1">
-              <h3 className="text-base font-semibold text-gray-900 dark:text-dark-text-primary">
+              <h3 className="text-base font-semibold text-light-text-primary dark:text-dark-text-primary">
                 Email Notifications
               </h3>
-              <p className="mt-1 text-sm text-gray-500 dark:text-dark-text-tertiary">
+              <p className="mt-1 text-sm text-light-text-tertiary dark:text-dark-text-tertiary">
                 Receive notifications via email
               </p>
             </div>
             <button
               type="button"
               onClick={() => setEmailNotifications(!emailNotifications)}
-              className={`relative inline-flex h-7 w-14 items-center rounded-full transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 ${
+              className={`relative inline-flex h-7 w-14 items-center rounded-full transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-light-focus-ring dark:focus:ring-dark-focus-ring focus:ring-offset-2 ${
                 emailNotifications
-                  ? "bg-primary-600"
-                  : "bg-gray-200 dark:bg-dark-bg-tertiary"
+                  ? "bg-light-button-primary dark:bg-dark-button-primary"
+                  : "bg-light-bg-tertiary dark:bg-dark-bg-tertiary"
               }`}
             >
               <span
@@ -101,7 +101,7 @@ const NotificationsSection = ({
             <div className="mb-4">
               <label
                 htmlFor="email"
-                className="block text-sm font-medium text-gray-700 dark:text-dark-text-primary mb-1"
+                className="block text-sm font-medium text-light-text-primary dark:text-dark-text-primary mb-1"
               >
                 Email Address
               </label>
@@ -110,7 +110,7 @@ const NotificationsSection = ({
                 id="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-2.5 border border-gray-300 dark:border-dark-input-border rounded-xl shadow-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-dark-input-bg dark:text-dark-input-text transition-all duration-200"
+                className="w-full px-4 py-2.5 border border-light-input-border dark:border-dark-input-border rounded-xl shadow-sm focus:ring-2 focus:ring-light-focus-ring dark:focus:ring-dark-focus-ring focus:border-light-focus-ring dark:focus:border-dark-focus-ring bg-light-input-bg dark:bg-dark-input-bg text-light-input-text dark:text-dark-input-text transition-all duration-200"
                 placeholder="Enter your email address"
               />
             </div>
@@ -120,7 +120,7 @@ const NotificationsSection = ({
           <div className="space-y-2">
             <label
               htmlFor="notification-days"
-              className="block text-sm font-medium text-gray-700 dark:text-dark-text-primary mb-1"
+              className="block text-sm font-medium text-light-text-primary dark:text-dark-text-primary mb-1"
             >
               Notify me
             </label>
@@ -130,7 +130,7 @@ const NotificationsSection = ({
                 isCustomDays ? "custom" : notificationDaysBefore.toString()
               }
               onChange={(e) => handleDaysChange(e.target.value)}
-              className="w-full px-4 py-2.5 border border-gray-300 dark:border-dark-input-border rounded-xl shadow-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-dark-input-bg dark:text-dark-input-text transition-all duration-200"
+              className="w-full px-4 py-2.5 border border-light-input-border dark:border-dark-input-border rounded-xl shadow-sm focus:ring-2 focus:ring-light-focus-ring dark:focus:ring-dark-focus-ring focus:border-light-focus-ring dark:focus:border-dark-focus-ring bg-light-input-bg dark:bg-dark-input-bg text-light-input-text dark:text-dark-input-text transition-all duration-200"
             >
               <option value="1">1 day before</option>
               <option value="2">2 days before</option>
@@ -151,10 +151,10 @@ const NotificationsSection = ({
                   max="30"
                   value={customDays}
                   onChange={handleCustomDaysChange}
-                  className="w-full px-4 py-2.5 border border-gray-300 dark:border-dark-input-border rounded-xl shadow-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-dark-input-bg dark:text-dark-input-text transition-all duration-200"
+                  className="w-full px-4 py-2.5 border border-light-input-border dark:border-dark-input-border rounded-xl shadow-sm focus:ring-2 focus:ring-light-focus-ring dark:focus:ring-dark-focus-ring focus:border-light-focus-ring dark:focus:border-dark-focus-ring bg-light-input-bg dark:bg-dark-input-bg text-light-input-text dark:text-dark-input-text transition-all duration-200"
                   placeholder="Enter number of days (1-30)"
                 />
-                <p className="mt-1 text-sm text-gray-500 dark:text-dark-text-tertiary">
+                <p className="mt-1 text-sm text-light-text-tertiary dark:text-dark-text-tertiary">
                   Choose between 1 and 30 days
                 </p>
               </div>

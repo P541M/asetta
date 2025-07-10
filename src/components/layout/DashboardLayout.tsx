@@ -80,7 +80,13 @@ const DashboardLayout = ({
       // If forceSemesterId is provided, use it directly
       if (forceSemesterId) {
         try {
-          const semesterRef = doc(db, "users", user.uid, "semesters", forceSemesterId);
+          const semesterRef = doc(
+            db,
+            "users",
+            user.uid,
+            "semesters",
+            forceSemesterId
+          );
           const semesterSnap = await getDoc(semesterRef);
           if (semesterSnap.exists()) {
             setSelectedSemesterId(forceSemesterId);
@@ -124,7 +130,7 @@ const DashboardLayout = ({
       setAssessments([]);
       return;
     }
-    
+
     // Only show loading spinner on initial load or when there's no previous data
     if (assessments.length === 0) {
       setIsLoading(true);
@@ -161,7 +167,7 @@ const DashboardLayout = ({
             };
           });
           setAssessments(assessmentsList);
-    
+
           const now = new Date();
           const oneWeek = new Date();
           oneWeek.setDate(now.getDate() + 7);
@@ -199,7 +205,7 @@ const DashboardLayout = ({
           console.error("Error fetching assessments:", err);
           setError("Failed to load assessments. Please try again.");
           setIsLoading(false);
-            }
+        }
       );
     } catch (error) {
       console.error("Error setting up assessments listener:", error);
@@ -285,7 +291,9 @@ const DashboardLayout = ({
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
             <div>
-              <h1 className="text-3xl font-bold text-light-button-primary dark:text-dark-button-primary">Dashboard</h1>
+              <h1 className="text-3xl font-bold text-light-button-primary dark:text-dark-button-primary">
+                Dashboard
+              </h1>
               <p className="text-sm text-light-text-secondary dark:text-dark-text-secondary mt-2">
                 {selectedSemester
                   ? `Viewing ${selectedSemester} semester`
@@ -335,11 +343,14 @@ const DashboardLayout = ({
               <div className="hidden md:flex space-x-2">
                 <button
                   onClick={() => {
-                    const path = selectedSemesterId ? `/dashboard/${selectedSemesterId}/courses` : "/dashboard/courses";
+                    const path = selectedSemesterId
+                      ? `/dashboard/${selectedSemesterId}/courses`
+                      : "/dashboard/courses";
                     router.push(path);
                   }}
-                  className={`flex-1 px-6 py-3 font-medium text-sm transition-all duration-200 rounded-lg ${
-                    router.pathname === "/dashboard/courses" || router.pathname === "/dashboard/[semester]/courses"
+                  className={`flex-1 px-6 py-3 font-medium text-sm transition-all duration-200 rounded-xl ${
+                    router.pathname === "/dashboard/courses" ||
+                    router.pathname === "/dashboard/[semester]/courses"
                       ? "bg-light-button-primary/10 text-light-button-primary dark:bg-dark-button-primary/10 dark:text-dark-button-primary"
                       : "text-light-text-secondary dark:text-dark-text-secondary hover:bg-light-hover-primary dark:hover:bg-dark-hover-primary hover:text-light-text-primary dark:hover:text-dark-text-primary"
                   }`}
@@ -363,11 +374,14 @@ const DashboardLayout = ({
                 </button>
                 <button
                   onClick={() => {
-                    const path = selectedSemesterId ? `/dashboard/${selectedSemesterId}/assessments` : "/dashboard/assessments";
+                    const path = selectedSemesterId
+                      ? `/dashboard/${selectedSemesterId}/assessments`
+                      : "/dashboard/assessments";
                     router.push(path);
                   }}
-                  className={`flex-1 px-6 py-3 font-medium text-sm transition-all duration-200 rounded-lg ${
-                    router.pathname === "/dashboard/assessments" || router.pathname === "/dashboard/[semester]/assessments"
+                  className={`flex-1 px-6 py-3 font-medium text-sm transition-all duration-200 rounded-xl ${
+                    router.pathname === "/dashboard/assessments" ||
+                    router.pathname === "/dashboard/[semester]/assessments"
                       ? "bg-light-button-primary/10 text-light-button-primary dark:bg-dark-button-primary/10 dark:text-dark-button-primary"
                       : "text-light-text-secondary dark:text-dark-text-secondary hover:bg-light-hover-primary dark:hover:bg-dark-hover-primary hover:text-light-text-primary dark:hover:text-dark-text-primary"
                   }`}
@@ -390,11 +404,14 @@ const DashboardLayout = ({
                 </button>
                 <button
                   onClick={() => {
-                    const path = selectedSemesterId ? `/dashboard/${selectedSemesterId}/grades` : "/dashboard/grades";
+                    const path = selectedSemesterId
+                      ? `/dashboard/${selectedSemesterId}/grades`
+                      : "/dashboard/grades";
                     router.push(path);
                   }}
-                  className={`flex-1 px-6 py-3 font-medium text-sm transition-all duration-200 rounded-lg ${
-                    router.pathname === "/dashboard/grades" || router.pathname === "/dashboard/[semester]/grades"
+                  className={`flex-1 px-6 py-3 font-medium text-sm transition-all duration-200 rounded-xl ${
+                    router.pathname === "/dashboard/grades" ||
+                    router.pathname === "/dashboard/[semester]/grades"
                       ? "bg-light-button-primary/10 text-light-button-primary dark:bg-dark-button-primary/10 dark:text-dark-button-primary"
                       : "text-light-text-secondary dark:text-dark-text-secondary hover:bg-light-hover-primary dark:hover:bg-dark-hover-primary hover:text-light-text-primary dark:hover:text-dark-text-primary"
                   }`}
@@ -410,18 +427,21 @@ const DashboardLayout = ({
                       strokeLinecap="round"
                       strokeLinejoin="round"
                     >
-                      <path d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                      <path d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
                     </svg>
                     <span>Grades</span>
                   </div>
                 </button>
                 <button
                   onClick={() => {
-                    const path = selectedSemesterId ? `/dashboard/${selectedSemesterId}/calendar` : "/dashboard/calendar";
+                    const path = selectedSemesterId
+                      ? `/dashboard/${selectedSemesterId}/calendar`
+                      : "/dashboard/calendar";
                     router.push(path);
                   }}
-                  className={`flex-1 px-6 py-3 font-medium text-sm transition-all duration-200 rounded-lg ${
-                    router.pathname === "/dashboard/calendar" || router.pathname === "/dashboard/[semester]/calendar"
+                  className={`flex-1 px-6 py-3 font-medium text-sm transition-all duration-200 rounded-xl ${
+                    router.pathname === "/dashboard/calendar" ||
+                    router.pathname === "/dashboard/[semester]/calendar"
                       ? "bg-light-button-primary/10 text-light-button-primary dark:bg-dark-button-primary/10 dark:text-dark-button-primary"
                       : "text-light-text-secondary dark:text-dark-text-secondary hover:bg-light-hover-primary dark:hover:bg-dark-hover-primary hover:text-light-text-primary dark:hover:text-dark-text-primary"
                   }`}
@@ -447,11 +467,14 @@ const DashboardLayout = ({
                 </button>
                 <button
                   onClick={() => {
-                    const path = selectedSemesterId ? `/dashboard/${selectedSemesterId}/add` : "/dashboard/add";
+                    const path = selectedSemesterId
+                      ? `/dashboard/${selectedSemesterId}/add`
+                      : "/dashboard/add";
                     router.push(path);
                   }}
-                  className={`flex-1 px-6 py-3 font-medium text-sm transition-all duration-200 rounded-lg ${
-                    router.pathname === "/dashboard/add" || router.pathname === "/dashboard/[semester]/add"
+                  className={`flex-1 px-6 py-3 font-medium text-sm transition-all duration-200 rounded-xl ${
+                    router.pathname === "/dashboard/add" ||
+                    router.pathname === "/dashboard/[semester]/add"
                       ? "bg-light-button-primary/10 text-light-button-primary dark:bg-dark-button-primary/10 dark:text-dark-button-primary"
                       : "text-light-text-secondary dark:text-dark-text-secondary hover:bg-light-hover-primary dark:hover:bg-dark-hover-primary hover:text-light-text-primary dark:hover:text-dark-text-primary"
                   }`}
@@ -477,147 +500,169 @@ const DashboardLayout = ({
               {/* Mobile Navigation */}
               <div className="md:hidden">
                 <div className="grid grid-cols-3 gap-1 mb-1">
-                <button
-                  onClick={() => {
-                    const path = selectedSemesterId ? `/dashboard/${selectedSemesterId}/courses` : "/dashboard/courses";
-                    router.push(path);
-                  }}
-                  className={`px-3 py-3 font-medium text-sm transition-all duration-200 rounded-lg ${
-                    router.pathname === "/dashboard/courses" || router.pathname === "/dashboard/[semester]/courses"
-                      ? "bg-light-button-primary/10 text-light-button-primary dark:bg-dark-button-primary/10 dark:text-dark-button-primary"
-                      : "text-light-text-secondary dark:text-dark-text-secondary hover:bg-light-hover-primary dark:hover:bg-dark-hover-primary hover:text-light-text-primary dark:hover:text-dark-text-primary"
-                  }`}
-                >
-                  <div className="flex flex-col items-center space-y-1">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-4 w-4"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
-                      <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
-                    </svg>
-                    <span className="text-xs">Courses</span>
-                  </div>
-                </button>
-                <button
-                  onClick={() => {
-                    const path = selectedSemesterId ? `/dashboard/${selectedSemesterId}/assessments` : "/dashboard/assessments";
-                    router.push(path);
-                  }}
-                  className={`px-3 py-3 font-medium text-sm transition-all duration-200 rounded-lg ${
-                    router.pathname === "/dashboard/assessments" || router.pathname === "/dashboard/[semester]/assessments"
-                      ? "bg-light-button-primary/10 text-light-button-primary dark:bg-dark-button-primary/10 dark:text-dark-button-primary"
-                      : "text-light-text-secondary dark:text-dark-text-secondary hover:bg-light-hover-primary dark:hover:bg-dark-hover-primary hover:text-light-text-primary dark:hover:text-dark-text-primary"
-                  }`}
-                >
-                  <div className="flex flex-col items-center space-y-1">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-4 w-4"
-                      viewBox="0 0 20 20"
-                      fill="currentColor"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                    <span className="text-xs">Assessments</span>
-                  </div>
-                </button>
-                <button
-                  onClick={() => {
-                    const path = selectedSemesterId ? `/dashboard/${selectedSemesterId}/grades` : "/dashboard/grades";
-                    router.push(path);
-                  }}
-                  className={`px-3 py-3 font-medium text-sm transition-all duration-200 rounded-lg ${
-                    router.pathname === "/dashboard/grades" || router.pathname === "/dashboard/[semester]/grades"
-                      ? "bg-light-button-primary/10 text-light-button-primary dark:bg-dark-button-primary/10 dark:text-dark-button-primary"
-                      : "text-light-text-secondary dark:text-dark-text-secondary hover:bg-light-hover-primary dark:hover:bg-dark-hover-primary hover:text-light-text-primary dark:hover:text-dark-text-primary"
-                  }`}
-                >
-                  <div className="flex flex-col items-center space-y-1">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-4 w-4"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <path d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
-                    </svg>
-                    <span className="text-xs">Grades</span>
-                  </div>
-                </button>
+                  <button
+                    onClick={() => {
+                      const path = selectedSemesterId
+                        ? `/dashboard/${selectedSemesterId}/courses`
+                        : "/dashboard/courses";
+                      router.push(path);
+                    }}
+                    className={`px-3 py-3 font-medium text-sm transition-all duration-200 rounded-xl ${
+                      router.pathname === "/dashboard/courses" ||
+                      router.pathname === "/dashboard/[semester]/courses"
+                        ? "bg-light-button-primary/10 text-light-button-primary dark:bg-dark-button-primary/10 dark:text-dark-button-primary"
+                        : "text-light-text-secondary dark:text-dark-text-secondary hover:bg-light-hover-primary dark:hover:bg-dark-hover-primary hover:text-light-text-primary dark:hover:text-dark-text-primary"
+                    }`}
+                  >
+                    <div className="flex flex-col items-center space-y-1">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-4 w-4"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+                        <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+                      </svg>
+                      <span className="text-xs">Courses</span>
+                    </div>
+                  </button>
+                  <button
+                    onClick={() => {
+                      const path = selectedSemesterId
+                        ? `/dashboard/${selectedSemesterId}/assessments`
+                        : "/dashboard/assessments";
+                      router.push(path);
+                    }}
+                    className={`px-3 py-3 font-medium text-sm transition-all duration-200 rounded-xl ${
+                      router.pathname === "/dashboard/assessments" ||
+                      router.pathname === "/dashboard/[semester]/assessments"
+                        ? "bg-light-button-primary/10 text-light-button-primary dark:bg-dark-button-primary/10 dark:text-dark-button-primary"
+                        : "text-light-text-secondary dark:text-dark-text-secondary hover:bg-light-hover-primary dark:hover:bg-dark-hover-primary hover:text-light-text-primary dark:hover:text-dark-text-primary"
+                    }`}
+                  >
+                    <div className="flex flex-col items-center space-y-1">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-4 w-4"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                      <span className="text-xs">Assessments</span>
+                    </div>
+                  </button>
+                  <button
+                    onClick={() => {
+                      const path = selectedSemesterId
+                        ? `/dashboard/${selectedSemesterId}/grades`
+                        : "/dashboard/grades";
+                      router.push(path);
+                    }}
+                    className={`px-3 py-3 font-medium text-sm transition-all duration-200 rounded-xl ${
+                      router.pathname === "/dashboard/grades" ||
+                      router.pathname === "/dashboard/[semester]/grades"
+                        ? "bg-light-button-primary/10 text-light-button-primary dark:bg-dark-button-primary/10 dark:text-dark-button-primary"
+                        : "text-light-text-secondary dark:text-dark-text-secondary hover:bg-light-hover-primary dark:hover:bg-dark-hover-primary hover:text-light-text-primary dark:hover:text-dark-text-primary"
+                    }`}
+                  >
+                    <div className="flex flex-col items-center space-y-1">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-4 w-4"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                      </svg>
+                      <span className="text-xs">Grades</span>
+                    </div>
+                  </button>
                 </div>
                 <div className="grid grid-cols-2 gap-1">
-                <button
-                  onClick={() => {
-                    const path = selectedSemesterId ? `/dashboard/${selectedSemesterId}/calendar` : "/dashboard/calendar";
-                    router.push(path);
-                  }}
-                  className={`px-3 py-3 font-medium text-sm transition-all duration-200 rounded-lg ${
-                    router.pathname === "/dashboard/calendar" || router.pathname === "/dashboard/[semester]/calendar"
-                      ? "bg-light-button-primary/10 text-light-button-primary dark:bg-dark-button-primary/10 dark:text-dark-button-primary"
-                      : "text-light-text-secondary dark:text-dark-text-secondary hover:bg-light-hover-primary dark:hover:bg-dark-hover-primary hover:text-light-text-primary dark:hover:text-dark-text-primary"
-                  }`}
-                >
-                  <div className="flex flex-col items-center space-y-1">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-4 w-4"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-                      <line x1="16" y1="2" x2="16" y2="6" />
-                      <line x1="8" y1="2" x2="8" y2="6" />
-                      <line x1="3" y1="10" x2="21" y2="10" />
-                    </svg>
-                    <span className="text-xs">Calendar</span>
-                  </div>
-                </button>
-                <button
-                  onClick={() => {
-                    const path = selectedSemesterId ? `/dashboard/${selectedSemesterId}/add` : "/dashboard/add";
-                    router.push(path);
-                  }}
-                  className={`px-3 py-3 font-medium text-sm transition-all duration-200 rounded-lg ${
-                    router.pathname === "/dashboard/add" || router.pathname === "/dashboard/[semester]/add"
-                      ? "bg-light-button-primary/10 text-light-button-primary dark:bg-dark-button-primary/10 dark:text-dark-button-primary"
-                      : "text-light-text-secondary dark:text-dark-text-secondary hover:bg-light-hover-primary dark:hover:bg-dark-hover-primary hover:text-light-text-primary dark:hover:text-dark-text-primary"
-                  }`}
-                >
-                  <div className="flex flex-col items-center space-y-1">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-4 w-4"
-                      viewBox="0 0 20 20"
-                      fill="currentColor"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                    <span className="text-xs">Add</span>
-                  </div>
-                </button>
+                  <button
+                    onClick={() => {
+                      const path = selectedSemesterId
+                        ? `/dashboard/${selectedSemesterId}/calendar`
+                        : "/dashboard/calendar";
+                      router.push(path);
+                    }}
+                    className={`px-3 py-3 font-medium text-sm transition-all duration-200 rounded-xl ${
+                      router.pathname === "/dashboard/calendar" ||
+                      router.pathname === "/dashboard/[semester]/calendar"
+                        ? "bg-light-button-primary/10 text-light-button-primary dark:bg-dark-button-primary/10 dark:text-dark-button-primary"
+                        : "text-light-text-secondary dark:text-dark-text-secondary hover:bg-light-hover-primary dark:hover:bg-dark-hover-primary hover:text-light-text-primary dark:hover:text-dark-text-primary"
+                    }`}
+                  >
+                    <div className="flex flex-col items-center space-y-1">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-4 w-4"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <rect
+                          x="3"
+                          y="4"
+                          width="18"
+                          height="18"
+                          rx="2"
+                          ry="2"
+                        />
+                        <line x1="16" y1="2" x2="16" y2="6" />
+                        <line x1="8" y1="2" x2="8" y2="6" />
+                        <line x1="3" y1="10" x2="21" y2="10" />
+                      </svg>
+                      <span className="text-xs">Calendar</span>
+                    </div>
+                  </button>
+                  <button
+                    onClick={() => {
+                      const path = selectedSemesterId
+                        ? `/dashboard/${selectedSemesterId}/add`
+                        : "/dashboard/add";
+                      router.push(path);
+                    }}
+                    className={`px-3 py-3 font-medium text-sm transition-all duration-200 rounded-xl ${
+                      router.pathname === "/dashboard/add" ||
+                      router.pathname === "/dashboard/[semester]/add"
+                        ? "bg-light-button-primary/10 text-light-button-primary dark:bg-dark-button-primary/10 dark:text-dark-button-primary"
+                        : "text-light-text-secondary dark:text-dark-text-secondary hover:bg-light-hover-primary dark:hover:bg-dark-hover-primary hover:text-light-text-primary dark:hover:text-dark-text-primary"
+                    }`}
+                  >
+                    <div className="flex flex-col items-center space-y-1">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-4 w-4"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                      <span className="text-xs">Add</span>
+                    </div>
+                  </button>
                 </div>
               </div>
             </div>

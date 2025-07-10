@@ -82,7 +82,7 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-gray-50 to-white p-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-light-bg-secondary to-light-bg-primary dark:from-dark-bg-primary dark:to-dark-bg-secondary p-4">
       <Head>
         <title>Asetta - Sign Up</title>
         <meta
@@ -92,15 +92,15 @@ const Register = () => {
       </Head>
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 font-heading tracking-tight">
+          <h1 className="text-3xl font-bold text-light-text-primary dark:text-dark-text-primary font-heading tracking-tight">
             Create Your Account
           </h1>
-          <p className="text-gray-600 mt-2">
+          <p className="text-light-text-secondary dark:text-dark-text-secondary mt-2">
             Join Asetta to streamline your academic journey
           </p>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
+        <div className="bg-light-bg-primary dark:bg-dark-bg-secondary rounded-2xl shadow-sm border border-light-border-primary dark:border-dark-border-primary p-8">
           {error && (
             <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg shadow-sm">
               <div className="flex items-start">

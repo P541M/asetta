@@ -52,7 +52,7 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-gray-50 to-white p-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-light-bg-secondary to-light-bg-primary dark:from-dark-bg-primary dark:to-dark-bg-secondary p-4">
       <Head>
         <title>Asetta - Sign In</title>
         <meta
@@ -62,21 +62,21 @@ const Login = () => {
       </Head>
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 font-heading tracking-tight">
+          <h1 className="text-3xl font-bold text-light-text-primary dark:text-dark-text-primary font-heading tracking-tight">
             Welcome Back
           </h1>
-          <p className="text-gray-600 mt-2">
+          <p className="text-light-text-secondary dark:text-dark-text-secondary mt-2">
             Sign in to access your academic dashboard
           </p>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
+        <div className="bg-light-bg-primary dark:bg-dark-bg-secondary rounded-2xl shadow-sm border border-light-border-primary dark:border-dark-border-primary p-8">
           {error && (
-            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg shadow-sm">
+            <div className="mb-6 p-4 bg-light-error-bg dark:bg-dark-error-bg border border-light-error-text/20 dark:border-dark-error-text/20 rounded-lg shadow-sm">
               <div className="flex items-start">
                 <div className="flex-shrink-0">
                   <svg
-                    className="h-5 w-5 text-red-400"
+                    className="h-5 w-5 text-light-error-text dark:text-dark-error-text"
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 20 20"
                     fill="currentColor"
@@ -90,10 +90,10 @@ const Login = () => {
                   </svg>
                 </div>
                 <div className="ml-3">
-                  <h3 className="text-sm font-medium text-red-800">
+                  <h3 className="text-sm font-medium text-light-error-text dark:text-dark-error-text">
                     Login Error
                   </h3>
-                  <div className="mt-1 text-sm text-red-700">{error}</div>
+                  <div className="mt-1 text-sm text-light-error-text dark:text-dark-error-text">{error}</div>
                 </div>
               </div>
             </div>
