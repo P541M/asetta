@@ -9,32 +9,6 @@ export default {
   theme: {
     extend: {
       colors: {
-        //We need to get rid of these old colours.
-        primary: {
-          50: "#e6f7ff",
-          100: "#ccefff",
-          200: "#99dfff",
-          300: "#66cfff",
-          400: "#33bfff",
-          500: "#009cff",
-          600: "#008cff",
-          700: "#007cff",
-          800: "#006cff",
-          900: "#005cff",
-        },
-        //We need to get rid of these old colours.
-        secondary: {
-          50: "#f9fafb",
-          100: "#f3f4f6",
-          200: "#e5e7eb",
-          300: "#d1d5db",
-          400: "#9ca3af",
-          500: "#6b7280",
-          600: "#4b5563",
-          700: "#374151",
-          800: "#1f2937",
-          900: "#111827",
-        },
         light: {
           "bg-primary": "#FFFFFF",
           "bg-secondary": "#FAFAFA",

@@ -89,7 +89,7 @@ const ProfileSection = ({
           </div>
           <label
             htmlFor="profile-picture"
-            className="absolute bottom-0 right-0 p-2 bg-primary-600 text-white rounded-full cursor-pointer hover:bg-primary-700 transition-colors shadow-lg"
+            className="absolute bottom-0 right-0 p-2 bg-light-button-primary dark:bg-dark-button-primary text-white rounded-full cursor-pointer hover:bg-light-button-primary-hover dark:hover:bg-dark-button-primary-hover transition-colors shadow-lg"
             onClick={handleChooseImage}
           >
             <svg
@@ -139,7 +139,7 @@ const ProfileSection = ({
             type="text"
             value={displayName}
             onChange={(e) => setDisplayName(e.target.value)}
-            className="w-full px-4 py-2.5 border border-gray-300 dark:border-dark-input-border rounded-xl shadow-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-dark-input-bg dark:text-dark-input-text transition-all duration-200"
+            className="w-full px-4 py-2.5 border border-gray-300 dark:border-dark-input-border rounded-xl shadow-sm focus:ring-2 focus:ring-light-focus-ring dark:focus:ring-dark-focus-ring focus:border-light-focus-ring dark:focus:border-dark-focus-ring dark:bg-dark-input-bg dark:text-dark-input-text transition-all duration-200"
             placeholder="Your name"
           />
         </div>
@@ -156,7 +156,7 @@ const ProfileSection = ({
             type="text"
             value={institution}
             onChange={(e) => setInstitution(e.target.value)}
-            className="w-full px-4 py-2.5 border border-gray-300 dark:border-dark-input-border rounded-xl shadow-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-dark-input-bg dark:text-dark-input-text transition-all duration-200"
+            className="w-full px-4 py-2.5 border border-gray-300 dark:border-dark-input-border rounded-xl shadow-sm focus:ring-2 focus:ring-light-focus-ring dark:focus:ring-dark-focus-ring focus:border-light-focus-ring dark:focus:border-dark-focus-ring dark:bg-dark-input-bg dark:text-dark-input-text transition-all duration-200"
             placeholder="Your university or school"
           />
         </div>
@@ -173,7 +173,7 @@ const ProfileSection = ({
             type="text"
             value={studyProgram}
             onChange={(e) => setStudyProgram(e.target.value)}
-            className="w-full px-4 py-2.5 border border-gray-300 dark:border-dark-input-border rounded-xl shadow-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-dark-input-bg dark:text-dark-input-text transition-all duration-200"
+            className="w-full px-4 py-2.5 border border-gray-300 dark:border-dark-input-border rounded-xl shadow-sm focus:ring-2 focus:ring-light-focus-ring dark:focus:ring-dark-focus-ring focus:border-light-focus-ring dark:focus:border-dark-focus-ring dark:bg-dark-input-bg dark:text-dark-input-text transition-all duration-200"
             placeholder="Your study program"
           />
         </div>
@@ -192,7 +192,7 @@ const ProfileSection = ({
             max={currentYear + 10}
             value={graduationYear}
             onChange={(e) => setGraduationYear(parseInt(e.target.value))}
-            className="w-full px-4 py-2.5 border border-gray-300 dark:border-dark-input-border rounded-xl shadow-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-dark-input-bg dark:text-dark-input-text transition-all duration-200"
+            className="w-full px-4 py-2.5 border border-gray-300 dark:border-dark-input-border rounded-xl shadow-sm focus:ring-2 focus:ring-light-focus-ring dark:focus:ring-dark-focus-ring focus:border-light-focus-ring dark:focus:border-dark-focus-ring dark:bg-dark-input-bg dark:text-dark-input-text transition-all duration-200"
           />
         </div>
       </div>

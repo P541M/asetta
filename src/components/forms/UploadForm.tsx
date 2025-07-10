@@ -153,10 +153,10 @@ const UploadForm = ({ semester, onUploadSuccess }: UploadFormProps) => {
               file:mr-4 file:py-2 file:px-4
               file:rounded-md file:border-0
               file:text-sm file:font-medium
-              file:bg-primary-50 file:text-primary-700
-              hover:file:bg-primary-100
-              dark:file:bg-primary-900/20 dark:file:text-primary-400
-              dark:hover:file:bg-primary-800/20
+              file:bg-light-button-secondary file:text-light-text-primary
+              hover:file:bg-light-button-secondary-hover
+              dark:file:bg-dark-button-secondary dark:file:text-dark-text-primary
+              dark:hover:file:bg-dark-button-secondary-hover
               cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
           />
         </div>
@@ -223,7 +223,7 @@ const UploadForm = ({ semester, onUploadSuccess }: UploadFormProps) => {
           {files.length > 0 && uploadStatus !== "uploading" && (
             <button
               onClick={handleReset}
-              className="px-4 py-2 border border-gray-300 dark:border-dark-border-primary rounded-md text-sm font-medium text-gray-700 dark:text-dark-text-primary bg-white dark:bg-dark-bg-tertiary hover:bg-gray-50 dark:hover:bg-dark-bg-secondary focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-colors"
+              className="px-4 py-2 border border-gray-300 dark:border-dark-border-primary rounded-md text-sm font-medium text-gray-700 dark:text-dark-text-primary bg-white dark:bg-dark-bg-tertiary hover:bg-gray-50 dark:hover:bg-dark-bg-secondary focus:outline-none focus:ring-2 focus:ring-light-focus-ring dark:focus:ring-dark-focus-ring focus:ring-offset-2 transition-colors"
             >
               {uploadStatus === "rate_limited" ? "Cancel & Clear" : "Clear"}
             </button>

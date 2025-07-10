@@ -510,7 +510,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                   sortedAssessments.length > 0
                 }
                 onChange={toggleSelectAll}
-                className="h-4 w-4 rounded border-gray-300 dark:border-dark-border-primary text-primary-500 dark:text-primary-400 focus:ring-primary-500 dark:focus:ring-primary-400"
+                className="h-4 w-4 rounded border-gray-300 dark:border-dark-border-primary text-light-button-primary dark:text-dark-button-primary focus:ring-light-focus-ring dark:focus:ring-dark-focus-ring"
               />
               <span className="text-xs font-medium text-gray-500 dark:text-dark-text-tertiary uppercase tracking-wider">
                 Status
@@ -563,7 +563,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                         type="checkbox"
                         checked={selectedRows.includes(assessment.id || '')}
                         onChange={() => toggleRowSelection(assessment.id || '')}
-                        className="h-4 w-4 rounded border-gray-300 dark:border-dark-border-primary text-primary-500 dark:text-primary-400 focus:ring-primary-500 dark:focus:ring-primary-400"
+                        className="h-4 w-4 rounded border-gray-300 dark:border-dark-border-primary text-light-button-primary dark:text-dark-button-primary focus:ring-light-focus-ring dark:focus:ring-dark-focus-ring"
                       />
                       <select
                         name="status"
@@ -677,7 +677,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                         type="checkbox"
                         checked={selectedRows.includes(assessment.id || '')}
                         onChange={() => toggleRowSelection(assessment.id || '')}
-                        className="h-4 w-4 rounded border-gray-300 dark:border-dark-border-primary text-primary-500 dark:text-primary-400 focus:ring-primary-500 dark:focus:ring-primary-400"
+                        className="h-4 w-4 rounded border-gray-300 dark:border-dark-border-primary text-light-button-primary dark:text-dark-button-primary focus:ring-light-focus-ring dark:focus:ring-dark-focus-ring"
                       />
                       <select
                         value={assessment.status}
@@ -756,7 +756,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                               onClick={() => handleNotesClick(assessment)}
                               className={`text-gray-500 dark:text-dark-text-tertiary hover:text-gray-700 dark:hover:text-dark-text-secondary p-1 hover:bg-gray-100 dark:hover:bg-dark-bg-tertiary rounded-md transition-colors ${
                                 assessment.notes
-                                  ? "text-primary-500 dark:text-primary-400"
+                                  ? "text-light-button-primary dark:text-dark-button-primary"
                                   : ""
                               }`}
                               title={

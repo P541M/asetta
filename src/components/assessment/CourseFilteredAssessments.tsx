@@ -52,7 +52,7 @@ const CourseFilteredAssessments = ({
 
       {isLoading ? (
         <div className="flex items-center justify-center py-12">
-          <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary-200 dark:border-primary-800 border-t-primary-500 dark:border-t-primary-400"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-4 border-light-text-tertiary dark:border-dark-text-tertiary border-t-light-button-primary dark:border-t-dark-button-primary"></div>
         </div>
       ) : error ? (
         <div className="p-4 bg-red-50 dark:bg-red-900/20 rounded-lg text-red-700 dark:text-red-400 animate-fade-in">

@@ -433,7 +433,7 @@ const CalendarView = ({ selectedSemester, semesterId }: CalendarViewProps) => {
                     {day.date.getDate()}
                   </span>
                   {day.assessments.length > 0 && (
-                    <span className="flex h-5 w-5 items-center justify-center text-xs font-medium text-primary-600 dark:text-primary-400 bg-primary-100 dark:bg-primary-900/30 rounded-full">
+                    <span className="flex h-5 w-5 items-center justify-center text-xs font-medium text-light-button-primary dark:text-dark-button-primary bg-light-button-secondary dark:bg-dark-button-secondary rounded-full">
                       {day.assessments.length}
                     </span>
                   )}

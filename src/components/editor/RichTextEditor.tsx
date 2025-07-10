@@ -83,7 +83,7 @@ const LinkModal = ({ isOpen, onClose, onAddLink }: LinkModalProps) => {
               value={url}
               onChange={(e) => setUrl(e.target.value)}
               placeholder="https://example.com"
-              className="mt-1 block w-full rounded-md border-gray-300 dark:border-dark-border-primary shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm dark:bg-dark-bg-tertiary dark:text-dark-text-primary"
+              className="mt-1 block w-full rounded-md border-gray-300 dark:border-dark-border-primary shadow-sm focus:border-light-focus-ring dark:focus:border-dark-focus-ring focus:ring-light-focus-ring dark:focus:ring-dark-focus-ring sm:text-sm dark:bg-dark-bg-tertiary dark:text-dark-text-primary"
               required
             />
           </div>
@@ -100,7 +100,7 @@ const LinkModal = ({ isOpen, onClose, onAddLink }: LinkModalProps) => {
               value={text}
               onChange={(e) => setText(e.target.value)}
               placeholder="Display text"
-              className="mt-1 block w-full rounded-md border-gray-300 dark:border-dark-border-primary shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm dark:bg-dark-bg-tertiary dark:text-dark-text-primary"
+              className="mt-1 block w-full rounded-md border-gray-300 dark:border-dark-border-primary shadow-sm focus:border-light-focus-ring dark:focus:border-dark-focus-ring focus:ring-light-focus-ring dark:focus:ring-dark-focus-ring sm:text-sm dark:bg-dark-bg-tertiary dark:text-dark-text-primary"
             />
           </div>
           <div className="modal-footer">

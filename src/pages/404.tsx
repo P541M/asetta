@@ -22,7 +22,7 @@ const Custom404 = () => {
           <div className="space-y-4">
             <Link
               href="/dashboard"
-              className="block w-full bg-primary-600 hover:bg-primary-700 text-white font-medium py-3 px-4 rounded-md transition-colors duration-200"
+              className="block w-full bg-light-button-primary hover:bg-light-button-primary-hover dark:bg-dark-button-primary dark:hover:bg-dark-button-primary-hover text-white font-medium py-3 px-4 rounded-md transition-colors duration-200"
             >
               Go back to Dashboard
             </Link>
