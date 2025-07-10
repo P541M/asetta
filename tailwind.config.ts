@@ -74,10 +74,8 @@ export default {
           "input-border": "#2A2A2A",
           "input-text": "#FAFAFA",
           "input-placeholder": "#808080",
-
           "button-primary": "#F59E0B",
           "button-primary-hover": "#D97706",
-          
           "button-secondary": "#202020",
           "button-secondary-hover": "#2A2A2A",
           "success-bg": "rgba(16, 185, 129, 0.15)",
