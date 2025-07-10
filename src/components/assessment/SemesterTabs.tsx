@@ -606,7 +606,7 @@ const SemesterTabs = ({
     return (
       <div className="mb-4 bg-light-bg-primary dark:bg-dark-bg-secondary rounded-lg shadow-sm p-4 border border-light-border-primary dark:border-dark-border-primary">
         <div className="flex justify-center py-2">
-          <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-light-button-primary dark:border-dark-button-primary"></div>
+          <div className="animate-spin rounded-full h-5 w-5 border-2 border-light-button-primary border-t-transparent dark:border-dark-button-primary dark:border-t-transparent"></div>
         </div>
       </div>
     );

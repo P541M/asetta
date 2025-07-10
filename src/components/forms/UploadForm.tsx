@@ -178,7 +178,7 @@ const UploadForm = ({ semester, onUploadSuccess }: UploadFormProps) => {
                 </div>
                 <div className="flex items-center space-x-2">
                   {uploadStatus === "uploading" && (
-                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-primary-200 dark:border-primary-800 border-t-primary-500 dark:border-t-primary-400"></div>
+                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-light-button-primary border-t-transparent dark:border-dark-button-primary dark:border-t-transparent"></div>
                   )}
                 </div>
               </div>
@@ -212,7 +212,7 @@ const UploadForm = ({ semester, onUploadSuccess }: UploadFormProps) => {
           >
             {uploadStatus === "uploading" ? (
               <div className="flex items-center justify-center">
-                <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2"></div>
+                <div className="animate-spin rounded-full h-4 w-4 border-2 border-light-button-primary border-t-transparent dark:border-dark-button-primary dark:border-t-transparent mr-2"></div>
                 Processing...
               </div>
             ) : (

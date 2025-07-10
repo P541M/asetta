@@ -110,7 +110,7 @@ const Header = ({ onLogout }: HeaderProps) => {
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className="h-8 w-8 text-primary-500 dark:text-primary-400 transition-transform duration-300 group-hover:scale-110"
+                  className="h-8 w-8 text-light-button-primary dark:text-dark-button-primary transition-transform duration-300 group-hover:scale-110"
                   viewBox="0 0 20 20"
                   fill="currentColor"
                 >

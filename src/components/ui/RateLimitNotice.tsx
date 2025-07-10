@@ -103,7 +103,7 @@ const RateLimitNotice = ({
             </div>
           ) : (
             <div className="flex items-center space-x-3">
-              <div className="animate-spin rounded-full h-4 w-4 border-2 border-amber-500 border-t-transparent"></div>
+              <div className="animate-spin rounded-full h-4 w-4 border-2 border-light-button-primary border-t-transparent dark:border-dark-button-primary dark:border-t-transparent"></div>
               <span className="text-amber-700 dark:text-amber-400 font-medium">
                 Retrying your request...
               </span>
