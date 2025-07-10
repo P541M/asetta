@@ -123,7 +123,9 @@ const Register = () => {
                   <h3 className="text-sm font-medium text-light-error-text dark:text-dark-error-text">
                     Registration Error
                   </h3>
-                  <div className="mt-1 text-sm text-light-error-text dark:text-dark-error-text">{error}</div>
+                  <div className="mt-1 text-sm text-light-error-text dark:text-dark-error-text">
+                    {error}
+                  </div>
                 </div>
               </div>
             </div>
@@ -138,7 +140,7 @@ const Register = () => {
                 id="email"
                 type="email"
                 placeholder="you@example.com"
-                className="w-full px-4 py-2.5 text-light-input-text dark:text-dark-input-text placeholder-light-input-placeholder dark:placeholder-dark-input-placeholder bg-light-input-bg dark:bg-dark-input-bg border border-light-input-border dark:border-dark-input-border rounded-lg focus:outline-none focus:ring-2 focus:ring-light-focus-ring dark:focus:ring-dark-focus-ring focus:border-light-focus-ring dark:focus:border-dark-focus-ring transition-all duration-200 disabled:bg-light-disabled-bg dark:disabled:bg-dark-disabled-bg disabled:text-light-disabled-text dark:disabled:text-dark-disabled-text"
+                className="input"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -154,7 +156,7 @@ const Register = () => {
                 id="password"
                 type="password"
                 placeholder="Create a password"
-                className="w-full px-4 py-2.5 text-light-input-text dark:text-dark-input-text placeholder-light-input-placeholder dark:placeholder-dark-input-placeholder bg-light-input-bg dark:bg-dark-input-bg border border-light-input-border dark:border-dark-input-border rounded-lg focus:outline-none focus:ring-2 focus:ring-light-focus-ring dark:focus:ring-dark-focus-ring focus:border-light-focus-ring dark:focus:border-dark-focus-ring transition-all duration-200 disabled:bg-light-disabled-bg dark:disabled:bg-dark-disabled-bg disabled:text-light-disabled-text dark:disabled:text-dark-disabled-text"
+                className="input"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 onFocus={() => setPasswordFocused(true)}
@@ -277,7 +279,7 @@ const Register = () => {
                 id="confirmPassword"
                 type="password"
                 placeholder="Confirm your password"
-                className="w-full px-4 py-2.5 text-light-input-text dark:text-dark-input-text placeholder-light-input-placeholder dark:placeholder-dark-input-placeholder bg-light-input-bg dark:bg-dark-input-bg border border-light-input-border dark:border-dark-input-border rounded-lg focus:outline-none focus:ring-2 focus:ring-light-focus-ring dark:focus:ring-dark-focus-ring focus:border-light-focus-ring dark:focus:border-dark-focus-ring transition-all duration-200 disabled:bg-light-disabled-bg dark:disabled:bg-dark-disabled-bg disabled:text-light-disabled-text dark:disabled:text-dark-disabled-text"
+                className="input"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 required
@@ -289,7 +291,7 @@ const Register = () => {
             <button
               type="submit"
               disabled={isSubmitting}
-              className={`w-full flex items-center justify-center gap-2 py-2.5 px-4 border border-transparent rounded-lg text-white bg-light-button-primary hover:bg-light-button-primary-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-light-focus-ring dark:bg-dark-button-primary dark:hover:bg-dark-button-primary-hover dark:focus:ring-dark-focus-ring transition-all duration-200 ${
+              className={`btn-primary w-full ${
                 isSubmitting ? "opacity-70 cursor-not-allowed" : ""
               }`}
               aria-label={isSubmitting ? "Signing up..." : "Sign up"}
@@ -329,7 +331,7 @@ const Register = () => {
               <div className="w-full border-t border-light-border-primary dark:border-dark-border-primary"></div>
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-light-bg-primary dark:bg-dark-bg-primary text-light-text-tertiary dark:text-dark-text-tertiary">
+              <span className="px-2 bg-light-bg-primary dark:bg-dark-bg-secondary text-light-text-tertiary dark:text-dark-text-tertiary">
                 Or continue with Google
               </span>
             </div>
@@ -338,7 +340,7 @@ const Register = () => {
           <button
             onClick={handleGoogleSignIn}
             disabled={isSubmitting}
-            className="w-full flex items-center justify-center gap-3 py-3 px-4 border border-light-border-primary dark:border-dark-border-primary rounded-lg text-light-text-primary dark:text-dark-text-primary bg-light-bg-primary dark:bg-dark-bg-primary hover:bg-light-hover-primary dark:hover:bg-dark-hover-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-light-focus-ring dark:focus:ring-dark-focus-ring transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="btn-outline w-full flex items-center justify-center gap-3 py-3 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"

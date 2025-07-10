@@ -197,7 +197,7 @@ const RegisterForm = ({
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="form-group">
         <label htmlFor="email" className="form-label">
-          Email Address <span className="text-red-500">*</span>
+          Email Address <span className="text-light-error-text dark:text-dark-error-text">*</span>
         </label>
         <input
           id="email"
@@ -215,7 +215,7 @@ const RegisterForm = ({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="form-group">
           <label htmlFor="password" className="form-label">
-            Password <span className="text-red-500">*</span>
+            Password <span className="text-light-error-text dark:text-dark-error-text">*</span>
           </label>
           <div className="relative">
             <input
@@ -226,10 +226,10 @@ const RegisterForm = ({
               className={`input ${
                 formData.password &&
                 (passwordStrength === "weak"
-                  ? "border-red-300 focus:border-red-400 focus:ring-red-200"
+                  ? "border-light-error-text dark:border-dark-error-text focus:border-light-error-text dark:focus:border-dark-error-text focus:ring-light-error-bg dark:focus:ring-dark-error-bg"
                   : passwordStrength === "medium"
-                  ? "border-yellow-300 focus:border-yellow-400 focus:ring-yellow-200"
-                  : "border-green-300 focus:border-green-400 focus:ring-green-200")
+                  ? "border-light-warning-text dark:border-dark-warning-text focus:border-light-warning-text dark:focus:border-dark-warning-text focus:ring-light-warning-bg dark:focus:ring-dark-warning-bg"
+                  : "border-light-success-text dark:border-dark-success-text focus:border-light-success-text dark:focus:border-dark-success-text focus:ring-light-success-bg dark:focus:ring-dark-success-bg")
               }`}
               value={formData.password}
               onChange={handleChange}
@@ -244,23 +244,23 @@ const RegisterForm = ({
                 <div
                   className={`flex items-center space-x-1 ${
                     passwordStrength === "weak"
-                      ? "text-red-500"
+                      ? "text-light-error-text dark:text-dark-error-text"
                       : passwordStrength === "medium"
-                      ? "text-yellow-500"
-                      : "text-green-500"
+                      ? "text-light-warning-text dark:text-dark-warning-text"
+                      : "text-light-success-text dark:text-dark-success-text"
                   }`}
                 >
                   <div className="h-1.5 w-2 rounded-full bg-current"></div>
                   <div
                     className={`h-1.5 w-2 rounded-full ${
-                      passwordStrength === "weak" ? "bg-gray-200" : "bg-current"
+                      passwordStrength === "weak" ? "bg-light-bg-tertiary dark:bg-dark-bg-tertiary" : "bg-current"
                     }`}
                   ></div>
                   <div
                     className={`h-1.5 w-2 rounded-full ${
                       passwordStrength === "strong"
                         ? "bg-current"
-                        : "bg-gray-200"
+                        : "bg-light-bg-tertiary dark:bg-dark-bg-tertiary"
                     }`}
                   ></div>
                 </div>
@@ -268,24 +268,24 @@ const RegisterForm = ({
             )}
           </div>
           {passwordFocused && (
-            <div className="mt-2 p-3 bg-gray-50 border border-gray-100 rounded-md">
-              <p className="text-xs font-medium text-gray-700 mb-1.5">
+            <div className="mt-2 p-3 bg-light-bg-secondary dark:bg-dark-bg-tertiary border border-light-border-primary dark:border-dark-border-primary rounded-md">
+              <p className="text-xs font-medium text-light-text-primary dark:text-dark-text-primary mb-1.5">
                 Password must include:
               </p>
               <ul className="space-y-1 text-xs">
                 <li
                   className={`flex items-center ${
                     passwordCriteria.minLength
-                      ? "text-green-600"
-                      : "text-gray-600"
+                      ? "text-light-success-text dark:text-dark-success-text"
+                      : "text-light-text-tertiary dark:text-dark-text-tertiary"
                   }`}
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     className={`h-3.5 w-3.5 mr-1.5 ${
                       passwordCriteria.minLength
-                        ? "text-green-500"
-                        : "text-gray-400"
+                        ? "text-light-success-text dark:text-dark-success-text"
+                        : "text-light-text-tertiary dark:text-dark-text-tertiary"
                     }`}
                     viewBox="0 0 20 20"
                     fill="currentColor"
@@ -309,16 +309,16 @@ const RegisterForm = ({
                 <li
                   className={`flex items-center ${
                     passwordCriteria.hasUppercase
-                      ? "text-green-600"
-                      : "text-gray-600"
+                      ? "text-light-success-text dark:text-dark-success-text"
+                      : "text-light-text-tertiary dark:text-dark-text-tertiary"
                   }`}
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     className={`h-3.5 w-3.5 mr-1.5 ${
                       passwordCriteria.hasUppercase
-                        ? "text-green-500"
-                        : "text-gray-400"
+                        ? "text-light-success-text dark:text-dark-success-text"
+                        : "text-light-text-tertiary dark:text-dark-text-tertiary"
                     }`}
                     viewBox="0 0 20 20"
                     fill="currentColor"
@@ -342,16 +342,16 @@ const RegisterForm = ({
                 <li
                   className={`flex items-center ${
                     passwordCriteria.hasLowercase
-                      ? "text-green-600"
-                      : "text-gray-600"
+                      ? "text-light-success-text dark:text-dark-success-text"
+                      : "text-light-text-tertiary dark:text-dark-text-tertiary"
                   }`}
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     className={`h-3.5 w-3.5 mr-1.5 ${
                       passwordCriteria.hasLowercase
-                        ? "text-green-500"
-                        : "text-gray-400"
+                        ? "text-light-success-text dark:text-dark-success-text"
+                        : "text-light-text-tertiary dark:text-dark-text-tertiary"
                     }`}
                     viewBox="0 0 20 20"
                     fill="currentColor"
@@ -375,16 +375,16 @@ const RegisterForm = ({
                 <li
                   className={`flex items-center ${
                     passwordCriteria.hasNumber
-                      ? "text-green-600"
-                      : "text-gray-600"
+                      ? "text-light-success-text dark:text-dark-success-text"
+                      : "text-light-text-tertiary dark:text-dark-text-tertiary"
                   }`}
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     className={`h-3.5 w-3.5 mr-1.5 ${
                       passwordCriteria.hasNumber
-                        ? "text-green-500"
-                        : "text-gray-400"
+                        ? "text-light-success-text dark:text-dark-success-text"
+                        : "text-light-text-tertiary dark:text-dark-text-tertiary"
                     }`}
                     viewBox="0 0 20 20"
                     fill="currentColor"
@@ -408,16 +408,16 @@ const RegisterForm = ({
                 <li
                   className={`flex items-center ${
                     passwordCriteria.hasSpecialChar
-                      ? "text-green-600"
-                      : "text-gray-600"
+                      ? "text-light-success-text dark:text-dark-success-text"
+                      : "text-light-text-tertiary dark:text-dark-text-tertiary"
                   }`}
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     className={`h-3.5 w-3.5 mr-1.5 ${
                       passwordCriteria.hasSpecialChar
-                        ? "text-green-500"
-                        : "text-gray-400"
+                        ? "text-light-success-text dark:text-dark-success-text"
+                        : "text-light-text-tertiary dark:text-dark-text-tertiary"
                     }`}
                     viewBox="0 0 20 20"
                     fill="currentColor"
@@ -445,7 +445,7 @@ const RegisterForm = ({
 
         <div className="form-group">
           <label htmlFor="confirmPassword" className="form-label">
-            Confirm Password <span className="text-red-500">*</span>
+            Confirm Password <span className="text-light-error-text dark:text-dark-error-text">*</span>
           </label>
           <div className="relative">
             <input
@@ -456,9 +456,9 @@ const RegisterForm = ({
               className={`input ${
                 formData.confirmPassword &&
                 formData.password !== formData.confirmPassword
-                  ? "border-red-300 focus:border-red-400 focus:ring-red-200"
+                  ? "border-light-error-text dark:border-dark-error-text focus:border-light-error-text dark:focus:border-dark-error-text focus:ring-light-error-bg dark:focus:ring-dark-error-bg"
                   : formData.confirmPassword
-                  ? "border-green-300 focus:border-green-400 focus:ring-green-200"
+                  ? "border-light-success-text dark:border-dark-success-text focus:border-light-success-text dark:focus:border-dark-success-text focus:ring-light-success-bg dark:focus:ring-dark-success-bg"
                   : ""
               }`}
               value={formData.confirmPassword}
@@ -471,7 +471,7 @@ const RegisterForm = ({
                 {formData.password === formData.confirmPassword ? (
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5 text-green-500"
+                    className="h-5 w-5 text-light-success-text dark:text-dark-success-text"
                     viewBox="0 0 20 20"
                     fill="currentColor"
                   >
@@ -484,7 +484,7 @@ const RegisterForm = ({
                 ) : (
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5 text-red-500"
+                    className="h-5 w-5 text-light-error-text dark:text-dark-error-text"
                     viewBox="0 0 20 20"
                     fill="currentColor"
                   >
@@ -500,7 +500,7 @@ const RegisterForm = ({
           </div>
           {formData.confirmPassword &&
             formData.password !== formData.confirmPassword && (
-              <p className="text-xs text-red-500 mt-1">
+              <p className="text-xs text-light-error-text dark:text-dark-error-text mt-1">
                 Passwords do not match
               </p>
             )}
@@ -509,7 +509,7 @@ const RegisterForm = ({
 
       <div className="form-group">
         <label htmlFor="displayName" className="form-label">
-          Full Name <span className="text-red-500">*</span>
+          Full Name <span className="text-light-error-text dark:text-dark-error-text">*</span>
         </label>
         <input
           id="displayName"
@@ -580,7 +580,7 @@ const RegisterForm = ({
         <button
           type="button"
           onClick={onCancel}
-          className="text-primary-600 hover:text-primary-800 text-sm font-medium"
+          className="text-light-button-primary hover:text-light-button-primary-hover dark:text-dark-button-primary dark:hover:text-dark-button-primary-hover text-sm font-medium transition-colors duration-200"
         >
           Already have an account? Sign in
         </button>

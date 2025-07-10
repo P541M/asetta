@@ -93,7 +93,9 @@ const Login = () => {
                   <h3 className="text-sm font-medium text-light-error-text dark:text-dark-error-text">
                     Login Error
                   </h3>
-                  <div className="mt-1 text-sm text-light-error-text dark:text-dark-error-text">{error}</div>
+                  <div className="mt-1 text-sm text-light-error-text dark:text-dark-error-text">
+                    {error}
+                  </div>
                 </div>
               </div>
             </div>
@@ -108,7 +110,7 @@ const Login = () => {
                 id="email"
                 type="email"
                 placeholder="you@example.com"
-                className="w-full px-4 py-2.5 text-gray-900 placeholder-gray-400 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200 disabled:bg-gray-50 disabled:text-gray-500"
+                className="input"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -123,7 +125,7 @@ const Login = () => {
                 </label>
                 <Link
                   href="/reset-password"
-                  className="text-sm text-primary-500 hover:text-primary-600 transition-colors duration-200"
+                  className="text-sm text-light-button-primary hover:text-light-button-primary-hover dark:text-dark-button-primary dark:hover:text-dark-button-primary-hover transition-colors duration-200"
                 >
                   Forgot password?
                 </Link>
@@ -132,7 +134,7 @@ const Login = () => {
                 id="password"
                 type="password"
                 placeholder="Your password"
-                className="w-full px-4 py-2.5 text-gray-900 placeholder-gray-400 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200 disabled:bg-gray-50 disabled:text-gray-500"
+                className="input"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
@@ -144,7 +146,7 @@ const Login = () => {
             <button
               type="submit"
               disabled={isSubmitting}
-              className={`w-full flex items-center justify-center gap-2 py-2.5 px-4 border border-transparent rounded-lg text-white bg-primary-500 hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-all duration-200 ${
+              className={`btn-primary w-full ${
                 isSubmitting ? "opacity-70 cursor-not-allowed" : ""
               }`}
               aria-label={isSubmitting ? "Signing in..." : "Sign in"}
@@ -181,10 +183,10 @@ const Login = () => {
 
           <div className="relative my-6">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-200"></div>
+              <div className="w-full border-t border-light-border-primary dark:border-dark-border-primary"></div>
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-white text-gray-500">
+              <span className="px-2 bg-light-bg-primary dark:bg-dark-bg-secondary text-light-text-tertiary dark:text-dark-text-tertiary">
                 Or continue with Google
               </span>
             </div>
@@ -193,7 +195,7 @@ const Login = () => {
           <button
             onClick={handleGoogleSignIn}
             disabled={isSubmitting}
-            className="w-full flex items-center justify-center gap-3 py-3 px-4 border border-gray-300 rounded-lg text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full flex items-center justify-center gap-3 py-3 px-4 border border-light-border-primary dark:border-dark-border-primary rounded-lg text-light-text-primary dark:text-dark-text-primary bg-light-bg-primary dark:bg-dark-bg-secondary hover:bg-light-hover-primary dark:hover:bg-dark-hover-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-light-button-primary dark:focus:ring-dark-button-primary transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -222,11 +224,11 @@ const Login = () => {
           </button>
 
           <div className="mt-6 text-center">
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-light-text-secondary dark:text-dark-text-secondary">
               Don&apos;t have an account?{" "}
               <Link
                 href="/register"
-                className="text-primary-500 hover:text-primary-600 font-medium transition-colors duration-200"
+                className="text-light-button-primary hover:text-light-button-primary-hover dark:text-dark-button-primary dark:hover:text-dark-button-primary-hover font-medium transition-colors duration-200"
               >
                 Sign up
               </Link>
