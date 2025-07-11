@@ -11,7 +11,7 @@ export default function PricingPage() {
         <title>Pricing - Asetta</title>
         <meta
           name="description"
-          content="Asetta is completely free for all students. Join us today!"
+          content="Always ahead, never behind. Asetta is completely free for all students. Join us today!"
         />
       </Head>
       <Header />

@@ -10,7 +10,7 @@ export default function FeaturesPage() {
         <title>Features - Asetta</title>
         <meta
           name="description"
-          content="Discover Asetta's AI-powered features designed to help students excel in their academic journey—completely free."
+          content="Always ahead, never behind. Discover Asetta's AI-powered features designed to help students excel in their academic journey—completely free."
         />
       </Head>
       <Header />
@@ -36,9 +36,8 @@ export default function FeaturesPage() {
               </span>
             </h1>
             <p className="text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-              Experience the future of academic organization with our
-              intelligent AI technology, designed to help you stay on top of
-              your studies—all completely free.
+              Always ahead, never behind. Discover how our intelligent AI technology 
+              keeps you organized and on top of your academic goals—all completely free.
             </p>
           </div>
 

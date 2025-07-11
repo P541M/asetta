@@ -61,7 +61,7 @@ export default function Contact() {
         <title>Contact Us - Asetta</title>
         <meta
           name="description"
-          content="Get in touch with the Asetta team. We're here to help you make the most of your free AI-powered academic success platform."
+          content="Always ahead, never behind. Get in touch with the Asetta team. We're here to help you make the most of your free AI-powered academic success platform."
         />
       </Head>
       <Header />
@@ -90,7 +90,7 @@ export default function Contact() {
               </span>
             </h1>
             <p className="text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-              Have questions about our AI-powered features or need help getting started? Our team is dedicated to supporting your academic journey—all completely free.
+              Always ahead, never behind. Have questions about our AI-powered features or need help getting started? Our team is dedicated to supporting your academic journey—all completely free.
             </p>
           </div>
 

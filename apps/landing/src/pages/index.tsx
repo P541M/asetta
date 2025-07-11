@@ -15,7 +15,7 @@ export default function LandingPage() {
         <title>Asetta - Your AI-Powered Academic Success Companion</title>
         <meta
           name="description"
-          content="Asetta is a completely free AI-powered platform that helps students manage assignments, track deadlines, and stay organized throughout their academic journey."
+          content="Always ahead, never behind. Asetta is a completely free AI-powered platform that helps students stay on top of assignments, deadlines, and academic goals."
         />
       </Head>
       <Header />
@@ -46,9 +46,8 @@ export default function LandingPage() {
               </h1>
 
               <p className="text-lg sm:text-xl lg:text-2xl text-gray-600 leading-relaxed max-w-3xl mx-auto animate-fade-in-up">
-                AI-powered organization that adapts to your study habits. Track
-                assignments, manage deadlines, and boost
-                productivity—effortlessly.
+                Always ahead, never behind. AI-powered academic organization 
+                that keeps you on top of assignments, deadlines, and your study goals.
               </p>
             </div>
 

@@ -36,8 +36,8 @@ const Footer = () => {
               </Link>
 
               <p className="text-gray-600 leading-relaxed text-lg max-w-sm">
-                Your smart academic assistant. Helping students stay organized,
-                track assignments, and achieve their goals—completely free.
+                Always ahead, never behind. Your smart academic assistant 
+                helping students stay organized and achieve their goals—completely free.
               </p>
             </div>
 
