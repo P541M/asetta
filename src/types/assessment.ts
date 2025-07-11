@@ -13,7 +13,6 @@ export interface Assessment {
 }
 
 export interface AddAssessmentFormProps {
-  semester: string;
   semesterId: string;
   onSuccess: () => void;
 }

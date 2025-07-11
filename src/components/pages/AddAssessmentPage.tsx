@@ -53,15 +53,14 @@ const AddAssessmentPage = ({ forceSemesterId }: AddAssessmentPageProps) => {
               </div>
 
               {addMode === "upload" ? (
-                <AddAssessmentForm
-                  semester={selectedSemester}
-                  semesterId={selectedSemesterId}
-                  onSuccess={refreshAssessments}
-                />
-              ) : (
                 <UploadForm
                   semester={selectedSemester}
                   onUploadSuccess={refreshAssessments}
+                />
+              ) : (
+                <AddAssessmentForm
+                  semesterId={selectedSemesterId}
+                  onSuccess={refreshAssessments}
                 />
               )}
             </div>
