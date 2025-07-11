@@ -10,7 +10,7 @@ interface AddAssessmentPageProps {
 
 const AddAssessmentPage = ({ forceSemesterId }: AddAssessmentPageProps) => {
   const router = useRouter();
-  const [addMode, setAddMode] = useState<"manual" | "upload">("manual");
+  const [addMode, setAddMode] = useState<"manual" | "upload">("upload");
 
   // Extract semester ID from URL if this is a semester-specific route
   const urlSemesterId = forceSemesterId || (router.query.semester as string);
@@ -21,11 +21,7 @@ const AddAssessmentPage = ({ forceSemesterId }: AddAssessmentPageProps) => {
       description="Add new assessments to your semester either manually or by uploading a file."
       forceSemesterId={urlSemesterId}
     >
-      {({
-        selectedSemester,
-        selectedSemesterId,
-        refreshAssessments,
-      }) => (
+      {({ selectedSemester, selectedSemesterId, refreshAssessments }) => (
         <div className="animate-fade-in">
           {selectedSemesterId ? (
             <div className="p-6">
@@ -34,16 +30,6 @@ const AddAssessmentPage = ({ forceSemesterId }: AddAssessmentPageProps) => {
               </h2>
 
               <div className="flex space-x-4 mb-6">
-                <button
-                  onClick={() => setAddMode("manual")}
-                  className={`flex-1 py-3 px-4 rounded-md text-sm font-medium transition-all duration-200 ${
-                    addMode === "manual"
-                      ? "bg-light-button-primary text-white shadow-sm dark:bg-dark-button-primary"
-                      : "bg-gray-50 dark:bg-dark-bg-tertiary text-gray-600 dark:text-dark-text-secondary hover:bg-gray-100 dark:hover:bg-dark-bg-hover"
-                  }`}
-                >
-                  Quick Add
-                </button>
                 <button
                   onClick={() => setAddMode("upload")}
                   className={`flex-1 py-3 px-4 rounded-md text-sm font-medium transition-all duration-200 ${
@@ -54,9 +40,19 @@ const AddAssessmentPage = ({ forceSemesterId }: AddAssessmentPageProps) => {
                 >
                   Upload File
                 </button>
+                <button
+                  onClick={() => setAddMode("manual")}
+                  className={`flex-1 py-3 px-4 rounded-md text-sm font-medium transition-all duration-200 ${
+                    addMode === "manual"
+                      ? "bg-light-button-primary text-white shadow-sm dark:bg-dark-button-primary"
+                      : "bg-gray-50 dark:bg-dark-bg-tertiary text-gray-600 dark:text-dark-text-secondary hover:bg-gray-100 dark:hover:bg-dark-bg-hover"
+                  }`}
+                >
+                  Quick Add
+                </button>
               </div>
 
-              {addMode === "manual" ? (
+              {addMode === "upload" ? (
                 <AddAssessmentForm
                   semester={selectedSemester}
                   semesterId={selectedSemesterId}
@@ -72,10 +68,9 @@ const AddAssessmentPage = ({ forceSemesterId }: AddAssessmentPageProps) => {
           ) : (
             <div className="p-6 text-center">
               <p className="text-gray-600 dark:text-dark-text-secondary">
-                {urlSemesterId 
+                {urlSemesterId
                   ? "Unable to load semester data. Please check the URL or return to the dashboard."
-                  : "Please select a semester to add assessments."
-                }
+                  : "Please select a semester to add assessments."}
               </p>
             </div>
           )}

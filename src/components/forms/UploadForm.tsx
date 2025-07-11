@@ -136,8 +136,14 @@ const UploadForm = ({ semester, onUploadSuccess }: UploadFormProps) => {
         </div>
       </div>
 
-      <div className="space-y-4">
-        <div>
+      <div className="space-y-6">
+        <div className="space-y-4">
+          <div className="flex items-center space-x-2 mb-4">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+            </svg>
+            <h4 className="text-sm font-medium text-gray-700 dark:text-dark-text-primary">File Selection</h4>
+          </div>
           <label htmlFor="file-upload" className="block text-sm font-medium text-gray-700 dark:text-dark-text-primary mb-2">
             Select PDF Files
           </label>
@@ -150,39 +156,53 @@ const UploadForm = ({ semester, onUploadSuccess }: UploadFormProps) => {
             onChange={handleFileSelect}
             disabled={uploadStatus === "uploading"}
             className="block w-full text-sm text-gray-500 dark:text-dark-text-secondary
-              file:mr-4 file:py-2 file:px-4
+              file:mr-4 file:py-2.5 file:px-4
               file:rounded-md file:border-0
               file:text-sm file:font-medium
               file:bg-light-button-secondary file:text-light-text-primary
               hover:file:bg-light-button-secondary-hover
               dark:file:bg-dark-button-secondary dark:file:text-dark-text-primary
               dark:hover:file:bg-dark-button-secondary-hover
-              cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
+              cursor-pointer disabled:cursor-not-allowed disabled:opacity-50
+              focus:outline-none focus:ring-2 focus:ring-light-focus-ring dark:focus:ring-dark-focus-ring
+              transition-all duration-200"
           />
         </div>
 
         {files.length > 0 && (
-          <div className="space-y-2">
-            <h4 className="text-sm font-medium text-gray-700 dark:text-dark-text-primary">
-              Selected Files
-            </h4>
-            {files.map((file, index) => (
-              <div key={index} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-dark-bg-tertiary rounded-md">
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-gray-900 dark:text-dark-text-primary truncate">
-                    {file.name}
-                  </p>
-                  <p className="text-xs text-gray-500 dark:text-dark-text-tertiary">
-                    {formatFileSize(file.size)}
-                  </p>
+          <div className="space-y-4">
+            <div className="flex items-center space-x-2">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              <h4 className="text-sm font-medium text-gray-700 dark:text-dark-text-primary">
+                Selected Files ({files.length})
+              </h4>
+            </div>
+            <div className="space-y-2">
+              {files.map((file, index) => (
+                <div key={index} className="flex items-center justify-between p-4 bg-gray-50 dark:bg-dark-bg-tertiary rounded-lg border border-gray-200 dark:border-dark-border-primary">
+                  <div className="flex items-center space-x-3 flex-1 min-w-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-red-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                    </svg>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-gray-900 dark:text-dark-text-primary truncate">
+                        {file.name}
+                      </p>
+                      <p className="text-xs text-gray-500 dark:text-dark-text-tertiary">
+                        {formatFileSize(file.size)}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-2 flex-shrink-0">
+                    {uploadStatus === "uploading" && (
+                      <div className="animate-spin rounded-full h-4 w-4 border-2 border-light-button-primary border-t-transparent dark:border-dark-button-primary dark:border-t-transparent"></div>
+                    )}
+                  </div>
                 </div>
-                <div className="flex items-center space-x-2">
-                  {uploadStatus === "uploading" && (
-                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-light-button-primary border-t-transparent dark:border-dark-button-primary dark:border-t-transparent"></div>
-                  )}
-                </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         )}
 
@@ -204,28 +224,38 @@ const UploadForm = ({ semester, onUploadSuccess }: UploadFormProps) => {
           </div>
         )}
 
-        <div className="flex space-x-3">
+        <div className="flex space-x-3 pt-4 border-t border-gray-200 dark:border-dark-border-primary">
           <button
             onClick={handleUpload}
             disabled={files.length === 0 || uploadStatus === "uploading" || uploadStatus === "rate_limited" || !user}
-            className="flex-1 bg-light-button-primary text-white py-2 px-4 rounded-md hover:bg-light-button-primary-hover dark:bg-dark-button-primary dark:hover:bg-dark-button-primary-hover focus:outline-none focus:ring-2 focus:ring-light-focus-ring dark:focus:ring-dark-focus-ring focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="flex-1 bg-light-button-primary text-white py-2.5 px-6 rounded-md hover:bg-light-button-primary-hover dark:bg-dark-button-primary dark:hover:bg-dark-button-primary-hover focus:outline-none focus:ring-2 focus:ring-light-focus-ring dark:focus:ring-dark-focus-ring focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
           >
             {uploadStatus === "uploading" ? (
               <div className="flex items-center justify-center">
-                <div className="animate-spin rounded-full h-4 w-4 border-2 border-light-button-primary border-t-transparent dark:border-dark-button-primary dark:border-t-transparent mr-2"></div>
+                <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2"></div>
                 Processing...
               </div>
             ) : (
-              "Extract Assessments"
+              <span className="flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                </svg>
+                Extract Assessments
+              </span>
             )}
           </button>
           
           {files.length > 0 && uploadStatus !== "uploading" && (
             <button
               onClick={handleReset}
-              className="px-4 py-2 border border-gray-300 dark:border-dark-border-primary rounded-md text-sm font-medium text-gray-700 dark:text-dark-text-primary bg-white dark:bg-dark-bg-tertiary hover:bg-gray-50 dark:hover:bg-dark-bg-secondary focus:outline-none focus:ring-2 focus:ring-light-focus-ring dark:focus:ring-dark-focus-ring focus:ring-offset-2 transition-colors"
+              className="px-6 py-2.5 border border-gray-300 dark:border-dark-border-primary rounded-md text-sm font-medium text-gray-700 dark:text-dark-text-primary bg-white dark:bg-dark-bg-tertiary hover:bg-gray-50 dark:hover:bg-dark-bg-secondary focus:outline-none focus:ring-2 focus:ring-light-focus-ring dark:focus:ring-dark-focus-ring focus:ring-offset-2 transition-colors"
             >
-              {uploadStatus === "rate_limited" ? "Cancel & Clear" : "Clear"}
+              <span className="flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+                {uploadStatus === "rate_limited" ? "Cancel & Clear" : "Clear"}
+              </span>
             </button>
           )}
         </div>
