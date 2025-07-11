@@ -9,20 +9,6 @@ const nextConfig = {
       },
     ],
   },
-  async redirects() {
-    return [
-      {
-        source: "/login",
-        destination: "https://asetta.me/login",
-        permanent: true,
-      },
-      {
-        source: "/register",
-        destination: "https://asetta.me/register",
-        permanent: true,
-      },
-    ];
-  },
 };
 
 export default nextConfig;
