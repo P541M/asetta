@@ -42,7 +42,9 @@ export default function PricingPage() {
               </span>
             </h1>
             <p className="text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-              Spoiler alert: It's completely free! We believe every student deserves access to powerful academic tools without breaking the bank.
+              Spoiler alert: It's completely free! We believe every student
+              deserves access to powerful academic tools without breaking the
+              bank.
             </p>
           </motion.div>
 
@@ -56,7 +58,7 @@ export default function PricingPage() {
             >
               {/* Decorative Elements */}
               <div className="absolute inset-0 bg-gradient-to-br from-primary-50/30 via-transparent to-green-50/20 opacity-50"></div>
-              
+
               <div className="relative z-10">
                 <div className="text-center mb-12">
                   <motion.div
@@ -74,7 +76,8 @@ export default function PricingPage() {
                     Hey there, fellow student! 👋
                   </h2>
                   <p className="text-xl md:text-2xl text-gray-600 mb-8 leading-relaxed">
-                    We know you're already spending enough on textbooks and coffee.
+                    We know you're already spending enough on textbooks and
+                    coffee.
                     <br className="hidden md:block" />
                     That's why Asetta is and always will be completely free!
                   </p>
@@ -82,13 +85,18 @@ export default function PricingPage() {
 
                 <div className="text-center mb-12">
                   <div className="inline-flex items-baseline mb-6">
-                    <span className="text-8xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-green-600 to-primary-600">$0</span>
-                    <span className="text-2xl font-bold text-gray-500 ml-2">/forever</span>
+                    <span className="text-8xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-green-600 to-primary-600">
+                      $0
+                    </span>
+                    <span className="text-2xl font-bold text-gray-500 ml-2">
+                      /forever
+                    </span>
                   </div>
                   <p className="text-gray-600 text-xl mb-12 max-w-3xl mx-auto leading-relaxed">
                     No hidden fees. No premium features. No catch.
                     <br />
-                    Just a simple, powerful tool to help you ace your studies! 📚✨
+                    Just a simple, powerful tool to help you ace your studies!
+                    📚✨
                   </p>
 
                   <motion.div
@@ -97,7 +105,7 @@ export default function PricingPage() {
                     className="inline-block"
                   >
                     <Link
-                      href="https://asetta.vercel.app/register"
+                      href="https://asetta.me/register"
                       className="group inline-flex items-center justify-center px-10 py-5 text-xl font-bold text-white bg-gradient-to-r from-primary-600 to-primary-700 rounded-2xl hover:from-primary-700 hover:to-primary-800 transition-all duration-300 shadow-lg hover:shadow-xl"
                     >
                       Join the Student Community
@@ -130,17 +138,20 @@ export default function PricingPage() {
                       {
                         emoji: "🎯",
                         title: "All Features Included",
-                        description: "AI-powered tracking, smart notifications, and personalized insights"
+                        description:
+                          "AI-powered tracking, smart notifications, and personalized insights",
                       },
                       {
                         emoji: "🚀",
                         title: "No Credit Card Required",
-                        description: "Sign up instantly with just your email address"
+                        description:
+                          "Sign up instantly with just your email address",
                       },
                       {
                         emoji: "💫",
                         title: "Always Free for Students",
-                        description: "No subscription fees, premium tiers, or hidden costs"
+                        description:
+                          "No subscription fees, premium tiers, or hidden costs",
                       },
                     ].map((item, index) => (
                       <motion.div
@@ -150,9 +161,15 @@ export default function PricingPage() {
                         transition={{ duration: 0.6, delay: 0.8 + index * 0.1 }}
                         className="group text-center p-6 rounded-2xl hover:bg-primary-50/50 transition-all duration-300"
                       >
-                        <div className="text-4xl mb-4 group-hover:scale-110 transition-transform duration-300">{item.emoji}</div>
-                        <h3 className="text-xl font-bold text-gray-900 mb-3 font-heading">{item.title}</h3>
-                        <p className="text-gray-600 leading-relaxed">{item.description}</p>
+                        <div className="text-4xl mb-4 group-hover:scale-110 transition-transform duration-300">
+                          {item.emoji}
+                        </div>
+                        <h3 className="text-xl font-bold text-gray-900 mb-3 font-heading">
+                          {item.title}
+                        </h3>
+                        <p className="text-gray-600 leading-relaxed">
+                          {item.description}
+                        </p>
                       </motion.div>
                     ))}
                   </div>
@@ -173,7 +190,9 @@ export default function PricingPage() {
               <p className="text-gray-700 font-medium text-lg">
                 P.S. Save your money for that extra coffee during finals week!
                 <br className="hidden sm:block" />
-                <span className="font-bold text-primary-600">We've got your back! 💪</span>
+                <span className="font-bold text-primary-600">
+                  We've got your back! 💪
+                </span>
               </p>
             </div>
           </motion.div>

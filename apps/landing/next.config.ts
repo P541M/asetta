@@ -13,12 +13,12 @@ const nextConfig = {
     return [
       {
         source: "/login",
-        destination: "https://asetta.vercel.app/login",
+        destination: "https://asetta.me/login",
         permanent: true,
       },
       {
         source: "/register",
-        destination: "https://asetta.vercel.app/register",
+        destination: "https://asetta.me/register",
         permanent: true,
       },
     ];

@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Asetta is a landing page for an AI-powered academic management platform. The landing page showcases features like assessment tracking, deadline management, and personalized insights for students. The project is built as a marketing site that redirects users to the main application at `https://asetta.vercel.app`.
+Asetta is a landing page for an AI-powered academic management platform. The landing page showcases features like assessment tracking, deadline management, and personalized insights for students. The project is built as a marketing site that redirects users to the main application at `https://asetta.me`.
 
 ## Tech Stack & Architecture
 
@@ -84,8 +84,8 @@ npm run lint
 
 ### Redirects Configuration
 
-- `/login` → `https://asetta.vercel.app/login`
-- `/register` → `https://asetta.vercel.app/register`
+- `/login` → `https://asetta.me/login`
+- `/register` → `https://asetta.me/register`
 - Configured in `next.config.ts` as permanent redirects
 
 ### Social Media Links

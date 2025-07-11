@@ -54,7 +54,7 @@ export default function LandingPage() {
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center mt-8 lg:mt-10 animate-fade-in-up">
               <Link
-                href="https://asetta.vercel.app/register"
+                href="https://asetta.me/register"
                 className="group inline-flex items-center justify-center px-8 py-4 text-lg font-bold text-white bg-gradient-to-r from-primary-600 to-primary-700 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
               >
                 Get Started Free
@@ -268,7 +268,7 @@ export default function LandingPage() {
             </p>
             <div className="flex justify-center group transform transition-all duration-300 hover:scale-105 hover:-translate-y-2">
               <Link
-                href="https://asetta.vercel.app/register"
+                href="https://asetta.me/register"
                 className="inline-flex items-center justify-center px-12 py-6 text-xl font-bold text-white bg-gradient-to-r from-primary-600 via-primary-700 to-primary-800 rounded-2xl shadow-2xl hover:shadow-3xl transition-all duration-300 relative overflow-hidden animate-scale-delayed"
               >
                 <span className="absolute inset-0 bg-gradient-to-r from-primary-700 via-primary-800 to-primary-900 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>

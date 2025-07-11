@@ -108,7 +108,7 @@ const Header = () => {
             <div className="h-6 w-px bg-gray-300 mx-3"></div>
 
             <Link
-              href="https://asetta.vercel.app/login"
+              href="https://asetta.me/login"
               className="px-4 py-2 text-gray-700 hover:text-primary-600 transition-all duration-300 text-sm font-semibold rounded-lg hover:bg-gray-50"
             >
               Login
@@ -120,7 +120,7 @@ const Header = () => {
               className="ml-2"
             >
               <Link
-                href="https://asetta.vercel.app/register"
+                href="https://asetta.me/register"
                 className="group relative inline-flex items-center justify-center px-6 py-2.5 text-sm font-bold text-white bg-gradient-to-r from-primary-600 to-primary-700 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden"
               >
                 <span className="absolute inset-0 bg-gradient-to-r from-primary-700 to-primary-800 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
@@ -230,7 +230,7 @@ const Header = () => {
                     <div className="h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent my-4" />
 
                     <Link
-                      href="https://asetta.vercel.app/login"
+                      href="https://asetta.me/login"
                       className="group flex items-center px-4 py-3.5 text-gray-700 hover:text-primary-600 hover:bg-gray-50/80 rounded-xl transition-all duration-300 text-base font-semibold"
                       onClick={() => setMobileMenuOpen(false)}
                     >
@@ -241,7 +241,7 @@ const Header = () => {
 
                     <motion.div className="pt-2" whileTap={{ scale: 0.98 }}>
                       <Link
-                        href="https://asetta.vercel.app/register"
+                        href="https://asetta.me/register"
                         className="group relative flex items-center justify-center mx-2 px-6 py-4 text-base font-bold text-white bg-gradient-to-r from-primary-600 to-primary-700 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden"
                         onClick={() => setMobileMenuOpen(false)}
                       >

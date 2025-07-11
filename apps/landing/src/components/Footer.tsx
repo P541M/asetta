@@ -124,7 +124,7 @@ const Footer = () => {
                   Ready to boost your academic productivity?
                 </p>
                 <Link
-                  href="https://asetta.vercel.app/register"
+                  href="https://asetta.me/register"
                   className="group inline-flex items-center px-6 py-3 text-sm font-bold text-white bg-gradient-to-r from-primary-600 to-primary-700 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5"
                 >
                   <span className="relative z-10">Start Free</span>

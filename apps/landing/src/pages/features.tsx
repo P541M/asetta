@@ -136,7 +136,7 @@ export default function FeaturesPage() {
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <a
-                  href="https://asetta.vercel.app/register"
+                  href="https://asetta.me/register"
                   className="group inline-flex items-center justify-center px-10 py-4 text-lg font-bold text-white bg-gradient-to-r from-primary-600 to-primary-700 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
                 >
                   Get Started Free

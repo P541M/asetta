@@ -127,8 +127,8 @@ npm run lint
 
 ### Application Redirects
 
-- `/login` → `https://asetta.vercel.app/login`
-- `/register` → `https://asetta.vercel.app/register`
+- `/login` → `https://asetta.me/login`
+- `/register` → `https://asetta.me/register`
 
 ### Social Media
 
