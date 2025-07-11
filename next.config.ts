@@ -19,6 +19,15 @@ const config: NextConfig = {
     contentDispositionType: "attachment",
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
   },
+  async redirects() {
+    return [
+      {
+        source: "/",
+        destination: "https://www.asetta.me",
+        permanent: true,
+      },
+    ];
+  },
 };
 
 export default config;
