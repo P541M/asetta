@@ -176,8 +176,8 @@
 
 /* Scrollbar styles */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 4px;
+  height: 4px;
 }
 
 ::-webkit-scrollbar-track {
@@ -185,18 +185,18 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-light-bg-tertiary dark:bg-dark-bg-tertiary hover:bg-light-border-primary dark:hover:bg-dark-border-primary rounded-full;
+  @apply bg-light-border-primary dark:bg-dark-border-primary hover:bg-light-border-secondary dark:hover:bg-dark-border-secondary rounded-full;
 }
 
 /* For Firefox */
 * {
   scrollbar-width: thin;
-  scrollbar-color: theme("colors.light.bg-tertiary")
+  scrollbar-color: theme("colors.light.border-primary")
     theme("colors.light.bg-secondary");
 }
 
 .dark * {
-  scrollbar-color: theme("colors.dark.bg-tertiary")
+  scrollbar-color: theme("colors.dark.border-primary")
     theme("colors.dark.bg-secondary");
 }
 
