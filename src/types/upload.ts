@@ -1,5 +1,6 @@
 export interface UploadFormProps {
-  semester: string;
+  semesterId: string;
+  semesterName: string;
   onUploadSuccess: (semester: string) => void;
 }
 

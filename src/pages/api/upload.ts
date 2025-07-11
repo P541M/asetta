@@ -24,30 +24,41 @@ async function extractAssessmentsAI(text: string): Promise<string> {
   const geminiApiKey = process.env.GEMINI_API_KEY;
 
   if (!geminiApiKey) {
-    throw new Error("Gemini API not configured");
+    throw new Error("Gemini API key not configured");
   }
 
   const genAI = new GoogleGenerativeAI(geminiApiKey);
-  const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+  const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
   const prompt = `
-    You are an AI assistant that extracts assessment information from course outlines.
-    Extract all assessments from the following course outline text. Return a JSON array with objects having the following structure:
+    Extract assessment information from this course outline. Return ONLY a valid JSON array with this structure:
     {
-      "courseName": "The course code or name",
-      "assignmentName": "Name of the assessment",
-      "dueDate": "YYYY-MM-DD format date",
-      "dueTime": "HH:MM format time (24-hour), default to '23:59' if not specified",
-      "weight": "Percentage weight as a number",
+      "courseName": "Course code and name",
+      "assignmentName": "Assessment name and type", 
+      "dueDate": "YYYY-MM-DD format",
+      "dueTime": "HH:MM format (24-hour), use '23:59' if not specified",
+      "weight": "Numeric percentage weight",
       "status": "Not started"
     }
 
-    Only include assessments that have clear due dates or deadline information. Extract as many assessments as you can find. If no time is specified, use '23:59' as the default.
+    WEIGHT EXTRACTION - Look for these patterns:
+    - "25%" → weight: 25
+    - "30% of final grade" → weight: 30  
+    - "50 points out of 200 total" → weight: 25
+    - "1/4 of course grade" → weight: 25
+    - If no weight found → weight: 0
+
+    REQUIREMENTS:
+    - Only extract assessments with clear due dates
+    - Include exams, assignments, quizzes, labs, projects
+    - Convert all dates to YYYY-MM-DD format
+    - Return ONLY the JSON array, no explanations
+    - No markdown formatting
 
     Course outline text:
     ${text}
 
-    Respond with ONLY a valid JSON array of assessment objects. No other explanation or text.
+    JSON array:
   `;
 
   try {
@@ -94,14 +105,14 @@ export default async function handler(
 
   try {
     const { fields, files } = await parseForm(req);
-    const semesterField = fields.semester;
-    const semester = Array.isArray(semesterField)
-      ? semesterField[0]
-      : semesterField;
-    if (!semester) {
+    const semesterIdField = fields.semesterId;
+    const semesterId = Array.isArray(semesterIdField)
+      ? semesterIdField[0]
+      : semesterIdField;
+    if (!semesterId) {
       return res
         .status(400)
-        .json({ success: false, error: "Semester is required" });
+        .json({ success: false, error: "Semester ID is required" });
     }
 
     const authHeader = req.headers.authorization;
@@ -116,24 +127,21 @@ export default async function handler(
     try {
       const decodedToken = await admin.auth().verifyIdToken(token);
       userId = decodedToken.uid;
-    } catch (error) {
-      console.error("Invalid token:", error);
+    } catch {
       return res
         .status(401)
         .json({ success: false, error: "Invalid authentication token" });
     }
 
     const adminDb = admin.firestore();
-    const semestersRef = adminDb.collection(`users/${userId}/semesters`);
-    const semesterQuery = semestersRef.where("name", "==", semester).limit(1);
-    const semesterSnapshot = await semesterQuery.get();
-    if (semesterSnapshot.empty) {
+    // Verify the semester exists by checking if we can access it
+    const semesterRef = adminDb.doc(`users/${userId}/semesters/${semesterId}`);
+    const semesterDoc = await semesterRef.get();
+    if (!semesterDoc.exists) {
       return res
         .status(400)
         .json({ success: false, error: "Semester not found" });
     }
-    const semesterDoc = semesterSnapshot.docs[0];
-    const semesterId = semesterDoc.id;
 
     const uploadedFiles: formidable.File[] = [];
     Object.keys(files).forEach((key) => {
@@ -164,8 +172,7 @@ export default async function handler(
         try {
           const data = await pdfParse(pdfBuffer);
           extractedText = data.text;
-        } catch (error) {
-          console.error(`Error parsing PDF ${fileName}:`, error);
+        } catch {
           failedFiles++;
           errors.push(`Failed to parse PDF: ${fileName}`);
           continue;
@@ -175,25 +182,59 @@ export default async function handler(
         try {
           if (process.env.GEMINI_API_KEY) {
             const aiContent = await extractAssessmentsAI(extractedText);
-            const jsonMatch = aiContent.match(/\[[\s\S]*\]/);
-            const jsonString = jsonMatch ? jsonMatch[0] : aiContent;
-            assessments = JSON.parse(jsonString);
-            assessments = assessments.map((assessment) => ({
-              courseName:
-                assessment.courseName ||
-                extractCourseName(extractedText) ||
-                "Unknown Course",
-              assignmentName: assessment.assignmentName || "Unknown Assessment",
-              dueDate:
-                formatDate(assessment.dueDate) ||
-                new Date().toISOString().split("T")[0],
-              dueTime: assessment.dueTime || "23:59",
-              weight:
-                typeof assessment.weight === "number"
-                  ? assessment.weight
-                  : parseFloat(assessment.weight) || 0,
-              status: "Not started",
-            }));
+            
+            // Clean up the AI response to extract JSON
+            let jsonString = aiContent.trim();
+            
+            // Remove markdown code blocks if present
+            jsonString = jsonString.replace(/```json\n?/g, '').replace(/```\n?/g, '');
+            
+            // Try to extract JSON array from response
+            const jsonMatch = jsonString.match(/\[[\s\S]*\]/);
+            if (jsonMatch) {
+              jsonString = jsonMatch[0];
+            }
+            
+            let parsedAssessments;
+            try {
+              parsedAssessments = JSON.parse(jsonString);
+            } catch {
+              throw new Error(`Failed to parse AI response as JSON`);
+            }
+            
+            // Validate and clean the parsed assessments
+            if (!Array.isArray(parsedAssessments)) {
+              throw new Error("AI response is not an array");
+            }
+            
+            assessments = parsedAssessments
+              .map((assessment, index) => {
+                // Validate required fields
+                if (!assessment || typeof assessment !== 'object') {
+                  return null;
+                }
+                
+                const courseName = assessment.courseName || extractCourseName(extractedText) || "Unknown Course";
+                const assignmentName = assessment.assignmentName || `Assessment ${index + 1}`;
+                const dueDate = formatDate(assessment.dueDate) || new Date().toISOString().split("T")[0];
+                const dueTime = assessment.dueTime || "23:59";
+                const weight = typeof assessment.weight === "number" ? assessment.weight : (parseFloat(assessment.weight) || 0);
+                
+                // Basic validation
+                if (!courseName || !assignmentName || !dueDate) {
+                  return null;
+                }
+                
+                return {
+                  courseName,
+                  assignmentName,
+                  dueDate,
+                  dueTime,
+                  weight,
+                  status: "Not started" as const,
+                } as Assessment;
+              })
+              .filter((assessment): assessment is Assessment => assessment !== null);
           } else {
             throw new Error("Gemini API not configured");
           }
@@ -204,9 +245,7 @@ export default async function handler(
             errors.push(`Rate limit exceeded: ${fileName}. Please wait a moment and try again.`);
             continue;
           }
-          console.warn(
-            `AI extraction failed for ${fileName}, falling back to basic extraction`
-          );
+          // Fall back to basic extraction
           assessments = extractAssessmentsBasic(extractedText);
         }
 
@@ -237,8 +276,7 @@ export default async function handler(
 
         totalAssessments += assessments.length;
         processedFiles++;
-      } catch (fileError) {
-        console.error("Error processing file:", fileError);
+      } catch {
         failedFiles++;
         errors.push(`Failed to process file: ${fileData.originalFilename}`);
       }
@@ -265,11 +303,10 @@ export default async function handler(
       errors: errors.length > 0 ? errors : undefined,
       hasRateLimitErrors,
     });
-  } catch (error) {
-    console.error("Processing error:", error);
+  } catch {
     return res.status(500).json({
       success: false,
-      error: error instanceof Error ? error.message : "Unknown error",
+      error: "Processing error occurred",
     });
   }
 }

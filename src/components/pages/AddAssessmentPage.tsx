@@ -54,7 +54,8 @@ const AddAssessmentPage = ({ forceSemesterId }: AddAssessmentPageProps) => {
 
               {addMode === "upload" ? (
                 <UploadForm
-                  semester={selectedSemester}
+                  semesterId={selectedSemesterId}
+                  semesterName={selectedSemester}
                   onUploadSuccess={refreshAssessments}
                 />
               ) : (

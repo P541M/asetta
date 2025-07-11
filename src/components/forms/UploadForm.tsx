@@ -3,7 +3,7 @@ import { useAuth } from "../../contexts/AuthContext";
 import { UploadFormProps, UploadStatus, FileProgress } from "../../types/upload";
 import RateLimitNotice from "../ui/RateLimitNotice";
 
-const UploadForm = ({ semester, onUploadSuccess }: UploadFormProps) => {
+const UploadForm = ({ semesterId, semesterName, onUploadSuccess }: UploadFormProps) => {
   const { user } = useAuth();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [files, setFiles] = useState<FileProgress[]>([]);
@@ -37,7 +37,7 @@ const UploadForm = ({ semester, onUploadSuccess }: UploadFormProps) => {
 
     try {
       const formData = new FormData();
-      formData.append("semester", semester);
+      formData.append("semesterId", semesterId);
 
       // Add all files to form data
       if (fileInputRef.current?.files) {
@@ -64,7 +64,7 @@ const UploadForm = ({ semester, onUploadSuccess }: UploadFormProps) => {
         if (fileInputRef.current) {
           fileInputRef.current.value = "";
         }
-        onUploadSuccess(semester);
+        onUploadSuccess(semesterName);
       } else {
         // Check if it's a rate limit error
         if (response.status === 429 || result.error === "RATE_LIMITED") {
