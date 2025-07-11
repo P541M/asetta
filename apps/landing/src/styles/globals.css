@@ -59,17 +59,17 @@
 /* Custom scrollbar styling */
 @layer components {
   ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
+    width: 6px;
+    height: 6px;
   }
   ::-webkit-scrollbar-track {
-    @apply bg-light-bg-tertiary rounded-full;
+    @apply bg-light-bg-secondary;
   }
   ::-webkit-scrollbar-thumb {
-    @apply bg-light-button-primary rounded-full;
+    @apply bg-light-bg-tertiary hover:bg-light-border-primary rounded-full;
   }
   * {
     scrollbar-width: thin;
-    scrollbar-color: theme("colors.light.button-primary") theme("colors.light.bg-tertiary");
+    scrollbar-color: theme("colors.light.bg-tertiary") theme("colors.light.bg-secondary");
   }
 }
