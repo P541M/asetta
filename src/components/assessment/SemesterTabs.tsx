@@ -677,7 +677,7 @@ const SemesterTabs = ({
 
       {/* Semester tabs - horizontally scrollable */}
       <div className="relative px-4 py-2">
-        <div className="flex items-center space-x-2 overflow-x-auto pb-1 hide-scrollbar scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-dark-bg-tertiary scrollbar-track-transparent">
+        <div className="flex items-center space-x-2 overflow-x-auto pb-1 hide-scrollbar">
           {semesters.map((sem) => (
             <div key={sem.id} className="flex-shrink-0">
               <button
