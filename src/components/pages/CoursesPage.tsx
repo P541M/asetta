@@ -9,28 +9,24 @@ interface CoursesPageProps {
 
 const CoursesPage = ({ forceSemesterId }: CoursesPageProps) => {
   const router = useRouter();
-  
+
   // Extract semester ID from URL if this is a semester-specific route
   const urlSemesterId = forceSemesterId || (router.query.semester as string);
 
   const handleSelectCourse = (courseName: string) => {
-    const basePath = urlSemesterId 
-      ? `/dashboard/${urlSemesterId}/assessments` 
+    const basePath = urlSemesterId
+      ? `/dashboard/${urlSemesterId}/assessments`
       : "/dashboard/assessments";
     router.push(`${basePath}?course=${encodeURIComponent(courseName)}`);
   };
 
   return (
     <DashboardLayout
-      title="Courses - Asetta"
+      title="Courses | Asetta"
       description="View course overview and statistics for your current semester."
       forceSemesterId={urlSemesterId}
     >
-      {({
-        selectedSemesterId,
-        isLoading,
-        error,
-      }) => (
+      {({ selectedSemesterId, isLoading, error }) => (
         <div className="animate-fade-in">
           {isLoading ? (
             <div className="flex justify-center py-8">

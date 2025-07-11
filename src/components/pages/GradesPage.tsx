@@ -25,48 +25,51 @@ const GradesPage = ({ forceSemesterId }: GradesPageProps) => {
   const [currentSemesterId, setCurrentSemesterId] = useState<string>("");
 
   // Function to fetch available courses for the selected semester
-  const fetchAvailableCourses = useCallback(async (semesterId: string) => {
-    if (!user || !semesterId) {
-      setAvailableCourses([]);
-      return;
-    }
-
-    setIsLoadingCourses(true);
-    try {
-      const assessmentsRef = collection(
-        db,
-        "users",
-        user.uid,
-        "semesters",
-        semesterId,
-        "assessments"
-      );
-      const assessmentsQuery = query(assessmentsRef);
-      const querySnapshot = await getDocs(assessmentsQuery);
-
-      // Extract unique course names
-      const courses = new Set<string>();
-      querySnapshot.docs.forEach((doc) => {
-        const data = doc.data();
-        if (data.courseName) {
-          courses.add(data.courseName);
-        }
-      });
-
-      const courseArray = Array.from(courses).sort();
-      setAvailableCourses(courseArray);
-
-      // Auto-select first course if none selected
-      if (!selectedCourse && courseArray.length > 0) {
-        setSelectedCourse(courseArray[0]);
+  const fetchAvailableCourses = useCallback(
+    async (semesterId: string) => {
+      if (!user || !semesterId) {
+        setAvailableCourses([]);
+        return;
       }
-    } catch (error) {
-      console.error("Error fetching courses:", error);
-      setAvailableCourses([]);
-    } finally {
-      setIsLoadingCourses(false);
-    }
-  }, [user, selectedCourse]);
+
+      setIsLoadingCourses(true);
+      try {
+        const assessmentsRef = collection(
+          db,
+          "users",
+          user.uid,
+          "semesters",
+          semesterId,
+          "assessments"
+        );
+        const assessmentsQuery = query(assessmentsRef);
+        const querySnapshot = await getDocs(assessmentsQuery);
+
+        // Extract unique course names
+        const courses = new Set<string>();
+        querySnapshot.docs.forEach((doc) => {
+          const data = doc.data();
+          if (data.courseName) {
+            courses.add(data.courseName);
+          }
+        });
+
+        const courseArray = Array.from(courses).sort();
+        setAvailableCourses(courseArray);
+
+        // Auto-select first course if none selected
+        if (!selectedCourse && courseArray.length > 0) {
+          setSelectedCourse(courseArray[0]);
+        }
+      } catch (error) {
+        console.error("Error fetching courses:", error);
+        setAvailableCourses([]);
+      } finally {
+        setIsLoadingCourses(false);
+      }
+    },
+    [user, selectedCourse]
+  );
 
   // Fetch courses when semester changes
   useEffect(() => {
@@ -82,20 +85,25 @@ const GradesPage = ({ forceSemesterId }: GradesPageProps) => {
   useEffect(() => {
     if (router.query.course && typeof router.query.course === "string") {
       const courseFromUrl = decodeURIComponent(router.query.course);
-      if (availableCourses.includes(courseFromUrl) && selectedCourse !== courseFromUrl) {
+      if (
+        availableCourses.includes(courseFromUrl) &&
+        selectedCourse !== courseFromUrl
+      ) {
         setSelectedCourse(courseFromUrl);
       }
     }
   }, [router.query.course, availableCourses, selectedCourse]);
 
   const handleAddAssessment = () => {
-    const basePath = urlSemesterId ? `/dashboard/${urlSemesterId}/add` : "/dashboard/add";
+    const basePath = urlSemesterId
+      ? `/dashboard/${urlSemesterId}/add`
+      : "/dashboard/add";
     window.location.href = basePath;
   };
 
   return (
     <DashboardLayout
-      title="Grades - Asetta"
+      title="Grades | Asetta"
       description="Calculate and analyze your grades across courses and assessments."
       forceSemesterId={urlSemesterId}
     >
@@ -139,7 +147,9 @@ const GradesPage = ({ forceSemesterId }: GradesPageProps) => {
                     Grade Calculator
                   </h2>
                   <p className="text-sm text-gray-500 dark:text-dark-text-tertiary mt-1">
-                    {selectedSemester ? `${selectedSemester} semester` : "Select a course to calculate grades"}
+                    {selectedSemester
+                      ? `${selectedSemester} semester`
+                      : "Select a course to calculate grades"}
                   </p>
                 </div>
 
@@ -157,7 +167,9 @@ const GradesPage = ({ forceSemesterId }: GradesPageProps) => {
                     <select
                       id="course-select"
                       value={selectedCourse || ""}
-                      onChange={(e) => setSelectedCourse(e.target.value || null)}
+                      onChange={(e) =>
+                        setSelectedCourse(e.target.value || null)
+                      }
                       className="input bg-white dark:bg-dark-bg-tertiary py-1.5 px-3 text-sm dark:text-dark-text-primary dark:border-dark-border-primary min-w-48"
                       disabled={availableCourses.length === 0}
                     >

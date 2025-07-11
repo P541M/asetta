@@ -27,28 +27,36 @@ const AssessmentsPage = ({ forceSemesterId }: AssessmentsPageProps) => {
   useEffect(() => {
     const handleSwitchToAssessments = () => {
       setSelectedCourse(null);
-      const basePath = urlSemesterId ? `/dashboard/${urlSemesterId}/assessments` : "/dashboard/assessments";
+      const basePath = urlSemesterId
+        ? `/dashboard/${urlSemesterId}/assessments`
+        : "/dashboard/assessments";
       router.push(basePath, undefined, { shallow: true });
     };
 
     window.addEventListener("switchToAssessments", handleSwitchToAssessments);
     return () => {
-      window.removeEventListener("switchToAssessments", handleSwitchToAssessments);
+      window.removeEventListener(
+        "switchToAssessments",
+        handleSwitchToAssessments
+      );
     };
   }, [router, urlSemesterId]);
 
   const handleClearCourseSelection = () => {
     setSelectedCourse(null);
-    const basePath = urlSemesterId ? `/dashboard/${urlSemesterId}/assessments` : "/dashboard/assessments";
+    const basePath = urlSemesterId
+      ? `/dashboard/${urlSemesterId}/assessments`
+      : "/dashboard/assessments";
     router.push(basePath, undefined, { shallow: true });
   };
 
   return (
     <DashboardLayout
-      title="Assessments - Asetta"
-      description={urlSemesterId 
-        ? "View and manage all your assessments for this semester."
-        : "View and manage all your assessments across courses and semesters."
+      title="Assessments | Asetta"
+      description={
+        urlSemesterId
+          ? "View and manage all your assessments for this semester."
+          : "View and manage all your assessments across courses and semesters."
       }
       forceSemesterId={urlSemesterId}
     >

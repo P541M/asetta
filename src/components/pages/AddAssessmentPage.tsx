@@ -17,7 +17,7 @@ const AddAssessmentPage = ({ forceSemesterId }: AddAssessmentPageProps) => {
 
   return (
     <DashboardLayout
-      title="Add Assessment - Asetta"
+      title="Add Assessment | Asetta"
       description="Add new assessments to your semester either manually or by uploading a file."
       forceSemesterId={urlSemesterId}
     >
