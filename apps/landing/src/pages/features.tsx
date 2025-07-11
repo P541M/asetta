@@ -7,7 +7,7 @@ export default function FeaturesPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-white via-primary-50/20 to-white flex flex-col">
       <Head>
-        <title>Features - Asetta</title>
+        <title>Features | Asetta</title>
         <meta
           name="description"
           content="Always ahead, never behind. Discover Asetta's AI-powered features designed to help students excel in their academic journey—completely free."
@@ -36,8 +36,9 @@ export default function FeaturesPage() {
               </span>
             </h1>
             <p className="text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-              Always ahead, never behind. Discover how our intelligent AI technology 
-              keeps you organized and on top of your academic goals—all completely free.
+              Always ahead, never behind. Discover how our intelligent AI
+              technology keeps you organized and on top of your academic
+              goals—all completely free.
             </p>
           </div>
 

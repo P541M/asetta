@@ -8,7 +8,7 @@ export default function PricingPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-white via-primary-50/20 to-white flex flex-col">
       <Head>
-        <title>Pricing - Asetta</title>
+        <title>Pricing | Asetta</title>
         <meta
           name="description"
           content="Always ahead, never behind. Asetta is completely free for all students. Join us today!"
