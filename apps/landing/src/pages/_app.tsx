@@ -1,21 +1,14 @@
 import type { AppProps } from "next/app";
 import Head from "next/head";
-import { Outfit, Lexend } from "next/font/google";
+import { Manrope } from "next/font/google";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
 import "../styles/globals.css";
 
-const outfit = Outfit({
+const manrope = Manrope({
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700"],
-  variable: "--font-outfit",
-  display: "swap",
-});
-
-const lexend = Lexend({
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
-  variable: "--font-lexend",
+  variable: "--font-manrope",
   display: "swap",
 });
 
@@ -76,7 +69,7 @@ export default function App({ Component, pageProps }: AppProps) {
           href="/images/android-chrome-512x512.png"
         />
       </Head>
-      <main className={`${outfit.variable} ${lexend.variable} font-body`}>
+      <main className={`${manrope.variable} font-sans`}>
         <Component {...pageProps} />
       </main>
     </>

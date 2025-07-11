@@ -61,8 +61,8 @@ const Header = () => {
       transition={{ duration: 0.6, ease: "easeOut" }}
       className={`fixed w-full top-0 z-50 transition-all duration-500 ${
         scrolled
-          ? "bg-white/90 backdrop-blur-xl shadow-lg border-b border-gray-200/50"
-          : "bg-white/70 backdrop-blur-md border-b border-white/20"
+          ? "bg-light-bg-primary/90 backdrop-blur-xl shadow-lg border-b border-light-border-primary/50"
+          : "bg-light-bg-primary/70 backdrop-blur-md border-b border-light-bg-primary/20"
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -85,31 +85,31 @@ const Header = () => {
           <nav className="hidden md:flex items-center space-x-1">
             <Link
               href="/features"
-              className="relative px-4 py-2 text-gray-700 hover:text-primary-600 transition-all duration-300 text-sm font-semibold rounded-lg hover:bg-primary-50/80 group"
+              className="relative px-4 py-2 text-light-text-secondary hover:text-primary-600 transition-all duration-300 text-sm font-semibold rounded-lg hover:bg-light-hover-primary/80 group"
             >
               Features
               <div className="absolute bottom-0 left-1/2 w-0 h-0.5 bg-primary-600 group-hover:w-1/2 group-hover:left-1/4 transition-all duration-300"></div>
             </Link>
             <Link
               href="/pricing"
-              className="relative px-4 py-2 text-gray-700 hover:text-primary-600 transition-all duration-300 text-sm font-semibold rounded-lg hover:bg-primary-50/80 group"
+              className="relative px-4 py-2 text-light-text-secondary hover:text-primary-600 transition-all duration-300 text-sm font-semibold rounded-lg hover:bg-light-hover-primary/80 group"
             >
               Pricing?
               <div className="absolute bottom-0 left-1/2 w-0 h-0.5 bg-primary-600 group-hover:w-1/2 group-hover:left-1/4 transition-all duration-300"></div>
             </Link>
             <Link
               href="/contact"
-              className="relative px-4 py-2 text-gray-700 hover:text-primary-600 transition-all duration-300 text-sm font-semibold rounded-lg hover:bg-primary-50/80 group"
+              className="relative px-4 py-2 text-light-text-secondary hover:text-primary-600 transition-all duration-300 text-sm font-semibold rounded-lg hover:bg-light-hover-primary/80 group"
             >
               Contact
               <div className="absolute bottom-0 left-1/2 w-0 h-0.5 bg-primary-600 group-hover:w-1/2 group-hover:left-1/4 transition-all duration-300"></div>
             </Link>
 
-            <div className="h-6 w-px bg-gray-300 mx-3"></div>
+            <div className="h-6 w-px bg-light-border-primary mx-3"></div>
 
             <Link
               href="https://asetta.me/login"
-              className="px-4 py-2 text-gray-700 hover:text-primary-600 transition-all duration-300 text-sm font-semibold rounded-lg hover:bg-gray-50"
+              className="px-4 py-2 text-light-text-secondary hover:text-primary-600 transition-all duration-300 text-sm font-semibold rounded-lg hover:bg-light-hover-primary"
             >
               Login
             </Link>
@@ -148,8 +148,8 @@ const Header = () => {
               type="button"
               className={`relative p-3 rounded-xl transition-all duration-300 ${
                 mobileMenuOpen
-                  ? "bg-primary-50 text-primary-600 shadow-md"
-                  : "text-gray-700 hover:text-primary-600 hover:bg-primary-50/50"
+                  ? "bg-light-hover-primary text-primary-600 shadow-md"
+                  : "text-light-text-secondary hover:text-primary-600 hover:bg-light-hover-primary/50"
               }`}
               aria-label="Toggle menu"
               aria-expanded={mobileMenuOpen}
@@ -196,12 +196,12 @@ const Header = () => {
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: -10, scale: 0.95 }}
                   transition={{ duration: 0.3, ease: "easeOut" }}
-                  className="absolute top-full left-0 right-0 mt-3 mx-4 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-200/50 py-6 z-50"
+                  className="absolute top-full left-0 right-0 mt-3 mx-4 bg-light-bg-primary/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-light-border-primary/50 py-6 z-50"
                 >
                   <div className="flex flex-col space-y-2 px-4">
                     <Link
                       href="/features"
-                      className="group flex items-center px-4 py-3.5 text-gray-700 hover:text-primary-600 hover:bg-primary-50/80 rounded-xl transition-all duration-300 text-base font-semibold"
+                      className="group flex items-center px-4 py-3.5 text-light-text-secondary hover:text-primary-600 hover:bg-light-hover-primary/80 rounded-xl transition-all duration-300 text-base font-semibold"
                       onClick={() => setMobileMenuOpen(false)}
                     >
                       <span className="group-hover:translate-x-1 transition-transform duration-300">
@@ -210,7 +210,7 @@ const Header = () => {
                     </Link>
                     <Link
                       href="/pricing"
-                      className="group flex items-center px-4 py-3.5 text-gray-700 hover:text-primary-600 hover:bg-primary-50/80 rounded-xl transition-all duration-300 text-base font-semibold"
+                      className="group flex items-center px-4 py-3.5 text-light-text-secondary hover:text-primary-600 hover:bg-light-hover-primary/80 rounded-xl transition-all duration-300 text-base font-semibold"
                       onClick={() => setMobileMenuOpen(false)}
                     >
                       <span className="group-hover:translate-x-1 transition-transform duration-300">
@@ -219,7 +219,7 @@ const Header = () => {
                     </Link>
                     <Link
                       href="/contact"
-                      className="group flex items-center px-4 py-3.5 text-gray-700 hover:text-primary-600 hover:bg-primary-50/80 rounded-xl transition-all duration-300 text-base font-semibold"
+                      className="group flex items-center px-4 py-3.5 text-light-text-secondary hover:text-primary-600 hover:bg-light-hover-primary/80 rounded-xl transition-all duration-300 text-base font-semibold"
                       onClick={() => setMobileMenuOpen(false)}
                     >
                       <span className="group-hover:translate-x-1 transition-transform duration-300">
@@ -227,11 +227,11 @@ const Header = () => {
                       </span>
                     </Link>
 
-                    <div className="h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent my-4" />
+                    <div className="h-px bg-gradient-to-r from-transparent via-light-border-primary to-transparent my-4" />
 
                     <Link
                       href="https://asetta.me/login"
-                      className="group flex items-center px-4 py-3.5 text-gray-700 hover:text-primary-600 hover:bg-gray-50/80 rounded-xl transition-all duration-300 text-base font-semibold"
+                      className="group flex items-center px-4 py-3.5 text-light-text-secondary hover:text-primary-600 hover:bg-light-hover-primary/80 rounded-xl transition-all duration-300 text-base font-semibold"
                       onClick={() => setMobileMenuOpen(false)}
                     >
                       <span className="group-hover:translate-x-1 transition-transform duration-300">

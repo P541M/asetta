@@ -7,8 +7,8 @@
     @apply antialiased;
   }
   body {
-    @apply bg-gray-50 text-gray-800;
-    font-family: var(--font-outfit), "Outfit", sans-serif;
+    @apply bg-light-bg-secondary text-light-text-primary;
+    font-family: var(--font-manrope), "Manrope", sans-serif;
   }
   h1,
   h2,
@@ -16,30 +16,30 @@
   h4,
   h5,
   h6 {
-    @apply font-medium text-gray-900;
-    font-family: var(--font-lexend), "Lexend", sans-serif;
+    @apply font-medium text-light-text-primary;
+    font-family: var(--font-manrope), "Manrope", sans-serif;
   }
 }
 
 @layer components {
   .btn-primary {
-    @apply bg-primary-500 text-white rounded-lg font-medium hover:bg-primary-600 transition-colors duration-200 shadow-sm hover:shadow focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2;
+    @apply bg-light-button-primary text-white rounded-lg font-medium hover:bg-light-button-primary-hover transition-colors duration-200 shadow-sm hover:shadow focus:outline-none focus:ring-2 focus:ring-light-focus-ring focus:ring-offset-2;
   }
 
   .btn-outline {
-    @apply border-2 border-primary-500 text-primary-500 rounded-lg font-medium hover:bg-primary-50 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2;
+    @apply border-2 border-light-button-primary text-light-button-primary rounded-lg font-medium hover:bg-light-hover-primary transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-light-focus-ring focus:ring-offset-2;
   }
 
   .card {
-    @apply bg-white rounded-xl shadow-sm p-6 border border-gray-100;
+    @apply bg-light-bg-primary rounded-xl shadow-sm p-6 border border-light-border-primary;
   }
 
   .input {
-    @apply w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent;
+    @apply w-full px-3 py-2 border border-light-input-border bg-light-input-bg text-light-input-text rounded-lg focus:outline-none focus:ring-2 focus:ring-light-focus-ring focus:border-transparent placeholder:text-light-input-placeholder;
   }
 
   .form-label {
-    @apply block text-sm font-medium text-gray-700 mb-1;
+    @apply block text-sm font-medium text-light-text-secondary mb-1;
   }
 
   .form-group {
@@ -49,10 +49,10 @@
 
 @layer utilities {
   .font-heading {
-    font-family: var(--font-lexend), "Lexend", sans-serif;
+    font-family: var(--font-manrope), "Manrope", sans-serif;
   }
   .font-body {
-    font-family: var(--font-outfit), "Outfit", sans-serif;
+    font-family: var(--font-manrope), "Manrope", sans-serif;
   }
 }
 
@@ -63,13 +63,13 @@
     height: 8px;
   }
   ::-webkit-scrollbar-track {
-    @apply bg-gray-100 rounded-full;
+    @apply bg-light-bg-tertiary rounded-full;
   }
   ::-webkit-scrollbar-thumb {
-    @apply bg-primary-300 rounded-full;
+    @apply bg-light-button-primary rounded-full;
   }
   * {
     scrollbar-width: thin;
-    scrollbar-color: theme("colors.primary.300") theme("colors.gray.100");
+    scrollbar-color: theme("colors.light.button-primary") theme("colors.light.bg-tertiary");
   }
 }
