@@ -1,7 +1,8 @@
 import { useState, useRef } from "react";
 import { useAuth } from "../../contexts/AuthContext";
-import { UploadFormProps, UploadStatus, FileProgress } from "../../types/upload";
+import { UploadFormProps, UploadStatus, FileProgress, ExtractionResult } from "../../types/upload";
 import RateLimitNotice from "../ui/RateLimitNotice";
+import ExtractionSuccessModal from "../modals/ExtractionSuccessModal";
 
 const UploadForm = ({ semesterId, semesterName, onUploadSuccess }: UploadFormProps) => {
   const { user } = useAuth();
@@ -11,6 +12,8 @@ const UploadForm = ({ semesterId, semesterName, onUploadSuccess }: UploadFormPro
   const [message, setMessage] = useState<string>("");
   const [error, setError] = useState<string>("");
   const [retryAfter, setRetryAfter] = useState<number>(120);
+  const [showSuccessModal, setShowSuccessModal] = useState<boolean>(false);
+  const [extractionResult, setExtractionResult] = useState<ExtractionResult | null>(null);
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFiles = Array.from(e.target.files || []);
@@ -64,6 +67,13 @@ const UploadForm = ({ semesterId, semesterName, onUploadSuccess }: UploadFormPro
         if (fileInputRef.current) {
           fileInputRef.current.value = "";
         }
+        
+        // Show success modal with enhanced data
+        if (result.data) {
+          setExtractionResult(result.data);
+          setShowSuccessModal(true);
+        }
+        
         onUploadSuccess(semesterName);
       } else {
         // Check if it's a rate limit error
@@ -103,9 +113,16 @@ const UploadForm = ({ semesterId, semesterName, onUploadSuccess }: UploadFormPro
     setMessage("");
     setError("");
     setRetryAfter(120);
+    setShowSuccessModal(false);
+    setExtractionResult(null);
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
+  };
+
+  const handleCloseSuccessModal = () => {
+    setShowSuccessModal(false);
+    setExtractionResult(null);
   };
 
   const formatFileSize = (bytes: number) => {
@@ -186,7 +203,7 @@ const UploadForm = ({ semesterId, semesterName, onUploadSuccess }: UploadFormPro
           </div>
         )}
 
-        {message && (
+        {message && !showSuccessModal && (
           <div className="p-4 bg-light-success-bg dark:bg-dark-success-bg rounded-md">
             <p className="text-sm text-light-success-text dark:text-dark-success-text">{message}</p>
           </div>
@@ -230,6 +247,16 @@ const UploadForm = ({ semesterId, semesterName, onUploadSuccess }: UploadFormPro
           )}
         </div>
       </div>
+
+      {/* Success Modal */}
+      {showSuccessModal && extractionResult && (
+        <ExtractionSuccessModal
+          isOpen={showSuccessModal}
+          onClose={handleCloseSuccessModal}
+          result={extractionResult}
+          semesterId={semesterId}
+        />
+      )}
     </div>
   );
 };

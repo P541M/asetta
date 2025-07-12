@@ -162,6 +162,11 @@ export default async function handler(
     let processedFiles = 0;
     let failedFiles = 0;
     const errors: string[] = [];
+    const courseBreakdown: Array<{
+      courseName: string;
+      assessmentCount: number;
+    }> = [];
+    const processingStartTime = Date.now();
 
     for (const fileData of uploadedFiles) {
       try {
@@ -276,6 +281,23 @@ export default async function handler(
 
         totalAssessments += assessments.length;
         processedFiles++;
+
+        // Track course breakdown for the success modal
+        if (assessments.length > 0) {
+          const courseNames = [...new Set(assessments.map(a => a.courseName))];
+          courseNames.forEach(courseName => {
+            const courseAssessments = assessments.filter(a => a.courseName === courseName);
+            const existingCourse = courseBreakdown.find(c => c.courseName === courseName);
+            if (existingCourse) {
+              existingCourse.assessmentCount += courseAssessments.length;
+            } else {
+              courseBreakdown.push({
+                courseName,
+                assessmentCount: courseAssessments.length,
+              });
+            }
+          });
+        }
       } catch {
         failedFiles++;
         errors.push(`Failed to process file: ${fileData.originalFilename}`);
@@ -295,11 +317,20 @@ export default async function handler(
       });
     }
 
+    const processingTime = Math.round((Date.now() - processingStartTime) / 1000);
+
     return res.status(200).json({
       success: true,
       message: `Processed ${processedFiles} file(s), extracted ${totalAssessments} assessments. ${
         failedFiles > 0 ? `Failed to process ${failedFiles} file(s).` : ""
       }`,
+      data: {
+        processedFiles,
+        totalAssessments,
+        failedFiles,
+        courseBreakdown: courseBreakdown.length > 0 ? courseBreakdown : undefined,
+        processingTime,
+      },
       errors: errors.length > 0 ? errors : undefined,
       hasRateLimitErrors,
     });

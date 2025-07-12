@@ -18,3 +18,14 @@ export interface FileProgress {
   progress: number; // 0-100
   status: UploadStatus;
 }
+
+export interface ExtractionResult {
+  processedFiles: number;
+  totalAssessments: number;
+  failedFiles?: number;
+  courseBreakdown?: Array<{
+    courseName: string;
+    assessmentCount: number;
+  }>;
+  processingTime?: number;
+}
