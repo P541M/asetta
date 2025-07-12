@@ -2,10 +2,12 @@ import { useRouter } from "next/router";
 import { useAuth } from "../contexts/AuthContext";
 import UserSettings from "../components/settings/UserSettings";
 import { useEffect } from "react";
+import Head from "next/head";
+import DashboardHeader from "../components/layout/DashboardHeader";
 
 const SettingsPage = () => {
   const router = useRouter();
-  const { user, loading } = useAuth();
+  const { user, loading, logout } = useAuth();
 
   // Redirect to login if not authenticated
   useEffect(() => {
@@ -14,12 +16,17 @@ const SettingsPage = () => {
     }
   }, [user, loading, router]);
 
+  const handleLogout = async () => {
+    await logout();
+    router.push("/login");
+  };
+
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white dark:bg-dark-bg-primary">
+      <div className="min-h-screen flex items-center justify-center bg-light-bg-secondary dark:bg-dark-bg-primary">
         <div className="flex flex-col items-center">
           <div className="animate-spin rounded-full h-12 w-12 border-2 border-light-button-primary border-t-transparent dark:border-dark-button-primary dark:border-t-transparent"></div>
-          <p className="mt-4 text-gray-600 dark:text-dark-text-secondary">
+          <p className="mt-4 text-light-text-secondary dark:text-dark-text-secondary">
             Loading...
           </p>
         </div>
@@ -32,9 +39,48 @@ const SettingsPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-dark-bg-primary">
-      <div className="max-w-4xl mx-auto">
-        <UserSettings isOpen={true} onClose={() => router.back()} />
+    <div className="min-h-screen bg-light-bg-secondary dark:bg-dark-bg-primary transition-theme">
+      <Head>
+        <title>Settings - Asetta</title>
+        <meta name="description" content="Manage your account settings and preferences" />
+      </Head>
+      <DashboardHeader onLogout={handleLogout} />
+      <div className="p-4 md:p-6">
+        <div className="max-w-7xl mx-auto">
+          {/* Page Header */}
+          <div className="mb-8">
+            <h1 className="text-3xl font-bold text-light-button-primary dark:text-dark-button-primary">
+              Settings
+            </h1>
+            <p className="text-sm text-light-text-secondary dark:text-dark-text-secondary mt-2">
+              Manage your account settings and preferences
+            </p>
+            
+            {/* Back Navigation */}
+            <div className="mt-4">
+              <button
+                onClick={() => router.back()}
+                className="flex items-center space-x-2 text-light-text-secondary dark:text-dark-text-secondary hover:text-light-text-primary dark:hover:text-dark-text-primary transition-colors group"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-4 w-4 transition-transform group-hover:-translate-x-1"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+                </svg>
+                <span className="text-sm">Back to Dashboard</span>
+              </button>
+            </div>
+          </div>
+          
+          <UserSettings isOpen={true} onClose={() => router.back()} />
+        </div>
       </div>
     </div>
   );

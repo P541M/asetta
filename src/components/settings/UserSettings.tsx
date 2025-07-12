@@ -8,7 +8,6 @@ import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import ProfileSection from "./ProfileSection";
 import PreferencesSection from "./PreferencesSection";
 import NotificationsSection from "./NotificationsSection";
-import SettingsHeader from "./SettingsHeader";
 import SettingsNavigation from "./SettingsNavigation";
 import SettingsActions from "./SettingsActions";
 import SettingsMessage from "./SettingsMessage";
@@ -306,63 +305,61 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
   if (!isOpen) return null;
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-8">
-      <SettingsHeader onClose={onClose} />
+    <div className="space-y-6">
       <SettingsNavigation activeTab={activeTab} setActiveTab={setActiveTab} />
 
-      <form
-        onSubmit={handleSubmit}
-        className="bg-white dark:bg-dark-bg-primary rounded-2xl shadow-sm p-6"
-      >
-        {activeTab === "profile" ? (
-          <ProfileSection
-            displayName={displayName}
-            setDisplayName={setDisplayName}
-            institution={institution}
-            setInstitution={setInstitution}
-            studyProgram={studyProgram}
-            setStudyProgram={setStudyProgram}
-            graduationYear={graduationYear}
-            setGraduationYear={setGraduationYear}
-            imagePreview={imagePreview}
-            setImagePreview={setImagePreview}
-            setImageFile={setImageFile}
-            setMessage={setMessage}
-          />
-        ) : activeTab === "preferences" ? (
-          <PreferencesSection
-            showDaysTillDue={showDaysTillDue}
-            setShowDaysTillDue={setShowDaysTillDue}
-            showWeight={showWeight}
-            setShowWeight={setShowWeight}
-            showNotes={showNotes}
-            setShowNotes={setShowNotes}
-            showStatsBar={showStatsBar}
-            setShowStatsBar={setShowStatsBar}
-            isDarkMode={isDarkModeLocal}
-            setIsDarkMode={setIsDarkModeLocal}
-          />
-        ) : (
-          <NotificationsSection
-            emailNotifications={emailNotifications}
-            setEmailNotifications={setEmailNotifications}
-            notificationDaysBefore={notificationDaysBefore}
-            setNotificationDaysBefore={setNotificationDaysBefore}
-            email={email}
-            setEmail={setEmail}
-            hasConsentedToNotifications={hasConsentedToNotifications}
-            setHasConsentedToNotifications={setHasConsentedToNotifications}
-          />
-        )}
+      <div className="bg-light-bg-primary dark:bg-dark-bg-secondary rounded-xl border border-light-border-primary dark:border-dark-border-primary">
+        <form onSubmit={handleSubmit} className="p-6 md:p-8">
+          {activeTab === "profile" ? (
+            <ProfileSection
+              displayName={displayName}
+              setDisplayName={setDisplayName}
+              institution={institution}
+              setInstitution={setInstitution}
+              studyProgram={studyProgram}
+              setStudyProgram={setStudyProgram}
+              graduationYear={graduationYear}
+              setGraduationYear={setGraduationYear}
+              imagePreview={imagePreview}
+              setImagePreview={setImagePreview}
+              setImageFile={setImageFile}
+              setMessage={setMessage}
+            />
+          ) : activeTab === "preferences" ? (
+            <PreferencesSection
+              showDaysTillDue={showDaysTillDue}
+              setShowDaysTillDue={setShowDaysTillDue}
+              showWeight={showWeight}
+              setShowWeight={setShowWeight}
+              showNotes={showNotes}
+              setShowNotes={setShowNotes}
+              showStatsBar={showStatsBar}
+              setShowStatsBar={setShowStatsBar}
+              isDarkMode={isDarkModeLocal}
+              setIsDarkMode={setIsDarkModeLocal}
+            />
+          ) : (
+            <NotificationsSection
+              emailNotifications={emailNotifications}
+              setEmailNotifications={setEmailNotifications}
+              notificationDaysBefore={notificationDaysBefore}
+              setNotificationDaysBefore={setNotificationDaysBefore}
+              email={email}
+              setEmail={setEmail}
+              hasConsentedToNotifications={hasConsentedToNotifications}
+              setHasConsentedToNotifications={setHasConsentedToNotifications}
+            />
+          )}
 
-        <SettingsMessage text={message.text} type={message.type} />
-        <SettingsActions
-          onCancel={handleCancel}
-          onSubmit={handleSubmit}
-          hasChanges={hasChanges()}
-          isSubmitting={isSubmitting}
-        />
-      </form>
+          <SettingsMessage text={message.text} type={message.type} />
+          <SettingsActions
+            onCancel={handleCancel}
+            onSubmit={handleSubmit}
+            hasChanges={hasChanges()}
+            isSubmitting={isSubmitting}
+          />
+        </form>
+      </div>
     </div>
   );
 };
