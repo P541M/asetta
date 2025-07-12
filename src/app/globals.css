@@ -242,7 +242,7 @@
 
 /* SVG Logo Color Filters for Main App */
 .filter-primary-main {
-  filter: brightness(0) saturate(100%) invert(59%) sepia(39%) saturate(1058%) hue-rotate(12deg) brightness(90%) contrast(92%);
+  filter: brightness(0) saturate(100%) invert(60%) sepia(95%) saturate(1342%) hue-rotate(0deg) brightness(97%) contrast(95%);
 }
 .filter-white-main {
   filter: brightness(0) saturate(100%) invert(100%) sepia(100%) saturate(0%) hue-rotate(288deg) brightness(102%) contrast(102%);
