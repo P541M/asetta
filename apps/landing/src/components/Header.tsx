@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import Logo from "./Logo";
 
 const Header = () => {
   const [scrolled, setScrolled] = useState(false);
@@ -73,12 +74,13 @@ const Header = () => {
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
           >
-            <Link href="/" className="group relative">
-              <span className="text-2xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-primary-600 to-primary-800 group-hover:from-primary-700 group-hover:to-primary-900 transition-all duration-300 tracking-tight">
-                Asetta
-              </span>
-              <div className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-primary-600 to-primary-800 group-hover:w-full transition-all duration-300"></div>
-            </Link>
+            <Logo 
+              size="sm" 
+              variant="logo-with-text" 
+              color="primary"
+              href="/"
+              className="group"
+            />
           </motion.div>
 
           {/* Desktop Navigation */}

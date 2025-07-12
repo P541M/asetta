@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Logo from "./Logo";
 
 const footerLinks = {
   mainLinks: [
@@ -28,12 +29,13 @@ const Footer = () => {
           {/* Brand Section */}
           <div className="lg:col-span-1 space-y-8">
             <div className="space-y-6">
-              <Link href="/" className="group inline-block">
-                <span className="text-3xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-primary-600 to-primary-800 group-hover:from-primary-700 group-hover:to-primary-900 transition-all duration-300 tracking-tight">
-                  Asetta
-                </span>
-                <div className="w-0 h-0.5 bg-gradient-to-r from-primary-600 to-primary-800 group-hover:w-full transition-all duration-500 mt-1"></div>
-              </Link>
+              <Logo 
+                size="md" 
+                variant="logo-with-text" 
+                color="primary"
+                href="/"
+                className="group"
+              />
 
               <p className="text-gray-600 leading-relaxed text-lg max-w-sm">
                 Always ahead, never behind. Your smart academic assistant 
