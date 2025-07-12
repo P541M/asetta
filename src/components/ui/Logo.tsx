@@ -12,27 +12,27 @@ interface LogoProps {
 
 const sizeClasses = {
   xs: "h-5 w-5",
-  sm: "h-7 w-7", 
+  sm: "h-7 w-7",
   md: "h-10 w-10",
   lg: "h-14 w-14",
-  xl: "h-20 w-20"
+  xl: "h-17 w-17",
 };
 
 const textSizeClasses = {
   xs: "text-lg",
   sm: "text-xl",
-  md: "text-2xl", 
+  md: "text-2xl",
   lg: "text-3xl",
-  xl: "text-4xl"
+  xl: "text-4xl",
 };
 
-const Logo = ({ 
-  size = "md", 
+const Logo = ({
+  size = "md",
   variant = "logo-with-text",
   color = "primary",
   href,
   className = "",
-  showText = true
+  showText = true,
 }: LogoProps) => {
   const logoElement = (
     <div className={`flex items-center space-x-3 ${className}`}>
@@ -44,9 +44,13 @@ const Logo = ({
           width={80}
           height={80}
           className={`w-full h-full object-contain transition-all duration-300 ${
-            color === "primary" ? "filter-primary-main" :
-            color === "white" ? "filter-white-main" : 
-            color === "dark" ? "filter-dark-main" : ""
+            color === "primary"
+              ? "filter-primary-main"
+              : color === "white"
+              ? "filter-white-main"
+              : color === "dark"
+              ? "filter-dark-main"
+              : ""
           }`}
           priority
         />
@@ -54,7 +58,9 @@ const Logo = ({
 
       {/* Text Logo */}
       {(variant === "logo-with-text" || showText) && (
-        <span className={`font-extrabold text-light-text-primary dark:text-dark-text-primary transition-all duration-300 tracking-tight ${textSizeClasses[size]}`}>
+        <span
+          className={`font-extrabold text-light-text-primary dark:text-dark-text-primary transition-all duration-300 tracking-tight ${textSizeClasses[size]}`}
+        >
           Asetta
         </span>
       )}
