@@ -5,14 +5,22 @@ import { useEffect } from "react";
 
 const SettingsPage = () => {
   const router = useRouter();
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
 
   // Redirect to login if not authenticated
   useEffect(() => {
-    if (!user) {
+    if (!loading && !user) {
       router.push("/login");
     }
-  }, [user, router]);
+  }, [user, loading, router]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-dark-bg-primary flex items-center justify-center">
+        <div className="text-gray-600 dark:text-gray-400">Loading...</div>
+      </div>
+    );
+  }
 
   if (!user) {
     return null;
