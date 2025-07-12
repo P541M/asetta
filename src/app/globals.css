@@ -239,3 +239,14 @@
 .modal-footer {
   @apply px-6 py-4 border-t border-light-border-primary dark:border-dark-border-primary flex justify-end space-x-3;
 }
+
+/* SVG Logo Color Filters for Main App */
+.filter-primary-main {
+  filter: brightness(0) saturate(100%) invert(59%) sepia(39%) saturate(1058%) hue-rotate(12deg) brightness(90%) contrast(92%);
+}
+.filter-white-main {
+  filter: brightness(0) saturate(100%) invert(100%) sepia(100%) saturate(0%) hue-rotate(288deg) brightness(102%) contrast(102%);
+}
+.filter-dark-main {
+  filter: brightness(0) saturate(100%) invert(7%) sepia(10%) saturate(1168%) hue-rotate(169deg) brightness(99%) contrast(95%);
+}

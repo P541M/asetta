@@ -8,6 +8,7 @@ import {
   GoogleAuthProvider,
 } from "firebase/auth";
 import Link from "next/link";
+import Logo from "../components/ui/Logo";
 
 const Register = () => {
   const [email, setEmail] = useState("");
@@ -92,6 +93,13 @@ const Register = () => {
       </Head>
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
+          <div className="flex justify-center mb-6">
+            <Logo 
+              size="lg" 
+              variant="logo-with-text" 
+              color="primary"
+            />
+          </div>
           <h1 className="text-3xl font-bold text-light-text-primary dark:text-dark-text-primary font-heading tracking-tight">
             Create Your Account
           </h1>
