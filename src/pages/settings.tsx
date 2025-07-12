@@ -16,8 +16,13 @@ const SettingsPage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-dark-bg-primary flex items-center justify-center">
-        <div className="text-gray-600 dark:text-gray-400">Loading...</div>
+      <div className="min-h-screen flex items-center justify-center bg-white dark:bg-dark-bg-primary">
+        <div className="flex flex-col items-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-2 border-light-button-primary border-t-transparent dark:border-dark-button-primary dark:border-t-transparent"></div>
+          <p className="mt-4 text-gray-600 dark:text-dark-text-secondary">
+            Loading...
+          </p>
+        </div>
       </div>
     );
   }
