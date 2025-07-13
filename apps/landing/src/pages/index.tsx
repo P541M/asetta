@@ -21,7 +21,12 @@ export default function LandingPage() {
       <Header />
 
       {/* Hero Section */}
-      <section className="relative pt-32 pb-20 lg:pt-40 lg:pb-32 pt-safe pb-safe overflow-hidden bg-gradient-to-br from-primary-50 via-white to-white">
+      <section 
+        className="relative pb-20 lg:pb-32 pb-safe overflow-hidden bg-gradient-to-br from-primary-50 via-white to-white"
+        style={{
+          paddingTop: `max(11rem, calc(11rem + env(safe-area-inset-top)))`,
+        }}
+      >
         {/* Subtle background elements */}
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute -top-24 -left-24 w-96 h-96 bg-gradient-to-br from-primary-100/20 to-transparent rounded-full blur-3xl" />

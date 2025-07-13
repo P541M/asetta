@@ -16,7 +16,12 @@ export default function PricingPage() {
       </Head>
       <Header />
 
-      <main className="flex-grow pt-32 pb-24 relative overflow-hidden">
+      <main 
+        className="flex-grow pb-24 relative overflow-hidden"
+        style={{
+          paddingTop: `max(8rem, calc(8rem + env(safe-area-inset-top)))`,
+        }}
+      >
         {/* Background Elements */}
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute -top-24 -left-24 w-96 h-96 bg-gradient-to-br from-primary-100/20 to-transparent rounded-full blur-3xl" />

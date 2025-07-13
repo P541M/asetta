@@ -57,17 +57,14 @@ const Header = () => {
 
   return (
     <motion.header
-      initial={{ y: -100 }}
-      animate={{ y: 0 }}
-      transition={{ duration: 0.6, ease: "easeOut" }}
-      className={`fixed w-full top-safe z-50 transition-all duration-500 pt-safe ${
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.3, ease: "easeOut" }}
+      className={`fixed w-full top-0 z-50 transition-all duration-500 pt-safe-only ${
         scrolled
           ? "bg-light-bg-primary/90 backdrop-blur-xl shadow-lg border-b border-light-border-primary/50"
           : "bg-light-bg-primary/70 backdrop-blur-md border-b border-light-bg-primary/20"
       }`}
-      style={{
-        paddingTop: `max(1rem, env(safe-area-inset-top))`,
-      }}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pl-safe pr-safe">
         <div className="flex justify-between items-center h-20">
