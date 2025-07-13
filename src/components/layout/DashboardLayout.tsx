@@ -281,13 +281,13 @@ const DashboardLayout = ({
   }
 
   return (
-    <div className="min-h-screen bg-light-bg-secondary dark:bg-dark-bg-primary transition-theme">
+    <div className="min-h-safe-screen bg-light-bg-secondary dark:bg-dark-bg-primary transition-theme pt-safe pb-safe">
       <Head>
         <title>{title}</title>
         <meta name="description" content={description} />
       </Head>
       <DashboardHeader onLogout={handleLogout} />
-      <div className="p-4 md:p-6">
+      <div className="p-4 md:p-6 pl-safe pr-safe">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
             <div>

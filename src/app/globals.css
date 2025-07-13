@@ -20,17 +20,40 @@
     --spacing-lg: 1.5rem;
     --spacing-xl: 2rem;
     --spacing-2xl: 3rem;
+    
+    /* Safe Area Support for Mobile Devices */
+    --safe-area-inset-top: env(safe-area-inset-top);
+    --safe-area-inset-right: env(safe-area-inset-right);
+    --safe-area-inset-bottom: env(safe-area-inset-bottom);
+    --safe-area-inset-left: env(safe-area-inset-left);
   }
 }
 
 @layer base {
   * {
     @apply border-light-border-primary dark:border-dark-border-primary;
+    /* Improve touch scrolling on iOS */
+    -webkit-overflow-scrolling: touch;
+    /* Optimize touch interactions */
+    touch-action: manipulation;
   }
   body {
     @apply bg-light-bg-secondary text-light-text-primary dark:bg-dark-bg-primary dark:text-dark-text-primary;
     font-family: "Manrope", sans-serif;
     line-height: 1.6;
+  }
+  
+  /* Smooth scrolling for better UX */
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  /* Prevent zoom on input focus on iOS */
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  textarea {
+    font-size: 16px;
   }
   h1 {
     @apply text-3xl font-semibold text-light-text-primary dark:text-dark-text-primary leading-tight;
@@ -267,6 +290,49 @@
 
 .modal-footer {
   @apply px-6 py-4 border-t border-light-border-primary dark:border-dark-border-primary flex justify-end space-x-3;
+}
+
+/* Safe Area Utilities */
+@layer utilities {
+  .pt-safe {
+    padding-top: max(1rem, env(safe-area-inset-top));
+  }
+  
+  .pb-safe {
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  }
+  
+  .pl-safe {
+    padding-left: max(1rem, env(safe-area-inset-left));
+  }
+  
+  .pr-safe {
+    padding-right: max(1rem, env(safe-area-inset-right));
+  }
+  
+  .mt-safe {
+    margin-top: max(0px, env(safe-area-inset-top));
+  }
+  
+  .mb-safe {
+    margin-bottom: max(0px, env(safe-area-inset-bottom));
+  }
+  
+  .top-safe {
+    top: max(0px, env(safe-area-inset-top));
+  }
+  
+  .bottom-safe {
+    bottom: max(0px, env(safe-area-inset-bottom));
+  }
+  
+  .h-safe-screen {
+    height: calc(100vh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  }
+  
+  .min-h-safe-screen {
+    min-height: calc(100vh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  }
 }
 
 /* SVG Logo Color Filters for Main App */
