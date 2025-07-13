@@ -21,14 +21,14 @@ export default function LandingPage() {
       <Header />
 
       {/* Hero Section */}
-      <section className="relative pt-32 pb-20 lg:pt-40 lg:pb-32 overflow-hidden bg-gradient-to-br from-primary-50 via-white to-white">
+      <section className="relative pt-32 pb-20 lg:pt-40 lg:pb-32 pt-safe pb-safe overflow-hidden bg-gradient-to-br from-primary-50 via-white to-white">
         {/* Subtle background elements */}
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute -top-24 -left-24 w-96 h-96 bg-gradient-to-br from-primary-100/20 to-transparent rounded-full blur-3xl" />
           <div className="absolute -bottom-24 -right-24 w-80 h-80 bg-gradient-to-tr from-primary-100/15 to-transparent rounded-full blur-3xl" />
         </div>
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pl-safe pr-safe relative z-10">
           {/* Content Section */}
           <div className="text-center mb-16 lg:mb-20">
             <div className="max-w-4xl mx-auto space-y-6 md:space-y-8">
@@ -137,7 +137,7 @@ export default function LandingPage() {
         className="py-32 bg-gradient-to-b from-white via-gray-50/50 to-white relative overflow-hidden"
       >
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-primary-50/30 via-transparent to-transparent"></div>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pl-safe pr-safe relative z-10">
           <div className="text-center mb-24 animate-fade-in-up">
             <span className="inline-block mb-4 px-4 py-2 rounded-full bg-gradient-to-r from-primary-100 to-primary-50 text-primary-700 font-semibold text-sm shadow-md border border-primary-200/50">
               ⚡ Powered by AI
@@ -240,7 +240,7 @@ export default function LandingPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-32 bg-gradient-to-br from-primary-50 via-primary-25 to-white relative overflow-hidden">
+      <section className="py-32 pb-safe bg-gradient-to-br from-primary-50 via-primary-25 to-white relative overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary-100/40 via-transparent to-transparent"></div>
         <div className="absolute -top-24 -left-24 w-96 h-96 bg-gradient-to-br from-primary-200 to-primary-100 rounded-full blur-3xl opacity-30 animate-float"></div>
         <div
