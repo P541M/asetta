@@ -10,7 +10,7 @@ export default function FeaturesPage() {
         <title>Features | Asetta</title>
         <meta
           name="description"
-          content="Always ahead, never behind. Discover Asetta's AI-powered features designed to help students excel in their academic journey—completely free."
+          content="Discover Asetta's powerful features for academic organization: semester management, grade calculator, calendar system, and more—completely free."
         />
       </Head>
       <Header />
@@ -36,9 +36,9 @@ export default function FeaturesPage() {
               </span>
             </h1>
             <p className="text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-              Always ahead, never behind. Discover how our intelligent AI
-              technology keeps you organized and on top of your academic
-              goals—all completely free.
+              Comprehensive academic organization tools designed for students.
+              Track assessments, calculate grades, manage deadlines, and stay organized
+              across all your semesters—completely free.
             </p>
           </div>
 
@@ -46,40 +46,40 @@ export default function FeaturesPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-10 animate-fade-in-up">
             {[
               {
-                icon: "M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2",
-                title: "AI-Powered Assessment Tracking",
+                icon: "M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z",
+                title: "Intelligent Document Processing",
                 description:
-                  "Automatically extract and organize assignments, exams, and projects from your course documents using advanced AI technology.",
+                  "Transform course syllabi into organized assignment schedules. Upload your PDF course outline and let AI instantly extract every assignment, deadline, and weight—eliminating manual data entry and ensuring nothing falls through the cracks.",
+              },
+              {
+                icon: "M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z",
+                title: "Advanced Grade Calculator",
+                description:
+                  "Take control of your academic performance with precision grade tracking. Calculate exactly what you need to achieve your target grades, monitor your GPA in real-time, and make informed decisions about your study priorities.",
               },
               {
                 icon: "M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z",
-                title: "Smart Deadline Management",
+                title: "Smart Calendar & Deadline Management",
                 description:
-                  "Never miss a deadline with AI-powered notifications and automated progress tracking for all your academic tasks.",
+                  "Visualize your entire semester at a glance with drag-and-drop scheduling. Never miss another deadline with intelligent notifications and seamless calendar integration that syncs with your existing tools.",
               },
               {
-                icon: "M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z",
-                title: "Personalized Insights",
+                icon: "M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10",
+                title: "Semester Organization",
                 description:
-                  "Get AI-driven analytics and recommendations to optimize your study schedule and improve your academic performance.",
+                  "Structure your academic journey with intuitive semester management. Organize courses, navigate between terms effortlessly, and maintain clear separation between different academic periods for better focus and planning.",
               },
               {
-                icon: "M12 8c-1.657 0-3 1.343-3 3s1.343 3 3 3 3-1.343 3-3-1.343-3-3-3zm0 10c-4.418 0-8-1.79-8-4V7a2 2 0 012-2h2V3a1 1 0 112 0v2h4V3a1 1 0 112 0v2h2a2 2 0 012 2v7c0 2.21-3.582 4-8 4z",
-                title: "Smart Notifications",
+                icon: "M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4",
+                title: "Comprehensive Assessment Tracking",
                 description:
-                  "Receive intelligent reminders and real-time updates about upcoming deadlines and important academic events.",
+                  "Master your academic workload with powerful assessment management tools. Track progress, manage statuses, filter by courses, and handle multiple assignments efficiently with bulk operations and intelligent search capabilities.",
               },
               {
-                icon: "M5 13l4 4L19 7",
-                title: "Document Processing",
+                icon: "M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z",
+                title: "Professional Notes & Documentation",
                 description:
-                  "Upload course outlines and syllabi for automatic extraction of assessment details, dates, and weights.",
-              },
-              {
-                icon: "M12 4v16m8-8H4",
-                title: "Course Management",
-                description:
-                  "Organize your courses by semester, track assignment weights, and manage your academic progress efficiently.",
+                  "Enhance your study process with a sophisticated note-taking system. Create detailed, formatted notes for each assessment with professional text editing tools, link management, and persistent storage for comprehensive academic documentation.",
               },
             ].map((feature, index) => (
               <div
@@ -131,8 +131,8 @@ export default function FeaturesPage() {
                 </span>
               </h2>
               <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
-                Join thousands of students who are already using Asetta to stay
-                organized and achieve their academic goals.
+                Join students who are using Asetta's comprehensive tools to organize
+                their academic work, track grades, and manage deadlines effectively.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <a

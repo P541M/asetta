@@ -32,7 +32,7 @@ export default function App({ Component, pageProps }: AppProps) {
         <title>Asetta - Simplify Your Academic Journey</title>
         <meta
           name="description"
-          content="Asetta is an all-in-one platform to help students manage assignments, track deadlines, and stay organized."
+          content="Comprehensive academic organization platform for students. Manage semesters, track assessments, calculate grades, and organize deadlines."
         />
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
         <meta charSet="utf-8" />

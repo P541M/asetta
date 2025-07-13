@@ -11,7 +11,7 @@ export default function PricingPage() {
         <title>Pricing | Asetta</title>
         <meta
           name="description"
-          content="Always ahead, never behind. Asetta is completely free for all students. Join us today!"
+          content="100% Free for Students! Comprehensive academic organization tools with no hidden fees. Semester management, grade tracking, and deadline organization."
         />
       </Head>
       <Header />
@@ -139,7 +139,7 @@ export default function PricingPage() {
                         emoji: "🎯",
                         title: "All Features Included",
                         description:
-                          "AI-powered tracking, smart notifications, and personalized insights",
+                          "Semester management, grade calculator, calendar system, and rich notes",
                       },
                       {
                         emoji: "🚀",

@@ -46,8 +46,9 @@ export default function LandingPage() {
               </h1>
 
               <p className="text-lg sm:text-xl lg:text-2xl text-gray-600 leading-relaxed max-w-3xl mx-auto animate-fade-in-up">
-                Always ahead, never behind. AI-powered academic organization 
-                that keeps you on top of assignments, deadlines, and your study goals.
+                Always ahead, never behind. AI-powered academic organization
+                that keeps you on top of assignments, deadlines, and your study
+                goals.
               </p>
             </div>
 
@@ -140,7 +141,7 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pl-safe pr-safe relative z-10">
           <div className="text-center mb-24 animate-fade-in-up">
             <span className="inline-block mb-4 px-4 py-2 rounded-full bg-gradient-to-r from-primary-100 to-primary-50 text-primary-700 font-semibold text-sm shadow-md border border-primary-200/50">
-              ⚡ Powered by AI
+              🚀 Always Ahead, Never Behind
             </span>
             <h2 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-6 font-heading tracking-tight">
               Smart Features for{" "}
@@ -149,30 +150,30 @@ export default function LandingPage() {
               </span>
             </h2>
             <p className="text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-              Everything you need to excel in your studies, powered by advanced
-              AI technology.
+              Everything you need to dominate your academic journey with tools
+              that actually work for students.
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
             {[
               {
-                icon: "M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2",
-                title: "AI-Powered Assessment Tracking",
+                icon: "M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z",
+                title: "Intelligent Document Processing",
                 description:
-                  "Automatically extract and organize assignments, exams, and projects from your course documents using advanced AI technology.",
+                  "Transform course syllabi into organized assignment schedules. Upload your PDF course outline and let AI instantly extract every assignment, deadline, and weight—eliminating manual data entry and ensuring nothing falls through the cracks.",
+              },
+              {
+                icon: "M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z",
+                title: "Advanced Grade Calculator",
+                description:
+                  "Take control of your academic performance with precision grade tracking. Calculate exactly what you need to achieve your target grades, monitor your GPA in real-time, and make informed decisions about your study priorities.",
               },
               {
                 icon: "M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z",
-                title: "Smart Deadline Management",
+                title: "Smart Calendar & Deadline Management",
                 description:
-                  "Never miss a deadline with AI-powered notifications and automated progress tracking for all your academic tasks.",
-              },
-              {
-                icon: "M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z",
-                title: "Personalized Insights",
-                description:
-                  "Get AI-driven analytics and recommendations to optimize your study schedule and improve your academic performance.",
+                  "Visualize your entire semester at a glance with drag-and-drop scheduling. Never miss another deadline with intelligent notifications and seamless calendar integration that syncs with your existing tools.",
               },
             ].map((feature, index) => (
               <div
@@ -261,9 +262,9 @@ export default function LandingPage() {
               Journey Today
             </h2>
             <p className="text-xl md:text-2xl text-gray-700 mb-12 max-w-4xl mx-auto leading-relaxed font-medium">
-              Join thousands of students who are using Asetta's AI-powered
-              platform to stay organized, meet deadlines, and achieve their
-              academic goals—all completely free.
+              Join students who are using Asetta's comprehensive platform to
+              organize semesters, track grades, manage deadlines, and achieve
+              their academic goals—all completely free.
             </p>
             <div className="flex justify-center group transform transition-all duration-300 hover:scale-105 hover:-translate-y-2">
               <Link
