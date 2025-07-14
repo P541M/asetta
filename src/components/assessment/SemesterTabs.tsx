@@ -659,13 +659,13 @@ const SemesterTabs = ({
             </button>
 
             {showMoreOptions && (
-              <div className="absolute right-0 top-full mt-1 bg-light-bg-primary dark:bg-dark-bg-secondary border border-light-border-primary dark:border-dark-border-primary rounded-md shadow-md z-20 animate-fade-in-down">
+              <div className="absolute right-0 top-full mt-1 bg-light-bg-primary dark:bg-dark-bg-secondary border border-light-border-primary dark:border-dark-border-primary rounded-md shadow-md z-20 animate-fade-in-down min-w-max">
                 <button
                   onClick={() => {
                     setShowMoreOptions(false);
                     setShowManageModal(true);
                   }}
-                  className="w-full px-4 py-2 text-left text-sm text-light-text-primary dark:text-dark-text-primary hover:bg-light-hover-primary dark:hover:bg-dark-hover-primary transition-colors"
+                  className="w-full px-4 py-2 text-left text-sm text-light-text-primary dark:text-dark-text-primary hover:bg-light-hover-primary dark:hover:bg-dark-hover-primary transition-colors whitespace-nowrap"
                 >
                   Manage Semesters
                 </button>
