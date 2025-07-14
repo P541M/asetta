@@ -1,25 +1,18 @@
 import { useAuth } from "../../contexts/AuthContext";
-import Image from "next/image";
 import { useState, useRef, useEffect } from "react";
 import UserSettings from "../settings/UserSettings";
 import { useRouter } from "next/router";
+import Avatar from "../ui/Avatar";
+import { useUserProfile } from "../../hooks/useUserProfile";
 
 interface DashboardHeaderProps {
   onLogout?: () => Promise<void>;
 }
 
-// Add a loader function for user avatars
-const avatarLoader = ({ src }: { src: string }) => {
-  // Return the URL directly if it's already a full URL (e.g., from Google)
-  if (src.startsWith("http")) {
-    return src;
-  }
-  // Add your default avatar URL here if needed
-  return `/default-avatar.png`;
-};
 
 const DashboardHeader = ({ onLogout }: DashboardHeaderProps) => {
   const { user } = useAuth();
+  const { profile } = useUserProfile();
   const [showDropdown, setShowDropdown] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -92,33 +85,7 @@ const DashboardHeader = ({ onLogout }: DashboardHeaderProps) => {
             onClick={toggleDropdown}
             className="flex items-center space-x-2 text-gray-600 dark:text-dark-text-secondary hover:text-light-button-primary dark:hover:text-dark-button-primary transition-colors duration-200 focus:outline-none bg-white dark:bg-dark-bg-secondary rounded-lg shadow-sm border border-gray-100 dark:border-dark-border-primary px-3 py-2"
           >
-            {user.photoURL ? (
-              <div className="relative h-8 w-8">
-                <Image
-                  src={user.photoURL}
-                  alt={user.displayName || "User"}
-                  width={32}
-                  height={32}
-                  className="rounded-full object-cover border border-gray-200 dark:border-dark-border-primary"
-                  loader={avatarLoader}
-                />
-              </div>
-            ) : (
-              <div className="h-8 w-8 rounded-full bg-light-button-primary/10 dark:bg-dark-button-primary/10 flex items-center justify-center text-light-button-primary dark:text-dark-button-primary border border-light-button-primary/20 dark:border-dark-button-primary/20">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-              </div>
-            )}
+            <Avatar size="sm" color={profile?.avatarColor || "blue"} />
             <span className="hidden md:block truncate max-w-[150px] dark:text-dark-text-primary">
               {user.displayName || user.email}
             </span>

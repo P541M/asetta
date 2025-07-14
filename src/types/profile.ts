@@ -7,8 +7,6 @@ export interface ProfileSectionProps {
   setStudyProgram: (program: string) => void;
   graduationYear: number;
   setGraduationYear: (year: number) => void;
-  imagePreview: string | null;
-  setImagePreview: (preview: string | null) => void;
-  setImageFile: (file: File | null) => void;
-  setMessage: (message: { text: string; type: "success" | "error" }) => void;
+  avatarColor: "blue" | "green" | "purple" | "orange" | "red" | "pink" | "indigo" | "teal";
+  setAvatarColor: (color: "blue" | "green" | "purple" | "orange" | "red" | "pink" | "indigo" | "teal") => void;
 }

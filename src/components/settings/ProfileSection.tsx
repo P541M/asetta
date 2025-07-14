@@ -1,6 +1,5 @@
-import { useRef } from "react";
-import Image from "next/image";
 import { ProfileSectionProps } from "../../types/profile";
+import Avatar from "../ui/Avatar";
 
 const ProfileSection = ({
   displayName,
@@ -11,49 +10,25 @@ const ProfileSection = ({
   setStudyProgram,
   graduationYear,
   setGraduationYear,
-  imagePreview,
-  setImagePreview,
-  setImageFile,
-  setMessage,
+  avatarColor,
+  setAvatarColor,
 }: ProfileSectionProps) => {
-  const fileInputRef = useRef<HTMLInputElement>(null);
   const currentYear = new Date().getFullYear();
 
-  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-
-      if (file.size > 2 * 1024 * 1024) {
-        setMessage({
-          text: "Image size should be less than 2MB",
-          type: "error",
-        });
-        return;
-      }
-
-      if (!file.type.startsWith("image/")) {
-        setMessage({
-          text: "Please select an image file",
-          type: "error",
-        });
-        return;
-      }
-
-      setImageFile(file);
-
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        if (e.target?.result) {
-          setImagePreview(e.target.result as string);
-        }
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const handleChooseImage = () => {
-    fileInputRef.current?.click();
-  };
+  const colorOptions: Array<{
+    value: "blue" | "green" | "purple" | "orange" | "red" | "pink" | "indigo" | "teal";
+    label: string;
+    bgColor: string;
+  }> = [
+    { value: "blue", label: "Blue", bgColor: "bg-blue-500" },
+    { value: "green", label: "Green", bgColor: "bg-green-500" },
+    { value: "purple", label: "Purple", bgColor: "bg-purple-500" },
+    { value: "orange", label: "Orange", bgColor: "bg-orange-500" },
+    { value: "red", label: "Red", bgColor: "bg-red-500" },
+    { value: "pink", label: "Pink", bgColor: "bg-pink-500" },
+    { value: "indigo", label: "Indigo", bgColor: "bg-indigo-500" },
+    { value: "teal", label: "Teal", bgColor: "bg-teal-500" },
+  ];
 
   return (
     <div className="space-y-8">
@@ -63,82 +38,55 @@ const ProfileSection = ({
           Profile Information
         </h3>
         <p className="text-sm text-light-text-secondary dark:text-dark-text-secondary mt-1">
-          Update your profile details and photo
+          Update your profile details and avatar color
         </p>
       </div>
 
-      {/* Profile Picture */}
-      <div className="flex flex-col items-center space-y-4">
-        <div className="relative group">
-          <div className="w-32 h-32 rounded-full overflow-hidden bg-light-bg-tertiary dark:bg-dark-bg-tertiary border-4 border-light-border-primary dark:border-dark-border-primary shadow-lg group-hover:shadow-xl transition-shadow duration-200">
-            {imagePreview ? (
-              <Image
-                src={imagePreview}
-                alt="Profile"
-                width={128}
-                height={128}
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center text-light-text-tertiary dark:text-dark-text-tertiary">
-                <svg
-                  className="w-16 h-16"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={1.5}
-                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                  />
-                </svg>
-              </div>
-            )}
+      {/* Avatar Section */}
+      <div className="flex flex-col items-center space-y-6">
+        <div className="flex flex-col items-center space-y-4">
+          <Avatar size="lg" color={avatarColor} className="shadow-lg" />
+          <div className="text-center">
+            <p className="text-sm text-light-text-secondary dark:text-dark-text-secondary">
+              Your avatar color
+            </p>
+            <p className="text-xs text-light-text-tertiary dark:text-dark-text-tertiary mt-1">
+              Choose from the colors below to personalize your avatar
+            </p>
           </div>
-          <button
-            type="button"
-            onClick={handleChooseImage}
-            className="absolute bottom-0 right-0 p-3 bg-light-button-primary dark:bg-dark-button-primary text-white rounded-full cursor-pointer hover:bg-light-button-primary-hover dark:hover:bg-dark-button-primary-hover transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
-            aria-label="Change profile picture"
-          >
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
-              />
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"
-              />
-            </svg>
-          </button>
-          <input
-            ref={fileInputRef}
-            id="profile-picture"
-            type="file"
-            accept="image/*"
-            className="hidden"
-            onChange={handleImageSelect}
-          />
         </div>
-        <div className="text-center">
-          <p className="text-sm text-light-text-secondary dark:text-dark-text-secondary">
-            Click the camera icon to upload a new photo
-          </p>
-          <p className="text-xs text-light-text-tertiary dark:text-dark-text-tertiary mt-1">
-            Supports JPG, PNG files up to 2MB
-          </p>
+
+        {/* Color Picker */}
+        <div className="space-y-3">
+          <label className="block text-sm font-medium text-light-text-primary dark:text-dark-text-primary text-center">
+            Avatar Color
+          </label>
+          <div className="flex flex-wrap justify-center gap-3">
+            {colorOptions.map((color) => (
+              <button
+                key={color.value}
+                type="button"
+                onClick={() => setAvatarColor(color.value)}
+                className={`group relative w-12 h-12 rounded-full border-3 transition-all duration-200 hover:scale-110 ${
+                  avatarColor === color.value
+                    ? "border-light-button-primary dark:border-dark-button-primary shadow-lg"
+                    : "border-light-border-primary dark:border-dark-border-primary hover:border-light-button-primary dark:hover:border-dark-button-primary"
+                }`}
+                aria-label={`Select ${color.label} color`}
+              >
+                <div className="w-full h-full rounded-full overflow-hidden">
+                  <Avatar size="md" color={color.value} className="w-full h-full" />
+                </div>
+                {avatarColor === color.value && (
+                  <div className="absolute -top-1 -right-1 w-5 h-5 bg-light-button-primary dark:bg-dark-button-primary rounded-full flex items-center justify-center">
+                    <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                )}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 

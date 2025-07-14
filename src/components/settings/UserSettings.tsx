@@ -4,7 +4,6 @@ import { useAuth } from "../../contexts/AuthContext";
 import { updateProfile } from "firebase/auth";
 import { doc, updateDoc, getDoc } from "firebase/firestore";
 import { db } from "../../lib/firebase";
-import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import ProfileSection from "./ProfileSection";
 import PreferencesSection from "./PreferencesSection";
 import NotificationsSection from "./NotificationsSection";
@@ -37,10 +36,7 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
     text: string;
     type: "success" | "error";
   }>({ text: "", type: "success" });
-  const [imagePreview, setImagePreview] = useState<string | null>(
-    user?.photoURL || null
-  );
-  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [avatarColor, setAvatarColor] = useState<"blue" | "green" | "purple" | "orange" | "red" | "pink" | "indigo" | "teal">("blue");
   const [activeTab, setActiveTab] = useState<
     "profile" | "preferences" | "notifications"
   >("profile");
@@ -63,7 +59,7 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
     showWeight: true,
     showNotes: true,
     showStatsBar: false,
-    photoURL: null as string | null,
+    avatarColor: "blue" as "blue" | "green" | "purple" | "orange" | "red" | "pink" | "indigo" | "teal",
     isDarkMode: false,
     emailNotifications: false,
     notificationDaysBefore: 1,
@@ -85,8 +81,7 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
       showWeight !== initialValues.showWeight ||
       showNotes !== initialValues.showNotes ||
       showStatsBar !== initialValues.showStatsBar ||
-      imageFile !== null ||
-      imagePreview !== initialValues.photoURL ||
+      avatarColor !== initialValues.avatarColor ||
       isDarkModeLocal !== initialValues.isDarkMode ||
       emailNotifications !== initialValues.emailNotifications ||
       notificationDaysBefore !== initialValues.notificationDaysBefore ||
@@ -119,6 +114,7 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
           const newEmail = userData.email || "";
           const newHasConsentedToNotifications =
             userData.hasConsentedToNotifications ?? false;
+          const newAvatarColor = userData.avatarColor || "blue";
 
           // Set current values
           setInstitution(newInstitution);
@@ -133,6 +129,7 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
           setNotificationDaysBefore(newNotificationDaysBefore);
           setEmail(newEmail);
           setHasConsentedToNotifications(newHasConsentedToNotifications);
+          setAvatarColor(newAvatarColor);
 
           // Set initial values
           setInitialValues({
@@ -144,7 +141,7 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
             showWeight: newShowWeight,
             showNotes: newShowNotes,
             showStatsBar: newShowStatsBar,
-            photoURL: user.photoURL,
+            avatarColor: newAvatarColor,
             isDarkMode: isDarkMode,
             emailNotifications: newEmailNotifications,
             notificationDaysBefore: newNotificationDaysBefore,
@@ -179,20 +176,12 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
 
     try {
       // Update profile data in Firebase Auth
-      const updates: { displayName?: string; photoURL?: string } = {};
+      const updates: { displayName?: string } = {};
 
       if (displayName !== initialValues.displayName) {
         updates.displayName = displayName;
       }
 
-      // Upload image if a new one was selected
-      if (imageFile) {
-        const storage = getStorage();
-        const storageRef = ref(storage, `profile-images/${user.uid}`);
-        await uploadBytes(storageRef, imageFile);
-        const downloadURL = await getDownloadURL(storageRef);
-        updates.photoURL = downloadURL;
-      }
 
       // Update profile if there are any auth updates
       if (Object.keys(updates).length > 0) {
@@ -214,6 +203,7 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
         notificationDaysBefore: notificationDaysBefore,
         email: email,
         hasConsentedToNotifications: hasConsentedToNotifications,
+        avatarColor: avatarColor,
         updatedAt: new Date(),
       });
 
@@ -232,11 +222,7 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
         showWeight,
         showNotes,
         showStatsBar,
-        photoURL: imageFile
-          ? await getDownloadURL(
-              ref(getStorage(), `profile-images/${user.uid}`)
-            )
-          : imagePreview,
+        avatarColor: avatarColor,
         isDarkMode: isDarkModeLocal,
         emailNotifications,
         notificationDaysBefore,
@@ -244,8 +230,6 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
         hasConsentedToNotifications,
       });
 
-      // Reset image file
-      setImageFile(null);
 
       // Trigger a custom event to notify other components of the preference change
       const event = new CustomEvent("userPreferencesUpdated", {
@@ -286,8 +270,7 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
     setShowWeight(initialValues.showWeight);
     setShowNotes(initialValues.showNotes);
     setShowStatsBar(initialValues.showStatsBar);
-    setImagePreview(initialValues.photoURL);
-    setImageFile(null);
+    setAvatarColor(initialValues.avatarColor);
     setIsDarkModeLocal(initialValues.isDarkMode);
     setEmailNotifications(initialValues.emailNotifications);
     setNotificationDaysBefore(initialValues.notificationDaysBefore);
@@ -320,10 +303,8 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
               setStudyProgram={setStudyProgram}
               graduationYear={graduationYear}
               setGraduationYear={setGraduationYear}
-              imagePreview={imagePreview}
-              setImagePreview={setImagePreview}
-              setImageFile={setImageFile}
-              setMessage={setMessage}
+              avatarColor={avatarColor}
+              setAvatarColor={setAvatarColor}
             />
           ) : activeTab === "preferences" ? (
             <PreferencesSection
