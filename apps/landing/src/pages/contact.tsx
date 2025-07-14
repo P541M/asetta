@@ -36,7 +36,7 @@ export default function Contact() {
 
       setStatus({
         type: "success",
-        message: "Message sent successfully! We'll get back to you soon.",
+        message: "We'll get back to you soon.",
       });
       setFormData({ name: "", email: "", message: "" });
     } catch (error) {
