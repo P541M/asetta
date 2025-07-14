@@ -37,12 +37,12 @@ export default function LandingPage() {
           {/* Content Section */}
           <div className="text-center mb-16 lg:mb-20">
             <div className="max-w-4xl mx-auto space-y-6 md:space-y-8">
-              <span className="inline-flex items-center px-4 py-2 rounded-full bg-primary-100 text-primary-700 font-semibold text-sm border border-primary-200/50 animate-fade-in-down">
+              <span className="inline-flex items-center px-4 py-2 rounded-full bg-primary-100 text-primary-700 font-semibold text-sm border border-primary-200/50 animate-fade-in-down-initial animate-fade-in-down">
                 <span className="w-2 h-2 bg-primary-500 rounded-full mr-2 animate-pulse"></span>
                 100% Free for Students
               </span>
 
-              <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold text-gray-900 font-heading tracking-tight leading-tight animate-fade-in">
+              <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold text-gray-900 font-heading tracking-tight leading-tight animate-fade-in-initial animate-fade-in">
                 Your Smart{" "}
                 <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary-600 to-primary-800">
                   Academic
@@ -50,14 +50,14 @@ export default function LandingPage() {
                 Assistant
               </h1>
 
-              <p className="text-lg sm:text-xl lg:text-2xl text-gray-600 leading-relaxed max-w-3xl mx-auto animate-fade-in-up">
+              <p className="text-lg sm:text-xl lg:text-2xl text-gray-600 leading-relaxed max-w-3xl mx-auto animate-fade-in-up-initial animate-fade-in-up">
                 Always ahead, never behind. AI-powered academic organization
                 that keeps you on top of assignments, deadlines, and your study
                 goals.
               </p>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-4 justify-center mt-8 lg:mt-10 animate-fade-in-up">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center mt-8 lg:mt-10 animate-fade-in-up-initial animate-fade-in-up">
               <Link
                 href="https://asetta.me/register"
                 className="group inline-flex items-center justify-center px-8 py-4 text-lg font-bold text-white bg-gradient-to-r from-primary-600 to-primary-700 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
@@ -86,7 +86,7 @@ export default function LandingPage() {
               </Link>
             </div>
 
-            <div className="flex flex-col sm:flex-row items-center justify-center space-y-2 sm:space-y-0 sm:space-x-8 mt-8 text-sm text-gray-500 animate-fade-in-up">
+            <div className="flex flex-col sm:flex-row items-center justify-center space-y-2 sm:space-y-0 sm:space-x-8 mt-8 text-sm text-gray-500 animate-fade-in-up-initial animate-fade-in-up">
               <div className="flex items-center">
                 <svg
                   className="w-4 h-4 text-green-500 mr-2"
@@ -119,7 +119,7 @@ export default function LandingPage() {
           </div>
 
           {/* Dashboard Preview */}
-          <div className="max-w-5xl mx-auto animate-fade-in-up">
+          <div className="max-w-5xl mx-auto animate-fade-in-up-initial animate-fade-in-up">
             <div className="relative group">
               <div className="absolute -inset-4 bg-gradient-to-r from-primary-600/20 to-primary-700/20 rounded-3xl blur-2xl group-hover:blur-3xl transition-all duration-500"></div>
               <div className="relative bg-white rounded-2xl shadow-2xl border border-gray-200/50 overflow-hidden">
@@ -144,7 +144,7 @@ export default function LandingPage() {
       >
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-primary-50/30 via-transparent to-transparent"></div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pl-safe pr-safe relative z-10">
-          <div className="text-center mb-24 animate-fade-in-up">
+          <div className="text-center mb-24 animate-fade-in-up-initial animate-fade-in-up">
             <span className="inline-block mb-4 px-4 py-2 rounded-full bg-gradient-to-r from-primary-100 to-primary-50 text-primary-700 font-semibold text-sm shadow-md border border-primary-200/50">
               🚀 Always Ahead, Never Behind
             </span>
@@ -183,7 +183,7 @@ export default function LandingPage() {
             ].map((feature, index) => (
               <div
                 key={index}
-                className={`group transform transition-all duration-500 hover:-translate-y-3 hover:scale-105 animate-fade-in-up`}
+                className={`group transform transition-all duration-500 hover:-translate-y-3 hover:scale-105 animate-fade-in-up-initial animate-fade-in-up`}
                 style={{ animationDelay: `${index * 0.2}s` }}
               >
                 <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-lg hover:shadow-2xl transition-all duration-500 border border-gray-200/50 hover:border-primary-200 h-full flex flex-col relative overflow-hidden group-hover:bg-white">
@@ -218,7 +218,7 @@ export default function LandingPage() {
           </div>
 
           {/* And More Section */}
-          <div className="mt-20 text-center animate-fade-in-up">
+          <div className="mt-20 text-center animate-fade-in-up-initial animate-fade-in-up">
             <div className="group transform transition-all duration-300 hover:scale-105 hover:-translate-y-1 inline-block">
               <Link
                 href="/features"
@@ -255,7 +255,7 @@ export default function LandingPage() {
         ></div>
 
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
-          <div className="animate-fade-in-up">
+          <div className="animate-fade-in-up-initial animate-fade-in-up">
             <span className="inline-block mb-6 px-6 py-3 rounded-full bg-gradient-to-r from-primary-100 to-primary-50 text-primary-700 font-bold text-sm shadow-lg border border-primary-200/50 backdrop-blur-sm">
               🚀 Ready to Excel?
             </span>

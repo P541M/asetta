@@ -29,7 +29,7 @@ export default function FeaturesPage() {
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           {/* Hero Section */}
-          <div className="text-center mb-20 animate-fade-in">
+          <div className="text-center mb-20 animate-fade-in-initial animate-fade-in">
             <span className="inline-flex items-center px-4 py-2 rounded-full bg-primary-100 text-primary-700 font-semibold text-sm border border-primary-200/50 mb-6">
               <span className="w-2 h-2 bg-primary-500 rounded-full mr-2 animate-pulse"></span>
               AI-Powered Features
@@ -48,7 +48,7 @@ export default function FeaturesPage() {
           </div>
 
           {/* Features Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-10 animate-fade-in-up">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-10 animate-fade-in-up-initial animate-fade-in-up">
             {[
               {
                 icon: "M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z",
@@ -89,7 +89,7 @@ export default function FeaturesPage() {
             ].map((feature, index) => (
               <div
                 key={index}
-                className={`group transform transition-all duration-500 hover:-translate-y-3 hover:scale-105 animate-fade-in-up`}
+                className={`group transform transition-all duration-500 hover:-translate-y-3 hover:scale-105 animate-fade-in-up-initial animate-fade-in-up`}
                 style={{ animationDelay: `${index * 0.1}s` }}
               >
                 <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-lg hover:shadow-2xl transition-all duration-500 border border-gray-200/50 hover:border-primary-200 h-full flex flex-col relative overflow-hidden group-hover:bg-white">
@@ -127,7 +127,7 @@ export default function FeaturesPage() {
           </div>
 
           {/* CTA Section */}
-          <div className="text-center mt-24 animate-fade-in-up">
+          <div className="text-center mt-24 animate-fade-in-up-initial animate-fade-in-up">
             <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-12 shadow-xl border border-gray-200/50 max-w-4xl mx-auto">
               <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6 font-heading">
                 Ready to Transform Your{" "}
