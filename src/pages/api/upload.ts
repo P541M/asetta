@@ -31,6 +31,7 @@ async function extractAssessmentsAI(text: string): Promise<string> {
   const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
   const prompt = `
+    You are an AI assistant that extracts assessment information from course outlines.
     Extract assessment information from this course outline. Return ONLY a valid JSON array with this structure:
     {
       "courseName": "Course code and name",
@@ -40,6 +41,8 @@ async function extractAssessmentsAI(text: string): Promise<string> {
       "weight": "Numeric percentage weight",
       "status": "Not started"
     }
+
+    Only include assessments that have clear due dates or deadline information. Extract as many assessments as you can find. If no time is specified, use '23:59' as the default.
 
     WEIGHT EXTRACTION - Look for these patterns:
     - "25%" → weight: 25
@@ -67,11 +70,16 @@ async function extractAssessmentsAI(text: string): Promise<string> {
     return response.text();
   } catch (error: unknown) {
     // Handle rate limiting specifically
-    const errorMessage = error instanceof Error ? error.message : '';
+    const errorMessage = error instanceof Error ? error.message : "";
     const errorObj = error as { status?: number };
     const errorStatus = errorObj.status;
-    if (errorStatus === 429 || errorMessage.includes('429') || errorMessage.includes('quota') || errorMessage.includes('rate limit')) {
-      throw new Error('RATE_LIMITED');
+    if (
+      errorStatus === 429 ||
+      errorMessage.includes("429") ||
+      errorMessage.includes("quota") ||
+      errorMessage.includes("rate limit")
+    ) {
+      throw new Error("RATE_LIMITED");
     }
     throw error;
   }
@@ -187,49 +195,60 @@ export default async function handler(
         try {
           if (process.env.GEMINI_API_KEY) {
             const aiContent = await extractAssessmentsAI(extractedText);
-            
+
             // Clean up the AI response to extract JSON
             let jsonString = aiContent.trim();
-            
+
             // Remove markdown code blocks if present
-            jsonString = jsonString.replace(/```json\n?/g, '').replace(/```\n?/g, '');
-            
+            jsonString = jsonString
+              .replace(/```json\n?/g, "")
+              .replace(/```\n?/g, "");
+
             // Try to extract JSON array from response
             const jsonMatch = jsonString.match(/\[[\s\S]*\]/);
             if (jsonMatch) {
               jsonString = jsonMatch[0];
             }
-            
+
             let parsedAssessments;
             try {
               parsedAssessments = JSON.parse(jsonString);
             } catch {
               throw new Error(`Failed to parse AI response as JSON`);
             }
-            
+
             // Validate and clean the parsed assessments
             if (!Array.isArray(parsedAssessments)) {
               throw new Error("AI response is not an array");
             }
-            
+
             assessments = parsedAssessments
               .map((assessment, index) => {
                 // Validate required fields
-                if (!assessment || typeof assessment !== 'object') {
+                if (!assessment || typeof assessment !== "object") {
                   return null;
                 }
-                
-                const courseName = assessment.courseName || extractCourseName(extractedText) || "Unknown Course";
-                const assignmentName = assessment.assignmentName || `Assessment ${index + 1}`;
-                const dueDate = formatDate(assessment.dueDate) || new Date().toISOString().split("T")[0];
+
+                const courseName =
+                  assessment.courseName ||
+                  extractCourseName(extractedText) ||
+                  "Unknown Course";
+                const assignmentName =
+                  assessment.assignmentName || `Assessment ${index + 1}`;
+                const dueDate =
+                  formatDate(assessment.dueDate) ||
+                  new Date().toISOString().split("T")[0];
                 const dueTime = assessment.dueTime || "23:59";
-                const weight = typeof assessment.weight === "number" ? assessment.weight : (parseFloat(assessment.weight) || 0);
-                
+                const weight =
+                  typeof assessment.weight === "number"
+                    ? assessment.weight
+                    : parseFloat(assessment.weight) || 0;
+
                 // Basic validation
                 if (!courseName || !assignmentName || !dueDate) {
                   return null;
                 }
-                
+
                 return {
                   courseName,
                   assignmentName,
@@ -239,15 +258,19 @@ export default async function handler(
                   status: "Not started" as const,
                 } as Assessment;
               })
-              .filter((assessment): assessment is Assessment => assessment !== null);
+              .filter(
+                (assessment): assessment is Assessment => assessment !== null
+              );
           } else {
             throw new Error("Gemini API not configured");
           }
         } catch (error: unknown) {
-          const errorMessage = error instanceof Error ? error.message : '';
-          if (errorMessage === 'RATE_LIMITED') {
+          const errorMessage = error instanceof Error ? error.message : "";
+          if (errorMessage === "RATE_LIMITED") {
             failedFiles++;
-            errors.push(`Rate limit exceeded: ${fileName}. Please wait a moment and try again.`);
+            errors.push(
+              `Rate limit exceeded: ${fileName}. Please wait a moment and try again.`
+            );
             continue;
           }
           // Fall back to basic extraction
@@ -284,10 +307,16 @@ export default async function handler(
 
         // Track course breakdown for the success modal
         if (assessments.length > 0) {
-          const courseNames = [...new Set(assessments.map(a => a.courseName))];
-          courseNames.forEach(courseName => {
-            const courseAssessments = assessments.filter(a => a.courseName === courseName);
-            const existingCourse = courseBreakdown.find(c => c.courseName === courseName);
+          const courseNames = [
+            ...new Set(assessments.map((a) => a.courseName)),
+          ];
+          courseNames.forEach((courseName) => {
+            const courseAssessments = assessments.filter(
+              (a) => a.courseName === courseName
+            );
+            const existingCourse = courseBreakdown.find(
+              (c) => c.courseName === courseName
+            );
             if (existingCourse) {
               existingCourse.assessmentCount += courseAssessments.length;
             } else {
@@ -305,19 +334,24 @@ export default async function handler(
     }
 
     // Check if any files failed due to rate limiting
-    const hasRateLimitErrors = errors.some(error => error.includes('Rate limit exceeded'));
-    
+    const hasRateLimitErrors = errors.some((error) =>
+      error.includes("Rate limit exceeded")
+    );
+
     if (hasRateLimitErrors && processedFiles === 0) {
       // All files failed due to rate limiting
       return res.status(429).json({
         success: false,
         error: "RATE_LIMITED",
-        message: "Our servers are currently busy processing requests. Please wait 1-2 minutes and try again.",
+        message:
+          "Our servers are currently busy processing requests. Please wait 1-2 minutes and try again.",
         retryAfter: 120, // seconds
       });
     }
 
-    const processingTime = Math.round((Date.now() - processingStartTime) / 1000);
+    const processingTime = Math.round(
+      (Date.now() - processingStartTime) / 1000
+    );
 
     return res.status(200).json({
       success: true,
@@ -328,7 +362,8 @@ export default async function handler(
         processedFiles,
         totalAssessments,
         failedFiles,
-        courseBreakdown: courseBreakdown.length > 0 ? courseBreakdown : undefined,
+        courseBreakdown:
+          courseBreakdown.length > 0 ? courseBreakdown : undefined,
         processingTime,
       },
       errors: errors.length > 0 ? errors : undefined,
