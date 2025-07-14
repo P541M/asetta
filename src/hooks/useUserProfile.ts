@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { doc, getDoc } from 'firebase/firestore';
 import { useAuth } from '../contexts/AuthContext';
 import { db } from '../lib/firebase';
+import { getFromLocalStorage, setToLocalStorage, removeFromLocalStorage } from '../utils/localStorage';
 
 interface UserProfile {
   avatarColor: "blue" | "green" | "purple" | "orange" | "red" | "pink" | "indigo" | "teal";
@@ -25,6 +26,35 @@ export const useUserProfile = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Initialize with cached avatar color for immediate display
+  useEffect(() => {
+    if (!user) {
+      setProfile(null);
+      removeFromLocalStorage('avatarColor');
+      return;
+    }
+
+    // Get cached avatar color for immediate display
+    const cachedAvatarColor = getFromLocalStorage<"blue" | "green" | "purple" | "orange" | "red" | "pink" | "indigo" | "teal">("avatarColor", "blue");
+    
+    // Set initial profile with cached color to prevent flash
+    setProfile(prev => prev || {
+      avatarColor: cachedAvatarColor,
+      displayName: "",
+      institution: "",
+      studyProgram: "",
+      graduationYear: new Date().getFullYear() + 4,
+      showDaysTillDue: true,
+      showWeight: true,
+      showNotes: true,
+      showStatsBar: false,
+      emailNotifications: false,
+      notificationDaysBefore: 1,
+      email: "",
+      hasConsentedToNotifications: false,
+    });
+  }, [user]);
+
   useEffect(() => {
     const fetchUserProfile = async () => {
       if (!user) {
@@ -41,8 +71,13 @@ export const useUserProfile = () => {
 
         if (userSnapshot.exists()) {
           const userData = userSnapshot.data();
+          const avatarColor = userData.avatarColor || "blue";
+          
+          // Cache the avatar color for immediate future loads
+          setToLocalStorage("avatarColor", avatarColor);
+          
           setProfile({
-            avatarColor: userData.avatarColor || "blue",
+            avatarColor: avatarColor,
             displayName: userData.displayName || "",
             institution: userData.institution || "",
             studyProgram: userData.studyProgram || "",
@@ -57,7 +92,8 @@ export const useUserProfile = () => {
             hasConsentedToNotifications: userData.hasConsentedToNotifications ?? false,
           });
         } else {
-          // Set default profile if document doesn't exist
+          // Set default profile if document doesn't exist and cache it
+          setToLocalStorage("avatarColor", "blue");
           setProfile({
             avatarColor: "blue",
             displayName: "",
