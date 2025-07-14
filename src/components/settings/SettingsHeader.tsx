@@ -6,7 +6,9 @@ const SettingsHeader = ({ onClose }: SettingsHeaderProps) => {
   return (
     <div className="flex justify-between items-center mb-8">
       <div>
-        <h2 className="text-3xl font-bold text-light-button-primary dark:text-dark-button-primary">Settings</h2>
+        <h2 className="text-3xl font-bold text-light-button-primary dark:text-dark-button-primary">
+          Settings
+        </h2>
         <p className="text-sm text-light-text-tertiary dark:text-dark-text-tertiary mt-1">
           Manage your account settings and preferences
         </p>

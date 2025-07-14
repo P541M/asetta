@@ -39,13 +39,16 @@ const SettingsPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-light-bg-secondary dark:bg-dark-bg-primary transition-theme">
+    <div className="min-h-screen bg-light-bg-secondary dark:bg-dark-bg-primary transition-theme pt-safe pb-safe">
       <Head>
         <title>Settings - Asetta</title>
-        <meta name="description" content="Manage your account settings and preferences" />
+        <meta
+          name="description"
+          content="Manage your account settings and preferences"
+        />
       </Head>
       <DashboardHeader onLogout={handleLogout} />
-      <div className="p-4 md:p-6">
+      <div className="p-4 md:p-6 pl-safe pr-safe">
         <div className="max-w-7xl mx-auto">
           {/* Page Header */}
           <div className="mb-8">
@@ -55,7 +58,7 @@ const SettingsPage = () => {
             <p className="text-sm text-light-text-secondary dark:text-dark-text-secondary mt-2">
               Manage your account settings and preferences
             </p>
-            
+
             {/* Back Navigation */}
             <div className="mt-4">
               <button
@@ -78,7 +81,7 @@ const SettingsPage = () => {
               </button>
             </div>
           </div>
-          
+
           <UserSettings isOpen={true} onClose={() => router.back()} />
         </div>
       </div>
