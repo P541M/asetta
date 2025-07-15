@@ -103,7 +103,7 @@ const Register = () => {
           <h1 className="text-3xl font-bold text-light-text-primary dark:text-dark-text-primary font-heading tracking-tight">
             Create Your Account
           </h1>
-          <p className="text-light-text-secondary dark:text-dark-text-secondary mt-2">
+          <p className="text-light-text-secondary dark:text-dark-text-secondary mt-3">
             Join Asetta to streamline your academic journey
           </p>
         </div>
