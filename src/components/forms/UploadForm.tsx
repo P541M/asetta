@@ -183,7 +183,7 @@ const UploadForm = ({ semesterId, semesterName, onUploadSuccess }: UploadFormPro
   };
 
   return (
-    <div className="bg-light-bg-primary dark:bg-dark-bg-secondary rounded-xl shadow-soft border border-light-border-primary dark:border-dark-border-primary p-6 transition-all duration-200">
+    <div className="bg-light-bg-primary dark:bg-dark-bg-secondary rounded-xl border border-light-border-primary dark:border-dark-border-primary p-6 transition-all duration-200">
       <div className="mb-6">
         <div className="flex items-center space-x-3 mb-4">
           <div className="p-2 bg-light-button-primary dark:bg-dark-button-primary rounded-lg">
