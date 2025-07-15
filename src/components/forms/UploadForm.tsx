@@ -224,7 +224,6 @@ const UploadForm = ({ semesterId, semesterName, onUploadSuccess }: UploadFormPro
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
-          onClick={() => fileInputRef.current?.click()}
           className={`relative cursor-pointer transition-all duration-200 ${
             isDragActive
               ? "border-light-button-primary dark:border-dark-button-primary bg-light-button-primary/5 dark:bg-dark-button-primary/10"
