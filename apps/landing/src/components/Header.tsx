@@ -74,9 +74,9 @@ const Header = () => {
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
           >
-            <Logo 
-              size="sm" 
-              variant="logo-with-text" 
+            <Logo
+              size="sm"
+              variant="logo-with-text"
               color="primary"
               href="/"
               className="group"
@@ -85,6 +85,13 @@ const Header = () => {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-1">
+            <Link
+              href="/"
+              className="relative px-4 py-2 text-light-text-secondary hover:text-primary-600 transition-all duration-300 text-sm font-semibold rounded-lg hover:bg-light-hover-primary/80 group"
+            >
+              Home
+              <div className="absolute bottom-0 left-1/2 w-0 h-0.5 bg-primary-600 group-hover:w-1/2 group-hover:left-1/4 transition-all duration-300"></div>
+            </Link>
             <Link
               href="/features"
               className="relative px-4 py-2 text-light-text-secondary hover:text-primary-600 transition-all duration-300 text-sm font-semibold rounded-lg hover:bg-light-hover-primary/80 group"
@@ -96,7 +103,7 @@ const Header = () => {
               href="/pricing"
               className="relative px-4 py-2 text-light-text-secondary hover:text-primary-600 transition-all duration-300 text-sm font-semibold rounded-lg hover:bg-light-hover-primary/80 group"
             >
-              Pricing?
+              Pricing
               <div className="absolute bottom-0 left-1/2 w-0 h-0.5 bg-primary-600 group-hover:w-1/2 group-hover:left-1/4 transition-all duration-300"></div>
             </Link>
             <Link
@@ -202,6 +209,15 @@ const Header = () => {
                 >
                   <div className="flex flex-col space-y-2 px-4">
                     <Link
+                      href="/"
+                      className="group flex items-center px-4 py-3.5 text-light-text-secondary hover:text-primary-600 hover:bg-light-hover-primary/80 rounded-xl transition-all duration-300 text-base font-semibold"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      <span className="group-hover:translate-x-1 transition-transform duration-300">
+                        Home
+                      </span>
+                    </Link>
+                    <Link
                       href="/features"
                       className="group flex items-center px-4 py-3.5 text-light-text-secondary hover:text-primary-600 hover:bg-light-hover-primary/80 rounded-xl transition-all duration-300 text-base font-semibold"
                       onClick={() => setMobileMenuOpen(false)}
@@ -216,7 +232,7 @@ const Header = () => {
                       onClick={() => setMobileMenuOpen(false)}
                     >
                       <span className="group-hover:translate-x-1 transition-transform duration-300">
-                        Pricing?
+                        Pricing
                       </span>
                     </Link>
                     <Link
