@@ -1,7 +1,7 @@
 import { useRouter } from "next/router";
 import DashboardLayout from "../layout/DashboardLayout";
 import CoursesOverviewTable from "../tables/CoursesOverviewTable";
-import { LoadingSpinner, ErrorMessage } from "../ui";
+import { ErrorMessage } from "../ui";
 
 interface CoursesPageProps {
   forceSemesterId?: string;
@@ -26,21 +26,17 @@ const CoursesPage = ({ forceSemesterId }: CoursesPageProps) => {
       description="View course overview and statistics for your current semester."
       forceSemesterId={urlSemesterId}
     >
-      {({ selectedSemesterId, isLoading, error }) => (
-        <div className="animate-fade-in">
-          {isLoading ? (
-            <div className="flex justify-center py-8">
-              <LoadingSpinner />
-            </div>
-          ) : error ? (
+      {({ courses, error }) => (
+        <>
+          {error ? (
             <ErrorMessage message={error} />
           ) : (
             <CoursesOverviewTable
-              semesterId={selectedSemesterId}
+              courses={courses}
               onSelectCourse={handleSelectCourse}
             />
           )}
-        </div>
+        </>
       )}
     </DashboardLayout>
   );

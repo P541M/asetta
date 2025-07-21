@@ -19,12 +19,10 @@ const CalendarPage = ({ forceSemesterId }: CalendarPageProps) => {
       forceSemesterId={urlSemesterId}
     >
       {({ selectedSemester, selectedSemesterId }) => (
-        <div className="animate-fade-in">
-          <CalendarView
-            selectedSemester={selectedSemester}
-            semesterId={selectedSemesterId}
-          />
-        </div>
+        <CalendarView
+          selectedSemester={selectedSemester}
+          semesterId={selectedSemesterId}
+        />
       )}
     </DashboardLayout>
   );

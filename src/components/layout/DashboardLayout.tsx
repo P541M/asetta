@@ -16,13 +16,17 @@ import {
 import SemesterTabs from "../assessment/SemesterTabs";
 import DashboardHeader from "./DashboardHeader";
 import { Assessment } from "../../types/assessment";
+import { CourseStats } from "../../types/course";
 
 interface DashboardLayoutProps {
   children: (props: {
     selectedSemester: string;
     selectedSemesterId: string;
     assessments: Assessment[];
+    courses: CourseStats[];
+    availableCourses: string[];
     isLoading: boolean;
+    isDataReady: boolean;
     error: string | null;
     stats: {
       total: number;
@@ -50,7 +54,10 @@ const DashboardLayout = ({
   const [selectedSemester, setSelectedSemester] = useState<string>("");
   const [selectedSemesterId, setSelectedSemesterId] = useState<string>("");
   const [assessments, setAssessments] = useState<Assessment[]>([]);
+  const [courses, setCourses] = useState<CourseStats[]>([]);
+  const [availableCourses, setAvailableCourses] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isDataReady, setIsDataReady] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showStatsBar, setShowStatsBar] = useState(false);
 
@@ -62,6 +69,50 @@ const DashboardLayout = ({
     upcomingDeadlines: 0,
     completionRate: 0,
   });
+
+  // Helper function to process course statistics from assessments
+  const processCourseStats = (assessmentsList: Assessment[]): CourseStats[] => {
+    const courseMap = new Map<string, Assessment[]>();
+    assessmentsList.forEach((assessment) => {
+      if (!courseMap.has(assessment.courseName)) {
+        courseMap.set(assessment.courseName, []);
+      }
+      courseMap.get(assessment.courseName)?.push(assessment);
+    });
+
+    const courseStatsList: CourseStats[] = [];
+    courseMap.forEach((assessments, courseName) => {
+      const completedStatuses = ["Submitted"];
+      const completed = assessments.filter((a) =>
+        completedStatuses.includes(a.status)
+      );
+      const now = new Date();
+      const upcomingAssessments = assessments
+        .filter(
+          (a) =>
+            !completedStatuses.includes(a.status) &&
+            new Date(a.dueDate) >= now
+        )
+        .sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime());
+
+      const nextUpcoming = upcomingAssessments[0];
+      const progress = assessments.length > 0 
+        ? Math.round((completed.length / assessments.length) * 100) 
+        : 0;
+
+      courseStatsList.push({
+        courseName,
+        totalAssessments: assessments.length,
+        pendingAssessments: assessments.length - completed.length,
+        completedAssessments: completed.length,
+        nextDueDate: nextUpcoming ? nextUpcoming.dueDate : null,
+        nextAssignment: nextUpcoming ? nextUpcoming.assignmentName : null,
+        progress,
+      });
+    });
+
+    return courseStatsList.sort((a, b) => a.courseName.localeCompare(b.courseName));
+  };
 
   useEffect(() => {
     if (!loading && !user) {
@@ -135,6 +186,7 @@ const DashboardLayout = ({
     if (assessments.length === 0) {
       setIsLoading(true);
     }
+    setIsDataReady(false);
     setError(null);
     const assessmentsRef = collection(
       db,
@@ -168,6 +220,16 @@ const DashboardLayout = ({
           });
           setAssessments(assessmentsList);
 
+          // Process course statistics
+          const courseStats = processCourseStats(assessmentsList);
+          setCourses(courseStats);
+
+          // Extract available courses (sorted alphabetically)
+          const uniqueCourses = Array.from(
+            new Set(assessmentsList.map(a => a.courseName))
+          ).sort();
+          setAvailableCourses(uniqueCourses);
+
           const now = new Date();
           const oneWeek = new Date();
           oneWeek.setDate(now.getDate() + 7);
@@ -200,17 +262,24 @@ const DashboardLayout = ({
             completionRate: completionRate,
           });
           setIsLoading(false);
+          
+          // Add a small delay before marking data as ready to ensure smooth animations
+          setTimeout(() => {
+            setIsDataReady(true);
+          }, 50);
         },
         (err) => {
           console.error("Error fetching assessments:", err);
           setError("Failed to load assessments. Please try again.");
           setIsLoading(false);
+          setIsDataReady(true);
         }
       );
     } catch (error) {
       console.error("Error setting up assessments listener:", error);
       setError("Failed to set up assessments listener. Please try again.");
       setIsLoading(false);
+      setIsDataReady(true);
     }
 
     return () => {
@@ -668,12 +737,15 @@ const DashboardLayout = ({
             </div>
 
             <div className="mt-6">
-              <div className="bg-light-bg-primary dark:bg-dark-bg-secondary rounded-xl border border-light-border-primary dark:border-dark-border-primary">
+              <div className={`bg-light-bg-primary dark:bg-dark-bg-secondary rounded-xl border border-light-border-primary dark:border-dark-border-primary ${isDataReady ? "animate-fade-in-up" : "opacity-0"}`}>
                 {children({
                   selectedSemester,
                   selectedSemesterId,
                   assessments,
+                  courses,
+                  availableCourses,
                   isLoading,
+                  isDataReady,
                   error,
                   stats,
                   refreshAssessments,

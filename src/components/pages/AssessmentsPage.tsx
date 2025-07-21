@@ -3,7 +3,7 @@ import { useRouter } from "next/router";
 import DashboardLayout from "../layout/DashboardLayout";
 import AssessmentsTable from "../tables/AssessmentsTable";
 import CourseFilteredAssessments from "../assessment/CourseFilteredAssessments";
-import { ErrorMessage, SkeletonLoader } from "../ui";
+import { ErrorMessage } from "../ui";
 
 interface AssessmentsPageProps {
   forceSemesterId?: string;
@@ -63,7 +63,6 @@ const AssessmentsPage = ({ forceSemesterId }: AssessmentsPageProps) => {
       {({
         selectedSemesterId,
         assessments,
-        isLoading,
         error,
         refreshAssessments,
       }) => (
@@ -76,9 +75,7 @@ const AssessmentsPage = ({ forceSemesterId }: AssessmentsPageProps) => {
             />
           ) : (
             <>
-              {isLoading && assessments.length === 0 ? (
-                <SkeletonLoader type="table" rows={5} />
-              ) : error ? (
+              {error ? (
                 <ErrorMessage message={error} />
               ) : (
                 <AssessmentsTable

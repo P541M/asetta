@@ -22,7 +22,7 @@ const AddAssessmentPage = ({ forceSemesterId }: AddAssessmentPageProps) => {
       forceSemesterId={urlSemesterId}
     >
       {({ selectedSemester, selectedSemesterId, refreshAssessments }) => (
-        <div className="animate-fade-in">
+        <div>
           {selectedSemesterId ? (
             <div className="p-6">
               <h2 className="text-xl font-medium mb-6 dark:text-dark-text-primary">

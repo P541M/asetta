@@ -6,14 +6,12 @@ import { generateICSFile } from "../../utils/icsGenerator";
 import { DndContext, DragEndEvent } from "@dnd-kit/core";
 import { Assessment } from "../../types/assessment";
 import { Day, CalendarViewProps } from "../../types/calendar";
-import { SkeletonLoader } from "../ui";
 
 const CalendarView = ({ selectedSemester, semesterId }: CalendarViewProps) => {
   const { user } = useAuth();
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [calendarDays, setCalendarDays] = useState<Day[]>([]);
   const [assessments, setAssessments] = useState<Assessment[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
   const [selectedDay, setSelectedDay] = useState<Day | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
@@ -42,7 +40,6 @@ const CalendarView = ({ selectedSemester, semesterId }: CalendarViewProps) => {
         setAssessments([]);
         return;
       }
-      setIsLoading(true);
       try {
         const assessmentsRef = collection(
           db,
@@ -64,8 +61,6 @@ const CalendarView = ({ selectedSemester, semesterId }: CalendarViewProps) => {
         setAssessments(assessmentsList);
       } catch (error) {
         console.error("Error fetching assessments for calendar:", error);
-      } finally {
-        setIsLoading(false);
       }
     };
     fetchAssessments();
@@ -267,14 +262,6 @@ const CalendarView = ({ selectedSemester, semesterId }: CalendarViewProps) => {
     window.URL.revokeObjectURL(url);
   };
 
-  // Loading skeleton
-  if (isLoading) {
-    return (
-      <div className="p-6">
-        <SkeletonLoader type="calendar" />
-      </div>
-    );
-  }
 
   return (
     <div className="p-6">

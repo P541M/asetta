@@ -1,98 +1,27 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
-import { useAuth } from "../../contexts/AuthContext";
-import { db } from "../../lib/firebase";
-import { collection, getDocs, query } from "firebase/firestore";
 import DashboardLayout from "../layout/DashboardLayout";
 import GradeCalculator from "../assessment/GradeCalculator";
-import { LoadingSpinner, EmptyState } from "../ui";
+import { EmptyState } from "../ui";
 
 interface GradesPageProps {
   forceSemesterId?: string;
 }
 
 const GradesPage = ({ forceSemesterId }: GradesPageProps) => {
-  const { user } = useAuth();
   const router = useRouter();
   const [selectedCourse, setSelectedCourse] = useState<string | null>(null);
-  const [availableCourses, setAvailableCourses] = useState<string[]>([]);
-  const [isLoadingCourses, setIsLoadingCourses] = useState(false);
 
   // Extract semester ID from URL if this is a semester-specific route
   const urlSemesterId = forceSemesterId || (router.query.semester as string);
 
-  // State to track semester ID for useEffect
-  const [currentSemesterId, setCurrentSemesterId] = useState<string>("");
-
-  // Function to fetch available courses for the selected semester
-  const fetchAvailableCourses = useCallback(
-    async (semesterId: string) => {
-      if (!user || !semesterId) {
-        setAvailableCourses([]);
-        return;
-      }
-
-      setIsLoadingCourses(true);
-      try {
-        const assessmentsRef = collection(
-          db,
-          "users",
-          user.uid,
-          "semesters",
-          semesterId,
-          "assessments"
-        );
-        const assessmentsQuery = query(assessmentsRef);
-        const querySnapshot = await getDocs(assessmentsQuery);
-
-        // Extract unique course names
-        const courses = new Set<string>();
-        querySnapshot.docs.forEach((doc) => {
-          const data = doc.data();
-          if (data.courseName) {
-            courses.add(data.courseName);
-          }
-        });
-
-        const courseArray = Array.from(courses).sort();
-        setAvailableCourses(courseArray);
-
-        // Auto-select first course if none selected
-        if (!selectedCourse && courseArray.length > 0) {
-          setSelectedCourse(courseArray[0]);
-        }
-      } catch (error) {
-        console.error("Error fetching courses:", error);
-        setAvailableCourses([]);
-      } finally {
-        setIsLoadingCourses(false);
-      }
-    },
-    [user, selectedCourse]
-  );
-
-  // Fetch courses when semester changes
-  useEffect(() => {
-    if (currentSemesterId) {
-      fetchAvailableCourses(currentSemesterId);
-    } else {
-      setAvailableCourses([]);
-      setSelectedCourse(null);
-    }
-  }, [currentSemesterId, fetchAvailableCourses]);
-
-  // Handle course selection from URL parameters
+  // Handle course selection from URL parameters and auto-select first course
   useEffect(() => {
     if (router.query.course && typeof router.query.course === "string") {
       const courseFromUrl = decodeURIComponent(router.query.course);
-      if (
-        availableCourses.includes(courseFromUrl) &&
-        selectedCourse !== courseFromUrl
-      ) {
-        setSelectedCourse(courseFromUrl);
-      }
+      setSelectedCourse(courseFromUrl);
     }
-  }, [router.query.course, availableCourses, selectedCourse]);
+  }, [router.query.course]);
 
   const handleAddAssessment = () => {
     const basePath = urlSemesterId
@@ -107,10 +36,10 @@ const GradesPage = ({ forceSemesterId }: GradesPageProps) => {
       description="Calculate and analyze your grades across courses and assessments."
       forceSemesterId={urlSemesterId}
     >
-      {({ selectedSemester, selectedSemesterId }) => {
-        // Update current semester ID when it changes
-        if (selectedSemesterId !== currentSemesterId) {
-          setCurrentSemesterId(selectedSemesterId);
+      {({ selectedSemester, selectedSemesterId, availableCourses }) => {
+        // Auto-select first course if none selected and courses are available
+        if (!selectedCourse && availableCourses.length > 0) {
+          setSelectedCourse(availableCourses[0]);
         }
 
         if (!selectedSemesterId) {
@@ -138,7 +67,7 @@ const GradesPage = ({ forceSemesterId }: GradesPageProps) => {
         }
 
         return (
-          <div className="animate-fade-in">
+          <div>
             <div className="p-6">
               {/* Header with Course Selection */}
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4">
@@ -161,31 +90,27 @@ const GradesPage = ({ forceSemesterId }: GradesPageProps) => {
                   >
                     Course:
                   </label>
-                  {isLoadingCourses ? (
-                    <LoadingSpinner size="sm" />
-                  ) : (
-                    <select
-                      id="course-select"
-                      value={selectedCourse || ""}
-                      onChange={(e) =>
-                        setSelectedCourse(e.target.value || null)
-                      }
-                      className="input bg-white dark:bg-dark-bg-tertiary py-1.5 px-3 text-sm dark:text-dark-text-primary dark:border-dark-border-primary min-w-48"
-                      disabled={availableCourses.length === 0}
-                    >
-                      <option value="">Select a course...</option>
-                      {availableCourses.map((course) => (
-                        <option key={course} value={course}>
-                          {course}
-                        </option>
-                      ))}
-                    </select>
-                  )}
+                  <select
+                    id="course-select"
+                    value={selectedCourse || ""}
+                    onChange={(e) =>
+                      setSelectedCourse(e.target.value || null)
+                    }
+                    className="input bg-white dark:bg-dark-bg-tertiary py-1.5 px-3 text-sm dark:text-dark-text-primary dark:border-dark-border-primary min-w-48"
+                    disabled={availableCourses.length === 0}
+                  >
+                    <option value="">Select a course...</option>
+                    {availableCourses.map((course) => (
+                      <option key={course} value={course}>
+                        {course}
+                      </option>
+                    ))}
+                  </select>
                 </div>
               </div>
 
               {/* No Courses Message */}
-              {!isLoadingCourses && availableCourses.length === 0 && (
+              {availableCourses.length === 0 && (
                 <EmptyState
                   icon={
                     <svg
