@@ -178,20 +178,66 @@
   }
 }
 
-/* Custom scrollbar styling */
+/* Advanced Overlay Scrollbar Styling */
 @layer components {
+  /* Prevent layout shift when scrollbars appear */
+  * {
+    scrollbar-gutter: stable;
+  }
+
+  /* WebKit Scrollbars (Chrome, Safari, Edge) */
   ::-webkit-scrollbar {
-    width: 4px;
-    height: 4px;
+    width: 8px;
+    height: 8px;
+    /* Make scrollbar overlay content */
+    position: absolute;
   }
+
   ::-webkit-scrollbar-track {
-    @apply bg-light-bg-secondary;
+    /* Remove track background entirely for overlay effect */
+    background: transparent;
   }
+
   ::-webkit-scrollbar-thumb {
-    @apply bg-light-border-primary hover:bg-light-border-secondary rounded-full;
+    /* Style only the thumb with rounded corners */
+    @apply bg-light-border-primary;
+    border-radius: 4px;
+    /* Default opacity 50% */
+    opacity: 0.5;
   }
+
+  ::-webkit-scrollbar-thumb:hover {
+    /* 100% opacity on hover */
+    opacity: 1;
+  }
+
+  ::-webkit-scrollbar-thumb:active {
+    /* 100% opacity when clicked/dragged */
+    opacity: 1;
+  }
+
+  /* Firefox Scrollbar */
   * {
     scrollbar-width: thin;
-    scrollbar-color: theme("colors.light.border-primary") theme("colors.light.bg-secondary");
+    /* Use transparent track and colored thumb with 50% opacity */
+    scrollbar-color: rgba(229, 229, 229, 0.5) transparent;
+  }
+
+  /* Firefox hover state - using CSS custom properties for dynamic opacity */
+  html {
+    --scrollbar-thumb-light: rgba(229, 229, 229, 0.5);
+  }
+
+  html:hover {
+    --scrollbar-thumb-light: rgba(229, 229, 229, 1);
+  }
+
+  /* Hide scrollbar utility - for cases where scrollbars should be completely hidden */
+  .hide-scrollbar {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+  }
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
   }
 }
