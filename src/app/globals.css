@@ -9,18 +9,20 @@
     --radius-md: 0.5rem;
     --radius-lg: 0.75rem;
     --radius-xl: 1rem;
-    
+
     --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-    
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+      0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+      0 4px 6px -2px rgba(0, 0, 0, 0.05);
+
     --spacing-xs: 0.25rem;
     --spacing-sm: 0.5rem;
     --spacing-md: 1rem;
     --spacing-lg: 1.5rem;
     --spacing-xl: 2rem;
     --spacing-2xl: 3rem;
-    
+
     /* Safe Area Support for Mobile Devices */
     --safe-area-inset-top: env(safe-area-inset-top);
     --safe-area-inset-right: env(safe-area-inset-right);
@@ -42,12 +44,12 @@
     font-family: "Manrope", sans-serif;
     line-height: 1.6;
   }
-  
+
   /* Smooth scrolling for better UX */
   html {
     scroll-behavior: smooth;
   }
-  
+
   /* Prevent zoom on input focus on iOS */
   input[type="text"],
   input[type="email"],
@@ -241,30 +243,64 @@
   }
 }
 
-/* Scrollbar styles */
+/* Overlay Scrollbar Styles */
+* {
+  /* Prevent layout shift when scrollbars appear */
+  scrollbar-gutter: stable;
+}
+
+/* WebKit Scrollbars (Chrome, Safari, Edge) */
 ::-webkit-scrollbar {
-  width: 4px;
-  height: 4px;
+  width: 8px;
+  height: 8px;
+  /* Make scrollbar overlay content */
+  position: absolute;
 }
 
 ::-webkit-scrollbar-track {
-  @apply bg-light-bg-secondary dark:bg-dark-bg-secondary;
+  /* Remove track background entirely */
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-light-border-primary dark:bg-dark-border-primary hover:bg-light-border-secondary dark:hover:bg-dark-border-secondary rounded-full;
+  /* Style only the thumb with rounded corners */
+  @apply bg-light-border-primary dark:bg-dark-border-primary;
+  border-radius: 4px;
+  /* Default opacity 50% */
+  opacity: 0.5;
 }
 
-/* For Firefox */
+::-webkit-scrollbar-thumb:hover {
+  /* 100% opacity on hover */
+  opacity: 1;
+}
+
+::-webkit-scrollbar-thumb:active {
+  /* 100% opacity when clicked/dragged */
+  opacity: 1;
+}
+
+/* Firefox Scrollbar */
 * {
   scrollbar-width: thin;
-  scrollbar-color: theme("colors.light.border-primary")
-    theme("colors.light.bg-secondary");
+  /* Use transparent track and colored thumb */
+  scrollbar-color: rgba(229, 229, 229, 0.5) transparent;
 }
 
 .dark * {
-  scrollbar-color: theme("colors.dark.border-primary")
-    theme("colors.dark.bg-secondary");
+  /* Dark mode scrollbar colors */
+  scrollbar-color: rgba(42, 42, 42, 0.5) transparent;
+}
+
+/* Firefox hover state - using CSS custom properties for dynamic opacity */
+html {
+  --scrollbar-thumb-light: rgba(229, 229, 229, 0.5);
+  --scrollbar-thumb-dark: rgba(42, 42, 42, 0.5);
+}
+
+html:hover {
+  --scrollbar-thumb-light: rgba(229, 229, 229, 1);
+  --scrollbar-thumb-dark: rgba(42, 42, 42, 1);
 }
 
 /* Utility classes for improved spacing */
@@ -278,7 +314,8 @@
 
 /* Improved transitions */
 .transition-theme {
-  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+  transition: background-color 0.2s ease, border-color 0.2s ease,
+    color 0.2s ease;
 }
 
 /* Focus states */
@@ -312,77 +349,92 @@
   .pt-safe {
     padding-top: max(1rem, env(safe-area-inset-top));
   }
-  
+
   .pb-safe {
     padding-bottom: max(1rem, env(safe-area-inset-bottom));
   }
-  
+
   .pl-safe {
     padding-left: max(1rem, env(safe-area-inset-left));
   }
-  
+
   .pr-safe {
     padding-right: max(1rem, env(safe-area-inset-right));
   }
-  
+
   .mt-safe {
     margin-top: max(0px, env(safe-area-inset-top));
   }
-  
+
   .mb-safe {
     margin-bottom: max(0px, env(safe-area-inset-bottom));
   }
-  
+
   .top-safe {
     top: max(0px, env(safe-area-inset-top));
   }
-  
+
   .bottom-safe {
     bottom: max(0px, env(safe-area-inset-bottom));
   }
-  
+
   .h-safe-screen {
-    height: calc(100vh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+    height: calc(
+      100vh - env(safe-area-inset-top) - env(safe-area-inset-bottom)
+    );
   }
-  
+
   .min-h-safe-screen {
-    min-height: calc(100vh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+    min-height: calc(
+      100vh - env(safe-area-inset-top) - env(safe-area-inset-bottom)
+    );
   }
 }
 
 /* SVG Logo Color Filters for Main App */
 .filter-primary-main {
-  filter: brightness(0) saturate(100%) invert(60%) sepia(95%) saturate(1342%) hue-rotate(0deg) brightness(97%) contrast(95%);
+  filter: brightness(0) saturate(100%) invert(60%) sepia(95%) saturate(1342%)
+    hue-rotate(0deg) brightness(97%) contrast(95%);
 }
 .filter-white-main {
-  filter: brightness(0) saturate(100%) invert(100%) sepia(100%) saturate(0%) hue-rotate(288deg) brightness(102%) contrast(102%);
+  filter: brightness(0) saturate(100%) invert(100%) sepia(100%) saturate(0%)
+    hue-rotate(288deg) brightness(102%) contrast(102%);
 }
 .filter-dark-main {
-  filter: brightness(0) saturate(100%) invert(7%) sepia(10%) saturate(1168%) hue-rotate(169deg) brightness(99%) contrast(95%);
+  filter: brightness(0) saturate(100%) invert(7%) sepia(10%) saturate(1168%)
+    hue-rotate(169deg) brightness(99%) contrast(95%);
 }
 
 /* Avatar Color Filters */
 .filter-blue-avatar {
-  filter: brightness(0) saturate(100%) invert(39%) sepia(96%) saturate(1751%) hue-rotate(213deg) brightness(97%) contrast(97%);
+  filter: brightness(0) saturate(100%) invert(39%) sepia(96%) saturate(1751%)
+    hue-rotate(213deg) brightness(97%) contrast(97%);
 }
 .filter-green-avatar {
-  filter: brightness(0) saturate(100%) invert(49%) sepia(96%) saturate(2080%) hue-rotate(123deg) brightness(95%) contrast(86%);
+  filter: brightness(0) saturate(100%) invert(49%) sepia(96%) saturate(2080%)
+    hue-rotate(123deg) brightness(95%) contrast(86%);
 }
 .filter-purple-avatar {
-  filter: brightness(0) saturate(100%) invert(33%) sepia(83%) saturate(3207%) hue-rotate(269deg) brightness(91%) contrast(91%);
+  filter: brightness(0) saturate(100%) invert(33%) sepia(83%) saturate(3207%)
+    hue-rotate(269deg) brightness(91%) contrast(91%);
 }
 .filter-orange-avatar {
-  filter: brightness(0) saturate(100%) invert(56%) sepia(94%) saturate(1398%) hue-rotate(3deg) brightness(98%) contrast(101%);
+  filter: brightness(0) saturate(100%) invert(56%) sepia(94%) saturate(1398%)
+    hue-rotate(3deg) brightness(98%) contrast(101%);
 }
 .filter-red-avatar {
-  filter: brightness(0) saturate(100%) invert(23%) sepia(95%) saturate(4518%) hue-rotate(343deg) brightness(98%) contrast(98%);
+  filter: brightness(0) saturate(100%) invert(23%) sepia(95%) saturate(4518%)
+    hue-rotate(343deg) brightness(98%) contrast(98%);
 }
 .filter-pink-avatar {
-  filter: brightness(0) saturate(100%) invert(65%) sepia(78%) saturate(2598%) hue-rotate(299deg) brightness(92%) contrast(86%);
+  filter: brightness(0) saturate(100%) invert(65%) sepia(78%) saturate(2598%)
+    hue-rotate(299deg) brightness(92%) contrast(86%);
 }
 .filter-indigo-avatar {
-  filter: brightness(0) saturate(100%) invert(29%) sepia(92%) saturate(2631%) hue-rotate(226deg) brightness(90%) contrast(96%);
+  filter: brightness(0) saturate(100%) invert(29%) sepia(92%) saturate(2631%)
+    hue-rotate(226deg) brightness(90%) contrast(96%);
 }
 .filter-teal-avatar {
-  filter: brightness(0) saturate(100%) invert(60%) sepia(45%) saturate(1685%) hue-rotate(151deg) brightness(93%) contrast(88%);
+  filter: brightness(0) saturate(100%) invert(60%) sepia(45%) saturate(1685%)
+    hue-rotate(151deg) brightness(93%) contrast(88%);
 }
