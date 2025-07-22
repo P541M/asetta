@@ -262,12 +262,11 @@ const CalendarView = ({ selectedSemester, semesterId }: CalendarViewProps) => {
     window.URL.revokeObjectURL(url);
   };
 
-
   return (
     <div className="p-6">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 space-y-4 md:space-y-0">
         <div>
-          <h2 className="text-xl font-medium text-gray-900 dark:text-dark-text-primary">
+          <h2 className="text-xl font-medium text-light-text-primary dark:text-dark-text-primary mb-6">
             Calendar View
           </h2>
           <p className="text-sm text-light-text-tertiary dark:text-dark-text-tertiary">
@@ -469,13 +468,13 @@ const CalendarView = ({ selectedSemester, semesterId }: CalendarViewProps) => {
               <div className="flex justify-between items-center">
                 <div>
                   <h3 className="text-lg font-medium text-light-text-primary dark:text-dark-text-primary">
-                  {selectedDay.date.toLocaleDateString(undefined, {
-                    weekday: "long",
-                    month: "long",
-                    day: "numeric",
-                    year: "numeric",
-                  })}
-                </h3>
+                    {selectedDay.date.toLocaleDateString(undefined, {
+                      weekday: "long",
+                      month: "long",
+                      day: "numeric",
+                      year: "numeric",
+                    })}
+                  </h3>
                   <p className="text-sm text-light-text-tertiary dark:text-dark-text-tertiary">
                     {selectedDay.assessments.length} assessment
                     {selectedDay.assessments.length !== 1 ? "s" : ""}
@@ -485,18 +484,18 @@ const CalendarView = ({ selectedSemester, semesterId }: CalendarViewProps) => {
                   onClick={() => setSelectedDay(null)}
                   className="text-light-text-tertiary dark:text-dark-text-tertiary hover:text-light-text-secondary dark:hover:text-dark-text-secondary"
                 >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                    clipRule="evenodd"
-                  />
-                </svg>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
                 </button>
               </div>
             </div>

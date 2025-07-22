@@ -2,7 +2,11 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import { TabProvider, useTab, TabType } from "../../contexts/TabContext";
 import OptimizedDashboardLayout from "../layout/OptimizedDashboardLayout";
-import { DashboardData, TabComponentProps, CoursesTabProps } from "../../types/dashboard";
+import {
+  DashboardData,
+  TabComponentProps,
+  CoursesTabProps,
+} from "../../types/dashboard";
 
 // Import existing tab content components
 import CoursesOverviewTable from "../tables/CoursesOverviewTable";
@@ -21,7 +25,7 @@ interface UnifiedDashboardPageProps {
 // Courses Tab Component
 const CoursesTab = ({ data, onSelectCourse }: CoursesTabProps) => {
   const { error, courses } = data;
-  
+
   return (
     <>
       {error ? (
@@ -54,7 +58,9 @@ const AssessmentsTab = ({ data }: { data: DashboardData }) => {
     setSelectedCourse(null);
     const newQuery = { ...router.query };
     delete newQuery.course;
-    router.replace({ pathname: router.pathname, query: newQuery }, undefined, { shallow: true });
+    router.replace({ pathname: router.pathname, query: newQuery }, undefined, {
+      shallow: true,
+    });
   };
 
   return (
@@ -137,7 +143,7 @@ const GradesTab = ({ data, urlSemesterId }: TabComponentProps) => {
         {/* Header with Course Selection */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4">
           <div>
-            <h2 className="text-xl font-medium text-gray-900 dark:text-dark-text-primary">
+            <h2 className="text-xl font-medium text-light-text-primary dark:text-dark-text-primary mb-6">
               Grade Calculator
             </h2>
             <p className="text-sm text-gray-500 dark:text-dark-text-tertiary mt-1">
@@ -216,7 +222,7 @@ const GradesTab = ({ data, urlSemesterId }: TabComponentProps) => {
 // Calendar Tab Component
 const CalendarTab = ({ data }: { data: DashboardData }) => {
   const { selectedSemester, selectedSemesterId } = data;
-  
+
   return (
     <CalendarView
       selectedSemester={selectedSemester}
@@ -234,7 +240,7 @@ const AddTab = ({ data, urlSemesterId }: TabComponentProps) => {
     <div>
       {selectedSemesterId ? (
         <div className="p-6">
-          <h2 className="text-xl font-medium mb-6 dark:text-dark-text-primary">
+          <h2 className="text-xl font-medium text-light-text-primary dark:text-dark-text-primary mb-6">
             Add Assessment for {selectedSemester}
           </h2>
 
@@ -294,8 +300,14 @@ const DashboardContent = ({ urlSemesterId }: { urlSemesterId?: string }) => {
 
   const handleSelectCourse = (courseName: string) => {
     // Switch to assessments tab and set course filter
-    const newQuery = { ...router.query, tab: 'assessments', course: encodeURIComponent(courseName) };
-    router.replace({ pathname: router.pathname, query: newQuery }, undefined, { shallow: true });
+    const newQuery = {
+      ...router.query,
+      tab: "assessments",
+      course: encodeURIComponent(courseName),
+    };
+    router.replace({ pathname: router.pathname, query: newQuery }, undefined, {
+      shallow: true,
+    });
   };
 
   return (
@@ -305,25 +317,29 @@ const DashboardContent = ({ urlSemesterId }: { urlSemesterId?: string }) => {
       forceSemesterId={urlSemesterId}
     >
       {(data) => (
-        <div className={`${data.isDataReady ? "animate-fade-in-up" : "opacity-0"}`}>
+        <div
+          className={`${data.isDataReady ? "animate-fade-in-up" : "opacity-0"}`}
+        >
           {/* Render tab content based on active tab */}
-          <div style={{ display: activeTab === 'courses' ? 'block' : 'none' }}>
+          <div style={{ display: activeTab === "courses" ? "block" : "none" }}>
             <CoursesTab data={data} onSelectCourse={handleSelectCourse} />
           </div>
-          
-          <div style={{ display: activeTab === 'assessments' ? 'block' : 'none' }}>
+
+          <div
+            style={{ display: activeTab === "assessments" ? "block" : "none" }}
+          >
             <AssessmentsTab data={data} />
           </div>
-          
-          <div style={{ display: activeTab === 'grades' ? 'block' : 'none' }}>
+
+          <div style={{ display: activeTab === "grades" ? "block" : "none" }}>
             <GradesTab data={data} urlSemesterId={urlSemesterId} />
           </div>
-          
-          <div style={{ display: activeTab === 'calendar' ? 'block' : 'none' }}>
+
+          <div style={{ display: activeTab === "calendar" ? "block" : "none" }}>
             <CalendarTab data={data} />
           </div>
-          
-          <div style={{ display: activeTab === 'add' ? 'block' : 'none' }}>
+
+          <div style={{ display: activeTab === "add" ? "block" : "none" }}>
             <AddTab data={data} urlSemesterId={urlSemesterId} />
           </div>
         </div>
@@ -333,27 +349,31 @@ const DashboardContent = ({ urlSemesterId }: { urlSemesterId?: string }) => {
 };
 
 // Main Component (wraps with TabProvider)
-const UnifiedDashboardPage = ({ forceSemesterId }: UnifiedDashboardPageProps) => {
+const UnifiedDashboardPage = ({
+  forceSemesterId,
+}: UnifiedDashboardPageProps) => {
   const router = useRouter();
   const urlSemesterId = forceSemesterId || (router.query.semester as string);
-  
+
   // Determine initial tab from URL
   const getInitialTab = (): TabType => {
-    if (router.query.tab && typeof router.query.tab === 'string') {
+    if (router.query.tab && typeof router.query.tab === "string") {
       const tab = router.query.tab as TabType;
-      if (['courses', 'assessments', 'grades', 'calendar', 'add'].includes(tab)) {
+      if (
+        ["courses", "assessments", "grades", "calendar", "add"].includes(tab)
+      ) {
         return tab;
       }
     }
-    
+
     // Default based on pathname (for backward compatibility)
-    if (router.pathname.includes('/courses')) return 'courses';
-    if (router.pathname.includes('/assessments')) return 'assessments';
-    if (router.pathname.includes('/grades')) return 'grades';
-    if (router.pathname.includes('/calendar')) return 'calendar';
-    if (router.pathname.includes('/add')) return 'add';
-    
-    return 'assessments'; // Default tab
+    if (router.pathname.includes("/courses")) return "courses";
+    if (router.pathname.includes("/assessments")) return "assessments";
+    if (router.pathname.includes("/grades")) return "grades";
+    if (router.pathname.includes("/calendar")) return "calendar";
+    if (router.pathname.includes("/add")) return "add";
+
+    return "assessments"; // Default tab
   };
 
   return (

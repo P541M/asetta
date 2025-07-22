@@ -25,7 +25,7 @@ const AddAssessmentPage = ({ forceSemesterId }: AddAssessmentPageProps) => {
         <div>
           {selectedSemesterId ? (
             <div className="p-6">
-              <h2 className="text-xl font-medium mb-6 dark:text-dark-text-primary">
+              <h2 className="text-xl font-medium text-light-text-primary dark:text-dark-text-primary mb-6">
                 Add Assessment for {selectedSemester}
               </h2>
 

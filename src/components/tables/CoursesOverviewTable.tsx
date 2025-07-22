@@ -11,7 +11,7 @@ const CoursesOverviewTable = ({
   if (courses.length === 0) {
     return (
       <div className="p-6">
-        <h2 className="text-xl font-semibold text-light-text-primary dark:text-dark-text-primary mb-6">
+        <h2 className="text-xl font-medium text-light-text-primary dark:text-dark-text-primary mb-6">
           Your Courses
         </h2>
         <div className="text-center py-10">
@@ -41,20 +41,21 @@ const CoursesOverviewTable = ({
 
   return (
     <div className="p-6">
-      <h2 className="text-xl font-semibold text-light-text-primary dark:text-dark-text-primary mb-6">
+      <h2 className="text-xl font-medium text-light-text-primary dark:text-dark-text-primary mb-6">
         Your Courses
       </h2>
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         {courses.map((course) => {
-          const progressColor = course.progress >= 80 
-            ? "bg-emerald-500" 
-            : course.progress >= 50 
-            ? "bg-amber-500" 
-            : "bg-red-500";
+          const progressColor =
+            course.progress >= 80
+              ? "bg-emerald-500"
+              : course.progress >= 50
+              ? "bg-amber-500"
+              : "bg-red-500";
 
-          const isUpcoming = course.nextDueDate 
-            ? isDateUpcoming(course.nextDueDate) 
+          const isUpcoming = course.nextDueDate
+            ? isDateUpcoming(course.nextDueDate)
             : false;
 
           return (
@@ -107,11 +108,13 @@ const CoursesOverviewTable = ({
                   <p className="font-medium text-light-text-primary dark:text-dark-text-primary text-sm line-clamp-2 mb-1">
                     {course.nextAssignment}
                   </p>
-                  <p className={`text-sm font-medium ${
-                    isUpcoming 
-                      ? "text-amber-600 dark:text-amber-400" 
-                      : "text-light-text-secondary dark:text-dark-text-secondary"
-                  }`}>
+                  <p
+                    className={`text-sm font-medium ${
+                      isUpcoming
+                        ? "text-amber-600 dark:text-amber-400"
+                        : "text-light-text-secondary dark:text-dark-text-secondary"
+                    }`}
+                  >
                     {formatLocalDate(course.nextDueDate)}
                     {isUpcoming && (
                       <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800 dark:bg-amber-900/20 dark:text-amber-400">

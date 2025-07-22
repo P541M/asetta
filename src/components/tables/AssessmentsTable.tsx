@@ -23,8 +23,9 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
   onStatusChange,
 }) => {
   const { user } = useAuth();
-  const [localAssessments, setLocalAssessments] = useState<Assessment[]>(assessments);
-  
+  const [localAssessments, setLocalAssessments] =
+    useState<Assessment[]>(assessments);
+
   // Update local assessments when props change
   useEffect(() => {
     setLocalAssessments(assessments);
@@ -141,7 +142,12 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
     dueTime: string,
     status: string
   ): number | null => {
-    const completedStatuses = ["Submitted", "Under Review", "Completed", "Missed"];
+    const completedStatuses = [
+      "Submitted",
+      "Under Review",
+      "Completed",
+      "Missed",
+    ];
     if (completedStatuses.includes(status)) return null;
 
     return getDaysUntil(dueDate, dueTime);
@@ -193,21 +199,25 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
 
   const handleStatusChange = async (
     assessmentId: string,
-    newStatus: 'Not started' | 'In progress' | 'Submitted' | 'Missed'
+    newStatus: "Not started" | "In progress" | "Submitted" | "Missed"
   ) => {
     if (!user || !assessmentId) return;
 
     // Optimistic update: Update UI immediately
-    setLocalAssessments(prev => 
-      prev.map(assessment => 
-        assessment.id === assessmentId 
+    setLocalAssessments((prev) =>
+      prev.map((assessment) =>
+        assessment.id === assessmentId
           ? { ...assessment, status: newStatus }
           : assessment
       )
     );
 
     try {
-      const assessmentRef = getAssessmentDocRef(user.uid, semesterId, assessmentId);
+      const assessmentRef = getAssessmentDocRef(
+        user.uid,
+        semesterId,
+        assessmentId
+      );
       await updateDoc(assessmentRef, {
         status: newStatus,
         updatedAt: serverTimestamp(),
@@ -226,10 +236,14 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
     if (!user || !assessment.id) return;
 
     try {
-      const assessmentRef = getAssessmentDocRef(user.uid, semesterId, assessment.id);
+      const assessmentRef = getAssessmentDocRef(
+        user.uid,
+        semesterId,
+        assessment.id
+      );
       await deleteDoc(assessmentRef);
       // Remove from local state after successful deletion
-      setLocalAssessments(prev => prev.filter(a => a.id !== assessment.id));
+      setLocalAssessments((prev) => prev.filter((a) => a.id !== assessment.id));
       setShowDeleteModal(false);
       setAssessmentToDelete(null);
     } catch (error) {
@@ -246,7 +260,9 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
         await deleteDoc(assessmentRef);
       }
       // Remove deleted assessments from local state
-      setLocalAssessments(prev => prev.filter(a => !selectedRows.includes(a.id || '')));
+      setLocalAssessments((prev) =>
+        prev.filter((a) => !selectedRows.includes(a.id || ""))
+      );
       setSelectedRows([]);
       setShowBulkDeleteModal(false);
     } catch (error) {
@@ -297,7 +313,11 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
   const handleSaveEdit = async (assessmentId: string) => {
     if (!user) return;
     try {
-      const assessmentRef = getAssessmentDocRef(user.uid, semesterId, assessmentId);
+      const assessmentRef = getAssessmentDocRef(
+        user.uid,
+        semesterId,
+        assessmentId
+      );
       await updateDoc(assessmentRef, {
         ...editFormData,
         updatedAt: new Date(),
@@ -318,7 +338,11 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
   const handleSaveNotes = async () => {
     if (!user || !selectedAssessment?.id) return;
     try {
-      const assessmentRef = getAssessmentDocRef(user.uid, semesterId, selectedAssessment.id);
+      const assessmentRef = getAssessmentDocRef(
+        user.uid,
+        semesterId,
+        selectedAssessment.id
+      );
 
       // Strip HTML tags and whitespace to check if content is truly empty
       const strippedContent = notesInput.replace(/<[^>]*>/g, "").trim();
@@ -355,7 +379,9 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
   };
 
   // Add new function for bulk status update
-  const handleBulkStatusUpdate = async (newStatus: 'Not started' | 'In progress' | 'Submitted' | 'Missed') => {
+  const handleBulkStatusUpdate = async (
+    newStatus: "Not started" | "In progress" | "Submitted" | "Missed"
+  ) => {
     if (!user || selectedRows.length === 0) return;
 
     try {
@@ -367,9 +393,9 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
         });
       }
       // Update local state optimistically
-      setLocalAssessments(prev => 
-        prev.map(assessment => 
-          selectedRows.includes(assessment.id || '') 
+      setLocalAssessments((prev) =>
+        prev.map((assessment) =>
+          selectedRows.includes(assessment.id || "")
             ? { ...assessment, status: newStatus }
             : assessment
         )
@@ -395,7 +421,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
   return (
     <div className="p-6">
       <div className="flex flex-col sm:flex-row justify-between mb-6 gap-4">
-        <h2 className="text-xl font-medium text-gray-900 dark:text-dark-text-primary">
+        <h2 className="text-xl font-medium text-light-text-primary dark:text-dark-text-primary mb-6">
           Your Assessments
         </h2>
         <div className="flex space-x-2 items-center">
@@ -442,7 +468,15 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                       <span className="font-medium">{selectedStatus}</span>
                     </span>
                     <button
-                      onClick={() => handleBulkStatusUpdate(selectedStatus as 'Not started' | 'In progress' | 'Submitted' | 'Missed')}
+                      onClick={() =>
+                        handleBulkStatusUpdate(
+                          selectedStatus as
+                            | "Not started"
+                            | "In progress"
+                            | "Submitted"
+                            | "Missed"
+                        )
+                      }
                       className="btn-primary py-1.5 px-3 text-sm"
                     >
                       Confirm
@@ -561,8 +595,8 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                     <div className="col-span-12 lg:col-span-2 flex items-center space-x-2">
                       <input
                         type="checkbox"
-                        checked={selectedRows.includes(assessment.id || '')}
-                        onChange={() => toggleRowSelection(assessment.id || '')}
+                        checked={selectedRows.includes(assessment.id || "")}
+                        onChange={() => toggleRowSelection(assessment.id || "")}
                         className="h-4 w-4 rounded border-gray-300 dark:border-dark-border-primary text-light-button-primary dark:text-dark-button-primary focus:ring-light-focus-ring dark:focus:ring-dark-focus-ring"
                       />
                       <select
@@ -630,7 +664,9 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                     )}
                     <div className="col-span-12 lg:col-span-2 flex items-center space-x-2">
                       <button
-                        onClick={() => assessment.id && handleSaveEdit(assessment.id)}
+                        onClick={() =>
+                          assessment.id && handleSaveEdit(assessment.id)
+                        }
                         className="text-emerald-600 dark:text-emerald-400 hover:text-emerald-800 dark:hover:text-emerald-300 p-1.5 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 rounded-md transition-colors"
                       >
                         <svg
@@ -675,14 +711,22 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                     <div className="col-span-12 lg:col-span-2 flex items-center space-x-2">
                       <input
                         type="checkbox"
-                        checked={selectedRows.includes(assessment.id || '')}
-                        onChange={() => toggleRowSelection(assessment.id || '')}
+                        checked={selectedRows.includes(assessment.id || "")}
+                        onChange={() => toggleRowSelection(assessment.id || "")}
                         className="h-4 w-4 rounded border-gray-300 dark:border-dark-border-primary text-light-button-primary dark:text-dark-button-primary focus:ring-light-focus-ring dark:focus:ring-dark-focus-ring"
                       />
                       <select
                         value={assessment.status}
                         onChange={(e) =>
-                          assessment.id && handleStatusChange(assessment.id, e.target.value as 'Not started' | 'In progress' | 'Submitted' | 'Missed')
+                          assessment.id &&
+                          handleStatusChange(
+                            assessment.id,
+                            e.target.value as
+                              | "Not started"
+                              | "In progress"
+                              | "Submitted"
+                              | "Missed"
+                          )
                         }
                         className="py-0.5 px-3 text-md rounded-lg transition-all duration-300 bg-white dark:bg-dark-bg-tertiary text-gray-700 dark:text-dark-text-primary border border-gray-200 dark:border-dark-border-primary appearance-none pr-8 relative"
                         style={{

@@ -10,14 +10,14 @@ const CourseFilteredAssessments = ({
   onBack,
 }: CourseFilteredAssessmentsProps) => {
   const router = useRouter();
-  
-  const { 
-    assessments, 
-    loading: isLoading, 
-    error, 
-    refetch 
-  } = useAssessments(semesterId, { 
-    courseName: selectedCourse 
+
+  const {
+    assessments,
+    loading: isLoading,
+    error,
+    refetch,
+  } = useAssessments(semesterId, {
+    courseName: selectedCourse,
   });
 
   const handleStatusChange = () => {
@@ -25,7 +25,11 @@ const CourseFilteredAssessments = ({
   };
 
   const handleCalculateGrades = () => {
-    router.push(`/dashboard/${semesterId}/grades?course=${encodeURIComponent(selectedCourse)}`);
+    router.push(
+      `/dashboard/${semesterId}/grades?course=${encodeURIComponent(
+        selectedCourse
+      )}`
+    );
   };
 
   return (

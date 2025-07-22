@@ -72,7 +72,7 @@ const GradesPage = ({ forceSemesterId }: GradesPageProps) => {
               {/* Header with Course Selection */}
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4">
                 <div>
-                  <h2 className="text-xl font-medium text-gray-900 dark:text-dark-text-primary">
+                  <h2 className="text-xl font-medium text-light-text-primary dark:text-dark-text-primary mb-6">
                     Grade Calculator
                   </h2>
                   <p className="text-sm text-gray-500 dark:text-dark-text-tertiary mt-1">
@@ -93,9 +93,7 @@ const GradesPage = ({ forceSemesterId }: GradesPageProps) => {
                   <select
                     id="course-select"
                     value={selectedCourse || ""}
-                    onChange={(e) =>
-                      setSelectedCourse(e.target.value || null)
-                    }
+                    onChange={(e) => setSelectedCourse(e.target.value || null)}
                     className="input bg-white dark:bg-dark-bg-tertiary py-1.5 px-3 text-sm dark:text-dark-text-primary dark:border-dark-border-primary min-w-48"
                     disabled={availableCourses.length === 0}
                   >
