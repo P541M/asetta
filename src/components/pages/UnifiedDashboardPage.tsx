@@ -143,10 +143,10 @@ const GradesTab = ({ data, urlSemesterId }: TabComponentProps) => {
         {/* Header with Course Selection */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4">
           <div>
-            <h2 className="text-xl font-medium text-light-text-primary dark:text-dark-text-primary mb-6">
+            <h2 className="text-xl font-medium text-light-text-primary dark:text-dark-text-primary">
               Grade Calculator
             </h2>
-            <p className="text-sm text-gray-500 dark:text-dark-text-tertiary mt-1">
+            <p className="text-sm text-light-text-tertiary dark:text-dark-text-tertiary">
               {selectedSemester
                 ? `${selectedSemester} semester`
                 : "Select a course to calculate grades"}
@@ -317,9 +317,7 @@ const DashboardContent = ({ urlSemesterId }: { urlSemesterId?: string }) => {
       forceSemesterId={urlSemesterId}
     >
       {(data) => (
-        <div
-          className={`${data.isDataReady ? "animate-fade-in-up" : "opacity-0"}`}
-        >
+        <div>
           {/* Render tab content based on active tab */}
           <div style={{ display: activeTab === "courses" ? "block" : "none" }}>
             <CoursesTab data={data} onSelectCourse={handleSelectCourse} />
