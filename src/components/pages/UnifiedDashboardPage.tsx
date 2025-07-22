@@ -64,7 +64,7 @@ const AssessmentsTab = ({ data }: { data: DashboardData }) => {
   };
 
   return (
-    <div className="animate-fade-in">
+    <div>
       {selectedCourse ? (
         <CourseFilteredAssessments
           semesterId={selectedSemesterId}
