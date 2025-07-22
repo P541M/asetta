@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import { TabProvider, useTab, TabType } from "../../contexts/TabContext";
-import OptimizedDashboardLayout from "../layout/OptimizedDashboardLayout";
+import DashboardLayout from "../layout/DashboardLayout";
 import {
   DashboardData,
   TabComponentProps,
@@ -311,7 +311,7 @@ const DashboardContent = ({ urlSemesterId }: { urlSemesterId?: string }) => {
   };
 
   return (
-    <OptimizedDashboardLayout
+    <DashboardLayout
       title="Dashboard | Asetta"
       description="Manage your semesters, track assessments, and stay organized with Asetta."
       forceSemesterId={urlSemesterId}
@@ -344,7 +344,7 @@ const DashboardContent = ({ urlSemesterId }: { urlSemesterId?: string }) => {
           </div>
         </div>
       )}
-    </OptimizedDashboardLayout>
+    </DashboardLayout>
   );
 };
 
