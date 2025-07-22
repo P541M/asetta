@@ -1,3 +1,3 @@
-import CoursesPage from "../../components/pages/CoursesPage";
+import UnifiedDashboardPage from "../../components/pages/UnifiedDashboardPage";
 
-export default CoursesPage;
+export default UnifiedDashboardPage;

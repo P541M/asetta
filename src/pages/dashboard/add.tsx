@@ -1,3 +1,3 @@
-import AddAssessmentPage from "../../components/pages/AddAssessmentPage";
+import UnifiedDashboardPage from "../../components/pages/UnifiedDashboardPage";
 
-export default AddAssessmentPage;
+export default UnifiedDashboardPage;

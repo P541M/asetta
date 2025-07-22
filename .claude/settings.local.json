@@ -21,7 +21,10 @@
       "Bash(sed:*)",
       "Bash(dos2unix:*)",
       "WebFetch(domain:ai.google.dev)",
-      "Bash(env)"
+      "Bash(env)",
+      "Bash(timeout 10s npm run dev:*)",
+      "Bash(timeout 30s npm run build:*)",
+      "Bash(ls:*)"
     ],
     "deny": []
   }

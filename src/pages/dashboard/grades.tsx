@@ -1,3 +1,3 @@
-import GradesPage from "../../components/pages/GradesPage";
+import UnifiedDashboardPage from "../../components/pages/UnifiedDashboardPage";
 
-export default GradesPage;
+export default UnifiedDashboardPage;

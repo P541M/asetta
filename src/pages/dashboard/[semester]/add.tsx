@@ -1,11 +1,11 @@
 import { useRouter } from "next/router";
-import AddAssessmentPage from "../../../components/pages/AddAssessmentPage";
+import UnifiedDashboardPage from "../../../components/pages/UnifiedDashboardPage";
 
 const SemesterAddAssessmentPage = () => {
   const router = useRouter();
   const { semester: semesterId } = router.query;
 
-  return <AddAssessmentPage forceSemesterId={semesterId as string} />;
+  return <UnifiedDashboardPage forceSemesterId={semesterId as string} />;
 };
 
 export default SemesterAddAssessmentPage;

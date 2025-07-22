@@ -1,3 +1,3 @@
-import CalendarPage from "../../components/pages/CalendarPage";
+import UnifiedDashboardPage from "../../components/pages/UnifiedDashboardPage";
 
-export default CalendarPage;
+export default UnifiedDashboardPage;

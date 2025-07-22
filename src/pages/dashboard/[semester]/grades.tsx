@@ -1,11 +1,11 @@
 import { useRouter } from "next/router";
-import GradesPage from "../../../components/pages/GradesPage";
+import UnifiedDashboardPage from "../../../components/pages/UnifiedDashboardPage";
 
 const SemesterGradesPage = () => {
   const router = useRouter();
   const { semester: semesterId } = router.query;
 
-  return <GradesPage forceSemesterId={semesterId as string} />;
+  return <UnifiedDashboardPage forceSemesterId={semesterId as string} />;
 };
 
 export default SemesterGradesPage;
