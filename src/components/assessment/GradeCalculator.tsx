@@ -1,7 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import { updateDoc } from "firebase/firestore";
 import { useAssessments } from "../../hooks/useAssessments";
+import { useAutoSave } from "../../hooks/useAutoSave";
 import { getAssessmentDocRef } from "../../lib/firebaseUtils";
 import { Assessment } from "../../types/assessment";
 import { LoadingSpinner, ErrorMessage, EmptyState } from "../ui";
@@ -25,9 +26,6 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
   const { user } = useAuth();
   const [currentGrade, setCurrentGrade] = useState<number | null>(null);
   const [totalWeight, setTotalWeight] = useState<number>(0);
-  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
-  const [saveError, setSaveError] = useState<string | null>(null);
   const [targetGrade, setTargetGrade] = useState<number>(85);
 
   const {
@@ -41,6 +39,47 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
   );
 
   const [assessments, setAssessments] = useState<Assessment[]>([]);
+
+  // Prepare data for auto-save (only include modified fields)
+  const assessmentData = useMemo(() => 
+    assessments.map(assessment => ({
+      id: assessment.id,
+      mark: assessment.mark,
+      weight: assessment.weight,
+      status: assessment.status
+    }))
+  , [assessments]);
+
+  // Auto-save function
+  const handleAutoSave = useCallback(async (data: typeof assessmentData) => {
+    if (!user || !semesterId) return;
+
+    for (const assessmentUpdate of data) {
+      if (!assessmentUpdate.id) continue;
+      const assessmentRef = getAssessmentDocRef(
+        user.uid,
+        semesterId,
+        assessmentUpdate.id
+      );
+      const mark = assessmentUpdate.mark === undefined ? null : assessmentUpdate.mark;
+
+      await updateDoc(assessmentRef, {
+        mark,
+        weight: assessmentUpdate.weight,
+        status: assessmentUpdate.status,
+      });
+    }
+
+    // No need to refetch - local state is already updated optimistically
+    // and represents the correct current state after Firebase update
+  }, [user, semesterId]);
+
+  // Auto-save hook
+  const { status: saveStatus, error: saveError } = useAutoSave({
+    data: assessmentData,
+    onSave: handleAutoSave,
+    enabled: Boolean(user && semesterId)
+  });
 
   // Grade scale configuration
   const getGradeInfo = (percentage: number): GradeInfo => {
@@ -192,8 +231,6 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
           : assessment
       )
     );
-
-    setHasUnsavedChanges(true);
   };
 
   const handleWeightChange = (assessmentId: string, value: string) => {
@@ -221,7 +258,6 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
     setTotalWeight(total);
 
     recalculateGrade(updatedAssessments);
-    setHasUnsavedChanges(true);
   };
 
   const recalculateGrade = (updatedAssessments: Assessment[]) => {
@@ -277,38 +313,6 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
       : 0;
   };
 
-  const handleSaveChanges = async () => {
-    if (!user || !semesterId || !hasUnsavedChanges) return;
-
-    setIsSaving(true);
-    setSaveError(null);
-
-    try {
-      for (const assessment of assessments) {
-        if (!assessment.id) continue;
-        const assessmentRef = getAssessmentDocRef(
-          user.uid,
-          semesterId,
-          assessment.id
-        );
-        const mark = assessment.mark === undefined ? null : assessment.mark;
-
-        await updateDoc(assessmentRef, {
-          mark,
-          weight: assessment.weight,
-          status: assessment.status,
-        });
-      }
-
-      setHasUnsavedChanges(false);
-      refetch();
-    } catch (err) {
-      console.error("Error saving assessment changes:", err);
-      setSaveError("Failed to save changes. Please try again.");
-    } finally {
-      setIsSaving(false);
-    }
-  };
 
   const getAssessmentStatus = (assessment: Assessment) => {
     const now = new Date();
@@ -373,7 +377,7 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
 
   return (
     <div className="space-y-6">
-      {/* Header with Save Button */}
+      {/* Header with Auto-Save Status */}
       <div className="flex justify-between items-center mb-6">
         <div>
           <h3 className="text-base font-medium text-light-text-primary dark:text-dark-text-primary">
@@ -383,22 +387,42 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
             Grade calculator and progress tracking
           </p>
         </div>
-        {hasUnsavedChanges && (
-          <button
-            onClick={handleSaveChanges}
-            disabled={isSaving}
-            className={`btn-primary ${
-              isSaving ? "opacity-70 cursor-not-allowed" : ""
-            }`}
-          >
-            {isSaving ? "Saving..." : "Save Changes"}
-          </button>
-        )}
+        
+        {/* Auto-Save Status Indicator */}
+        <div className="flex items-center space-x-2 min-h-[20px]">
+          {saveStatus === 'saving' && (
+            <div className="flex items-center space-x-2 text-sm text-light-text-secondary dark:text-dark-text-secondary animate-fade-in transition-all duration-200 ease-out">
+              <div className="animate-spin rounded-full h-4 w-4 border-2 border-light-button-primary border-t-transparent"></div>
+              <span>Saving...</span>
+            </div>
+          )}
+          {saveStatus === 'saved' && (
+            <div className="flex items-center space-x-2 text-sm text-green-600 dark:text-green-400 animate-fade-in transition-all duration-200 ease-out">
+              <svg className="w-4 h-4 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
+              <span>Saved</span>
+            </div>
+          )}
+          {saveStatus === 'error' && saveError && (
+            <div className="flex items-center space-x-2 text-sm text-red-600 dark:text-red-400 animate-fade-in transition-all duration-200 ease-out">
+              <svg className="w-4 h-4 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span>Error saving</span>
+            </div>
+          )}
+        </div>
       </div>
 
-      {saveError && (
+      {saveStatus === 'error' && saveError && (
         <div className="p-4 bg-light-error-bg dark:bg-dark-error-bg rounded-md text-light-error-text dark:text-dark-error-text animate-fade-in shadow-sm">
-          <p>{saveError}</p>
+          <div className="flex items-center space-x-2">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <p>{saveError}</p>
+          </div>
         </div>
       )}
 
