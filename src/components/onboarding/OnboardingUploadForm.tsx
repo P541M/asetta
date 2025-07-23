@@ -97,6 +97,7 @@ export function OnboardingUploadForm({
       })));
 
       const result = await response.json();
+      console.log('Upload API Response:', result);
 
       setFiles(prev => prev.map(f => ({ 
         ...f, 
@@ -105,9 +106,19 @@ export function OnboardingUploadForm({
       })));
 
       setUploadStatus('success');
-      setMessage(`Successfully processed ${result.processedFiles} file(s)!`);
+      setMessage(`Successfully processed ${result.data?.processedFiles || result.processedFiles || 0} file(s)!`);
       
-      onUploadSuccess(result);
+      // The API response has data nested under 'data' property
+      const extractionData = {
+        processedFiles: result.data?.processedFiles || result.processedFiles || 0,
+        totalAssessments: result.data?.totalAssessments || result.totalAssessments || 0,
+        courseBreakdown: result.data?.courseBreakdown || result.courseBreakdown || [],
+        failedFiles: result.data?.failedFiles || result.failedFiles || 0,
+        processingTime: result.data?.processingTime || result.processingTime || 0,
+      };
+      console.log('Extracted data for onboarding:', extractionData);
+      
+      onUploadSuccess(extractionData);
 
     } catch (err) {
       console.error('Upload error:', err);

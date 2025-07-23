@@ -1,9 +1,26 @@
 import React from "react";
 import { StepNavigation } from "../ui/StepNavigation";
+import { useAuth } from "../../../contexts/AuthContext";
 
 export function WelcomeStep() {
+  const { user } = useAuth();
+  const userName = user?.displayName || user?.email?.split("@")[0] || "there";
+
   return (
     <div className="text-center">
+      {/* Personalized Welcome Banner */}
+      <div className="mb-8">
+        <div className="bg-gradient-to-r from-light-button-primary/10 to-light-button-primary-hover/10 dark:from-dark-button-primary/10 dark:to-dark-button-primary-hover/10 rounded-2xl p-6 border border-light-button-primary/20 dark:border-dark-button-primary/20">
+          <h2 className="text-2xl font-bold text-light-text-primary dark:text-dark-text-primary mb-2">
+            Welcome to Asetta, {userName}! 👋
+          </h2>
+          <p className="text-light-text-secondary dark:text-dark-text-secondary">
+            We&apos;re excited to help you take control of your academic life. Let&apos;s get you set up 
+            with a smarter way to track your assessments and never miss another deadline.
+          </p>
+        </div>
+      </div>
+
       {/* Hero Section */}
       <div className="mb-12">
         <div className="mb-8">
@@ -23,12 +40,12 @@ export function WelcomeStep() {
             </svg>
           </div>
           <h1 className="text-4xl font-bold text-light-text-primary dark:text-dark-text-primary mb-4">
-            Transform Your Academic Planning
+            Your Academic Success Starts Here
           </h1>
           <p className="text-xl text-light-text-secondary dark:text-dark-text-secondary max-w-2xl mx-auto leading-relaxed">
-            Upload your course outlines and let AI extract all assessment dates,
-            weights, and deadlines automatically. Stay organized and never miss
-            another deadline.
+            Simply upload your course outlines and watch as our AI intelligently extracts 
+            all your assessment dates, weights, and deadlines. You&apos;ll have a complete 
+            academic overview in minutes, not hours.
           </p>
         </div>
 
@@ -80,12 +97,12 @@ export function WelcomeStep() {
         {/* Getting Started Message */}
         <div className="bg-light-bg-secondary dark:bg-dark-bg-secondary rounded-xl p-6 border border-light-border-primary dark:border-dark-border-primary">
           <h3 className="text-lg font-semibold text-light-text-primary dark:text-dark-text-primary mb-2">
-            Ready to get started?
+            Let&apos;s get you set up! 🚀
           </h3>
           <p className="text-light-text-secondary dark:text-dark-text-secondary">
-            We&apos;ll guide you through setting up your first semester and
-            uploading your course outlines. The entire process takes less than 5
-            minutes.
+            We&apos;ll walk you through creating your first semester and uploading your course outlines 
+            step by step. The entire setup takes less than 5 minutes, and you&apos;ll be amazed at 
+            how much time this saves you throughout the semester.
           </p>
         </div>
       </div>

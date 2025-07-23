@@ -7,7 +7,7 @@ interface ProgressBarProps {
 }
 
 export function ProgressBar({ currentStep, totalSteps, className = '' }: ProgressBarProps) {
-  const progress = (currentStep / totalSteps) * 100;
+  const progress = ((currentStep - 1) / (totalSteps - 1)) * 100;
   
   return (
     <div className={`w-full ${className}`}>

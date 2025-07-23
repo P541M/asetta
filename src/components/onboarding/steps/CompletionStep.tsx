@@ -39,7 +39,7 @@ export function CompletionStep() {
       </div>
 
       {/* Results Summary */}
-      {state.hasCompletedUpload && state.extractionResults && (
+      {state.hasCompletedUpload && (
         <div className="bg-light-bg-secondary dark:bg-dark-bg-secondary rounded-xl p-6 border border-light-border-primary dark:border-dark-border-primary mb-8">
           <h3 className="text-lg font-semibold text-light-text-primary dark:text-dark-text-primary mb-4">
             Setup Summary
@@ -48,7 +48,7 @@ export function CompletionStep() {
           <div className="grid md:grid-cols-3 gap-4 text-center">
             <div>
               <div className="text-2xl font-bold text-light-button-primary dark:text-dark-button-primary">
-                {state.extractionResults.processedFiles}
+                {state.extractionResults?.processedFiles || 0}
               </div>
               <div className="text-sm text-light-text-secondary dark:text-dark-text-secondary">
                 Files Processed
@@ -57,7 +57,7 @@ export function CompletionStep() {
 
             <div>
               <div className="text-2xl font-bold text-light-button-primary dark:text-dark-button-primary">
-                {state.extractionResults.totalAssessments}
+                {state.extractionResults?.totalAssessments || 0}
               </div>
               <div className="text-sm text-light-text-secondary dark:text-dark-text-secondary">
                 Assessments Found
@@ -66,7 +66,7 @@ export function CompletionStep() {
 
             <div>
               <div className="text-2xl font-bold text-light-button-primary dark:text-dark-button-primary">
-                {state.extractionResults.courseBreakdown?.length || 0}
+                {state.extractionResults?.courseBreakdown?.length || 0}
               </div>
               <div className="text-sm text-light-text-secondary dark:text-dark-text-secondary">
                 Courses Identified
@@ -75,7 +75,7 @@ export function CompletionStep() {
           </div>
 
           {/* Course Breakdown */}
-          {state.extractionResults.courseBreakdown &&
+          {state.extractionResults?.courseBreakdown &&
             state.extractionResults.courseBreakdown.length > 0 && (
               <div className="mt-6 pt-6 border-t border-light-border-primary dark:border-dark-border-primary">
                 <h4 className="font-medium text-light-text-primary dark:text-dark-text-primary mb-3 text-left">
