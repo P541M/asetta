@@ -73,8 +73,12 @@ export function OnboardingUploadForm({
 
       setMessage('Uploading files...');
 
+      const token = await user.getIdToken();
       const response = await fetch('/api/upload', {
         method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
         body: formData,
       });
 

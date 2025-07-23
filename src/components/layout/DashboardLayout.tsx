@@ -91,15 +91,18 @@ const DashboardLayout = ({
       const upcomingAssessments = assessments
         .filter(
           (a) =>
-            !completedStatuses.includes(a.status) &&
-            new Date(a.dueDate) >= now
+            !completedStatuses.includes(a.status) && new Date(a.dueDate) >= now
         )
-        .sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime());
+        .sort(
+          (a, b) =>
+            new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime()
+        );
 
       const nextUpcoming = upcomingAssessments[0];
-      const progress = assessments.length > 0 
-        ? Math.round((completed.length / assessments.length) * 100) 
-        : 0;
+      const progress =
+        assessments.length > 0
+          ? Math.round((completed.length / assessments.length) * 100)
+          : 0;
 
       courseStatsList.push({
         courseName,
@@ -112,7 +115,9 @@ const DashboardLayout = ({
       });
     });
 
-    return courseStatsList.sort((a, b) => a.courseName.localeCompare(b.courseName));
+    return courseStatsList.sort((a, b) =>
+      a.courseName.localeCompare(b.courseName)
+    );
   };
 
   useEffect(() => {
@@ -227,7 +232,7 @@ const DashboardLayout = ({
 
           // Extract available courses (sorted alphabetically)
           const uniqueCourses = Array.from(
-            new Set(assessmentsList.map(a => a.courseName))
+            new Set(assessmentsList.map((a) => a.courseName))
           ).sort();
           setAvailableCourses(uniqueCourses);
 
@@ -263,7 +268,7 @@ const DashboardLayout = ({
             completionRate: completionRate,
           });
           setIsLoading(false);
-          
+
           // Add a small delay before marking data as ready to ensure smooth animations
           setTimeout(() => {
             setIsDataReady(true);
@@ -359,16 +364,11 @@ const DashboardLayout = ({
       <DashboardHeader onLogout={handleLogout} />
       <div className="p-4 md:p-6 pl-safe pr-safe">
         <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-7">
             <div>
               <h1 className="text-3xl font-bold text-light-button-primary dark:text-dark-button-primary">
                 Dashboard
               </h1>
-              <p className="text-sm text-light-text-secondary dark:text-dark-text-secondary mt-2">
-                {selectedSemester
-                  ? `Viewing ${selectedSemester} semester`
-                  : "Select a semester to get started"}
-              </p>
             </div>
           </div>
 
@@ -413,19 +413,23 @@ const DashboardLayout = ({
 
             {/* Tab Content Area */}
             <div className="mt-6">
-              <div className={`bg-light-bg-primary dark:bg-dark-bg-secondary rounded-xl border border-light-border-primary dark:border-dark-border-primary ${isDataReady ? "animate-fade-in-up" : "opacity-0"}`}>
-              {children({
-                selectedSemester,
-                selectedSemesterId,
-                assessments,
-                courses,
-                availableCourses,
-                isLoading,
-                isDataReady,
-                error,
-                stats,
-                refreshAssessments,
-              })}
+              <div
+                className={`bg-light-bg-primary dark:bg-dark-bg-secondary rounded-xl border border-light-border-primary dark:border-dark-border-primary ${
+                  isDataReady ? "animate-fade-in-up" : "opacity-0"
+                }`}
+              >
+                {children({
+                  selectedSemester,
+                  selectedSemesterId,
+                  assessments,
+                  courses,
+                  availableCourses,
+                  isLoading,
+                  isDataReady,
+                  error,
+                  stats,
+                  refreshAssessments,
+                })}
               </div>
             </div>
           </div>
