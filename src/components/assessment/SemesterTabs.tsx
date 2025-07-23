@@ -57,7 +57,7 @@ const DragHandle = () => (
 // Skeleton loading component that maintains consistent dimensions
 const SemesterTabsSkeleton = () => (
   <div className="semester-tabs-container mb-6">
-    <div className="flex items-center justify-between px-4 py-2 border-b border-light-border-primary dark:border-dark-border-primary">
+    <div className="flex items-center justify-between px-4 py-2">
       <div className="flex items-center space-x-2">
         <div className="h-4 w-16 bg-light-bg-tertiary dark:bg-dark-bg-tertiary rounded animate-pulse"></div>
       </div>
