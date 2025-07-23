@@ -54,6 +54,31 @@ const DragHandle = () => (
   </svg>
 );
 
+// Skeleton loading component that maintains consistent dimensions
+const SemesterTabsSkeleton = () => (
+  <div className="semester-tabs-container mb-6">
+    <div className="flex items-center justify-between px-4 py-2 border-b border-light-border-primary dark:border-dark-border-primary">
+      <div className="flex items-center space-x-2">
+        <div className="h-4 w-16 bg-light-bg-tertiary dark:bg-dark-bg-tertiary rounded animate-pulse"></div>
+      </div>
+      <div className="flex items-center space-x-1">
+        <div className="h-7 w-7 bg-light-bg-tertiary dark:bg-dark-bg-tertiary rounded-md animate-pulse"></div>
+        <div className="h-7 w-7 bg-light-bg-tertiary dark:bg-dark-bg-tertiary rounded-md animate-pulse"></div>
+      </div>
+    </div>
+    
+    {/* Skeleton tabs - horizontally scrollable */}
+    <div className="relative px-4 py-2">
+      <div className="flex items-center space-x-2 overflow-x-auto pb-1 hide-scrollbar">
+        {/* Skeleton tab pills */}
+        <div className="h-8 w-20 bg-light-bg-tertiary dark:bg-dark-bg-tertiary rounded-lg animate-pulse flex-shrink-0"></div>
+        <div className="h-8 w-24 bg-light-bg-tertiary dark:bg-dark-bg-tertiary rounded-lg animate-pulse flex-shrink-0"></div>
+        <div className="h-8 w-18 bg-light-bg-tertiary dark:bg-dark-bg-tertiary rounded-lg animate-pulse flex-shrink-0"></div>
+      </div>
+    </div>
+  </div>
+);
+
 // New SortableSemester component for drag-and-drop
 function SortableSemester({
   semester,
@@ -254,6 +279,7 @@ const SemesterTabs = ({
   const [newSemester, setNewSemester] = useState("");
   const [semesters, setSemesters] = useState<Semester[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isDataReady, setIsDataReady] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
   const [showMoreOptions, setShowMoreOptions] = useState(false);
   const [showAddInput, setShowAddInput] = useState(false);
@@ -328,6 +354,7 @@ const SemesterTabs = ({
     if (!user) return;
 
     setIsLoading(true);
+    setIsDataReady(false);
     const semColRef = collection(db, "users", user.uid, "semesters");
     const q = query(semColRef, orderBy("order", "asc"));
 
@@ -341,6 +368,11 @@ const SemesterTabs = ({
         setSemesters(sems);
         setIsLoading(false);
 
+        // Add a small delay before marking data as ready to ensure smooth animations
+        setTimeout(() => {
+          setIsDataReady(true);
+        }, 50);
+
         if (sems.length > 0 && !selectedSemester) {
           onSelect(sems[0].name);
         }
@@ -348,11 +380,13 @@ const SemesterTabs = ({
       (error) => {
         console.error("Error listening to semesters:", error);
         setIsLoading(false);
+        setIsDataReady(true);
       }
     );
 
     return () => unsubscribe();
-  }, [user, selectedSemester, onSelect]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, onSelect]); // selectedSemester excluded intentionally to prevent double stutter on semester switching
 
   // Add a new semester to Firestore
   const handleAddSemester = async () => {
@@ -602,18 +636,12 @@ const SemesterTabs = ({
     }
   };
 
-  if (isLoading) {
-    return (
-      <div className="mb-4 bg-light-bg-primary dark:bg-dark-bg-secondary rounded-lg shadow-sm p-4 border border-light-border-primary dark:border-dark-border-primary">
-        <div className="flex justify-center py-2">
-          <div className="animate-spin rounded-full h-5 w-5 border-2 border-light-button-primary border-t-transparent dark:border-dark-button-primary dark:border-t-transparent"></div>
-        </div>
-      </div>
-    );
+  if (isLoading || !isDataReady) {
+    return <SemesterTabsSkeleton />;
   }
 
   return (
-    <div className={`semester-tabs-container mb-6 ${className}`}>
+    <div className={`semester-tabs-container mb-6 ${className} ${isDataReady ? "animate-fade-in-up" : "opacity-0"}`}>
       <div className="flex items-center justify-between px-4 py-2 border-b border-light-border-primary dark:border-dark-border-primary">
         <div className="flex items-center space-x-2">
           <h2 className="text-sm font-medium text-light-text-primary dark:text-dark-text-primary">
