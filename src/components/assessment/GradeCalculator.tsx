@@ -32,7 +32,6 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
     assessments: fetchedAssessments,
     loading: isLoading,
     error,
-    refetch,
   } = useAssessments(
     semesterId,
     selectedCourse ? { courseName: selectedCourse } : {}

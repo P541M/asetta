@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useDebounce } from './useDebounce';
 
 export type AutoSaveStatus = 'idle' | 'saving' | 'saved' | 'error';
@@ -37,7 +37,7 @@ export function useAutoSave<T>({
   const lastSavedData = useRef<T>();
 
   // Manual save function
-  const save = async (): Promise<void> => {
+  const save = useCallback(async (): Promise<void> => {
     if (!enabled) return;
 
     try {
@@ -56,7 +56,7 @@ export function useAutoSave<T>({
       setError(err instanceof Error ? err.message : 'Failed to save changes');
       setStatus('error');
     }
-  };
+  }, [enabled, onSave, data]);
 
   // Auto-save effect triggered by debounced data changes
   useEffect(() => {
@@ -73,7 +73,7 @@ export function useAutoSave<T>({
     }
 
     save();
-  }, [debouncedData, enabled]);
+  }, [debouncedData, enabled, save]);
 
   return {
     status,
