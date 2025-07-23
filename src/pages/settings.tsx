@@ -52,15 +52,12 @@ const SettingsPage = () => {
         <div className="max-w-7xl mx-auto">
           {/* Page Header */}
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-light-button-primary dark:text-dark-button-primary">
+            <h1 className="text-3xl font-bold text-light-button-primary dark:text-dark-button-primary mb-7">
               Settings
             </h1>
-            <p className="text-sm text-light-text-secondary dark:text-dark-text-secondary mt-2">
-              Manage your account settings and preferences
-            </p>
 
             {/* Back Navigation */}
-            <div className="mt-4">
+            <div>
               <button
                 onClick={() => router.back()}
                 className="flex items-center space-x-2 text-light-text-secondary dark:text-dark-text-secondary hover:text-light-text-primary dark:hover:text-dark-text-primary transition-colors group"
