@@ -98,7 +98,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const logout = async () => {
     // Clear user-specific cached data before signing out
-    removeFromLocalStorage('avatarColor');
+    removeFromLocalStorage('avatarEmoji');
     await signOut(auth);
   };
 

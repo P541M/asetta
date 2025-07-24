@@ -37,7 +37,6 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
     text: string;
     type: "success" | "error";
   }>({ text: "", type: "success" });
-  const [avatarColor, setAvatarColor] = useState<"blue" | "green" | "purple" | "orange" | "red" | "pink" | "indigo" | "teal">("blue");
   const [avatarEmoji, setAvatarEmoji] = useState<string>(DEFAULT_EMOJI);
   const [activeTab, setActiveTab] = useState<
     "profile" | "preferences" | "notifications"
@@ -61,7 +60,6 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
     showWeight: true,
     showNotes: true,
     showStatsBar: false,
-    avatarColor: "blue" as "blue" | "green" | "purple" | "orange" | "red" | "pink" | "indigo" | "teal",
     avatarEmoji: DEFAULT_EMOJI,
     isDarkMode: false,
     emailNotifications: false,
@@ -84,7 +82,6 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
       showWeight !== initialValues.showWeight ||
       showNotes !== initialValues.showNotes ||
       showStatsBar !== initialValues.showStatsBar ||
-      avatarColor !== initialValues.avatarColor ||
       avatarEmoji !== initialValues.avatarEmoji ||
       isDarkModeLocal !== initialValues.isDarkMode ||
       emailNotifications !== initialValues.emailNotifications ||
@@ -118,7 +115,6 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
           const newEmail = userData.email || "";
           const newHasConsentedToNotifications =
             userData.hasConsentedToNotifications ?? false;
-          const newAvatarColor = userData.avatarColor || "blue";
           const newAvatarEmoji = userData.avatarEmoji || DEFAULT_EMOJI;
 
           // Set current values
@@ -134,7 +130,6 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
           setNotificationDaysBefore(newNotificationDaysBefore);
           setEmail(newEmail);
           setHasConsentedToNotifications(newHasConsentedToNotifications);
-          setAvatarColor(newAvatarColor);
           setAvatarEmoji(newAvatarEmoji);
 
           // Set initial values
@@ -147,7 +142,6 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
             showWeight: newShowWeight,
             showNotes: newShowNotes,
             showStatsBar: newShowStatsBar,
-            avatarColor: newAvatarColor,
             avatarEmoji: newAvatarEmoji,
             isDarkMode: isDarkMode,
             emailNotifications: newEmailNotifications,
@@ -210,7 +204,6 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
         notificationDaysBefore: notificationDaysBefore,
         email: email,
         hasConsentedToNotifications: hasConsentedToNotifications,
-        avatarColor: avatarColor,
         avatarEmoji: avatarEmoji,
         updatedAt: new Date(),
       });
@@ -230,7 +223,6 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
         showWeight,
         showNotes,
         showStatsBar,
-        avatarColor: avatarColor,
         avatarEmoji: avatarEmoji,
         isDarkMode: isDarkModeLocal,
         emailNotifications,
@@ -279,7 +271,6 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
     setShowWeight(initialValues.showWeight);
     setShowNotes(initialValues.showNotes);
     setShowStatsBar(initialValues.showStatsBar);
-    setAvatarColor(initialValues.avatarColor);
     setAvatarEmoji(initialValues.avatarEmoji);
     setIsDarkModeLocal(initialValues.isDarkMode);
     setEmailNotifications(initialValues.emailNotifications);
@@ -315,8 +306,6 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
               setGraduationYear={setGraduationYear}
               avatarEmoji={avatarEmoji}
               setAvatarEmoji={setAvatarEmoji}
-              avatarColor={avatarColor}
-              setAvatarColor={setAvatarColor}
             />
           ) : activeTab === "preferences" ? (
             <PreferencesSection

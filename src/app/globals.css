@@ -405,36 +405,3 @@ html:hover {
     hue-rotate(169deg) brightness(99%) contrast(95%);
 }
 
-/* Avatar Color Filters */
-.filter-blue-avatar {
-  filter: brightness(0) saturate(100%) invert(39%) sepia(96%) saturate(1751%)
-    hue-rotate(213deg) brightness(97%) contrast(97%);
-}
-.filter-green-avatar {
-  filter: brightness(0) saturate(100%) invert(49%) sepia(96%) saturate(2080%)
-    hue-rotate(123deg) brightness(95%) contrast(86%);
-}
-.filter-purple-avatar {
-  filter: brightness(0) saturate(100%) invert(33%) sepia(83%) saturate(3207%)
-    hue-rotate(269deg) brightness(91%) contrast(91%);
-}
-.filter-orange-avatar {
-  filter: brightness(0) saturate(100%) invert(56%) sepia(94%) saturate(1398%)
-    hue-rotate(3deg) brightness(98%) contrast(101%);
-}
-.filter-red-avatar {
-  filter: brightness(0) saturate(100%) invert(23%) sepia(95%) saturate(4518%)
-    hue-rotate(343deg) brightness(98%) contrast(98%);
-}
-.filter-pink-avatar {
-  filter: brightness(0) saturate(100%) invert(65%) sepia(78%) saturate(2598%)
-    hue-rotate(299deg) brightness(92%) contrast(86%);
-}
-.filter-indigo-avatar {
-  filter: brightness(0) saturate(100%) invert(29%) sepia(92%) saturate(2631%)
-    hue-rotate(226deg) brightness(90%) contrast(96%);
-}
-.filter-teal-avatar {
-  filter: brightness(0) saturate(100%) invert(60%) sepia(45%) saturate(1685%)
-    hue-rotate(151deg) brightness(93%) contrast(88%);
-}
