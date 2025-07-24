@@ -97,7 +97,6 @@ export function OnboardingUploadForm({
       })));
 
       const result = await response.json();
-      console.log('Upload API Response:', result);
 
       setFiles(prev => prev.map(f => ({ 
         ...f, 
@@ -116,7 +115,6 @@ export function OnboardingUploadForm({
         failedFiles: result.data?.failedFiles || result.failedFiles || 0,
         processingTime: result.data?.processingTime || result.processingTime || 0,
       };
-      console.log('Extracted data for onboarding:', extractionData);
       
       onUploadSuccess(extractionData);
 

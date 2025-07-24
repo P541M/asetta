@@ -7,9 +7,11 @@ import {
   signInWithEmailAndPassword,
   signInWithPopup,
   GoogleAuthProvider,
+  User,
 } from "firebase/auth";
 import Link from "next/link";
 import Logo from "../components/ui/Logo";
+import { getUserOnboardingStatus, shouldRedirectToOnboarding } from "../utils/onboardingUtils";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -18,13 +20,28 @@ const Login = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
 
+  const handlePostAuthRedirect = async (user: User) => {
+    try {
+      const onboardingStatus = await getUserOnboardingStatus(user);
+      if (shouldRedirectToOnboarding(onboardingStatus)) {
+        router.push("/onboarding");
+      } else {
+        router.push("/dashboard");
+      }
+    } catch (error) {
+      console.error("Error checking onboarding status:", error);
+      // Default to dashboard if there's an error
+      router.push("/dashboard");
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     setIsSubmitting(true);
     try {
-      await signInWithEmailAndPassword(auth, email, password);
-      router.push("/dashboard");
+      const result = await signInWithEmailAndPassword(auth, email, password);
+      await handlePostAuthRedirect(result.user);
     } catch (error: unknown) {
       setError(
         error instanceof Error
@@ -40,8 +57,8 @@ const Login = () => {
     setIsSubmitting(true);
     const provider = new GoogleAuthProvider();
     try {
-      await signInWithPopup(auth, provider);
-      router.push("/dashboard");
+      const result = await signInWithPopup(auth, provider);
+      await handlePostAuthRedirect(result.user);
     } catch (error: unknown) {
       setError(
         error instanceof Error

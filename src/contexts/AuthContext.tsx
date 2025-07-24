@@ -11,10 +11,14 @@ import { auth, db } from "../lib/firebase";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { AuthContextType } from "../types/context";
 import { removeFromLocalStorage } from "../utils/localStorage";
+import { useOnboardingStatus } from "../hooks/useOnboardingStatus";
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
   loading: true,
+  onboardingStatus: null,
+  onboardingLoading: true,
+  refreshOnboardingStatus: async () => {},
   logout: async () => {},
 });
 
@@ -23,6 +27,13 @@ export const useAuth = () => useContext(AuthContext);
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  
+  // Use the onboarding status hook
+  const { 
+    onboardingStatus, 
+    loading: onboardingLoading, 
+    refreshStatus: refreshOnboardingStatus 
+  } = useOnboardingStatus(user);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (usr) => {
@@ -92,7 +103,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, logout }}>
+    <AuthContext.Provider 
+      value={{ 
+        user, 
+        loading, 
+        onboardingStatus, 
+        onboardingLoading, 
+        refreshOnboardingStatus, 
+        logout 
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

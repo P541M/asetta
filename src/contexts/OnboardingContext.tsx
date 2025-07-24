@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 import { useAuth } from './AuthContext';
 import { db } from '../lib/firebase';
 import { doc, updateDoc } from 'firebase/firestore';
+import { clearOnboardingProgress } from '../utils/onboardingUtils';
 import {
   OnboardingState,
   OnboardingContextType,
@@ -21,6 +22,7 @@ const initialState: OnboardingState = {
   error: null,
   hasCompletedUpload: false,
   extractionResults: null,
+  showExitModal: false,
 };
 
 // Action types
@@ -33,7 +35,9 @@ type OnboardingAction =
   | { type: 'SET_CREATED_SEMESTER_ID'; payload: string }
   | { type: 'SET_LOADING'; payload: boolean }
   | { type: 'SET_ERROR'; payload: string | null }
-  | { type: 'SET_UPLOAD_COMPLETE'; payload: ExtractionResult };
+  | { type: 'SET_UPLOAD_COMPLETE'; payload: ExtractionResult }
+  | { type: 'SHOW_EXIT_MODAL' }
+  | { type: 'HIDE_EXIT_MODAL' };
 
 // Reducer
 function onboardingReducer(state: OnboardingState, action: OnboardingAction): OnboardingState {
@@ -84,6 +88,16 @@ function onboardingReducer(state: OnboardingState, action: OnboardingAction): On
         hasCompletedUpload: true,
         extractionResults: action.payload,
       };
+    case 'SHOW_EXIT_MODAL':
+      return {
+        ...state,
+        showExitModal: true,
+      };
+    case 'HIDE_EXIT_MODAL':
+      return {
+        ...state,
+        showExitModal: false,
+      };
     default:
       return state;
   }
@@ -95,7 +109,7 @@ const OnboardingContext = createContext<OnboardingContextType | undefined>(undef
 // Provider component
 export function OnboardingProvider({ children }: { children: React.ReactNode }) {
   const [state, dispatch] = useReducer(onboardingReducer, initialState);
-  const { user } = useAuth();
+  const { user, refreshOnboardingStatus } = useAuth();
   const router = useRouter();
 
   const nextStep = useCallback(() => {
@@ -134,6 +148,45 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
     dispatch({ type: 'SET_UPLOAD_COMPLETE', payload: results });
   }, []);
 
+  const requestExit = useCallback(() => {
+    dispatch({ type: 'SHOW_EXIT_MODAL' });
+  }, []);
+
+  const cancelExit = useCallback(() => {
+    dispatch({ type: 'HIDE_EXIT_MODAL' });
+  }, []);
+
+  const confirmExit = useCallback(async () => {
+    if (!user) return;
+
+    try {
+      setLoading(true);
+      
+      // Mark onboarding as completed (skipped) without saving profile data
+      const userRef = doc(db, 'users', user.uid);
+      await updateDoc(userRef, {
+        hasCompletedOnboarding: true,
+        onboardingCompletedAt: new Date(),
+        onboardingSkipped: true, // Flag to indicate it was skipped
+      });
+
+      // Clear any partial progress saved in localStorage
+      clearOnboardingProgress();
+
+      // Refresh the onboarding status in AuthContext
+      await refreshOnboardingStatus();
+
+      // Hide modal and navigate to dashboard
+      dispatch({ type: 'HIDE_EXIT_MODAL' });
+      router.push('/dashboard');
+    } catch (error) {
+      console.error('Error skipping onboarding:', error);
+      setError('Failed to skip onboarding. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  }, [user, router, setLoading, setError, refreshOnboardingStatus]);
+
   const completeOnboarding = useCallback(async () => {
     if (!user) return;
 
@@ -150,6 +203,12 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
         expectedGraduation: state.userData.expectedGraduation || '',
       });
 
+      // Clear any saved onboarding progress
+      clearOnboardingProgress();
+
+      // Refresh the onboarding status in AuthContext
+      await refreshOnboardingStatus();
+
       // Navigate to dashboard
       router.push('/dashboard');
     } catch (error) {
@@ -158,7 +217,7 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
     } finally {
       setLoading(false);
     }
-  }, [user, state.userData, router, setLoading, setError]);
+  }, [user, state.userData, router, setLoading, setError, refreshOnboardingStatus]);
 
   const value: OnboardingContextType = {
     state,
@@ -172,6 +231,9 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
     setError,
     setUploadComplete,
     completeOnboarding,
+    requestExit,
+    cancelExit,
+    confirmExit,
   };
 
   return (

@@ -34,7 +34,7 @@ export function useAutoSave<T>({
   const [error, setError] = useState<string | null>(null);
   const debouncedData = useDebounce(data, delay);
   const initialRender = useRef(true);
-  const lastSavedData = useRef<T>();
+  const lastSavedData = useRef<T | undefined>(undefined);
 
   // Manual save function
   const save = useCallback(async (): Promise<void> => {

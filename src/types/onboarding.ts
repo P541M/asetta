@@ -22,6 +22,7 @@ export interface OnboardingState {
   error: string | null;
   hasCompletedUpload: boolean;
   extractionResults: ExtractionResult | null;
+  showExitModal: boolean;
 }
 
 export interface OnboardingContextType {
@@ -36,6 +37,9 @@ export interface OnboardingContextType {
   setError: (error: string | null) => void;
   setUploadComplete: (results: ExtractionResult) => void;
   completeOnboarding: () => Promise<void>;
+  requestExit: () => void;
+  cancelExit: () => void;
+  confirmExit: () => Promise<void>;
 }
 
 export type OnboardingStep = 

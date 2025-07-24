@@ -3,20 +3,32 @@ import { useAuth } from "../contexts/AuthContext";
 import { useRouter } from "next/router";
 import { db } from "../lib/firebase";
 import { collection, getDocs, query, orderBy, limit } from "firebase/firestore";
+import { shouldRedirectToOnboarding } from "../utils/onboardingUtils";
 
 const Dashboard = () => {
-  const { user, loading } = useAuth();
+  const { user, loading, onboardingStatus, onboardingLoading } = useAuth();
   const router = useRouter();
   const [redirecting, setRedirecting] = useState(false);
 
   useEffect(() => {
     const redirectToFirstSemester = async () => {
-      if (!loading && !user) {
+      // Wait for both auth and onboarding status to load
+      if (loading || onboardingLoading) {
+        return;
+      }
+      
+      if (!user) {
         router.push("/login");
         return;
       }
 
-      if (!loading && user && !redirecting) {
+      // Check if user needs to complete onboarding first
+      if (shouldRedirectToOnboarding(onboardingStatus)) {
+        router.push("/onboarding");
+        return;
+      }
+
+      if (!redirecting) {
         setRedirecting(true);
         try {
           // Get the user's first semester
@@ -40,9 +52,9 @@ const Dashboard = () => {
     };
 
     redirectToFirstSemester();
-  }, [user, loading, router, redirecting]);
+  }, [user, loading, onboardingStatus, onboardingLoading, router, redirecting]);
 
-  if (loading) {
+  if (loading || onboardingLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-dark-bg-primary">
         <div className="flex flex-col items-center">

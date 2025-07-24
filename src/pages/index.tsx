@@ -2,22 +2,29 @@
 import { useEffect } from "react";
 import { useRouter } from "next/router";
 import { useAuth } from "../contexts/AuthContext";
+import { shouldRedirectToOnboarding } from "../utils/onboardingUtils";
 
 export default function Index() {
   const router = useRouter();
-  const { user, loading } = useAuth();
+  const { user, loading, onboardingStatus, onboardingLoading } = useAuth();
 
   useEffect(() => {
-    if (!loading) {
-      if (user) {
-        router.push("/dashboard");
-      } else {
+    // Wait for both auth and onboarding status to load
+    if (!loading && !onboardingLoading) {
+      if (!user) {
+        // Not authenticated - redirect to login
         router.push("/login");
+      } else if (shouldRedirectToOnboarding(onboardingStatus)) {
+        // Authenticated but needs onboarding - redirect to onboarding
+        router.push("/onboarding");
+      } else {
+        // Authenticated and completed onboarding - redirect to dashboard
+        router.push("/dashboard");
       }
     }
-  }, [user, loading, router]);
+  }, [user, loading, onboardingStatus, onboardingLoading, router]);
 
-  // Show loading state while checking auth
+  // Show loading state while checking auth and onboarding status
   return (
     <div className="min-h-screen flex items-center justify-center bg-white dark:bg-dark-bg-primary">
       <div className="flex flex-col items-center">
