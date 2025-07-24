@@ -3,8 +3,10 @@ import { doc, getDoc } from 'firebase/firestore';
 import { useAuth } from '../contexts/AuthContext';
 import { db } from '../lib/firebase';
 import { getFromLocalStorage, setToLocalStorage, removeFromLocalStorage } from '../utils/localStorage';
+import { DEFAULT_EMOJI, isValidEmoji } from '../data/emojis';
 
 interface UserProfile {
+  avatarEmoji: string;
   avatarColor: "blue" | "green" | "purple" | "orange" | "red" | "pink" | "indigo" | "teal";
   displayName: string;
   institution: string;
@@ -26,19 +28,22 @@ export const useUserProfile = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Initialize with cached avatar color for immediate display
+  // Initialize with cached avatar data for immediate display
   useEffect(() => {
     if (!user) {
       setProfile(null);
       removeFromLocalStorage('avatarColor');
+      removeFromLocalStorage('avatarEmoji');
       return;
     }
 
-    // Get cached avatar color for immediate display
+    // Get cached avatar data for immediate display
+    const cachedAvatarEmoji = getFromLocalStorage<string>("avatarEmoji", DEFAULT_EMOJI);
     const cachedAvatarColor = getFromLocalStorage<"blue" | "green" | "purple" | "orange" | "red" | "pink" | "indigo" | "teal">("avatarColor", "blue");
     
-    // Set initial profile with cached color to prevent flash
+    // Set initial profile with cached data to prevent flash
     setProfile(prev => prev || {
+      avatarEmoji: isValidEmoji(cachedAvatarEmoji) ? cachedAvatarEmoji : DEFAULT_EMOJI,
       avatarColor: cachedAvatarColor,
       displayName: "",
       institution: "",
@@ -71,12 +76,19 @@ export const useUserProfile = () => {
 
         if (userSnapshot.exists()) {
           const userData = userSnapshot.data();
+          
+          // Handle emoji preference with fallback to color system
+          const avatarEmoji = userData.avatarEmoji && isValidEmoji(userData.avatarEmoji) 
+            ? userData.avatarEmoji 
+            : DEFAULT_EMOJI;
           const avatarColor = userData.avatarColor || "blue";
           
-          // Cache the avatar color for immediate future loads
+          // Cache both avatar data for immediate future loads
+          setToLocalStorage("avatarEmoji", avatarEmoji);
           setToLocalStorage("avatarColor", avatarColor);
           
           setProfile({
+            avatarEmoji: avatarEmoji,
             avatarColor: avatarColor,
             displayName: userData.displayName || "",
             institution: userData.institution || "",
@@ -93,8 +105,10 @@ export const useUserProfile = () => {
           });
         } else {
           // Set default profile if document doesn't exist and cache it
+          setToLocalStorage("avatarEmoji", DEFAULT_EMOJI);
           setToLocalStorage("avatarColor", "blue");
           setProfile({
+            avatarEmoji: DEFAULT_EMOJI,
             avatarColor: "blue",
             displayName: "",
             institution: "",

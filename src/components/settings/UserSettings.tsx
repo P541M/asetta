@@ -11,6 +11,7 @@ import SettingsNavigation from "./SettingsNavigation";
 import SettingsActions from "./SettingsActions";
 import SettingsMessage from "./SettingsMessage";
 import { useTheme } from "../../contexts/ThemeContext";
+import { DEFAULT_EMOJI } from "../../data/emojis";
 
 interface UserSettingsProps {
   isOpen: boolean;
@@ -37,6 +38,7 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
     type: "success" | "error";
   }>({ text: "", type: "success" });
   const [avatarColor, setAvatarColor] = useState<"blue" | "green" | "purple" | "orange" | "red" | "pink" | "indigo" | "teal">("blue");
+  const [avatarEmoji, setAvatarEmoji] = useState<string>(DEFAULT_EMOJI);
   const [activeTab, setActiveTab] = useState<
     "profile" | "preferences" | "notifications"
   >("profile");
@@ -60,6 +62,7 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
     showNotes: true,
     showStatsBar: false,
     avatarColor: "blue" as "blue" | "green" | "purple" | "orange" | "red" | "pink" | "indigo" | "teal",
+    avatarEmoji: DEFAULT_EMOJI,
     isDarkMode: false,
     emailNotifications: false,
     notificationDaysBefore: 1,
@@ -82,6 +85,7 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
       showNotes !== initialValues.showNotes ||
       showStatsBar !== initialValues.showStatsBar ||
       avatarColor !== initialValues.avatarColor ||
+      avatarEmoji !== initialValues.avatarEmoji ||
       isDarkModeLocal !== initialValues.isDarkMode ||
       emailNotifications !== initialValues.emailNotifications ||
       notificationDaysBefore !== initialValues.notificationDaysBefore ||
@@ -115,6 +119,7 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
           const newHasConsentedToNotifications =
             userData.hasConsentedToNotifications ?? false;
           const newAvatarColor = userData.avatarColor || "blue";
+          const newAvatarEmoji = userData.avatarEmoji || DEFAULT_EMOJI;
 
           // Set current values
           setInstitution(newInstitution);
@@ -130,6 +135,7 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
           setEmail(newEmail);
           setHasConsentedToNotifications(newHasConsentedToNotifications);
           setAvatarColor(newAvatarColor);
+          setAvatarEmoji(newAvatarEmoji);
 
           // Set initial values
           setInitialValues({
@@ -142,6 +148,7 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
             showNotes: newShowNotes,
             showStatsBar: newShowStatsBar,
             avatarColor: newAvatarColor,
+            avatarEmoji: newAvatarEmoji,
             isDarkMode: isDarkMode,
             emailNotifications: newEmailNotifications,
             notificationDaysBefore: newNotificationDaysBefore,
@@ -204,6 +211,7 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
         email: email,
         hasConsentedToNotifications: hasConsentedToNotifications,
         avatarColor: avatarColor,
+        avatarEmoji: avatarEmoji,
         updatedAt: new Date(),
       });
 
@@ -223,6 +231,7 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
         showNotes,
         showStatsBar,
         avatarColor: avatarColor,
+        avatarEmoji: avatarEmoji,
         isDarkMode: isDarkModeLocal,
         emailNotifications,
         notificationDaysBefore,
@@ -271,6 +280,7 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
     setShowNotes(initialValues.showNotes);
     setShowStatsBar(initialValues.showStatsBar);
     setAvatarColor(initialValues.avatarColor);
+    setAvatarEmoji(initialValues.avatarEmoji);
     setIsDarkModeLocal(initialValues.isDarkMode);
     setEmailNotifications(initialValues.emailNotifications);
     setNotificationDaysBefore(initialValues.notificationDaysBefore);
@@ -303,6 +313,8 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
               setStudyProgram={setStudyProgram}
               graduationYear={graduationYear}
               setGraduationYear={setGraduationYear}
+              avatarEmoji={avatarEmoji}
+              setAvatarEmoji={setAvatarEmoji}
               avatarColor={avatarColor}
               setAvatarColor={setAvatarColor}
             />

@@ -11,6 +11,7 @@ import {
   OnboardingSemesterData,
 } from '../types/onboarding';
 import { ExtractionResult } from '../types/upload';
+import { DEFAULT_EMOJI } from '../data/emojis';
 
 // Initial state
 const initialState: OnboardingState = {
@@ -201,6 +202,7 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
         institution: state.userData.institution || '',
         program: state.userData.program || '',
         expectedGraduation: state.userData.expectedGraduation || '',
+        avatarEmoji: state.userData.avatarEmoji || DEFAULT_EMOJI,
       });
 
       // Clear any saved onboarding progress

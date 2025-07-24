@@ -3,6 +3,7 @@ import Image from "next/image";
 interface AvatarProps {
   size?: "xs" | "sm" | "md" | "lg";
   color?: "blue" | "green" | "purple" | "orange" | "red" | "pink" | "indigo" | "teal";
+  emoji?: string;
   className?: string;
 }
 
@@ -20,6 +21,13 @@ const logoSizeClasses = {
   lg: "h-7 w-7",
 };
 
+const emojiSizeClasses = {
+  xs: "text-xs",
+  sm: "text-sm", 
+  md: "text-lg",
+  lg: "text-xl",
+};
+
 const colorClasses = {
   blue: "filter-blue-avatar",
   green: "filter-green-avatar", 
@@ -34,10 +42,29 @@ const colorClasses = {
 const Avatar = ({ 
   size = "md", 
   color = "blue", 
+  emoji,
   className = "" 
 }: AvatarProps) => {
+  const containerClasses = `${sizeClasses[size]} rounded-full flex items-center justify-center bg-light-bg-secondary dark:bg-dark-bg-secondary border border-light-border-primary dark:border-dark-border-primary ${className}`;
+
+  // Render emoji if provided
+  if (emoji) {
+    return (
+      <div className={containerClasses}>
+        <span 
+          className={`${emojiSizeClasses[size]} select-none leading-none`}
+          role="img"
+          aria-label="User avatar emoji"
+        >
+          {emoji}
+        </span>
+      </div>
+    );
+  }
+
+  // Fallback to color-filtered logo system
   return (
-    <div className={`${sizeClasses[size]} rounded-full flex items-center justify-center bg-light-background-secondary dark:bg-dark-background-secondary border border-light-border dark:border-dark-border ${className}`}>
+    <div className={containerClasses}>
       <div className={`${logoSizeClasses[size]} relative flex-shrink-0`}>
         <Image
           src="/images/Asetta_Logo.svg"

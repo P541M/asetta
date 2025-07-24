@@ -85,7 +85,7 @@ const DashboardHeader = ({ onLogout }: DashboardHeaderProps) => {
             onClick={toggleDropdown}
             className="flex items-center space-x-2 text-gray-600 dark:text-dark-text-secondary hover:text-light-button-primary dark:hover:text-dark-button-primary transition-colors duration-200 focus:outline-none bg-white dark:bg-dark-bg-secondary rounded-lg shadow-sm border border-gray-100 dark:border-dark-border-primary px-3 py-2"
           >
-            <Avatar size="sm" color={profile?.avatarColor || "blue"} />
+            <Avatar size="sm" emoji={profile?.avatarEmoji} color={profile?.avatarColor || "blue"} />
             <span className="hidden md:block truncate max-w-[150px] dark:text-dark-text-primary">
               {user.displayName || user.email}
             </span>

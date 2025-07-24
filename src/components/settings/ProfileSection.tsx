@@ -1,5 +1,6 @@
 import { ProfileSectionProps } from "../../types/profile";
 import Avatar from "../ui/Avatar";
+import EmojiPicker from "../ui/EmojiPicker";
 
 const ProfileSection = ({
   displayName,
@@ -10,25 +11,10 @@ const ProfileSection = ({
   setStudyProgram,
   graduationYear,
   setGraduationYear,
-  avatarColor,
-  setAvatarColor,
+  avatarEmoji,
+  setAvatarEmoji,
 }: ProfileSectionProps) => {
   const currentYear = new Date().getFullYear();
-
-  const colorOptions: Array<{
-    value: "blue" | "green" | "purple" | "orange" | "red" | "pink" | "indigo" | "teal";
-    label: string;
-    bgColor: string;
-  }> = [
-    { value: "blue", label: "Blue", bgColor: "bg-blue-500" },
-    { value: "green", label: "Green", bgColor: "bg-green-500" },
-    { value: "purple", label: "Purple", bgColor: "bg-purple-500" },
-    { value: "orange", label: "Orange", bgColor: "bg-orange-500" },
-    { value: "red", label: "Red", bgColor: "bg-red-500" },
-    { value: "pink", label: "Pink", bgColor: "bg-pink-500" },
-    { value: "indigo", label: "Indigo", bgColor: "bg-indigo-500" },
-    { value: "teal", label: "Teal", bgColor: "bg-teal-500" },
-  ];
 
   return (
     <div className="space-y-8">
@@ -38,55 +24,32 @@ const ProfileSection = ({
           Profile Information
         </h3>
         <p className="text-sm text-light-text-secondary dark:text-dark-text-secondary mt-1">
-          Update your profile details and avatar color
+          Update your profile details and emoji avatar
         </p>
       </div>
 
       {/* Avatar Section */}
       <div className="flex flex-col items-center space-y-6">
         <div className="flex flex-col items-center space-y-4">
-          <Avatar size="lg" color={avatarColor} className="shadow-lg" />
+          <Avatar size="lg" emoji={avatarEmoji} className="shadow-lg" />
           <div className="text-center">
             <p className="text-sm text-light-text-secondary dark:text-dark-text-secondary">
-              Your avatar color
+              Your profile emoji
             </p>
             <p className="text-xs text-light-text-tertiary dark:text-dark-text-tertiary mt-1">
-              Choose from the colors below to personalize your avatar
+              Choose an emoji to represent yourself
             </p>
           </div>
         </div>
 
-        {/* Color Picker */}
-        <div className="space-y-3">
-          <label className="block text-sm font-medium text-light-text-primary dark:text-dark-text-primary text-center">
-            Avatar Color
-          </label>
-          <div className="flex flex-wrap justify-center gap-3">
-            {colorOptions.map((color) => (
-              <button
-                key={color.value}
-                type="button"
-                onClick={() => setAvatarColor(color.value)}
-                className={`group relative w-12 h-12 rounded-full border-3 transition-all duration-200 hover:scale-110 ${
-                  avatarColor === color.value
-                    ? "border-light-button-primary dark:border-dark-button-primary shadow-lg"
-                    : "border-light-border-primary dark:border-dark-border-primary hover:border-light-button-primary dark:hover:border-dark-button-primary"
-                }`}
-                aria-label={`Select ${color.label} color`}
-              >
-                <div className="w-full h-full rounded-full overflow-hidden">
-                  <Avatar size="md" color={color.value} className="w-full h-full" />
-                </div>
-                {avatarColor === color.value && (
-                  <div className="absolute -top-1 -right-1 w-5 h-5 bg-light-button-primary dark:bg-dark-button-primary rounded-full flex items-center justify-center">
-                    <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
-                  </div>
-                )}
-              </button>
-            ))}
-          </div>
+        {/* Emoji Picker */}
+        <div className="w-full max-w-sm">
+          <EmojiPicker
+            selectedEmoji={avatarEmoji}
+            onEmojiSelect={setAvatarEmoji}
+            variant="inline"
+            className="w-full"
+          />
         </div>
       </div>
 
