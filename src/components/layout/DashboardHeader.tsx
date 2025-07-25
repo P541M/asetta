@@ -21,6 +21,7 @@ const DashboardHeader = ({ onLogout }: DashboardHeaderProps) => {
   const [showSettings, setShowSettings] = useState(false);
   const [greeting, setGreeting] = useState("");
   const [subtitle, setSubtitle] = useState("");
+  const [isHeaderReady, setIsHeaderReady] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const avatarRef = useRef<HTMLButtonElement>(null);
   const greetingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -28,9 +29,14 @@ const DashboardHeader = ({ onLogout }: DashboardHeaderProps) => {
 
   // Initialize and update greeting
   useEffect(() => {
+    // Reset ready state when user/profile changes
+    setIsHeaderReady(false);
+
     const updateGreeting = () => {
       setGreeting(getPersonalizedGreeting(user, profile));
       setSubtitle(getRotatingSubtitle());
+      // Small delay to ensure smooth animation
+      setTimeout(() => setIsHeaderReady(true), 50);
     };
 
     // Initial greeting
@@ -116,9 +122,18 @@ const DashboardHeader = ({ onLogout }: DashboardHeaderProps) => {
     <>
       <div className="bg-light-bg-primary dark:bg-dark-bg-secondary border-b border-light-border-primary dark:border-dark-border-primary">
         <div className="max-w-7xl mx-auto px-4 md:px-6 py-4">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between min-h-[4rem]">
             {/* Left side - Personalized Greeting */}
-            <div className="flex items-center space-x-3">
+            <div
+              className={`flex items-center space-x-3 ${
+                isHeaderReady ? "animate-fade-in-up" : "opacity-0"
+              }`}
+            >
+              {/* <Avatar 
+                size="md" 
+                emoji={profile?.avatarEmoji} 
+                className="ring-2 ring-light-button-primary dark:ring-dark-button-primary ring-opacity-20"
+              /> */}
               <div className="flex flex-col">
                 <h1
                   className="text-2xl md:text-3xl font-bold text-light-text-primary dark:text-dark-text-primary transition-all duration-300"
@@ -134,7 +149,11 @@ const DashboardHeader = ({ onLogout }: DashboardHeaderProps) => {
             </div>
 
             {/* Right side - User Settings Menu */}
-            <div className="relative">
+            <div
+              className={`relative ${
+                isHeaderReady ? "animate-fade-in-up" : "opacity-0"
+              }`}
+            >
               <button
                 ref={avatarRef}
                 onClick={toggleDropdown}
