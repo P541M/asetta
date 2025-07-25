@@ -107,6 +107,13 @@ const Header = () => {
               <div className="absolute bottom-0 left-1/2 w-0 h-0.5 bg-primary-600 group-hover:w-1/2 group-hover:left-1/4 transition-all duration-300"></div>
             </Link>
             <Link
+              href="/about"
+              className="relative px-4 py-2 text-light-text-secondary hover:text-primary-600 transition-all duration-300 text-sm font-semibold rounded-lg hover:bg-light-hover-primary/80 group"
+            >
+              About
+              <div className="absolute bottom-0 left-1/2 w-0 h-0.5 bg-primary-600 group-hover:w-1/2 group-hover:left-1/4 transition-all duration-300"></div>
+            </Link>
+            <Link
               href="/contact"
               className="relative px-4 py-2 text-light-text-secondary hover:text-primary-600 transition-all duration-300 text-sm font-semibold rounded-lg hover:bg-light-hover-primary/80 group"
             >
@@ -233,6 +240,15 @@ const Header = () => {
                     >
                       <span className="group-hover:translate-x-1 transition-transform duration-300">
                         Pricing
+                      </span>
+                    </Link>
+                    <Link
+                      href="/about"
+                      className="group flex items-center px-4 py-3.5 text-light-text-secondary hover:text-primary-600 hover:bg-light-hover-primary/80 rounded-xl transition-all duration-300 text-base font-semibold"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      <span className="group-hover:translate-x-1 transition-transform duration-300">
+                        About
                       </span>
                     </Link>
                     <Link
