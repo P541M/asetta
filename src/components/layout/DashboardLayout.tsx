@@ -356,22 +356,14 @@ const DashboardLayout = ({
   }
 
   return (
-    <div className="min-h-safe-screen bg-light-bg-secondary dark:bg-dark-bg-primary transition-theme pt-safe pb-safe">
+    <div className="min-h-safe-screen bg-light-bg-secondary dark:bg-dark-bg-primary transition-theme">
       <Head>
         <title>{title}</title>
         <meta name="description" content={description} />
       </Head>
       <DashboardHeader onLogout={handleLogout} />
-      <div className="p-4 md:p-6 pl-safe pr-safe">
+      <div className="p-4 md:p-6 pl-safe pr-safe pt-safe pb-safe">
         <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-7">
-            <div>
-              <h1 className="text-3xl font-bold text-light-button-primary dark:text-dark-button-primary">
-                Dashboard
-              </h1>
-            </div>
-          </div>
-
           <SemesterTabs
             selectedSemester={selectedSemester}
             onSelect={setSelectedSemester}

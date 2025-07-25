@@ -39,7 +39,7 @@ const SettingsPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-light-bg-secondary dark:bg-dark-bg-primary transition-theme pt-safe pb-safe">
+    <div className="min-h-safe-screen bg-light-bg-secondary dark:bg-dark-bg-primary transition-theme">
       <Head>
         <title>Settings - Asetta</title>
         <meta
@@ -48,7 +48,7 @@ const SettingsPage = () => {
         />
       </Head>
       <DashboardHeader onLogout={handleLogout} />
-      <div className="p-4 md:p-6 pl-safe pr-safe">
+      <div className="p-4 md:p-6 pl-safe pr-safe pt-safe pb-safe">
         <div className="max-w-7xl mx-auto">
           {/* Page Header */}
           <div className="mb-8">
