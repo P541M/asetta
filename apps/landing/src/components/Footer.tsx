@@ -2,10 +2,15 @@ import Link from "next/link";
 import Logo from "./Logo";
 
 const footerLinks = {
-  mainLinks: [
+  productLinks: [
     { href: "/features", label: "Features" },
-    { href: "/contact", label: "Contact" },
     { href: "/pricing", label: "Pricing" },
+    { href: "/contact", label: "Contact" },
+  ],
+  companyLinks: [
+    { href: "/about", label: "About" },
+    { href: "/story", label: "Our Story" },
+    { href: "/founders-note", label: "Founder's Note" },
   ],
   legalLinks: [
     { href: "/privacy", label: "Privacy Policy" },
@@ -73,14 +78,36 @@ const Footer = () => {
             </div>
 
             {/* Navigation Links */}
-            <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-3 gap-8 lg:gap-12">
-              {/* Quick Links */}
+            <div className="lg:col-span-2 grid grid-cols-2 sm:grid-cols-4 gap-8 lg:gap-12">
+              {/* Product Links */}
               <div className="space-y-6">
                 <h4 className="text-sm font-semibold text-gray-900 uppercase tracking-wider">
                   Product
                 </h4>
                 <ul className="space-y-4">
-                  {footerLinks.mainLinks.map((link) => (
+                  {footerLinks.productLinks.map((link) => (
+                    <li key={link.href}>
+                      <Link
+                        href={link.href}
+                        className="group relative text-gray-600 hover:text-primary-600 transition-all duration-300 text-base font-medium"
+                      >
+                        <span className="group-hover:translate-x-1 transition-transform duration-300 inline-block">
+                          {link.label}
+                        </span>
+                        <div className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary-600 group-hover:w-full transition-all duration-300"></div>
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* Company Links */}
+              <div className="space-y-6">
+                <h4 className="text-sm font-semibold text-gray-900 uppercase tracking-wider">
+                  Company
+                </h4>
+                <ul className="space-y-4">
+                  {footerLinks.companyLinks.map((link) => (
                     <li key={link.href}>
                       <Link
                         href={link.href}

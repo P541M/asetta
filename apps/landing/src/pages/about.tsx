@@ -51,9 +51,9 @@ export default function AboutPage() {
             </p>
           </motion.div>
 
-          {/* Main Story Section */}
+          {/* Main Content Section */}
           <div className="space-y-16">
-            {/* The Transition */}
+            {/* Our Mission */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -64,136 +64,54 @@ export default function AboutPage() {
               
               <div className="relative z-10">
                 <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6 font-heading">
-                  The Educational Journey
+                  Our Mission
                 </h2>
                 <div className="prose prose-lg prose-gray max-w-none">
                   <p className="text-lg md:text-xl text-gray-700 leading-relaxed mb-6">
-                    From elementary school through high school, our entire educational journey was guided. Teachers told us exactly when assignments were due, 
-                    what to study, and how to manage our time. Parents, counselors, and the system itself provided structure at every step.
+                    At Asetta, we believe that the transition to post-secondary education shouldn't mean losing the academic support you need. 
+                    While students gain independence, they also face more complex coursework, tighter deadlines, and increased responsibility—often without the structured guidance they've always had.
                   </p>
                   <p className="text-lg md:text-xl text-gray-700 leading-relaxed mb-6">
-                    Then post-secondary education arrives—university, college, trade school—and suddenly that structure disappears. 
-                    No more daily check-ins. No more guided schedules. You're expected to independently manage complex coursework, deadlines, and academic goals.
+                    We're here to bridge that gap. Asetta uses AI to help students track deadlines, organize assignments, and manage their academic workload with less effort and stress. 
+                    Our intelligent system extracts assignment details from syllabi, predicts upcoming deadlines, and provides personalized insights.
                   </p>
                   <p className="text-lg md:text-xl text-gray-700 leading-relaxed">
-                    <strong className="text-primary-600">But why should support vanish right when the academic challenges become most demanding?</strong>
+                    <strong className="text-primary-600">We're here when you need us, until you don't need us anymore.</strong>
                   </p>
                 </div>
               </div>
             </motion.div>
 
-            {/* The Problem */}
+            {/* Meet the Founder */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.4 }}
               className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 md:p-12 shadow-lg border border-gray-200/50 relative overflow-hidden"
             >
-              <div className="absolute inset-0 bg-gradient-to-br from-orange-50/30 via-transparent to-orange-50/10 opacity-50"></div>
+              <div className="absolute inset-0 bg-gradient-to-br from-gray-50/30 via-transparent to-gray-50/10 opacity-50"></div>
               
-              <div className="relative z-10">
+              <div className="relative z-10 text-center">
                 <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6 font-heading">
-                  The Independence Challenge
+                  Meet Our Founder
                 </h2>
-                <div className="prose prose-lg prose-gray max-w-none">
+                <div className="max-w-2xl mx-auto">
                   <p className="text-lg md:text-xl text-gray-700 leading-relaxed mb-6">
-                    Post-secondary life is overwhelming. New environments, new freedoms, increased responsibility—and suddenly you're 
-                    expected to independently track multiple courses, assignments, and deadlines without the support systems you've always had.
-                  </p>
-                  <p className="text-lg md:text-xl text-gray-700 leading-relaxed mb-6">
-                    Many students, like myself when I started, struggle with this transition. There are countless new adjustments: 
-                    managing complex schedules, understanding different course structures, balancing academic and personal responsibilities, 
-                    all while trying to build the organizational skills that were never explicitly taught.
-                  </p>
-                  <p className="text-lg md:text-xl text-gray-700 leading-relaxed">
-                    <strong className="text-orange-600">When life gets overwhelming, even the most motivated students can struggle to stay organized.</strong>
-                  </p>
-                </div>
-              </div>
-            </motion.div>
-
-            {/* The Solution */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.6 }}
-              className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 md:p-12 shadow-lg border border-gray-200/50 relative overflow-hidden"
-            >
-              <div className="absolute inset-0 bg-gradient-to-br from-green-50/30 via-transparent to-green-50/10 opacity-50"></div>
-              
-              <div className="relative z-10">
-                <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6 font-heading">
-                  Our Approach
-                </h2>
-                <div className="prose prose-lg prose-gray max-w-none">
-                  <p className="text-lg md:text-xl text-gray-700 leading-relaxed mb-6">
-                    That's where Asetta comes in. We're here to help you navigate the crazy transition to post-secondary life 
-                    and stay organized through the challenges that come with academic independence.
+                    Asetta was created by Eleazar, a student who experienced firsthand the overwhelming transition to post-secondary life. 
+                    After struggling with academic organization during his first year, he built Asetta as the support system he wished he had.
                   </p>
                   <p className="text-lg md:text-xl text-gray-700 leading-relaxed mb-6">
-                    Asetta uses AI to help you track deadlines, organize assignments, and manage your academic workload with less effort and stress. 
-                    Our intelligent system can extract assignment details from your syllabi, predict upcoming deadlines, and provide personalized insights—so you can focus 
-                    on learning and enjoying your post-secondary experience. Whether you're a first-year finding your footing or 
-                    a senior managing complex coursework, we're here to support your academic success.
+                    Today, as a 4th-year student, Eleazar still uses Asetta daily and continues to develop features based on real student needs and challenges.
                   </p>
-                  <p className="text-lg md:text-xl text-gray-700 leading-relaxed">
-                    <strong className="text-green-600">We're always available when academic life gets overwhelming, helping you stay organized and in control.</strong>
-                  </p>
-                </div>
-              </div>
-            </motion.div>
-
-            {/* Personal Message */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.7 }}
-              className="relative"
-            >
-              <div className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-3xl p-8 md:p-10 shadow-sm border border-gray-200/30 relative overflow-hidden">
-                {/* Subtle decorative elements */}
-                <div className="absolute top-4 left-4 w-8 h-8 opacity-10">
-                  <svg viewBox="0 0 24 24" fill="currentColor" className="text-primary-600">
-                    <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h4v10h-10z"/>
-                  </svg>
-                </div>
-                
-                <div className="relative z-10">
-                  <div className="max-w-3xl mx-auto text-center">
-                    <h3 className="text-2xl md:text-3xl font-bold text-gray-800 mb-6 font-heading">
-                      A Personal Note
-                    </h3>
-                    
-                    <div className="prose prose-lg max-w-none">
-                      <p className="text-lg md:text-xl text-gray-700 leading-relaxed mb-6 italic">
-                        "I was that kid who felt completely overwhelmed when I started post-secondary. 
-                        The jump from having everything structured and guided to suddenly being responsible for managing 
-                        complex course loads, multiple deadlines, and academic planning was honestly terrifying."
-                      </p>
-                      
-                      <p className="text-lg md:text-xl text-gray-700 leading-relaxed mb-6">
-                        I spent my first year constantly stressed about missing assignments, forgetting deadlines, 
-                        and feeling like I was always playing catch-up. I realized I wasn't alone—so many of my friends 
-                        were struggling with the same overwhelming transition. We had the intelligence and motivation to succeed, 
-                        but we just didn't have the organizational systems to handle this new level of academic independence.
-                      </p>
-                      
-                      <p className="text-lg md:text-xl text-gray-700 leading-relaxed mb-6">
-                        That's why I built Asetta. Not as another productivity app, but as the support system I wish I had 
-                        during that crazy transition. If my experience can help even one student feel less overwhelmed 
-                        and more in control of their academic journey, then every hour spent building this platform was worth it.
-                      </p>
-                    </div>
-                    
-                    <div className="mt-8 pt-6 border-t border-gray-300/50">
-                      <p className="text-lg font-semibold text-gray-600">
-                        — Eleazar, Founder
-                      </p>
-                      <p className="text-sm text-gray-500 mt-1">
-                        Still using Asetta as a 4th-year student
-                      </p>
-                    </div>
-                  </div>
+                  <Link
+                    href="/founders-note"
+                    className="inline-flex items-center text-primary-600 hover:text-primary-700 font-semibold"
+                  >
+                    Read Eleazar's full story
+                    <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </Link>
                 </div>
               </div>
             </motion.div>
