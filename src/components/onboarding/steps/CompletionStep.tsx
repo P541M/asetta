@@ -32,9 +32,8 @@ export function CompletionStep() {
           You&apos;re all set! 🎉
         </h1>
 
-        <p className="text-xl text-light-text-secondary dark:text-dark-text-secondary leading-relaxed">
-          Welcome to Asetta! Your academic planning assistant is ready to help
-          you stay organized and never miss another deadline.
+        <p className="text-lg text-light-text-secondary dark:text-dark-text-secondary">
+          Your academic planning assistant is ready to help you stay organized.
         </p>
       </div>
 

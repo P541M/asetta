@@ -33,8 +33,7 @@ export function UploadStep() {
           Upload your course outlines
         </h2>
         <p className="text-light-text-secondary dark:text-dark-text-secondary max-w-2xl mx-auto">
-          Upload your course syllabus, outline, or assignment schedule files. Our AI will automatically 
-          extract all assessment dates, weights, and requirements.
+          Upload your course files and we&apos;ll automatically extract your assessments.
         </p>
       </div>
 
@@ -63,12 +62,8 @@ export function UploadStep() {
               <h4 className="font-medium text-green-800 dark:text-green-300 mb-1">
                 Upload successful!
               </h4>
-              <p className="text-sm text-green-700 dark:text-green-400 mb-2">
-                We processed {state.extractionResults.processedFiles} file(s) and found{' '}
-                {state.extractionResults.totalAssessments} assessment(s).
-              </p>
-              <p className="text-xs text-green-600 dark:text-green-500">
-                You can always upload more files later from your dashboard.
+              <p className="text-sm text-green-700 dark:text-green-400">
+                Found {state.extractionResults.totalAssessments} assessment(s) from {state.extractionResults.processedFiles} file(s).
               </p>
             </div>
           </div>

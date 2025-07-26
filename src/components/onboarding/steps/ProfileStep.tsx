@@ -42,11 +42,10 @@ export function ProfileStep() {
           </svg>
         </div>
         <h2 className="text-2xl font-bold text-light-text-primary dark:text-dark-text-primary mb-2">
-          Tell us about yourself
+          Set up your profile
         </h2>
         <p className="text-light-text-secondary dark:text-dark-text-secondary">
-          Help us personalize your experience and better organize your academic
-          journey.
+          Add some basic info to personalize your experience.
         </p>
       </div>
 
@@ -56,9 +55,6 @@ export function ProfileStep() {
         <div className="text-center">
           <p className="text-sm text-light-text-secondary dark:text-dark-text-secondary">
             Choose your profile emoji
-          </p>
-          <p className="text-xs text-light-text-tertiary dark:text-dark-text-tertiary mt-1">
-            This will represent you throughout the platform
           </p>
         </div>
         <div className="w-full max-w-sm">
@@ -121,34 +117,6 @@ export function ProfileStep() {
           />
         </div>
 
-        {/* Help Text */}
-        <div className="bg-light-bg-secondary dark:bg-dark-bg-secondary rounded-lg p-4 border border-light-border-primary dark:border-dark-border-primary">
-          <div className="flex items-start space-x-3">
-            <svg
-              className="w-5 h-5 text-light-button-primary dark:text-dark-button-primary flex-shrink-0 mt-0.5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-            <div>
-              <h4 className="text-sm font-medium text-light-text-primary dark:text-dark-text-primary mb-1">
-                Why do we ask for this information?
-              </h4>
-              <p className="text-xs text-light-text-secondary dark:text-dark-text-secondary">
-                This helps us provide better recommendations and organize your
-                academic planning. You can always update this information later
-                in your profile settings.
-              </p>
-            </div>
-          </div>
-        </div>
       </div>
 
       <StepNavigation
