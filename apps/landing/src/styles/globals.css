@@ -180,17 +180,17 @@
 
 /* Advanced Overlay Scrollbar Styling */
 @layer components {
-  /* Prevent layout shift when scrollbars appear */
+  /* Remove gutter to enable true overlay scrollbars */
   * {
-    scrollbar-gutter: stable;
   }
 
   /* WebKit Scrollbars (Chrome, Safari, Edge) */
   ::-webkit-scrollbar {
     width: 8px;
     height: 8px;
-    /* Make scrollbar overlay content */
+    /* Enable overlay scrollbars that don't take up layout space */
     position: absolute;
+    z-index: 9999;
   }
 
   ::-webkit-scrollbar-track {
