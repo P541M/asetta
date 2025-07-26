@@ -245,16 +245,16 @@
 
 /* Overlay Scrollbar Styles */
 * {
-  /* Prevent layout shift when scrollbars appear */
-  scrollbar-gutter: stable;
+  /* Remove gutter to enable true overlay scrollbars */
 }
 
 /* WebKit Scrollbars (Chrome, Safari, Edge) */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
-  /* Make scrollbar overlay content */
+  /* Enable overlay scrollbars that don't take up layout space */
   position: absolute;
+  z-index: 9999;
 }
 
 ::-webkit-scrollbar-track {
