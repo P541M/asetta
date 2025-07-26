@@ -17,6 +17,70 @@ import { formatLocalDateTime, getDaysUntil } from "../../utils/dateUtils";
 import { Assessment, AssessmentsTableProps } from "../../types/assessment";
 import ConfirmationModal from "../common/ConfirmationModal";
 import StatusSelect from "../ui/StatusSelect";
+import CustomSelect, { type SelectOption } from "../ui/CustomSelect";
+
+const filterOptions: SelectOption[] = [
+  {
+    value: "all",
+    label: "All Tasks",
+    icon: (
+      <svg
+        className="w-4 h-4"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth="2"
+          d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+        />
+      </svg>
+    ),
+    colorClass: "text-light-text-primary dark:text-dark-text-primary",
+  },
+  {
+    value: "not_submitted",
+    label: "Not Submitted",
+    icon: (
+      <svg
+        className="w-4 h-4"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth="2"
+          d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+        />
+      </svg>
+    ),
+    colorClass: "text-amber-600 dark:text-amber-400",
+  },
+  {
+    value: "submitted",
+    label: "Submitted",
+    icon: (
+      <svg
+        className="w-4 h-4"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth="2"
+          d="M5 13l4 4L19 7"
+        />
+      </svg>
+    ),
+    colorClass: "text-emerald-600 dark:text-emerald-400",
+  },
+];
 
 const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
   assessments,
@@ -426,15 +490,14 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
           Your Assessments
         </h2>
         <div className="flex space-x-2 items-center">
-          <select
+          <CustomSelect
             value={filter}
-            onChange={(e) => setFilter(e.target.value)}
-            className="input bg-white dark:bg-dark-bg-tertiary max-w-xs py-1.5 px-3 text-md transition-all duration-300 hover:shadow-sm dark:text-dark-text-primary dark:border-dark-border-primary"
-          >
-            <option value="all">All Tasks</option>
-            <option value="not_submitted">Not Submitted</option>
-            <option value="submitted">Submitted</option>
-          </select>
+            onChange={setFilter}
+            options={filterOptions}
+            placeholder="Filter tasks"
+            className="max-w-xs"
+            size="md"
+          />
         </div>
       </div>
 

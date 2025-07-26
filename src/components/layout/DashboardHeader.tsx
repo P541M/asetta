@@ -4,6 +4,7 @@ import UserSettings from "../settings/UserSettings";
 import { useRouter } from "next/router";
 import Avatar from "../ui/Avatar";
 import { useUserProfile } from "../../hooks/useUserProfile";
+import UserMenuDropdown from "../ui/UserMenuDropdown";
 import {
   getPersonalizedGreeting,
   getMillisecondsToNextGreetingUpdate,
@@ -22,7 +23,6 @@ const DashboardHeader = ({ onLogout }: DashboardHeaderProps) => {
   const [greeting, setGreeting] = useState("");
   const [subtitle, setSubtitle] = useState("");
   const [isHeaderReady, setIsHeaderReady] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
   const avatarRef = useRef<HTMLButtonElement>(null);
   const greetingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const router = useRouter();
@@ -61,24 +61,6 @@ const DashboardHeader = ({ onLogout }: DashboardHeaderProps) => {
     };
   }, [user, profile]);
 
-  // Handle click outside to close user dropdown
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      // Only close if click is outside both the dropdown and avatar button
-      if (
-        showDropdown &&
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node) &&
-        avatarRef.current &&
-        !avatarRef.current.contains(event.target as Node)
-      ) {
-        setShowDropdown(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [showDropdown]);
 
   // Handle logout with proper dropdown closing
   const handleLogout = async (e: React.MouseEvent) => {
@@ -183,66 +165,14 @@ const DashboardHeader = ({ onLogout }: DashboardHeaderProps) => {
                 </svg>
               </button>
 
-              {showDropdown && (
-                <div
-                  ref={dropdownRef}
-                  className="absolute right-0 mt-2 w-48 bg-light-bg-primary dark:bg-dark-bg-secondary rounded-lg shadow-lg py-1 z-50 animate-fade-in-down border border-light-border-primary dark:border-dark-border-primary"
-                  role="menu"
-                  aria-orientation="vertical"
-                  aria-labelledby="user-menu"
-                >
-                  <div className="px-4 py-2 text-sm text-light-text-tertiary dark:text-dark-text-tertiary border-b border-light-border-primary dark:border-dark-border-primary">
-                    Signed in as
-                    <div className="font-medium text-light-text-primary dark:text-dark-text-primary truncate">
-                      {user?.email}
-                    </div>
-                  </div>
-
-                  {/* Settings option */}
-                  <button
-                    onClick={openSettings}
-                    className="flex w-full items-center px-4 py-2 text-sm text-light-text-primary dark:text-dark-text-primary hover:bg-light-hover-primary dark:hover:bg-dark-hover-primary transition-colors duration-150"
-                    role="menuitem"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-4 w-4 mr-2 text-light-text-tertiary dark:text-dark-text-tertiary"
-                      viewBox="0 0 20 20"
-                      fill="currentColor"
-                      aria-hidden="true"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                    Settings
-                  </button>
-
-                  {/* Logout option */}
-                  <button
-                    onClick={handleLogout}
-                    className="flex w-full items-center px-4 py-2 text-sm text-light-text-primary dark:text-dark-text-primary hover:bg-light-hover-primary dark:hover:bg-dark-hover-primary transition-colors duration-150 border-t border-light-border-primary dark:border-dark-border-primary"
-                    role="menuitem"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-4 w-4 mr-2 text-light-text-tertiary dark:text-dark-text-tertiary"
-                      viewBox="0 0 20 20"
-                      fill="currentColor"
-                      aria-hidden="true"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M3 3a1 1 0 00-1 1v12a1 1 0 001 1h12a1 1 0 001-1V4a1 1 0 00-1-1H3zm11 3a1 1 0 10-2 0v6.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L14 12.586V6z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                    Logout
-                  </button>
-                </div>
-              )}
+              <UserMenuDropdown
+                isOpen={showDropdown}
+                onClose={() => setShowDropdown(false)}
+                userEmail={user?.email || ""}
+                onSettingsClick={openSettings}
+                onLogoutClick={handleLogout}
+                avatarRef={avatarRef}
+              />
             </div>
           </div>
         </div>

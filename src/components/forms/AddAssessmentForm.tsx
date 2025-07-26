@@ -3,6 +3,86 @@ import { useAuth } from "../../contexts/AuthContext";
 import { addDoc } from "firebase/firestore";
 import { getAssessmentsRef } from "../../lib/firebaseUtils";
 import { AddAssessmentFormProps } from "../../types/assessment";
+import CustomSelect, { type SelectOption } from "../ui/CustomSelect";
+
+const statusOptions: SelectOption[] = [
+  {
+    value: "Not started",
+    label: "Not Started",
+    icon: (
+      <svg
+        className="w-4 h-4"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <circle cx="12" cy="12" r="10" strokeWidth="2" />
+        <path strokeWidth="2" d="M12 6v6l4 2" />
+      </svg>
+    ),
+    colorClass: "text-gray-600 dark:text-gray-400",
+    bgClass: "bg-gray-100 dark:bg-gray-800",
+  },
+  {
+    value: "In progress",
+    label: "In Progress",
+    icon: (
+      <svg
+        className="w-4 h-4"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <circle cx="12" cy="12" r="10" strokeWidth="2" />
+        <polyline points="12,6 12,12 16,14" strokeWidth="2" />
+      </svg>
+    ),
+    colorClass: "text-amber-600 dark:text-amber-400",
+    bgClass: "bg-amber-100 dark:bg-amber-900/30",
+  },
+  {
+    value: "Submitted",
+    label: "Submitted",
+    icon: (
+      <svg
+        className="w-4 h-4"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth="2"
+          d="M5 13l4 4L19 7"
+        />
+      </svg>
+    ),
+    colorClass: "text-emerald-600 dark:text-emerald-400",
+    bgClass: "bg-emerald-100 dark:bg-emerald-900/30",
+  },
+  {
+    value: "Missed",
+    label: "Missed",
+    icon: (
+      <svg
+        className="w-4 h-4"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth="2"
+          d="M6 18L18 6M6 6l12 12"
+        />
+      </svg>
+    ),
+    colorClass: "text-red-600 dark:text-red-400",
+    bgClass: "bg-red-100 dark:bg-red-900/30",
+  },
+];
 
 const AddAssessmentForm = ({
   semesterId,
@@ -201,18 +281,13 @@ const AddAssessmentForm = ({
                 >
                   Status
                 </label>
-                <select
-                  id="status"
-                  name="status"
+                <CustomSelect
                   value={formData.status}
-                  onChange={handleChange}
-                  className="input"
-                >
-                  <option value="Not started">Not Started</option>
-                  <option value="In progress">In Progress</option>
-                  <option value="Submitted">Submitted</option>
-                  <option value="Missed">Missed</option>
-                </select>
+                  onChange={(value) => setFormData((prev) => ({ ...prev, status: value }))}
+                  options={statusOptions}
+                  placeholder="Select status"
+                  className="w-full"
+                />
               </div>
           </div>
           <div className="flex items-center justify-end pt-4">
