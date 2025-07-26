@@ -16,6 +16,7 @@ import {
 import { formatLocalDateTime, getDaysUntil } from "../../utils/dateUtils";
 import { Assessment, AssessmentsTableProps } from "../../types/assessment";
 import ConfirmationModal from "../common/ConfirmationModal";
+import StatusSelect from "../ui/StatusSelect";
 
 const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
   assessments,
@@ -448,19 +449,15 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
               </span>
               <div className="flex items-center space-x-2">
                 {!showBulkStatusUpdate ? (
-                  <select
-                    onChange={(e) => handleStatusSelect(e.target.value)}
-                    className="input py-1.5 px-3 text-sm"
-                    defaultValue=""
-                  >
-                    <option value="" disabled>
-                      Update Status
-                    </option>
-                    <option value="Not started">Not Started</option>
-                    <option value="In progress">In Progress</option>
-                    <option value="Submitted">Submitted</option>
-                    <option value="Missed">Missed</option>
-                  </select>
+                  <div className="min-w-[140px]">
+                    <StatusSelect
+                      value={null}
+                      onChange={(value) => handleStatusSelect(value)}
+                      size="sm"
+                      placeholder="Update Status"
+                      className="text-sm"
+                    />
+                  </div>
                 ) : (
                   <div className="flex items-center space-x-2">
                     <span className="text-sm text-light-text-secondary dark:text-dark-text-secondary">
@@ -599,17 +596,12 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                         onChange={() => toggleRowSelection(assessment.id || "")}
                         className="h-4 w-4 rounded border-gray-300 dark:border-dark-border-primary text-light-button-primary dark:text-dark-button-primary focus:ring-light-focus-ring dark:focus:ring-dark-focus-ring"
                       />
-                      <select
-                        name="status"
+                      <StatusSelect
                         value={editFormData.status}
-                        onChange={handleEditFormChange}
-                        className="input py-1 px-2 text-md transition-all duration-300 w-full dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border-primary rounded-md"
-                      >
-                        <option value="Not started">Not Started</option>
-                        <option value="In progress">In Progress</option>
-                        <option value="Submitted">Submitted</option>
-                        <option value="Missed">Missed</option>
-                      </select>
+                        onChange={(value) => setEditFormData(prev => ({ ...prev, status: value }))}
+                        size="sm"
+                        className="flex-1"
+                      />
                     </div>
                     <div className="col-span-12 lg:col-span-2">
                       <input
@@ -715,32 +707,15 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                         onChange={() => toggleRowSelection(assessment.id || "")}
                         className="h-4 w-4 rounded border-gray-300 dark:border-dark-border-primary text-light-button-primary dark:text-dark-button-primary focus:ring-light-focus-ring dark:focus:ring-dark-focus-ring"
                       />
-                      <select
+                      <StatusSelect
                         value={assessment.status}
-                        onChange={(e) =>
+                        onChange={(value) =>
                           assessment.id &&
-                          handleStatusChange(
-                            assessment.id,
-                            e.target.value as
-                              | "Not started"
-                              | "In progress"
-                              | "Submitted"
-                              | "Missed"
-                          )
+                          handleStatusChange(assessment.id, value)
                         }
-                        className="py-0.5 px-3 text-md rounded-lg transition-all duration-300 bg-white dark:bg-dark-bg-tertiary text-gray-700 dark:text-dark-text-primary border border-gray-200 dark:border-dark-border-primary appearance-none pr-8 relative"
-                        style={{
-                          backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236B7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`,
-                          backgroundPosition: "right 0.5rem center",
-                          backgroundRepeat: "no-repeat",
-                          backgroundSize: "1.5em 1.5em",
-                        }}
-                      >
-                        <option value="Not started">Not Started</option>
-                        <option value="In progress">In Progress</option>
-                        <option value="Submitted">Submitted</option>
-                        <option value="Missed">Missed</option>
-                      </select>
+                        size="sm"
+                        className="flex-1"
+                      />
                     </div>
                     <div className="col-span-12 lg:col-span-2">
                       <h3 className="font-medium text-light-text-primary dark:text-dark-text-primary text-sm">
