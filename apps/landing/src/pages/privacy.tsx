@@ -93,31 +93,31 @@ export default function PrivacyPage() {
               <h2 className="text-3xl font-bold text-gray-900 mb-4">Information We Collect</h2>
               <div className="space-y-3">
                 <div className="flex items-start">
-                  <div className="w-2 h-2 bg-primary-600 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
                   <span className="text-gray-700">Account information (name, email, password)</span>
                 </div>
                 <div className="flex items-start">
-                  <div className="w-2 h-2 bg-primary-600 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
                   <span className="text-gray-700">Academic information (courses, assignments, grades, deadlines)</span>
                 </div>
                 <div className="flex items-start">
-                  <div className="w-2 h-2 bg-primary-600 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
                   <span className="text-gray-700">PDF files uploaded for assessment extraction</span>
                 </div>
                 <div className="flex items-start">
-                  <div className="w-2 h-2 bg-primary-600 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
                   <span className="text-gray-700">Rich text notes and personal academic content</span>
                 </div>
                 <div className="flex items-start">
-                  <div className="w-2 h-2 bg-primary-600 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
                   <span className="text-gray-700">Email preferences and notification settings</span>
                 </div>
                 <div className="flex items-start">
-                  <div className="w-2 h-2 bg-primary-600 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
                   <span className="text-gray-700">Usage data, analytics, and platform interactions</span>
                 </div>
                 <div className="flex items-start">
-                  <div className="w-2 h-2 bg-primary-600 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
                   <span className="text-gray-700">Device information and browser data</span>
                 </div>
               </div>
@@ -128,35 +128,35 @@ export default function PrivacyPage() {
               <h2 className="text-3xl font-bold text-gray-900 mb-4">How We Use Your Information</h2>
               <div className="space-y-3">
                 <div className="flex items-start">
-                  <div className="w-2 h-2 bg-primary-600 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
                   <span className="text-gray-700">Provide AI-powered assessment tracking and deadline management</span>
                 </div>
                 <div className="flex items-start">
-                  <div className="w-2 h-2 bg-primary-600 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
                   <span className="text-gray-700">Process uploaded PDFs using Google Gemini AI for data extraction</span>
                 </div>
                 <div className="flex items-start">
-                  <div className="w-2 h-2 bg-primary-600 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
                   <span className="text-gray-700">Send personalized email notifications about upcoming deadlines</span>
                 </div>
                 <div className="flex items-start">
-                  <div className="w-2 h-2 bg-primary-600 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
                   <span className="text-gray-700">Store and sync your academic data across devices via Firebase</span>
                 </div>
                 <div className="flex items-start">
-                  <div className="w-2 h-2 bg-primary-600 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
                   <span className="text-gray-700">Improve our AI algorithms and platform functionality</span>
                 </div>
                 <div className="flex items-start">
-                  <div className="w-2 h-2 bg-primary-600 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
                   <span className="text-gray-700">Provide customer support and technical assistance</span>
                 </div>
                 <div className="flex items-start">
-                  <div className="w-2 h-2 bg-primary-600 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
                   <span className="text-gray-700">Ensure platform security and prevent unauthorized access</span>
                 </div>
                 <div className="flex items-start">
-                  <div className="w-2 h-2 bg-primary-600 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
                   <span className="text-gray-700">Comply with legal obligations and enforce our terms</span>
                 </div>
               </div>
@@ -169,7 +169,7 @@ export default function PrivacyPage() {
                 We implement industry-standard security measures including Firebase Authentication, encrypted data transmission, and secure cloud storage. Your academic data is stored in Google's secure Firebase infrastructure with enterprise-grade protection. However, no method of transmission over the Internet is 100% secure.
               </p>
               <h4 className="font-semibold text-gray-900 mb-3">Security Measures:</h4>
-              <div className="space-y-2">
+              <div className="space-y-3">
                 <div className="flex items-start">
                   <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
                   <span className="text-gray-700">Firebase Authentication with secure password hashing</span>
@@ -199,35 +199,35 @@ export default function PrivacyPage() {
               <h4 className="font-semibold text-gray-900 mb-3">Access and Control Rights:</h4>
               <div className="space-y-3 mb-6">
                 <div className="flex items-start">
-                  <div className="w-2 h-2 bg-primary-600 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
                   <span className="text-gray-700">Access and download your personal information and academic data</span>
                 </div>
                 <div className="flex items-start">
-                  <div className="w-2 h-2 bg-primary-600 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
                   <span className="text-gray-700">Correct inaccurate or incomplete personal information</span>
                 </div>
                 <div className="flex items-start">
-                  <div className="w-2 h-2 bg-primary-600 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
                   <span className="text-gray-700">Delete your account and all associated personal data</span>
                 </div>
                 <div className="flex items-start">
-                  <div className="w-2 h-2 bg-primary-600 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
                   <span className="text-gray-700">Withdraw consent for specific data processing activities</span>
                 </div>
                 <div className="flex items-start">
-                  <div className="w-2 h-2 bg-primary-600 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
                   <span className="text-gray-700">Control AI processing of your uploaded files and documents</span>
                 </div>
                 <div className="flex items-start">
-                  <div className="w-2 h-2 bg-primary-600 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
                   <span className="text-gray-700">Request data portability in machine-readable formats</span>
                 </div>
                 <div className="flex items-start">
-                  <div className="w-2 h-2 bg-primary-600 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
                   <span className="text-gray-700">Object to certain types of automated decision-making</span>
                 </div>
                 <div className="flex items-start">
-                  <div className="w-2 h-2 bg-primary-600 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
                   <span className="text-gray-700">File complaints with the Privacy Commissioner of Canada</span>
                 </div>
               </div>
@@ -281,7 +281,7 @@ export default function PrivacyPage() {
               </p>
               
               <h4 className="font-semibold text-gray-900 mb-3">Google/Firebase Services:</h4>
-              <div className="space-y-2 mb-4">
+              <div className="space-y-3 mb-4">
                 <div className="flex items-start">
                   <div className="w-2 h-2 bg-primary-400 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
                   <span className="text-gray-700">Firebase Authentication for secure login</span>
@@ -301,7 +301,7 @@ export default function PrivacyPage() {
               </div>
               
               <h4 className="font-semibold text-gray-900 mb-3">Email & Communication:</h4>
-              <div className="space-y-2">
+              <div className="space-y-3">
                 <div className="flex items-start">
                   <div className="w-2 h-2 bg-primary-400 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
                   <span className="text-gray-700">Gmail/Nodemailer for notification emails</span>
@@ -497,7 +497,7 @@ export default function PrivacyPage() {
               
               <div className="bg-green-50 border border-green-200 rounded-xl p-6 mb-6">
                 <h4 className="font-semibold text-green-800 mb-3">Strengthened Privacy Rights:</h4>
-                <div className="space-y-2">
+                <div className="space-y-3">
                   <div className="flex items-start">
                     <div className="w-2 h-2 bg-green-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
                     <span className="text-green-700"><strong>Data Portability:</strong> Export your data in machine-readable formats</span>

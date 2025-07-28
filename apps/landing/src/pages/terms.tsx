@@ -112,21 +112,21 @@ export default function TermsPage() {
               
               <div className="bg-blue-50 border border-blue-200 rounded-xl p-6 mb-6">
                 <h4 className="font-semibold text-blue-800 mb-3">Enhanced Digital Consumer Rights (Upcoming):</h4>
-                <div className="space-y-2">
+                <div className="space-y-3">
                   <div className="flex items-start">
-                    <div className="w-2 h-2 bg-blue-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                    <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
                     <span className="text-blue-700"><strong>Click-to-Cancel:</strong> Easy cancellation for any paid services (when introduced)</span>
                   </div>
                   <div className="flex items-start">
-                    <div className="w-2 h-2 bg-blue-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                    <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
                     <span className="text-blue-700"><strong>Online Contract Protection:</strong> Enhanced protections for digital agreements</span>
                   </div>
                   <div className="flex items-start">
-                    <div className="w-2 h-2 bg-blue-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                    <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
                     <span className="text-blue-700"><strong>Unilateral Amendment Limits:</strong> Restrictions on unilateral changes to terms</span>
                   </div>
                   <div className="flex items-start">
-                    <div className="w-2 h-2 bg-blue-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                    <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
                     <span className="text-blue-700"><strong>Private Action Rights:</strong> Enhanced rights to seek damages for violations</span>
                   </div>
                 </div>
@@ -135,19 +135,19 @@ export default function TermsPage() {
               <h4 className="font-semibold text-gray-900 mb-3">Our Proactive Commitments:</h4>
               <div className="space-y-3 mb-6">
                 <div className="flex items-start">
-                  <div className="w-2 h-2 bg-primary-400 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
                   <span className="text-gray-700">We will update these Terms automatically when new CPA requirements take effect</span>
                 </div>
                 <div className="flex items-start">
-                  <div className="w-2 h-2 bg-primary-400 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
                   <span className="text-gray-700">Users will receive 30 days notice of any material changes required by new legislation</span>
                 </div>
                 <div className="flex items-start">
-                  <div className="w-2 h-2 bg-primary-400 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
                   <span className="text-gray-700">Our free service model ensures minimal disruption from new consumer protection requirements</span>
                 </div>
                 <div className="flex items-start">
-                  <div className="w-2 h-2 bg-primary-400 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
                   <span className="text-gray-700">We maintain proactive compliance monitoring through legal consultation</span>
                 </div>
               </div>
@@ -167,31 +167,31 @@ export default function TermsPage() {
               <h2 className="text-3xl font-bold text-gray-900 mb-4">Prohibited Uses</h2>
               <div className="space-y-3">
                 <div className="flex items-start">
-                  <div className="w-2 h-2 bg-secondary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
                   <span className="text-gray-700">Uploading malicious files or content that could harm our systems</span>
                 </div>
                 <div className="flex items-start">
-                  <div className="w-2 h-2 bg-secondary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
                   <span className="text-gray-700">Using the platform for commercial purposes without authorization</span>
                 </div>
                 <div className="flex items-start">
-                  <div className="w-2 h-2 bg-secondary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
                   <span className="text-gray-700">Attempting to reverse engineer any AI or software components</span>
                 </div>
                 <div className="flex items-start">
-                  <div className="w-2 h-2 bg-secondary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
                   <span className="text-gray-700">Sharing copyrighted course materials without permission</span>
                 </div>
                 <div className="flex items-start">
-                  <div className="w-2 h-2 bg-secondary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
                   <span className="text-gray-700">Creating multiple accounts to bypass usage limitations</span>
                 </div>
                 <div className="flex items-start">
-                  <div className="w-2 h-2 bg-secondary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
                   <span className="text-gray-700">Interfering with other users' access to the platform</span>
                 </div>
                 <div className="flex items-start">
-                  <div className="w-2 h-2 bg-secondary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
                   <span className="text-gray-700">Using automated tools to scrape or extract platform data</span>
                 </div>
               </div>
@@ -256,33 +256,33 @@ export default function TermsPage() {
               <p className="text-gray-700 leading-relaxed text-lg mb-4">
                 To the maximum extent permitted by Ontario law, Asetta and its operators shall not be liable for any damages arising from your use of the platform, including but not limited to:
               </p>
-              <div className="space-y-2 mb-6">
+              <div className="space-y-3 mb-6">
                 <div className="flex items-start">
-                  <div className="w-2 h-2 bg-secondary-400 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
                   <span className="text-gray-700">Missed academic deadlines due to notification failures, system outages, or AI inaccuracies</span>
                 </div>
                 <div className="flex items-start">
-                  <div className="w-2 h-2 bg-secondary-400 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
                   <span className="text-gray-700">Academic consequences, grade impacts, or educational setbacks resulting from reliance on platform information</span>
                 </div>
                 <div className="flex items-start">
-                  <div className="w-2 h-2 bg-secondary-400 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
                   <span className="text-gray-700">Data loss, corruption, or unauthorized access due to technical issues, security breaches, or service interruptions</span>
                 </div>
                 <div className="flex items-start">
-                  <div className="w-2 h-2 bg-secondary-400 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
                   <span className="text-gray-700">Damages from third-party service failures including Firebase, Google AI, email providers, or hosting services</span>
                 </div>
                 <div className="flex items-start">
-                  <div className="w-2 h-2 bg-secondary-400 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
                   <span className="text-gray-700">Indirect, consequential, incidental, special, exemplary, or punitive damages of any kind</span>
                 </div>
                 <div className="flex items-start">
-                  <div className="w-2 h-2 bg-secondary-400 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
                   <span className="text-gray-700">Loss of profits, business opportunities, data, goodwill, or other intangible losses</span>
                 </div>
                 <div className="flex items-start">
-                  <div className="w-2 h-2 bg-secondary-400 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
                   <span className="text-gray-700">Any damages arising from user-generated content, copyright infringement, or academic misconduct</span>
                 </div>
               </div>
@@ -310,41 +310,41 @@ export default function TermsPage() {
               </p>
               
               <h4 className="font-semibold text-gray-900 mb-3">AI-Powered Document Processing:</h4>
-              <div className="space-y-2 mb-4">
+              <div className="space-y-3 mb-4">
                 <div className="flex items-start">
-                  <div className="w-2 h-2 bg-secondary-600 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
                   <span className="text-gray-700">PDF files are processed using Google Gemini AI to extract assessment information</span>
                 </div>
                 <div className="flex items-start">
-                  <div className="w-2 h-2 bg-secondary-600 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
                   <span className="text-gray-700">AI accuracy is not guaranteed; always verify extracted data against original documents</span>
                 </div>
                 <div className="flex items-start">
-                  <div className="w-2 h-2 bg-secondary-600 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
                   <span className="text-gray-700">We are not responsible for misinterpretation of uploaded content</span>
                 </div>
                 <div className="flex items-start">
-                  <div className="w-2 h-2 bg-secondary-600 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
                   <span className="text-gray-700">Large or complex files may take longer to process or may fail</span>
                 </div>
               </div>
               
               <h4 className="font-semibold text-gray-900 mb-3">Email Notifications:</h4>
-              <div className="space-y-2">
+              <div className="space-y-3">
                 <div className="flex items-start">
-                  <div className="w-2 h-2 bg-secondary-600 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
                   <span className="text-gray-700">Notification delivery depends on email service availability</span>
                 </div>
                 <div className="flex items-start">
-                  <div className="w-2 h-2 bg-secondary-600 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
                   <span className="text-gray-700">Emails may be delayed, filtered as spam, or fail to deliver</span>
                 </div>
                 <div className="flex items-start">
-                  <div className="w-2 h-2 bg-secondary-600 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
                   <span className="text-gray-700">Users must maintain current email addresses for notifications</span>
                 </div>
                 <div className="flex items-start">
-                  <div className="w-2 h-2 bg-secondary-600 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
                   <span className="text-gray-700">Notification preferences can be adjusted in platform settings</span>
                 </div>
               </div>
@@ -358,7 +358,7 @@ export default function TermsPage() {
               </p>
               
               <h4 className="font-semibold text-gray-900 mb-3">Your Content:</h4>
-              <div className="space-y-2 mb-4">
+              <div className="space-y-3 mb-4">
                 <div className="flex items-start">
                   <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
                   <span className="text-gray-700">You retain ownership of all academic materials you upload</span>
@@ -378,7 +378,7 @@ export default function TermsPage() {
               </div>
               
               <h4 className="font-semibold text-gray-900 mb-3">Platform Content:</h4>
-              <div className="space-y-2">
+              <div className="space-y-3">
                 <div className="flex items-start">
                   <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
                   <span className="text-gray-700">All platform software, design, and AI algorithms remain our property</span>
@@ -406,31 +406,31 @@ export default function TermsPage() {
               </p>
               <div className="space-y-3">
                 <div className="flex items-start">
-                  <div className="w-2 h-2 bg-primary-400 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
                   <span className="text-gray-700">Service availability depends on Firebase, Google AI, and third-party services</span>
                 </div>
                 <div className="flex items-start">
-                  <div className="w-2 h-2 bg-primary-400 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
                   <span className="text-gray-700">We may modify, suspend, or discontinue features at any time</span>
                 </div>
                 <div className="flex items-start">
-                  <div className="w-2 h-2 bg-primary-400 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
                   <span className="text-gray-700">Maintenance periods may temporarily interrupt service access</span>
                 </div>
                 <div className="flex items-start">
-                  <div className="w-2 h-2 bg-primary-400 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
                   <span className="text-gray-700">Free service may include usage limitations or rate limiting</span>
                 </div>
                 <div className="flex items-start">
-                  <div className="w-2 h-2 bg-primary-400 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
                   <span className="text-gray-700">We will provide reasonable notice for significant changes when possible</span>
                 </div>
                 <div className="flex items-start">
-                  <div className="w-2 h-2 bg-primary-400 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
                   <span className="text-gray-700">Account termination may result in immediate loss of access to data</span>
                 </div>
                 <div className="flex items-start">
-                  <div className="w-2 h-2 bg-primary-400 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
                   <span className="text-gray-700">Data export tools will be provided before any service discontinuation</span>
                 </div>
               </div>
@@ -444,27 +444,27 @@ export default function TermsPage() {
               </p>
               <div className="space-y-3">
                 <div className="flex items-start">
-                  <div className="w-2 h-2 bg-secondary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
                   <span className="text-gray-700">Asetta is designed to help with organization, not to complete academic work</span>
                 </div>
                 <div className="flex items-start">
-                  <div className="w-2 h-2 bg-secondary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
                   <span className="text-gray-700">AI-generated insights should not be submitted as your own work</span>
                 </div>
                 <div className="flex items-start">
-                  <div className="w-2 h-2 bg-secondary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
                   <span className="text-gray-700">Sharing of course materials must comply with institutional policies</span>
                 </div>
                 <div className="flex items-start">
-                  <div className="w-2 h-2 bg-secondary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
                   <span className="text-gray-700">Users must follow their institution's technology and academic integrity guidelines</span>
                 </div>
                 <div className="flex items-start">
-                  <div className="w-2 h-2 bg-secondary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
                   <span className="text-gray-700">The platform should supplement, not replace, traditional study methods</span>
                 </div>
                 <div className="flex items-start">
-                  <div className="w-2 h-2 bg-secondary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
                   <span className="text-gray-700">Any academic misconduct using our platform may result in account termination</span>
                 </div>
               </div>
@@ -514,23 +514,23 @@ export default function TermsPage() {
               <h4 className="font-semibold text-gray-900 mb-3">Copyright Infringement Claims:</h4>
               <div className="space-y-3 mb-6">
                 <div className="flex items-start">
-                  <div className="w-2 h-2 bg-secondary-600 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
                   <span className="text-gray-700">Send written notice to <strong>videna.psalmeleazar@gmail.com</strong> with "DMCA Takedown" in the subject line</span>
                 </div>
                 <div className="flex items-start">
-                  <div className="w-2 h-2 bg-secondary-600 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
                   <span className="text-gray-700">Include identification of the copyrighted work claimed to be infringed</span>
                 </div>
                 <div className="flex items-start">
-                  <div className="w-2 h-2 bg-secondary-600 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
                   <span className="text-gray-700">Provide location of the allegedly infringing material on our platform</span>
                 </div>
                 <div className="flex items-start">
-                  <div className="w-2 h-2 bg-secondary-600 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
                   <span className="text-gray-700">Include your contact information and a statement of good faith belief</span>
                 </div>
                 <div className="flex items-start">
-                  <div className="w-2 h-2 bg-secondary-600 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
                   <span className="text-gray-700">Provide physical or electronic signature of the copyright owner or authorized agent</span>
                 </div>
               </div>
@@ -538,19 +538,19 @@ export default function TermsPage() {
               <h4 className="font-semibold text-gray-900 mb-3">Response Procedures:</h4>
               <div className="space-y-3 mb-6">
                 <div className="flex items-start">
-                  <div className="w-2 h-2 bg-secondary-600 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
                   <span className="text-gray-700">We will investigate valid DMCA notices within 48 hours</span>
                 </div>
                 <div className="flex items-start">
-                  <div className="w-2 h-2 bg-secondary-600 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
                   <span className="text-gray-700">Infringing content will be removed and users notified</span>
                 </div>
                 <div className="flex items-start">
-                  <div className="w-2 h-2 bg-secondary-600 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
                   <span className="text-gray-700">Repeat infringers may have their accounts terminated</span>
                 </div>
                 <div className="flex items-start">
-                  <div className="w-2 h-2 bg-secondary-600 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
                   <span className="text-gray-700">Users may file counter-notices if they believe content was wrongly removed</span>
                 </div>
               </div>
@@ -571,23 +571,23 @@ export default function TermsPage() {
               </p>
               <div className="space-y-3 mb-6">
                 <div className="flex items-start">
-                  <div className="w-2 h-2 bg-primary-400 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
                   <span className="text-gray-700">Natural disasters, pandemics, or public health emergencies</span>
                 </div>
                 <div className="flex items-start">
-                  <div className="w-2 h-2 bg-primary-400 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
                   <span className="text-gray-700">Government actions, legal restrictions, or regulatory changes</span>
                 </div>
                 <div className="flex items-start">
-                  <div className="w-2 h-2 bg-primary-400 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
                   <span className="text-gray-700">Internet service failures, cyber attacks, or major technical outages</span>
                 </div>
                 <div className="flex items-start">
-                  <div className="w-2 h-2 bg-primary-400 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
                   <span className="text-gray-700">Third-party service disruptions (Google, Firebase, email providers)</span>
                 </div>
                 <div className="flex items-start">
-                  <div className="w-2 h-2 bg-primary-400 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
                   <span className="text-gray-700">Labor strikes, equipment failures, or supplier disruptions</span>
                 </div>
               </div>
