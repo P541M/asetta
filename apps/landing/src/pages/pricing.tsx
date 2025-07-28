@@ -164,6 +164,7 @@ export default function PricingPage() {
               </p>
             </div>
           </motion.div>
+
         </div>
       </main>
 

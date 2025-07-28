@@ -77,9 +77,89 @@ export default function TermsPage() {
             {/* Agreement to Terms */}
             <section className="mb-10">
               <h2 className="text-3xl font-bold text-gray-900 mb-4">Agreement to Terms</h2>
-              <p className="text-gray-700 leading-relaxed text-lg">
-                By accessing and using Asetta, you agree to be bound by these Terms of Service and all applicable laws and regulations.
+              <p className="text-gray-700 leading-relaxed text-lg mb-4">
+                By accessing and using Asetta, you agree to be bound by these Terms of Service and all applicable laws and regulations. These Terms are governed by the laws of Ontario, Canada, and comply with the Ontario Consumer Protection Act, 2023.
               </p>
+              
+              <div className="bg-primary-50 border border-primary-200 rounded-xl p-4 mb-4">
+                <h4 className="font-semibold text-primary-800 mb-2">Governing Law and Jurisdiction:</h4>
+                <p className="text-primary-700">
+                  These Terms of Service are governed by and construed in accordance with the laws of Ontario, Canada, including the Consumer Protection Act, 2023. Any legal action or proceeding arising under these Terms will be brought exclusively in the Ontario Superior Court of Justice, and you hereby consent to personal jurisdiction and venue therein.
+                </p>
+              </div>
+
+              <div className="bg-green-50 border border-green-200 rounded-xl p-4">
+                <h4 className="font-semibold text-green-800 mb-2">Ontario Consumer Protection Act Compliance:</h4>
+                <p className="text-green-700 mb-2">
+                  In accordance with Ontario's Consumer Protection Act, 2023, these Terms do not contain any prohibited clauses. Specifically:
+                </p>
+                <ul className="text-green-700 text-sm space-y-1 ml-4">
+                  <li>• You retain the right to publish reviews of Asetta and our services</li>
+                  <li>• No monetary limits are placed on claims for breaches of conditions or warranties</li>
+                  <li>• You are not prevented from commencing class action proceedings</li>
+                  <li>• Disputes may be resolved in Ontario Superior Court as provided by law</li>
+                  <li>• You have the right to cancel this agreement within one year if prohibited terms are discovered</li>
+                </ul>
+              </div>
+            </section>
+
+            {/* Forward-Looking Consumer Protection Compliance */}
+            <section className="mb-10">
+              <h2 className="text-3xl font-bold text-gray-900 mb-4">Upcoming Consumer Protection Changes (2026)</h2>
+              <p className="text-gray-700 leading-relaxed text-lg mb-6">
+                We are proactively preparing for Ontario's new Consumer Protection Act, 2023, expected to come into force in 2026. While still in regulatory development, we commit to full compliance with enhanced consumer protections:
+              </p>
+              
+              <div className="bg-blue-50 border border-blue-200 rounded-xl p-6 mb-6">
+                <h4 className="font-semibold text-blue-800 mb-3">Enhanced Digital Consumer Rights (Upcoming):</h4>
+                <div className="space-y-2">
+                  <div className="flex items-start">
+                    <div className="w-2 h-2 bg-blue-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                    <span className="text-blue-700"><strong>Click-to-Cancel:</strong> Easy cancellation for any paid services (when introduced)</span>
+                  </div>
+                  <div className="flex items-start">
+                    <div className="w-2 h-2 bg-blue-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                    <span className="text-blue-700"><strong>Online Contract Protection:</strong> Enhanced protections for digital agreements</span>
+                  </div>
+                  <div className="flex items-start">
+                    <div className="w-2 h-2 bg-blue-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                    <span className="text-blue-700"><strong>Unilateral Amendment Limits:</strong> Restrictions on unilateral changes to terms</span>
+                  </div>
+                  <div className="flex items-start">
+                    <div className="w-2 h-2 bg-blue-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                    <span className="text-blue-700"><strong>Private Action Rights:</strong> Enhanced rights to seek damages for violations</span>
+                  </div>
+                </div>
+              </div>
+
+              <h4 className="font-semibold text-gray-900 mb-3">Our Proactive Commitments:</h4>
+              <div className="space-y-3 mb-6">
+                <div className="flex items-start">
+                  <div className="w-2 h-2 bg-primary-400 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <span className="text-gray-700">We will update these Terms automatically when new CPA requirements take effect</span>
+                </div>
+                <div className="flex items-start">
+                  <div className="w-2 h-2 bg-primary-400 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <span className="text-gray-700">Users will receive 30 days notice of any material changes required by new legislation</span>
+                </div>
+                <div className="flex items-start">
+                  <div className="w-2 h-2 bg-primary-400 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <span className="text-gray-700">Our free service model ensures minimal disruption from new consumer protection requirements</span>
+                </div>
+                <div className="flex items-start">
+                  <div className="w-2 h-2 bg-primary-400 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <span className="text-gray-700">We maintain proactive compliance monitoring through legal consultation</span>
+                </div>
+              </div>
+
+              <div className="bg-orange-50 border border-orange-200 rounded-xl p-4">
+                <h4 className="font-semibold text-orange-800 mb-2">Regulatory Transition:</h4>
+                <p className="text-orange-700 text-sm">
+                  As Ontario's new Consumer Protection Act regulations are finalized, we will provide updates to ensure 
+                  continuous compliance. Users will be notified of any material changes with appropriate notice periods. 
+                  Our commitment to free service for students remains unchanged regardless of regulatory updates.
+                </p>
+              </div>
             </section>
 
             {/* Prohibited Uses */}
@@ -170,33 +250,55 @@ export default function TermsPage() {
               </div>
             </section>
 
-            {/* Limitations */}
+            {/* Limitation of Liability */}
             <section className="mb-10">
-              <h2 className="text-3xl font-bold text-gray-900 mb-4">Limitations</h2>
+              <h2 className="text-3xl font-bold text-gray-900 mb-4">Limitation of Liability</h2>
               <p className="text-gray-700 leading-relaxed text-lg mb-4">
-                To the maximum extent permitted by law, Asetta shall not be liable for:
+                To the maximum extent permitted by Ontario law, Asetta and its operators shall not be liable for any damages arising from your use of the platform, including but not limited to:
               </p>
-              <div className="space-y-2">
+              <div className="space-y-2 mb-6">
                 <div className="flex items-start">
                   <div className="w-2 h-2 bg-secondary-400 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
-                  <span className="text-gray-700">Missed deadlines due to notification failures or AI inaccuracies</span>
+                  <span className="text-gray-700">Missed academic deadlines due to notification failures, system outages, or AI inaccuracies</span>
                 </div>
                 <div className="flex items-start">
                   <div className="w-2 h-2 bg-secondary-400 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
-                  <span className="text-gray-700">Academic consequences resulting from reliance on platform information</span>
+                  <span className="text-gray-700">Academic consequences, grade impacts, or educational setbacks resulting from reliance on platform information</span>
                 </div>
                 <div className="flex items-start">
                   <div className="w-2 h-2 bg-secondary-400 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
-                  <span className="text-gray-700">Data loss due to technical issues or service interruptions</span>
+                  <span className="text-gray-700">Data loss, corruption, or unauthorized access due to technical issues, security breaches, or service interruptions</span>
                 </div>
                 <div className="flex items-start">
                   <div className="w-2 h-2 bg-secondary-400 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
-                  <span className="text-gray-700">Damages from third-party service failures (Firebase, Google AI)</span>
+                  <span className="text-gray-700">Damages from third-party service failures including Firebase, Google AI, email providers, or hosting services</span>
                 </div>
                 <div className="flex items-start">
                   <div className="w-2 h-2 bg-secondary-400 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
-                  <span className="text-gray-700">Indirect, consequential, or punitive damages of any kind</span>
+                  <span className="text-gray-700">Indirect, consequential, incidental, special, exemplary, or punitive damages of any kind</span>
                 </div>
+                <div className="flex items-start">
+                  <div className="w-2 h-2 bg-secondary-400 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <span className="text-gray-700">Loss of profits, business opportunities, data, goodwill, or other intangible losses</span>
+                </div>
+                <div className="flex items-start">
+                  <div className="w-2 h-2 bg-secondary-400 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <span className="text-gray-700">Any damages arising from user-generated content, copyright infringement, or academic misconduct</span>
+                </div>
+              </div>
+              
+              <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-4">
+                <h4 className="font-semibold text-red-800 mb-2">Maximum Liability Cap:</h4>
+                <p className="text-red-700">
+                  In no event shall our total aggregate liability exceed CAD $100 or the amount you paid to use our services in the 12 months preceding the claim, whichever is greater. This limitation applies regardless of the legal theory on which the claim is based.
+                </p>
+              </div>
+              
+              <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4">
+                <h4 className="font-semibold text-yellow-800 mb-2">Statutory Rights:</h4>
+                <p className="text-yellow-700">
+                  Nothing in these Terms excludes or limits our liability for death or personal injury caused by negligence, fraud, or other liability that cannot be excluded or limited under Ontario law.
+                </p>
               </div>
             </section>
 
@@ -368,11 +470,205 @@ export default function TermsPage() {
               </div>
             </section>
 
+            {/* Indemnification */}
+            <section className="mb-10">
+              <h2 className="text-3xl font-bold text-gray-900 mb-4">Indemnification</h2>
+              <p className="text-gray-700 leading-relaxed text-lg mb-4">
+                You agree to indemnify, defend, and hold harmless Asetta, its operators, and affiliates from and against any and all claims, damages, losses, costs, and expenses (including reasonable legal fees) arising from:
+              </p>
+              <div className="space-y-3">
+                <div className="flex items-start">
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <span className="text-gray-700">Your violation of these Terms of Service or any applicable law</span>
+                </div>
+                <div className="flex items-start">
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <span className="text-gray-700">Your use or misuse of the platform or services</span>
+                </div>
+                <div className="flex items-start">
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <span className="text-gray-700">Copyright infringement or intellectual property violations in content you upload</span>
+                </div>
+                <div className="flex items-start">
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <span className="text-gray-700">Any breach of your academic institution's policies resulting from platform use</span>
+                </div>
+                <div className="flex items-start">
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <span className="text-gray-700">Any third-party claims arising from your content or platform usage</span>
+                </div>
+                <div className="flex items-start">
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <span className="text-gray-700">Negligence, misconduct, or illegal activities conducted through your account</span>
+                </div>
+              </div>
+            </section>
+
+            {/* DMCA and Copyright Policy */}
+            <section className="mb-10">
+              <h2 className="text-3xl font-bold text-gray-900 mb-4">Copyright and DMCA Policy</h2>
+              <p className="text-gray-700 leading-relaxed text-lg mb-4">
+                We respect intellectual property rights and comply with copyright laws. If you believe your copyrighted work has been uploaded without permission:
+              </p>
+              
+              <h4 className="font-semibold text-gray-900 mb-3">Copyright Infringement Claims:</h4>
+              <div className="space-y-3 mb-6">
+                <div className="flex items-start">
+                  <div className="w-2 h-2 bg-secondary-600 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <span className="text-gray-700">Send written notice to <strong>videna.psalmeleazar@gmail.com</strong> with "DMCA Takedown" in the subject line</span>
+                </div>
+                <div className="flex items-start">
+                  <div className="w-2 h-2 bg-secondary-600 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <span className="text-gray-700">Include identification of the copyrighted work claimed to be infringed</span>
+                </div>
+                <div className="flex items-start">
+                  <div className="w-2 h-2 bg-secondary-600 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <span className="text-gray-700">Provide location of the allegedly infringing material on our platform</span>
+                </div>
+                <div className="flex items-start">
+                  <div className="w-2 h-2 bg-secondary-600 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <span className="text-gray-700">Include your contact information and a statement of good faith belief</span>
+                </div>
+                <div className="flex items-start">
+                  <div className="w-2 h-2 bg-secondary-600 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <span className="text-gray-700">Provide physical or electronic signature of the copyright owner or authorized agent</span>
+                </div>
+              </div>
+              
+              <h4 className="font-semibold text-gray-900 mb-3">Response Procedures:</h4>
+              <div className="space-y-3 mb-6">
+                <div className="flex items-start">
+                  <div className="w-2 h-2 bg-secondary-600 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <span className="text-gray-700">We will investigate valid DMCA notices within 48 hours</span>
+                </div>
+                <div className="flex items-start">
+                  <div className="w-2 h-2 bg-secondary-600 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <span className="text-gray-700">Infringing content will be removed and users notified</span>
+                </div>
+                <div className="flex items-start">
+                  <div className="w-2 h-2 bg-secondary-600 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <span className="text-gray-700">Repeat infringers may have their accounts terminated</span>
+                </div>
+                <div className="flex items-start">
+                  <div className="w-2 h-2 bg-secondary-600 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <span className="text-gray-700">Users may file counter-notices if they believe content was wrongly removed</span>
+                </div>
+              </div>
+              
+              <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4">
+                <h4 className="font-semibold text-yellow-800 mb-2">Fair Use and Educational Content:</h4>
+                <p className="text-yellow-700">
+                  Users should consider fair use principles when uploading course materials. However, fair use does not automatically protect all educational content from copyright claims.
+                </p>
+              </div>
+            </section>
+
+            {/* Force Majeure */}
+            <section className="mb-10">
+              <h2 className="text-3xl font-bold text-gray-900 mb-4">Force Majeure</h2>
+              <p className="text-gray-700 leading-relaxed text-lg mb-4">
+                We shall not be liable for any failure or delay in performance under these Terms due to circumstances beyond our reasonable control, including but not limited to:
+              </p>
+              <div className="space-y-3 mb-6">
+                <div className="flex items-start">
+                  <div className="w-2 h-2 bg-primary-400 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <span className="text-gray-700">Natural disasters, pandemics, or public health emergencies</span>
+                </div>
+                <div className="flex items-start">
+                  <div className="w-2 h-2 bg-primary-400 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <span className="text-gray-700">Government actions, legal restrictions, or regulatory changes</span>
+                </div>
+                <div className="flex items-start">
+                  <div className="w-2 h-2 bg-primary-400 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <span className="text-gray-700">Internet service failures, cyber attacks, or major technical outages</span>
+                </div>
+                <div className="flex items-start">
+                  <div className="w-2 h-2 bg-primary-400 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <span className="text-gray-700">Third-party service disruptions (Google, Firebase, email providers)</span>
+                </div>
+                <div className="flex items-start">
+                  <div className="w-2 h-2 bg-primary-400 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <span className="text-gray-700">Labor strikes, equipment failures, or supplier disruptions</span>
+                </div>
+              </div>
+              
+              <p className="text-gray-700 leading-relaxed text-lg">
+                During force majeure events, we will make commercially reasonable efforts to minimize service disruption and provide updates to users when possible.
+              </p>
+            </section>
+
+            {/* Dispute Resolution */}
+            <section className="mb-10">
+              <h2 className="text-3xl font-bold text-gray-900 mb-4">Dispute Resolution</h2>
+              <p className="text-gray-700 leading-relaxed text-lg mb-4">
+                Any disputes arising under these Terms shall be resolved according to Ontario law:
+              </p>
+              
+              <h4 className="font-semibold text-gray-900 mb-3">Resolution Process:</h4>
+              <div className="space-y-3 mb-6">
+                <div className="flex items-start">
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <span className="text-gray-700"><strong>Step 1:</strong> Contact us directly at videna.psalmeleazar@gmail.com to attempt good faith resolution</span>
+                </div>
+                <div className="flex items-start">
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <span className="text-gray-700"><strong>Step 2:</strong> If informal resolution fails, mediation through Ontario mediation services</span>
+                </div>
+                <div className="flex items-start">
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <span className="text-gray-700"><strong>Step 3:</strong> Final resolution through Ontario courts if mediation is unsuccessful</span>
+                </div>
+              </div>
+              
+              <div className="bg-primary-50 border border-primary-200 rounded-xl p-4">
+                <h4 className="font-semibold text-primary-800 mb-2">Limitation Period:</h4>
+                <p className="text-primary-700">
+                  Any legal action must be commenced within one (1) year after the cause of action arose, or such claim shall be permanently barred.
+                </p>
+              </div>
+            </section>
+
+            {/* Digital Services Tax Compliance (2025) */}
+            <section className="mb-10">
+              <h2 className="text-3xl font-bold text-gray-900 mb-4">Digital Services Tax Compliance</h2>
+              <p className="text-gray-700 leading-relaxed text-lg mb-4">
+                In accordance with Canada's Digital Services Tax (DST) legislation effective 2025:
+              </p>
+              
+              <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6">
+                <h4 className="font-semibold text-blue-800 mb-2">Tax Transparency Notice:</h4>
+                <p className="text-blue-700 text-sm">
+                  While our service is free to students, we comply with Canadian DST requirements for digital services. 
+                  This legislation requires registration and reporting for qualifying digital services revenue, 
+                  applicable retroactively from January 1, 2022.
+                </p>
+              </div>
+              
+              <div className="space-y-3">
+                <div className="flex items-start">
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <span className="text-gray-700">DST applies to certain digital services that rely on Canadian user engagement and data</span>
+                </div>
+                <div className="flex items-start">
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <span className="text-gray-700">Our free service model means no direct DST costs are passed to users</span>
+                </div>
+                <div className="flex items-start">
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <span className="text-gray-700">We maintain compliance with all Canadian federal tax obligations</span>
+                </div>
+                <div className="flex items-start">
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <span className="text-gray-700">Tax compliance information is available upon reasonable request</span>
+                </div>
+              </div>
+            </section>
+
             {/* Contact Information */}
             <section className="mb-0">
-              <h2 className="text-3xl font-bold text-gray-900 mb-4">Contact Information</h2>
+              <h2 className="text-3xl font-bold text-gray-900 mb-4">Legal Contact Information</h2>
               <p className="text-gray-700 leading-relaxed text-lg mb-4">
-                If you have any questions about these Terms, please contact us at:
+                For legal matters, copyright issues, or questions about these Terms, please contact:
               </p>
               <div className="p-4 bg-primary-50 rounded-xl border border-primary-200/50">
                 <a
@@ -385,6 +681,7 @@ export default function TermsPage() {
                   </svg>
                   videna.psalmeleazar@gmail.com
                 </a>
+                <p className="text-primary-600 mt-2 text-sm">Legal Affairs - Asetta Platform</p>
               </div>
             </section>
           </div>
@@ -403,7 +700,7 @@ export default function TermsPage() {
                   clipRule="evenodd"
                 />
               </svg>
-              Last updated: July 11, 2025
+              Last updated: July 28, 2025
             </div>
           </div>
         </div>

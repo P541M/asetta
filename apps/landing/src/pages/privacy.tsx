@@ -77,9 +77,15 @@ export default function PrivacyPage() {
             {/* Introduction */}
             <section className="mb-10">
               <h2 className="text-3xl font-bold text-gray-900 mb-4">Introduction</h2>
-              <p className="text-gray-700 leading-relaxed text-lg">
-                At Asetta, we take your privacy seriously. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our platform.
+              <p className="text-gray-700 leading-relaxed text-lg mb-4">
+                At Asetta, we take your privacy seriously. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our platform in compliance with Canada's Personal Information Protection and Electronic Documents Act (PIPEDA) and Ontario privacy laws.
               </p>
+              <div className="bg-primary-50 border border-primary-200 rounded-xl p-4">
+                <h4 className="font-semibold text-primary-800 mb-2">Jurisdiction and Governing Law:</h4>
+                <p className="text-primary-700">
+                  This Privacy Policy and our data processing practices are governed by the laws of Ontario, Canada. Any disputes relating to privacy matters will be resolved under Ontario jurisdiction.
+                </p>
+              </div>
             </section>
 
             {/* Information We Collect */}
@@ -183,38 +189,57 @@ export default function PrivacyPage() {
               </div>
             </section>
 
-            {/* Your Rights */}
+            {/* Your Rights Under PIPEDA */}
             <section className="mb-10">
-              <h2 className="text-3xl font-bold text-gray-900 mb-4">Your Rights</h2>
-              <div className="space-y-3">
+              <h2 className="text-3xl font-bold text-gray-900 mb-4">Your Rights Under PIPEDA and Ontario Law</h2>
+              <p className="text-gray-700 leading-relaxed text-lg mb-4">
+                Under Canada's Personal Information Protection and Electronic Documents Act (PIPEDA), you have specific rights regarding your personal information:
+              </p>
+              
+              <h4 className="font-semibold text-gray-900 mb-3">Access and Control Rights:</h4>
+              <div className="space-y-3 mb-6">
                 <div className="flex items-start">
                   <div className="w-2 h-2 bg-primary-600 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
-                  <span className="text-gray-700">Access and download your academic data</span>
+                  <span className="text-gray-700">Access and download your personal information and academic data</span>
                 </div>
                 <div className="flex items-start">
                   <div className="w-2 h-2 bg-primary-600 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
-                  <span className="text-gray-700">Correct inaccurate information in your profile</span>
+                  <span className="text-gray-700">Correct inaccurate or incomplete personal information</span>
                 </div>
                 <div className="flex items-start">
                   <div className="w-2 h-2 bg-primary-600 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
-                  <span className="text-gray-700">Delete your account and all associated data</span>
+                  <span className="text-gray-700">Delete your account and all associated personal data</span>
                 </div>
                 <div className="flex items-start">
                   <div className="w-2 h-2 bg-primary-600 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
-                  <span className="text-gray-700">Opt-out of email notifications and communications</span>
+                  <span className="text-gray-700">Withdraw consent for specific data processing activities</span>
                 </div>
                 <div className="flex items-start">
                   <div className="w-2 h-2 bg-primary-600 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
-                  <span className="text-gray-700">Control AI processing of your uploaded files</span>
+                  <span className="text-gray-700">Control AI processing of your uploaded files and documents</span>
                 </div>
                 <div className="flex items-start">
                   <div className="w-2 h-2 bg-primary-600 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
-                  <span className="text-gray-700">Request data portability in standard formats</span>
+                  <span className="text-gray-700">Request data portability in machine-readable formats</span>
                 </div>
                 <div className="flex items-start">
                   <div className="w-2 h-2 bg-primary-600 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
-                  <span className="text-gray-700">Object to certain types of data processing</span>
+                  <span className="text-gray-700">Object to certain types of automated decision-making</span>
                 </div>
+                <div className="flex items-start">
+                  <div className="w-2 h-2 bg-primary-600 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <span className="text-gray-700">File complaints with the Privacy Commissioner of Canada</span>
+                </div>
+              </div>
+              
+              <div className="bg-primary-50 border border-primary-200 rounded-xl p-4">
+                <h4 className="font-semibold text-primary-800 mb-2">Exercising Your Rights:</h4>
+                <p className="text-primary-700 mb-2">
+                  To exercise any of these rights, contact us at videna.psalmeleazar@gmail.com with "Privacy Request" in the subject line. We will respond within 30 days as required by PIPEDA.
+                </p>
+                <p className="text-primary-700">
+                  You may also file a complaint with the Privacy Commissioner of Canada at: <strong>1-800-282-1376</strong> or <strong>www.priv.gc.ca</strong>
+                </p>
               </div>
             </section>
 
@@ -296,43 +321,146 @@ export default function PrivacyPage() {
             <section className="mb-10">
               <h2 className="text-3xl font-bold text-gray-900 mb-4">Data Retention and Deletion</h2>
               <p className="text-gray-700 leading-relaxed text-lg mb-4">
-                We retain your data only as long as necessary to provide our services:
+                In compliance with PIPEDA principles, we retain your personal information only as long as necessary for the identified purposes or as required by law:
               </p>
-              <div className="space-y-3">
+              <div className="space-y-3 mb-6">
                 <div className="flex items-start">
                   <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
-                  <span className="text-gray-700">Academic data: Retained while your account is active</span>
+                  <span className="text-gray-700">Academic data and personal information: Retained while your account is active and for legitimate business purposes</span>
                 </div>
                 <div className="flex items-start">
                   <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
-                  <span className="text-gray-700">Uploaded PDFs: Processed immediately and deleted within 24 hours</span>
+                  <span className="text-gray-700">Uploaded PDFs: Processed immediately and securely deleted within 24 hours (no permanent storage)</span>
                 </div>
                 <div className="flex items-start">
                   <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
-                  <span className="text-gray-700">Email preferences: Retained until you opt-out or delete your account</span>
+                  <span className="text-gray-700">Communication preferences: Retained until you withdraw consent or delete your account</span>
                 </div>
                 <div className="flex items-start">
                   <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
-                  <span className="text-gray-700">Usage analytics: Anonymized after 2 years</span>
+                  <span className="text-gray-700">Usage analytics: Anonymized and aggregated after 2 years, with personal identifiers removed</span>
                 </div>
                 <div className="flex items-start">
                   <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
-                  <span className="text-gray-700">Account deletion: All data permanently deleted within 30 days</span>
+                  <span className="text-gray-700">Legal compliance records: Retained for 7 years as required by Canadian business law</span>
                 </div>
                 <div className="flex items-start">
                   <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
-                  <span className="text-gray-700">Backup data: Purged within 90 days of account deletion</span>
+                  <span className="text-gray-700">Account deletion: All personal data permanently deleted within 30 days (subject to legal obligations)</span>
                 </div>
+                <div className="flex items-start">
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <span className="text-gray-700">Backup systems: All backup data containing personal information purged within 90 days of account deletion</span>
+                </div>
+              </div>
+              
+              <div className="bg-secondary-50 border border-secondary-200 rounded-xl p-4">
+                <h4 className="font-semibold text-secondary-800 mb-2">Data Minimization Principle:</h4>
+                <p className="text-secondary-700">
+                  We follow PIPEDA's data minimization principle by collecting only the personal information necessary for identified purposes and retaining it only as long as required.
+                </p>
+              </div>
+            </section>
+
+            {/* Data Breach Notification */}
+            <section className="mb-10">
+              <h2 className="text-3xl font-bold text-gray-900 mb-4">Data Breach Notification</h2>
+              <p className="text-gray-700 leading-relaxed text-lg mb-4">
+                In compliance with PIPEDA requirements, we have established procedures for handling potential data breaches:
+              </p>
+              <div className="space-y-3 mb-6">
+                <div className="flex items-start">
+                  <div className="w-2 h-2 bg-secondary-600 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <span className="text-gray-700">Immediate assessment and containment of any suspected breach within 24 hours</span>
+                </div>
+                <div className="flex items-start">
+                  <div className="w-2 h-2 bg-secondary-600 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <span className="text-gray-700">Notification to the Privacy Commissioner of Canada within 72 hours if required by law</span>
+                </div>
+                <div className="flex items-start">
+                  <div className="w-2 h-2 bg-secondary-600 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <span className="text-gray-700">User notification without undue delay if the breach poses real risk of significant harm</span>
+                </div>
+                <div className="flex items-start">
+                  <div className="w-2 h-2 bg-secondary-600 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <span className="text-gray-700">Detailed incident documentation and remediation measures implementation</span>
+                </div>
+                <div className="flex items-start">
+                  <div className="w-2 h-2 bg-secondary-600 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <span className="text-gray-700">Enhanced security measures to prevent future occurrences</span>
+                </div>
+              </div>
+              
+              <div className="bg-red-50 border border-red-200 rounded-xl p-4">
+                <h4 className="font-semibold text-red-800 mb-2">If You Suspect a Data Breach:</h4>
+                <p className="text-red-700">
+                  Contact us immediately at <strong>videna.psalmeleazar@gmail.com</strong> with "SECURITY INCIDENT" in the subject line. We take all security concerns seriously and will investigate promptly.
+                </p>
+              </div>
+            </section>
+
+            {/* Consent Management */}
+            <section className="mb-10">
+              <h2 className="text-3xl font-bold text-gray-900 mb-4">Consent Management</h2>
+              <p className="text-gray-700 leading-relaxed text-lg mb-4">
+                Your consent is fundamental to our data processing activities. We obtain and manage consent in accordance with PIPEDA requirements:
+              </p>
+              
+              <h4 className="font-semibold text-gray-900 mb-3">Types of Consent We Collect:</h4>
+              <div className="space-y-3 mb-6">
+                <div className="flex items-start">
+                  <div className="w-2 h-2 bg-primary-400 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <span className="text-gray-700"><strong>Account Creation:</strong> Express consent to process basic account information</span>
+                </div>
+                <div className="flex items-start">
+                  <div className="w-2 h-2 bg-primary-400 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <span className="text-gray-700"><strong>AI Processing:</strong> Explicit consent for AI analysis of uploaded documents</span>
+                </div>
+                <div className="flex items-start">
+                  <div className="w-2 h-2 bg-primary-400 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <span className="text-gray-700"><strong>Email Communications:</strong> Opt-in consent for notification emails and updates</span>
+                </div>
+                <div className="flex items-start">
+                  <div className="w-2 h-2 bg-primary-400 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <span className="text-gray-700"><strong>Analytics:</strong> Consent for usage analytics and platform improvement</span>
+                </div>
+              </div>
+              
+              <h4 className="font-semibold text-gray-900 mb-3">Consent Principles:</h4>
+              <div className="space-y-3 mb-6">
+                <div className="flex items-start">
+                  <div className="w-2 h-2 bg-primary-400 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <span className="text-gray-700">Consent must be freely given, specific, informed, and clearly indicated</span>
+                </div>
+                <div className="flex items-start">
+                  <div className="w-2 h-2 bg-primary-400 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <span className="text-gray-700">You can withdraw consent at any time through your account settings</span>
+                </div>
+                <div className="flex items-start">
+                  <div className="w-2 h-2 bg-primary-400 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <span className="text-gray-700">Withdrawal of consent may limit certain platform functionality</span>
+                </div>
+                <div className="flex items-start">
+                  <div className="w-2 h-2 bg-primary-400 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <span className="text-gray-700">We maintain records of consent for accountability purposes</span>
+                </div>
+              </div>
+              
+              <div className="bg-primary-50 border border-primary-200 rounded-xl p-4">
+                <h4 className="font-semibold text-primary-800 mb-2">Managing Your Consent:</h4>
+                <p className="text-primary-700">
+                  Access your consent preferences through the Settings page in your account. You can review, modify, or withdraw specific consents while maintaining your account.
+                </p>
               </div>
             </section>
 
             {/* Contact Us */}
             <section className="mb-0">
-              <h2 className="text-3xl font-bold text-gray-900 mb-4">Contact Us</h2>
+              <h2 className="text-3xl font-bold text-gray-900 mb-4">Privacy Officer Contact</h2>
               <p className="text-gray-700 leading-relaxed text-lg mb-4">
-                If you have any questions about this Privacy Policy, please contact us at:
+                For privacy-related inquiries, complaints, or to exercise your rights under PIPEDA, please contact our Privacy Officer:
               </p>
-              <div className="p-4 bg-primary-50 rounded-xl border border-primary-200/50">
+              <div className="p-4 bg-primary-50 rounded-xl border border-primary-200/50 mb-4">
                 <a
                   href="mailto:videna.psalmeleazar@gmail.com"
                   className="text-primary-600 hover:text-primary-700 transition-colors duration-200 font-semibold text-lg flex items-center"
@@ -343,6 +471,79 @@ export default function PrivacyPage() {
                   </svg>
                   videna.psalmeleazar@gmail.com
                 </a>
+                <p className="text-primary-600 mt-2 text-sm">Privacy Officer - Asetta Platform</p>
+              </div>
+              
+              <div className="bg-gray-50 border border-gray-200 rounded-xl p-4">
+                <h4 className="font-semibold text-gray-800 mb-2">Alternative Dispute Resolution:</h4>
+                <p className="text-gray-700 text-sm mb-2">
+                  If you are not satisfied with our response to your privacy concern, you may file a complaint with:
+                </p>
+                <p className="text-gray-700 text-sm">
+                  <strong>Privacy Commissioner of Canada</strong><br/>
+                  Phone: 1-800-282-1376<br/>
+                  Website: www.priv.gc.ca<br/>
+                  Email: info@priv.gc.ca
+                </p>
+              </div>
+            </section>
+
+            {/* Enhanced PIPEDA Compliance (2025) */}
+            <section className="mb-10">
+              <h2 className="text-3xl font-bold text-gray-900 mb-4">Enhanced Privacy Protection (2025)</h2>
+              <p className="text-gray-700 leading-relaxed text-lg mb-6">
+                In accordance with evolving Canadian privacy standards and regulatory guidance for 2025, we have implemented enhanced privacy protection measures:
+              </p>
+              
+              <div className="bg-green-50 border border-green-200 rounded-xl p-6 mb-6">
+                <h4 className="font-semibold text-green-800 mb-3">Strengthened Privacy Rights:</h4>
+                <div className="space-y-2">
+                  <div className="flex items-start">
+                    <div className="w-2 h-2 bg-green-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                    <span className="text-green-700"><strong>Data Portability:</strong> Export your data in machine-readable formats</span>
+                  </div>
+                  <div className="flex items-start">
+                    <div className="w-2 h-2 bg-green-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                    <span className="text-green-700"><strong>Automated Decision-Making:</strong> Opt-out of AI processing where legally required</span>
+                  </div>
+                  <div className="flex items-start">
+                    <div className="w-2 h-2 bg-green-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                    <span className="text-green-700"><strong>Enhanced Consent:</strong> Granular controls for different data processing activities</span>
+                  </div>
+                  <div className="flex items-start">
+                    <div className="w-2 h-2 bg-green-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                    <span className="text-green-700"><strong>Breach Notification:</strong> Direct notification within 72 hours for high-risk breaches</span>
+                  </div>
+                </div>
+              </div>
+
+              <h4 className="font-semibold text-gray-900 mb-3">Privacy by Design Implementation:</h4>
+              <div className="space-y-3 mb-6">
+                <div className="flex items-start">
+                  <div className="w-2 h-2 bg-primary-400 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <span className="text-gray-700">Data minimization principles applied to all collection practices</span>
+                </div>
+                <div className="flex items-start">
+                  <div className="w-2 h-2 bg-primary-400 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <span className="text-gray-700">Purpose limitation ensuring data use aligns with stated collection purposes</span>
+                </div>
+                <div className="flex items-start">
+                  <div className="w-2 h-2 bg-primary-400 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <span className="text-gray-700">Storage limitation with automated deletion schedules</span>
+                </div>
+                <div className="flex items-start">
+                  <div className="w-2 h-2 bg-primary-400 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <span className="text-gray-700">Regular privacy impact assessments for new features</span>
+                </div>
+              </div>
+
+              <h4 className="font-semibold text-gray-900 mb-3">Digital Services Tax (DST) Privacy Implications:</h4>
+              <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
+                <p className="text-blue-700 text-sm">
+                  Canada's 2025 Digital Services Tax legislation may require additional data reporting for qualifying digital services. 
+                  Any DST-related data processing will be limited to what is legally required and will not expand beyond 
+                  our existing privacy commitments. Users retain all privacy rights regarding such processing.
+                </p>
               </div>
             </section>
           </div>
@@ -361,7 +562,7 @@ export default function PrivacyPage() {
                   clipRule="evenodd"
                 />
               </svg>
-              Last updated: July 11, 2025
+              Last updated: July 28, 2025
             </div>
           </div>
         </div>

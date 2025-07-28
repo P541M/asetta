@@ -5,6 +5,7 @@ type ContactFormData = {
   name: string;
   email: string;
   message: string;
+  emailConsent: boolean;
 };
 
 export default async function handler(
@@ -15,10 +16,17 @@ export default async function handler(
     return res.status(405).json({ message: "Method not allowed" });
   }
 
-  const { name, email, message } = req.body as ContactFormData;
+  const { name, email, message, emailConsent } = req.body as ContactFormData;
 
   if (!name || !email || !message) {
     return res.status(400).json({ message: "Missing required fields" });
+  }
+
+  // CASL Compliance Check
+  if (!emailConsent) {
+    return res.status(400).json({ 
+      message: "Email consent is required under Canada's Anti-Spam Legislation (CASL) to process this inquiry." 
+    });
   }
 
   // Validate email format
@@ -54,16 +62,33 @@ export default async function handler(
       to: "videna.psalmeleazar@gmail.com",
       subject: `New Contact Form Submission from ${name}`,
       text: `
+New Contact Form Submission (CASL Compliant)
+
 Name: ${name}
 Email: ${email}
 Message: ${message}
+
+CASL Compliance: User provided explicit consent for email communications.
+Submission Date: ${new Date().toISOString()}
+IP Address: ${req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'Unknown'}
       `,
       html: `
 <h2>New Contact Form Submission</h2>
+<div style="background-color: #e8f5e8; padding: 10px; border-radius: 5px; margin-bottom: 15px;">
+  <p><strong>✅ CASL Compliant Submission</strong></p>
+  <p style="font-size: 12px;">User provided explicit consent for email communications as required by Canada's Anti-Spam Legislation.</p>
+</div>
 <p><strong>Name:</strong> ${name}</p>
 <p><strong>Email:</strong> ${email}</p>
 <p><strong>Message:</strong></p>
-<p>${message}</p>
+<p style="background-color: #f5f5f5; padding: 10px; border-radius: 5px;">${message}</p>
+<hr>
+<p style="font-size: 12px; color: #666;">
+  <strong>Submission Details:</strong><br>
+  Date: ${new Date().toLocaleString('en-CA', { timeZone: 'America/Toronto' })}<br>
+  IP: ${req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'Unknown'}<br>
+  User Agent: ${req.headers['user-agent'] || 'Unknown'}
+</p>
       `,
     });
 

@@ -9,6 +9,7 @@ export default function Contact() {
     name: "",
     email: "",
     message: "",
+    emailConsent: false,
   });
   const [status, setStatus] = useState<{
     type: "idle" | "loading" | "success" | "error";
@@ -38,7 +39,7 @@ export default function Contact() {
         type: "success",
         message: "We'll get back to you soon.",
       });
-      setFormData({ name: "", email: "", message: "" });
+      setFormData({ name: "", email: "", message: "", emailConsent: false });
     } catch (error) {
       setStatus({
         type: "error",
@@ -51,8 +52,12 @@ export default function Contact() {
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    const { name, value, type } = e.target;
+    const checked = (e.target as HTMLInputElement).checked;
+    setFormData((prev) => ({ 
+      ...prev, 
+      [name]: type === 'checkbox' ? checked : value 
+    }));
   };
 
   return (
@@ -177,6 +182,30 @@ export default function Contact() {
                       required
                     />
                   </div>
+                  
+                  {/* CASL Compliance Checkbox */}
+                  <div className="group">
+                    <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
+                      <h4 className="font-semibold text-blue-800 mb-2">Email Communication Consent (CASL Compliance)</h4>
+                      <div className="flex items-start space-x-3">
+                        <input
+                          type="checkbox"
+                          id="emailConsent"
+                          name="emailConsent"
+                          checked={formData.emailConsent || false}
+                          onChange={handleChange}
+                          required
+                          className="h-5 w-5 text-primary-600 border-gray-300 rounded focus:ring-primary-500 mt-0.5"
+                        />
+                        <label htmlFor="emailConsent" className="text-sm text-blue-700 leading-relaxed">
+                          <strong>Required:</strong> I consent to receive email communications from Asetta in response to this inquiry. 
+                          This consent is required under Canada's Anti-Spam Legislation (CASL). You may withdraw this consent at any time by 
+                          emailing <a href="mailto:videna.psalmeleazar@gmail.com" className="underline font-medium">videna.psalmeleazar@gmail.com</a>.
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+
                   {status.type === "error" && (
                     <div className="p-4 bg-red-50 border border-red-200 rounded-xl text-red-600">
                       {status.message}
