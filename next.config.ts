@@ -26,6 +26,27 @@ const config: NextConfig = {
         destination: "https://www.asetta.me",
         permanent: true,
       },
+      {
+        source: "/legal/terms",
+        destination: "https://www.asetta.me/terms",
+        permanent: true,
+      },
+      {
+        source: "/legal/privacy",
+        destination: "https://www.asetta.me/privacy",
+        permanent: true,
+      },
+      // Also handle direct /terms and /privacy routes for consistency
+      {
+        source: "/terms",
+        destination: "https://www.asetta.me/terms",
+        permanent: true,
+      },
+      {
+        source: "/privacy",
+        destination: "https://www.asetta.me/privacy",
+        permanent: true,
+      },
     ];
   },
 };
