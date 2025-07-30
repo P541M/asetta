@@ -5,6 +5,7 @@ import Head from "next/head";
 import Link from "next/link";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import { trackCTAClick } from "../utils/analytics";
 
 export default function LandingPage() {
   const router = useRouter();
@@ -96,6 +97,7 @@ export default function LandingPage() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center mt-8 lg:mt-10 animate-fade-in-up-initial animate-fade-in-up">
               <Link
                 href="https://asetta.me/register"
+                onClick={() => trackCTAClick('Get Started Free - Hero', 'https://asetta.me/register')}
                 className="group inline-flex items-center justify-center px-8 py-4 text-lg font-bold text-white bg-gradient-to-r from-primary-600 to-primary-700 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
               >
                 Get Started Free
@@ -116,6 +118,7 @@ export default function LandingPage() {
 
               <Link
                 href="/features"
+                onClick={() => trackCTAClick('Explore Features - Hero', '/features')}
                 className="inline-flex items-center justify-center px-8 py-4 text-lg font-bold text-gray-700 bg-white border-2 border-gray-200 rounded-2xl shadow-lg hover:shadow-xl hover:border-primary-300 transition-all duration-300 hover:-translate-y-1"
               >
                 Explore Features

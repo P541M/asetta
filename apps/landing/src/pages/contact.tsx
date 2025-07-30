@@ -3,6 +3,7 @@ import Head from "next/head";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { useState } from "react";
+import { trackContactFormSubmission } from "../utils/analytics";
 
 export default function Contact() {
   const [formData, setFormData] = useState({
@@ -40,12 +41,18 @@ export default function Contact() {
         message: "We'll get back to you soon.",
       });
       setFormData({ name: "", email: "", message: "", emailConsent: false });
+      
+      // Track successful form submission
+      trackContactFormSubmission(true);
     } catch (error) {
       setStatus({
         type: "error",
         message:
           error instanceof Error ? error.message : "Failed to send message",
       });
+      
+      // Track failed form submission
+      trackContactFormSubmission(false);
     }
   };
 

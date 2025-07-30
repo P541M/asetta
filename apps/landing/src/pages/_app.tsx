@@ -3,7 +3,15 @@ import Head from "next/head";
 import { Manrope } from "next/font/google";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
+import { GoogleAnalytics } from "@next/third-parties/google";
 import "../styles/globals.css";
+
+// Extend window object for gtag
+declare global {
+  interface Window {
+    gtag: (command: string, targetId: string, config?: any) => void;
+  }
+}
 
 const manrope = Manrope({
   subsets: ["latin"],
@@ -17,7 +25,12 @@ export default function App({ Component, pageProps }: AppProps) {
 
   useEffect(() => {
     const handleRouteChange = (url: string) => {
-      // Route change tracking for analytics (if needed)
+      // Track page views with Google Analytics
+      if (typeof window !== 'undefined' && window.gtag) {
+        window.gtag('config', process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID!, {
+          page_path: url,
+        });
+      }
     };
 
     router.events.on("routeChangeComplete", handleRouteChange);
@@ -72,6 +85,9 @@ export default function App({ Component, pageProps }: AppProps) {
       <main className={`${manrope.variable} font-sans`}>
         <Component {...pageProps} />
       </main>
+      {process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID && (
+        <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID} />
+      )}
     </>
   );
 }

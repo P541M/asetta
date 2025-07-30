@@ -59,14 +59,14 @@ export default function PrivacyPage() {
               <div className="grid md:grid-cols-2 gap-6 text-sm">
                 <div>
                   <h4 className="font-semibold text-gray-900 mb-1">What We Collect</h4>
-                  <p className="text-gray-600">Name, email, course outlines, academic data, usage information</p>
+                  <p className="text-gray-600">Name, email, course outlines, academic data, usage information, website analytics</p>
                   
                   <h4 className="font-semibold text-gray-900 mb-1 mt-3">How We Use It</h4>
                   <p className="text-gray-600">AI processing, deadline notifications, platform improvements</p>
                 </div>
                 <div>
                   <h4 className="font-semibold text-gray-900 mb-1">Your Rights</h4>
-                  <p className="text-gray-600">Access, correct, delete data; control AI processing</p>
+                  <p className="text-gray-600">Access, correct, delete data; control AI processing; opt-out of analytics</p>
                   
                   <h4 className="font-semibold text-gray-900 mb-1 mt-3">Security</h4>
                   <p className="text-gray-600">Encrypted storage, secure authentication, Google Cloud</p>
@@ -108,6 +108,10 @@ export default function PrivacyPage() {
                 <div className="flex items-start">
                   <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
                   <span className="text-gray-700">Basic usage information to improve our service</span>
+                </div>
+                <div className="flex items-start">
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <span className="text-gray-700">Website analytics and interaction data through Google Analytics</span>
                 </div>
               </div>
             </section>
@@ -171,6 +175,77 @@ export default function PrivacyPage() {
               </div>
             </section>
 
+            {/* Website Analytics & Tracking */}
+            <section className="mb-10">
+              <h2 className="text-3xl font-bold text-gray-900 mb-4">Website Analytics & Tracking</h2>
+              <p className="text-gray-700 leading-relaxed text-lg mb-4">
+                We use Google Analytics 4 to understand how visitors use our website and improve our services:
+              </p>
+              <div className="space-y-3 mb-4">
+                <div className="flex items-start">
+                  <div className="w-2 h-2 bg-secondary-600 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <span className="text-gray-700">Page views, session duration, and navigation patterns</span>
+                </div>
+                <div className="flex items-start">
+                  <div className="w-2 h-2 bg-secondary-600 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <span className="text-gray-700">Device type, browser, and general location (city/region level)</span>
+                </div>
+                <div className="flex items-start">
+                  <div className="w-2 h-2 bg-secondary-600 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <span className="text-gray-700">Button clicks and form interactions on our marketing site</span>
+                </div>
+                <div className="flex items-start">
+                  <div className="w-2 h-2 bg-secondary-600 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <span className="text-gray-700">Traffic sources (how you found our website)</span>
+                </div>
+              </div>
+              
+              <h3 className="text-xl font-semibold text-gray-900 mb-3">Cookies & Tracking Technologies</h3>
+              <p className="text-gray-700 leading-relaxed mb-4">
+                Google Analytics uses cookies and similar technologies to collect this information. These are small files stored on your device that help us:
+              </p>
+              <div className="space-y-2 mb-4">
+                <div className="flex items-start">
+                  <div className="w-2 h-2 bg-primary-400 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <span className="text-gray-700">Distinguish between different visitors</span>
+                </div>
+                <div className="flex items-start">
+                  <div className="w-2 h-2 bg-primary-400 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <span className="text-gray-700">Remember your preferences for future visits</span>
+                </div>
+                <div className="flex items-start">
+                  <div className="w-2 h-2 bg-primary-400 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <span className="text-gray-700">Analyze site performance and user experience</span>
+                </div>
+              </div>
+
+              <h3 className="text-xl font-semibold text-gray-900 mb-3">Your Control Over Tracking</h3>
+              <p className="text-gray-700 leading-relaxed mb-4">
+                You have several options to control or disable tracking:
+              </p>
+              <div className="space-y-2 mb-4">
+                <div className="flex items-start">
+                  <div className="w-2 h-2 bg-green-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <span className="text-gray-700">Use browser settings to block or delete cookies</span>
+                </div>
+                <div className="flex items-start">
+                  <div className="w-2 h-2 bg-green-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <span className="text-gray-700">Install the <a href="https://tools.google.com/dlpage/gaoptout" className="text-primary-600 hover:text-primary-700 underline" target="_blank" rel="noopener noreferrer">Google Analytics Opt-out Browser Add-on</a></span>
+                </div>
+                <div className="flex items-start">
+                  <div className="w-2 h-2 bg-green-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <span className="text-gray-700">Enable "Do Not Track" in your browser settings</span>
+                </div>
+              </div>
+
+              <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
+                <h4 className="font-semibold text-blue-800 mb-2">Legal Basis for Analytics:</h4>
+                <p className="text-blue-700">
+                  We collect analytics data based on our legitimate interest in improving our website and services. This is permitted under GDPR Article 6(1)(f) and similar privacy laws. You can opt-out at any time using the methods above.
+                </p>
+              </div>
+            </section>
+
             {/* Data Security */}
             <section className="mb-10">
               <h2 className="text-3xl font-bold text-gray-900 mb-4">How We Protect Your Data</h2>
@@ -226,6 +301,10 @@ export default function PrivacyPage() {
                 </div>
                 <div className="flex items-start">
                   <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <span className="text-gray-700">Opt-out of website analytics and tracking</span>
+                </div>
+                <div className="flex items-start">
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
                   <span className="text-gray-700">File complaints with the Privacy Commissioner of Canada</span>
                 </div>
               </div>
@@ -258,6 +337,10 @@ export default function PrivacyPage() {
                   <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
                   <span className="text-gray-700">Usage analytics: Anonymized after 2 years</span>
                 </div>
+                <div className="flex items-start">
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <span className="text-gray-700">Google Analytics data: Automatically deleted after 14 months</span>
+                </div>
               </div>
             </section>
 
@@ -279,6 +362,33 @@ export default function PrivacyPage() {
                 <div className="flex items-start">
                   <div className="w-2 h-2 bg-primary-400 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
                   <span className="text-gray-700">Email services for deadline notifications</span>
+                </div>
+                <div className="flex items-start">
+                  <div className="w-2 h-2 bg-primary-400 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <span className="text-gray-700">Google Analytics 4 for website analytics and user behavior insights</span>
+                </div>
+              </div>
+              
+              <h3 className="text-xl font-semibold text-gray-900 mb-3">Google Analytics Data Processing</h3>
+              <p className="text-gray-700 leading-relaxed mb-4">
+                Google Analytics processes your website interaction data under our instructions:
+              </p>
+              <div className="space-y-2 mb-4">
+                <div className="flex items-start">
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <span className="text-gray-700">Data is shared with Google for analytics processing only</span>
+                </div>
+                <div className="flex items-start">
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <span className="text-gray-700">Google's data retention is set to 14 months for our account</span>
+                </div>
+                <div className="flex items-start">
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <span className="text-gray-700">Data is anonymized and aggregated for reporting</span>
+                </div>
+                <div className="flex items-start">
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <span className="text-gray-700">Google's privacy policy applies: <a href="https://policies.google.com/privacy" className="text-primary-600 hover:text-primary-700 underline" target="_blank" rel="noopener noreferrer">policies.google.com/privacy</a></span>
                 </div>
               </div>
             </section>
@@ -331,7 +441,7 @@ export default function PrivacyPage() {
                   clipRule="evenodd"
                 />
               </svg>
-              Last updated: July 28, 2025
+              Last updated: January 30, 2025
             </div>
           </div>
         </div>

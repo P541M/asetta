@@ -59,7 +59,7 @@ export default function TermsPage() {
               <div className="grid md:grid-cols-2 gap-6 text-sm">
                 <div>
                   <h4 className="font-semibold text-gray-900 mb-1">Your Responsibilities</h4>
-                  <p className="text-gray-600">Only upload course outlines you have permission to use</p>
+                  <p className="text-gray-600">Only upload course outlines you have permission to use; consent to analytics</p>
                   
                   <h4 className="font-semibold text-gray-900 mb-1 mt-3">What You Own</h4>
                   <p className="text-gray-600">Your academic content; we own the platform</p>
@@ -78,7 +78,7 @@ export default function TermsPage() {
             <section className="mb-10">
               <h2 className="text-3xl font-bold text-gray-900 mb-4">Agreement to Terms</h2>
               <p className="text-gray-700 leading-relaxed text-lg mb-4">
-                By using Asetta, you agree to these terms. These terms are governed by Ontario, Canada law and comply with the Personal Information Protection and Electronic Documents Act (PIPEDA) and Copyright Act of Canada.
+                By using Asetta, you agree to these terms and our use of cookies and analytics as described in our Privacy Policy. These terms are governed by Ontario, Canada law and comply with the Personal Information Protection and Electronic Documents Act (PIPEDA) and Copyright Act of Canada.
               </p>
             </section>
 
@@ -132,6 +132,39 @@ export default function TermsPage() {
                   <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
                   <span className="text-gray-700">The service may be temporarily unavailable for maintenance</span>
                 </div>
+              </div>
+            </section>
+
+            {/* Website Analytics & Tracking */}
+            <section className="mb-10">
+              <h2 className="text-3xl font-bold text-gray-900 mb-4">Website Analytics & Tracking Consent</h2>
+              <p className="text-gray-700 leading-relaxed text-lg mb-4">
+                By using our website, you consent to our collection of analytics data through cookies and similar technologies:
+              </p>
+              <div className="space-y-3 mb-4">
+                <div className="flex items-start">
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <span className="text-gray-700">We use Google Analytics 4 to understand how visitors use our website</span>
+                </div>
+                <div className="flex items-start">
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <span className="text-gray-700">Analytics data helps us improve user experience and optimize our platform</span>
+                </div>
+                <div className="flex items-start">
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <span className="text-gray-700">You can opt-out of tracking using browser settings or Google's opt-out tools</span>
+                </div>
+                <div className="flex items-start">
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <span className="text-gray-700">Opting out of analytics does not affect your ability to use our platform</span>
+                </div>
+              </div>
+              
+              <div className="bg-primary-50 border border-primary-200 rounded-xl p-4">
+                <h4 className="font-semibold text-primary-800 mb-2">Analytics Data Use:</h4>
+                <p className="text-primary-700">
+                  We collect analytics data based on our legitimate business interest in improving our services. Full details about what data we collect and how to opt-out are available in our Privacy Policy.
+                </p>
               </div>
             </section>
 
@@ -256,7 +289,7 @@ export default function TermsPage() {
                   clipRule="evenodd"
                 />
               </svg>
-              Last updated: July 28, 2025
+              Last updated: January 30, 2025
             </div>
           </div>
         </div>
