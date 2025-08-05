@@ -2,15 +2,12 @@
 import { useAssessments } from "../../hooks/useAssessments";
 import AssessmentsTable from "../tables/AssessmentsTable";
 import { CourseFilteredAssessmentsProps } from "../../types/course";
-import { useRouter } from "next/router";
 
 const CourseFilteredAssessments = ({
   semesterId,
   selectedCourse,
   onBack,
 }: CourseFilteredAssessmentsProps) => {
-  const router = useRouter();
-
   const {
     assessments,
     loading: isLoading,
@@ -24,14 +21,6 @@ const CourseFilteredAssessments = ({
     refetch();
   };
 
-  const handleCalculateGrades = () => {
-    router.push(
-      `/dashboard/${semesterId}/grades?course=${encodeURIComponent(
-        selectedCourse
-      )}`
-    );
-  };
-
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center pt-6 px-6">
@@ -41,17 +30,9 @@ const CourseFilteredAssessments = ({
         >
           ← Back to All Courses
         </button>
-        <div className="flex items-center space-x-3">
-          <span className="text-sm text-light-text-primary dark:text-dark-text-primary font-medium">
-            {selectedCourse}
-          </span>
-          <button
-            onClick={handleCalculateGrades}
-            className="btn-primary px-4 py-2"
-          >
-            Calculate Grades
-          </button>
-        </div>
+        <span className="text-sm text-light-text-primary dark:text-dark-text-primary font-medium">
+          {selectedCourse}
+        </span>
       </div>
 
       {isLoading ? (
