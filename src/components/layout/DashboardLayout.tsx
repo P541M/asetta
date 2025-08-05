@@ -83,7 +83,7 @@ const DashboardLayout = ({
 
     const courseStatsList: CourseStats[] = [];
     courseMap.forEach((assessments, courseName) => {
-      const completedStatuses = ["Submitted"];
+      const completedStatuses = ["Submitted", "Missed"];
       const completed = assessments.filter((a) =>
         completedStatuses.includes(a.status)
       );
