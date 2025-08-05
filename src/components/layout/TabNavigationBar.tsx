@@ -30,7 +30,7 @@ const TabNavigationBar = ({ className = "" }: TabNavigationBarProps) => {
     },
     {
       id: 'assessments',
-      label: 'All Assessments',
+      label: 'Assessments',
       icon: (
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -87,7 +87,7 @@ const TabNavigationBar = ({ className = "" }: TabNavigationBarProps) => {
     },
     {
       id: 'add',
-      label: 'Add Assessment',
+      label: 'Add',
       icon: (
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -113,11 +113,12 @@ const TabNavigationBar = ({ className = "" }: TabNavigationBarProps) => {
     }`;
 
   const getMobileTabButtonClass = (tabId: TabType) =>
-    `px-3 py-3 font-medium text-sm transition-all duration-200 rounded-xl ${
+    `px-2 py-2.5 font-medium text-sm transition-all duration-200 rounded-xl ${
       activeTab === tabId
         ? "bg-light-button-primary/10 text-light-button-primary dark:bg-dark-button-primary/10 dark:text-dark-button-primary"
         : "text-light-text-secondary dark:text-dark-text-secondary hover:bg-light-hover-primary dark:hover:bg-dark-hover-primary hover:text-light-text-primary dark:hover:text-dark-text-primary"
     }`;
+
 
   return (
     <div className={`bg-light-bg-primary dark:bg-dark-bg-secondary rounded-xl p-1 border border-light-border-primary dark:border-dark-border-primary ${className}`}>
@@ -139,37 +140,19 @@ const TabNavigationBar = ({ className = "" }: TabNavigationBarProps) => {
 
       {/* Mobile Navigation */}
       <div className="md:hidden">
-        <div className="grid grid-cols-3 gap-1 mb-1">
-          {tabs.slice(0, 3).map((tab) => (
+        <div className="flex justify-between gap-1">
+          {tabs.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={getMobileTabButtonClass(tab.id)}
+              className={`${getMobileTabButtonClass(tab.id)} flex-1 text-center overflow-hidden`}
             >
-              <div className="flex flex-col items-center space-y-1">
-                <div className="h-4 w-4">
+              <div className="flex flex-col items-center space-y-1 w-full">
+                <div className="h-4 w-4 flex-shrink-0">
                   {tab.icon}
                 </div>
-                <span className="text-xs">
-                  {tab.id === 'assessments' ? 'Assessments' : tab.label}
-                </span>
-              </div>
-            </button>
-          ))}
-        </div>
-        <div className="grid grid-cols-2 gap-1">
-          {tabs.slice(3).map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={getMobileTabButtonClass(tab.id)}
-            >
-              <div className="flex flex-col items-center space-y-1">
-                <div className="h-4 w-4">
-                  {tab.icon}
-                </div>
-                <span className="text-xs">
-                  {tab.id === 'add' ? 'Add' : tab.label}
+                <span className="text-xs leading-tight truncate w-full text-center">
+                  {tab.label}
                 </span>
               </div>
             </button>
