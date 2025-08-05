@@ -378,24 +378,24 @@ const DashboardLayout = ({
                 <h3 className="stat-value">{stats.total}</h3>
               </div>
               <div className="stat-card">
-                <p className="stat-label">Not Started</p>
-                <h3 className="stat-value">{stats.notStarted}</h3>
-              </div>
-              <div className="stat-card">
-                <p className="stat-label">In Progress</p>
-                <h3 className="stat-value">{stats.inProgress}</h3>
-              </div>
-              <div className="stat-card">
-                <p className="stat-label">Submitted</p>
-                <h3 className="stat-value">{stats.submitted}</h3>
+                <p className="stat-label">Completion Rate</p>
+                <h3 className="stat-value">{stats.completionRate}%</h3>
               </div>
               <div className="stat-card">
                 <p className="stat-label">Upcoming</p>
                 <h3 className="stat-value">{stats.upcomingDeadlines}</h3>
               </div>
               <div className="stat-card">
-                <p className="stat-label">Completion Rate</p>
-                <h3 className="stat-value">{stats.completionRate}%</h3>
+                <p className="stat-label">Submitted</p>
+                <h3 className="stat-value">{stats.submitted}</h3>
+              </div>
+              <div className="stat-card">
+                <p className="stat-label">In Progress</p>
+                <h3 className="stat-value">{stats.inProgress}</h3>
+              </div>
+              <div className="stat-card">
+                <p className="stat-label">Not Started</p>
+                <h3 className="stat-value">{stats.notStarted}</h3>
               </div>
             </div>
           )}
