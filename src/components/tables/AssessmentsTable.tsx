@@ -240,8 +240,8 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
 
   const filteredAssessments = localAssessments.filter((assessment) => {
     if (filter === "all") return true;
-    if (filter === "not_submitted") return assessment.status !== "Submitted";
-    if (filter === "submitted") return assessment.status === "Submitted";
+    if (filter === "not_submitted") return !["Submitted", "Missed"].includes(assessment.status);
+    if (filter === "submitted") return ["Submitted", "Missed"].includes(assessment.status);
     return true;
   });
 

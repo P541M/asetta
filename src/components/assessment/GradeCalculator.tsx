@@ -190,7 +190,7 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
     setTotalWeight(total);
 
     const completedAssessments = sortedAssessments.filter(
-      (a) => a.status === "Submitted" && a.mark !== null && a.mark !== undefined
+      (a) => ["Submitted", "Missed"].includes(a.status) && a.mark !== null && a.mark !== undefined
     );
 
     if (completedAssessments.length > 0) {
@@ -261,7 +261,7 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
 
   const recalculateGrade = (updatedAssessments: Assessment[]) => {
     const completedAssessments = updatedAssessments.filter(
-      (a) => a.status === "Submitted" && a.mark !== null && a.mark !== undefined
+      (a) => ["Submitted", "Missed"].includes(a.status) && a.mark !== null && a.mark !== undefined
     );
 
     if (completedAssessments.length > 0) {
@@ -283,10 +283,10 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
 
   const calculateRequiredGrade = () => {
     const completedAssessments = assessments.filter(
-      (a) => a.status === "Submitted" && a.mark !== null && a.mark !== undefined
+      (a) => ["Submitted", "Missed"].includes(a.status) && a.mark !== null && a.mark !== undefined
     );
     const remainingAssessments = assessments.filter(
-      (a) => a.status !== "Submitted" || a.mark === null || a.mark === undefined
+      (a) => !["Submitted", "Missed"].includes(a.status) || a.mark === null || a.mark === undefined
     );
 
     if (remainingAssessments.length === 0) return null;

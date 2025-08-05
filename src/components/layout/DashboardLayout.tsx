@@ -246,24 +246,25 @@ const DashboardLayout = ({
           const inProgressCount = assessmentsList.filter(
             (a) => a.status === "In progress"
           ).length;
-          const submittedCount = assessmentsList.filter(
-            (a) => a.status === "Submitted"
+          const completedStatuses = ["Submitted", "Missed"];
+          const completedCount = assessmentsList.filter((a) =>
+            completedStatuses.includes(a.status)
           ).length;
           const upcomingCount = assessmentsList.filter((a) => {
             const dueDate = new Date(a.dueDate);
             return (
-              dueDate > now && dueDate <= oneWeek && a.status !== "Submitted"
+              dueDate > now && dueDate <= oneWeek && !completedStatuses.includes(a.status)
             );
           }).length;
           const completionRate =
             totalCount > 0
-              ? Math.round((submittedCount / totalCount) * 100)
+              ? Math.round((completedCount / totalCount) * 100)
               : 0;
           setStats({
             total: totalCount,
             notStarted: notStartedCount,
             inProgress: inProgressCount,
-            submitted: submittedCount,
+            submitted: completedCount,
             upcomingDeadlines: upcomingCount,
             completionRate: completionRate,
           });
