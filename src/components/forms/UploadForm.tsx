@@ -25,6 +25,7 @@ const UploadForm = ({
   const [extractionResult, setExtractionResult] =
     useState<ExtractionResult | null>(null);
   const [isDragActive, setIsDragActive] = useState<boolean>(false);
+  const [copyrightAgreed, setCopyrightAgreed] = useState<boolean>(false);
 
   const processFiles = useCallback((selectedFiles: File[]) => {
     if (selectedFiles.length === 0) return;
@@ -99,7 +100,7 @@ const UploadForm = ({
   );
 
   const handleUpload = async () => {
-    if (!user || files.length === 0) return;
+    if (!user || files.length === 0 || !copyrightAgreed) return;
 
     setUploadStatus("uploading");
     setError("");
@@ -187,6 +188,7 @@ const UploadForm = ({
     setRetryAfter(120);
     setShowSuccessModal(false);
     setExtractionResult(null);
+    setCopyrightAgreed(false);
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
@@ -453,6 +455,36 @@ const UploadForm = ({
           )
         )}
 
+        {/* Copyright Agreement */}
+        {files.length > 0 && uploadStatus === "idle" && (
+          <div className="p-4 bg-light-bg-secondary dark:bg-dark-bg-secondary rounded-lg border border-light-border-secondary dark:border-dark-border-secondary">
+            <div className="flex items-start space-x-3">
+              <input
+                type="checkbox"
+                id="upload-copyright-agreement"
+                checked={copyrightAgreed}
+                onChange={(e) => setCopyrightAgreed(e.target.checked)}
+                className="mt-1 w-4 h-4 text-light-button-primary dark:text-dark-button-primary border-gray-300 rounded focus:ring-light-button-primary dark:focus:ring-dark-button-primary"
+              />
+              <label
+                htmlFor="upload-copyright-agreement"
+                className="text-sm text-light-text-secondary dark:text-dark-text-secondary"
+              >
+                By uploading, I agree to the{" "}
+                <a
+                  href="https://www.asetta.me/terms"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-light-button-primary dark:text-dark-button-primary hover:underline"
+                >
+                  Terms of Service
+                </a>{" "}
+                and confirm I have permission to upload these materials.
+              </label>
+            </div>
+          </div>
+        )}
+
         <div className="flex space-x-3">
           <button
             onClick={handleUpload}
@@ -460,7 +492,8 @@ const UploadForm = ({
               files.length === 0 ||
               uploadStatus === "uploading" ||
               uploadStatus === "rate_limited" ||
-              !user
+              !user ||
+              !copyrightAgreed
             }
             className="btn-primary flex-1 py-3 px-4 flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >

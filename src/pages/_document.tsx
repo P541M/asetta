@@ -15,10 +15,8 @@ export default function Document() {
           {`
             (function() {
               try {
-                const storedTheme = localStorage.getItem('theme');
-                const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-                const theme = storedTheme || systemTheme;
-                document.documentElement.classList.toggle('dark', theme === 'dark');
+                const darkMode = localStorage.getItem('darkMode') === 'true';
+                document.documentElement.classList.toggle('dark', darkMode);
               } catch (e) {
                 console.error('Error setting initial theme:', e);
               }
