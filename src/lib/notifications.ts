@@ -285,13 +285,6 @@ export function isValidEmail(email: string): boolean {
   return emailRegex.test(email);
 }
 
-// Function to validate phone number format (basic validation)
-export function isValidPhoneNumber(phoneNumber: string): boolean {
-  // This is a basic validation - you might want to use a more comprehensive library
-  // like libphonenumber-js for proper phone number validation
-  const phoneRegex = /^\+?[\d\s-()]{10,}$/;
-  return phoneRegex.test(phoneNumber);
-}
 
 // Function to validate user notification preferences
 export function validateNotificationPreferences(preferences: unknown): {
@@ -349,69 +342,3 @@ export function validateNotificationPreferences(preferences: unknown): {
   };
 }
 
-// Function to validate assessment data
-export function validateAssessment(assessment: unknown): {
-  isValid: boolean;
-  errors: string[];
-  sanitized: Assessment | null;
-} {
-  const errors: string[] = [];
-  
-  if (typeof assessment !== 'object' || assessment === null) {
-    errors.push("Assessment must be an object");
-    return { isValid: false, errors, sanitized: null };
-  }
-
-  const assess = assessment as Record<string, unknown>;
-
-  // Validate required fields
-  if (!assess.id || typeof assess.id !== 'string') {
-    errors.push("Assessment ID is required and must be a string");
-  }
-
-  if (!assess.title && !assess.assignmentName) {
-    errors.push("Assessment must have either title or assignmentName");
-  }
-
-  if (!assess.dueDate) {
-    errors.push("Assessment dueDate is required");
-  }
-
-  if (!assess.userId || typeof assess.userId !== 'string') {
-    errors.push("Assessment userId is required and must be a string");
-  }
-
-  // Try to validate/parse the due date
-  let parsedDueDate: Date | null = null;
-  if (assess.dueDate) {
-    try {
-      if (typeof assess.dueDate === 'object' && assess.dueDate !== null && 'toDate' in assess.dueDate) {
-        parsedDueDate = (assess.dueDate as { toDate: () => Date }).toDate();
-      } else if (typeof assess.dueDate === 'string') {
-        parsedDueDate = new Date(assess.dueDate);
-      }
-      
-      if (!parsedDueDate || isNaN(parsedDueDate.getTime())) {
-        errors.push("Invalid dueDate format");
-      }
-    } catch {
-      errors.push("Error parsing dueDate");
-    }
-  }
-
-  const sanitized: Assessment = {
-    id: String(assess.id || ""),
-    title: String(assess.title || assess.assignmentName || ""),
-    dueDate: assess.dueDate as Date | string | { toDate: () => Date },
-    userId: String(assess.userId || ""),
-    courseName: String(assess.courseName || ""),
-    assignmentName: String(assess.assignmentName || assess.title || ""),
-    dueTime: String(assess.dueTime || "23:59"),
-  };
-
-  return {
-    isValid: errors.length === 0,
-    errors,
-    sanitized: errors.length === 0 ? sanitized : null
-  };
-}

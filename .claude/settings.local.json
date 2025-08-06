@@ -24,7 +24,8 @@
       "Bash(env)",
       "Bash(timeout 10s npm run dev:*)",
       "Bash(timeout 30s npm run build:*)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(curl:*)"
     ],
     "deny": []
   }

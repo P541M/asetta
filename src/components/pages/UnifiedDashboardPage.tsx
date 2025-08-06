@@ -16,7 +16,8 @@ import GradeCalculator from "../assessment/GradeCalculator";
 import CalendarView from "../calendar/CalendarView";
 import AddAssessmentForm from "../forms/AddAssessmentForm";
 import UploadForm from "../forms/UploadForm";
-import { ErrorMessage, EmptyState } from "../ui";
+import ErrorMessage from "../ui/ErrorMessage";
+import EmptyState from "../ui/EmptyState";
 import CustomSelect, { type SelectOption } from "../ui/CustomSelect";
 
 interface UnifiedDashboardPageProps {

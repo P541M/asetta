@@ -104,19 +104,6 @@ export const getRotatingSubtitle = (): string => {
   return SUBTITLE_MESSAGES[index];
 };
 
-/**
- * Check if it's time to update the greeting (for dynamic updates)
- * Returns true at the start of each time period (12:00 AM, 12:00 PM, 5:00 PM)
- * @returns boolean indicating if greeting should be updated
- */
-export const shouldUpdateGreeting = (): boolean => {
-  const now = new Date();
-  const hour = now.getHours();
-  const minute = now.getMinutes();
-  
-  // Update at the start of each greeting period (within first minute)
-  return minute === 0 && (hour === 0 || hour === 12 || hour === 17);
-};
 
 /**
  * Get milliseconds until next greeting update

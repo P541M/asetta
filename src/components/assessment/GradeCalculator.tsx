@@ -5,7 +5,9 @@ import { useAssessments } from "../../hooks/useAssessments";
 import { useAutoSave } from "../../hooks/useAutoSave";
 import { getAssessmentDocRef } from "../../lib/firebaseUtils";
 import { Assessment } from "../../types/assessment";
-import { LoadingSpinner, ErrorMessage, EmptyState } from "../ui";
+import LoadingSpinner from "../ui/LoadingSpinner";
+import ErrorMessage from "../ui/ErrorMessage";
+import EmptyState from "../ui/EmptyState";
 
 interface GradeCalculatorProps {
   semesterId: string;
