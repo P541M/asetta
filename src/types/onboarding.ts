@@ -4,7 +4,7 @@ export interface OnboardingUserData {
   institution?: string;
   program?: string;
   expectedGraduation?: string;
-  avatarEmoji?: string;
+  avatarIconId?: string;
 }
 
 export interface OnboardingSemesterData {

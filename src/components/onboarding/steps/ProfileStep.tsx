@@ -2,8 +2,8 @@ import React, { useState } from "react";
 import { useOnboarding } from "../../../contexts/OnboardingContext";
 import { StepNavigation } from "../ui/StepNavigation";
 import Avatar from "../../ui/Avatar";
-import EmojiPicker from "../../ui/EmojiPicker";
-import { DEFAULT_EMOJI } from "../../../data/emojis";
+import AvatarPicker from "../../ui/AvatarPicker";
+import { DEFAULT_ICON } from "../../../data/profileIcons";
 
 export function ProfileStep() {
   const { state, updateUserData } = useOnboarding();
@@ -11,11 +11,20 @@ export function ProfileStep() {
     institution: state.userData.institution || "",
     program: state.userData.program || "",
     expectedGraduation: state.userData.expectedGraduation || "",
-    avatarEmoji: state.userData.avatarEmoji || DEFAULT_EMOJI,
+    avatarIconId: state.userData.avatarIconId || DEFAULT_ICON.id,
   });
 
   const handleInputChange = (field: string, value: string) => {
     const newFormData = { ...formData, [field]: value };
+    setFormData(newFormData);
+    updateUserData(newFormData);
+  };
+
+  const handleIconSelect = (iconId: string) => {
+    const newFormData = { 
+      ...formData, 
+      avatarIconId: iconId
+    };
     setFormData(newFormData);
     updateUserData(newFormData);
   };
@@ -51,16 +60,20 @@ export function ProfileStep() {
 
       {/* Avatar Section */}
       <div className="flex flex-col items-center space-y-4 mb-8">
-        <Avatar size="lg" emoji={formData.avatarEmoji} className="shadow-lg" />
+        <Avatar 
+          size="lg" 
+          iconId={formData.avatarIconId}
+          className="shadow-lg" 
+        />
         <div className="text-center">
           <p className="text-sm text-light-text-secondary dark:text-dark-text-secondary">
-            Choose your profile emoji
+            Choose your profile avatar
           </p>
         </div>
-        <div className="w-full max-w-sm">
-          <EmojiPicker
-            selectedEmoji={formData.avatarEmoji}
-            onEmojiSelect={(emoji) => handleInputChange("avatarEmoji", emoji)}
+        <div className="w-full max-w-md">
+          <AvatarPicker
+            selectedIconId={formData.avatarIconId}
+            onIconSelect={handleIconSelect}
             variant="inline"
             className="w-full"
           />

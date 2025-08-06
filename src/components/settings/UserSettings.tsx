@@ -11,7 +11,7 @@ import SettingsNavigation from "./SettingsNavigation";
 import SettingsActions from "./SettingsActions";
 import SettingsMessage from "./SettingsMessage";
 import { useTheme } from "../../contexts/ThemeContext";
-import { DEFAULT_EMOJI } from "../../data/emojis";
+import { DEFAULT_ICON } from "../../data/profileIcons";
 
 interface UserSettingsProps {
   isOpen: boolean;
@@ -37,7 +37,7 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
     text: string;
     type: "success" | "error";
   }>({ text: "", type: "success" });
-  const [avatarEmoji, setAvatarEmoji] = useState<string>(DEFAULT_EMOJI);
+  const [avatarIconId, setAvatarIconId] = useState<string>(DEFAULT_ICON.id);
   const [activeTab, setActiveTab] = useState<
     "profile" | "preferences" | "notifications"
   >("profile");
@@ -60,7 +60,7 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
     showWeight: true,
     showNotes: true,
     showStatsBar: false,
-    avatarEmoji: DEFAULT_EMOJI,
+    avatarIconId: DEFAULT_ICON.id,
     isDarkMode: false,
     emailNotifications: false,
     notificationDaysBefore: 1,
@@ -82,7 +82,7 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
       showWeight !== initialValues.showWeight ||
       showNotes !== initialValues.showNotes ||
       showStatsBar !== initialValues.showStatsBar ||
-      avatarEmoji !== initialValues.avatarEmoji ||
+      avatarIconId !== initialValues.avatarIconId ||
       isDarkModeLocal !== initialValues.isDarkMode ||
       emailNotifications !== initialValues.emailNotifications ||
       notificationDaysBefore !== initialValues.notificationDaysBefore ||
@@ -115,7 +115,8 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
           const newEmail = userData.email || "";
           const newHasConsentedToNotifications =
             userData.hasConsentedToNotifications ?? false;
-          const newAvatarEmoji = userData.avatarEmoji || DEFAULT_EMOJI;
+          // Handle migration from emoji to icon if needed
+          const newAvatarIconId = userData.avatarIconId || (userData.avatarEmoji ? DEFAULT_ICON.id : DEFAULT_ICON.id);
 
           // Set current values
           setInstitution(newInstitution);
@@ -130,7 +131,7 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
           setNotificationDaysBefore(newNotificationDaysBefore);
           setEmail(newEmail);
           setHasConsentedToNotifications(newHasConsentedToNotifications);
-          setAvatarEmoji(newAvatarEmoji);
+          setAvatarIconId(newAvatarIconId);
 
           // Set initial values
           setInitialValues({
@@ -142,7 +143,7 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
             showWeight: newShowWeight,
             showNotes: newShowNotes,
             showStatsBar: newShowStatsBar,
-            avatarEmoji: newAvatarEmoji,
+            avatarIconId: newAvatarIconId,
             isDarkMode: isDarkMode,
             emailNotifications: newEmailNotifications,
             notificationDaysBefore: newNotificationDaysBefore,
@@ -204,7 +205,7 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
         notificationDaysBefore: notificationDaysBefore,
         email: email,
         hasConsentedToNotifications: hasConsentedToNotifications,
-        avatarEmoji: avatarEmoji,
+        avatarIconId: avatarIconId,
         updatedAt: new Date(),
       });
 
@@ -223,7 +224,7 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
         showWeight,
         showNotes,
         showStatsBar,
-        avatarEmoji: avatarEmoji,
+        avatarIconId: avatarIconId,
         isDarkMode: isDarkModeLocal,
         emailNotifications,
         notificationDaysBefore,
@@ -271,7 +272,6 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
     setShowWeight(initialValues.showWeight);
     setShowNotes(initialValues.showNotes);
     setShowStatsBar(initialValues.showStatsBar);
-    setAvatarEmoji(initialValues.avatarEmoji);
     setIsDarkModeLocal(initialValues.isDarkMode);
     setEmailNotifications(initialValues.emailNotifications);
     setNotificationDaysBefore(initialValues.notificationDaysBefore);
@@ -304,8 +304,8 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
               setStudyProgram={setStudyProgram}
               graduationYear={graduationYear}
               setGraduationYear={setGraduationYear}
-              avatarEmoji={avatarEmoji}
-              setAvatarEmoji={setAvatarEmoji}
+              avatarIconId={avatarIconId}
+              setAvatarIconId={setAvatarIconId}
             />
           ) : activeTab === "preferences" ? (
             <PreferencesSection

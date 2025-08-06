@@ -19,7 +19,7 @@ const SUBTITLE_MESSAGES = [
 
 interface UserProfile {
   displayName?: string;
-  avatarEmoji?: string;
+  avatarIconId?: string;
 }
 
 /**

@@ -3,10 +3,10 @@ import { doc, getDoc } from 'firebase/firestore';
 import { useAuth } from '../contexts/AuthContext';
 import { db } from '../lib/firebase';
 import { getFromLocalStorage, setToLocalStorage, removeFromLocalStorage } from '../utils/localStorage';
-import { DEFAULT_EMOJI, isValidEmoji } from '../data/emojis';
+import { DEFAULT_ICON, isValidIconId } from '../data/profileIcons';
 
 interface UserProfile {
-  avatarEmoji: string;
+  avatarIconId: string;
   displayName: string;
   institution: string;
   studyProgram: string;
@@ -31,16 +31,16 @@ export const useUserProfile = () => {
   useEffect(() => {
     if (!user) {
       setProfile(null);
-      removeFromLocalStorage('avatarEmoji');
+      removeFromLocalStorage('avatarIconId');
       return;
     }
 
     // Get cached avatar data for immediate display
-    const cachedAvatarEmoji = getFromLocalStorage<string>("avatarEmoji", DEFAULT_EMOJI);
+    const cachedAvatarIconId = getFromLocalStorage<string>("avatarIconId", DEFAULT_ICON.id);
     
     // Set initial profile with cached data to prevent flash
     setProfile(prev => prev || {
-      avatarEmoji: isValidEmoji(cachedAvatarEmoji) ? cachedAvatarEmoji : DEFAULT_EMOJI,
+      avatarIconId: isValidIconId(cachedAvatarIconId) ? cachedAvatarIconId : DEFAULT_ICON.id,
       displayName: "",
       institution: "",
       studyProgram: "",
@@ -73,16 +73,16 @@ export const useUserProfile = () => {
         if (userSnapshot.exists()) {
           const userData = userSnapshot.data();
           
-          // Handle emoji preference
-          const avatarEmoji = userData.avatarEmoji && isValidEmoji(userData.avatarEmoji) 
-            ? userData.avatarEmoji 
-            : DEFAULT_EMOJI;
+          // Handle avatar preferences with emoji->icon migration
+          const avatarIconId = userData.avatarIconId && isValidIconId(userData.avatarIconId)
+            ? userData.avatarIconId
+            : DEFAULT_ICON.id; // Migrate from emoji or set default
           
           // Cache avatar data for immediate future loads
-          setToLocalStorage("avatarEmoji", avatarEmoji);
+          setToLocalStorage("avatarIconId", avatarIconId);
           
           setProfile({
-            avatarEmoji: avatarEmoji,
+            avatarIconId: avatarIconId,
             displayName: userData.displayName || "",
             institution: userData.institution || "",
             studyProgram: userData.studyProgram || "",
@@ -98,9 +98,9 @@ export const useUserProfile = () => {
           });
         } else {
           // Set default profile if document doesn't exist and cache it
-          setToLocalStorage("avatarEmoji", DEFAULT_EMOJI);
+          setToLocalStorage("avatarIconId", DEFAULT_ICON.id);
           setProfile({
-            avatarEmoji: DEFAULT_EMOJI,
+            avatarIconId: DEFAULT_ICON.id,
             displayName: "",
             institution: "",
             studyProgram: "",

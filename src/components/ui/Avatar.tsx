@@ -1,11 +1,9 @@
-import { DEFAULT_EMOJI } from "../../data/emojis";
+import { getIconById, DEFAULT_ICON } from "../../data/profileIcons";
 
 interface AvatarProps {
   size?: "xs" | "sm" | "md" | "lg";
-  emoji?: string;
+  iconId?: string;
   className?: string;
-  // Legacy prop for backward compatibility - not used
-  color?: string;
 }
 
 const sizeClasses = {
@@ -15,29 +13,30 @@ const sizeClasses = {
   lg: "h-12 w-12",
 };
 
-const emojiSizeClasses = {
-  xs: "text-xs",
-  sm: "text-sm", 
-  md: "text-lg",
-  lg: "text-xl",
+const iconSizeClasses = {
+  xs: "h-3 w-3",
+  sm: "h-4 w-4", 
+  md: "h-5 w-5",
+  lg: "h-6 w-6",
 };
 
 const Avatar = ({ 
   size = "md", 
-  emoji = DEFAULT_EMOJI,
+  iconId = DEFAULT_ICON.id,
   className = "" 
 }: AvatarProps) => {
   const containerClasses = `${sizeClasses[size]} rounded-full flex items-center justify-center bg-light-bg-secondary dark:bg-dark-bg-secondary border border-light-border-primary dark:border-dark-border-primary ${className}`;
 
+  // Get icon data, fallback to default if invalid
+  const iconData = getIconById(iconId) || DEFAULT_ICON;
+  const IconComponent = iconData.icon;
+
   return (
     <div className={containerClasses}>
-      <span 
-        className={`${emojiSizeClasses[size]} select-none leading-none`}
-        role="img"
-        aria-label="User avatar emoji"
-      >
-        {emoji}
-      </span>
+      <IconComponent 
+        className={`${iconSizeClasses[size]} text-light-text-primary dark:text-dark-text-primary`}
+        aria-label={`User avatar icon: ${iconData.name}`}
+      />
     </div>
   );
 };

@@ -1,6 +1,6 @@
 import { ProfileSectionProps } from "../../types/profile";
 import Avatar from "../ui/Avatar";
-import EmojiPicker from "../ui/EmojiPicker";
+import AvatarPicker from "../ui/AvatarPicker";
 
 const ProfileSection = ({
   displayName,
@@ -11,8 +11,8 @@ const ProfileSection = ({
   setStudyProgram,
   graduationYear,
   setGraduationYear,
-  avatarEmoji,
-  setAvatarEmoji,
+  avatarIconId,
+  setAvatarIconId,
 }: ProfileSectionProps) => {
   const currentYear = new Date().getFullYear();
 
@@ -24,29 +24,33 @@ const ProfileSection = ({
           Profile Information
         </h3>
         <p className="text-sm text-light-text-secondary dark:text-dark-text-secondary mt-1">
-          Update your profile details and emoji avatar
+          Update your profile details and avatar
         </p>
       </div>
 
       {/* Avatar Section */}
       <div className="flex flex-col items-center space-y-6">
         <div className="flex flex-col items-center space-y-4">
-          <Avatar size="lg" emoji={avatarEmoji} className="shadow-lg" />
+          <Avatar 
+            size="lg" 
+            iconId={avatarIconId}
+            className="shadow-lg" 
+          />
           <div className="text-center">
             <p className="text-sm text-light-text-secondary dark:text-dark-text-secondary">
-              Your profile emoji
+              Your profile avatar
             </p>
             <p className="text-xs text-light-text-tertiary dark:text-dark-text-tertiary mt-1">
-              Choose an emoji to represent yourself
+              Choose an icon to represent yourself
             </p>
           </div>
         </div>
 
-        {/* Emoji Picker */}
-        <div className="w-full max-w-sm">
-          <EmojiPicker
-            selectedEmoji={avatarEmoji}
-            onEmojiSelect={setAvatarEmoji}
+        {/* Avatar Picker */}
+        <div className="w-full max-w-md">
+          <AvatarPicker
+            selectedIconId={avatarIconId}
+            onIconSelect={setAvatarIconId}
             variant="inline"
             className="w-full"
           />

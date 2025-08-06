@@ -99,7 +99,10 @@ const Header = ({ onLogout }: HeaderProps) => {
                       onClick={toggleDropdown}
                       className="flex items-center space-x-2 text-light-text-secondary dark:text-dark-text-secondary hover:text-light-button-primary dark:hover:text-dark-button-primary transition-colors duration-200 focus:outline-none"
                     >
-                      <Avatar size="sm" emoji={profile?.avatarEmoji} />
+                      <Avatar 
+                        size="sm" 
+                        iconId={profile?.avatarIconId}
+                      />
                       <span className="hidden md:block truncate max-w-[150px] text-light-text-primary dark:text-dark-text-primary font-medium">
                         {user.displayName || user.email}
                       </span>
