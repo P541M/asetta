@@ -1,51 +1,11 @@
-import { useEffect, useState } from "react";
-import Image from "next/image";
-import { useRouter } from "next/router";
 import Head from "next/head";
 import Link from "next/link";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { trackCTAClick } from "../utils/analytics";
+import { ImageComparison, ImageComparisonImage, ImageComparisonSlider } from "../components/ui/image-comparison";
 
 export default function LandingPage() {
-  const router = useRouter();
-  const [isDarkMode, setIsDarkMode] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isTransitioning, setIsTransitioning] = useState(false);
-
-  // Handle ESC key to close modal
-  useEffect(() => {
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && isModalOpen) {
-        setIsModalOpen(false);
-      }
-    };
-
-    if (isModalOpen) {
-      document.addEventListener("keydown", handleEscape);
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "unset";
-    }
-
-    return () => {
-      document.removeEventListener("keydown", handleEscape);
-      document.body.style.overflow = "unset";
-    };
-  }, [isModalOpen]);
-
-  const handleThemeSwitch = (newMode: boolean) => {
-    if (isDarkMode === newMode || isTransitioning) return;
-
-    setIsTransitioning(true);
-    setIsDarkMode(newMode);
-
-    // Reset transition state after animation completes
-    setTimeout(() => {
-      setIsTransitioning(false);
-    }, 300);
-  };
-
   return (
     <div className="min-h-screen flex flex-col bg-white">
       <Head>
@@ -159,115 +119,40 @@ export default function LandingPage() {
 
           {/* Dashboard Preview */}
           <div className="max-w-5xl mx-auto animate-fade-in-up-initial animate-fade-in-up">
-            {/* Theme Toggle */}
-            <div className="flex justify-center mb-8">
-              <div className="inline-flex items-center bg-white rounded-full p-1 shadow-lg border border-gray-200">
-                <button
-                  onClick={() => handleThemeSwitch(false)}
-                  disabled={isTransitioning}
-                  className={`flex items-center px-4 py-2 rounded-full transition-all duration-300 ${
-                    !isDarkMode
-                      ? "bg-primary-600 text-white shadow-md"
-                      : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
-                  } ${
-                    isTransitioning
-                      ? "cursor-not-allowed opacity-50"
-                      : "cursor-pointer"
-                  }`}
-                >
-                  <svg
-                    className={`w-4 h-4 mr-2 transition-all duration-300 ${
-                      !isDarkMode ? "rotate-0" : "rotate-180"
-                    }`}
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"
-                      clipRule="evenodd"
-                    />
+            {/* Instructions */}
+            {/* <div className="text-center mb-8">
+              <p className="text-sm text-gray-600 font-medium">
+                <span className="inline-flex items-center">
+                  <svg className="w-4 h-4 mr-2 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12H3m0 0l6-6m-6 6l6 6" />
                   </svg>
-                  Light
-                </button>
-
-                <button
-                  onClick={() => handleThemeSwitch(true)}
-                  disabled={isTransitioning}
-                  className={`flex items-center px-4 py-2 rounded-full transition-all duration-300 ${
-                    isDarkMode
-                      ? "bg-gray-900 text-white shadow-md"
-                      : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
-                  } ${
-                    isTransitioning
-                      ? "cursor-not-allowed opacity-50"
-                      : "cursor-pointer"
-                  }`}
-                >
-                  <svg
-                    className={`w-4 h-4 mr-2 transition-all duration-300 ${
-                      isDarkMode ? "rotate-0" : "-rotate-12"
-                    }`}
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
+                  Experience both themes — slide to explore light and dark dashboard views
+                  <svg className="w-4 h-4 ml-2 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h12m0 0l-6-6m6 6l-6 6" />
                   </svg>
-                  Dark
-                </button>
-              </div>
-            </div>
+                </span>
+              </p>
+            </div> */}
 
-            <div className="relative group">
-              <div className="absolute -inset-4 bg-primary-600/20 rounded-3xl blur-2xl group-hover:blur-3xl transition-all duration-500"></div>
-              <button
-                onClick={() => setIsModalOpen(true)}
-                className="relative bg-white rounded-2xl shadow-2xl border border-gray-200/50 overflow-hidden w-full hover:scale-105 transition-transform duration-300 cursor-pointer"
-                aria-label="Click to view dashboard preview in full size"
-              >
-                <div className="relative">
-                  {/* Light Mode Image */}
-                  <Image
-                    src="/images/Light_Prev.png"
-                    alt="Asetta Dashboard Preview - Light Mode"
-                    width={1000}
-                    height={600}
-                    priority
-                    className={`w-full h-auto transition-opacity duration-300 ${
-                      !isDarkMode ? "opacity-100" : "opacity-0"
-                    }`}
-                  />
-
-                  {/* Dark Mode Image - Layered on top */}
-                  <Image
+            <div className="relative">
+              <div className="absolute -inset-4 bg-primary-600/20 rounded-3xl blur-2xl transition-all duration-500"></div>
+              <div className="relative bg-white rounded-2xl shadow-2xl border border-gray-200/50 overflow-hidden w-full">
+                <ImageComparison className="aspect-video w-full rounded-2xl overflow-hidden">
+                  <ImageComparisonImage
                     src="/images/Dark_Prev.png"
                     alt="Asetta Dashboard Preview - Dark Mode"
-                    width={1000}
-                    height={600}
-                    priority
-                    className={`absolute inset-0 w-full h-auto transition-opacity duration-300 ${
-                      isDarkMode ? "opacity-100" : "opacity-0"
-                    }`}
+                    position="left"
                   />
-                  <div className="absolute inset-0 bg-black/0 hover:bg-black/5 transition-all duration-300 flex items-center justify-center">
-                    <div className="opacity-0 hover:opacity-100 transition-opacity duration-300 bg-white/90 rounded-full p-3 shadow-lg">
-                      <svg
-                        className="w-8 h-8 text-primary-600"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"
-                        />
-                      </svg>
-                    </div>
-                  </div>
-                </div>
-              </button>
+                  <ImageComparisonImage
+                    src="/images/Light_Prev.png"
+                    alt="Asetta Dashboard Preview - Light Mode"
+                    position="right"
+                  />
+                  <ImageComparisonSlider className="bg-white/90 backdrop-blur-sm shadow-lg">
+                    <div className="absolute left-1/2 top-1/2 h-8 w-6 -translate-x-1/2 -translate-y-1/2 rounded bg-white shadow-md border border-gray-300" />
+                  </ImageComparisonSlider>
+                </ImageComparison>
+              </div>
             </div>
           </div>
         </div>
@@ -437,71 +322,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Image Preview Modal */}
-      {isModalOpen && (
-        <div
-          className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in"
-          onClick={() => setIsModalOpen(false)}
-        >
-          <div
-            className="relative max-w-7xl max-h-[90vh] w-full animate-scale"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Close Button */}
-            <button
-              onClick={() => setIsModalOpen(false)}
-              className="absolute -top-12 right-0 text-white hover:text-gray-300 transition-colors duration-200 z-10"
-              aria-label="Close modal"
-            >
-              <svg
-                className="w-8 h-8"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
-            </button>
-
-            {/* Modal Image */}
-            <div className="relative bg-white rounded-2xl shadow-2xl overflow-hidden">
-              {/* Light Mode Image */}
-              <Image
-                src="/images/Light_Prev.png"
-                alt="Asetta Dashboard Preview - Light Mode - Full Size"
-                width={1400}
-                height={900}
-                className={`w-full h-auto transition-opacity duration-300 ${
-                  !isDarkMode ? "opacity-100" : "opacity-0"
-                }`}
-                priority
-              />
-
-              {/* Dark Mode Image - Layered on top */}
-              <Image
-                src="/images/Dark_Prev.png"
-                alt="Asetta Dashboard Preview - Dark Mode - Full Size"
-                width={1400}
-                height={900}
-                className={`absolute inset-0 w-full h-auto transition-opacity duration-300 ${
-                  isDarkMode ? "opacity-100" : "opacity-0"
-                }`}
-                priority
-              />
-            </div>
-
-            {/* Theme indicator */}
-            <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm rounded-full px-3 py-1 text-sm font-medium text-gray-700">
-              {isDarkMode ? "Dark" : "Light"} Mode
-            </div>
-          </div>
-        </div>
-      )}
 
       <Footer />
     </div>
