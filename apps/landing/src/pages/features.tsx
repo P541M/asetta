@@ -1,5 +1,6 @@
 import Head from "next/head";
 import Link from "next/link";
+import Image from "next/image";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 
@@ -51,37 +52,37 @@ export default function FeaturesPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-10 animate-fade-in-up-initial animate-fade-in-up">
             {[
               {
-                icon: "M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z",
+                image: "/images/features/document-processing.png",
                 title: "Intelligent Document Processing",
                 description:
                   "Transform course syllabi into organized assignment schedules. Upload your PDF course outline and let AI instantly extract every assignment, deadline, and weight—eliminating manual data entry and ensuring nothing falls through the cracks.",
               },
               {
-                icon: "M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z",
+                image: "/images/features/grade-calculator.png",
                 title: "Advanced Grade Calculator",
                 description:
                   "Take control of your academic performance with precision grade tracking. Calculate exactly what you need to achieve your target grades, monitor your GPA in real-time, and make informed decisions about your study priorities.",
               },
               {
-                icon: "M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z",
+                image: "/images/features/calendar-deadlines.png",
                 title: "Smart Calendar & Deadline Management",
                 description:
                   "Visualize your entire semester at a glance with drag-and-drop scheduling. Never miss another deadline with intelligent notifications and seamless calendar integration that syncs with your existing tools.",
               },
               {
-                icon: "M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10",
+                image: "/images/features/semester-organization.png",
                 title: "Semester Organization",
                 description:
                   "Structure your academic journey with intuitive semester management. Organize courses, navigate between terms effortlessly, and maintain clear separation between different academic periods for better focus and planning.",
               },
               {
-                icon: "M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4",
+                image: "/images/features/assessment-tracking.png",
                 title: "Comprehensive Assessment Tracking",
                 description:
                   "Master your academic workload with powerful assessment management tools. Track progress, manage statuses, filter by courses, and handle multiple assignments efficiently with bulk operations and intelligent search capabilities.",
               },
               {
-                icon: "M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z",
+                image: "/images/features/notes-documentation.png",
                 title: "Professional Notes & Documentation",
                 description:
                   "Enhance your study process with a sophisticated note-taking system. Create detailed, formatted notes for each assessment with professional text editing tools, link management, and persistent storage for comprehensive academic documentation.",
@@ -89,35 +90,26 @@ export default function FeaturesPage() {
             ].map((feature, index) => (
               <div
                 key={index}
-                className={`group transform transition-all duration-500 hover:-translate-y-3 hover:scale-105 animate-fade-in-up-initial animate-fade-in-up`}
+                className={`animate-fade-in-up-initial animate-fade-in-up`}
                 style={{ animationDelay: `${index * 0.1}s` }}
               >
-                <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-lg hover:shadow-2xl transition-all duration-500 border border-gray-200/50 hover:border-primary-200 h-full flex flex-col relative overflow-hidden group-hover:bg-white">
-                  <div className="absolute inset-0 bg-primary-50/30 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <div className="bg-white rounded-3xl shadow-lg border border-gray-200/50 h-full overflow-hidden">
+                  {/* Image Header */}
+                  <div className="relative h-48 md:h-56 overflow-hidden">
+                    <Image
+                      src={feature.image}
+                      alt={feature.title}
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
 
-                  <div className="relative z-10">
-                    <div className="w-16 h-16 bg-primary-100 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 group-hover:bg-primary-200 transition-all duration-300 shadow-md">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-8 w-8 text-primary-600 group-hover:text-primary-700 transition-colors duration-300"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d={feature.icon}
-                        />
-                      </svg>
-                    </div>
-
-                    <h3 className="text-2xl font-bold text-gray-900 mb-4 group-hover:text-primary-900 transition-colors duration-300 font-heading">
+                  {/* Text Box */}
+                  <div className="p-6 md:p-8">
+                    <h3 className="text-2xl font-bold text-gray-900 mb-4 font-heading">
                       {feature.title}
                     </h3>
-
-                    <p className="text-gray-600 leading-relaxed flex-grow text-lg group-hover:text-gray-700 transition-colors duration-300">
+                    <p className="text-gray-600 leading-relaxed text-lg">
                       {feature.description}
                     </p>
                   </div>

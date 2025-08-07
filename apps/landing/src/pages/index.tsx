@@ -1,9 +1,14 @@
 import Head from "next/head";
 import Link from "next/link";
+import Image from "next/image";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { trackCTAClick } from "../utils/analytics";
-import { ImageComparison, ImageComparisonImage, ImageComparisonSlider } from "../components/ui/image-comparison";
+import {
+  ImageComparison,
+  ImageComparisonImage,
+  ImageComparisonSlider,
+} from "../components/ui/image-comparison";
 
 export default function LandingPage() {
   return (
@@ -40,10 +45,7 @@ export default function LandingPage() {
               </span>
 
               <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold text-gray-900 font-heading tracking-tight leading-tight animate-fade-in-initial animate-fade-in">
-                Your Smart{" "}
-                <span className="text-primary-600">
-                  Academic
-                </span>{" "}
+                Your Smart <span className="text-primary-600">Academic</span>{" "}
                 Assistant
               </h1>
 
@@ -57,7 +59,12 @@ export default function LandingPage() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center mt-8 lg:mt-10 animate-fade-in-up-initial animate-fade-in-up">
               <Link
                 href="https://asetta.me/register"
-                onClick={() => trackCTAClick('Get Started Free - Hero', 'https://asetta.me/register')}
+                onClick={() =>
+                  trackCTAClick(
+                    "Get Started Free - Hero",
+                    "https://asetta.me/register"
+                  )
+                }
                 className="group inline-flex items-center justify-center px-8 py-4 text-lg font-bold text-white bg-primary-600 hover:bg-primary-700 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
               >
                 Get Started Free
@@ -78,7 +85,9 @@ export default function LandingPage() {
 
               <Link
                 href="/features"
-                onClick={() => trackCTAClick('Explore Features - Hero', '/features')}
+                onClick={() =>
+                  trackCTAClick("Explore Features - Hero", "/features")
+                }
                 className="inline-flex items-center justify-center px-8 py-4 text-lg font-bold text-gray-700 bg-white border-2 border-gray-200 rounded-2xl shadow-lg hover:shadow-xl hover:border-primary-300 transition-all duration-300 hover:-translate-y-1"
               >
                 Explore Features
@@ -119,21 +128,6 @@ export default function LandingPage() {
 
           {/* Dashboard Preview */}
           <div className="max-w-5xl mx-auto animate-fade-in-up-initial animate-fade-in-up">
-            {/* Instructions */}
-            {/* <div className="text-center mb-8">
-              <p className="text-sm text-gray-600 font-medium">
-                <span className="inline-flex items-center">
-                  <svg className="w-4 h-4 mr-2 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12H3m0 0l6-6m-6 6l6 6" />
-                  </svg>
-                  Experience both themes — slide to explore light and dark dashboard views
-                  <svg className="w-4 h-4 ml-2 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h12m0 0l-6-6m6 6l-6 6" />
-                  </svg>
-                </span>
-              </p>
-            </div> */}
-
             <div className="relative">
               <div className="absolute -inset-4 bg-primary-600/20 rounded-3xl blur-2xl transition-all duration-500"></div>
               <div className="relative bg-white rounded-2xl shadow-2xl border border-gray-200/50 overflow-hidden w-full">
@@ -171,9 +165,7 @@ export default function LandingPage() {
             </span>
             <h2 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-6 font-heading tracking-tight">
               Smart Features for{" "}
-              <span className="text-primary-600">
-                Student Success
-              </span>
+              <span className="text-primary-600">Student Success</span>
             </h2>
             <p className="text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
               Everything you need to dominate your academic journey with tools
@@ -181,22 +173,22 @@ export default function LandingPage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-10">
             {[
               {
-                icon: "M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z",
+                image: "/images/features/document-processing.png",
                 title: "Intelligent Document Processing",
                 description:
                   "Transform course syllabi into organized assignment schedules. Upload your PDF course outline and let AI instantly extract every assignment, deadline, and weight—eliminating manual data entry and ensuring nothing falls through the cracks.",
               },
               {
-                icon: "M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z",
+                image: "/images/features/grade-calculator.png",
                 title: "Advanced Grade Calculator",
                 description:
                   "Take control of your academic performance with precision grade tracking. Calculate exactly what you need to achieve your target grades, monitor your GPA in real-time, and make informed decisions about your study priorities.",
               },
               {
-                icon: "M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z",
+                image: "/images/features/calendar-deadlines.png",
                 title: "Smart Calendar & Deadline Management",
                 description:
                   "Visualize your entire semester at a glance with drag-and-drop scheduling. Never miss another deadline with intelligent notifications and seamless calendar integration that syncs with your existing tools.",
@@ -204,32 +196,26 @@ export default function LandingPage() {
             ].map((feature, index) => (
               <div
                 key={index}
-                className={`group transform transition-all duration-500 hover:-translate-y-3 hover:scale-105 animate-fade-in-up-initial animate-fade-in-up`}
-                style={{ animationDelay: `${index * 0.2}s` }}
+                className={`animate-fade-in-up-initial animate-fade-in-up`}
+                style={{ animationDelay: `${index * 0.15}s` }}
               >
-                <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-lg hover:shadow-2xl transition-all duration-500 border border-gray-200/50 hover:border-primary-200 h-full flex flex-col relative overflow-hidden group-hover:bg-white">
-                  <div className="absolute inset-0 bg-primary-50/30 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                  <div className="relative z-10">
-                    <div className="w-16 h-16 bg-primary-100 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 group-hover:bg-primary-200 transition-all duration-300 shadow-md">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-8 w-8 text-primary-600 group-hover:text-primary-700 transition-colors duration-300"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d={feature.icon}
-                        />
-                      </svg>
-                    </div>
-                    <h3 className="text-2xl font-bold text-gray-900 mb-4 group-hover:text-primary-900 transition-colors duration-300">
+                <div className="bg-white rounded-3xl shadow-lg border border-gray-200/50 h-full overflow-hidden">
+                  {/* Image Header */}
+                  <div className="relative h-48 md:h-56 overflow-hidden">
+                    <Image
+                      src={feature.image}
+                      alt={feature.title}
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
+
+                  {/* Text Box */}
+                  <div className="p-6 md:p-8">
+                    <h3 className="text-2xl font-bold text-gray-900 mb-4 font-heading">
                       {feature.title}
                     </h3>
-                    <p className="text-gray-600 leading-relaxed flex-grow text-lg group-hover:text-gray-700 transition-colors duration-300">
+                    <p className="text-gray-600 leading-relaxed text-lg">
                       {feature.description}
                     </p>
                   </div>
@@ -282,10 +268,8 @@ export default function LandingPage() {
             </span>
             <h2 className="text-5xl md:text-6xl font-extrabold text-gray-900 mb-8 font-heading tracking-tight leading-tight">
               Start Your{" "}
-              <span className="text-primary-600">
-                Academic Success
-              </span>{" "}
-              Journey Today
+              <span className="text-primary-600">Academic Success</span> Journey
+              Today
             </h2>
             <p className="text-xl md:text-2xl text-gray-700 mb-12 max-w-4xl mx-auto leading-relaxed font-medium">
               Join students who are using Asetta's comprehensive platform to
@@ -321,7 +305,6 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
-
 
       <Footer />
     </div>
