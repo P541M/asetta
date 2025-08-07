@@ -1,6 +1,19 @@
 import { getAdmin } from "./firebase-admin";
 import { sendEmail } from "./email";
 
+// Helper functions for development-only logging
+const devLog = (...args: unknown[]) => {
+  if (process.env.NODE_ENV === 'development') {
+    console.log(...args);
+  }
+};
+
+const devError = (...args: unknown[]) => {
+  if (process.env.NODE_ENV === 'development') {
+    console.error(...args);
+  }
+};
+
 interface NotificationPreferences {
   emailNotifications: boolean;
   notificationDaysBefore: number;
@@ -20,17 +33,17 @@ interface Assessment {
 
 export async function checkAndSendNotifications() {
   const startTime = new Date();
-  console.log("=== NOTIFICATION CHECK STARTED ===", startTime.toISOString());
+  devLog("=== NOTIFICATION CHECK STARTED ===", startTime.toISOString());
   
   try {
     const admin = await getAdmin();
     const db = admin.firestore();
-    console.log("✅ Firebase Admin initialized successfully");
+    devLog("✅ Firebase Admin initialized successfully");
 
     // Get all users with notification preferences
     const usersRef = db.collection("users");
     const usersSnapshot = await usersRef.get();
-    console.log(`📊 Found ${usersSnapshot.docs.length} users to check`);
+    devLog(`📊 Found ${usersSnapshot.docs.length} users to check`);
 
     let totalNotificationsSent = 0;
     let totalUsersProcessed = 0;
@@ -38,11 +51,11 @@ export async function checkAndSendNotifications() {
 
     for (const userDoc of usersSnapshot.docs) {
       totalUsersProcessed++;
-      console.log(`\n--- Processing User ${userDoc.id} (${totalUsersProcessed}/${usersSnapshot.docs.length}) ---`);
+      devLog(`\n--- Processing User ${userDoc.id} (${totalUsersProcessed}/${usersSnapshot.docs.length}) ---`);
       
       try {
         const userData = userDoc.data();
-        console.log("📋 Raw user data:", {
+        devLog("📋 Raw user data:", {
           hasEmailNotifications: 'emailNotifications' in userData,
           hasNotificationDaysBefore: 'notificationDaysBefore' in userData,
           hasEmail: 'email' in userData,
@@ -53,13 +66,13 @@ export async function checkAndSendNotifications() {
         const preferencesValidation = validateNotificationPreferences(userData);
         
         if (!preferencesValidation.isValid) {
-          console.log(`⚠️ Invalid user preferences for ${userDoc.id}:`, preferencesValidation.errors);
+          devLog(`⚠️ Invalid user preferences for ${userDoc.id}:`, preferencesValidation.errors);
           continue;
         }
 
         const preferences = preferencesValidation.sanitized!;
 
-        console.log("⚙️ User preferences:", {
+        devLog("⚙️ User preferences:", {
           userId: userDoc.id,
           emailNotifications: preferences.emailNotifications,
           notificationDaysBefore: preferences.notificationDaysBefore,
@@ -68,39 +81,39 @@ export async function checkAndSendNotifications() {
         });
 
         if (!preferences.hasConsentedToNotifications) {
-          console.log("⏭️ User has not consented to notifications, skipping");
+          devLog("⏭️ User has not consented to notifications, skipping");
           continue;
         }
 
         if (!preferences.emailNotifications) {
-          console.log("⏭️ Email notifications disabled for user, skipping");
+          devLog("⏭️ Email notifications disabled for user, skipping");
           continue;
         }
 
         if (!preferences.email) {
-          console.log("⚠️ No email address set for user, skipping");
+          devLog("⚠️ No email address set for user, skipping");
           continue;
         }
 
         // Get all semesters for this user
         const semestersRef = userDoc.ref.collection("semesters");
         const semestersSnapshot = await semestersRef.get();
-        console.log(`📚 Found ${semestersSnapshot.docs.length} semesters for user`);
+        devLog(`📚 Found ${semestersSnapshot.docs.length} semesters for user`);
 
         // Get all assessments across all semesters
         const now = new Date();
-        console.log("🕐 Current time:", now.toISOString());
+        devLog("🕐 Current time:", now.toISOString());
 
         let allAssessments: Assessment[] = [];
 
         for (const semesterDoc of semestersSnapshot.docs) {
           const assessmentsRef = semesterDoc.ref.collection("assessments");
           const assessmentsSnapshot = await assessmentsRef.get();
-          console.log(`📝 Found ${assessmentsSnapshot.docs.length} assessments in semester ${semesterDoc.id}`);
+          devLog(`📝 Found ${assessmentsSnapshot.docs.length} assessments in semester ${semesterDoc.id}`);
 
           const semesterAssessments = assessmentsSnapshot.docs.map((doc) => {
             const data = doc.data();
-            console.log(`📄 Assessment data for ${doc.id}:`, {
+            devLog(`📄 Assessment data for ${doc.id}:`, {
               title: data.title,
               assignmentName: data.assignmentName,
               dueDate: data.dueDate,
@@ -120,7 +133,7 @@ export async function checkAndSendNotifications() {
           allAssessments = [...allAssessments, ...semesterAssessments];
         }
 
-        console.log(`📊 Total assessments found: ${allAssessments.length}`);
+        devLog(`📊 Total assessments found: ${allAssessments.length}`);
 
         // Filter assessments that are due in the future and process dates
         const futureAssessments = [];
@@ -159,9 +172,9 @@ export async function checkAndSendNotifications() {
               });
             }
 
-            console.log(`✅ Parsed date for "${assessment.assignmentName}": ${dueDate.toISOString()}`);
+            devLog(`✅ Parsed date for "${assessment.assignmentName}": ${dueDate.toISOString()}`);
           } catch (error) {
-            console.error(`❌ Date parsing error for assessment "${assessment.assignmentName}":`, error);
+            devError(`❌ Date parsing error for assessment "${assessment.assignmentName}":`, error);
             dateParsingErrors.push({
               assessmentId: assessment.id,
               title: assessment.assignmentName,
@@ -171,10 +184,10 @@ export async function checkAndSendNotifications() {
         }
 
         if (dateParsingErrors.length > 0) {
-          console.log(`⚠️ Date parsing errors (${dateParsingErrors.length}):`, dateParsingErrors);
+          devLog(`⚠️ Date parsing errors (${dateParsingErrors.length}):`, dateParsingErrors);
         }
 
-        console.log(`🔮 Future assessments: ${futureAssessments.length}`);
+        devLog(`🔮 Future assessments: ${futureAssessments.length}`);
 
         for (const assessment of futureAssessments) {
           const dueDate = assessment.parsedDueDate;
@@ -182,7 +195,7 @@ export async function checkAndSendNotifications() {
           const daysUntilDue = Math.floor(timeDiffMs / (1000 * 60 * 60 * 24));
           const hoursUntilDue = Math.floor(timeDiffMs / (1000 * 60 * 60));
 
-          console.log(`📋 Assessment details:`, {
+          devLog(`📋 Assessment details:`, {
             title: assessment.assignmentName,
             courseName: assessment.courseName,
             dueDate: dueDate.toISOString(),
@@ -202,13 +215,13 @@ export async function checkAndSendNotifications() {
             const existingNotification = await notificationRef.get();
             
             if (existingNotification.exists) {
-              console.log(`⏭️ Notification already sent for "${assessment.assignmentName}" (${daysUntilDue} days)`);
+              devLog(`⏭️ Notification already sent for "${assessment.assignmentName}" (${daysUntilDue} days)`);
               continue;
             }
             
             const subject = `Assessment Reminder: ${assessment.assignmentName}`;
 
-            console.log(`📧 Sending notification for "${assessment.assignmentName}" (${daysUntilDue} days until due)`);
+            devLog(`📧 Sending notification for "${assessment.assignmentName}" (${daysUntilDue} days until due)`);
             
             try {
               await sendEmail(
@@ -232,9 +245,9 @@ export async function checkAndSendNotifications() {
               });
               
               totalNotificationsSent++;
-              console.log(`✅ Email sent successfully to ${preferences.email} and notification recorded`);
+              devLog(`✅ Email sent successfully to ${preferences.email} and notification recorded`);
             } catch (emailError) {
-              console.error(`❌ Failed to send email:`, emailError);
+              devError(`❌ Failed to send email:`, emailError);
               
               // Record the failed notification attempt
               await notificationRef.set({
@@ -253,11 +266,11 @@ export async function checkAndSendNotifications() {
               totalErrors++;
             }
           } else {
-            console.log(`⏭️ Not sending notification - timing doesn't match (${daysUntilDue} days vs ${preferences.notificationDaysBefore} required)`);
+            devLog(`⏭️ Not sending notification - timing doesn't match (${daysUntilDue} days vs ${preferences.notificationDaysBefore} required)`);
           }
         }
       } catch (userError) {
-        console.error(`❌ Error processing user ${userDoc.id}:`, userError);
+        devError(`❌ Error processing user ${userDoc.id}:`, userError);
         totalErrors++;
       }
     }
@@ -265,16 +278,16 @@ export async function checkAndSendNotifications() {
     const endTime = new Date();
     const duration = endTime.getTime() - startTime.getTime();
     
-    console.log("\n=== NOTIFICATION CHECK COMPLETED ===");
-    console.log(`⏱️ Duration: ${duration}ms`);
-    console.log(`👥 Users processed: ${totalUsersProcessed}`);
-    console.log(`📧 Notifications sent: ${totalNotificationsSent}`);
-    console.log(`❌ Errors encountered: ${totalErrors}`);
-    console.log("=== END SUMMARY ===");
+    devLog("\n=== NOTIFICATION CHECK COMPLETED ===");
+    devLog(`⏱️ Duration: ${duration}ms`);
+    devLog(`👥 Users processed: ${totalUsersProcessed}`);
+    devLog(`📧 Notifications sent: ${totalNotificationsSent}`);
+    devLog(`❌ Errors encountered: ${totalErrors}`);
+    devLog("=== END SUMMARY ===");
 
   } catch (error) {
-    console.error("💥 CRITICAL ERROR in notification system:", error);
-    console.error("Stack trace:", error instanceof Error ? error.stack : String(error));
+    devError("💥 CRITICAL ERROR in notification system:", error);
+    devError("Stack trace:", error instanceof Error ? error.stack : String(error));
     throw error;
   }
 }

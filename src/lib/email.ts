@@ -1,5 +1,18 @@
 import nodemailer from "nodemailer";
 
+// Helper functions for development-only logging
+const devLog = (...args: unknown[]) => {
+  if (process.env.NODE_ENV === 'development') {
+    console.log(...args);
+  }
+};
+
+const devError = (...args: unknown[]) => {
+  if (process.env.NODE_ENV === 'development') {
+    console.error(...args);
+  }
+};
+
 // Create a transporter using Gmail
 const transporter = nodemailer.createTransport({
   service: "gmail",
@@ -301,7 +314,7 @@ export async function sendWelcomeEmail(
   studyProgram?: string
 ) {
   if (process.env.NODE_ENV === 'development') {
-    console.log("📧 Attempting to send welcome email");
+    devLog("📧 Attempting to send welcome email");
   }
 
   // Validate environment variables
@@ -315,11 +328,11 @@ export async function sendWelcomeEmail(
   try {
     // Test transporter connection
     if (process.env.NODE_ENV === 'development') {
-      console.log("🔍 Testing email transporter connection...");
+      devLog("🔍 Testing email transporter connection...");
     }
     await transporter.verify();
     if (process.env.NODE_ENV === 'development') {
-      console.log("✅ Email transporter connection verified");
+      devLog("✅ Email transporter connection verified");
     }
 
     const html = generateWelcomeEmailHTML(displayName, email, institution, studyProgram);
@@ -333,12 +346,12 @@ export async function sendWelcomeEmail(
     };
 
     if (process.env.NODE_ENV === 'development') {
-      console.log("📤 Sending welcome email");
+      devLog("📤 Sending welcome email");
     }
 
     await transporter.sendMail(mailOptions);
     if (process.env.NODE_ENV === 'development') {
-      console.log("✅ Welcome email sent successfully");
+      devLog("✅ Welcome email sent successfully");
     }
     return true;
   } catch (error) {
@@ -349,9 +362,9 @@ export async function sendWelcomeEmail(
       response?: string; 
       responseCode?: number; 
     };
-    console.error("❌ Welcome email sending failed");
+    devError("❌ Welcome email sending failed");
     if (process.env.NODE_ENV === 'development') {
-      console.error("Welcome email error details:", {
+      devError("Welcome email error details:", {
         error: emailError.message || String(error),
         code: emailError.code,
       });
@@ -367,7 +380,7 @@ export async function sendEmail(
   daysUntilDue: number
 ) {
   if (process.env.NODE_ENV === 'development') {
-    console.log("📧 Attempting to send assessment email");
+    devLog("📧 Attempting to send assessment email");
   }
 
   // Validate environment variables
@@ -381,11 +394,11 @@ export async function sendEmail(
   try {
     // Test transporter connection
     if (process.env.NODE_ENV === 'development') {
-      console.log("🔍 Testing email transporter connection...");
+      devLog("🔍 Testing email transporter connection...");
     }
     await transporter.verify();
     if (process.env.NODE_ENV === 'development') {
-      console.log("✅ Email transporter connection verified");
+      devLog("✅ Email transporter connection verified");
     }
 
     const html = generateEmailHTML(assessmentTitle, daysUntilDue);
@@ -401,12 +414,12 @@ export async function sendEmail(
     };
 
     if (process.env.NODE_ENV === 'development') {
-      console.log("📤 Sending assessment email");
+      devLog("📤 Sending assessment email");
     }
 
     await transporter.sendMail(mailOptions);
     if (process.env.NODE_ENV === 'development') {
-      console.log("✅ Assessment email sent successfully");
+      devLog("✅ Assessment email sent successfully");
     }
     return true;
   } catch (error) {
@@ -417,9 +430,9 @@ export async function sendEmail(
       response?: string; 
       responseCode?: number; 
     };
-    console.error("❌ Assessment email sending failed");
+    devError("❌ Assessment email sending failed");
     if (process.env.NODE_ENV === 'development') {
-      console.error("Assessment email error details:", {
+      devError("Assessment email error details:", {
         error: emailError.message || String(error),
         code: emailError.code,
       });

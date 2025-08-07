@@ -1,6 +1,19 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { sendWelcomeEmail } from '../../lib/email';
 
+// Helper functions for development-only logging
+const devLog = (...args: unknown[]) => {
+  if (process.env.NODE_ENV === 'development') {
+    console.log(...args);
+  }
+};
+
+const devError = (...args: unknown[]) => {
+  if (process.env.NODE_ENV === 'development') {
+    console.error(...args);
+  }
+};
+
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
@@ -33,7 +46,7 @@ export default async function handler(
 
   try {
     if (process.env.NODE_ENV === 'development') {
-      console.log('📧 Welcome email API called');
+      devLog('📧 Welcome email API called');
     }
 
     await sendWelcomeEmail(displayName, email, institution, studyProgram);
@@ -43,7 +56,7 @@ export default async function handler(
       message: 'Welcome email sent successfully' 
     });
   } catch (error) {
-    console.error('❌ Welcome email API error');
+    devError('❌ Welcome email API error');
     
     // Check if it's an email service error
     const emailError = error as { 
