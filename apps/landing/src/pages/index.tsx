@@ -59,15 +59,15 @@ export default function LandingPage() {
 
       {/* Hero Section */}
       <section
-        className="relative pb-20 lg:pb-32 pb-safe overflow-hidden bg-gradient-to-br from-primary-50 via-white to-white"
+        className="relative pb-20 lg:pb-32 pb-safe overflow-hidden bg-white"
         style={{
           paddingTop: `max(11rem, calc(11rem + env(safe-area-inset-top)))`,
         }}
       >
         {/* Subtle background elements */}
         <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute -top-24 -left-24 w-96 h-96 bg-gradient-to-br from-primary-100/20 to-transparent rounded-full blur-3xl" />
-          <div className="absolute -bottom-24 -right-24 w-80 h-80 bg-gradient-to-tr from-primary-100/15 to-transparent rounded-full blur-3xl" />
+          <div className="absolute -top-24 -left-24 w-96 h-96 bg-primary-100/20 rounded-full blur-3xl" />
+          <div className="absolute -bottom-24 -right-24 w-80 h-80 bg-primary-100/15 rounded-full blur-3xl" />
         </div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pl-safe pr-safe relative z-10">
@@ -81,7 +81,7 @@ export default function LandingPage() {
 
               <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold text-gray-900 font-heading tracking-tight leading-tight animate-fade-in-initial animate-fade-in">
                 Your Smart{" "}
-                <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary-600 to-primary-800">
+                <span className="text-primary-600">
                   Academic
                 </span>{" "}
                 Assistant
@@ -98,7 +98,7 @@ export default function LandingPage() {
               <Link
                 href="https://asetta.me/register"
                 onClick={() => trackCTAClick('Get Started Free - Hero', 'https://asetta.me/register')}
-                className="group inline-flex items-center justify-center px-8 py-4 text-lg font-bold text-white bg-gradient-to-r from-primary-600 to-primary-700 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
+                className="group inline-flex items-center justify-center px-8 py-4 text-lg font-bold text-white bg-primary-600 hover:bg-primary-700 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
               >
                 Get Started Free
                 <svg
@@ -219,7 +219,7 @@ export default function LandingPage() {
             </div>
 
             <div className="relative group">
-              <div className="absolute -inset-4 bg-gradient-to-r from-primary-600/20 to-primary-700/20 rounded-3xl blur-2xl group-hover:blur-3xl transition-all duration-500"></div>
+              <div className="absolute -inset-4 bg-primary-600/20 rounded-3xl blur-2xl group-hover:blur-3xl transition-all duration-500"></div>
               <button
                 onClick={() => setIsModalOpen(true)}
                 className="relative bg-white rounded-2xl shadow-2xl border border-gray-200/50 overflow-hidden w-full hover:scale-105 transition-transform duration-300 cursor-pointer"
@@ -276,17 +276,17 @@ export default function LandingPage() {
       {/* Features Section */}
       <section
         id="features"
-        className="py-32 bg-gradient-to-b from-white via-gray-50/50 to-white relative overflow-hidden"
+        className="py-32 bg-gray-50/50 relative overflow-hidden"
       >
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-primary-50/30 via-transparent to-transparent"></div>
+        <div className="absolute inset-0 bg-primary-50/30"></div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pl-safe pr-safe relative z-10">
           <div className="text-center mb-24 animate-fade-in-up-initial animate-fade-in-up">
-            <span className="inline-block mb-4 px-4 py-2 rounded-full bg-gradient-to-r from-primary-100 to-primary-50 text-primary-700 font-semibold text-sm shadow-md border border-primary-200/50">
+            <span className="inline-block mb-4 px-4 py-2 rounded-full bg-primary-100 text-primary-700 font-semibold text-sm shadow-md border border-primary-200/50">
               🚀 Always Ahead, Never Behind
             </span>
             <h2 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-6 font-heading tracking-tight">
               Smart Features for{" "}
-              <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary-600 to-primary-700">
+              <span className="text-primary-600">
                 Student Success
               </span>
             </h2>
@@ -323,9 +323,9 @@ export default function LandingPage() {
                 style={{ animationDelay: `${index * 0.2}s` }}
               >
                 <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-lg hover:shadow-2xl transition-all duration-500 border border-gray-200/50 hover:border-primary-200 h-full flex flex-col relative overflow-hidden group-hover:bg-white">
-                  <div className="absolute inset-0 bg-gradient-to-br from-primary-50/30 via-transparent to-primary-50/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                  <div className="absolute inset-0 bg-primary-50/30 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                   <div className="relative z-10">
-                    <div className="w-16 h-16 bg-gradient-to-br from-primary-100 to-primary-50 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 group-hover:bg-gradient-to-br group-hover:from-primary-200 group-hover:to-primary-100 transition-all duration-300 shadow-md">
+                    <div className="w-16 h-16 bg-primary-100 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 group-hover:bg-primary-200 transition-all duration-300 shadow-md">
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         className="h-8 w-8 text-primary-600 group-hover:text-primary-700 transition-colors duration-300"
@@ -358,9 +358,9 @@ export default function LandingPage() {
             <div className="group transform transition-all duration-300 hover:scale-105 hover:-translate-y-1 inline-block">
               <Link
                 href="/features"
-                className="inline-flex items-center justify-center px-8 py-4 text-lg font-bold text-white bg-gradient-to-r from-primary-600 to-primary-700 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 relative overflow-hidden"
+                className="inline-flex items-center justify-center px-8 py-4 text-lg font-bold text-white bg-primary-600 hover:bg-primary-700 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 relative overflow-hidden"
               >
-                <span className="absolute inset-0 bg-gradient-to-r from-primary-700 to-primary-800 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
+                <span className="absolute inset-0 bg-primary-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
                 <span className="relative z-10">See All Features</span>
                 <svg
                   className="w-5 h-5 ml-3 group-hover:translate-x-1 transition-transform duration-300 relative z-10"
@@ -382,22 +382,22 @@ export default function LandingPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-32 pb-safe bg-gradient-to-br from-primary-50 via-primary-25 to-white relative overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary-100/40 via-transparent to-transparent"></div>
-        <div className="absolute -top-24 -left-24 w-96 h-96 bg-gradient-to-br from-primary-200 to-primary-100 rounded-full blur-3xl opacity-30 animate-float"></div>
+      <section className="py-32 pb-safe bg-primary-50 relative overflow-hidden">
+        <div className="absolute inset-0 bg-primary-100/40"></div>
+        <div className="absolute -top-24 -left-24 w-96 h-96 bg-primary-200 rounded-full blur-3xl opacity-30 animate-float"></div>
         <div
-          className="absolute -bottom-24 -right-24 w-80 h-80 bg-gradient-to-br from-primary-150 to-primary-50 rounded-full blur-3xl opacity-40 animate-float"
+          className="absolute -bottom-24 -right-24 w-80 h-80 bg-primary-150 rounded-full blur-3xl opacity-40 animate-float"
           style={{ animationDelay: "2s" }}
         ></div>
 
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
           <div className="animate-fade-in-up-initial animate-fade-in-up">
-            <span className="inline-block mb-6 px-6 py-3 rounded-full bg-gradient-to-r from-primary-100 to-primary-50 text-primary-700 font-bold text-sm shadow-lg border border-primary-200/50 backdrop-blur-sm">
+            <span className="inline-block mb-6 px-6 py-3 rounded-full bg-primary-100 text-primary-700 font-bold text-sm shadow-lg border border-primary-200/50 backdrop-blur-sm">
               🚀 Ready to Excel?
             </span>
             <h2 className="text-5xl md:text-6xl font-extrabold text-gray-900 mb-8 font-heading tracking-tight leading-tight">
               Start Your{" "}
-              <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary-600 via-primary-700 to-primary-800 animate-gradient-x">
+              <span className="text-primary-600">
                 Academic Success
               </span>{" "}
               Journey Today
@@ -410,9 +410,9 @@ export default function LandingPage() {
             <div className="flex justify-center group transform transition-all duration-300 hover:scale-105 hover:-translate-y-2">
               <Link
                 href="https://asetta.me/register"
-                className="inline-flex items-center justify-center px-12 py-6 text-xl font-bold text-white bg-gradient-to-r from-primary-600 via-primary-700 to-primary-800 rounded-2xl shadow-2xl hover:shadow-3xl transition-all duration-300 relative overflow-hidden animate-scale-delayed"
+                className="inline-flex items-center justify-center px-12 py-6 text-xl font-bold text-white bg-primary-600 hover:bg-primary-700 rounded-2xl shadow-2xl hover:shadow-3xl transition-all duration-300 relative overflow-hidden animate-scale-delayed"
               >
-                <span className="absolute inset-0 bg-gradient-to-r from-primary-700 via-primary-800 to-primary-900 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
+                <span className="absolute inset-0 bg-primary-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
                 <span className="relative z-10">Create Your Free Account</span>
                 <svg
                   className="w-6 h-6 ml-4 group-hover:translate-x-2 transition-transform duration-300 relative z-10"

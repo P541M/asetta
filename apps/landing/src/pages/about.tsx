@@ -6,7 +6,7 @@ import Footer from "../components/Footer";
 
 export default function AboutPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-white via-primary-50/20 to-white flex flex-col">
+    <div className="min-h-screen bg-primary-50/20 flex flex-col">
       <Head>
         <title>About Us | Asetta</title>
         <meta
@@ -24,8 +24,8 @@ export default function AboutPage() {
       >
         {/* Background Elements */}
         <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute -top-24 -left-24 w-96 h-96 bg-gradient-to-br from-primary-100/20 to-transparent rounded-full blur-3xl" />
-          <div className="absolute -bottom-24 -right-24 w-80 h-80 bg-gradient-to-tr from-primary-100/15 to-transparent rounded-full blur-3xl" />
+          <div className="absolute -top-24 -left-24 w-96 h-96 bg-primary-100/20 rounded-full blur-3xl" />
+          <div className="absolute -bottom-24 -right-24 w-80 h-80 bg-primary-100/15 rounded-full blur-3xl" />
         </div>
 
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
@@ -42,7 +42,7 @@ export default function AboutPage() {
             </span>
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-gray-900 mb-8 font-heading tracking-tight leading-tight">
               Our{" "}
-              <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary-600 to-primary-800">
+              <span className="text-primary-600">
                 Story
               </span>
             </h1>
@@ -60,7 +60,7 @@ export default function AboutPage() {
               transition={{ duration: 0.6, delay: 0.2 }}
               className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 md:p-12 shadow-lg border border-gray-200/50 relative overflow-hidden"
             >
-              <div className="absolute inset-0 bg-gradient-to-br from-primary-50/30 via-transparent to-primary-50/10 opacity-50"></div>
+              <div className="absolute inset-0 bg-primary-50/30 opacity-50"></div>
               
               <div className="relative z-10">
                 <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6 font-heading">
@@ -89,7 +89,7 @@ export default function AboutPage() {
               transition={{ duration: 0.6, delay: 0.4 }}
               className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 md:p-12 shadow-lg border border-gray-200/50 relative overflow-hidden"
             >
-              <div className="absolute inset-0 bg-gradient-to-br from-gray-50/30 via-transparent to-gray-50/10 opacity-50"></div>
+              <div className="absolute inset-0 bg-gray-50/30 opacity-50"></div>
               
               <div className="relative z-10 text-center">
                 <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6 font-heading">
@@ -121,9 +121,9 @@ export default function AboutPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.9 }}
-              className="bg-gradient-to-br from-primary-50 to-primary-25 rounded-3xl p-8 md:p-12 shadow-lg border border-primary-200/50 relative overflow-hidden"
+              className="bg-primary-50 rounded-3xl p-8 md:p-12 shadow-lg border border-primary-200/50 relative overflow-hidden"
             >
-              <div className="absolute inset-0 bg-gradient-to-br from-primary-100/20 via-transparent to-primary-100/10"></div>
+              <div className="absolute inset-0 bg-primary-100/20"></div>
               
               <div className="relative z-10 text-center">
                 <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6 font-heading">
@@ -160,7 +160,7 @@ export default function AboutPage() {
                 >
                   <Link
                     href="https://asetta.me/register"
-                    className="group inline-flex items-center justify-center px-10 py-5 text-xl font-bold text-white bg-gradient-to-r from-primary-600 to-primary-700 rounded-2xl hover:from-primary-700 hover:to-primary-800 transition-all duration-300 shadow-lg hover:shadow-xl"
+                    className="group inline-flex items-center justify-center px-10 py-5 text-xl font-bold text-white bg-primary-600 hover:bg-primary-700 rounded-2xl transition-all duration-300 shadow-lg hover:shadow-xl"
                   >
                     Get Organized Today
                     <svg

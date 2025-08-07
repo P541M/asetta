@@ -21,12 +21,12 @@ const footerLinks = {
 const Footer = () => {
   return (
     <>
-      <footer className="relative bg-gradient-to-br from-gray-50/80 via-white to-primary-50/30 border-t border-gray-200/30 pt-24 pb-12 pb-safe overflow-hidden">
+      <footer className="relative bg-gray-50/80 border-t border-gray-200/30 pt-24 pb-12 pb-safe overflow-hidden">
         {/* Enhanced Background Elements */}
         <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute -top-24 -left-24 w-96 h-96 bg-gradient-to-br from-primary-100/20 to-transparent rounded-full blur-3xl" />
-          <div className="absolute -bottom-24 -right-24 w-80 h-80 bg-gradient-to-tr from-primary-100/15 to-transparent rounded-full blur-3xl" />
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-primary-50/10 via-transparent to-transparent"></div>
+          <div className="absolute -top-24 -left-24 w-96 h-96 bg-primary-100/20 rounded-full blur-3xl" />
+          <div className="absolute -bottom-24 -right-24 w-80 h-80 bg-primary-100/15 rounded-full blur-3xl" />
+          <div className="absolute inset-0 bg-primary-50/10"></div>
         </div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
@@ -156,7 +156,7 @@ const Footer = () => {
                   </p>
                   <Link
                     href="https://asetta.me/register"
-                    className="group inline-flex items-center px-6 py-3 text-sm font-bold text-white bg-gradient-to-r from-primary-600 to-primary-700 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5"
+                    className="group inline-flex items-center px-6 py-3 text-sm font-bold text-white bg-primary-600 hover:bg-primary-700 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5"
                   >
                     <span className="relative z-10">Start Free</span>
                     <svg
@@ -201,7 +201,7 @@ const Footer = () => {
 
       {/* Safe area background extension for footer */}
       <div
-        className="bg-gradient-to-br from-gray-50/80 via-white to-primary-50/30"
+        className="bg-gray-50/80"
         style={{
           height: `max(0px, env(safe-area-inset-bottom))`,
         }}

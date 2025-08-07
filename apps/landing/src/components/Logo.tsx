@@ -66,7 +66,7 @@ const Logo = ({
       {/* Text Logo */}
       {(variant === "logo-with-text" || showText) && (
         <span
-          className={`font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-primary-600 to-primary-800 transition-all duration-300 tracking-tight ${textSizeClasses[size]}`}
+          className={`font-extrabold text-primary-600 transition-all duration-300 tracking-tight ${textSizeClasses[size]}`}
         >
           Asetta
         </span>

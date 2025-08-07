@@ -4,7 +4,7 @@ import Footer from "../components/Footer";
 
 export default function PrivacyPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-white via-primary-50/20 to-white flex flex-col">
+    <div className="min-h-screen bg-primary-50/20 flex flex-col">
       <Head>
         <title>Privacy Policy | Asetta</title>
         <meta
@@ -17,8 +17,8 @@ export default function PrivacyPage() {
       <main className="flex-grow pt-32 pb-24 relative overflow-hidden">
         {/* Background Elements */}
         <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute -top-24 -left-24 w-96 h-96 bg-gradient-to-br from-primary-100/20 to-transparent rounded-full blur-3xl" />
-          <div className="absolute -bottom-24 -right-24 w-80 h-80 bg-gradient-to-tr from-primary-100/15 to-transparent rounded-full blur-3xl" />
+          <div className="absolute -top-24 -left-24 w-96 h-96 bg-primary-100/20 rounded-full blur-3xl" />
+          <div className="absolute -bottom-24 -right-24 w-80 h-80 bg-primary-100/15 rounded-full blur-3xl" />
         </div>
 
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
@@ -40,7 +40,7 @@ export default function PrivacyPage() {
             </span>
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-gray-900 mb-8 font-heading tracking-tight leading-tight">
               Your Privacy is{" "}
-              <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary-600 to-primary-800">
+              <span className="text-primary-600">
                 Important to Us
               </span>
             </h1>
@@ -54,7 +54,7 @@ export default function PrivacyPage() {
           <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 md:p-12 shadow-xl border border-gray-200/50 animate-fade-in-up">
             
             {/* Quick Summary */}
-            <div className="bg-gradient-to-r from-primary-50 to-primary-100 rounded-xl p-6 mb-12 border border-primary-200/50">
+            <div className="bg-primary-50 rounded-xl p-6 mb-12 border border-primary-200/50">
               <h2 className="text-2xl font-bold text-gray-900 mb-4">Quick Summary</h2>
               <div className="grid md:grid-cols-2 gap-6 text-sm">
                 <div>
@@ -154,15 +154,15 @@ export default function PrivacyPage() {
               </p>
               <div className="space-y-3 mb-4">
                 <div className="flex items-start">
-                  <div className="w-2 h-2 bg-secondary-600 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
                   <span className="text-gray-700">Your uploaded files are processed using Google's Gemini AI</span>
                 </div>
                 <div className="flex items-start">
-                  <div className="w-2 h-2 bg-secondary-600 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
                   <span className="text-gray-700">Files are deleted after processing - we don't store the original documents</span>
                 </div>
                 <div className="flex items-start">
-                  <div className="w-2 h-2 bg-secondary-600 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
                   <span className="text-gray-700">You can request to opt-out of AI processing (this limits functionality)</span>
                 </div>
               </div>
@@ -183,19 +183,19 @@ export default function PrivacyPage() {
               </p>
               <div className="space-y-3 mb-4">
                 <div className="flex items-start">
-                  <div className="w-2 h-2 bg-secondary-600 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
                   <span className="text-gray-700">Page views, session duration, and navigation patterns</span>
                 </div>
                 <div className="flex items-start">
-                  <div className="w-2 h-2 bg-secondary-600 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
                   <span className="text-gray-700">Device type, browser, and general location (city/region level)</span>
                 </div>
                 <div className="flex items-start">
-                  <div className="w-2 h-2 bg-secondary-600 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
                   <span className="text-gray-700">Button clicks and form interactions on our marketing site</span>
                 </div>
                 <div className="flex items-start">
-                  <div className="w-2 h-2 bg-secondary-600 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
                   <span className="text-gray-700">Traffic sources (how you found our website)</span>
                 </div>
               </div>
@@ -206,15 +206,15 @@ export default function PrivacyPage() {
               </p>
               <div className="space-y-2 mb-4">
                 <div className="flex items-start">
-                  <div className="w-2 h-2 bg-primary-400 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
                   <span className="text-gray-700">Distinguish between different visitors</span>
                 </div>
                 <div className="flex items-start">
-                  <div className="w-2 h-2 bg-primary-400 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
                   <span className="text-gray-700">Remember your preferences for future visits</span>
                 </div>
                 <div className="flex items-start">
-                  <div className="w-2 h-2 bg-primary-400 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
                   <span className="text-gray-700">Analyze site performance and user experience</span>
                 </div>
               </div>
@@ -225,15 +225,15 @@ export default function PrivacyPage() {
               </p>
               <div className="space-y-2 mb-4">
                 <div className="flex items-start">
-                  <div className="w-2 h-2 bg-green-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
                   <span className="text-gray-700">Use browser settings to block or delete cookies</span>
                 </div>
                 <div className="flex items-start">
-                  <div className="w-2 h-2 bg-green-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
                   <span className="text-gray-700">Install the <a href="https://tools.google.com/dlpage/gaoptout" className="text-primary-600 hover:text-primary-700 underline" target="_blank" rel="noopener noreferrer">Google Analytics Opt-out Browser Add-on</a></span>
                 </div>
                 <div className="flex items-start">
-                  <div className="w-2 h-2 bg-green-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
                   <span className="text-gray-700">Enable "Do Not Track" in your browser settings</span>
                 </div>
               </div>
@@ -352,19 +352,19 @@ export default function PrivacyPage() {
               </p>
               <div className="space-y-3">
                 <div className="flex items-start">
-                  <div className="w-2 h-2 bg-primary-400 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
                   <span className="text-gray-700">Google Firebase for secure data storage and authentication</span>
                 </div>
                 <div className="flex items-start">
-                  <div className="w-2 h-2 bg-primary-400 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
                   <span className="text-gray-700">Google Gemini AI for document processing</span>
                 </div>
                 <div className="flex items-start">
-                  <div className="w-2 h-2 bg-primary-400 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
                   <span className="text-gray-700">Email services for deadline notifications</span>
                 </div>
                 <div className="flex items-start">
-                  <div className="w-2 h-2 bg-primary-400 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
                   <span className="text-gray-700">Google Analytics 4 for website analytics and user behavior insights</span>
                 </div>
               </div>

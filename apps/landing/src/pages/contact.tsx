@@ -68,7 +68,7 @@ export default function Contact() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-white via-primary-50/20 to-white flex flex-col">
+    <div className="min-h-screen bg-primary-50/20 flex flex-col">
       <Head>
         <title>Contact Us | Asetta</title>
         <meta
@@ -81,8 +81,8 @@ export default function Contact() {
       <main className="flex-grow pt-32 pb-24 relative overflow-hidden">
         {/* Background Elements */}
         <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute -top-24 -left-24 w-96 h-96 bg-gradient-to-br from-primary-100/20 to-transparent rounded-full blur-3xl" />
-          <div className="absolute -bottom-24 -right-24 w-80 h-80 bg-gradient-to-tr from-primary-100/15 to-transparent rounded-full blur-3xl" />
+          <div className="absolute -top-24 -left-24 w-96 h-96 bg-primary-100/20 rounded-full blur-3xl" />
+          <div className="absolute -bottom-24 -right-24 w-80 h-80 bg-primary-100/15 rounded-full blur-3xl" />
         </div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
@@ -101,7 +101,7 @@ export default function Contact() {
             </span>
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-gray-900 mb-8 font-heading tracking-tight leading-tight">
               We're Here to{" "}
-              <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary-600 to-primary-800">
+              <span className="text-primary-600">
                 Help You Succeed
               </span>
             </h1>
@@ -138,7 +138,7 @@ export default function Contact() {
                   <p className="text-gray-600 mb-6">{status.message}</p>
                   <button
                     onClick={() => setStatus({ type: "idle", message: "" })}
-                    className="inline-flex items-center justify-center px-8 py-4 text-lg font-bold text-white bg-gradient-to-r from-primary-600 to-primary-700 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
+                    className="inline-flex items-center justify-center px-8 py-4 text-lg font-bold text-white bg-primary-600 hover:bg-primary-700 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
                   >
                     Send Another Message
                   </button>
@@ -222,7 +222,7 @@ export default function Contact() {
                     <button
                       type="submit"
                       disabled={status.type === "loading"}
-                      className="w-full py-5 px-8 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-2xl font-bold text-lg hover:from-primary-700 hover:to-primary-800 transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-1 disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none"
+                      className="w-full py-5 px-8 bg-primary-600 text-white rounded-2xl font-bold text-lg hover:bg-primary-700 transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-1 disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none"
                     >
                       {status.type === "loading" ? (
                         <span className="flex items-center justify-center">

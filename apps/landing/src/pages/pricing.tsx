@@ -6,7 +6,7 @@ import Footer from "../components/Footer";
 
 export default function PricingPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-white via-primary-50/20 to-white flex flex-col">
+    <div className="min-h-screen bg-primary-50/20 flex flex-col">
       <Head>
         <title>Pricing | Asetta</title>
         <meta
@@ -24,8 +24,8 @@ export default function PricingPage() {
       >
         {/* Background Elements */}
         <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute -top-24 -left-24 w-96 h-96 bg-gradient-to-br from-primary-100/20 to-transparent rounded-full blur-3xl" />
-          <div className="absolute -bottom-24 -right-24 w-80 h-80 bg-gradient-to-tr from-primary-100/15 to-transparent rounded-full blur-3xl" />
+          <div className="absolute -top-24 -left-24 w-96 h-96 bg-primary-100/20 rounded-full blur-3xl" />
+          <div className="absolute -bottom-24 -right-24 w-80 h-80 bg-primary-100/15 rounded-full blur-3xl" />
         </div>
 
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
@@ -42,7 +42,7 @@ export default function PricingPage() {
             </span>
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-gray-900 mb-8 font-heading tracking-tight leading-tight">
               Simple{" "}
-              <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary-600 to-primary-800">
+              <span className="text-primary-600">
                 Pricing
               </span>
             </h1>
@@ -60,7 +60,7 @@ export default function PricingPage() {
               className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 md:p-12 shadow-xl border border-gray-200/50 max-w-4xl mx-auto relative overflow-hidden"
             >
               {/* Decorative Elements */}
-              <div className="absolute inset-0 bg-gradient-to-br from-primary-50/30 via-transparent to-primary-50/20 opacity-50"></div>
+              <div className="absolute inset-0 bg-primary-50/30 opacity-50"></div>
 
               <div className="relative z-10">
                 <div className="text-center mb-12">
@@ -74,7 +74,7 @@ export default function PricingPage() {
 
                 <div className="text-center mb-8">
                   <div className="inline-flex items-baseline">
-                    <span className="text-8xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-primary-600 to-primary-700">
+                    <span className="text-8xl font-extrabold text-primary-600">
                       $0
                     </span>
                     <span className="text-2xl font-bold text-gray-500 ml-2">
@@ -91,7 +91,7 @@ export default function PricingPage() {
                   >
                     <Link
                       href="https://asetta.me/register"
-                      className="group inline-flex items-center justify-center px-10 py-5 text-xl font-bold text-white bg-gradient-to-r from-primary-600 to-primary-700 rounded-2xl hover:from-primary-700 hover:to-primary-800 transition-all duration-300 shadow-lg hover:shadow-xl"
+                      className="group inline-flex items-center justify-center px-10 py-5 text-xl font-bold text-white bg-primary-600 hover:bg-primary-700 rounded-2xl transition-all duration-300 shadow-lg hover:shadow-xl"
                     >
                       Get Started Free
                       <svg
@@ -154,7 +154,7 @@ export default function PricingPage() {
             transition={{ duration: 0.6, delay: 1 }}
             className="mt-16 text-center animate-fade-in-up"
           >
-            <div className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-primary-50 to-primary-25 rounded-2xl border border-primary-200/50 shadow-sm">
+            <div className="inline-flex items-center px-8 py-4 bg-primary-50 rounded-2xl border border-primary-200/50 shadow-sm">
               <p className="text-gray-700 font-medium text-lg">
                 Save your money for textbooks and coffee.
                 <br className="hidden sm:block" />

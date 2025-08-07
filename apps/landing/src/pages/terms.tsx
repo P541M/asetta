@@ -4,7 +4,7 @@ import Footer from "../components/Footer";
 
 export default function TermsPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-white via-primary-50/20 to-white flex flex-col">
+    <div className="min-h-screen bg-primary-50/20 flex flex-col">
       <Head>
         <title>Terms of Service | Asetta</title>
         <meta
@@ -17,8 +17,8 @@ export default function TermsPage() {
       <main className="flex-grow pt-32 pb-24 relative overflow-hidden">
         {/* Background Elements */}
         <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute -top-24 -left-24 w-96 h-96 bg-gradient-to-br from-primary-100/20 to-transparent rounded-full blur-3xl" />
-          <div className="absolute -bottom-24 -right-24 w-80 h-80 bg-gradient-to-tr from-primary-100/15 to-transparent rounded-full blur-3xl" />
+          <div className="absolute -top-24 -left-24 w-96 h-96 bg-primary-100/20 rounded-full blur-3xl" />
+          <div className="absolute -bottom-24 -right-24 w-80 h-80 bg-primary-100/15 rounded-full blur-3xl" />
         </div>
 
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
@@ -40,7 +40,7 @@ export default function TermsPage() {
             </span>
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-gray-900 mb-8 font-heading tracking-tight leading-tight">
               Terms of{" "}
-              <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary-600 to-primary-800">
+              <span className="text-primary-600">
                 Service
               </span>
             </h1>
@@ -54,7 +54,7 @@ export default function TermsPage() {
           <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 md:p-12 shadow-xl border border-gray-200/50 animate-fade-in-up">
             
             {/* Quick Summary */}
-            <div className="bg-gradient-to-r from-primary-50 to-primary-100 rounded-xl p-6 mb-12 border border-primary-200/50">
+            <div className="bg-primary-50 rounded-xl p-6 mb-12 border border-primary-200/50">
               <h2 className="text-2xl font-bold text-gray-900 mb-4">Quick Summary</h2>
               <div className="grid md:grid-cols-2 gap-6 text-sm">
                 <div>

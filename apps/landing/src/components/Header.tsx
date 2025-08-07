@@ -147,9 +147,9 @@ const Header = () => {
               <Link
                 href="https://asetta.me/register"
                 onClick={() => trackCTAClick('Get Started - Header', 'https://asetta.me/register')}
-                className="group relative inline-flex items-center justify-center px-6 py-2.5 text-sm font-bold text-white bg-gradient-to-r from-primary-600 to-primary-700 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden"
+                className="group relative inline-flex items-center justify-center px-6 py-2.5 text-sm font-bold text-white bg-primary-600 hover:bg-primary-700 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden"
               >
-                <span className="absolute inset-0 bg-gradient-to-r from-primary-700 to-primary-800 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
+                <span className="absolute inset-0 bg-primary-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
                 <span className="relative z-10">Get Started</span>
                 <svg
                   className="w-4 h-4 ml-2 relative z-10 group-hover:translate-x-0.5 transition-transform duration-300"
@@ -280,7 +280,7 @@ const Header = () => {
                       </span>
                     </Link>
 
-                    <div className="h-px bg-gradient-to-r from-transparent via-light-border-primary to-transparent my-4" />
+                    <div className="h-px bg-light-border-primary my-4" />
 
                     <Link
                       href="https://asetta.me/login"
@@ -298,13 +298,13 @@ const Header = () => {
                     <motion.div className="pt-2" whileTap={{ scale: 0.98 }}>
                       <Link
                         href="https://asetta.me/register"
-                        className="group relative flex items-center justify-center mx-2 px-6 py-4 text-base font-bold text-white bg-gradient-to-r from-primary-600 to-primary-700 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden"
+                        className="group relative flex items-center justify-center mx-2 px-6 py-4 text-base font-bold text-white bg-primary-600 hover:bg-primary-700 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden"
                         onClick={() => {
                           trackCTAClick('Get Started - Mobile Menu', 'https://asetta.me/register');
                           setMobileMenuOpen(false);
                         }}
                       >
-                        <span className="absolute inset-0 bg-gradient-to-r from-primary-700 to-primary-800 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
+                        <span className="absolute inset-0 bg-primary-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
                         <span className="relative z-10">Get Started</span>
                         <svg
                           className="w-5 h-5 ml-2 relative z-10 group-hover:translate-x-1 transition-transform duration-300"
