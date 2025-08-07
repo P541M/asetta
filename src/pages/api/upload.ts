@@ -51,6 +51,34 @@ async function extractAssessmentsAI(text: string): Promise<string> {
     - "1/4 of course grade" → weight: 25
     - If no weight found → weight: 0
 
+    ASSESSMENT GROUPING - Handle grouped assessments correctly:
+    - If you see "Quizzes: 20%" and extract 5 quizzes, each quiz = 20 ÷ 5 = 4%
+    - If you see "Assignments: 40%" and extract 4 assignments, each = 40 ÷ 4 = 10%
+    - Look for patterns like: "Category: X%" followed by multiple items
+    - Keywords indicating groups: "all quizzes", "total quiz grade", "combined weight"
+    - If individual weights are specified (e.g., "Quiz 1: 5%, Quiz 2: 5%"), use those instead
+    
+    WEIGHT DISTRIBUTION RULES:
+    1. Check if multiple assessments share a category with one percentage
+    2. If yes, divide the category percentage by the number of assessments in that category
+    3. If individual percentages are specified, use those directly
+    4. Ensure total course weight is reasonable (typically 90-110% accounting for rounding)
+    5. Round distributed weights to whole numbers or one decimal place
+
+    COMMON PHRASING PATTERNS TO RECOGNIZE:
+    - "Quizzes (10 total): 20%" = Each quiz worth 2%
+    - "Weekly assignments: 30%" = Divide 30% by number of weekly assignments
+    - "Lab reports: 25% total" = All lab reports combined = 25%
+    - "Midterm 1: 15%, Midterm 2: 15%" = Each specified individually
+    - "Participation and attendance: 10%" = Single assessment worth 10%
+    - "Final project components: 40%" = Divide among project parts
+    
+    VALIDATION REQUIREMENTS:
+    - Verify total course weight is reasonable (typically 90-110%)
+    - If total weight exceeds 120%, likely error in grouping logic
+    - If individual assessment > 50%, verify it's actually one major assessment
+    - Double-check math: group percentage ÷ number of items = individual weight
+
     REQUIREMENTS:
     - Only extract assessments with clear due dates
     - Include exams, assignments, quizzes, labs, projects
