@@ -9,7 +9,6 @@ import {
   User,
 } from "firebase/auth";
 import Link from "next/link";
-import Logo from "../components/ui/Logo";
 import { getUserOnboardingStatus, shouldRedirectToOnboarding } from "../utils/onboardingUtils";
 
 const Register = () => {
