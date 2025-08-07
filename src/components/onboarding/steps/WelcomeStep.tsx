@@ -1,4 +1,3 @@
-import React from "react";
 import { StepNavigation } from "../ui/StepNavigation";
 import { useAuth } from "../../../contexts/AuthContext";
 

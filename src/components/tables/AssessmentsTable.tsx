@@ -13,6 +13,7 @@ import {
   getFromLocalStorage,
   setToLocalStorage,
 } from "../../utils/localStorage";
+import { getStatusTextClasses, getStatusBadgeClasses } from "../../utils/statusUtils";
 import { formatLocalDateTime, getDaysUntil } from "../../utils/dateUtils";
 import { Assessment, AssessmentsTableProps } from "../../types/assessment";
 import ConfirmationModal from "../common/ConfirmationModal";
@@ -793,15 +794,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                     <div className="col-span-12 lg:col-span-4 flex items-center justify-between">
                       <div className="flex flex-col space-y-0.5">
                         <span
-                          className={`text-md ${
-                            assessment.status === "Submitted"
-                              ? "text-emerald-600 dark:text-emerald-400"
-                              : assessment.status === "In progress"
-                              ? "text-amber-600 dark:text-amber-400"
-                              : assessment.status === "Missed"
-                              ? "text-red-600 dark:text-red-400"
-                              : "text-gray-600 dark:text-gray-400"
-                          }`}
+                          className={`text-md ${getStatusTextClasses(assessment.status)}`}
                         >
                           {formatDateTimeForDisplay(
                             assessment.dueDate,
@@ -930,15 +923,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                       Weight: {selectedAssessment.weight}%
                     </span>
                     <span
-                      className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        selectedAssessment.status === "Submitted"
-                          ? "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-800 dark:text-emerald-400"
-                          : selectedAssessment.status === "In progress"
-                          ? "bg-amber-100 dark:bg-amber-900/30 text-amber-800 dark:text-amber-400"
-                          : selectedAssessment.status === "Missed"
-                          ? "bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400"
-                          : "bg-gray-100 dark:bg-gray-900/30 text-gray-800 dark:text-gray-400"
-                      }`}
+                      className={getStatusBadgeClasses(selectedAssessment.status)}
                     >
                       {selectedAssessment.status}
                     </span>

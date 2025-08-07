@@ -3,6 +3,7 @@ import { useAuth } from "../../contexts/AuthContext";
 import { db } from "../../lib/firebase";
 import { collection, getDocs, query, updateDoc, doc } from "firebase/firestore";
 import { generateICSFile } from "../../utils/icsGenerator";
+import { getStatusBackgroundClasses, getStatusBadgeClasses } from "../../utils/statusUtils";
 import { DndContext, DragEndEvent } from "@dnd-kit/core";
 import { Assessment } from "../../types/assessment";
 import { Day, CalendarViewProps } from "../../types/calendar";
@@ -312,15 +313,6 @@ const CalendarView = ({ selectedSemester, semesterId }: CalendarViewProps) => {
   };
 
   // Status color mapping
-  const getStatusColor = (status: string): string => {
-    if (status === "Submitted") {
-      return "bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800";
-    }
-    if (status === "In progress") {
-      return "bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-800";
-    }
-    return "bg-gray-50 dark:bg-dark-bg-tertiary text-gray-800 dark:text-gray-400 border border-gray-200 dark:border-dark-border-primary";
-  };
 
   // Export calendar
   const handleExportCalendar = () => {
@@ -505,7 +497,7 @@ const CalendarView = ({ selectedSemester, semesterId }: CalendarViewProps) => {
                   {day.assessments.slice(0, 3).map((assessment) => (
                     <div
                       key={assessment.id}
-                      className={`text-xs px-2 py-1.5 rounded-md truncate ${getStatusColor(
+                      className={`text-xs px-2 py-1.5 rounded-md truncate ${getStatusBackgroundClasses(
                         assessment.status
                       )} hover:shadow-sm transition-all duration-200`}
                     >
@@ -592,9 +584,7 @@ const CalendarView = ({ selectedSemester, semesterId }: CalendarViewProps) => {
                       </p>
                     </div>
                     <span
-                      className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(
-                        assessment.status
-                      )}`}
+                      className={getStatusBadgeClasses(assessment.status)}
                     >
                       {assessment.status}
                     </span>

@@ -1,4 +1,3 @@
-import React from 'react';
 import { useOnboarding } from '../../contexts/OnboardingContext';
 import { OnboardingLayout } from './ui/OnboardingLayout';
 import { ProgressBar } from './ui/ProgressBar';
