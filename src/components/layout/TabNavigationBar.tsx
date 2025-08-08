@@ -113,10 +113,10 @@ const TabNavigationBar = ({ className = "" }: TabNavigationBarProps) => {
     }`;
 
   const getMobileTabButtonClass = (tabId: TabType) =>
-    `px-2 py-2.5 font-medium text-sm transition-all duration-200 rounded-xl ${
+    `px-2 py-3 font-medium text-sm transition-all duration-200 rounded-xl min-h-[44px] ${
       activeTab === tabId
         ? "bg-light-button-primary/10 text-light-button-primary dark:bg-dark-button-primary/10 dark:text-dark-button-primary"
-        : "text-light-text-secondary dark:text-dark-text-secondary hover:bg-light-hover-primary dark:hover:bg-dark-hover-primary hover:text-light-text-primary dark:hover:text-dark-text-primary"
+        : "text-light-text-secondary dark:text-dark-text-secondary hover:bg-light-hover-primary dark:hover:bg-dark-hover-primary hover:text-light-text-primary dark:hover:text-dark-text-primary active:bg-light-hover-primary/80 dark:active:bg-dark-hover-primary/80"
     }`;
 
 
@@ -147,9 +147,11 @@ const TabNavigationBar = ({ className = "" }: TabNavigationBarProps) => {
               onClick={() => setActiveTab(tab.id)}
               className={`${getMobileTabButtonClass(tab.id)} flex-1 text-center overflow-hidden`}
             >
-              <div className="flex flex-col items-center space-y-1 w-full">
-                <div className="h-4 w-4 flex-shrink-0">
-                  {tab.icon}
+              <div className="flex flex-col items-center justify-center space-y-0.5 w-full h-full">
+                <div className="h-5 w-5 flex-shrink-0">
+                  {React.cloneElement(tab.icon, {
+                    className: "h-5 w-5"
+                  })}
                 </div>
                 <span className="text-xs leading-tight truncate w-full text-center">
                   {tab.label}

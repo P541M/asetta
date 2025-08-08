@@ -65,7 +65,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
       onClick={onClose}
     >
       <div
-        className="modal-container w-full max-w-sm"
+        className="modal-container w-full max-w-sm mx-4"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="modal-content">
@@ -89,14 +89,14 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="btn-outline px-3 py-1.5 text-sm"
+            className="btn-outline px-4 py-3 sm:px-3 sm:py-1.5 text-base sm:text-sm min-h-[44px] flex-1 sm:flex-initial"
           >
             {cancelText}
           </button>
           <button
             type="button"
             onClick={onConfirm}
-            className={`px-3 py-1.5 text-sm font-medium text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors ${variantClasses.button}`}
+            className={`px-4 py-3 sm:px-3 sm:py-1.5 text-base sm:text-sm font-medium text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors min-h-[44px] flex-1 sm:flex-initial ${variantClasses.button}`}
           >
             {confirmText}
           </button>

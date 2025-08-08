@@ -75,7 +75,7 @@ export function StepNavigation({
           <button
             onClick={handleSkip}
             disabled={isLoading}
-            className="text-light-text-tertiary dark:text-dark-text-tertiary hover:text-light-text-secondary dark:hover:text-dark-text-secondary text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="text-light-text-tertiary dark:text-dark-text-tertiary hover:text-light-text-secondary dark:hover:text-dark-text-secondary text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed px-4 py-3 sm:px-2 sm:py-1 min-h-[44px] sm:min-h-[auto] rounded-md"
           >
             {skipLabel}
           </button>

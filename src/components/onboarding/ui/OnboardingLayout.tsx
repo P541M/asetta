@@ -16,7 +16,7 @@ export function OnboardingLayout({ children, onSkip, showSkip = true }: Onboardi
             <div className="flex justify-end">
               <button
                 onClick={onSkip}
-                className="text-sm text-light-text-secondary dark:text-dark-text-secondary hover:text-light-text-primary dark:hover:text-dark-text-primary transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-light-button-primary dark:focus:ring-dark-button-primary rounded-md px-3 py-1"
+                className="text-sm text-light-text-secondary dark:text-dark-text-secondary hover:text-light-text-primary dark:hover:text-dark-text-primary transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-light-button-primary dark:focus:ring-dark-button-primary rounded-md px-4 py-3 sm:px-3 sm:py-1 min-h-[44px] sm:min-h-[auto]"
               >
                 Skip setup
               </button>

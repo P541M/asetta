@@ -515,7 +515,7 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
                 onChange={(e) =>
                   setTargetGrade(parseFloat(e.target.value) || 0)
                 }
-                className="input w-16 px-2 py-1 text-sm hover:shadow-sm transition-all duration-200 dark:bg-dark-input-bg dark:text-dark-input-text dark:border-dark-input-border"
+                className="input w-20 sm:w-16 px-3 py-2 sm:px-2 sm:py-1 text-base sm:text-sm hover:shadow-sm transition-all duration-200 dark:bg-dark-input-bg dark:text-dark-input-text dark:border-dark-input-border min-h-[44px] sm:min-h-[auto]"
               />
               <span className="text-light-text-tertiary dark:text-dark-text-tertiary text-sm">
                 %
@@ -577,29 +577,29 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
             />
           ) : (
             <div className="space-y-4">
-              {/* Headers */}
-              <div className="grid grid-cols-12 gap-4 px-4 py-3 bg-light-bg-secondary/50 dark:bg-dark-bg-tertiary/50 rounded-lg">
-                <div className="col-span-12 lg:col-span-4 flex items-center">
+              {/* Desktop Headers - Hidden on mobile */}
+              <div className="hidden lg:grid grid-cols-12 gap-4 px-4 py-3 bg-light-bg-secondary/50 dark:bg-dark-bg-tertiary/50 rounded-lg">
+                <div className="col-span-4 flex items-center">
                   <span className="text-xs font-medium text-light-text-tertiary dark:text-dark-text-tertiary uppercase tracking-wider">
                     Assessment
                   </span>
                 </div>
-                <div className="col-span-12 lg:col-span-2 flex items-center">
+                <div className="col-span-2 flex items-center">
                   <span className="text-xs font-medium text-light-text-tertiary dark:text-dark-text-tertiary uppercase tracking-wider">
                     Status
                   </span>
                 </div>
-                <div className="col-span-12 lg:col-span-2 flex items-center">
+                <div className="col-span-2 flex items-center">
                   <span className="text-xs font-medium text-light-text-tertiary dark:text-dark-text-tertiary uppercase tracking-wider">
                     Weight
                   </span>
                 </div>
-                <div className="col-span-12 lg:col-span-2 flex items-center">
+                <div className="col-span-2 flex items-center">
                   <span className="text-xs font-medium text-light-text-tertiary dark:text-dark-text-tertiary uppercase tracking-wider">
                     Mark
                   </span>
                 </div>
-                <div className="col-span-12 lg:col-span-2 flex items-center">
+                <div className="col-span-2 flex items-center">
                   <span className="text-xs font-medium text-light-text-tertiary dark:text-dark-text-tertiary uppercase tracking-wider">
                     Points
                   </span>
@@ -620,8 +620,91 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
                       key={assessment.id}
                       className="bg-light-bg-secondary/50 dark:bg-dark-bg-tertiary/30 rounded-lg transition-all duration-300 p-4 hover:bg-light-hover-primary/50 dark:hover:bg-dark-hover-primary/50"
                     >
-                      <div className="grid grid-cols-12 gap-4 items-center">
-                        <div className="col-span-12 lg:col-span-4">
+                      {/* Mobile Layout */}
+                      <div className="lg:hidden space-y-4">
+                        {/* Assessment Name and Due Date */}
+                        <div className="flex items-center justify-between">
+                          <div className="flex-1 min-w-0">
+                            <h3 className="font-medium text-light-text-primary dark:text-dark-text-primary text-base leading-tight">
+                              {assessment.assignmentName}
+                            </h3>
+                            <p className="text-sm text-light-text-tertiary dark:text-dark-text-tertiary mt-1">
+                              Due: {new Date(assessment.dueDate).toLocaleDateString()}
+                            </p>
+                          </div>
+                          <span
+                            className={`inline-flex items-center justify-center w-8 h-8 rounded-full text-sm font-medium ${status.bgColor} ${status.color} flex-shrink-0 ml-3`}
+                            title={assessment.status}
+                          >
+                            {status.icon}
+                          </span>
+                        </div>
+
+                        {/* Input Fields */}
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-xs font-medium text-light-text-tertiary dark:text-dark-text-tertiary uppercase tracking-wider mb-2">
+                              Weight
+                            </label>
+                            <div className="flex items-center space-x-2">
+                              <input
+                                type="number"
+                                min="0"
+                                max="100"
+                                step="0.1"
+                                value={assessment.weight}
+                                onChange={(e) =>
+                                  assessment.id &&
+                                  handleWeightChange(
+                                    assessment.id,
+                                    e.target.value
+                                  )
+                                }
+                                className="input w-full px-4 py-3 text-base hover:shadow-sm transition-all duration-200 dark:bg-dark-input-bg dark:text-dark-input-text dark:border-dark-input-border [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none min-h-[44px] rounded-lg"
+                              />
+                              <span className="text-sm text-light-text-tertiary dark:text-dark-text-tertiary flex-shrink-0">
+                                %
+                              </span>
+                            </div>
+                          </div>
+                          <div>
+                            <label className="block text-xs font-medium text-light-text-tertiary dark:text-dark-text-tertiary uppercase tracking-wider mb-2">
+                              Mark
+                            </label>
+                            <div className="flex items-center space-x-2">
+                              <input
+                                type="number"
+                                min="0"
+                                step="0.1"
+                                value={assessment.mark ?? ""}
+                                onChange={(e) =>
+                                  assessment.id &&
+                                  handleMarkChange(assessment.id, e.target.value)
+                                }
+                                className="input w-full px-4 py-3 text-base hover:shadow-sm transition-all duration-200 dark:bg-dark-input-bg dark:text-dark-input-text dark:border-dark-input-border [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none min-h-[44px] rounded-lg"
+                                placeholder="--"
+                              />
+                              <span className="text-sm text-light-text-tertiary dark:text-dark-text-tertiary flex-shrink-0">
+                                %
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Points Contribution */}
+                        <div className="flex items-center justify-between pt-2 border-t border-light-border-primary/50 dark:border-dark-border-primary/50">
+                          <span className="text-sm text-light-text-tertiary dark:text-dark-text-tertiary">
+                            Points Contribution:
+                          </span>
+                          <span className="text-base font-semibold text-light-text-primary dark:text-dark-text-primary">
+                            {contribution}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Desktop Layout */}
+                      <div className="hidden lg:grid grid-cols-12 gap-4 items-center">
+                        <div className="col-span-4">
                           <h3 className="font-medium text-light-text-primary dark:text-dark-text-primary text-sm">
                             {assessment.assignmentName}
                           </h3>
@@ -630,7 +713,7 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
                             {new Date(assessment.dueDate).toLocaleDateString()}
                           </p>
                         </div>
-                        <div className="col-span-12 lg:col-span-2">
+                        <div className="col-span-2">
                           <span
                             className={`inline-flex items-center justify-center w-6 h-6 rounded-full text-xs ${status.bgColor} ${status.color}`}
                             title={assessment.status}
@@ -638,7 +721,7 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
                             {status.icon}
                           </span>
                         </div>
-                        <div className="col-span-12 lg:col-span-2">
+                        <div className="col-span-2">
                           <div className="flex items-center space-x-2">
                             <input
                               type="number"
@@ -660,7 +743,7 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
                             </span>
                           </div>
                         </div>
-                        <div className="col-span-12 lg:col-span-2">
+                        <div className="col-span-2">
                           <div className="flex items-center space-x-2">
                             <input
                               type="number"
@@ -679,7 +762,7 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
                             </span>
                           </div>
                         </div>
-                        <div className="col-span-12 lg:col-span-2">
+                        <div className="col-span-2">
                           <span className="text-sm font-medium text-light-text-primary dark:text-dark-text-primary">
                             {contribution}
                           </span>

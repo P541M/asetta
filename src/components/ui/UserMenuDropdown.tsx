@@ -66,13 +66,13 @@ const UserMenuDropdown: React.FC<UserMenuDropdownProps> = ({
         {/* Settings Button */}
         <button
           onClick={onSettingsClick}
-          className="flex w-full items-center px-4 py-2 text-sm font-medium transition-colors duration-150 text-light-text-primary dark:text-dark-text-primary hover:bg-light-hover-primary dark:hover:bg-dark-hover-primary focus:bg-light-hover-primary dark:focus:bg-dark-hover-primary focus:outline-none"
+          className="flex w-full items-center px-4 py-3 text-sm font-medium transition-colors duration-150 text-light-text-primary dark:text-dark-text-primary hover:bg-light-hover-primary dark:hover:bg-dark-hover-primary focus:bg-light-hover-primary dark:focus:bg-dark-hover-primary focus:outline-none active:bg-light-hover-primary/80 dark:active:bg-dark-hover-primary/80 min-h-[44px]"
           role="menuitem"
         >
           <div className="flex items-center space-x-3 min-w-0 flex-1">
             <span className="flex-shrink-0 text-light-text-tertiary dark:text-dark-text-tertiary">
               <svg
-                className="w-4 h-4"
+                className="w-5 h-5"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -98,13 +98,13 @@ const UserMenuDropdown: React.FC<UserMenuDropdownProps> = ({
         {/* Logout Button */}
         <button
           onClick={onLogoutClick}
-          className="flex w-full items-center px-4 py-2 text-sm font-medium transition-colors duration-150 text-light-text-primary dark:text-dark-text-primary hover:bg-light-hover-primary dark:hover:bg-dark-hover-primary focus:bg-light-hover-primary dark:focus:bg-dark-hover-primary focus:outline-none border-t border-light-border-primary dark:border-dark-border-primary"
+          className="flex w-full items-center px-4 py-3 text-sm font-medium transition-colors duration-150 text-light-text-primary dark:text-dark-text-primary hover:bg-light-hover-primary dark:hover:bg-dark-hover-primary focus:bg-light-hover-primary dark:focus:bg-dark-hover-primary focus:outline-none border-t border-light-border-primary dark:border-dark-border-primary active:bg-light-hover-primary/80 dark:active:bg-dark-hover-primary/80 min-h-[44px]"
           role="menuitem"
         >
           <div className="flex items-center space-x-3 min-w-0 flex-1">
             <span className="flex-shrink-0 text-light-text-tertiary dark:text-dark-text-tertiary">
               <svg
-                className="w-4 h-4"
+                className="w-5 h-5"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"

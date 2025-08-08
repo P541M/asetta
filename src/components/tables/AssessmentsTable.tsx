@@ -486,26 +486,99 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
 
   return (
     <div className="p-6">
-      <div className="flex flex-col sm:flex-row justify-between mb-6 gap-4">
-        <h2 className="text-xl font-medium text-light-text-primary dark:text-dark-text-primary mb-6">
-          Your Assessments
-        </h2>
-        <div className="flex space-x-2 items-center">
-          <CustomSelect
-            value={filter}
-            onChange={setFilter}
-            options={filterOptions}
-            placeholder="Filter tasks"
-            className="max-w-xs"
-            size="md"
-          />
+      <div className="flex flex-col gap-4 mb-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <h2 className="text-xl font-medium text-light-text-primary dark:text-dark-text-primary">
+            Your Assessments
+          </h2>
+          <div className="w-full sm:w-auto">
+            <CustomSelect
+              value={filter}
+              onChange={setFilter}
+              options={filterOptions}
+              placeholder="Filter tasks"
+              className="w-full sm:max-w-xs"
+              size="md"
+            />
+          </div>
         </div>
       </div>
 
       {/* Bulk Actions Toolbar */}
       {selectedRows.length > 0 && (
-        <div className="mb-4 p-3 bg-white dark:bg-dark-bg-secondary rounded-lg shadow-sm border border-gray-100 dark:border-dark-border-primary animate-fade-in">
-          <div className="flex items-center justify-between">
+        <div className="mb-4 p-4 bg-white dark:bg-dark-bg-secondary rounded-lg shadow-sm border border-gray-100 dark:border-dark-border-primary animate-fade-in">
+          {/* Mobile Layout */}
+          <div className="lg:hidden space-y-4">
+            <div className="text-center">
+              <span className="text-base font-medium text-gray-700 dark:text-dark-text-primary">
+                {selectedRows.length}{" "}
+                {selectedRows.length === 1 ? "item" : "items"} selected
+              </span>
+            </div>
+            
+            <div className="space-y-3">
+              {!showBulkStatusUpdate ? (
+                <div className="w-full">
+                  <StatusSelect
+                    value={null}
+                    onChange={(value) => handleStatusSelect(value)}
+                    size="md"
+                    placeholder="Update Status"
+                    className="w-full"
+                  />
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  <div className="text-center">
+                    <span className="text-sm text-light-text-secondary dark:text-dark-text-secondary">
+                      Update to:{" "}
+                      <span className="font-medium">{selectedStatus}</span>
+                    </span>
+                  </div>
+                  <div className="flex space-x-2">
+                    <button
+                      onClick={() =>
+                        handleBulkStatusUpdate(
+                          selectedStatus as
+                            | "Not started"
+                            | "In progress"
+                            | "Submitted"
+                            | "Missed"
+                        )
+                      }
+                      className="btn-primary flex-1 py-2.5 px-4 text-sm min-h-[44px]"
+                    >
+                      Confirm
+                    </button>
+                    <button
+                      onClick={handleCancelStatusUpdate}
+                      className="btn-outline flex-1 py-2.5 px-4 text-sm min-h-[44px]"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+            
+            <div className="flex flex-col space-y-2 pt-2 border-t border-gray-200 dark:border-dark-border-primary">
+              <button
+                onClick={() => setShowBulkDeleteModal(true)}
+                className="btn-danger py-2.5 px-4 text-sm w-full min-h-[44px]"
+              >
+                Delete Selected
+              </button>
+              <button
+                onClick={() => setSelectedRows([])}
+                className="text-sm text-light-text-tertiary dark:text-dark-text-tertiary hover:text-light-text-secondary dark:hover:text-dark-text-secondary py-2 min-h-[44px]"
+              >
+                Clear Selection
+              </button>
+            </div>
+          </div>
+
+          {/* Desktop Layout */}
+          <div className="hidden lg:flex items-center justify-between">
             <div className="flex items-center space-x-4">
               <span className="text-md font-medium text-gray-700 dark:text-dark-text-primary">
                 {selectedRows.length}{" "}
@@ -595,9 +668,9 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
         </div>
       ) : (
         <div className="space-y-2">
-          {/* Headers */}
-          <div className="grid grid-cols-12 gap-2 px-4 py-3 bg-gray-100/50 dark:bg-dark-bg-tertiary/50 rounded-lg">
-            <div className="col-span-12 lg:col-span-2 flex items-center space-x-3">
+          {/* Headers - Hidden on mobile, visible on desktop */}
+          <div className="hidden lg:grid grid-cols-12 gap-2 px-4 py-3 bg-gray-100/50 dark:bg-dark-bg-tertiary/50 rounded-lg">
+            <div className="col-span-2 flex items-center space-x-3">
               <input
                 type="checkbox"
                 checked={
@@ -611,17 +684,17 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                 Status
               </span>
             </div>
-            <div className="col-span-12 lg:col-span-2 flex items-center">
+            <div className="col-span-2 flex items-center">
               <span className="text-xs font-medium text-gray-500 dark:text-dark-text-tertiary uppercase tracking-wider">
                 Course
               </span>
             </div>
-            <div className="col-span-12 lg:col-span-4 flex items-center">
+            <div className="col-span-4 flex items-center">
               <span className="text-xs font-medium text-gray-500 dark:text-dark-text-tertiary uppercase tracking-wider">
                 Task
               </span>
             </div>
-            <div className="col-span-12 lg:col-span-4 flex items-center justify-between">
+            <div className="col-span-4 flex items-center justify-between">
               <span className="text-xs font-medium text-gray-500 dark:text-dark-text-tertiary uppercase tracking-wider">
                 Due Date
               </span>
@@ -638,6 +711,27 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
             </div>
           </div>
 
+          {/* Mobile Select All Header */}
+          <div className="lg:hidden flex items-center justify-between p-3 bg-gray-100/50 dark:bg-dark-bg-tertiary/50 rounded-lg">
+            <div className="flex items-center space-x-3">
+              <input
+                type="checkbox"
+                checked={
+                  selectedRows.length === sortedAssessments.length &&
+                  sortedAssessments.length > 0
+                }
+                onChange={toggleSelectAll}
+                className="h-5 w-5 rounded border-gray-300 dark:border-dark-border-primary text-light-button-primary dark:text-dark-button-primary focus:ring-light-focus-ring dark:focus:ring-dark-focus-ring"
+              />
+              <span className="text-sm font-medium text-gray-700 dark:text-dark-text-primary">
+                Select All ({sortedAssessments.length})
+              </span>
+            </div>
+            <span className="text-xs text-gray-500 dark:text-dark-text-tertiary">
+              {selectedRows.length} selected
+            </span>
+          </div>
+
           {/* Assessment Cards */}
           <div className="space-y-2">
             {sortedAssessments.map((assessment) => {
@@ -650,10 +744,124 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
               return editingId === assessment.id ? (
                 <div
                   key={`editing-${assessment.id}`}
-                  className="bg-gray-50/50 dark:bg-dark-bg-tertiary/30 rounded-lg transition-all duration-300 p-3 animate-fade-in"
+                  className="bg-gray-50/50 dark:bg-dark-bg-tertiary/30 rounded-lg transition-all duration-300 p-4 animate-fade-in"
                 >
-                  <div className="grid grid-cols-12 gap-2">
-                    <div className="col-span-12 lg:col-span-2 flex items-center space-x-2">
+                  {/* Mobile Edit Form */}
+                  <div className="lg:hidden space-y-4">
+                    <div className="flex items-center space-x-3">
+                      <input
+                        type="checkbox"
+                        checked={selectedRows.includes(assessment.id || "")}
+                        onChange={() => toggleRowSelection(assessment.id || "")}
+                        className="h-5 w-5 rounded border-gray-300 dark:border-dark-border-primary text-light-button-primary dark:text-dark-button-primary focus:ring-light-focus-ring dark:focus:ring-dark-focus-ring"
+                      />
+                      <div className="flex-1">
+                        <StatusSelect
+                          value={editFormData.status}
+                          onChange={(value) => setEditFormData(prev => ({ ...prev, status: value }))}
+                          size="md"
+                          className="w-full"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="space-y-3">
+                      <div>
+                        <label className="block text-xs font-medium text-gray-700 dark:text-dark-text-secondary mb-1">
+                          Course
+                        </label>
+                        <input
+                          type="text"
+                          name="courseName"
+                          value={editFormData.courseName}
+                          onChange={handleEditFormChange}
+                          placeholder="Course Name"
+                          className="input py-3 px-4 text-base w-full dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border-primary rounded-md min-h-[44px]"
+                        />
+                      </div>
+                      
+                      <div>
+                        <label className="block text-xs font-medium text-gray-700 dark:text-dark-text-secondary mb-1">
+                          Assignment
+                        </label>
+                        <input
+                          type="text"
+                          name="assignmentName"
+                          value={editFormData.assignmentName}
+                          onChange={handleEditFormChange}
+                          placeholder="Assignment Name"
+                          className="input py-3 px-4 text-base w-full dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border-primary rounded-md min-h-[44px]"
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-xs font-medium text-gray-700 dark:text-dark-text-secondary mb-1">
+                            Due Date
+                          </label>
+                          <input
+                            type="date"
+                            name="dueDate"
+                            value={editFormData.dueDate}
+                            onChange={handleEditFormChange}
+                            className="input py-3 px-4 text-base w-full dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border-primary rounded-md min-h-[44px]"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-medium text-gray-700 dark:text-dark-text-secondary mb-1">
+                            Due Time
+                          </label>
+                          <input
+                            type="time"
+                            name="dueTime"
+                            value={editFormData.dueTime}
+                            onChange={handleEditFormChange}
+                            className="input py-3 px-4 text-base w-full dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border-primary rounded-md min-h-[44px]"
+                          />
+                        </div>
+                      </div>
+
+                      {showWeight && (
+                        <div>
+                          <label className="block text-xs font-medium text-gray-700 dark:text-dark-text-secondary mb-1">
+                            Weight (%)
+                          </label>
+                          <input
+                            type="number"
+                            name="weight"
+                            value={editFormData.weight}
+                            onChange={handleEditFormChange}
+                            min="0"
+                            max="100"
+                            step="0.1"
+                            placeholder="Weight"
+                            className="input py-3 px-4 text-base w-full dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border-primary rounded-md min-h-[44px]"
+                          />
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="flex items-center justify-end space-x-3 pt-2">
+                      <button
+                        onClick={handleCancelEdit}
+                        className="btn-outline py-2.5 px-4 text-sm min-h-[44px] min-w-[80px]"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        onClick={() =>
+                          assessment.id && handleSaveEdit(assessment.id)
+                        }
+                        className="btn-primary py-2.5 px-4 text-sm min-h-[44px] min-w-[80px]"
+                      >
+                        Save
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Desktop Edit Form */}
+                  <div className="hidden lg:grid grid-cols-12 gap-2">
+                    <div className="col-span-2 flex items-center space-x-2">
                       <input
                         type="checkbox"
                         checked={selectedRows.includes(assessment.id || "")}
@@ -667,7 +875,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                         className="flex-1"
                       />
                     </div>
-                    <div className="col-span-12 lg:col-span-2">
+                    <div className="col-span-2">
                       <input
                         type="text"
                         name="courseName"
@@ -677,7 +885,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                         className="input py-1 px-2 text-md w-full dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border-primary rounded-md"
                       />
                     </div>
-                    <div className="col-span-12 lg:col-span-4">
+                    <div className="col-span-4">
                       <input
                         type="text"
                         name="assignmentName"
@@ -687,24 +895,22 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                         className="input py-1 px-2 text-md w-full dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border-primary rounded-md"
                       />
                     </div>
-                    <div className="col-span-12 lg:col-span-4 flex items-center space-x-2">
+                    <div className="col-span-4 flex items-center space-x-2">
                       <input
                         type="date"
                         name="dueDate"
                         value={editFormData.dueDate}
                         onChange={handleEditFormChange}
-                        className="input py-1 px-2 text-md w-2/3 dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border-primary rounded-md"
+                        className="input py-1 px-2 text-md flex-1 dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border-primary rounded-md"
                       />
                       <input
                         type="time"
                         name="dueTime"
                         value={editFormData.dueTime}
                         onChange={handleEditFormChange}
-                        className="input py-1 px-2 text-md w-1/3 dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border-primary rounded-md"
+                        className="input py-1 px-2 text-md w-24 dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border-primary rounded-md"
                       />
-                    </div>
-                    {showWeight && (
-                      <div className="col-span-12 lg:col-span-2">
+                      {showWeight && (
                         <input
                           type="number"
                           name="weight"
@@ -714,57 +920,193 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                           max="100"
                           step="0.1"
                           placeholder="Weight"
-                          className="input py-1 px-2 text-md w-full dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border-primary rounded-md"
+                          className="input py-1 px-2 text-md w-20 dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border-primary rounded-md"
                         />
+                      )}
+                      <div className="flex items-center space-x-1">
+                        <button
+                          onClick={() =>
+                            assessment.id && handleSaveEdit(assessment.id)
+                          }
+                          className="text-emerald-600 dark:text-emerald-400 hover:text-emerald-800 dark:hover:text-emerald-300 p-1.5 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 rounded-md transition-colors"
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-4 w-4"
+                            viewBox="0 0 20 20"
+                            fill="currentColor"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                        </button>
+                        <button
+                          onClick={handleCancelEdit}
+                          className="text-gray-600 dark:text-dark-text-tertiary hover:text-gray-800 dark:hover:text-dark-text-secondary p-1.5 hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary rounded-md transition-colors"
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-4 w-4"
+                            viewBox="0 0 20 20"
+                            fill="currentColor"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                        </button>
                       </div>
-                    )}
-                    <div className="col-span-12 lg:col-span-2 flex items-center space-x-2">
-                      <button
-                        onClick={() =>
-                          assessment.id && handleSaveEdit(assessment.id)
-                        }
-                        className="text-emerald-600 dark:text-emerald-400 hover:text-emerald-800 dark:hover:text-emerald-300 p-1.5 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 rounded-md transition-colors"
-                      >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="h-4 w-4"
-                          viewBox="0 0 20 20"
-                          fill="currentColor"
-                        >
-                          <path
-                            fillRule="evenodd"
-                            d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
-                      </button>
-                      <button
-                        onClick={handleCancelEdit}
-                        className="text-gray-600 dark:text-dark-text-tertiary hover:text-gray-800 dark:hover:text-dark-text-secondary p-1.5 hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary rounded-md transition-colors"
-                      >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="h-4 w-4"
-                          viewBox="0 0 20 20"
-                          fill="currentColor"
-                        >
-                          <path
-                            fillRule="evenodd"
-                            d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
-                      </button>
                     </div>
                   </div>
                 </div>
               ) : (
                 <div
                   key={assessment.id}
-                  className="bg-gray-50/50 dark:bg-dark-bg-tertiary/30 rounded-lg transition-all duration-300 p-3"
+                  className="bg-gray-50/50 dark:bg-dark-bg-tertiary/30 rounded-lg transition-all duration-300 p-4"
                 >
-                  <div className="grid grid-cols-12 gap-2 items-center">
-                    <div className="col-span-12 lg:col-span-2 flex items-center space-x-2">
+                  {/* Mobile Card Layout */}
+                  <div className="lg:hidden space-y-4">
+                    {/* Header with checkbox and status */}
+                    <div className="flex items-center space-x-3">
+                      <input
+                        type="checkbox"
+                        checked={selectedRows.includes(assessment.id || "")}
+                        onChange={() => toggleRowSelection(assessment.id || "")}
+                        className="h-5 w-5 rounded border-gray-300 dark:border-dark-border-primary text-light-button-primary dark:text-dark-button-primary focus:ring-light-focus-ring dark:focus:ring-dark-focus-ring"
+                      />
+                      <div className="flex-1">
+                        <StatusSelect
+                          value={assessment.status}
+                          onChange={(value) =>
+                            assessment.id &&
+                            handleStatusChange(assessment.id, value)
+                          }
+                          size="md"
+                          className="w-full"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Course and Assignment Info */}
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <h3 className="font-semibold text-light-text-primary dark:text-dark-text-primary text-base">
+                          {assessment.courseName}
+                        </h3>
+                        {showWeight && assessment.weight > 0 && (
+                          <span className="px-2 py-1 bg-gray-100 dark:bg-dark-bg-tertiary rounded-md text-sm font-medium text-gray-600 dark:text-dark-text-secondary">
+                            {assessment.weight}%
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-light-text-secondary dark:text-dark-text-secondary text-base font-medium leading-tight">
+                        {assessment.assignmentName}
+                      </p>
+                    </div>
+
+                    {/* Due Date Info */}
+                    <div className="space-y-1">
+                      <span
+                        className={`text-sm font-medium ${getStatusTextClasses(assessment.status)}`}
+                      >
+                        Due: {formatDateTimeForDisplay(
+                          assessment.dueDate,
+                          assessment.dueTime
+                        )}
+                      </span>
+                      {showDaysTillDue && daysTillDue !== null && (
+                        <div
+                          className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${
+                            daysTillDue <= 3
+                              ? "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300"
+                              : daysTillDue <= 7
+                              ? "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300"
+                              : "bg-gray-100 text-gray-600 dark:bg-gray-800/30 dark:text-gray-400"
+                          }`}
+                        >
+                          {daysTillDue === 0
+                            ? "Due today"
+                            : daysTillDue === 1
+                            ? "Due tomorrow"
+                            : `${daysTillDue} days left`}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="flex items-center justify-end space-x-2 pt-2 border-t border-gray-200 dark:border-dark-border-primary">
+                      {showNotes && (
+                        <button
+                          onClick={() => handleNotesClick(assessment)}
+                          className={`${
+                            assessment.notes
+                              ? "text-light-button-primary dark:text-dark-button-primary bg-blue-50 dark:bg-blue-900/30"
+                              : "text-gray-500 dark:text-dark-text-tertiary"
+                          } hover:bg-gray-100 dark:hover:bg-dark-bg-tertiary p-3 rounded-md transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center`}
+                          title={
+                            assessment.notes
+                              ? "View/Edit Notes"
+                              : "Add Notes"
+                          }
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-5 w-5"
+                            viewBox="0 0 20 20"
+                            fill="currentColor"
+                          >
+                            <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
+                            <path
+                              fillRule="evenodd"
+                              d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                        </button>
+                      )}
+                      <button
+                        onClick={() => handleEditClick(assessment)}
+                        className="text-gray-500 dark:text-dark-text-tertiary hover:text-gray-700 dark:hover:text-dark-text-secondary hover:bg-gray-100 dark:hover:bg-dark-bg-tertiary p-3 rounded-md transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
+                        title="Edit Assessment"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-5 w-5"
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
+                        >
+                          <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                        </svg>
+                      </button>
+                      <button
+                        onClick={() => handleDeleteClick(assessment)}
+                        className="text-gray-500 dark:text-dark-text-tertiary hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 p-3 rounded-md transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
+                        title="Delete Assessment"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-5 w-5"
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Desktop Table Layout */}
+                  <div className="hidden lg:grid grid-cols-12 gap-2 items-center">
+                    <div className="col-span-2 flex items-center space-x-2">
                       <input
                         type="checkbox"
                         checked={selectedRows.includes(assessment.id || "")}
@@ -781,17 +1123,17 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                         className="flex-1"
                       />
                     </div>
-                    <div className="col-span-12 lg:col-span-2">
+                    <div className="col-span-2">
                       <h3 className="font-medium text-light-text-primary dark:text-dark-text-primary text-sm">
                         {assessment.courseName}
                       </h3>
                     </div>
-                    <div className="col-span-12 lg:col-span-4">
+                    <div className="col-span-4">
                       <p className="text-light-text-secondary dark:text-dark-text-secondary text-base">
                         {assessment.assignmentName}
                       </p>
                     </div>
-                    <div className="col-span-12 lg:col-span-4 flex items-center justify-between">
+                    <div className="col-span-4 flex items-center justify-between">
                       <div className="flex flex-col space-y-0.5">
                         <span
                           className={`text-md ${getStatusTextClasses(assessment.status)}`}
