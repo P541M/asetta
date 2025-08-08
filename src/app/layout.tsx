@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Manrope } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/contexts/AuthContext";
-import { useEffect } from "react";
+import DarkModeProvider from "@/components/ui/DarkModeProvider";
 
 const manrope = Manrope({ subsets: ["latin"] });
 
@@ -38,17 +38,10 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  useEffect(() => {
-    // Check for saved dark mode preference
-    const darkMode = localStorage.getItem("darkMode") === "true";
-    if (darkMode) {
-      document.documentElement.classList.add("dark");
-    }
-  }, []);
-
   return (
     <html lang="en">
       <body className={manrope.className}>
+        <DarkModeProvider />
         <AuthProvider>{children}</AuthProvider>
       </body>
     </html>

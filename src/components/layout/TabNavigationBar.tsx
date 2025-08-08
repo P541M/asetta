@@ -151,7 +151,7 @@ const TabNavigationBar = ({ className = "" }: TabNavigationBarProps) => {
                 <div className="h-5 w-5 flex-shrink-0">
                   {React.cloneElement(tab.icon, {
                     className: "h-5 w-5"
-                  })}
+                  } as React.SVGProps<SVGSVGElement>)}
                 </div>
                 <span className="text-xs leading-tight truncate w-full text-center">
                   {tab.label}
