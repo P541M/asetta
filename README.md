@@ -5,6 +5,7 @@ Asetta is a comprehensive web application designed to help students manage their
 ## Features
 
 ### Assessment Management
+
 - **Add Assessments**: Manually add assessments or upload course outlines for automatic extraction
 - **Status Tracking**: Track assessment progress with statuses (Not Started, In Progress, Submitted, Missed)
 - **Due Date Management**: Visual indicators for upcoming deadlines with color-coded urgency
@@ -12,18 +13,21 @@ Asetta is a comprehensive web application designed to help students manage their
 - **Rich Text Notes**: Add detailed notes with rich text formatting for each assessment
 
 ### Organization & Filtering
+
 - **Semester Management**: Organize assessments by academic semesters
 - **Course Filtering**: Filter assessments by specific courses
 - **Status Filtering**: Filter by submission status (All Tasks, Not Submitted, Submitted)
 - **Bulk Operations**: Update multiple assessments at once or perform bulk deletions
 
 ### User Experience
+
 - **Dark Mode**: Full dark theme support with system preference detection
-- **Responsive Design**: Optimized for desktop and mobile devices  
+- **Responsive Design**: Optimized for desktop and mobile devices
 - **Real-time Updates**: Instant synchronization across sessions
 - **Calendar Integration**: Export assessments to calendar applications via ICS files
 
-### Document Processing
+### AI Extraction
+
 - **PDF Upload**: Upload course syllabi and outlines for automatic assessment extraction
 - **Smart Parsing**: AI-powered extraction of assessment details from uploaded documents
 
@@ -41,25 +45,29 @@ Asetta is a comprehensive web application designed to help students manage their
 ## Getting Started
 
 ### Prerequisites
-- Node.js 18+ 
+
+- Node.js 18+
 - npm or yarn
 - Firebase project with Firestore and Auth enabled
 
 ### Installation
 
 1. Clone the repository:
+
 ```bash
 git clone https://github.com/yourusername/asetta.git
 cd asetta
 ```
 
 2. Install dependencies:
+
 ```bash
 npm install
 ```
 
 3. Set up environment variables:
-Create a `.env.local` file with your Firebase configuration:
+   Create a `.env.local` file with your Firebase configuration:
+
 ```env
 NEXT_PUBLIC_FIREBASE_API_KEY=your_api_key
 NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your_auth_domain
@@ -70,6 +78,7 @@ NEXT_PUBLIC_FIREBASE_APP_ID=your_app_id
 ```
 
 4. Run the development server:
+
 ```bash
 npm run dev
 ```
