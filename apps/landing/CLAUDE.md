@@ -127,7 +127,7 @@ The landing page positions Asetta as a "100% Free for Students" AI-powered acade
 2. Smart Deadline Management
 3. Personalized Insights
 4. Smart Notifications
-5. Document Processing
+5. AI Extraction
 6. Course Management
 
 The pricing page uses humorous, student-friendly messaging ("Save your money for that extra coffee during finals week!") to reinforce the free positioning. All CTAs direct users to the main application for registration and login.

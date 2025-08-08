@@ -7,9 +7,17 @@ import Footer from "../components/Footer";
 import ImageModal from "../components/ImageModal";
 
 export default function FeaturesPage() {
-  const [modalImage, setModalImage] = useState<{ src: string; alt: string; title: string } | null>(null);
+  const [modalImage, setModalImage] = useState<{
+    src: string;
+    alt: string;
+    title: string;
+  } | null>(null);
 
-  const handleImageClick = (imageSrc: string, imageAlt: string, title: string) => {
+  const handleImageClick = (
+    imageSrc: string,
+    imageAlt: string,
+    title: string
+  ) => {
     setModalImage({ src: imageSrc, alt: imageAlt, title });
   };
 
@@ -28,7 +36,7 @@ export default function FeaturesPage() {
       </Head>
       <Header />
 
-      <main 
+      <main
         className="flex-grow pb-24 relative overflow-hidden"
         style={{
           paddingTop: `max(8rem, calc(8rem + env(safe-area-inset-top)))`,
@@ -49,14 +57,12 @@ export default function FeaturesPage() {
             </span>
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-gray-900 mb-8 font-heading tracking-tight leading-tight">
               Smart Features for{" "}
-              <span className="text-primary-600">
-                Academic Success
-              </span>
+              <span className="text-primary-600">Academic Success</span>
             </h1>
             <p className="text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
               Comprehensive academic organization tools designed for students.
-              Track assessments, calculate grades, manage deadlines, and stay organized
-              across all your semesters—completely free.
+              Track assessments, calculate grades, manage deadlines, and stay
+              organized across all your semesters—completely free.
             </p>
           </div>
 
@@ -64,20 +70,20 @@ export default function FeaturesPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-10 animate-fade-in-up-initial animate-fade-in-up">
             {[
               {
-                image: "/images/features/document-processing.png",
-                title: "Intelligent Document Processing",
+                image: "/images/features/document-processing.gif",
+                title: "AI Extraction",
                 description:
                   "Transform course syllabi into organized assignment schedules. Upload your PDF course outline and let AI instantly extract every assignment, deadline, and weight—eliminating manual data entry and ensuring nothing falls through the cracks.",
               },
               {
-                image: "/images/features/grade-calculator.png",
-                title: "Advanced Grade Calculator",
+                image: "/images/features/grade-calculator.gif",
+                title: "Grade Calculator",
                 description:
                   "Take control of your academic performance with precision grade tracking. Calculate exactly what you need to achieve your target grades, monitor your GPA in real-time, and make informed decisions about your study priorities.",
               },
               {
-                image: "/images/features/calendar-deadlines.png",
-                title: "Smart Calendar & Deadline Management",
+                image: "/images/features/calendar-deadlines.gif",
+                title: "Calendar & Deadline Management",
                 description:
                   "Visualize your entire semester at a glance with drag-and-drop scheduling. Never miss another deadline with intelligent notifications and seamless calendar integration that syncs with your existing tools.",
               },
@@ -88,14 +94,14 @@ export default function FeaturesPage() {
                   "Structure your academic journey with intuitive semester management. Organize courses, navigate between terms effortlessly, and maintain clear separation between different academic periods for better focus and planning.",
               },
               {
-                image: "/images/features/assessment-tracking.png",
-                title: "Comprehensive Assessment Tracking",
+                image: "/images/features/assessment-tracking.gif",
+                title: "Assessment Tracking",
                 description:
                   "Master your academic workload with powerful assessment management tools. Track progress, manage statuses, filter by courses, and handle multiple assignments efficiently with bulk operations and intelligent search capabilities.",
               },
               {
-                image: "/images/features/notes-documentation.png",
-                title: "Professional Notes & Documentation",
+                image: "/images/features/notes-documentation.gif",
+                title: "Notes & Documentation",
                 description:
                   "Enhance your study process with a sophisticated note-taking system. Create detailed, formatted notes for each assessment with professional text editing tools, link management, and persistent storage for comprehensive academic documentation.",
               },
@@ -107,22 +113,39 @@ export default function FeaturesPage() {
               >
                 <div className="bg-white rounded-3xl shadow-lg border border-gray-200/50 h-full overflow-hidden">
                   {/* Image Header */}
-                  <div 
+                  <div
                     className="relative h-48 md:h-56 overflow-hidden cursor-pointer group"
-                    onClick={() => handleImageClick(feature.image, feature.title, feature.title)}
+                    onClick={() =>
+                      handleImageClick(
+                        feature.image,
+                        feature.title,
+                        feature.title
+                      )
+                    }
                   >
                     <Image
                       src={feature.image}
                       alt={feature.title}
                       fill
                       className="object-cover transition-transform duration-300 group-hover:scale-105"
+                      unoptimized={feature.image.endsWith(".gif")}
                     />
                     {/* Hover overlay */}
                     <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300 flex items-center justify-center">
                       <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                         <div className="bg-white/90 backdrop-blur-sm rounded-full p-3 shadow-lg">
-                          <svg className="w-6 h-6 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
+                          <svg
+                            className="w-6 h-6 text-gray-800"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"
+                            />
                           </svg>
                         </div>
                       </div>
@@ -148,13 +171,12 @@ export default function FeaturesPage() {
             <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-12 shadow-xl border border-gray-200/50 max-w-4xl mx-auto">
               <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6 font-heading">
                 Ready to Transform Your{" "}
-                <span className="text-primary-600">
-                  Academic Journey?
-                </span>
+                <span className="text-primary-600">Academic Journey?</span>
               </h2>
               <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
-                Join students who are using Asetta's comprehensive tools to organize
-                their academic work, track grades, and manage deadlines effectively.
+                Join students who are using Asetta's comprehensive tools to
+                organize their academic work, track grades, and manage deadlines
+                effectively.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <a
