@@ -93,13 +93,6 @@ export default function ImageModal({
             />
           </div>
         </div>
-
-        {/* Instructions */}
-        <div className="text-center mt-4">
-          <p className="text-white/80 text-sm">
-            Click outside or press ESC to close
-          </p>
-        </div>
       </div>
     </div>
   );
