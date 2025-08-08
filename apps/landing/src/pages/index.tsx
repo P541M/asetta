@@ -172,24 +172,88 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Features Section */}
-      <section
-        id="features"
-        className="py-32 bg-gray-50/50 relative overflow-hidden"
-      >
+      {/* Student Challenges Bridge */}
+      <section className="py-32 bg-gray-50/50 relative overflow-hidden">
         <div className="absolute inset-0 bg-primary-50/30"></div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pl-safe pr-safe relative z-10">
           <div className="text-center mb-24 animate-fade-in-up-initial animate-fade-in-up">
             <span className="inline-block mb-4 px-4 py-2 rounded-full bg-primary-100 text-primary-700 font-semibold text-sm shadow-md border border-primary-200/50">
-              🚀 Always Ahead, Never Behind
+              The Student Challenge
             </span>
             <h2 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-6 font-heading tracking-tight">
-              Smart Features for{" "}
-              <span className="text-primary-600">Student Success</span>
+              Every semester, the{" "}
+              <span className="text-primary-600">same struggles</span>
             </h2>
             <p className="text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-              Everything you need to dominate your academic journey with tools
-              that actually work for students.
+              You're not alone. These challenges are universal—but they don't
+              have to be permanent.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-10 max-w-4xl mx-auto">
+            {[
+              {
+                title: "Scattered Information",
+                description:
+                  "Assignment details spread across multiple syllabi, emails, and announcements—making it impossible to see the full picture of your semester.",
+              },
+              {
+                title: "Grade Uncertainty",
+                description:
+                  'Constantly wondering "What do I need on the final?" without having a clear, real-time view of where you stand in each class.',
+              },
+              {
+                title: "Missed Deadlines",
+                description:
+                  "Despite good intentions and multiple reminder systems, important assignments still slip through the cracks at the worst possible times.",
+              },
+              {
+                title: "Time Wasted Organizing",
+                description:
+                  "Hours spent manually copying information into calendars and spreadsheets—time that could be better spent actually studying and learning.",
+              },
+            ].map((challenge, index) => (
+              <div
+                key={index}
+                className={`animate-fade-in-up-initial animate-fade-in-up`}
+                style={{ animationDelay: `${index * 0.15}s` }}
+              >
+                <h3 className="text-2xl font-bold text-gray-900 mb-4 font-heading">
+                  {challenge.title}
+                </h3>
+                <p className="text-gray-600 leading-relaxed text-lg">
+                  {challenge.description}
+                </p>
+              </div>
+            ))}
+          </div>
+
+          <div className="text-center mt-20 animate-fade-in-up-initial animate-fade-in-up">
+            <p className="text-xl font-medium text-gray-700">
+              That's exactly why we built{" "}
+              <span className="text-primary-600 font-bold">Asetta</span>.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Features Section */}
+      <section
+        id="features"
+        className="py-32 bg-white relative overflow-hidden"
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pl-safe pr-safe relative z-10">
+          <div className="text-center mb-24 animate-fade-in-up-initial animate-fade-in-up">
+            <span className="inline-block mb-4 px-4 py-2 rounded-full bg-primary-100 text-primary-700 font-semibold text-sm shadow-md border border-primary-200/50">
+              The Solution
+            </span>
+            <h2 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-6 font-heading tracking-tight">
+              Smart Features That Solve{" "}
+              <span className="text-primary-600">These Problems</span>
+            </h2>
+            <p className="text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+              Each feature directly addresses the challenges you face, turning
+              academic chaos into organized success.
             </p>
           </div>
 
@@ -314,7 +378,7 @@ export default function LandingPage() {
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
           <div className="animate-fade-in-up-initial animate-fade-in-up">
             <span className="inline-block mb-6 px-6 py-3 rounded-full bg-primary-100 text-primary-700 font-bold text-sm shadow-lg border border-primary-200/50 backdrop-blur-sm">
-              🚀 Ready to Excel?
+              Ready to Excel?
             </span>
             <h2 className="text-5xl md:text-6xl font-extrabold text-gray-900 mb-8 font-heading tracking-tight leading-tight">
               Start Your{" "}
