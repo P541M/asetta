@@ -2,13 +2,13 @@ import nodemailer from "nodemailer";
 
 // Helper functions for development-only logging
 const devLog = (...args: unknown[]) => {
-  if (process.env.NODE_ENV === 'development') {
+  if (process.env.NODE_ENV === "development") {
     console.log(...args);
   }
 };
 
 const devError = (...args: unknown[]) => {
-  if (process.env.NODE_ENV === 'development') {
+  if (process.env.NODE_ENV === "development") {
     console.error(...args);
   }
 };
@@ -35,7 +35,7 @@ function generateEmailHTML(
         <title>Assessment Reminder</title>
         <style>
           body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             line-height: 1.6;
             color: #111827;
             margin: 0;
@@ -51,7 +51,7 @@ function generateEmailHTML(
             box-shadow: 0 2px 15px -3px rgba(0, 0, 0, 0.07), 0 10px 20px -2px rgba(0, 0, 0, 0.04);
           }
           .header {
-            background-color: #009cff;
+            background-color: #D97706;
             color: white;
             padding: 24px;
             text-align: center;
@@ -77,7 +77,7 @@ function generateEmailHTML(
           .days-remaining {
             font-size: 32px;
             font-weight: 700;
-            color: #009cff;
+            color: #D97706;
             margin-top: 8px;
           }
           .message {
@@ -87,7 +87,7 @@ function generateEmailHTML(
           }
           .button {
             display: inline-block;
-            background-color: #009cff;
+            background-color: #D97706;
             color: white;
             padding: 12px 24px;
             border-radius: 6px;
@@ -105,7 +105,7 @@ function generateEmailHTML(
             border-radius: 0 0 12px 12px;
           }
           .highlight {
-            color: #009cff;
+            color: #D97706;
             font-weight: 500;
           }
           @media (max-width: 640px) {
@@ -166,7 +166,7 @@ function generateWelcomeEmailHTML(
         <title>Welcome to Asetta</title>
         <style>
           body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             line-height: 1.6;
             color: #111827;
             margin: 0;
@@ -182,7 +182,7 @@ function generateWelcomeEmailHTML(
             box-shadow: 0 2px 15px -3px rgba(0, 0, 0, 0.07), 0 10px 20px -2px rgba(0, 0, 0, 0.04);
           }
           .header {
-            background-color: #009cff;
+            background-color: #D97706;
             color: white;
             padding: 24px;
             text-align: center;
@@ -215,7 +215,7 @@ function generateWelcomeEmailHTML(
             padding: 20px;
             border-radius: 8px;
             margin: 24px 0;
-            border-left: 4px solid #009cff;
+            border-left: 4px solid #D97706;
           }
           .feature-item {
             margin: 8px 0;
@@ -223,7 +223,7 @@ function generateWelcomeEmailHTML(
           }
           .button {
             display: inline-block;
-            background-color: #009cff;
+            background-color: #D97706;
             color: white;
             padding: 12px 24px;
             border-radius: 6px;
@@ -241,7 +241,7 @@ function generateWelcomeEmailHTML(
             border-radius: 0 0 12px 12px;
           }
           .highlight {
-            color: #009cff;
+            color: #D97706;
             font-weight: 500;
           }
           @media (max-width: 640px) {
@@ -267,16 +267,20 @@ function generateWelcomeEmailHTML(
             <div class="welcome-title">Hi ${displayName}!</div>
             <p class="message">Thank you for joining Asetta! We're excited to help you manage your academic assessments and stay on top of your studies.</p>
             
-            ${institution || studyProgram ? `
+            ${
+              institution || studyProgram
+                ? `
             <div class="user-info">
               <p style="margin: 0; color: #374151; font-weight: 500;">Your Profile:</p>
               <p style="margin: 8px 0 0 0; color: #6B7280;">
-                ${institution ? `📚 ${institution}` : ''}
-                ${institution && studyProgram ? '<br>' : ''}
-                ${studyProgram ? `🎓 ${studyProgram}` : ''}
+                ${institution ? `📚 ${institution}` : ""}
+                ${institution && studyProgram ? "<br>" : ""}
+                ${studyProgram ? `🎓 ${studyProgram}` : ""}
               </p>
             </div>
-            ` : ''}
+            `
+                : ""
+            }
             
             <div class="feature-list">
               <p style="margin: 0 0 12px 0; color: #374151; font-weight: 500;">What you can do with Asetta:</p>
@@ -287,10 +291,14 @@ function generateWelcomeEmailHTML(
               <div class="feature-item">📱 Access everything from any device</div>
             </div>
             
-            <p class="message">Ready to get started? <a href="${process.env.NEXT_PUBLIC_APP_URL}/dashboard" class="highlight">Visit your dashboard</a> and add your first assessment!</p>
+            <p class="message">Ready to get started? <a href="${
+              process.env.NEXT_PUBLIC_APP_URL
+            }/dashboard" class="highlight">Visit your dashboard</a> and add your first assessment!</p>
             
             <div style="text-align: center; margin-top: 32px;">
-              <a href="${process.env.NEXT_PUBLIC_APP_URL}/dashboard" class="button">Go to Dashboard</a>
+              <a href="${
+                process.env.NEXT_PUBLIC_APP_URL
+              }/dashboard" class="button">Go to Dashboard</a>
             </div>
             
             <p class="message" style="margin-top: 24px; font-size: 14px; color: #6B7280;">
@@ -313,7 +321,7 @@ export async function sendWelcomeEmail(
   institution?: string,
   studyProgram?: string
 ) {
-  if (process.env.NODE_ENV === 'development') {
+  if (process.env.NODE_ENV === "development") {
     devLog("📧 Attempting to send welcome email");
   }
 
@@ -327,15 +335,20 @@ export async function sendWelcomeEmail(
 
   try {
     // Test transporter connection
-    if (process.env.NODE_ENV === 'development') {
+    if (process.env.NODE_ENV === "development") {
       devLog("🔍 Testing email transporter connection...");
     }
     await transporter.verify();
-    if (process.env.NODE_ENV === 'development') {
+    if (process.env.NODE_ENV === "development") {
       devLog("✅ Email transporter connection verified");
     }
 
-    const html = generateWelcomeEmailHTML(displayName, email, institution, studyProgram);
+    const html = generateWelcomeEmailHTML(
+      displayName,
+      email,
+      institution,
+      studyProgram
+    );
 
     const mailOptions = {
       from: `"Asetta" <${process.env.EMAIL_USER}>`,
@@ -345,25 +358,25 @@ export async function sendWelcomeEmail(
       html,
     };
 
-    if (process.env.NODE_ENV === 'development') {
+    if (process.env.NODE_ENV === "development") {
       devLog("📤 Sending welcome email");
     }
 
     await transporter.sendMail(mailOptions);
-    if (process.env.NODE_ENV === 'development') {
+    if (process.env.NODE_ENV === "development") {
       devLog("✅ Welcome email sent successfully");
     }
     return true;
   } catch (error) {
-    const emailError = error as { 
-      message?: string; 
-      code?: string; 
-      command?: string; 
-      response?: string; 
-      responseCode?: number; 
+    const emailError = error as {
+      message?: string;
+      code?: string;
+      command?: string;
+      response?: string;
+      responseCode?: number;
     };
     devError("❌ Welcome email sending failed");
-    if (process.env.NODE_ENV === 'development') {
+    if (process.env.NODE_ENV === "development") {
       devError("Welcome email error details:", {
         error: emailError.message || String(error),
         code: emailError.code,
@@ -379,7 +392,7 @@ export async function sendEmail(
   assessmentTitle: string,
   daysUntilDue: number
 ) {
-  if (process.env.NODE_ENV === 'development') {
+  if (process.env.NODE_ENV === "development") {
     devLog("📧 Attempting to send assessment email");
   }
 
@@ -393,11 +406,11 @@ export async function sendEmail(
 
   try {
     // Test transporter connection
-    if (process.env.NODE_ENV === 'development') {
+    if (process.env.NODE_ENV === "development") {
       devLog("🔍 Testing email transporter connection...");
     }
     await transporter.verify();
-    if (process.env.NODE_ENV === 'development') {
+    if (process.env.NODE_ENV === "development") {
       devLog("✅ Email transporter connection verified");
     }
 
@@ -413,25 +426,25 @@ export async function sendEmail(
       html,
     };
 
-    if (process.env.NODE_ENV === 'development') {
+    if (process.env.NODE_ENV === "development") {
       devLog("📤 Sending assessment email");
     }
 
     await transporter.sendMail(mailOptions);
-    if (process.env.NODE_ENV === 'development') {
+    if (process.env.NODE_ENV === "development") {
       devLog("✅ Assessment email sent successfully");
     }
     return true;
   } catch (error) {
-    const emailError = error as { 
-      message?: string; 
-      code?: string; 
-      command?: string; 
-      response?: string; 
-      responseCode?: number; 
+    const emailError = error as {
+      message?: string;
+      code?: string;
+      command?: string;
+      response?: string;
+      responseCode?: number;
     };
     devError("❌ Assessment email sending failed");
-    if (process.env.NODE_ENV === 'development') {
+    if (process.env.NODE_ENV === "development") {
       devError("Assessment email error details:", {
         error: emailError.message || String(error),
         code: emailError.code,
