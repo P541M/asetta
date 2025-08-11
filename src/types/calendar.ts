@@ -10,4 +10,5 @@ export interface Day {
 export interface CalendarViewProps {
   selectedSemester: string;
   semesterId: string;
+  refreshTrigger?: number;
 }

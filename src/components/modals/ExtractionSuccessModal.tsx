@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import { createPortal } from "react-dom";
 import { useRouter } from "next/router";
 import { ExtractionResult } from "../../types/upload";
 
@@ -48,18 +49,19 @@ const ExtractionSuccessModal: React.FC<ExtractionSuccessModalProps> = ({
     router.push(`/dashboard/${semesterId}/calendar`);
   };
 
-  return (
+  const modalContent = (
     <div
-      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 animate-fade-in"
+      className="fixed inset-0 bg-black/60 flex items-center justify-center p-4"
+      style={{ zIndex: 10000 }}
       onClick={onClose}
     >
       <div
-        className="bg-light-bg-primary dark:bg-dark-bg-secondary rounded-2xl shadow-2xl max-w-md w-full mx-4 animate-scale-in max-h-[85vh] overflow-y-auto"
+        className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full mx-4 max-h-[85vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header with Success Animation */}
-        <div className="p-6 text-center border-b border-light-border-primary dark:border-dark-border-primary">
-          <div className="mx-auto flex items-center justify-center w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-full mb-3 animate-bounce">
+        <div className="p-6 text-center border-b border-gray-200 dark:border-gray-700">
+          <div className="mx-auto flex items-center justify-center w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-full mb-3">
             <svg
               className="w-6 h-6 text-green-600 dark:text-green-400"
               fill="none"
@@ -74,10 +76,10 @@ const ExtractionSuccessModal: React.FC<ExtractionSuccessModalProps> = ({
               />
             </svg>
           </div>
-          <h2 className="text-xl font-bold text-light-text-primary dark:text-dark-text-primary mb-1">
+          <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-1">
             🎉 Extraction Complete!
           </h2>
-          <p className="text-sm text-light-text-secondary dark:text-dark-text-secondary">
+          <p className="text-sm text-gray-600 dark:text-gray-300">
             Your course outline has been successfully processed
           </p>
         </div>
@@ -206,6 +208,8 @@ const ExtractionSuccessModal: React.FC<ExtractionSuccessModalProps> = ({
       </div>
     </div>
   );
+
+  return createPortal(modalContent, document.body);
 };
 
 export default ExtractionSuccessModal;

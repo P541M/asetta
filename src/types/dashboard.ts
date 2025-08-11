@@ -19,6 +19,7 @@ export interface DashboardData {
     completionRate: number;
   };
   refreshAssessments: () => void;
+  refreshTrigger: number;
 }
 
 export interface TabComponentProps {

@@ -38,6 +38,7 @@ interface DashboardLayoutProps {
       completionRate: number;
     };
     refreshAssessments: () => void;
+    refreshTrigger: number;
   }) => React.ReactNode;
   title?: string;
   description?: string;
@@ -61,6 +62,7 @@ const DashboardLayout = ({
   const [isDataReady, setIsDataReady] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showStatsBar, setShowStatsBar] = useState(false);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   const [stats, setStats] = useState({
     total: 0,
@@ -341,6 +343,7 @@ const DashboardLayout = ({
 
   const refreshAssessments = () => {
     console.log("Assessment data refreshed");
+    setRefreshTrigger(prev => prev + 1);
   };
 
   if (loading) {
@@ -422,6 +425,7 @@ const DashboardLayout = ({
                   error,
                   stats,
                   refreshAssessments,
+                  refreshTrigger,
                 })}
               </div>
             </div>

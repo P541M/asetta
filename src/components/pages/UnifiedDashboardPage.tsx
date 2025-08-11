@@ -237,12 +237,13 @@ const GradesTab = ({ data, urlSemesterId }: TabComponentProps) => {
 
 // Calendar Tab Component
 const CalendarTab = ({ data }: { data: DashboardData }) => {
-  const { selectedSemester, selectedSemesterId } = data;
+  const { selectedSemester, selectedSemesterId, refreshTrigger } = data;
 
   return (
     <CalendarView
       selectedSemester={selectedSemester}
       semesterId={selectedSemesterId}
+      refreshTrigger={refreshTrigger}
     />
   );
 };

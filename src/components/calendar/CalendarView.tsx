@@ -87,7 +87,7 @@ const statusFilterOptions: SelectOption[] = [
   },
 ];
 
-const CalendarView = ({ selectedSemester, semesterId }: CalendarViewProps) => {
+const CalendarView = ({ selectedSemester, semesterId, refreshTrigger }: CalendarViewProps) => {
   const { user } = useAuth();
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [calendarDays, setCalendarDays] = useState<Day[]>([]);
@@ -144,7 +144,7 @@ const CalendarView = ({ selectedSemester, semesterId }: CalendarViewProps) => {
       }
     };
     fetchAssessments();
-  }, [user, semesterId]);
+  }, [user, semesterId, refreshTrigger]);
 
   // Filter assessments based on search and status
   const getAssessmentsForDate = useCallback(

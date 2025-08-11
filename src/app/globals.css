@@ -105,7 +105,7 @@
 
   /* Animation Components */
   .animate-fade-in {
-    animation: fadeIn 0.2s ease-out;
+    animation: fadeIn 0.3s ease-out;
   }
 
   .animate-fade-in-up {
@@ -144,6 +144,15 @@
     to {
       opacity: 1;
       transform: scale(1);
+    }
+  }
+
+  @keyframes bounce {
+    0%, 100% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.1);
     }
   }
 
@@ -306,7 +315,7 @@ html:hover {
 
 /* Modal Components */
 .modal-backdrop {
-  @apply fixed inset-0 bg-black/40 backdrop-blur-[2px] flex items-center justify-center z-[9999] animate-fade-in;
+  @apply fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[9999] animate-fade-in;
 }
 
 .modal-container {
