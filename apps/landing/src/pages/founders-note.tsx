@@ -77,11 +77,7 @@ export default function FoundersNotePage() {
                   <div className="max-w-3xl mx-auto">
                     <div className="prose prose-lg max-w-none">
                       <p className="text-lg md:text-xl text-gray-700 leading-relaxed mb-8 italic font-medium">
-                        "I was that kid who felt completely overwhelmed when I
-                        started post-secondary. The jump from having everything
-                        structured and guided to suddenly being responsible for
-                        managing complex course loads, multiple deadlines, and
-                        academic planning was honestly terrifying."
+                        "I was completely overwhelmed in my first year—going from structured high school to managing complex course loads and deadlines felt impossible."
                       </p>
                     </div>
                   </div>
@@ -100,49 +96,17 @@ export default function FoundersNotePage() {
 
               <div className="relative z-10">
                 <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6 font-heading">
-                  My First Year Reality Check
+                  The Problem
                 </h2>
                 <div className="prose prose-lg prose-gray max-w-none">
-                  <p className="text-lg md:text-xl text-gray-700 leading-relaxed mb-6">
-                    I spent my first year constantly stressed about missing
-                    assignments, forgetting deadlines, and feeling like I was
-                    always playing catch-up. My high school grades were
-                    excellent, but suddenly I found myself struggling not with
-                    the course material, but with managing the chaos of multiple
-                    syllabi, conflicting deadlines, and the complete lack of the
-                    organizational structure I'd relied on for 12 years.
-                  </p>
-
-                  <p className="text-lg md:text-xl text-gray-700 leading-relaxed mb-6">
-                    I remember sitting in my dorm room at 2 AM, frantically
-                    trying to figure out what assignments were due the next day,
-                    scrolling through different course portals, checking email
-                    threads, and rifling through printed syllabi. I had sticky
-                    notes everywhere, multiple calendar apps that I'd forget to
-                    update, and a constant anxiety that I was forgetting
-                    something important.
-                  </p>
-
-                  <p className="text-lg md:text-xl text-gray-700 leading-relaxed mb-6">
-                    The worst part? I realized I wasn't alone. So many of my
-                    friends were struggling with the same overwhelming
-                    transition. We had the intelligence and motivation to
-                    succeed—we'd all been successful students in high school—but
-                    we just didn't have the organizational systems to handle
-                    this new level of academic independence.
-                  </p>
-
                   <p className="text-lg md:text-xl text-gray-700 leading-relaxed">
-                    <strong className="text-orange-600">
-                      It felt like we were set up to fail at organization,
-                      despite being capable of succeeding academically.
-                    </strong>
+                    Despite being successful in high school, I was constantly stressed about missing assignments and deadlines. I wasn't alone—most of my friends were struggling with the same transition from structured support to complete academic independence. <strong className="text-orange-600">We had the intelligence to succeed, but lacked the organizational systems to handle this new level of independence.</strong>
                   </p>
                 </div>
               </div>
             </motion.div>
 
-            {/* The Realization */}
+            {/* The Solution */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -153,86 +117,15 @@ export default function FoundersNotePage() {
 
               <div className="relative z-10">
                 <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6 font-heading">
-                  The Turning Point
+                  Building Asetta
                 </h2>
                 <div className="prose prose-lg prose-gray max-w-none">
                   <p className="text-lg md:text-xl text-gray-700 leading-relaxed mb-6">
-                    By second year, I'd developed some coping strategies. I
-                    started using spreadsheets, created elaborate folder
-                    systems, and found ways to stay more organized. But I kept
-                    thinking: why should every student have to reinvent these
-                    systems from scratch? Why isn't there something that just...
-                    works?
-                  </p>
-
-                  <p className="text-lg md:text-xl text-gray-700 leading-relaxed mb-6">
-                    As a software engineering student, I started imagining what
-                    that solution could look like. What if technology could help
-                    bridge that gap between the structured support system of
-                    high school and the complete independence of post-secondary
-                    life? What if there was a way to automatically extract all
-                    those important dates from syllabi, organize them
-                    intelligently, and present them in a way that actually made
-                    sense?
+                    As a software engineering student, I realized technology could bridge the gap between high school's structured support and post-secondary independence. <strong className="text-blue-600">So I built Asetta—not as a business opportunity, but as the solution I desperately needed.</strong>
                   </p>
 
                   <p className="text-lg md:text-xl text-gray-700 leading-relaxed">
-                    <strong className="text-blue-600">
-                      That's when the idea for Asetta was born—not as a business
-                      opportunity, but as a solution to a problem I was living
-                      with every day.
-                    </strong>
-                  </p>
-                </div>
-              </div>
-            </motion.div>
-
-            {/* Building Asetta */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.8 }}
-              className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 md:p-12 shadow-lg border border-gray-200/50 relative overflow-hidden"
-            >
-              <div className="absolute inset-0 bg-green-50/30 opacity-50"></div>
-
-              <div className="relative z-10">
-                <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6 font-heading">
-                  Building the Solution
-                </h2>
-                <div className="prose prose-lg prose-gray max-w-none">
-                  <p className="text-lg md:text-xl text-gray-700 leading-relaxed mb-6">
-                    I started building Asetta during my third year, initially
-                    just for myself and a few close friends. The goal was
-                    simple: create a system that could automatically organize
-                    academic life the way high school teachers and parents used
-                    to do, but without taking away the independence that makes
-                    post-secondary education valuable.
-                  </p>
-
-                  <p className="text-lg md:text-xl text-gray-700 leading-relaxed mb-6">
-                    I wanted Asetta to be the support system I wish I had during
-                    that overwhelming first year—something that could take a
-                    syllabus and immediately understand all the important dates,
-                    something that could remind me about deadlines without being
-                    annoying, something that could help me see the big picture
-                    of my academic semester without requiring hours of manual
-                    organization.
-                  </p>
-
-                  <p className="text-lg md:text-xl text-gray-700 leading-relaxed mb-6">
-                    Most importantly, I wanted it to be accessible to every
-                    student who needed it. I remembered that feeling of stress
-                    and overwhelm, and I knew that financial barriers shouldn't
-                    prevent students from getting the organizational support
-                    they need to succeed.
-                  </p>
-
-                  <p className="text-lg md:text-xl text-gray-700 leading-relaxed">
-                    <strong className="text-green-600">
-                      That's why Asetta has been and will always remain
-                      completely free for students.
-                    </strong>
+                    I wanted a system that could automatically extract important dates from syllabi, organize academic life intelligently, and provide the support I wished I'd had during that overwhelming first year. Most importantly, I remembered that feeling of stress and knew financial barriers shouldn't prevent students from getting help. <strong className="text-green-600">That's why Asetta will always remain completely free for students.</strong>
                   </p>
                 </div>
               </div>
@@ -252,22 +145,8 @@ export default function FoundersNotePage() {
                   </h2>
 
                   <div className="prose prose-lg max-w-none">
-                    <p className="text-lg md:text-xl text-gray-700 leading-relaxed mb-6">
-                      I'm now in my fourth year, and I still use Asetta every
-                      single day. It helps me manage my course load, track my
-                      deadlines, and stay organized as I balance academics with
-                      building and improving the platform. Every feature I add
-                      is something I've needed myself or heard other students
-                      ask for.
-                    </p>
-
                     <p className="text-lg md:text-xl text-gray-700 leading-relaxed mb-8">
-                      If my experience struggling through that first year can
-                      help even one student feel less overwhelmed and more in
-                      control of their academic journey, then every hour spent
-                      building this platform was worth it. Asetta isn't just a
-                      product I built—it's the solution I needed, and I hope it
-                      can be the solution you need too.
+                      I'm now in my fourth year and still use Asetta daily to manage my course load and deadlines. Every feature comes from something I've needed or heard other students ask for. If my first-year struggles can help even one student feel more in control of their academic journey, every hour building this was worth it.
                     </p>
                   </div>
 
