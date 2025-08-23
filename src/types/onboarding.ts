@@ -5,6 +5,10 @@ export interface OnboardingUserData {
   program?: string;
   expectedGraduation?: string;
   avatarIconId?: string;
+  hasConsentedToNotifications?: boolean;
+  emailNotifications?: boolean;
+  notificationDaysBefore?: number;
+  email?: string;
 }
 
 export interface OnboardingSemesterData {

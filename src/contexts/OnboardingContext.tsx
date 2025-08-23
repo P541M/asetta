@@ -16,8 +16,13 @@ import { DEFAULT_ICON } from '../data/profileIcons';
 // Initial state
 const initialState: OnboardingState = {
   currentStep: 1,
-  totalSteps: 5,
-  userData: {},
+  totalSteps: 6,
+  userData: {
+    hasConsentedToNotifications: false,
+    emailNotifications: false,
+    notificationDaysBefore: 3,
+    email: '',
+  },
   semesterData: { name: '' },
   isLoading: false,
   error: null,
@@ -203,6 +208,10 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
         program: state.userData.program || '',
         expectedGraduation: state.userData.expectedGraduation || '',
         avatarIconId: state.userData.avatarIconId || DEFAULT_ICON.id,
+        hasConsentedToNotifications: state.userData.hasConsentedToNotifications || false,
+        emailNotifications: state.userData.emailNotifications || true,
+        notificationDaysBefore: state.userData.notificationDaysBefore || 3,
+        email: state.userData.email || '',
       });
 
       // Clear any saved onboarding progress

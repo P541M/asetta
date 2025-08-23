@@ -47,8 +47,10 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
   const [notificationDaysBefore, setNotificationDaysBefore] =
     useState<number>(1);
   const [email, setEmail] = useState<string>("");
-  const [hasConsentedToNotifications, setHasConsentedToNotifications] =
-    useState<boolean>(false);
+  
+  // Auto-sync consent with email notifications - no separate state needed
+  const hasConsentedToNotifications = emailNotifications;
+  const setHasConsentedToNotifications = setEmailNotifications;
 
   // Store initial values for comparison
   const [initialValues, setInitialValues] = useState({
@@ -65,7 +67,6 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
     emailNotifications: false,
     notificationDaysBefore: 1,
     email: "",
-    hasConsentedToNotifications: false,
   });
 
   // Current year for graduation year input
@@ -86,8 +87,7 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
       isDarkModeLocal !== initialValues.isDarkMode ||
       emailNotifications !== initialValues.emailNotifications ||
       notificationDaysBefore !== initialValues.notificationDaysBefore ||
-      email !== initialValues.email ||
-      hasConsentedToNotifications !== initialValues.hasConsentedToNotifications
+      email !== initialValues.email
     );
   };
 
@@ -113,8 +113,6 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
           const newNotificationDaysBefore =
             userData.notificationDaysBefore ?? 1;
           const newEmail = userData.email || "";
-          const newHasConsentedToNotifications =
-            userData.hasConsentedToNotifications ?? false;
           // Handle migration from emoji to icon if needed
           const newAvatarIconId = userData.avatarIconId || (userData.avatarEmoji ? DEFAULT_ICON.id : DEFAULT_ICON.id);
 
@@ -130,7 +128,6 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
           setEmailNotifications(newEmailNotifications);
           setNotificationDaysBefore(newNotificationDaysBefore);
           setEmail(newEmail);
-          setHasConsentedToNotifications(newHasConsentedToNotifications);
           setAvatarIconId(newAvatarIconId);
 
           // Set initial values
@@ -148,7 +145,6 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
             emailNotifications: newEmailNotifications,
             notificationDaysBefore: newNotificationDaysBefore,
             email: newEmail,
-            hasConsentedToNotifications: newHasConsentedToNotifications,
           });
         }
       } catch (error) {
@@ -229,7 +225,6 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
         emailNotifications,
         notificationDaysBefore,
         email,
-        hasConsentedToNotifications,
       });
 
 
@@ -276,7 +271,6 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
     setEmailNotifications(initialValues.emailNotifications);
     setNotificationDaysBefore(initialValues.notificationDaysBefore);
     setEmail(initialValues.email);
-    setHasConsentedToNotifications(initialValues.hasConsentedToNotifications);
     onClose();
   };
 
@@ -328,7 +322,6 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
               setNotificationDaysBefore={setNotificationDaysBefore}
               email={email}
               setEmail={setEmail}
-              hasConsentedToNotifications={hasConsentedToNotifications}
               setHasConsentedToNotifications={setHasConsentedToNotifications}
             />
           )}

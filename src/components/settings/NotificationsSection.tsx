@@ -8,9 +8,8 @@ const NotificationsSection = ({
   setNotificationDaysBefore,
   email,
   setEmail,
-  hasConsentedToNotifications,
   setHasConsentedToNotifications,
-}: NotificationPreferencesProps) => {
+}: Omit<NotificationPreferencesProps, 'hasConsentedToNotifications'>) => {
   const [isCustomDays, setIsCustomDays] = useState(false);
   const [customDays, setCustomDays] = useState(notificationDaysBefore);
 
@@ -64,48 +63,52 @@ const NotificationsSection = ({
         </p>
       </div>
 
-      {/* Consent Section */}
-      <div className="bg-light-bg-tertiary dark:bg-dark-bg-tertiary rounded-xl p-6 border border-light-border-primary dark:border-dark-border-primary">
-        <div className="flex items-start space-x-4">
-          <div className="flex items-center h-6">
-            <input
-              id="notification-consent"
-              type="checkbox"
-              checked={hasConsentedToNotifications}
-              onChange={(e) => setHasConsentedToNotifications(e.target.checked)}
-              className="h-5 w-5 text-light-button-primary dark:text-dark-button-primary border-light-border-primary dark:border-dark-border-primary rounded focus:ring-2 focus:ring-light-button-primary dark:focus:ring-dark-button-primary"
-            />
-          </div>
-          <div>
-            <label
-              htmlFor="notification-consent"
-              className="font-semibold text-light-text-primary dark:text-dark-text-primary cursor-pointer"
+      {/* Main Toggle Section */}
+      <div className="flex items-center justify-between p-6 rounded-xl bg-light-bg-tertiary dark:bg-dark-bg-tertiary hover:bg-light-hover-primary dark:hover:bg-dark-hover-primary transition-all duration-200 border border-light-border-primary dark:border-dark-border-primary">
+        <div className="flex-1">
+          <h3 className="text-lg font-semibold text-light-text-primary dark:text-dark-text-primary">
+            Email Notifications
+          </h3>
+          <p className="mt-1 text-sm text-light-text-secondary dark:text-dark-text-secondary">
+            Receive automated email reminders about upcoming assessment deadlines. You can customize when and how you receive these notifications below.
+          </p>
+          <div className="mt-3 flex items-center space-x-2 text-xs text-light-text-tertiary dark:text-dark-text-tertiary">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-4 w-4"
+              viewBox="0 0 20 20"
+              fill="currentColor"
             >
-              Enable Email Notifications
-            </label>
-            <p className="text-sm text-light-text-secondary dark:text-dark-text-secondary mt-1">
-              Receive automated email reminders about upcoming assessment deadlines. You can customize when and how you receive these notifications below.
-            </p>
-            <div className="mt-3 flex items-center space-x-2 text-xs text-light-text-tertiary dark:text-dark-text-tertiary">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-4 w-4"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
-                  clipRule="evenodd"
-                />
-              </svg>
-              <span>Your email is secure and will only be used for assessment notifications</span>
-            </div>
+              <path
+                fillRule="evenodd"
+                d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
+                clipRule="evenodd"
+              />
+            </svg>
+            <span>Your email is secure and will only be used for assessment notifications</span>
           </div>
         </div>
+        <button
+          type="button"
+          onClick={() => {
+            setEmailNotifications(!emailNotifications);
+            setHasConsentedToNotifications(!emailNotifications); // Auto-sync consent
+          }}
+          className={`relative inline-flex h-7 w-14 items-center rounded-full transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-light-button-primary dark:focus:ring-dark-button-primary focus:ring-offset-2 ${
+            emailNotifications
+              ? "bg-light-button-primary dark:bg-dark-button-primary"
+              : "bg-light-border-secondary dark:bg-dark-border-secondary"
+          }`}
+        >
+          <span
+            className={`inline-block h-5 w-5 transform rounded-full bg-white shadow-sm transition-transform duration-200 ${
+              emailNotifications ? "translate-x-8" : "translate-x-1"
+            }`}
+          />
+        </button>
       </div>
 
-      {hasConsentedToNotifications && (
+      {emailNotifications && (
         <div className="space-y-6">
           {/* Email Configuration */}
           <div className="space-y-4">
@@ -129,44 +132,13 @@ const NotificationsSection = ({
                 className="w-full px-4 py-3 border border-light-border-primary dark:border-dark-border-primary rounded-xl bg-light-bg-primary dark:bg-dark-bg-primary text-light-text-primary dark:text-dark-text-primary shadow-sm focus:ring-2 focus:ring-light-button-primary dark:focus:ring-dark-button-primary focus:border-light-button-primary dark:focus:border-dark-button-primary transition-all duration-200 placeholder-light-text-tertiary dark:placeholder-dark-text-tertiary"
                 placeholder="Enter your preferred email address"
               />
-              <p className="text-sm text-light-text-secondary dark:text-dark-text-secondary">
-                This email address will receive all assessment deadline reminders
-              </p>
-            </div>
 
-            {/* Email Toggle */}
-            <div className="flex items-center justify-between p-4 rounded-xl bg-light-bg-tertiary dark:bg-dark-bg-tertiary hover:bg-light-hover-primary dark:hover:bg-dark-hover-primary transition-all duration-200 border border-light-border-primary dark:border-dark-border-primary">
-              <div className="flex-1">
-                <h5 className="text-base font-semibold text-light-text-primary dark:text-dark-text-primary">
-                  Send Email Notifications
-                </h5>
-                <p className="mt-1 text-sm text-light-text-secondary dark:text-dark-text-secondary">
-                  Enable or disable email notifications for upcoming deadlines
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={() => setEmailNotifications(!emailNotifications)}
-                className={`relative inline-flex h-7 w-14 items-center rounded-full transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-light-button-primary dark:focus:ring-dark-button-primary focus:ring-offset-2 ${
-                  emailNotifications
-                    ? "bg-light-button-primary dark:bg-dark-button-primary"
-                    : "bg-light-border-secondary dark:bg-dark-border-secondary"
-                }`}
-              >
-                <span
-                  className={`inline-block h-5 w-5 transform rounded-full bg-white shadow-sm transition-transform duration-200 ${
-                    emailNotifications ? "translate-x-8" : "translate-x-1"
-                  }`}
-                />
-              </button>
             </div>
           </div>
 
-          {emailNotifications && (
-            <div className="space-y-4">
-              <h4 className="text-base font-semibold text-light-text-primary dark:text-dark-text-primary">
-                Notification Timing
-              </h4>
+          {/* Notification Timing - always show when notifications enabled */}
+          <div className="space-y-4">
+
               
               {/* Notification Days Before */}
               <div className="space-y-3">
@@ -194,9 +166,7 @@ const NotificationsSection = ({
                       : "Custom timing"}
                   </option>
                 </select>
-                <p className="text-sm text-light-text-secondary dark:text-dark-text-secondary">
-                  Choose how far in advance you want to be notified about upcoming deadlines
-                </p>
+
 
                 {isCustomDays && (
                   <div className="mt-4 p-4 bg-light-bg-tertiary dark:bg-dark-bg-tertiary rounded-xl border border-light-border-primary dark:border-dark-border-primary">
@@ -222,12 +192,11 @@ const NotificationsSection = ({
                   </div>
                 )}
               </div>
-            </div>
-          )}
+          </div>
         </div>
       )}
 
-      {!hasConsentedToNotifications && (
+      {!emailNotifications && (
         <div className="text-center py-12">
           <svg
             xmlns="http://www.w3.org/2000/svg"

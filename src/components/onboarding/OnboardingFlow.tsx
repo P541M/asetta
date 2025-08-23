@@ -5,6 +5,7 @@ import { WelcomeStep } from './steps/WelcomeStep';
 import { ProfileStep } from './steps/ProfileStep';
 import { SemesterStep } from './steps/SemesterStep';
 import { UploadStep } from './steps/UploadStep';
+import { NotificationsStep } from './steps/NotificationsStep';
 import { CompletionStep } from './steps/CompletionStep';
 import ConfirmationModal from '../common/ConfirmationModal';
 
@@ -22,6 +23,8 @@ export function OnboardingFlow() {
       case 4:
         return <UploadStep />;
       case 5:
+        return <NotificationsStep />;
+      case 6:
         return <CompletionStep />;
       default:
         return <WelcomeStep />;
