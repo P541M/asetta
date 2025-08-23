@@ -32,6 +32,11 @@ export function SemesterStep() {
     const newFormData = { ...formData, [field]: value };
     setFormData(newFormData);
     updateSemesterData(newFormData);
+    
+    // Clear error when user starts typing a new semester name
+    if (field === 'name' && state.error) {
+      setError(null);
+    }
   };
 
   const createSemester = async () => {
@@ -55,6 +60,7 @@ export function SemesterStep() {
         setError(
           `Semester "${semesterName}" already exists. Please choose a different name.`
         );
+        setIsCreating(false); // Allow user to try again
         return;
       }
 

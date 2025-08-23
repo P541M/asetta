@@ -1,9 +1,9 @@
-import React, { createContext, useContext, useReducer, useCallback } from 'react';
+import React, { createContext, useContext, useReducer, useCallback, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { useAuth } from './AuthContext';
 import { db } from '../lib/firebase';
 import { doc, updateDoc } from 'firebase/firestore';
-import { clearOnboardingProgress } from '../utils/onboardingUtils';
+import { clearOnboardingProgress, loadUserDataForOnboarding } from '../utils/onboardingUtils';
 import {
   OnboardingState,
   OnboardingContextType,
@@ -25,6 +25,8 @@ const initialState: OnboardingState = {
   },
   semesterData: { name: '' },
   isLoading: false,
+  isLoadingData: false,
+  dataLoaded: false,
   error: null,
   hasCompletedUpload: false,
   extractionResults: null,
@@ -40,8 +42,10 @@ type OnboardingAction =
   | { type: 'UPDATE_SEMESTER_DATA'; payload: Partial<OnboardingSemesterData> }
   | { type: 'SET_CREATED_SEMESTER_ID'; payload: string }
   | { type: 'SET_LOADING'; payload: boolean }
+  | { type: 'SET_LOADING_DATA'; payload: boolean }
   | { type: 'SET_ERROR'; payload: string | null }
   | { type: 'SET_UPLOAD_COMPLETE'; payload: ExtractionResult }
+  | { type: 'LOAD_EXISTING_DATA'; payload: { userData?: Partial<OnboardingUserData>; semesterData?: Partial<OnboardingSemesterData>; currentStep?: number } }
   | { type: 'SHOW_EXIT_MODAL' }
   | { type: 'HIDE_EXIT_MODAL' };
 
@@ -83,10 +87,24 @@ function onboardingReducer(state: OnboardingState, action: OnboardingAction): On
         ...state,
         isLoading: action.payload,
       };
+    case 'SET_LOADING_DATA':
+      return {
+        ...state,
+        isLoadingData: action.payload,
+      };
     case 'SET_ERROR':
       return {
         ...state,
         error: action.payload,
+      };
+    case 'LOAD_EXISTING_DATA':
+      return {
+        ...state,
+        userData: { ...state.userData, ...action.payload.userData },
+        semesterData: { ...state.semesterData, ...action.payload.semesterData },
+        currentStep: action.payload.currentStep || state.currentStep,
+        dataLoaded: true,
+        isLoadingData: false,
       };
     case 'SET_UPLOAD_COMPLETE':
       return {
@@ -117,6 +135,40 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
   const [state, dispatch] = useReducer(onboardingReducer, initialState);
   const { user, refreshOnboardingStatus } = useAuth();
   const router = useRouter();
+
+  // Load existing user data when user is available
+  useEffect(() => {
+    const loadExistingData = async () => {
+      if (!user || state.dataLoaded) return;
+      
+      try {
+        dispatch({ type: 'SET_LOADING_DATA', payload: true });
+        const existingData = await loadUserDataForOnboarding(user);
+        
+        if (existingData) {
+          dispatch({ 
+            type: 'LOAD_EXISTING_DATA', 
+            payload: existingData 
+          });
+        } else {
+          // No existing data, mark as loaded with defaults
+          dispatch({ 
+            type: 'LOAD_EXISTING_DATA', 
+            payload: {} 
+          });
+        }
+      } catch (error) {
+        console.error('Failed to load existing onboarding data:', error);
+        // Still mark as loaded to prevent infinite loading
+        dispatch({ 
+          type: 'LOAD_EXISTING_DATA', 
+          payload: {} 
+        });
+      }
+    };
+
+    loadExistingData();
+  }, [user, state.dataLoaded]);
 
   const nextStep = useCallback(() => {
     dispatch({ type: 'NEXT_STEP' });

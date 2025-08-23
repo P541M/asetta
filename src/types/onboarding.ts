@@ -24,6 +24,8 @@ export interface OnboardingState {
   semesterData: OnboardingSemesterData;
   createdSemesterId?: string;
   isLoading: boolean;
+  isLoadingData: boolean;
+  dataLoaded: boolean;
   error: string | null;
   hasCompletedUpload: boolean;
   extractionResults: ExtractionResult | null;
