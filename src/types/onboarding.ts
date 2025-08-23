@@ -2,8 +2,8 @@ import { ExtractionResult } from './upload';
 
 export interface OnboardingUserData {
   institution?: string;
-  program?: string;
-  expectedGraduation?: string;
+  studyProgram?: string;
+  graduationYear?: number;
   avatarIconId?: string;
   hasConsentedToNotifications?: boolean;
   emailNotifications?: boolean;

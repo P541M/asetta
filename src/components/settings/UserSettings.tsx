@@ -103,8 +103,9 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
         if (userSnapshot.exists()) {
           const userData = userSnapshot.data();
           const newInstitution = userData.institution || "";
-          const newStudyProgram = userData.studyProgram || "";
-          const newGraduationYear = userData.graduationYear || currentYear + 4;
+          // Migration support: handle both old and new field names
+          const newStudyProgram = userData.studyProgram || userData.program || "";
+          const newGraduationYear = userData.graduationYear || (typeof userData.expectedGraduation === 'string' ? parseInt(userData.expectedGraduation) || currentYear + 4 : currentYear + 4);
           const newShowDaysTillDue = userData.showDaysTillDue ?? true;
           const newShowWeight = userData.showWeight ?? true;
           const newShowNotes = userData.showNotes ?? true;

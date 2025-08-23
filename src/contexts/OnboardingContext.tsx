@@ -20,7 +20,7 @@ const initialState: OnboardingState = {
   userData: {
     hasConsentedToNotifications: false,
     emailNotifications: false,
-    notificationDaysBefore: 3,
+    notificationDaysBefore: 1,
     email: '',
   },
   semesterData: { name: '' },
@@ -205,12 +205,12 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
         hasCompletedOnboarding: true,
         onboardingCompletedAt: new Date(),
         institution: state.userData.institution || '',
-        program: state.userData.program || '',
-        expectedGraduation: state.userData.expectedGraduation || '',
+        studyProgram: state.userData.studyProgram || '',
+        graduationYear: state.userData.graduationYear || new Date().getFullYear() + 4,
         avatarIconId: state.userData.avatarIconId || DEFAULT_ICON.id,
         hasConsentedToNotifications: state.userData.hasConsentedToNotifications || false,
         emailNotifications: state.userData.emailNotifications || true,
-        notificationDaysBefore: state.userData.notificationDaysBefore || 3,
+        notificationDaysBefore: state.userData.notificationDaysBefore || 1,
         email: state.userData.email || '',
       });
 

@@ -6,7 +6,7 @@ export function NotificationsStep() {
   const { state, updateUserData } = useOnboarding();
   const [formData, setFormData] = useState({
     emailNotifications: state.userData.emailNotifications || false,
-    notificationDaysBefore: state.userData.notificationDaysBefore || 3,
+    notificationDaysBefore: state.userData.notificationDaysBefore || 1,
     email: state.userData.email || "",
   });
   const [isCustomDays, setIsCustomDays] = useState(false);

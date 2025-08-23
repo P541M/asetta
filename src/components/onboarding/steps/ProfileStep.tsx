@@ -9,12 +9,12 @@ export function ProfileStep() {
   const { state, updateUserData } = useOnboarding();
   const [formData, setFormData] = useState({
     institution: state.userData.institution || "",
-    program: state.userData.program || "",
-    expectedGraduation: state.userData.expectedGraduation || "",
+    studyProgram: state.userData.studyProgram || "",
+    graduationYear: state.userData.graduationYear || new Date().getFullYear() + 4,
     avatarIconId: state.userData.avatarIconId || DEFAULT_ICON.id,
   });
 
-  const handleInputChange = (field: string, value: string) => {
+  const handleInputChange = (field: string, value: string | number) => {
     const newFormData = { ...formData, [field]: value };
     setFormData(newFormData);
     updateUserData(newFormData);
@@ -100,14 +100,14 @@ export function ProfileStep() {
 
         {/* Program */}
         <div className="form-group">
-          <label htmlFor="program" className="form-label">
+          <label htmlFor="studyProgram" className="form-label">
             Program of Study
           </label>
           <input
-            id="program"
+            id="studyProgram"
             type="text"
-            value={formData.program}
-            onChange={(e) => handleInputChange("program", e.target.value)}
+            value={formData.studyProgram}
+            onChange={(e) => handleInputChange("studyProgram", e.target.value)}
             placeholder="e.g., Computer Science, Engineering, Business"
             className="input"
           />
@@ -115,17 +115,19 @@ export function ProfileStep() {
 
         {/* Expected Graduation */}
         <div className="form-group">
-          <label htmlFor="expectedGraduation" className="form-label">
+          <label htmlFor="graduationYear" className="form-label">
             Expected Graduation
           </label>
           <input
-            id="expectedGraduation"
-            type="text"
-            value={formData.expectedGraduation}
+            id="graduationYear"
+            type="number"
+            min={new Date().getFullYear()}
+            max={new Date().getFullYear() + 10}
+            value={formData.graduationYear}
             onChange={(e) =>
-              handleInputChange("expectedGraduation", e.target.value)
+              handleInputChange("graduationYear", parseInt(e.target.value) || new Date().getFullYear() + 4)
             }
-            placeholder="e.g., Spring 2026, May 2025"
+            placeholder="e.g., 2026, 2025"
             className="input"
           />
         </div>
