@@ -154,7 +154,7 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
           // No existing data, mark as loaded with defaults
           dispatch({ 
             type: 'LOAD_EXISTING_DATA', 
-            payload: {} 
+            payload: { currentStep: 1 } 
           });
         }
       } catch (error) {
@@ -162,7 +162,7 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
         // Still mark as loaded to prevent infinite loading
         dispatch({ 
           type: 'LOAD_EXISTING_DATA', 
-          payload: {} 
+          payload: { currentStep: 1 } 
         });
       }
     };

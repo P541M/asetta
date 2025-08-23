@@ -89,7 +89,11 @@ export function shouldRedirectToOnboarding(onboardingStatus: OnboardingStatus | 
   return onboardingStatus.needsOnboarding;
 }
 
-export async function loadUserDataForOnboarding(user: User | null) {
+export async function loadUserDataForOnboarding(user: User | null): Promise<{
+  userData?: Partial<import('../types/onboarding').OnboardingUserData>;
+  semesterData?: Partial<import('../types/onboarding').OnboardingSemesterData>;
+  currentStep?: number;
+} | null> {
   if (!user) return null;
 
   try {
@@ -124,8 +128,8 @@ export async function loadUserDataForOnboarding(user: User | null) {
         ...userData,
         ...(savedProgress?.userData || {}),
       },
-      semesterData: savedProgress?.semesterData || { name: '' },
-      currentStep: savedProgress?.currentStep || 1,
+      semesterData: (savedProgress?.semesterData && typeof savedProgress.semesterData === 'object' ? savedProgress.semesterData : { name: '' }),
+      currentStep: (typeof savedProgress?.currentStep === 'number' ? savedProgress.currentStep : 1),
     };
 
     return mergedData;
