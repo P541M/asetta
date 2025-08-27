@@ -56,7 +56,7 @@ const ExtractionSuccessModal: React.FC<ExtractionSuccessModalProps> = ({
       onClick={onClose}
     >
       <div
-        className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full mx-4 max-h-[85vh] overflow-y-auto"
+        className="bg-light-bg-primary dark:bg-dark-bg-secondary rounded-2xl shadow-2xl max-w-md w-full mx-4 max-h-[85vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header with Success Animation */}
