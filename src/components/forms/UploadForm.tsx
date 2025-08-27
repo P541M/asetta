@@ -8,6 +8,7 @@ import {
 } from "../../types/upload";
 import RateLimitNotice from "../ui/RateLimitNotice";
 import ExtractionSuccessModal from "../modals/ExtractionSuccessModal";
+import ApiLimitReachedModal from "../modals/ApiLimitReachedModal";
 
 const UploadForm = ({
   semesterId,
@@ -22,6 +23,7 @@ const UploadForm = ({
   const [error, setError] = useState<string>("");
   const [retryAfter, setRetryAfter] = useState<number>(120);
   const [showSuccessModal, setShowSuccessModal] = useState<boolean>(false);
+  const [showApiLimitModal, setShowApiLimitModal] = useState<boolean>(false);
   const [extractionResult, setExtractionResult] =
     useState<ExtractionResult | null>(null);
   const [isDragActive, setIsDragActive] = useState<boolean>(false);
@@ -144,27 +146,43 @@ const UploadForm = ({
 
         onUploadSuccess(semesterName);
       } else {
-        // Check if it's a rate limit error
-        if (response.status === 429 || result.error === "RATE_LIMITED") {
-          setUploadStatus("rate_limited");
-          setRetryAfter(result.retryAfter || 120);
-          setError(
-            result.message || "Servers are busy. Please wait and try again."
-          );
+        // Check for different types of errors
+        if (response.status === 429) {
+          if (result.error === "DAILY_QUOTA_EXCEEDED") {
+            setUploadStatus("daily_quota_exceeded");
+            setShowApiLimitModal(true);
+            setError(result.message || "Daily processing limit reached");
+          } else if (result.error === "RATE_LIMITED") {
+            setUploadStatus("rate_limited");
+            setRetryAfter(result.retryAfter || 120);
+            setError(
+              result.message || "Servers are busy. Please wait and try again."
+            );
+          } else {
+            throw new Error(result.error || "Upload failed");
+          }
         } else {
           throw new Error(result.error || "Upload failed");
         }
       }
     } catch (err) {
       console.error("Upload error:", err);
-      // Check if it's a network-level rate limit
+      // Check if it's a network-level error indicating quotas or rate limits
       if (
         err instanceof Error &&
-        (err.message.includes("429") || err.message.includes("rate limit"))
+        (err.message.includes("429") || 
+         err.message.includes("rate limit") ||
+         err.message.includes("quota"))
       ) {
-        setUploadStatus("rate_limited");
-        setRetryAfter(120);
-        setError("Servers are busy. Please wait and try again.");
+        if (err.message.includes("daily") || err.message.includes("quota exceeded")) {
+          setUploadStatus("daily_quota_exceeded");
+          setShowApiLimitModal(true);
+          setError("Daily processing limit reached");
+        } else {
+          setUploadStatus("rate_limited");
+          setRetryAfter(120);
+          setError("Servers are busy. Please wait and try again.");
+        }
       } else {
         setUploadStatus("error");
         setError(err instanceof Error ? err.message : "Upload failed");
@@ -187,6 +205,7 @@ const UploadForm = ({
     setError("");
     setRetryAfter(120);
     setShowSuccessModal(false);
+    setShowApiLimitModal(false);
     setExtractionResult(null);
     setCopyrightAgreed(false);
     if (fileInputRef.current) {
@@ -197,6 +216,10 @@ const UploadForm = ({
   const handleCloseSuccessModal = () => {
     setShowSuccessModal(false);
     setExtractionResult(null);
+  };
+
+  const handleCloseApiLimitModal = () => {
+    setShowApiLimitModal(false);
   };
 
   const formatFileSize = (bytes: number) => {
@@ -492,6 +515,7 @@ const UploadForm = ({
               files.length === 0 ||
               uploadStatus === "uploading" ||
               uploadStatus === "rate_limited" ||
+              uploadStatus === "daily_quota_exceeded" ||
               !user ||
               !copyrightAgreed
             }
@@ -541,6 +565,12 @@ const UploadForm = ({
           semesterId={semesterId}
         />
       )}
+
+      {/* API Limit Reached Modal */}
+      <ApiLimitReachedModal
+        isOpen={showApiLimitModal}
+        onClose={handleCloseApiLimitModal}
+      />
     </div>
   );
 };

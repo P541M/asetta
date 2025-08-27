@@ -97,17 +97,39 @@ async function extractAssessmentsAI(text: string): Promise<string> {
     const response = await result.response;
     return response.text();
   } catch (error: unknown) {
-    // Handle rate limiting specifically
+    // Handle rate limiting and quota exhaustion specifically
     const errorMessage = error instanceof Error ? error.message : "";
     const errorObj = error as { status?: number };
     const errorStatus = errorObj.status;
-    if (
-      errorStatus === 429 ||
-      errorMessage.includes("429") ||
+    
+    if (errorStatus === 429 || errorMessage.includes("429")) {
+      // Check for daily quota exhaustion vs temporary rate limiting
+      if (
+        errorMessage.includes("quota exceeded") ||
+        errorMessage.includes("quota exhausted") ||
+        errorMessage.includes("daily limit") ||
+        errorMessage.includes("QUOTA_EXCEEDED")
+      ) {
+        throw new Error("DAILY_QUOTA_EXCEEDED");
+      } else {
+        // Temporary rate limiting
+        throw new Error("RATE_LIMITED");
+      }
+    } else if (
       errorMessage.includes("quota") ||
-      errorMessage.includes("rate limit")
+      errorMessage.includes("rate limit") ||
+      errorMessage.includes("QUOTA_EXCEEDED")
     ) {
-      throw new Error("RATE_LIMITED");
+      // Additional quota checks for non-429 errors
+      if (
+        errorMessage.includes("quota exceeded") ||
+        errorMessage.includes("quota exhausted") ||
+        errorMessage.includes("daily limit")
+      ) {
+        throw new Error("DAILY_QUOTA_EXCEEDED");
+      } else {
+        throw new Error("RATE_LIMITED");
+      }
     }
     throw error;
   }
@@ -294,7 +316,13 @@ export default async function handler(
           }
         } catch (error: unknown) {
           const errorMessage = error instanceof Error ? error.message : "";
-          if (errorMessage === "RATE_LIMITED") {
+          if (errorMessage === "DAILY_QUOTA_EXCEEDED") {
+            failedFiles++;
+            errors.push(
+              `Daily quota exceeded: ${fileName}. Please try again tomorrow.`
+            );
+            continue;
+          } else if (errorMessage === "RATE_LIMITED") {
             failedFiles++;
             errors.push(
               `Rate limit exceeded: ${fileName}. Please wait a moment and try again.`
@@ -361,19 +389,34 @@ export default async function handler(
       }
     }
 
-    // Check if any files failed due to rate limiting
+    // Check if any files failed due to daily quota or rate limiting
+    const hasDailyQuotaErrors = errors.some((error) =>
+      error.includes("Daily quota exceeded")
+    );
     const hasRateLimitErrors = errors.some((error) =>
       error.includes("Rate limit exceeded")
     );
 
+    if (hasDailyQuotaErrors && processedFiles === 0) {
+      // All files failed due to daily quota exhaustion
+      return res.status(429).json({
+        success: false,
+        error: "DAILY_QUOTA_EXCEEDED",
+        message:
+          "We've reached our daily processing limit. Daily limits refresh at midnight UTC. Please try again tomorrow.",
+        quotaType: "daily",
+      });
+    }
+
     if (hasRateLimitErrors && processedFiles === 0) {
-      // All files failed due to rate limiting
+      // All files failed due to temporary rate limiting
       return res.status(429).json({
         success: false,
         error: "RATE_LIMITED",
         message:
           "Our servers are currently busy processing requests. Please wait 1-2 minutes and try again.",
         retryAfter: 120, // seconds
+        quotaType: "temporary",
       });
     }
 

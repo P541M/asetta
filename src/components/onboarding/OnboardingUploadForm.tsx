@@ -5,6 +5,7 @@ import {
   UploadStatus,
   ExtractionResult,
 } from "../../types/upload";
+import ApiLimitReachedModal from "../modals/ApiLimitReachedModal";
 
 interface OnboardingUploadFormProps {
   semesterId: string;
@@ -25,6 +26,7 @@ export function OnboardingUploadForm({
   const [error, setError] = useState<string>("");
   const [isDragOver, setIsDragOver] = useState(false);
   const [copyrightAgreed, setCopyrightAgreed] = useState(false);
+  const [showApiLimitModal, setShowApiLimitModal] = useState<boolean>(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileSelect = useCallback((selectedFiles: FileList | null) => {
@@ -97,6 +99,13 @@ export function OnboardingUploadForm({
 
       if (!response.ok) {
         const errorData = await response.json();
+        // Handle daily quota exhaustion
+        if (response.status === 429 && errorData.error === "DAILY_QUOTA_EXCEEDED") {
+          setUploadStatus("daily_quota_exceeded");
+          setShowApiLimitModal(true);
+          setError(errorData.message || "Daily processing limit reached");
+          return;
+        }
         throw new Error(errorData.error || "Upload failed");
       }
 
@@ -144,8 +153,21 @@ export function OnboardingUploadForm({
       onUploadSuccess(extractionData);
     } catch (err) {
       console.error("Upload error:", err);
-      setUploadStatus("error");
-      setError(err instanceof Error ? err.message : "Upload failed");
+      
+      // Check for daily quota errors in catch block as well
+      if (
+        err instanceof Error &&
+        (err.message.includes("DAILY_QUOTA_EXCEEDED") ||
+         err.message.includes("daily limit") ||
+         err.message.includes("quota exceeded"))
+      ) {
+        setUploadStatus("daily_quota_exceeded");
+        setShowApiLimitModal(true);
+        setError("Daily processing limit reached");
+      } else {
+        setUploadStatus("error");
+        setError(err instanceof Error ? err.message : "Upload failed");
+      }
 
       setFiles((prev) =>
         prev.map((f) => ({
@@ -161,10 +183,15 @@ export function OnboardingUploadForm({
     setUploadStatus("idle");
     setMessage("");
     setError("");
+    setShowApiLimitModal(false);
     setCopyrightAgreed(false);
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
+  };
+
+  const handleCloseApiLimitModal = () => {
+    setShowApiLimitModal(false);
   };
 
   return (
@@ -365,9 +392,9 @@ export function OnboardingUploadForm({
           </button>
           <button
             onClick={handleUpload}
-            disabled={!copyrightAgreed}
+            disabled={!copyrightAgreed || uploadStatus === "daily_quota_exceeded"}
             className={`btn-primary ${
-              !copyrightAgreed ? "opacity-50 cursor-not-allowed" : ""
+              (!copyrightAgreed || uploadStatus === "daily_quota_exceeded") ? "opacity-50 cursor-not-allowed" : ""
             }`}
           >
             Upload & Process Files
@@ -410,6 +437,12 @@ export function OnboardingUploadForm({
           </button>
         </div>
       )}
+
+      {/* API Limit Reached Modal */}
+      <ApiLimitReachedModal
+        isOpen={showApiLimitModal}
+        onClose={handleCloseApiLimitModal}
+      />
     </div>
   );
 }
