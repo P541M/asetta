@@ -392,9 +392,9 @@ export function OnboardingUploadForm({
           </button>
           <button
             onClick={handleUpload}
-            disabled={!copyrightAgreed || uploadStatus === "daily_quota_exceeded"}
+            disabled={!copyrightAgreed || (uploadStatus as UploadStatus) === "daily_quota_exceeded"}
             className={`btn-primary ${
-              (!copyrightAgreed || uploadStatus === "daily_quota_exceeded") ? "opacity-50 cursor-not-allowed" : ""
+              (!copyrightAgreed || (uploadStatus as UploadStatus) === "daily_quota_exceeded") ? "opacity-50 cursor-not-allowed" : ""
             }`}
           >
             Upload & Process Files
