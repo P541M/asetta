@@ -45,6 +45,7 @@ const CoursesTab = ({ data, onSelectCourse }: CoursesTabProps) => {
 // Assessments Tab Component
 const AssessmentsTab = ({ data }: { data: DashboardData }) => {
   const router = useRouter();
+  const { setActiveTab } = useTab();
   const [selectedCourse, setSelectedCourse] = useState<string | null>(null);
   const { selectedSemesterId, assessments, error, refreshAssessments } = data;
 
@@ -60,9 +61,12 @@ const AssessmentsTab = ({ data }: { data: DashboardData }) => {
     setSelectedCourse(null);
     const newQuery = { ...router.query };
     delete newQuery.course;
+    // Switch back to courses tab when clearing course selection
+    newQuery.tab = 'courses';
     router.replace({ pathname: router.pathname, query: newQuery }, undefined, {
       shallow: true,
     });
+    setActiveTab('courses');
   };
 
   return (
