@@ -47,6 +47,14 @@ export const TabProvider: React.FC<TabProviderProps> = ({
     const currentPath = router.asPath.split('?')[0];
     const newQuery = { ...router.query, tab };
     
+    // Clean up course parameter when switching tabs to ensure clean state
+    // User expectation: any tab switch from filtered course view should reset to normal tab
+    // Also clear when clicking assessments tab while already in filtered assessments view
+    if ((tab !== 'assessments' && 'course' in newQuery) || 
+        (tab === 'assessments' && activeTab === 'assessments' && 'course' in newQuery)) {
+      delete (newQuery as any).course;
+    }
+    
     router.replace({
       pathname: currentPath,
       query: newQuery,
