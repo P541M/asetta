@@ -28,7 +28,10 @@
       "Bash(curl:*)",
       "WebSearch",
       "Bash(npm ls:*)",
-      "Bash(timeout 5m npm run build)"
+      "Bash(timeout 5m npm run build)",
+      "Bash(timeout 60s npm run lint)",
+      "Bash(timeout 60s npm run build)",
+      "Bash(timeout 8s npm run dev)"
     ],
     "deny": []
   }

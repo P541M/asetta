@@ -3,6 +3,7 @@ import { useAuth } from "../../contexts/AuthContext";
 import { updateDoc } from "firebase/firestore";
 import { useAssessments } from "../../hooks/useAssessments";
 import { useAutoSave } from "../../hooks/useAutoSave";
+import { useCoursePreferences } from "../../hooks/useCoursePreferences";
 import { getAssessmentDocRef } from "../../lib/firebaseUtils";
 import { Assessment } from "../../types/assessment";
 import LoadingSpinner from "../ui/LoadingSpinner";
@@ -28,7 +29,14 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
   const { user } = useAuth();
   const [currentGrade, setCurrentGrade] = useState<number | null>(null);
   const [totalWeight, setTotalWeight] = useState<number>(0);
-  const [targetGrade, setTargetGrade] = useState<number>(85);
+
+  // Course preferences hook for target grade
+  const {
+    preferences: coursePreferences,
+    loading: preferencesLoading,
+    error: preferencesError,
+    updateTargetGrade,
+  } = useCoursePreferences(semesterId, selectedCourse);
 
   const {
     assessments: fetchedAssessments,
@@ -284,6 +292,8 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
   };
 
   const calculateRequiredGrade = () => {
+    if (!coursePreferences) return null;
+    
     const completedAssessments = assessments.filter(
       (a) => ["Submitted", "Missed"].includes(a.status) && a.mark !== null && a.mark !== undefined
     );
@@ -306,7 +316,7 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
       (sum, assessment) => sum + assessment.weight,
       0
     );
-    const targetWeightedSum = (targetGrade * totalWeight) / 100;
+    const targetWeightedSum = (coursePreferences.targetGrade * totalWeight) / 100;
     const requiredWeightedSum = targetWeightedSum - currentWeightedSum;
 
     return remainingWeight > 0
@@ -360,7 +370,7 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
     );
   }
 
-  if (isLoading) {
+  if (isLoading || preferencesLoading) {
     return (
       <div className="flex justify-center py-8">
         <LoadingSpinner />
@@ -370,6 +380,10 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
 
   if (error) {
     return <ErrorMessage message={error} />;
+  }
+
+  if (preferencesError) {
+    return <ErrorMessage message={`Course preferences error: ${preferencesError}`} />;
   }
 
   const currentGradeInfo =
@@ -511,11 +525,17 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
                 type="number"
                 min="0"
                 max="100"
-                value={targetGrade}
-                onChange={(e) =>
-                  setTargetGrade(parseFloat(e.target.value) || 0)
-                }
-                className="input w-20 sm:w-16 px-3 py-2 sm:px-2 sm:py-1 text-base sm:text-sm hover:shadow-sm transition-all duration-200 dark:bg-dark-input-bg dark:text-dark-input-text dark:border-dark-input-border min-h-[44px] sm:min-h-[auto]"
+                value={coursePreferences?.targetGrade || 85}
+                onChange={async (e) => {
+                  const newTargetGrade = parseFloat(e.target.value) || 0;
+                  try {
+                    await updateTargetGrade(newTargetGrade);
+                  } catch (error) {
+                    console.error('Failed to update target grade:', error);
+                  }
+                }}
+                disabled={preferencesLoading}
+                className="input w-20 sm:w-16 px-3 py-2 sm:px-2 sm:py-1 text-base sm:text-sm hover:shadow-sm transition-all duration-200 dark:bg-dark-input-bg dark:text-dark-input-text dark:border-dark-input-border min-h-[44px] sm:min-h-[auto] disabled:opacity-50 disabled:cursor-not-allowed"
               />
               <span className="text-light-text-tertiary dark:text-dark-text-tertiary text-sm">
                 %

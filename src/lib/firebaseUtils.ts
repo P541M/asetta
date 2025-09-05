@@ -43,3 +43,16 @@ export const getCourseDocRef = (
 ): DocumentReference => {
   return doc(db, 'users', userId, 'semesters', semesterId, 'courses', courseId);
 };
+
+// Course preferences document references
+export const getCoursePreferencesRef = (userId: string, semesterId: string): CollectionReference => {
+  return collection(db, 'users', userId, 'semesters', semesterId, 'coursePreferences');
+};
+
+export const getCoursePreferencesDocRef = (
+  userId: string, 
+  semesterId: string, 
+  courseName: string
+): DocumentReference => {
+  return doc(db, 'users', userId, 'semesters', semesterId, 'coursePreferences', courseName);
+};
