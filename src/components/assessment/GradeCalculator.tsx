@@ -490,7 +490,7 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
           </h3>
           <div className="space-y-3">
             <div className="text-2xl font-semibold text-light-text-primary dark:text-dark-text-primary">
-              {totalWeight}%
+              {totalWeight.toFixed(2)}%
             </div>
             <div className="w-full bg-light-bg-tertiary dark:bg-dark-bg-tertiary rounded-full h-1.5">
               <div
@@ -509,7 +509,7 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
                 ? "Complete"
                 : totalWeight > 100
                 ? "Over 100%"
-                : `${100 - totalWeight}% remaining`}
+                : `${(100 - totalWeight).toFixed(2)}% remaining`}
             </p>
           </div>
         </div>
