@@ -24,4 +24,6 @@ export interface CourseStats {
 export interface CoursesOverviewTableProps {
   courses: CourseStats[];
   onSelectCourse: (courseName: string) => void;
+  semesterId: string;
+  onCourseRenamed?: () => void;
 }

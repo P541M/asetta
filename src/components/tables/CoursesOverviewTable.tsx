@@ -1,13 +1,65 @@
+import { useState } from 'react';
+import { useRouter } from 'next/router';
 import {
   formatLocalDate,
   isUpcoming as isDateUpcoming,
 } from "../../utils/dateUtils";
 import { CoursesOverviewTableProps } from "../../types/course";
+import { useCourseRename } from "../../hooks/useCourseRename";
 
 const CoursesOverviewTable = ({
   courses,
   onSelectCourse,
+  semesterId,
+  onCourseRenamed,
 }: CoursesOverviewTableProps) => {
+  const router = useRouter();
+  const [editingCourse, setEditingCourse] = useState<string | null>(null);
+  const [editValue, setEditValue] = useState<string>('');
+
+  const { renameCourse, isRenaming } = useCourseRename(semesterId, {
+    onSuccess: (oldName, newName) => {
+      setEditingCourse(null);
+      onCourseRenamed?.();
+      
+      // Update navigation if user is currently viewing the renamed course
+      if (router.query.course === oldName) {
+        const newQuery = { ...router.query };
+        newQuery.course = newName;
+        router.replace({ pathname: router.pathname, query: newQuery }, undefined, {
+          shallow: true,
+        });
+      }
+    },
+    onError: (error) => {
+      console.error('Course rename failed:', error);
+      setEditingCourse(null);
+    }
+  });
+
+  const handleEditStart = (courseName: string, e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent triggering course selection
+    setEditingCourse(courseName);
+    setEditValue(courseName);
+  };
+
+  const handleEditSubmit = async (oldName: string) => {
+    const newName = editValue.trim();
+    if (newName === oldName.trim() || !newName) {
+      setEditingCourse(null);
+      return;
+    }
+    
+    await renameCourse(oldName, newName);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent, courseName: string) => {
+    if (e.key === 'Enter') {
+      handleEditSubmit(courseName);
+    } else if (e.key === 'Escape') {
+      setEditingCourse(null);
+    }
+  };
   if (courses.length === 0) {
     return (
       <div className="p-6">
@@ -65,9 +117,37 @@ const CoursesOverviewTable = ({
               className="bg-light-bg-primary dark:bg-dark-bg-tertiary rounded-lg p-6 border border-light-border-primary dark:border-dark-border-primary hover:shadow-md transition-all duration-200 cursor-pointer hover:scale-[1.02]"
             >
               <div className="flex items-start justify-between mb-4">
-                <h3 className="text-lg font-medium text-light-text-primary dark:text-dark-text-primary line-clamp-2 flex-1 mr-3">
-                  {course.courseName}
-                </h3>
+                <div className="flex-1 mr-3">
+                  {editingCourse === course.courseName ? (
+                    <input
+                      type="text"
+                      value={editValue}
+                      onChange={(e) => setEditValue(e.target.value)}
+                      onBlur={() => handleEditSubmit(course.courseName)}
+                      onKeyDown={(e) => handleKeyDown(e, course.courseName)}
+                      onClick={(e) => e.stopPropagation()}
+                      className="text-lg font-medium bg-transparent border-b-2 border-light-button-primary dark:border-dark-button-primary text-light-text-primary dark:text-dark-text-primary focus:outline-none w-full"
+                      autoFocus
+                      disabled={isRenaming}
+                    />
+                  ) : (
+                    <div className="flex items-center group">
+                      <h3 className="text-lg font-medium text-light-text-primary dark:text-dark-text-primary line-clamp-2 flex-1">
+                        {isRenaming && editingCourse === course.courseName ? 'Updating...' : course.courseName}
+                      </h3>
+                      <button
+                        onClick={(e) => handleEditStart(course.courseName, e)}
+                        className="ml-2 p-1 rounded opacity-0 group-hover:opacity-100 hover:bg-light-hover-primary dark:hover:bg-dark-hover-primary transition-all duration-200"
+                        title="Edit course name"
+                        disabled={isRenaming}
+                      >
+                        <svg className="w-4 h-4 text-light-text-secondary dark:text-dark-text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        </svg>
+                      </button>
+                    </div>
+                  )}
+                </div>
                 <div className="flex flex-col items-end">
                   <div className="text-2xl font-bold text-light-button-primary dark:text-dark-button-primary">
                     {course.progress}%
@@ -136,6 +216,7 @@ const CoursesOverviewTable = ({
           );
         })}
       </div>
+
     </div>
   );
 };

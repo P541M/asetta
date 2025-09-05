@@ -26,7 +26,12 @@ interface UnifiedDashboardPageProps {
 
 // Courses Tab Component
 const CoursesTab = ({ data, onSelectCourse }: CoursesTabProps) => {
-  const { error, courses } = data;
+  const { error, courses, selectedSemesterId, refreshAssessments } = data;
+
+  const handleCourseRenamed = () => {
+    // Refresh assessments data to reflect the course name change
+    refreshAssessments();
+  };
 
   return (
     <>
@@ -36,6 +41,8 @@ const CoursesTab = ({ data, onSelectCourse }: CoursesTabProps) => {
         <CoursesOverviewTable
           courses={courses}
           onSelectCourse={onSelectCourse}
+          semesterId={selectedSemesterId}
+          onCourseRenamed={handleCourseRenamed}
         />
       )}
     </>
