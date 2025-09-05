@@ -50,3 +50,6 @@ Before committing changes:
 2. Test in both light and dark modes
 3. Verify responsive behavior on mobile
 4. Check Firebase operations in browser dev tools
+
+## ⚠️ CRITICAL RULE ⚠️
+**NEVER commit or push code automatically. ONLY make file changes and let the user handle all git operations (add, commit, push). The user controls deployment timing and commit messages.**
