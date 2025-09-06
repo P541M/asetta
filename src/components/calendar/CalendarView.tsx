@@ -338,7 +338,7 @@ const CalendarView = ({ selectedSemester, semesterId, refreshTrigger }: Calendar
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 space-y-4 md:space-y-0">
         <div>
           <h2 className="text-xl font-medium text-light-text-primary dark:text-dark-text-primary">
-            Calendar View
+            Calendar
           </h2>
           <p className="text-sm text-light-text-tertiary dark:text-dark-text-tertiary">
             {monthNames[currentMonth.getMonth()]} {currentMonth.getFullYear()}

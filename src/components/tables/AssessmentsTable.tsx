@@ -488,8 +488,8 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
     <div className="p-6">
       <div className="flex flex-col gap-4 mb-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <h2 className="text-xl font-medium text-light-text-primary dark:text-dark-text-primary">
-            Your Assessments
+          <h2 className="text-xl font-medium text-light-text-primary dark:text-dark-text-primary mb-6">
+            Assessments
           </h2>
           <div className="w-full sm:w-auto">
             <CustomSelect

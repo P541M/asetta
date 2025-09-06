@@ -13,6 +13,7 @@ import EmptyState from "../ui/EmptyState";
 interface GradeCalculatorProps {
   semesterId: string;
   selectedCourse: string | null;
+  onAutoSaveStatusChange?: (status: 'idle' | 'saving' | 'saved' | 'error', error?: string) => void;
 }
 
 interface GradeInfo {
@@ -25,6 +26,7 @@ interface GradeInfo {
 const GradeCalculator: React.FC<GradeCalculatorProps> = ({
   semesterId,
   selectedCourse,
+  onAutoSaveStatusChange,
 }) => {
   const { user } = useAuth();
   const [currentGrade, setCurrentGrade] = useState<number | null>(null);
@@ -89,6 +91,11 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
     onSave: handleAutoSave,
     enabled: Boolean(user && semesterId)
   });
+
+  // Notify parent of auto-save status changes
+  useEffect(() => {
+    onAutoSaveStatusChange?.(saveStatus, saveError || undefined);
+  }, [saveStatus, saveError, onAutoSaveStatusChange]);
 
   // Grade scale configuration
   const getGradeInfo = (percentage: number): GradeInfo => {
@@ -392,43 +399,6 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
 
   return (
     <div className="space-y-6">
-      {/* Header with Auto-Save Status */}
-      <div className="flex justify-between items-center mb-6">
-        <div>
-          <h3 className="text-base font-medium text-light-text-primary dark:text-dark-text-primary">
-            {selectedCourse}
-          </h3>
-          <p className="text-sm text-light-text-tertiary dark:text-dark-text-tertiary mt-1">
-            Grade calculator and progress tracking
-          </p>
-        </div>
-        
-        {/* Auto-Save Status Indicator */}
-        <div className="flex items-center space-x-2 min-h-[20px]">
-          {saveStatus === 'saving' && (
-            <div className="flex items-center space-x-2 text-sm text-light-text-secondary dark:text-dark-text-secondary animate-fade-in transition-all duration-200 ease-out">
-              <div className="animate-spin rounded-full h-4 w-4 border-2 border-light-button-primary border-t-transparent"></div>
-              <span>Saving...</span>
-            </div>
-          )}
-          {saveStatus === 'saved' && (
-            <div className="flex items-center space-x-2 text-sm text-green-600 dark:text-green-400 animate-fade-in transition-all duration-200 ease-out">
-              <svg className="w-4 h-4 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-              </svg>
-              <span>Saved</span>
-            </div>
-          )}
-          {saveStatus === 'error' && saveError && (
-            <div className="flex items-center space-x-2 text-sm text-red-600 dark:text-red-400 animate-fade-in transition-all duration-200 ease-out">
-              <svg className="w-4 h-4 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <span>Error saving</span>
-            </div>
-          )}
-        </div>
-      </div>
 
       {saveStatus === 'error' && saveError && (
         <div className="p-4 bg-light-error-bg dark:bg-dark-error-bg rounded-md text-light-error-text dark:text-dark-error-text animate-fade-in shadow-sm">

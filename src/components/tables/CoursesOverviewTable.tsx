@@ -64,7 +64,7 @@ const CoursesOverviewTable = ({
     return (
       <div className="p-6">
         <h2 className="text-xl font-medium text-light-text-primary dark:text-dark-text-primary mb-6">
-          Your Courses
+          Courses
         </h2>
         <div className="text-center py-10">
           <svg
@@ -94,7 +94,7 @@ const CoursesOverviewTable = ({
   return (
     <div className="p-6">
       <h2 className="text-xl font-medium text-light-text-primary dark:text-dark-text-primary mb-6">
-        Your Courses
+        Courses
       </h2>
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">

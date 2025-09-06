@@ -105,6 +105,8 @@ const AssessmentsTab = ({ data }: { data: DashboardData }) => {
 const GradesTab = ({ data, urlSemesterId }: TabComponentProps) => {
   const router = useRouter();
   const [selectedCourse, setSelectedCourse] = useState<string | null>(null);
+  const [autoSaveStatus, setAutoSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+  const [autoSaveError, setAutoSaveError] = useState<string | undefined>();
   const { selectedSemester, selectedSemesterId, availableCourses } = data;
 
   useEffect(() => {
@@ -124,6 +126,11 @@ const GradesTab = ({ data, urlSemesterId }: TabComponentProps) => {
       ? `/dashboard/${urlSemesterId}`
       : "/dashboard";
     router.push(`${basePath}?tab=add`);
+  };
+
+  const handleAutoSaveStatusChange = (status: 'idle' | 'saving' | 'saved' | 'error', error?: string) => {
+    setAutoSaveStatus(status);
+    setAutoSaveError(error);
   };
 
   if (!selectedSemesterId) {
@@ -160,20 +167,38 @@ const GradesTab = ({ data, urlSemesterId }: TabComponentProps) => {
               Grade Calculator
             </h2>
             <p className="text-sm text-light-text-tertiary dark:text-dark-text-tertiary">
-              {selectedSemester
-                ? `${selectedSemester} semester`
-                : "Select a course to calculate grades"}
+              {selectedCourse || "Select a course"}
             </p>
           </div>
 
-          {/* Course Selector */}
-          <div className="flex items-center space-x-3">
-            <label
-              htmlFor="course-select"
-              className="text-sm font-medium text-gray-700 dark:text-dark-text-primary whitespace-nowrap"
-            >
-              Course:
-            </label>
+          {/* Auto-Save Status & Course Selector */}
+          <div className="flex items-center space-x-4">
+            {/* Auto-Save Status Indicator */}
+            <div className="flex items-center space-x-2 min-h-[20px]">
+              {autoSaveStatus === 'saving' && (
+                <div className="flex items-center space-x-2 text-sm text-light-text-secondary dark:text-dark-text-secondary animate-fade-in transition-all duration-200 ease-out">
+                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-light-button-primary border-t-transparent"></div>
+                  <span>Saving...</span>
+                </div>
+              )}
+              {autoSaveStatus === 'saved' && (
+                <div className="flex items-center space-x-2 text-sm text-green-600 dark:text-green-400 animate-fade-in transition-all duration-200 ease-out">
+                  <svg className="w-4 h-4 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                  <span>Saved</span>
+                </div>
+              )}
+              {autoSaveStatus === 'error' && autoSaveError && (
+                <div className="flex items-center space-x-2 text-sm text-red-600 dark:text-red-400 animate-fade-in transition-all duration-200 ease-out">
+                  <svg className="w-4 h-4 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <span>Error saving</span>
+                </div>
+              )}
+            </div>
+
             <CustomSelect
               value={selectedCourse}
               onChange={(value) => setSelectedCourse(value || null)}
@@ -239,6 +264,7 @@ const GradesTab = ({ data, urlSemesterId }: TabComponentProps) => {
           <GradeCalculator
             semesterId={selectedSemesterId}
             selectedCourse={selectedCourse}
+            onAutoSaveStatusChange={handleAutoSaveStatusChange}
           />
         )}
       </div>
@@ -269,7 +295,7 @@ const AddTab = ({ data, urlSemesterId }: TabComponentProps) => {
       {selectedSemesterId ? (
         <div className="p-6">
           <h2 className="text-xl font-medium text-light-text-primary dark:text-dark-text-primary mb-6">
-            Add Assessment for {selectedSemester}
+            Add Assessment
           </h2>
 
           <div className="flex space-x-4 mb-6">
