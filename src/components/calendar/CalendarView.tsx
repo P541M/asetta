@@ -442,7 +442,7 @@ const CalendarView = ({ selectedSemester, semesterId, refreshTrigger }: Calendar
           onKeyDown={handleKeyDown}
           className="focus:outline-none"
         >
-          <div className="grid grid-cols-7 border-b dark:border-dark-border-primary bg-gray-50 dark:bg-dark-bg-tertiary">
+          <div className="grid grid-cols-7 border-b dark:border-dark-border-primary bg-gray-50 dark:bg-dark-bg-tertiary rounded-t-xl">
             {dayNames.map((day, index) => (
               <div
                 key={index}
@@ -452,7 +452,7 @@ const CalendarView = ({ selectedSemester, semesterId, refreshTrigger }: Calendar
               </div>
             ))}
           </div>
-          <div className="grid grid-cols-7 auto-rows-fr bg-white dark:bg-dark-bg-secondary border-l border-t dark:border-dark-border-primary">
+          <div className="grid grid-cols-7 auto-rows-fr bg-white dark:bg-dark-bg-secondary border-l border-t dark:border-dark-border-primary rounded-b-xl overflow-hidden">
             {calendarDays.map((day, index) => (
               <div
                 key={index}
