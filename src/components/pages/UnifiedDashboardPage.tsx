@@ -69,11 +69,11 @@ const AssessmentsTab = ({ data }: { data: DashboardData }) => {
     const newQuery = { ...router.query };
     delete newQuery.course;
     // Switch back to courses tab when clearing course selection
-    newQuery.tab = 'courses';
+    newQuery.tab = "courses";
     router.replace({ pathname: router.pathname, query: newQuery }, undefined, {
       shallow: true,
     });
-    setActiveTab('courses');
+    setActiveTab("courses");
   };
 
   return (
@@ -105,9 +105,11 @@ const AssessmentsTab = ({ data }: { data: DashboardData }) => {
 const GradesTab = ({ data, urlSemesterId }: TabComponentProps) => {
   const router = useRouter();
   const [selectedCourse, setSelectedCourse] = useState<string | null>(null);
-  const [autoSaveStatus, setAutoSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+  const [autoSaveStatus, setAutoSaveStatus] = useState<
+    "idle" | "saving" | "saved" | "error"
+  >("idle");
   const [autoSaveError, setAutoSaveError] = useState<string | undefined>();
-  const { selectedSemester, selectedSemesterId, availableCourses } = data;
+  const { selectedSemesterId, availableCourses } = data;
 
   useEffect(() => {
     if (router.query.course && typeof router.query.course === "string") {
@@ -128,7 +130,10 @@ const GradesTab = ({ data, urlSemesterId }: TabComponentProps) => {
     router.push(`${basePath}?tab=add`);
   };
 
-  const handleAutoSaveStatusChange = (status: 'idle' | 'saving' | 'saved' | 'error', error?: string) => {
+  const handleAutoSaveStatusChange = (
+    status: "idle" | "saving" | "saved" | "error",
+    error?: string
+  ) => {
     setAutoSaveStatus(status);
     setAutoSaveError(error);
   };
@@ -175,24 +180,44 @@ const GradesTab = ({ data, urlSemesterId }: TabComponentProps) => {
           <div className="flex items-center space-x-4">
             {/* Auto-Save Status Indicator */}
             <div className="flex items-center space-x-2 min-h-[20px]">
-              {autoSaveStatus === 'saving' && (
+              {autoSaveStatus === "saving" && (
                 <div className="flex items-center space-x-2 text-sm text-light-text-secondary dark:text-dark-text-secondary animate-fade-in transition-all duration-200 ease-out">
                   <div className="animate-spin rounded-full h-4 w-4 border-2 border-light-button-primary border-t-transparent"></div>
                   <span>Saving...</span>
                 </div>
               )}
-              {autoSaveStatus === 'saved' && (
+              {autoSaveStatus === "saved" && (
                 <div className="flex items-center space-x-2 text-sm text-green-600 dark:text-green-400 animate-fade-in transition-all duration-200 ease-out">
-                  <svg className="w-4 h-4 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  <svg
+                    className="w-4 h-4 transform transition-transform duration-200"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M5 13l4 4L19 7"
+                    />
                   </svg>
                   <span>Saved</span>
                 </div>
               )}
-              {autoSaveStatus === 'error' && autoSaveError && (
+              {autoSaveStatus === "error" && autoSaveError && (
                 <div className="flex items-center space-x-2 text-sm text-red-600 dark:text-red-400 animate-fade-in transition-all duration-200 ease-out">
-                  <svg className="w-4 h-4 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  <svg
+                    className="w-4 h-4 transform transition-transform duration-200"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
                   </svg>
                   <span>Error saving</span>
                 </div>
@@ -202,26 +227,29 @@ const GradesTab = ({ data, urlSemesterId }: TabComponentProps) => {
             <CustomSelect
               value={selectedCourse}
               onChange={(value) => setSelectedCourse(value || null)}
-              options={availableCourses.map((course: string): SelectOption => ({
-                value: course,
-                label: course,
-                icon: (
-                  <svg
-                    className="w-4 h-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
-                    />
-                  </svg>
-                ),
-                colorClass: "text-light-text-primary dark:text-dark-text-primary",
-              }))}
+              options={availableCourses.map(
+                (course: string): SelectOption => ({
+                  value: course,
+                  label: course,
+                  icon: (
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+                      />
+                    </svg>
+                  ),
+                  colorClass:
+                    "text-light-text-primary dark:text-dark-text-primary",
+                })
+              )}
               disabled={availableCourses.length === 0}
               placeholder="Select a course..."
               className="min-w-48"
