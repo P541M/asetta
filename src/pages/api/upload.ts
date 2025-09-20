@@ -30,6 +30,9 @@ async function extractAssessmentsAI(text: string): Promise<string> {
   const genAI = new GoogleGenerativeAI(geminiApiKey);
   const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
+  // Get current year for date defaulting
+  const currentYear = new Date().getFullYear();
+
   const prompt = `
     You are an AI assistant that extracts assessment information from course outlines.
     Extract assessment information from this course outline. Return ONLY a valid JSON array with this structure:
@@ -43,6 +46,17 @@ async function extractAssessmentsAI(text: string): Promise<string> {
     }
 
     Only include assessments that have clear due dates or deadline information. Extract as many assessments as you can find. If no time is specified, use '23:59' as the default.
+
+    DATE YEAR DEFAULTING - VERY IMPORTANT:
+    - If a date has no year specified (e.g., "March 15", "12/25", "Sept 30"), default to ${currentYear}
+    - Only use a different year if explicitly stated in the document
+    - Examples: 
+      * "March 15" → "${currentYear}-03-15" (using current year)
+      * "Dec 25" → "${currentYear}-12-25" (using current year)  
+      * "March 15, 2025" → "2025-03-15" (year explicitly specified)
+      * "Assignment due September 20" → "${currentYear}-09-20" (using current year)
+    - For dates that seem to be in the past within the current year, consider if they should be the following year
+    - Always convert to YYYY-MM-DD format using the defaulted or specified year
 
     WEIGHT EXTRACTION - Look for these patterns:
     - "25%" → weight: 25
@@ -82,7 +96,7 @@ async function extractAssessmentsAI(text: string): Promise<string> {
     REQUIREMENTS:
     - Only extract assessments with clear due dates
     - Include exams, assignments, quizzes, labs, projects
-    - Convert all dates to YYYY-MM-DD format
+    - Convert all dates to YYYY-MM-DD format (defaulting to ${currentYear} if no year specified)
     - Return ONLY the JSON array, no explanations
     - No markdown formatting
 
