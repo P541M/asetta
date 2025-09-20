@@ -53,7 +53,18 @@ export function NotificationsStep() {
   };
 
   const handleCustomDaysChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = Math.max(1, Math.min(30, parseInt(e.target.value) || 1));
+    const inputValue = e.target.value;
+    
+    // Allow only digits
+    if (inputValue && !/^\d+$/.test(inputValue)) {
+      return;
+    }
+    
+    setCustomDays(inputValue ? parseInt(inputValue) : 1);
+  };
+
+  const handleCustomDaysBlur = () => {
+    const value = Math.max(1, Math.min(30, customDays || 1));
     setCustomDays(value);
     const newFormData = { ...formData, notificationDaysBefore: value };
     setFormData(newFormData);
@@ -205,26 +216,39 @@ export function NotificationsStep() {
               <label htmlFor="notification-days" className="form-label">
                 Send notifications before due date
               </label>
-              <select
-                id="notification-days"
-                value={
-                  isCustomDays
-                    ? "custom"
-                    : formData.notificationDaysBefore.toString()
-                }
-                onChange={(e) => handleDaysChange(e.target.value)}
-                className="input"
-              >
-                <option value="1">1 day before due date</option>
-                <option value="2">2 days before due date</option>
-                <option value="3">3 days before due date (recommended)</option>
-                <option value="7">1 week before due date</option>
-                <option value="custom">
-                  {isCustomDays
-                    ? `${customDays} days before due date`
-                    : "Custom timing"}
-                </option>
-              </select>
+              <div className="relative">
+                <select
+                  id="notification-days"
+                  value={
+                    isCustomDays
+                      ? "custom"
+                      : formData.notificationDaysBefore.toString()
+                  }
+                  onChange={(e) => handleDaysChange(e.target.value)}
+                  className="input appearance-none pr-10"
+                >
+                  <option value="1">1 day before due date</option>
+                  <option value="2">2 days before due date</option>
+                  <option value="3">3 days before due date (recommended)</option>
+                  <option value="7">1 week before due date</option>
+                  <option value="custom">
+                    {isCustomDays
+                      ? `Custom (${customDays} days)`
+                      : "Custom timing"}
+                  </option>
+                </select>
+                <svg
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-light-text-tertiary dark:text-dark-text-tertiary pointer-events-none"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  strokeWidth={2}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M6 9l6 6 6-6" />
+                </svg>
+              </div>
 
               {isCustomDays && (
                 <div className="mt-4 p-4 bg-light-bg-tertiary dark:bg-dark-bg-tertiary rounded-xl border border-light-border-primary dark:border-dark-border-primary">
@@ -236,13 +260,14 @@ export function NotificationsStep() {
                   </label>
                   <input
                     id="custom-days"
-                    type="number"
-                    min="1"
-                    max="30"
+                    type="text"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
                     value={customDays}
                     onChange={handleCustomDaysChange}
+                    onBlur={handleCustomDaysBlur}
                     className="input"
-                    placeholder="Enter number of days"
+                    placeholder="Enter number of days (1-30)"
                   />
                   <p className="mt-2 text-sm text-light-text-tertiary dark:text-dark-text-tertiary">
                     Choose between 1 and 30 days. Notifications will be sent
