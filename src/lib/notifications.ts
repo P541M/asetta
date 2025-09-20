@@ -219,7 +219,7 @@ export async function checkAndSendNotifications() {
               continue;
             }
             
-            const subject = `Assessment Reminder: ${assessment.assignmentName}`;
+            const subject = `Assessment Reminder: ${assessment.courseName} - ${assessment.assignmentName}`;
 
             devLog(`📧 Sending notification for "${assessment.assignmentName}" (${daysUntilDue} days until due)`);
             
@@ -228,7 +228,8 @@ export async function checkAndSendNotifications() {
                 preferences.email,
                 subject,
                 assessment.assignmentName,
-                daysUntilDue
+                daysUntilDue,
+                assessment.courseName
               );
               
               // Record the notification to prevent duplicates

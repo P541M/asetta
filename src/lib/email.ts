@@ -24,7 +24,8 @@ const transporter = nodemailer.createTransport({
 
 function generateEmailHTML(
   assessmentTitle: string,
-  daysUntilDue: number
+  daysUntilDue: number,
+  courseName: string
 ): string {
   return `
     <!DOCTYPE html>
@@ -128,7 +129,8 @@ function generateEmailHTML(
             <h1 style="margin: 0; font-size: 24px; font-weight: 600;">Assessment Reminder</h1>
           </div>
           <div class="content">
-            <div class="assessment-title">${assessmentTitle}</div>
+            <div class="assessment-title">${courseName} - ${assessmentTitle}</div>
+            <p style="margin: 0 0 16px 0; color: #6B7280; font-size: 16px; font-weight: 500;">${courseName}</p>
             <p class="message">Hey there! 👋 Just a friendly heads up about your upcoming assessment. We want to make sure you have everything you need to succeed!</p>
             <div class="due-date">
               <p style="margin: 0; color: #374151;">Time remaining:</p>
@@ -390,7 +392,8 @@ export async function sendEmail(
   to: string,
   subject: string,
   assessmentTitle: string,
-  daysUntilDue: number
+  daysUntilDue: number,
+  courseName: string
 ) {
   if (process.env.NODE_ENV === "development") {
     devLog("📧 Attempting to send assessment email");
@@ -414,13 +417,13 @@ export async function sendEmail(
       devLog("✅ Email transporter connection verified");
     }
 
-    const html = generateEmailHTML(assessmentTitle, daysUntilDue);
+    const html = generateEmailHTML(assessmentTitle, daysUntilDue, courseName);
 
     const mailOptions = {
       from: `"Asetta" <${process.env.EMAIL_USER}>`,
       to,
       subject,
-      text: `Reminder: "${assessmentTitle}" is due in ${daysUntilDue} day${
+      text: `Reminder: "${courseName} - ${assessmentTitle}" is due in ${daysUntilDue} day${
         daysUntilDue === 1 ? "" : "s"
       }`,
       html,
