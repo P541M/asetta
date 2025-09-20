@@ -9,7 +9,7 @@ const NotificationsSection = ({
   email,
   setEmail,
   setHasConsentedToNotifications,
-}: Omit<NotificationPreferencesProps, 'hasConsentedToNotifications'>) => {
+}: Omit<NotificationPreferencesProps, "hasConsentedToNotifications">) => {
   const [isCustomDays, setIsCustomDays] = useState(false);
   const [customDays, setCustomDays] = useState(notificationDaysBefore);
 
@@ -70,7 +70,9 @@ const NotificationsSection = ({
             Email Notifications
           </h3>
           <p className="mt-1 text-sm text-light-text-secondary dark:text-dark-text-secondary">
-            Receive automated email reminders about upcoming assessment deadlines. You can customize when and how you receive these notifications below.
+            Receive automated email reminders about upcoming assessment
+            deadlines. You can customize when and how you receive these
+            notifications below.
           </p>
           <div className="mt-3 flex items-center space-x-2 text-xs text-light-text-tertiary dark:text-dark-text-tertiary">
             <svg
@@ -85,7 +87,10 @@ const NotificationsSection = ({
                 clipRule="evenodd"
               />
             </svg>
-            <span>Your email is secure and will only be used for assessment notifications</span>
+            <span>
+              Your email is secure and will only be used for assessment
+              notifications
+            </span>
           </div>
         </div>
         <button
@@ -115,7 +120,7 @@ const NotificationsSection = ({
             <h4 className="text-base font-semibold text-light-text-primary dark:text-dark-text-primary">
               Email Configuration
             </h4>
-            
+
             {/* Email Address */}
             <div className="space-y-3">
               <label
@@ -133,65 +138,82 @@ const NotificationsSection = ({
                 placeholder="Enter your preferred email address"
               />
 
+              {email && (
+                <div className="flex items-center space-x-2 text-xs text-light-text-tertiary dark:text-dark-text-tertiary mt-2">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-3.5 w-3.5"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                  <span>
+                    Reminder: Notifications might end up in your spam folder
+                  </span>
+                </div>
+              )}
             </div>
           </div>
 
           {/* Notification Timing - always show when notifications enabled */}
           <div className="space-y-4">
+            {/* Notification Days Before */}
+            <div className="space-y-3">
+              <label
+                htmlFor="notification-days"
+                className="block text-sm font-medium text-light-text-primary dark:text-dark-text-primary"
+              >
+                Send notifications before due date
+              </label>
+              <select
+                id="notification-days"
+                value={
+                  isCustomDays ? "custom" : notificationDaysBefore.toString()
+                }
+                onChange={(e) => handleDaysChange(e.target.value)}
+                className="w-full px-4 py-3 border border-light-border-primary dark:border-dark-border-primary rounded-xl bg-light-bg-primary dark:bg-dark-bg-primary text-light-text-primary dark:text-dark-text-primary shadow-sm focus:ring-2 focus:ring-light-button-primary dark:focus:ring-dark-button-primary focus:border-light-button-primary dark:focus:border-dark-button-primary transition-all duration-200"
+              >
+                <option value="1">1 day before due date</option>
+                <option value="2">2 days before due date</option>
+                <option value="3">3 days before due date</option>
+                <option value="7">1 week before due date</option>
+                <option value="custom">
+                  {isCustomDays
+                    ? `${customDays} days before due date`
+                    : "Custom timing"}
+                </option>
+              </select>
 
-              
-              {/* Notification Days Before */}
-              <div className="space-y-3">
-                <label
-                  htmlFor="notification-days"
-                  className="block text-sm font-medium text-light-text-primary dark:text-dark-text-primary"
-                >
-                  Send notifications before due date
-                </label>
-                <select
-                  id="notification-days"
-                  value={
-                    isCustomDays ? "custom" : notificationDaysBefore.toString()
-                  }
-                  onChange={(e) => handleDaysChange(e.target.value)}
-                  className="w-full px-4 py-3 border border-light-border-primary dark:border-dark-border-primary rounded-xl bg-light-bg-primary dark:bg-dark-bg-primary text-light-text-primary dark:text-dark-text-primary shadow-sm focus:ring-2 focus:ring-light-button-primary dark:focus:ring-dark-button-primary focus:border-light-button-primary dark:focus:border-dark-button-primary transition-all duration-200"
-                >
-                  <option value="1">1 day before due date</option>
-                  <option value="2">2 days before due date</option>
-                  <option value="3">3 days before due date</option>
-                  <option value="7">1 week before due date</option>
-                  <option value="custom">
-                    {isCustomDays
-                      ? `${customDays} days before due date`
-                      : "Custom timing"}
-                  </option>
-                </select>
-
-
-                {isCustomDays && (
-                  <div className="mt-4 p-4 bg-light-bg-tertiary dark:bg-dark-bg-tertiary rounded-xl border border-light-border-primary dark:border-dark-border-primary">
-                    <label
-                      htmlFor="custom-days"
-                      className="block text-sm font-medium text-light-text-primary dark:text-dark-text-primary mb-2"
-                    >
-                      Custom number of days
-                    </label>
-                    <input
-                      id="custom-days"
-                      type="number"
-                      min="1"
-                      max="30"
-                      value={customDays}
-                      onChange={handleCustomDaysChange}
-                      className="w-full px-4 py-3 border border-light-border-primary dark:border-dark-border-primary rounded-xl bg-light-bg-primary dark:bg-dark-bg-primary text-light-text-primary dark:text-dark-text-primary shadow-sm focus:ring-2 focus:ring-light-button-primary dark:focus:ring-dark-button-primary focus:border-light-button-primary dark:focus:border-dark-button-primary transition-all duration-200"
-                      placeholder="Enter number of days"
-                    />
-                    <p className="mt-2 text-sm text-light-text-tertiary dark:text-dark-text-tertiary">
-                      Choose between 1 and 30 days. Notifications will be sent daily at 9:00 PM.
-                    </p>
-                  </div>
-                )}
-              </div>
+              {isCustomDays && (
+                <div className="mt-4 p-4 bg-light-bg-tertiary dark:bg-dark-bg-tertiary rounded-xl border border-light-border-primary dark:border-dark-border-primary">
+                  <label
+                    htmlFor="custom-days"
+                    className="block text-sm font-medium text-light-text-primary dark:text-dark-text-primary mb-2"
+                  >
+                    Custom number of days
+                  </label>
+                  <input
+                    id="custom-days"
+                    type="number"
+                    min="1"
+                    max="30"
+                    value={customDays}
+                    onChange={handleCustomDaysChange}
+                    className="w-full px-4 py-3 border border-light-border-primary dark:border-dark-border-primary rounded-xl bg-light-bg-primary dark:bg-dark-bg-primary text-light-text-primary dark:text-dark-text-primary shadow-sm focus:ring-2 focus:ring-light-button-primary dark:focus:ring-dark-button-primary focus:border-light-button-primary dark:focus:border-dark-button-primary transition-all duration-200"
+                    placeholder="Enter number of days"
+                  />
+                  <p className="mt-2 text-sm text-light-text-tertiary dark:text-dark-text-tertiary">
+                    Choose between 1 and 30 days. Notifications will be sent
+                    daily at 9:00 PM.
+                  </p>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       )}
@@ -216,7 +238,8 @@ const NotificationsSection = ({
             Email Notifications Disabled
           </h4>
           <p className="text-sm text-light-text-tertiary dark:text-dark-text-tertiary max-w-md mx-auto">
-            Enable email notifications above to receive reminders about upcoming assessment deadlines and never miss an important due date.
+            Enable email notifications above to receive reminders about upcoming
+            assessment deadlines and never miss an important due date.
           </p>
         </div>
       )}
