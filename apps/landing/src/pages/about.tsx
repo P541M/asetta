@@ -1,6 +1,6 @@
 import Container from "@/components/Container";
 import ContentSection from "@/components/ContentSection";
-import CTAPanel, { CTAPanelCard } from "@/components/CTAPanel";
+import CTAPanel from "@/components/CTAPanel";
 import Layout from "@/components/Layout";
 import PageHero from "@/components/PageHero";
 import Reveal from "@/components/Reveal";
@@ -102,14 +102,7 @@ export default function AboutPage() {
         title="Our promise to students"
         lead="We're here to support you through the challenges of post-secondary life, whether that's your first semester or your final year."
         trackLabel="Get Started - About CTA"
-      >
-        <CTAPanelCard title="Always free">
-          Because every student deserves academic support, regardless of their financial situation.
-        </CTAPanelCard>
-        <CTAPanelCard title="Student-centered">
-          Built by students who understand the challenges, designed to support your success.
-        </CTAPanelCard>
-      </CTAPanel>
+      />
     </Layout>
   );
 }
