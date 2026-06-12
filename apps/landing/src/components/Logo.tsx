@@ -10,7 +10,7 @@ interface LogoProps {
 
 export default function Logo({ href, className }: LogoProps) {
   const logo = (
-    <span className={cn("flex items-center gap-3", className)}>
+    <span className={cn("flex items-center gap-2", className)}>
       <span className="relative h-7 w-7 shrink-0">
         <Image
           src="/images/Asetta_Logo.svg"
