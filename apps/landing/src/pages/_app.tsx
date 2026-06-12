@@ -1,22 +1,15 @@
 import type { AppProps } from "next/app";
 import Head from "next/head";
-import { Manrope } from "next/font/google";
+import { Inter } from "next/font/google";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
 import { GoogleAnalytics } from "@next/third-parties/google";
-import "../styles/globals.css";
+import { trackPageView } from "@/utils/analytics";
+import "@/styles/globals.css";
 
-// Extend window object for gtag
-declare global {
-  interface Window {
-    gtag: (command: string, targetId: string, config?: any) => void;
-  }
-}
-
-const manrope = Manrope({
+const inter = Inter({
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
-  variable: "--font-manrope",
+  variable: "--font-inter",
   display: "swap",
 });
 
@@ -24,15 +17,7 @@ export default function App({ Component, pageProps }: AppProps) {
   const router = useRouter();
 
   useEffect(() => {
-    const handleRouteChange = (url: string) => {
-      // Track page views with Google Analytics
-      if (typeof window !== 'undefined' && window.gtag) {
-        window.gtag('config', process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID!, {
-          page_path: url,
-        });
-      }
-    };
-
+    const handleRouteChange = (url: string) => trackPageView(url);
     router.events.on("routeChangeComplete", handleRouteChange);
     return () => {
       router.events.off("routeChangeComplete", handleRouteChange);
@@ -42,33 +27,22 @@ export default function App({ Component, pageProps }: AppProps) {
   return (
     <>
       <Head>
-        <title>Asetta - Simplify Your Academic Journey</title>
+        <title>Asetta | Always ahead, never behind</title>
         <meta
           name="description"
-          content="Comprehensive academic organization platform for students. Manage semesters, track assessments, calculate grades, and organize deadlines."
+          content="Asetta is a free, AI-powered academic assistant that keeps students on top of assignments, deadlines, and grades."
         />
-        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+        <meta
+          name="viewport"
+          content="width=device-width, initial-scale=1, viewport-fit=cover"
+        />
         <meta charSet="utf-8" />
 
-        {/* Favicon */}
+        {/* Favicons */}
         <link rel="icon" href="/images/favicon.ico" />
-        <link
-          rel="icon"
-          type="image/png"
-          sizes="32x32"
-          href="/images/favicon-32x32.png"
-        />
-        <link
-          rel="icon"
-          type="image/png"
-          sizes="16x16"
-          href="/images/favicon-16x16.png"
-        />
-
-        {/* Apple Touch Icon */}
+        <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png" />
+        <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png" />
         <link rel="apple-touch-icon" href="/images/apple-touch-icon.png" />
-
-        {/* Android Chrome Icons */}
         <link
           rel="icon"
           type="image/png"
@@ -82,9 +56,9 @@ export default function App({ Component, pageProps }: AppProps) {
           href="/images/android-chrome-512x512.png"
         />
       </Head>
-      <main className={`${manrope.variable} font-sans`}>
+      <div className={`${inter.variable} font-sans`}>
         <Component {...pageProps} />
-      </main>
+      </div>
       {process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID && (
         <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID} />
       )}

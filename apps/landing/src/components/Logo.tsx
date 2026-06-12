@@ -1,90 +1,35 @@
 import Image from "next/image";
 import Link from "next/link";
+import { cn } from "@/lib/utils";
 
 interface LogoProps {
-  size?: "xs" | "sm" | "md" | "lg" | "xl";
-  variant?: "logo-only" | "logo-with-text";
-  color?: "primary" | "white" | "dark" | "inherit";
+  /** Wraps the logo in a link when provided. */
   href?: string;
   className?: string;
-  showText?: boolean;
 }
 
-const sizeClasses = {
-  xs: "h-5 w-5",
-  sm: "h-7 w-7",
-  md: "h-10 w-10",
-  lg: "h-14 w-14",
-  xl: "h-17 w-17",
-};
-
-const textSizeClasses = {
-  xs: "text-lg",
-  sm: "text-xl",
-  md: "text-2xl",
-  lg: "text-3xl",
-  xl: "text-4xl",
-};
-
-const colorClasses = {
-  primary: "text-primary-600",
-  white: "text-white",
-  dark: "text-gray-900",
-  inherit: "text-current",
-};
-
-const Logo = ({
-  size = "md",
-  variant = "logo-with-text",
-  color = "primary",
-  href = "/",
-  className = "",
-  showText = true,
-}: LogoProps) => {
-  const logoElement = (
-    <div className={`flex items-center space-x-3 ${className}`}>
-      {/* SVG Logo */}
-      <div className={`${sizeClasses[size]} relative flex-shrink-0`}>
+export default function Logo({ href, className }: LogoProps) {
+  const logo = (
+    <span className={cn("flex items-center gap-3", className)}>
+      <span className="relative h-7 w-7 shrink-0">
         <Image
           src="/images/Asetta_Logo.svg"
-          alt="Asetta Logo"
+          alt="Asetta logo"
           width={80}
           height={80}
-          className={`w-full h-full object-contain transition-all duration-300 ${
-            color === "primary"
-              ? "filter-primary"
-              : color === "white"
-              ? "filter-white"
-              : color === "dark"
-              ? "filter-dark"
-              : ""
-          }`}
+          className="filter-primary h-full w-full object-contain"
           priority
         />
-      </div>
-
-      {/* Text Logo */}
-      {(variant === "logo-with-text" || showText) && (
-        <span
-          className={`font-extrabold text-primary-600 transition-all duration-300 tracking-tight ${textSizeClasses[size]}`}
-        >
-          Asetta
-        </span>
-      )}
-    </div>
+      </span>
+      <span className="text-xl font-semibold tracking-tight text-stone-900">Asetta</span>
+    </span>
   );
 
-  if (href) {
-    return (
-      <Link href={href} className="group">
-        <div className="group-hover:scale-105 transition-transform duration-300">
-          {logoElement}
-        </div>
-      </Link>
-    );
-  }
+  if (!href) return logo;
 
-  return logoElement;
-};
-
-export default Logo;
+  return (
+    <Link href={href} className="transition-opacity duration-150 hover:opacity-80">
+      {logo}
+    </Link>
+  );
+}

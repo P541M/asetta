@@ -1,97 +1,57 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
+/* ---------------------------------------------------------------------------
+ * Design tokens (Tailwind v4 CSS-first config)
+ * ------------------------------------------------------------------------- */
+@theme {
+  --font-sans: var(--font-inter), "Inter", ui-sans-serif, system-ui, sans-serif;
+
+  /* Warm amber brand palette */
+  --color-primary-50: #fefaf7;
+  --color-primary-100: #fef2e8;
+  --color-primary-200: #fde2c8;
+  --color-primary-300: #fbcb9e;
+  --color-primary-400: #f7aa67;
+  --color-primary-500: #f39441;
+  --color-primary-600: #d97706;
+  --color-primary-700: #b45309;
+  --color-primary-800: #92400e;
+  --color-primary-900: #78350f;
+  --color-primary-950: #451a03;
+
+  --animate-fade-in: fade-in 0.25s ease-out both;
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * Base
+ * ------------------------------------------------------------------------- */
 @layer base {
-  html {
-    @apply antialiased;
-  }
-  body {
-    @apply bg-light-bg-secondary text-light-text-primary;
-    font-family: var(--font-manrope), "Manrope", sans-serif;
-  }
-  h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6 {
-    @apply font-medium text-light-text-primary;
-    font-family: var(--font-manrope), "Manrope", sans-serif;
-  }
-}
-
-@layer components {
-  .btn-primary {
-    @apply bg-light-button-primary text-white rounded-lg font-medium hover:bg-light-button-primary-hover transition-colors duration-200 shadow-sm hover:shadow focus:outline-none focus:ring-2 focus:ring-light-focus-ring focus:ring-offset-2;
-  }
-
-  .btn-outline {
-    @apply border-2 border-light-button-primary text-light-button-primary rounded-lg font-medium hover:bg-light-hover-primary transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-light-focus-ring focus:ring-offset-2;
-  }
-
-  .card {
-    @apply bg-light-bg-primary rounded-xl shadow-sm p-6 border border-light-border-primary;
-  }
-
-  .input {
-    @apply w-full px-3 py-2 border border-light-input-border bg-light-input-bg text-light-input-text rounded-lg focus:outline-none focus:ring-2 focus:ring-light-focus-ring focus:border-transparent placeholder:text-light-input-placeholder;
-  }
-
-  .form-label {
-    @apply block text-sm font-medium text-light-text-secondary mb-1;
-  }
-
-  .form-group {
-    @apply mb-4;
-  }
-}
-
-@layer utilities {
-  .font-heading {
-    font-family: var(--font-manrope), "Manrope", sans-serif;
-  }
-  .font-body {
-    font-family: var(--font-manrope), "Manrope", sans-serif;
-  }
-  
-  /* SVG Logo Color Filters */
-  .filter-primary {
-    filter: brightness(0) saturate(100%) invert(60%) sepia(95%) saturate(1342%) hue-rotate(0deg) brightness(97%) contrast(95%);
-  }
-  .filter-white {
-    filter: brightness(0) saturate(100%) invert(100%) sepia(100%) saturate(0%) hue-rotate(288deg) brightness(102%) contrast(102%);
-  }
-  .filter-dark {
-    filter: brightness(0) saturate(100%) invert(7%) sepia(10%) saturate(1168%) hue-rotate(169deg) brightness(99%) contrast(95%);
-  }
-}
-
-/* Safe Area Support for Mobile Devices */
-@layer base {
-  :root {
-    --safe-area-inset-top: env(safe-area-inset-top);
-    --safe-area-inset-right: env(safe-area-inset-right);
-    --safe-area-inset-bottom: env(safe-area-inset-bottom);
-    --safe-area-inset-left: env(safe-area-inset-left);
-  }
-}
-
-/* Mobile Performance Optimizations */
-@layer base {
-  * {
-    /* Improve touch scrolling on iOS */
-    -webkit-overflow-scrolling: touch;
-    /* Optimize touch interactions */
-    touch-action: manipulation;
-  }
-  
-  /* Smooth scrolling for better UX */
   html {
     scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
-  
-  /* Prevent zoom on input focus on iOS */
+
+  body {
+    background-color: var(--color-white);
+    color: var(--color-stone-900);
+  }
+
+  ::selection {
+    background-color: var(--color-primary-100);
+    color: var(--color-primary-950);
+  }
+
+  /* Prevent iOS Safari from zooming in when focusing form fields */
   input[type="text"],
   input[type="email"],
   textarea {
@@ -99,145 +59,47 @@
   }
 }
 
-/* Safe Area Utilities */
-@layer utilities {
-  .pt-safe {
-    padding-top: max(1rem, env(safe-area-inset-top));
-  }
-  
-  .pt-safe-only {
-    padding-top: env(safe-area-inset-top);
-  }
-  
-  .pb-safe {
-    padding-bottom: max(1rem, env(safe-area-inset-bottom));
-  }
-  
-  .pl-safe {
-    padding-left: max(1rem, env(safe-area-inset-left));
-  }
-  
-  .pr-safe {
-    padding-right: max(1rem, env(safe-area-inset-right));
-  }
-  
-  .mt-safe {
-    margin-top: max(0px, env(safe-area-inset-top));
-  }
-  
-  .mb-safe {
-    margin-bottom: max(0px, env(safe-area-inset-bottom));
-  }
-  
-  .top-safe {
-    top: max(0px, env(safe-area-inset-top));
-  }
-  
-  .bottom-safe {
-    bottom: max(0px, env(safe-area-inset-bottom));
-  }
-  
-  .h-safe-screen {
-    height: calc(100vh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
-  }
-  
-  .min-h-safe-screen {
-    min-height: calc(100vh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
-  }
+/* ---------------------------------------------------------------------------
+ * Custom utilities
+ * ------------------------------------------------------------------------- */
+
+/* Offsets page content below the fixed header, including notched devices */
+@utility pt-page {
+  padding-top: calc(7rem + env(safe-area-inset-top, 0px));
 }
 
-/* Animation initial states to prevent flickering */
-@layer utilities {
-  .animate-fade-in-initial {
-    opacity: 0;
-  }
-  
-  .animate-fade-in-up-initial {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  
-  .animate-fade-in-down-initial {
-    opacity: 0;
-    transform: translateY(-20px);
-  }
-  
-  .animate-fade-in-left-initial {
-    opacity: 0;
-    transform: translateX(-20px);
-  }
-  
-  .animate-fade-in-right-initial {
-    opacity: 0;
-    transform: translateX(20px);
-  }
-  
-  .animate-scale-initial {
-    opacity: 0;
-    transform: scale(0.95);
-  }
+@utility pt-safe-only {
+  padding-top: env(safe-area-inset-top, 0px);
 }
 
-/* Advanced Overlay Scrollbar Styling */
-@layer components {
-  /* Remove gutter to enable true overlay scrollbars */
-  * {
-  }
+/* Tints the monochrome SVG logo to primary-600 */
+@utility filter-primary {
+  filter: brightness(0) saturate(100%) invert(60%) sepia(95%) saturate(1342%)
+    hue-rotate(0deg) brightness(97%) contrast(95%);
+}
 
-  /* WebKit Scrollbars (Chrome, Safari, Edge) */
-  ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
-    /* Enable overlay scrollbars that don't take up layout space */
-    position: absolute;
-    z-index: 9999;
-  }
+/* ---------------------------------------------------------------------------
+ * Slim scrollbar
+ * ------------------------------------------------------------------------- */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
 
-  ::-webkit-scrollbar-track {
-    /* Remove track background entirely for overlay effect */
-    background: transparent;
-  }
+::-webkit-scrollbar-track {
+  background: transparent;
+}
 
-  ::-webkit-scrollbar-thumb {
-    /* Style only the thumb with rounded corners */
-    @apply bg-light-border-primary;
-    border-radius: 4px;
-    /* Default opacity 50% */
-    opacity: 0.5;
-  }
+::-webkit-scrollbar-thumb {
+  background-color: var(--color-stone-300);
+  border-radius: 4px;
+}
 
-  ::-webkit-scrollbar-thumb:hover {
-    /* 100% opacity on hover */
-    opacity: 1;
-  }
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--color-stone-400);
+}
 
-  ::-webkit-scrollbar-thumb:active {
-    /* 100% opacity when clicked/dragged */
-    opacity: 1;
-  }
-
-  /* Firefox Scrollbar */
-  * {
-    scrollbar-width: thin;
-    /* Use transparent track and colored thumb with 50% opacity */
-    scrollbar-color: rgba(229, 229, 229, 0.5) transparent;
-  }
-
-  /* Firefox hover state - using CSS custom properties for dynamic opacity */
-  html {
-    --scrollbar-thumb-light: rgba(229, 229, 229, 0.5);
-  }
-
-  html:hover {
-    --scrollbar-thumb-light: rgba(229, 229, 229, 1);
-  }
-
-  /* Hide scrollbar utility - for cases where scrollbars should be completely hidden */
-  .hide-scrollbar {
-    -ms-overflow-style: none; /* IE and Edge */
-    scrollbar-width: none; /* Firefox */
-  }
-  .hide-scrollbar::-webkit-scrollbar {
-    display: none; /* Chrome, Safari, Opera */
-  }
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-stone-300) transparent;
 }

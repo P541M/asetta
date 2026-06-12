@@ -1,40 +1,44 @@
-// Google Analytics utility functions
+// Google Analytics helpers. The gtag global is injected by
+// @next/third-parties' <GoogleAnalytics /> in _app.tsx.
 
 declare global {
   interface Window {
-    gtag: (command: string, action: string, parameters?: any) => void;
+    gtag?: (command: string, targetIdOrAction: string, params?: Record<string, unknown>) => void;
   }
 }
 
-// Track custom events
-export const trackEvent = (action: string, category: string, label?: string, value?: number) => {
-  if (typeof window !== 'undefined' && window.gtag) {
-    window.gtag('event', action, {
+export const trackEvent = (
+  action: string,
+  category: string,
+  label?: string,
+  value?: number
+) => {
+  if (typeof window !== "undefined" && window.gtag) {
+    window.gtag("event", action, {
       event_category: category,
       event_label: label,
-      value: value,
+      value,
     });
   }
 };
 
-// Track contact form submission
 export const trackContactFormSubmission = (success: boolean) => {
   trackEvent(
-    success ? 'contact_form_success' : 'contact_form_error',
-    'engagement',
-    success ? 'Contact form submitted successfully' : 'Contact form submission failed'
+    success ? "contact_form_success" : "contact_form_error",
+    "engagement",
+    success ? "Contact form submitted successfully" : "Contact form submission failed"
   );
 };
 
-// Track CTA clicks
 export const trackCTAClick = (buttonName: string, destination: string) => {
-  trackEvent('cta_click', 'navigation', `${buttonName} -> ${destination}`);
+  trackEvent("cta_click", "navigation", `${buttonName} -> ${destination}`);
 };
 
-// Track page views manually (for SPA routing)
+// Manual page-view tracking for client-side route changes.
 export const trackPageView = (url: string, title?: string) => {
-  if (typeof window !== 'undefined' && window.gtag) {
-    window.gtag('config', process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID!, {
+  const measurementId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
+  if (typeof window !== "undefined" && window.gtag && measurementId) {
+    window.gtag("config", measurementId, {
       page_path: url,
       page_title: title,
     });

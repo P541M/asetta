@@ -1,190 +1,122 @@
-import { motion } from "framer-motion";
-import Head from "next/head";
-import Link from "next/link";
-import Header from "../components/Header";
-import Footer from "../components/Footer";
+import Container from "@/components/Container";
+import ContentSection from "@/components/ContentSection";
+import CTAPanel, { CTAPanelCard } from "@/components/CTAPanel";
+import Layout from "@/components/Layout";
+import PageHero from "@/components/PageHero";
+import Reveal from "@/components/Reveal";
 
 export default function AboutPage() {
   return (
-    <div className="min-h-screen bg-primary-50/20 flex flex-col">
-      <Head>
-        <title>About Us | Asetta</title>
-        <meta
-          name="description"
-          content="Learn about Asetta's mission to support students transitioning to post-secondary independence. We're here when you need us, until you don't need us anymore."
+    <Layout
+      title="About Us | Asetta"
+      description="Learn about Asetta's mission to support students transitioning to post-secondary independence. We're here when you need us, until you don't need us anymore."
+    >
+      <Container>
+        <div className="mx-auto max-w-3xl">
+          <PageHero
+          title="Our story"
+          subtitle="Why we built Asetta and how we're supporting students through the challenges of post-secondary life."
         />
-      </Head>
-      <Header />
 
-      <main 
-        className="flex-grow pb-24 relative overflow-hidden"
-        style={{
-          paddingTop: `max(8rem, calc(8rem + env(safe-area-inset-top)))`,
-        }}
-      >
-        {/* Background Elements */}
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute -top-24 -left-24 w-96 h-96 bg-primary-100/20 rounded-full blur-3xl" />
-          <div className="absolute -bottom-24 -right-24 w-80 h-80 bg-primary-100/15 rounded-full blur-3xl" />
-        </div>
-
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          {/* Hero Section */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="text-center mb-20 animate-fade-in"
-          >
-            <span className="inline-flex items-center px-4 py-2 rounded-full bg-primary-100 text-primary-700 font-semibold text-sm border border-primary-200/50 mb-6">
-              <span className="w-2 h-2 bg-primary-500 rounded-full mr-2 animate-pulse"></span>
-              About Asetta
-            </span>
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-gray-900 mb-8 font-heading tracking-tight leading-tight">
-              Our{" "}
-              <span className="text-primary-600">
-                Story
-              </span>
-            </h1>
-            <p className="text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-              Why we built Asetta and how we're supporting students through the challenges of post-secondary life.
+        <div className="space-y-16 md:space-y-20">
+          <ContentSection title="Our mission">
+            <p>
+              At Asetta, we believe that the transition to post-secondary education shouldn't mean
+              losing the academic support you need. While students gain independence, they also
+              face more complex coursework, tighter deadlines, and increased responsibility,
+              often without the structured guidance they've always had.
             </p>
-          </motion.div>
+            <p>
+              We're here to bridge that gap. Asetta uses AI to help students track deadlines,
+              organize assignments, and manage their academic workload with less effort and
+              stress.
+            </p>
+            <p>
+              <strong className="font-semibold text-stone-900">
+                We're here when you need us, until you don't need us anymore.
+              </strong>
+            </p>
+          </ContentSection>
 
-          {/* Main Content Section */}
-          <div className="space-y-16">
-            {/* Our Mission */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 md:p-12 shadow-lg border border-gray-200/50 relative overflow-hidden"
-            >
-              <div className="absolute inset-0 bg-primary-50/30 opacity-50"></div>
-              
-              <div className="relative z-10">
-                <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6 font-heading">
-                  Our Mission
-                </h2>
-                <div className="prose prose-lg prose-gray max-w-none">
-                  <p className="text-lg md:text-xl text-gray-700 leading-relaxed mb-6">
-                    At Asetta, we believe that the transition to post-secondary education shouldn't mean losing the academic support you need. 
-                    While students gain independence, they also face more complex coursework, tighter deadlines, and increased responsibility—often without the structured guidance they've always had.
-                  </p>
-                  <p className="text-lg md:text-xl text-gray-700 leading-relaxed mb-6">
-                    We're here to bridge that gap. Asetta uses AI to help students track deadlines, organize assignments, and manage their academic workload with less effort and stress. 
-                    Our intelligent system extracts assignment details from syllabi, predicts upcoming deadlines, and provides personalized insights.
-                  </p>
-                  <p className="text-lg md:text-xl text-gray-700 leading-relaxed">
-                    <strong className="text-primary-600">We're here when you need us, until you don't need us anymore.</strong>
-                  </p>
-                </div>
-              </div>
-            </motion.div>
+          <ContentSection title="Why we built Asetta">
+            <p>
+              From elementary school through high school, our entire educational journey was
+              guided. Teachers told us exactly when assignments were due, what to study, and how
+              to manage our time. Then post-secondary education arrives, whether university,
+              college, or trade school, and suddenly that structure disappears. No more daily
+              check-ins. No more guided schedules. You're expected to independently manage
+              complex coursework, deadlines, and academic goals.
+            </p>
+            <p>
+              We recognized that students don't need less independence. They need better tools to
+              manage that independence effectively. Think of Asetta as the support system you
+              wish you had, helping you focus on learning and growing rather than constantly
+              worrying about missed deadlines or forgotten assignments.
+            </p>
+          </ContentSection>
 
-            {/* Meet the Founder */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.4 }}
-              className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 md:p-12 shadow-lg border border-gray-200/50 relative overflow-hidden"
-            >
-              <div className="absolute inset-0 bg-gray-50/30 opacity-50"></div>
-              
-              <div className="relative z-10 text-center">
-                <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6 font-heading">
-                  Meet Our Founder
-                </h2>
-                <div className="max-w-2xl mx-auto">
-                  <p className="text-lg md:text-xl text-gray-700 leading-relaxed mb-6">
-                    Asetta was created by Eleazar, a student who experienced firsthand the overwhelming transition to post-secondary life. 
-                    After struggling with academic organization during his first year, he built Asetta as the support system he wished he had.
-                  </p>
-                  <p className="text-lg md:text-xl text-gray-700 leading-relaxed mb-6">
-                    Today, as a 4th-year student, Eleazar still uses Asetta daily and continues to develop features based on real student needs and challenges.
-                  </p>
-                  <Link
-                    href="/founders-note"
-                    className="inline-flex items-center text-primary-600 hover:text-primary-700 font-semibold"
-                  >
-                    Read Eleazar's full story
-                    <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
-                  </Link>
-                </div>
-              </div>
-            </motion.div>
+          {/* Founder's note */}
+          <Reveal>
+            <section>
+              <h2 className="text-2xl font-semibold tracking-tight text-stone-900 sm:text-3xl">
+                A note from our founder
+              </h2>
 
-            {/* Our Commitment */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.9 }}
-              className="bg-primary-50 rounded-3xl p-8 md:p-12 shadow-lg border border-primary-200/50 relative overflow-hidden"
-            >
-              <div className="absolute inset-0 bg-primary-100/20"></div>
-              
-              <div className="relative z-10 text-center">
-                <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6 font-heading">
-                  Our Promise to Students
-                </h2>
-                <p className="text-lg md:text-xl text-gray-700 leading-relaxed mb-8 max-w-2xl mx-auto">
-                  We're here to support you through the challenges of post-secondary life, whether that's your first semester 
-                  or your final year. You don't have to navigate academic complexity alone.
+              <blockquote className="mt-6 border-l-2 border-stone-300 pl-6 text-lg font-medium italic leading-relaxed text-stone-700 md:text-xl">
+                "I was completely overwhelmed in my first year. Going from structured high school
+                to managing complex course loads and deadlines felt impossible."
+              </blockquote>
+
+              <div className="mt-6 space-y-5 text-lg leading-relaxed text-stone-700">
+                <p>
+                  Despite being successful in high school, I was constantly stressed about missing
+                  assignments and deadlines. I wasn't alone. Most of my friends were struggling
+                  with the same transition from structured support to complete academic
+                  independence. As a software engineering student, I realized technology could
+                  bridge that gap. So I built Asetta, not as a business opportunity, but as the
+                  solution I desperately needed.
                 </p>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                  <div className="bg-white/60 backdrop-blur-sm p-6 rounded-2xl">
-                    <h3 className="text-xl font-bold text-gray-900 mb-3 font-heading">
-                      Always Free
-                    </h3>
-                    <p className="text-gray-700">
-                      Because every student deserves academic support throughout their post-secondary journey, regardless of their financial situation.
-                    </p>
-                  </div>
-                  <div className="bg-white/60 backdrop-blur-sm p-6 rounded-2xl">
-                    <h3 className="text-xl font-bold text-gray-900 mb-3 font-heading">
-                      Student-Centered
-                    </h3>
-                    <p className="text-gray-700">
-                      Built by students who understand the challenges, designed to support your academic success however you choose to use it.
-                    </p>
-                  </div>
-                </div>
-
-                <motion.div
-                  whileHover={{ scale: 1.02, y: -2 }}
-                  whileTap={{ scale: 0.98 }}
-                  className="inline-block"
-                >
-                  <Link
-                    href="https://asetta.me/register"
-                    className="group inline-flex items-center justify-center px-10 py-5 text-xl font-bold text-white bg-primary-600 hover:bg-primary-700 rounded-2xl transition-all duration-300 shadow-lg hover:shadow-xl"
-                  >
-                    Get Organized Today
-                    <svg
-                      className="w-6 h-6 ml-3 group-hover:translate-x-1 transition-transform duration-300"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M17 8l4 4m0 0l-4 4m4-4H3"
-                      />
-                    </svg>
-                  </Link>
-                </motion.div>
+                <p>
+                  I remembered that feeling of stress and knew financial barriers shouldn't
+                  prevent students from getting help.{" "}
+                  <strong className="font-semibold text-stone-900">
+                    That's why Asetta will always remain completely free for students.
+                  </strong>
+                </p>
+                <p>
+                  I'm now in my fourth year and still use Asetta daily to manage my course load
+                  and deadlines. Every feature comes from something I've needed or heard other
+                  students ask for. If my first-year struggles can help even one student feel
+                  more in control of their academic journey, every hour building this was worth
+                  it.
+                </p>
               </div>
-            </motion.div>
-          </div>
-        </div>
-      </main>
 
-      <Footer />
-    </div>
+              <footer className="mt-8 border-t border-stone-200 pt-6">
+                <p className="font-semibold text-stone-900">Eleazar</p>
+                <p className="mt-1 text-sm text-stone-500">
+                  Founder & Student · 4th Year Software Engineering, University of Guelph
+                </p>
+              </footer>
+            </section>
+          </Reveal>
+        </div>
+        </div>
+      </Container>
+
+      <CTAPanel
+        title="Our promise to students"
+        lead="We're here to support you through the challenges of post-secondary life, whether that's your first semester or your final year."
+        trackLabel="Get Started - About CTA"
+      >
+        <CTAPanelCard title="Always free">
+          Because every student deserves academic support, regardless of their financial
+          situation.
+        </CTAPanelCard>
+        <CTAPanelCard title="Student-centered">
+          Built by students who understand the challenges, designed to support your success.
+        </CTAPanelCard>
+      </CTAPanel>
+    </Layout>
   );
 }

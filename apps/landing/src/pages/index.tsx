@@ -1,435 +1,159 @@
-import Head from "next/head";
-import Link from "next/link";
-import Image from "next/image";
-import { useState } from "react";
-import Header from "../components/Header";
-import Footer from "../components/Footer";
-import ImageModal from "../components/ImageModal";
-import { trackCTAClick } from "../utils/analytics";
+import ButtonLink from "@/components/Button";
+import Container from "@/components/Container";
+import CTAPanel from "@/components/CTAPanel";
+import FeatureGrid from "@/components/FeatureGrid";
+import Layout from "@/components/Layout";
+import Reveal from "@/components/Reveal";
+import SectionHeading from "@/components/SectionHeading";
 import {
   ImageComparison,
   ImageComparisonImage,
   ImageComparisonSlider,
-} from "../components/ui/image-comparison";
+} from "@/components/ui/image-comparison";
+import { CHALLENGES, HOME_FEATURES } from "@/lib/features";
+import { REGISTER_URL } from "@/lib/site";
 
 export default function LandingPage() {
-  const [modalImage, setModalImage] = useState<{
-    src: string;
-    alt: string;
-    title: string;
-  } | null>(null);
-
-  const handleImageClick = (
-    imageSrc: string,
-    imageAlt: string,
-    title: string
-  ) => {
-    setModalImage({ src: imageSrc, alt: imageAlt, title });
-  };
-
-  const handleCloseModal = () => {
-    setModalImage(null);
-  };
-
   return (
-    <div className="min-h-screen flex flex-col bg-white">
-      <Head>
-        <title>Asetta - Your AI-Powered Academic Success Companion</title>
-        <meta
-          name="description"
-          content="Always ahead, never behind. Asetta is a completely free AI-powered platform that helps students stay on top of assignments, deadlines, and academic goals."
-        />
-      </Head>
-      <Header />
+    <Layout
+      title="Asetta | Always ahead, never behind"
+      description="Asetta is a free, AI-powered academic assistant that keeps students on top of assignments, deadlines, and grades."
+    >
+      {/* Hero: tagline up top, product visible in the first viewport */}
+      <section className="pb-24 md:pb-32">
+        <Container>
+          <Reveal className="mx-auto max-w-3xl pt-4 text-center md:pt-8">
+            <h1 className="text-[clamp(2.5rem,1.5rem+4vw,4.25rem)] font-semibold leading-[1.08] tracking-tight text-stone-900">
+              Always ahead, never behind.
+            </h1>
 
-      {/* Hero Section */}
-      <section
-        className="relative pb-20 lg:pb-32 pb-safe overflow-hidden bg-white"
-        style={{
-          paddingTop: `max(11rem, calc(11rem + env(safe-area-inset-top)))`,
-        }}
-      >
-        {/* Subtle background elements */}
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute -top-24 -left-24 w-96 h-96 bg-primary-100/20 rounded-full blur-3xl" />
-          <div className="absolute -bottom-24 -right-24 w-80 h-80 bg-primary-100/15 rounded-full blur-3xl" />
-        </div>
+            <p className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-stone-600 md:text-xl">
+              Asetta is a free, AI-powered academic assistant that keeps you on top of
+              assignments, deadlines, and grades.
+            </p>
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pl-safe pr-safe relative z-10">
-          {/* Content Section */}
-          <div className="text-center mb-16 lg:mb-20">
-            <div className="max-w-4xl mx-auto space-y-6 md:space-y-8">
-              <span className="inline-flex items-center px-4 py-2 rounded-full bg-primary-100 text-primary-700 font-semibold text-sm border border-primary-200/50 animate-fade-in-down-initial animate-fade-in-down">
-                <span className="w-2 h-2 bg-primary-500 rounded-full mr-2 animate-pulse"></span>
-                100% Free for Students
-              </span>
-
-              <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold text-gray-900 font-heading tracking-tight leading-tight animate-fade-in-initial animate-fade-in">
-                Your Smart <span className="text-primary-600">Academic</span>{" "}
-                Assistant
-              </h1>
-
-              <p className="text-lg sm:text-xl lg:text-2xl text-gray-600 leading-relaxed max-w-3xl mx-auto animate-fade-in-up-initial animate-fade-in-up">
-                Always ahead, never behind. AI-powered academic organization
-                that keeps you on top of assignments, deadlines, and your study
-                goals.
-              </p>
-            </div>
-
-            <div className="flex flex-col sm:flex-row gap-4 justify-center mt-8 lg:mt-10 animate-fade-in-up-initial animate-fade-in-up">
-              <Link
-                href="https://asetta.me/register"
-                onClick={() =>
-                  trackCTAClick(
-                    "Get Started Free - Hero",
-                    "https://asetta.me/register"
-                  )
-                }
-                className="group inline-flex items-center justify-center px-8 py-4 text-lg font-bold text-white bg-primary-600 hover:bg-primary-700 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
-              >
-                Get Started Free
-                <svg
-                  className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M17 8l4 4m0 0l-4 4m4-4H3"
-                  />
-                </svg>
-              </Link>
-
-              <Link
+            <div className="mt-9 flex items-center justify-center gap-2">
+              <ButtonLink href={REGISTER_URL} size="lg" trackLabel="Get Started - Hero">
+                Get started
+              </ButtonLink>
+              <ButtonLink
                 href="/features"
-                onClick={() =>
-                  trackCTAClick("Explore Features - Hero", "/features")
-                }
-                className="inline-flex items-center justify-center px-8 py-4 text-lg font-bold text-gray-700 bg-white border-2 border-gray-200 rounded-2xl shadow-lg hover:shadow-xl hover:border-primary-300 transition-all duration-300 hover:-translate-y-1"
+                variant="ghost"
+                size="lg"
+                withArrow
+                trackLabel="Explore Features - Hero"
               >
-                Explore Features
-              </Link>
+                Explore features
+              </ButtonLink>
             </div>
+          </Reveal>
 
-            <div className="flex flex-col sm:flex-row items-center justify-center space-y-2 sm:space-y-0 sm:space-x-8 mt-8 text-sm text-gray-500 animate-fade-in-up-initial animate-fade-in-up">
-              <div className="flex items-center">
-                <svg
-                  className="w-4 h-4 text-green-500 mr-2"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-                No credit card required
+          {/* Dashboard preview, cresting into the first screen */}
+          <Reveal delay={0.1} className="mx-auto mt-12 max-w-5xl md:mt-16">
+            <div className="overflow-hidden rounded-2xl shadow-[0_32px_80px_-32px_rgb(28_25_23/0.35)]">
+              {/* macOS-style window bar */}
+              <div className="relative flex items-center bg-stone-100 px-4 py-3">
+                <span className="flex gap-1.5" aria-hidden>
+                  <span className="h-3 w-3 rounded-full bg-[#ff5f57]" />
+                  <span className="h-3 w-3 rounded-full bg-[#febc2e]" />
+                  <span className="h-3 w-3 rounded-full bg-[#28c840]" />
+                </span>
+                <span className="absolute left-1/2 -translate-x-1/2 text-xs font-medium text-stone-400">
+                  asetta.me
+                </span>
               </div>
-              <div className="flex items-center">
-                <svg
-                  className="w-4 h-4 text-green-500 mr-2"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-                Setup in 2 minutes
-              </div>
+              <ImageComparison className="aspect-video w-full">
+                <ImageComparisonImage
+                  src="/images/Dark_Prev.png"
+                  alt="Asetta dashboard in dark mode"
+                  position="left"
+                />
+                <ImageComparisonImage
+                  src="/images/Light_Prev.png"
+                  alt="Asetta dashboard in light mode"
+                  position="right"
+                />
+                <ImageComparisonSlider className="bg-white shadow-sm">
+                  <div className="absolute left-1/2 top-1/2 flex h-8 w-8 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-stone-200 bg-white shadow-md">
+                    <svg
+                      className="h-4 w-4 text-stone-400"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth={2}
+                      viewBox="0 0 24 24"
+                      aria-hidden="true"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M8 9l-3 3 3 3m8-6l3 3-3 3" />
+                    </svg>
+                  </div>
+                </ImageComparisonSlider>
+              </ImageComparison>
             </div>
-          </div>
-
-          {/* Dashboard Preview */}
-          <div className="max-w-5xl mx-auto animate-fade-in-up-initial animate-fade-in-up">
-            <div className="relative">
-              <div className="absolute -inset-4 bg-primary-600/20 rounded-3xl blur-2xl transition-all duration-500"></div>
-              <div className="relative bg-white rounded-2xl shadow-2xl border border-gray-200/50 overflow-hidden w-full">
-                <ImageComparison className="aspect-video w-full rounded-2xl overflow-hidden">
-                  <ImageComparisonImage
-                    src="/images/Dark_Prev.png"
-                    alt="Asetta Dashboard Preview - Dark Mode"
-                    position="left"
-                  />
-                  <ImageComparisonImage
-                    src="/images/Light_Prev.png"
-                    alt="Asetta Dashboard Preview - Light Mode"
-                    position="right"
-                  />
-                  <ImageComparisonSlider className="bg-white/90 backdrop-blur-sm shadow-lg">
-                    <div className="absolute left-1/2 top-1/2 h-8 w-6 -translate-x-1/2 -translate-y-1/2 rounded bg-white shadow-md border border-gray-300" />
-                  </ImageComparisonSlider>
-                </ImageComparison>
-              </div>
-            </div>
-          </div>
-        </div>
+            <p className="mt-4 text-center text-xs text-stone-400">
+              Drag to compare dark and light mode
+            </p>
+          </Reveal>
+        </Container>
       </section>
 
-      {/* Student Challenges Bridge */}
-      <section className="py-32 bg-gray-50/50 relative overflow-hidden">
-        <div className="absolute inset-0 bg-primary-50/30"></div>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pl-safe pr-safe relative z-10">
-          <div className="text-center mb-24 animate-fade-in-up-initial animate-fade-in-up">
-            <span className="inline-block mb-4 px-4 py-2 rounded-full bg-primary-100 text-primary-700 font-semibold text-sm shadow-md border border-primary-200/50">
-              The Student Challenge
-            </span>
-            <h2 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-6 font-heading tracking-tight">
-              Every semester, the{" "}
-              <span className="text-primary-600">same struggles</span>
-            </h2>
-            <p className="text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-              You're not alone. These challenges are universal—but they don't
-              have to be permanent.
-            </p>
-          </div>
+      {/* Student challenges: white tiles on a tinted band */}
+      <section className="bg-stone-50 py-24 md:py-32">
+        <Container>
+          <SectionHeading
+            align="split"
+            title="Every semester, the same struggles"
+            lead="You're not alone. These challenges are universal, but they don't have to be permanent."
+          />
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-10 max-w-4xl mx-auto">
-            {[
-              {
-                title: "Scattered Information",
-                description:
-                  "Assignment details spread across multiple syllabi, emails, and announcements—making it impossible to see the full picture of your semester.",
-              },
-              {
-                title: "Grade Uncertainty",
-                description:
-                  'Constantly wondering "What do I need on the final?" without having a clear, real-time view of where you stand in each class.',
-              },
-              {
-                title: "Missed Deadlines",
-                description:
-                  "Despite good intentions and multiple reminder systems, important assignments still slip through the cracks at the worst possible times.",
-              },
-              {
-                title: "Time Wasted Organizing",
-                description:
-                  "Hours spent manually copying information into calendars and spreadsheets—time that could be better spent actually studying and learning.",
-              },
-            ].map((challenge, index) => (
-              <div
-                key={index}
-                className={`animate-fade-in-up-initial animate-fade-in-up`}
-                style={{ animationDelay: `${index * 0.15}s` }}
-              >
-                <h3 className="text-2xl font-bold text-gray-900 mb-4 font-heading">
-                  {challenge.title}
-                </h3>
-                <p className="text-gray-600 leading-relaxed text-lg">
-                  {challenge.description}
-                </p>
-              </div>
-            ))}
-          </div>
-
-          <div className="text-center mt-20 animate-fade-in-up-initial animate-fade-in-up">
-            <p className="text-xl font-medium text-gray-700">
-              That's exactly why we built{" "}
-              <span className="text-primary-600 font-bold">Asetta</span>.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* Features Section */}
-      <section
-        id="features"
-        className="py-32 bg-white relative overflow-hidden"
-      >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pl-safe pr-safe relative z-10">
-          <div className="text-center mb-24 animate-fade-in-up-initial animate-fade-in-up">
-            <span className="inline-block mb-4 px-4 py-2 rounded-full bg-primary-100 text-primary-700 font-semibold text-sm shadow-md border border-primary-200/50">
-              The Solution
-            </span>
-            <h2 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-6 font-heading tracking-tight">
-              Smart Features That Solve{" "}
-              <span className="text-primary-600">These Problems</span>
-            </h2>
-            <p className="text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-              Each feature directly addresses the challenges you face, turning
-              academic chaos into organized success.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-10">
-            {[
-              {
-                image: "/images/features/document-processing.gif",
-                title: "AI Extraction",
-                description:
-                  "Transform course syllabi into organized assignment schedules. Upload your PDF course outline and let AI instantly extract every assignment, deadline, and weight—eliminating manual data entry and ensuring nothing falls through the cracks.",
-              },
-              {
-                image: "/images/features/grade-calculator.gif",
-                title: "Grade Calculator",
-                description:
-                  "Take control of your academic performance with precision grade tracking. Calculate exactly what you need to achieve your target grades, monitor your GPA in real-time, and make informed decisions about your study priorities.",
-              },
-              {
-                image: "/images/features/calendar-deadlines.gif",
-                title: "Calendar & Deadline Management",
-                description:
-                  "Visualize your entire semester at a glance with drag-and-drop scheduling. Never miss another deadline with intelligent notifications and seamless calendar integration that syncs with your existing tools.",
-              },
-            ].map((feature, index) => (
-              <div
-                key={index}
-                className={`animate-fade-in-up-initial animate-fade-in-up`}
-                style={{ animationDelay: `${index * 0.15}s` }}
-              >
-                <div className="bg-white rounded-3xl shadow-lg border border-gray-200/50 h-full overflow-hidden">
-                  {/* Image Header */}
-                  <div
-                    className="relative h-48 md:h-56 overflow-hidden cursor-pointer group"
-                    onClick={() =>
-                      handleImageClick(
-                        feature.image,
-                        feature.title,
-                        feature.title
-                      )
-                    }
-                  >
-                    <Image
-                      src={feature.image}
-                      alt={feature.title}
-                      fill
-                      className="object-cover transition-transform duration-300 group-hover:scale-105"
-                      unoptimized={feature.image.endsWith(".gif")}
-                    />
-                    {/* Hover overlay */}
-                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300 flex items-center justify-center">
-                      <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                        <div className="bg-white/90 backdrop-blur-sm rounded-full p-3 shadow-lg">
-                          <svg
-                            className="w-6 h-6 text-gray-800"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"
-                            />
-                          </svg>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Text Box */}
-                  <div className="p-6 md:p-8">
-                    <h3 className="text-2xl font-bold text-gray-900 mb-4 font-heading">
-                      {feature.title}
-                    </h3>
-                    <p className="text-gray-600 leading-relaxed text-lg">
-                      {feature.description}
-                    </p>
-                  </div>
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            {CHALLENGES.map((challenge, index) => (
+              <Reveal key={challenge.title} delay={index * 0.06} className="h-full">
+                <div className="h-full rounded-xl bg-white p-7">
+                  <span className="text-sm tabular-nums text-stone-400">
+                    {String(index + 1).padStart(2, "0")}
+                  </span>
+                  <h3 className="mt-3 text-lg font-semibold text-stone-900">{challenge.title}</h3>
+                  <p className="mt-2 text-base leading-relaxed text-stone-600">
+                    {challenge.description}
+                  </p>
                 </div>
-              </div>
+              </Reveal>
             ))}
           </div>
-
-          {/* And More Section */}
-          <div className="mt-20 text-center animate-fade-in-up-initial animate-fade-in-up">
-            <div className="group transform transition-all duration-300 hover:scale-105 hover:-translate-y-1 inline-block">
-              <Link
-                href="/features"
-                className="inline-flex items-center justify-center px-8 py-4 text-lg font-bold text-white bg-primary-600 hover:bg-primary-700 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 relative overflow-hidden"
-              >
-                <span className="absolute inset-0 bg-primary-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
-                <span className="relative z-10">See All Features</span>
-                <svg
-                  className="w-5 h-5 ml-3 group-hover:translate-x-1 transition-transform duration-300 relative z-10"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M17 8l4 4m0 0l-4 4m4-4H3"
-                  />
-                </svg>
-              </Link>
-            </div>
-          </div>
-        </div>
+        </Container>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-32 pb-safe bg-primary-50 relative overflow-hidden">
-        <div className="absolute inset-0 bg-primary-100/40"></div>
-        <div className="absolute -top-24 -left-24 w-96 h-96 bg-primary-200 rounded-full blur-3xl opacity-30 animate-float"></div>
-        <div
-          className="absolute -bottom-24 -right-24 w-80 h-80 bg-primary-150 rounded-full blur-3xl opacity-40 animate-float"
-          style={{ animationDelay: "2s" }}
-        ></div>
+      {/* Features */}
+      <section id="features" className="pt-24 md:pt-32">
+        <Container>
+          <SectionHeading
+            align="split"
+            title="Everything you need to stay organized"
+            lead="Each feature addresses a real student problem, turning chaos into structure."
+          />
 
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
-          <div className="animate-fade-in-up-initial animate-fade-in-up">
-            <span className="inline-block mb-6 px-6 py-3 rounded-full bg-primary-100 text-primary-700 font-bold text-sm shadow-lg border border-primary-200/50 backdrop-blur-sm">
-              Ready to Excel?
-            </span>
-            <h2 className="text-5xl md:text-6xl font-extrabold text-gray-900 mb-8 font-heading tracking-tight leading-tight">
-              Start Your{" "}
-              <span className="text-primary-600">Academic Success</span> Journey
-              Today
-            </h2>
-            <p className="text-xl md:text-2xl text-gray-700 mb-12 max-w-4xl mx-auto leading-relaxed font-medium">
-              Join students who are using Asetta's comprehensive platform to
-              organize semesters, track grades, manage deadlines, and achieve
-              their academic goals—all completely free.
-            </p>
-            <div className="flex justify-center group transform transition-all duration-300 hover:scale-105 hover:-translate-y-2">
-              <Link
-                href="https://asetta.me/register"
-                className="inline-flex items-center justify-center px-12 py-6 text-xl font-bold text-white bg-primary-600 hover:bg-primary-700 rounded-2xl shadow-2xl hover:shadow-3xl transition-all duration-300 relative overflow-hidden animate-scale-delayed"
-              >
-                <span className="absolute inset-0 bg-primary-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
-                <span className="relative z-10">Create Your Free Account</span>
-                <svg
-                  className="w-6 h-6 ml-4 group-hover:translate-x-2 transition-transform duration-300 relative z-10"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M17 8l4 4m0 0l-4 4m4-4H3"
-                  />
-                </svg>
-              </Link>
-            </div>
-            <p className="mt-8 text-sm text-gray-500 font-medium">
-              No credit card required • Forever free for students • Setup in
-              under 2 minutes
-            </p>
-          </div>
-        </div>
+          <FeatureGrid features={HOME_FEATURES} layout="featured" />
+
+          <Reveal className="mt-12 text-center">
+            <ButtonLink
+              href="/features"
+              variant="ghost"
+              size="lg"
+              withArrow
+              trackLabel="See All Features - Home"
+            >
+              See all features
+            </ButtonLink>
+          </Reveal>
+        </Container>
       </section>
 
-      <Footer />
-
-      {/* Image Modal */}
-      <ImageModal
-        isOpen={!!modalImage}
-        onClose={handleCloseModal}
-        imageSrc={modalImage?.src || ""}
-        imageAlt={modalImage?.alt || ""}
-        title={modalImage?.title || ""}
+      {/* Closing CTA */}
+      <CTAPanel
+        title="Get organized today"
+        lead="Organize your semesters, track your grades, and never miss a deadline. Free for students."
+        trackLabel="Get Started - Home CTA"
       />
-    </div>
+    </Layout>
   );
 }

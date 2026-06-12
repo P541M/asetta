@@ -9,6 +9,7 @@ interface ImageModalProps {
   title: string;
 }
 
+/** Full-size lightbox for feature previews. Closes on Escape or backdrop click. */
 export default function ImageModal({
   isOpen,
   onClose,
@@ -16,82 +17,65 @@ export default function ImageModal({
   imageAlt,
   title,
 }: ImageModalProps) {
-  // Handle ESC key press
+  // Close on Escape and lock body scroll while open.
   useEffect(() => {
     const handleEsc = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        onClose();
-      }
+      if (event.key === "Escape") onClose();
     };
 
     if (isOpen) {
       document.addEventListener("keydown", handleEsc);
-      // Prevent body scroll when modal is open
       document.body.style.overflow = "hidden";
     }
 
     return () => {
       document.removeEventListener("keydown", handleEsc);
-      document.body.style.overflow = "unset";
+      document.body.style.overflow = "";
     };
   }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
+    <div className="fixed inset-0 z-50 flex items-center justify-center" role="dialog" aria-modal="true">
       {/* Backdrop */}
-      <div
-        className="absolute inset-0 bg-black/80 backdrop-blur-sm transition-opacity duration-300"
-        onClick={onClose}
-      />
+      <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={onClose} />
 
-      {/* Modal Content */}
-      <div className="relative z-10 mx-4 animate-fade-in max-w-[95vw] max-h-[95vh] overflow-auto">
-        {/* Close Button */}
+      <div className="animate-fade-in relative z-10 mx-4 max-h-[95vh] max-w-[95vw] overflow-auto">
         <button
           onClick={onClose}
-          className="fixed top-4 right-4 z-30 p-3 bg-black/50 backdrop-blur-sm rounded-full text-white hover:text-gray-300 hover:bg-black/70 transition-all duration-200"
-          aria-label="Close image modal"
+          aria-label="Close image preview"
+          className="fixed right-4 top-4 z-30 rounded-full bg-black/50 p-3 text-white backdrop-blur-sm transition-colors duration-150 hover:bg-black/70"
         >
           <svg
-            className="w-6 h-6"
+            className="h-6 w-6"
             fill="none"
             stroke="currentColor"
+            strokeWidth={2}
             viewBox="0 0 24 24"
+            aria-hidden="true"
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M6 18L18 6M6 6l12 12"
-            />
+            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
 
-        {/* Image Container */}
-        <div className="relative bg-white rounded-2xl shadow-2xl overflow-hidden">
-          {/* Title Overlay */}
-          <div className="absolute top-0 left-0 right-0 z-10 bg-gradient-to-b from-black/70 to-transparent p-4 md:p-6">
-            <h3 className="text-white text-lg md:text-xl font-bold font-heading">
-              {title}
-            </h3>
+        <div className="relative overflow-hidden rounded-2xl bg-white shadow-2xl">
+          {/* Title overlay */}
+          <div className="absolute inset-x-0 top-0 z-10 bg-linear-to-b from-black/70 to-transparent p-4 md:p-6">
+            <h3 className="text-lg font-semibold text-white md:text-xl">{title}</h3>
           </div>
 
-          {/* Full Resolution Image */}
-          <div className="relative">
-            <Image
-              src={imageSrc}
-              alt={imageAlt}
-              width={0}
-              height={0}
-              sizes="100vw"
-              className="w-auto h-auto max-w-none"
-              style={{ maxWidth: "95vw", maxHeight: "95vh" }}
-              priority
-              unoptimized={imageSrc.endsWith(".gif")}
-            />
-          </div>
+          <Image
+            src={imageSrc}
+            alt={imageAlt}
+            width={0}
+            height={0}
+            sizes="100vw"
+            className="h-auto w-auto max-w-none"
+            style={{ maxWidth: "95vw", maxHeight: "95vh" }}
+            priority
+            unoptimized={imageSrc.endsWith(".gif")}
+          />
         </div>
       </div>
     </div>

@@ -1,288 +1,228 @@
-import Link from "next/link";
-import Head from "next/head";
-import Header from "../components/Header";
-import Footer from "../components/Footer";
 import { useState } from "react";
-import { trackContactFormSubmission } from "../utils/analytics";
+import Container from "@/components/Container";
+import Layout from "@/components/Layout";
+import Reveal from "@/components/Reveal";
+import TextLink from "@/components/TextLink";
+import { CONTACT_EMAIL } from "@/lib/site";
+import { trackContactFormSubmission } from "@/utils/analytics";
+
+interface FormData {
+  name: string;
+  email: string;
+  message: string;
+  emailConsent: boolean;
+}
+
+const EMPTY_FORM: FormData = { name: "", email: "", message: "", emailConsent: false };
+
+type Status =
+  | { type: "idle" | "loading" }
+  | { type: "success" | "error"; message: string };
+
+/** Filled, borderless inputs: stone field that turns white with a ring on focus. */
+const inputClasses =
+  "w-full rounded-lg bg-stone-100 px-3.5 py-2.5 text-stone-900 placeholder:text-stone-400 transition-colors duration-150 focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary-400";
 
 export default function Contact() {
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    message: "",
-    emailConsent: false,
-  });
-  const [status, setStatus] = useState<{
-    type: "idle" | "loading" | "success" | "error";
-    message: string;
-  }>({ type: "idle", message: "" });
+  const [formData, setFormData] = useState<FormData>(EMPTY_FORM);
+  const [status, setStatus] = useState<Status>({ type: "idle" });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setStatus({ type: "loading", message: "Sending message..." });
+    setStatus({ type: "loading" });
 
     try {
       const response = await fetch("/api/contact", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
-
       const data = await response.json();
 
       if (!response.ok) {
         throw new Error(data.message || "Something went wrong");
       }
 
-      setStatus({
-        type: "success",
-        message: "We'll get back to you soon.",
-      });
-      setFormData({ name: "", email: "", message: "", emailConsent: false });
-      
-      // Track successful form submission
+      setStatus({ type: "success", message: "We'll get back to you soon." });
+      setFormData(EMPTY_FORM);
       trackContactFormSubmission(true);
     } catch (error) {
       setStatus({
         type: "error",
-        message:
-          error instanceof Error ? error.message : "Failed to send message",
+        message: error instanceof Error ? error.message : "Failed to send message",
       });
-      
-      // Track failed form submission
       trackContactFormSubmission(false);
     }
   };
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value, type } = e.target;
     const checked = (e.target as HTMLInputElement).checked;
-    setFormData((prev) => ({ 
-      ...prev, 
-      [name]: type === 'checkbox' ? checked : value 
-    }));
+    setFormData((prev) => ({ ...prev, [name]: type === "checkbox" ? checked : value }));
   };
 
   return (
-    <div className="min-h-screen bg-primary-50/20 flex flex-col">
-      <Head>
-        <title>Contact Us | Asetta</title>
-        <meta
-          name="description"
-          content="Always ahead, never behind. Get in touch with the Asetta team. We're here to help you make the most of your free AI-powered academic success platform."
-        />
-      </Head>
-      <Header />
-
-      <main className="flex-grow pt-32 pb-24 relative overflow-hidden">
-        {/* Background Elements */}
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute -top-24 -left-24 w-96 h-96 bg-primary-100/20 rounded-full blur-3xl" />
-          <div className="absolute -bottom-24 -right-24 w-80 h-80 bg-primary-100/15 rounded-full blur-3xl" />
-        </div>
-
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          {/* Hero Section */}
-          <div className="text-center mb-16 animate-fade-in">
-            <span className="inline-flex items-center px-4 py-2 rounded-full bg-primary-100 text-primary-700 font-semibold text-sm border border-primary-200/50 mb-6">
-              <svg
-                className="w-4 h-4 mr-2"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
-                <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
-                <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
-              </svg>
-              Student Support
-            </span>
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-gray-900 mb-8 font-heading tracking-tight leading-tight">
-              We're Here to{" "}
-              <span className="text-primary-600">
-                Help You Succeed
-              </span>
+    <Layout
+      title="Contact Us | Asetta"
+      description="Get in touch with the Asetta team. We're here to help you get the most out of your free academic assistant."
+    >
+      <Container className="pb-24 md:pb-32">
+        <div className="grid grid-cols-1 gap-12 lg:grid-cols-[1fr_1.2fr] lg:gap-20">
+          {/* Intro */}
+          <Reveal>
+            <h1 className="text-3xl font-semibold tracking-tight text-stone-900 sm:text-4xl lg:text-5xl">
+              We're here to help
             </h1>
-            <p className="text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-              Always ahead, never behind. Have questions about our AI-powered
-              features or need help getting started? Our team is dedicated to
-              supporting your academic journey—all completely free.
+            <p className="mt-5 max-w-md text-lg leading-relaxed text-stone-600 md:text-xl">
+              Questions about Asetta or need help getting started? Send us a message.
             </p>
-          </div>
+            <p className="mt-8 text-base text-stone-600">
+              Prefer email? <TextLink href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</TextLink>
+            </p>
+          </Reveal>
 
-          {/* Contact Form Section */}
-          <div className="animate-fade-in-up">
-            <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 md:p-12 shadow-xl border border-gray-200/50 max-w-4xl mx-auto">
-              {status.type === "success" ? (
-                <div className="text-center py-8">
-                  <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-100 mb-4">
-                    <svg
-                      className="w-8 h-8 text-green-600"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M5 13l4 4L19 7"
-                      />
-                    </svg>
-                  </div>
-                  <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                    Message Sent!
-                  </h3>
-                  <p className="text-gray-600 mb-6">{status.message}</p>
-                  <button
-                    onClick={() => setStatus({ type: "idle", message: "" })}
-                    className="inline-flex items-center justify-center px-8 py-4 text-lg font-bold text-white bg-primary-600 hover:bg-primary-700 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
+          {/* Form */}
+          <Reveal delay={0.1}>
+            {status.type === "success" ? (
+              <div className="rounded-2xl bg-stone-50 p-10 text-center">
+                <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-white">
+                  <svg
+                    className="h-7 w-7 text-primary-600"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth={2}
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
                   >
-                    Send Another Message
-                  </button>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
                 </div>
-              ) : (
-                <form onSubmit={handleSubmit} className="space-y-8">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div className="group">
-                      <label className="block text-lg font-semibold text-gray-900 mb-3">
-                        Name
-                      </label>
-                      <input
-                        type="text"
-                        name="name"
-                        value={formData.name}
-                        onChange={handleChange}
-                        className="w-full px-6 py-4 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-primary-200 focus:border-primary-400 focus:outline-none transition-all duration-300 text-lg bg-white/80 backdrop-blur-sm hover:bg-white group-hover:border-primary-300"
-                        placeholder="Your name"
-                        required
-                      />
-                    </div>
-                    <div className="group">
-                      <label className="block text-lg font-semibold text-gray-900 mb-3">
-                        Email
-                      </label>
-                      <input
-                        type="email"
-                        name="email"
-                        value={formData.email}
-                        onChange={handleChange}
-                        className="w-full px-6 py-4 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-primary-200 focus:border-primary-400 focus:outline-none transition-all duration-300 text-lg bg-white/80 backdrop-blur-sm hover:bg-white group-hover:border-primary-300"
-                        placeholder="your.student@email.com"
-                        required
-                      />
-                    </div>
-                  </div>
-                  <div className="group">
-                    <label className="block text-lg font-semibold text-gray-900 mb-3">
-                      Message
+                <h3 className="text-xl font-semibold text-stone-900">Message sent!</h3>
+                <p className="mt-2 text-base text-stone-600">{status.message}</p>
+                <button
+                  onClick={() => setStatus({ type: "idle" })}
+                  className="mt-6 inline-flex items-center justify-center rounded-lg bg-primary-600 px-5 py-3 font-semibold text-white shadow-xs transition-colors duration-150 hover:bg-primary-700"
+                >
+                  Send another message
+                </button>
+              </div>
+            ) : (
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                  <div>
+                    <label htmlFor="name" className="mb-2 block text-sm font-semibold text-stone-900">
+                      Name
                     </label>
-                    <textarea
-                      name="message"
-                      value={formData.message}
+                    <input
+                      id="name"
+                      type="text"
+                      name="name"
+                      value={formData.name}
                       onChange={handleChange}
-                      className="w-full px-6 py-4 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-primary-200 focus:border-primary-400 focus:outline-none transition-all duration-300 text-lg bg-white/80 backdrop-blur-sm hover:bg-white group-hover:border-primary-300 resize-none"
-                      rows={6}
-                      placeholder="How can we help you with your academic journey?"
+                      className={inputClasses}
+                      placeholder="Your name"
                       required
                     />
                   </div>
-                  
-                  {/* CASL Compliance Checkbox */}
-                  <div className="group">
-                    <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
-                      <h4 className="font-semibold text-blue-800 mb-2">Email Communication Consent (CASL Compliance)</h4>
-                      <div className="flex items-start space-x-3">
-                        <input
-                          type="checkbox"
-                          id="emailConsent"
-                          name="emailConsent"
-                          checked={formData.emailConsent || false}
-                          onChange={handleChange}
-                          required
-                          className="h-5 w-5 text-primary-600 border-gray-300 rounded focus:ring-primary-500 mt-0.5"
-                        />
-                        <label htmlFor="emailConsent" className="text-sm text-blue-700 leading-relaxed">
-                          <strong>Required:</strong> I consent to receive email communications from Asetta in response to this inquiry. 
-                          This consent is required under Canada's Anti-Spam Legislation (CASL). You may withdraw this consent at any time by 
-                          emailing <a href="mailto:videna.psalmeleazar@gmail.com" className="underline font-medium">videna.psalmeleazar@gmail.com</a>.
-                        </label>
-                      </div>
-                    </div>
-                  </div>
-
-                  {status.type === "error" && (
-                    <div className="p-4 bg-red-50 border border-red-200 rounded-xl text-red-600">
-                      {status.message}
-                    </div>
-                  )}
-                  <div className="group">
-                    <button
-                      type="submit"
-                      disabled={status.type === "loading"}
-                      className="w-full py-5 px-8 bg-primary-600 text-white rounded-2xl font-bold text-lg hover:bg-primary-700 transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-1 disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none"
-                    >
-                      {status.type === "loading" ? (
-                        <span className="flex items-center justify-center">
-                          <svg
-                            className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                          >
-                            <circle
-                              className="opacity-25"
-                              cx="12"
-                              cy="12"
-                              r="10"
-                              stroke="currentColor"
-                              strokeWidth="4"
-                            ></circle>
-                            <path
-                              className="opacity-75"
-                              fill="currentColor"
-                              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                            ></path>
-                          </svg>
-                          Sending...
-                        </span>
-                      ) : (
-                        "Send Message"
-                      )}
-                    </button>
-                  </div>
-                </form>
-              )}
-
-              <div className="mt-12 text-center">
-                <Link
-                  href="/"
-                  className="group inline-flex items-center text-primary-600 hover:text-primary-700 font-semibold text-lg transition-all duration-300"
-                >
-                  <svg
-                    className="w-5 h-5 mr-2 group-hover:-translate-x-1 transition-transform duration-300"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M10 19l-7-7m0 0l7-7m-7 7h18"
+                  <div>
+                    <label htmlFor="email" className="mb-2 block text-sm font-semibold text-stone-900">
+                      Email
+                    </label>
+                    <input
+                      id="email"
+                      type="email"
+                      name="email"
+                      value={formData.email}
+                      onChange={handleChange}
+                      className={inputClasses}
+                      placeholder="your.student@email.com"
+                      required
                     />
-                  </svg>
-                  Back to Home
-                </Link>
-              </div>
-            </div>
-          </div>
-        </div>
-      </main>
+                  </div>
+                </div>
 
-      <Footer />
-    </div>
+                <div>
+                  <label htmlFor="message" className="mb-2 block text-sm font-semibold text-stone-900">
+                    Message
+                  </label>
+                  <textarea
+                    id="message"
+                    name="message"
+                    value={formData.message}
+                    onChange={handleChange}
+                    className={`${inputClasses} resize-none`}
+                    rows={6}
+                    placeholder="How can we help you with your academic journey?"
+                    required
+                  />
+                </div>
+
+                {/* CASL compliance consent */}
+                <div className="rounded-lg bg-stone-100 p-4">
+                  <h4 className="mb-2 text-sm font-semibold text-stone-900">
+                    Email Communication Consent (CASL Compliance)
+                  </h4>
+                  <div className="flex items-start gap-3">
+                    <input
+                      type="checkbox"
+                      id="emailConsent"
+                      name="emailConsent"
+                      checked={formData.emailConsent}
+                      onChange={handleChange}
+                      required
+                      className="mt-0.5 h-4 w-4 accent-primary-600"
+                    />
+                    <label htmlFor="emailConsent" className="text-sm leading-relaxed text-stone-600">
+                      <strong>Required:</strong> I consent to receive email communications from
+                      Asetta in response to this inquiry. This consent is required under Canada's
+                      Anti-Spam Legislation (CASL). You may withdraw this consent at any time by
+                      emailing <TextLink href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</TextLink>.
+                    </label>
+                  </div>
+                </div>
+
+                {status.type === "error" && (
+                  <div className="rounded-lg bg-red-50 p-4 text-red-700">{status.message}</div>
+                )}
+
+                <button
+                  type="submit"
+                  disabled={status.type === "loading"}
+                  className="w-full rounded-lg bg-primary-600 px-5 py-3 font-semibold text-white shadow-xs transition-colors duration-150 hover:bg-primary-700 disabled:cursor-not-allowed disabled:opacity-70"
+                >
+                  {status.type === "loading" ? (
+                    <span className="flex items-center justify-center gap-3">
+                      <svg
+                        className="h-5 w-5 animate-spin text-white"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        aria-hidden="true"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        />
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        />
+                      </svg>
+                      Sending...
+                    </span>
+                  ) : (
+                    "Send message"
+                  )}
+                </button>
+              </form>
+            )}
+          </Reveal>
+        </div>
+      </Container>
+    </Layout>
   );
 }

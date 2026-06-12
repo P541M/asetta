@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import nodemailer, { Transporter } from "nodemailer";
+import { CONTACT_EMAIL } from "@/lib/site";
 
 type ContactFormData = {
   name: string;
@@ -59,7 +60,7 @@ export default async function handler(
     // Send email
     await transporter.sendMail({
       from: process.env.EMAIL_USER,
-      to: "videna.psalmeleazar@gmail.com",
+      to: CONTACT_EMAIL,
       subject: `New Contact Form Submission from ${name}`,
       text: `
 New Contact Form Submission (CASL Compliant)
