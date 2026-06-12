@@ -1,10 +1,8 @@
 import type { AppProps } from "next/app";
 import Head from "next/head";
 import { Inter } from "next/font/google";
-import { useRouter } from "next/router";
-import { useEffect } from "react";
 import { GoogleAnalytics } from "@next/third-parties/google";
-import { trackPageView } from "@/utils/analytics";
+import { SITE_DESCRIPTION, SITE_TITLE } from "@/lib/site";
 import "@/styles/globals.css";
 
 const inter = Inter({
@@ -13,29 +11,15 @@ const inter = Inter({
   display: "swap",
 });
 
+// Page views (including client-side route changes) are tracked automatically
+// by GA4 Enhanced Measurement; do not add manual page-view tracking here.
 export default function App({ Component, pageProps }: AppProps) {
-  const router = useRouter();
-
-  useEffect(() => {
-    const handleRouteChange = (url: string) => trackPageView(url);
-    router.events.on("routeChangeComplete", handleRouteChange);
-    return () => {
-      router.events.off("routeChangeComplete", handleRouteChange);
-    };
-  }, [router]);
-
   return (
     <>
       <Head>
-        <title>Asetta | Always ahead, never behind</title>
-        <meta
-          name="description"
-          content="Asetta is a free, AI-powered academic assistant that keeps students on top of assignments, deadlines, and grades."
-        />
-        <meta
-          name="viewport"
-          content="width=device-width, initial-scale=1, viewport-fit=cover"
-        />
+        <title>{SITE_TITLE}</title>
+        <meta name="description" content={SITE_DESCRIPTION} />
+        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
         <meta charSet="utf-8" />
 
         {/* Favicons */}

@@ -7,13 +7,21 @@ import { NAV_LINKS, LOGIN_URL, REGISTER_URL } from "@/lib/site";
 import { trackCTAClick } from "@/utils/analytics";
 import Logo from "./Logo";
 import ButtonLink from "./Button";
+import { CloseIcon, MenuIcon } from "./icons";
 
-const navLinkClasses = (active: boolean) =>
+const NAV_LINK_VARIANTS = {
+  desktop: "rounded-md px-3 py-1.5 text-sm",
+  mobile: "rounded-lg px-3 py-2.5 text-base",
+} as const;
+
+/** Nav-link styling shared by the desktop bar and the mobile dropdown. */
+const navLinkClasses = (active: boolean, variant: keyof typeof NAV_LINK_VARIANTS = "desktop") =>
   cn(
-    "rounded-md px-3 py-1.5 text-sm transition-colors duration-150",
+    NAV_LINK_VARIANTS[variant],
+    "transition-colors duration-150",
     active
       ? "font-semibold text-stone-900"
-      : "font-medium text-stone-600 hover:bg-stone-100 hover:text-stone-900"
+      : "font-medium text-stone-600 hover:bg-stone-100 hover:text-stone-900",
   );
 
 export default function Header() {
@@ -57,7 +65,7 @@ export default function Header() {
     <header
       className={cn(
         "pt-safe-only fixed inset-x-0 top-0 z-50 bg-white/85 backdrop-blur-md transition-shadow duration-200",
-        scrolled && "shadow-[0_1px_12px_rgb(28_25_23/0.08)]"
+        scrolled && "shadow-[0_1px_12px_rgb(28_25_23/0.08)]",
       )}
     >
       {/* Three-zone layout: logo far left, page nav centered, auth far right */}
@@ -67,10 +75,7 @@ export default function Header() {
         </div>
 
         {/* Centered page navigation */}
-        <nav
-          className="col-start-2 hidden items-center gap-1 md:flex"
-          aria-label="Main"
-        >
+        <nav className="col-start-2 hidden items-center gap-1 md:flex" aria-label="Main">
           {NAV_LINKS.map((link) => (
             <Link
               key={link.href}
@@ -92,11 +97,7 @@ export default function Header() {
           >
             Login
           </Link>
-          <ButtonLink
-            href={REGISTER_URL}
-            trackLabel="Get Started - Header"
-            className="ml-2"
-          >
+          <ButtonLink href={REGISTER_URL} trackLabel="Get Started - Header" className="ml-2">
             Get started
           </ButtonLink>
         </div>
@@ -110,22 +111,7 @@ export default function Header() {
             onClick={() => setMobileMenuOpen((open) => !open)}
             className="rounded-md p-2 text-stone-600 transition-colors duration-150 hover:bg-stone-100 hover:text-stone-900"
           >
-            <svg
-              className="h-5 w-5"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth={2}
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              viewBox="0 0 24 24"
-              aria-hidden="true"
-            >
-              {mobileMenuOpen ? (
-                <path d="M6 18L18 6M6 6l12 12" />
-              ) : (
-                <path d="M4 6h16M4 12h16M4 18h16" />
-              )}
-            </svg>
+            {mobileMenuOpen ? <CloseIcon className="h-5 w-5" /> : <MenuIcon className="h-5 w-5" />}
           </button>
 
           <AnimatePresence>
@@ -145,12 +131,7 @@ export default function Header() {
                       href={link.href}
                       onClick={() => setMobileMenuOpen(false)}
                       aria-current={isActive(link.href) ? "page" : undefined}
-                      className={cn(
-                        "rounded-lg px-3 py-2.5 text-base transition-colors duration-150",
-                        isActive(link.href)
-                          ? "font-semibold text-stone-900"
-                          : "font-medium text-stone-600 hover:bg-stone-100 hover:text-stone-900"
-                      )}
+                      className={navLinkClasses(isActive(link.href), "mobile")}
                     >
                       {link.label}
                     </Link>
@@ -164,7 +145,7 @@ export default function Header() {
                       trackCTAClick("Login - Mobile Menu", LOGIN_URL);
                       setMobileMenuOpen(false);
                     }}
-                    className="rounded-lg px-3 py-2.5 text-base font-medium text-stone-600 transition-colors duration-150 hover:bg-stone-100 hover:text-stone-900"
+                    className={navLinkClasses(false, "mobile")}
                   >
                     Login
                   </Link>

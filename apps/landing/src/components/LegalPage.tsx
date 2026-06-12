@@ -4,7 +4,7 @@ import Reveal from "./Reveal";
 import TextLink from "./TextLink";
 
 /** Anchor id for a section title, shared by LegalSection and the TOC. */
-export function slugify(title: string) {
+function slugify(title: string) {
   return title
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
@@ -35,7 +35,13 @@ export function Callout({ title, children }: { title: string; children: React.Re
   );
 }
 
-export function LegalSection({ title, children }: { title: string; children: React.ReactNode }) {
+/** A titled block of legal copy; pages declare these in a SECTIONS array. */
+export interface LegalSectionData {
+  title: string;
+  body: React.ReactNode;
+}
+
+function LegalSection({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <section id={slugify(title)} className="mb-12 scroll-mt-28 last:mb-0">
       <h2 className="mb-4 text-xl font-semibold tracking-tight text-stone-900 sm:text-2xl">
@@ -46,19 +52,23 @@ export function LegalSection({ title, children }: { title: string; children: Rea
   );
 }
 
-interface SummaryColumn {
-  entries: { heading: string; text: string }[];
+interface SummaryEntry {
+  heading: string;
+  text: string;
 }
 
-/** "Quick summary" two-column box at the top of each legal page. */
-export function QuickSummary({ columns }: { columns: SummaryColumn[] }) {
+/** "Quick summary" box at the top of each legal page; entries split into two columns. */
+export function QuickSummary({ entries }: { entries: SummaryEntry[] }) {
+  const midpoint = Math.ceil(entries.length / 2);
+  const columns = [entries.slice(0, midpoint), entries.slice(midpoint)];
+
   return (
     <div className="mb-12 rounded-xl bg-stone-50 p-6 md:p-8">
       <h2 className="mb-4 text-xl font-semibold text-stone-900">Quick summary</h2>
       <div className="grid gap-6 text-sm md:grid-cols-2">
         {columns.map((column, index) => (
           <div key={index} className="space-y-3">
-            {column.entries.map((entry) => (
+            {column.map((entry) => (
               <div key={entry.heading}>
                 <h4 className="mb-1 font-semibold text-stone-900">{entry.heading}</h4>
                 <p className="text-stone-600">{entry.text}</p>
@@ -87,9 +97,10 @@ interface LegalPageProps {
   title: string;
   subtitle: string;
   lastUpdated: string;
-  /** Section titles, in order, for the "On this page" sidebar. */
-  toc: string[];
-  children: React.ReactNode;
+  /** The page's sections, in order; the "On this page" sidebar derives from their titles. */
+  sections: LegalSectionData[];
+  /** Rendered above the sections (e.g. the QuickSummary box). */
+  children?: React.ReactNode;
 }
 
 /** Document-style shell for the Privacy Policy and Terms of Service pages. */
@@ -99,7 +110,7 @@ export default function LegalPage({
   title,
   subtitle,
   lastUpdated,
-  toc,
+  sections,
   children,
 }: LegalPageProps) {
   return (
@@ -124,13 +135,13 @@ export default function LegalPage({
             <nav aria-label="On this page" className="sticky top-28">
               <h2 className="text-sm font-semibold text-stone-900">On this page</h2>
               <ul className="mt-3 space-y-2.5">
-                {toc.map((sectionTitle) => (
-                  <li key={sectionTitle}>
+                {sections.map((section) => (
+                  <li key={section.title}>
                     <a
-                      href={`#${slugify(sectionTitle)}`}
+                      href={`#${slugify(section.title)}`}
                       className="text-sm leading-snug text-stone-500 transition-colors duration-150 hover:text-stone-900"
                     >
-                      {sectionTitle}
+                      {section.title}
                     </a>
                   </li>
                 ))}
@@ -138,7 +149,14 @@ export default function LegalPage({
             </nav>
           </aside>
 
-          <div className="max-w-3xl">{children}</div>
+          <div className="max-w-3xl">
+            {children}
+            {sections.map((section) => (
+              <LegalSection key={section.title} title={section.title}>
+                {section.body}
+              </LegalSection>
+            ))}
+          </div>
         </Reveal>
       </Container>
     </Layout>

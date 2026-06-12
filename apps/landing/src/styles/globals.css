@@ -63,7 +63,9 @@
  * Custom utilities
  * ------------------------------------------------------------------------- */
 
-/* Offsets page content below the fixed header, including notched devices */
+/* Offsets page content below the fixed header, including notched devices.
+   7rem = the 4rem header bar (h-16 in Header.tsx) + 3rem breathing room;
+   keep in sync if the header height ever changes. */
 @utility pt-page {
   padding-top: calc(7rem + env(safe-area-inset-top, 0px));
 }
@@ -74,8 +76,8 @@
 
 /* Tints the monochrome SVG logo to primary-600 */
 @utility filter-primary {
-  filter: brightness(0) saturate(100%) invert(60%) sepia(95%) saturate(1342%)
-    hue-rotate(0deg) brightness(97%) contrast(95%);
+  filter: brightness(0) saturate(100%) invert(60%) sepia(95%) saturate(1342%) hue-rotate(0deg)
+    brightness(97%) contrast(95%);
 }
 
 /* ---------------------------------------------------------------------------

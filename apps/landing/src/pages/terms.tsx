@@ -2,12 +2,12 @@ import LegalPage, {
   BulletList,
   Callout,
   EmailContactCard,
-  LegalSection,
   QuickSummary,
+  type LegalSectionData,
 } from "@/components/LegalPage";
 import { CONTACT_EMAIL } from "@/lib/site";
 
-const SECTIONS: { title: string; body: React.ReactNode }[] = [
+const SECTIONS: LegalSectionData[] = [
   {
     title: "Agreement to Terms",
     body: (
@@ -18,9 +18,9 @@ const SECTIONS: { title: string; body: React.ReactNode }[] = [
           Protection and Electronic Documents Act (PIPEDA) and the Copyright Act of Canada.
         </p>
         <p>
-          You must be at least 13 years old to use Asetta. If you are under the age of majority
-          in your province or territory, you confirm that a parent or guardian has reviewed and
-          agreed to these terms on your behalf.
+          You must be at least 13 years old to use Asetta. If you are under the age of majority in
+          your province or territory, you confirm that a parent or guardian has reviewed and agreed
+          to these terms on your behalf.
         </p>
       </>
     ),
@@ -63,8 +63,8 @@ const SECTIONS: { title: string; body: React.ReactNode }[] = [
     body: (
       <>
         <p>
-          By using our website, you consent to our collection of analytics data through cookies
-          and similar technologies:
+          By using our website, you consent to our collection of analytics data through cookies and
+          similar technologies:
         </p>
         <BulletList
           items={[
@@ -90,8 +90,8 @@ const SECTIONS: { title: string; body: React.ReactNode }[] = [
       <>
         <p>
           When uploading course outlines, you confirm you have permission under Canada's Copyright
-          Act fair dealing provisions for educational purposes. If content is reported for
-          copyright infringement:
+          Act fair dealing provisions for educational purposes. If content is reported for copyright
+          infringement:
         </p>
         <BulletList
           items={[
@@ -152,10 +152,10 @@ const SECTIONS: { title: string; body: React.ReactNode }[] = [
     title: "Termination",
     body: (
       <p>
-        You may stop using Asetta and delete your account at any time from your account settings.
-        We may suspend or terminate accounts that violate these terms, after reasonable notice
-        where practical. Sections covering content ownership, liability limits, and governing law
-        survive termination.
+        You may stop using Asetta and delete your account at any time from your account settings. We
+        may suspend or terminate accounts that violate these terms, after reasonable notice where
+        practical. Sections covering content ownership, liability limits, and governing law survive
+        termination.
       </p>
     ),
   },
@@ -192,42 +192,28 @@ export default function TermsPage() {
       title="Terms of Service"
       subtitle="Please read these terms carefully. By using Asetta, you agree to be bound by them."
       lastUpdated="June 11, 2026"
-      toc={SECTIONS.map((section) => section.title)}
+      sections={SECTIONS}
     >
       <QuickSummary
-        columns={[
+        entries={[
           {
-            entries: [
-              {
-                heading: "Your responsibilities",
-                text: "Only upload course outlines you have permission to use; consent to analytics",
-              },
-              {
-                heading: "What you own",
-                text: "Your academic content; we own the platform",
-              },
-            ],
+            heading: "Your responsibilities",
+            text: "Only upload course outlines you have permission to use; consent to analytics",
           },
           {
-            entries: [
-              {
-                heading: "Our responsibility",
-                text: "Provide the service; no guarantees on AI accuracy",
-              },
-              {
-                heading: "Academic use",
-                text: "For organization only, not completing academic work",
-              },
-            ],
+            heading: "What you own",
+            text: "Your academic content; we own the platform",
+          },
+          {
+            heading: "Our responsibility",
+            text: "Provide the service; no guarantees on AI accuracy",
+          },
+          {
+            heading: "Academic use",
+            text: "For organization only, not completing academic work",
           },
         ]}
       />
-
-      {SECTIONS.map((section) => (
-        <LegalSection key={section.title} title={section.title}>
-          {section.body}
-        </LegalSection>
-      ))}
     </LegalPage>
   );
 }

@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import Image from "next/image";
+import { CloseIcon } from "./icons";
 
 interface ImageModalProps {
   isOpen: boolean;
@@ -37,7 +38,11 @@ export default function ImageModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center" role="dialog" aria-modal="true">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center"
+      role="dialog"
+      aria-modal="true"
+    >
       {/* Backdrop */}
       <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={onClose} />
 
@@ -47,16 +52,7 @@ export default function ImageModal({
           aria-label="Close image preview"
           className="fixed right-4 top-4 z-30 rounded-full bg-black/50 p-3 text-white backdrop-blur-sm transition-colors duration-150 hover:bg-black/70"
         >
-          <svg
-            className="h-6 w-6"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth={2}
-            viewBox="0 0 24 24"
-            aria-hidden="true"
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-          </svg>
+          <CloseIcon className="h-6 w-6" />
         </button>
 
         <div className="relative overflow-hidden rounded-2xl bg-white shadow-2xl">

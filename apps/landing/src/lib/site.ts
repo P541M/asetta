@@ -4,6 +4,11 @@ export const APP_URL = "https://asetta.me";
 export const REGISTER_URL = `${APP_URL}/register`;
 export const LOGIN_URL = `${APP_URL}/login`;
 
+// Default document title and meta description (_app fallback and home page).
+export const SITE_TITLE = "Asetta | Always ahead, never behind";
+export const SITE_DESCRIPTION =
+  "Asetta is a free, AI-powered academic assistant that keeps students on top of assignments, deadlines, and grades.";
+
 export const CONTACT_EMAIL = "videna.psalmeleazar@gmail.com";
 export const LINKEDIN_URL = "https://www.linkedin.com/company/asetta/";
 

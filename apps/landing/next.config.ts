@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import { LOGIN_URL, REGISTER_URL } from "./src/lib/site";
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
@@ -7,12 +8,12 @@ const nextConfig: NextConfig = {
       // Auth lives on the main application; bounce auth routes there.
       {
         source: "/login",
-        destination: "https://asetta.me/login",
+        destination: LOGIN_URL,
         permanent: true,
       },
       {
         source: "/register",
-        destination: "https://asetta.me/register",
+        destination: REGISTER_URL,
         permanent: true,
       },
       // Former narrative pages, merged into /about.

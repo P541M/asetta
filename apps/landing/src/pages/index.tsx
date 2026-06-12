@@ -5,20 +5,18 @@ import FeatureGrid from "@/components/FeatureGrid";
 import Layout from "@/components/Layout";
 import Reveal from "@/components/Reveal";
 import SectionHeading from "@/components/SectionHeading";
+import { ChevronsLeftRightIcon } from "@/components/icons";
 import {
   ImageComparison,
   ImageComparisonImage,
   ImageComparisonSlider,
 } from "@/components/ui/image-comparison";
 import { CHALLENGES, HOME_FEATURES } from "@/lib/features";
-import { REGISTER_URL } from "@/lib/site";
+import { REGISTER_URL, SITE_DESCRIPTION, SITE_TITLE } from "@/lib/site";
 
 export default function LandingPage() {
   return (
-    <Layout
-      title="Asetta | Always ahead, never behind"
-      description="Asetta is a free, AI-powered academic assistant that keeps students on top of assignments, deadlines, and grades."
-    >
+    <Layout title={SITE_TITLE} description={SITE_DESCRIPTION}>
       {/* Hero: tagline up top, product visible in the first viewport */}
       <section className="pb-24 md:pb-32">
         <Container>
@@ -28,8 +26,8 @@ export default function LandingPage() {
             </h1>
 
             <p className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-stone-600 md:text-xl">
-              Asetta is a free, AI-powered academic assistant that keeps you on top of
-              assignments, deadlines, and grades.
+              Asetta is a free, AI-powered academic assistant that keeps you on top of assignments,
+              deadlines, and grades.
             </p>
 
             <div className="mt-9 flex items-center justify-center gap-2">
@@ -75,16 +73,7 @@ export default function LandingPage() {
                 />
                 <ImageComparisonSlider className="bg-white shadow-sm">
                   <div className="absolute left-1/2 top-1/2 flex h-8 w-8 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-stone-200 bg-white shadow-md">
-                    <svg
-                      className="h-4 w-4 text-stone-400"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth={2}
-                      viewBox="0 0 24 24"
-                      aria-hidden="true"
-                    >
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M8 9l-3 3 3 3m8-6l3 3-3 3" />
-                    </svg>
+                    <ChevronsLeftRightIcon className="h-4 w-4 text-stone-400" />
                   </div>
                 </ImageComparisonSlider>
               </ImageComparison>

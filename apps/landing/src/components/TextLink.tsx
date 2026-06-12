@@ -16,7 +16,7 @@ export default function TextLink({ href, children, className }: TextLinkProps) {
       {...(external && { target: "_blank", rel: "noopener noreferrer" })}
       className={cn(
         "font-medium text-stone-900 underline underline-offset-4 transition-colors duration-150 hover:text-primary-700",
-        className
+        className,
       )}
     >
       {children}

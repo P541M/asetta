@@ -2,13 +2,13 @@ import LegalPage, {
   BulletList,
   Callout,
   EmailContactCard,
-  LegalSection,
   QuickSummary,
+  type LegalSectionData,
 } from "@/components/LegalPage";
 import TextLink from "@/components/TextLink";
 import { CONTACT_EMAIL } from "@/lib/site";
 
-const SECTIONS: { title: string; body: React.ReactNode }[] = [
+const SECTIONS: LegalSectionData[] = [
   {
     title: "Our Privacy Commitment",
     body: (
@@ -24,7 +24,9 @@ const SECTIONS: { title: string; body: React.ReactNode }[] = [
     title: "Information We Collect",
     body: (
       <>
-        <p>We collect only the information necessary to provide our academic management services:</p>
+        <p>
+          We collect only the information necessary to provide our academic management services:
+        </p>
         <BulletList
           items={[
             "Your name and email address for account creation",
@@ -97,8 +99,8 @@ const SECTIONS: { title: string; body: React.ReactNode }[] = [
           Cookies & tracking technologies
         </h3>
         <p>
-          Google Analytics uses cookies and similar technologies to collect this information.
-          These are small files stored on your device that help us:
+          Google Analytics uses cookies and similar technologies to collect this information. These
+          are small files stored on your device that help us:
         </p>
         <BulletList
           items={[
@@ -125,9 +127,9 @@ const SECTIONS: { title: string; body: React.ReactNode }[] = [
 
         <Callout title="Legal basis for analytics">
           <p>
-            We collect analytics data based on our legitimate interest in improving our website
-            and services. This is permitted under GDPR Article 6(1)(f) and similar privacy laws.
-            You can opt-out at any time using the methods above.
+            We collect analytics data based on our legitimate interest in improving our website and
+            services. This is permitted under GDPR Article 6(1)(f) and similar privacy laws. You can
+            opt-out at any time using the methods above.
           </p>
         </Callout>
       </>
@@ -160,9 +162,9 @@ const SECTIONS: { title: string; body: React.ReactNode }[] = [
         Your data is stored with our service providers (Google Firebase and Google Cloud), whose
         servers may be located outside of Canada, including in the United States. While your
         information is outside Canada, it is subject to the laws of those jurisdictions and may be
-        accessible to the courts and authorities there. We use providers with strong contractual
-        and technical safeguards, and by using Asetta you acknowledge this cross-border storage
-        and processing.
+        accessible to the courts and authorities there. We use providers with strong contractual and
+        technical safeguards, and by using Asetta you acknowledge this cross-border storage and
+        processing.
       </p>
     ),
   },
@@ -271,42 +273,28 @@ export default function PrivacyPage() {
       title="Privacy Policy"
       subtitle="How we collect, use, and protect your personal information."
       lastUpdated="June 11, 2026"
-      toc={SECTIONS.map((section) => section.title)}
+      sections={SECTIONS}
     >
       <QuickSummary
-        columns={[
+        entries={[
           {
-            entries: [
-              {
-                heading: "What we collect",
-                text: "Name, email, course outlines, academic data, usage information, website analytics",
-              },
-              {
-                heading: "How we use it",
-                text: "AI processing, deadline notifications, platform improvements",
-              },
-            ],
+            heading: "What we collect",
+            text: "Name, email, course outlines, academic data, usage information, website analytics",
           },
           {
-            entries: [
-              {
-                heading: "Your rights",
-                text: "Access, correct, delete data; control AI processing; opt-out of analytics",
-              },
-              {
-                heading: "Security",
-                text: "Encrypted storage, secure authentication, Google Cloud",
-              },
-            ],
+            heading: "How we use it",
+            text: "AI processing, deadline notifications, platform improvements",
+          },
+          {
+            heading: "Your rights",
+            text: "Access, correct, delete data; control AI processing; opt-out of analytics",
+          },
+          {
+            heading: "Security",
+            text: "Encrypted storage, secure authentication, Google Cloud",
           },
         ]}
       />
-
-      {SECTIONS.map((section) => (
-        <LegalSection key={section.title} title={section.title}>
-          {section.body}
-        </LegalSection>
-      ))}
     </LegalPage>
   );
 }

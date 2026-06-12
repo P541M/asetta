@@ -11,7 +11,6 @@ interface LayoutProps {
 /**
  * Page shell shared by every route: document head, floating header, footer,
  * and a main area padded below the header (notch-safe via .pt-page).
- * `main` is relative so page-level glow backdrops can span the full width.
  */
 export default function Layout({ title, description, children }: LayoutProps) {
   return (

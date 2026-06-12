@@ -1,64 +1,88 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import nodemailer, { Transporter } from "nodemailer";
+import nodemailer, { type Transporter } from "nodemailer";
+import type { ContactFormPayload } from "@/lib/contact";
 import { CONTACT_EMAIL } from "@/lib/site";
 
-type ContactFormData = {
-  name: string;
-  email: string;
-  message: string;
-  emailConsent: boolean;
-};
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
+const MAX_NAME_LENGTH = 200;
+const MAX_EMAIL_LENGTH = 320;
+const MAX_MESSAGE_LENGTH = 5000;
+
+/** Escapes user-supplied text before it is interpolated into the HTML email body. */
+function escapeHtml(value: string): string {
+  return value
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
+}
+
+// Reused across requests for the lifetime of the serverless instance.
+let transporter: Transporter | undefined;
+
+function getTransporter(): Transporter {
+  transporter ??= nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS,
+    },
+  });
+  return transporter;
+}
+
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "POST") {
     return res.status(405).json({ message: "Method not allowed" });
   }
 
-  const { name, email, message, emailConsent } = req.body as ContactFormData;
-
-  if (!name || !email || !message) {
-    return res.status(400).json({ message: "Missing required fields" });
-  }
-
-  // CASL Compliance Check
-  if (!emailConsent) {
-    return res.status(400).json({ 
-      message: "Email consent is required under Canada's Anti-Spam Legislation (CASL) to process this inquiry." 
-    });
-  }
-
-  // Validate email format
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailRegex.test(email)) {
-    return res.status(400).json({ message: "Invalid email format" });
-  }
-
-  let transporter: Transporter;
-  try {
-    // Create a transporter using Gmail
-    transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
-      },
-    });
-
-    // Verify transporter configuration
-    await transporter.verify();
-  } catch (error) {
-    console.error("Error creating email transporter:", error);
+  if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+    console.error("Contact form: EMAIL_USER and EMAIL_PASS must be configured");
     return res.status(500).json({
       message: "Failed to initialize email service. Please try again later.",
     });
   }
 
+  const { name, email, message, emailConsent } = (req.body ?? {}) as ContactFormPayload;
+
+  if (
+    typeof name !== "string" ||
+    typeof email !== "string" ||
+    typeof message !== "string" ||
+    !name.trim() ||
+    !email.trim() ||
+    !message.trim()
+  ) {
+    return res.status(400).json({ message: "Missing required fields" });
+  }
+
+  if (
+    name.length > MAX_NAME_LENGTH ||
+    email.length > MAX_EMAIL_LENGTH ||
+    message.length > MAX_MESSAGE_LENGTH
+  ) {
+    return res.status(400).json({ message: "Submission is too long" });
+  }
+
+  // CASL Compliance Check
+  if (!emailConsent) {
+    return res.status(400).json({
+      message:
+        "Email consent is required under Canada's Anti-Spam Legislation (CASL) to process this inquiry.",
+    });
+  }
+
+  if (!EMAIL_REGEX.test(email)) {
+    return res.status(400).json({ message: "Invalid email format" });
+  }
+
+  const ipAddress = String(req.headers["x-forwarded-for"] || req.socket.remoteAddress || "Unknown");
+  const userAgent = req.headers["user-agent"] || "Unknown";
+
   try {
-    // Send email
-    await transporter.sendMail({
+    await getTransporter().sendMail({
       from: process.env.EMAIL_USER,
       to: CONTACT_EMAIL,
       subject: `New Contact Form Submission from ${name}`,
@@ -71,7 +95,7 @@ Message: ${message}
 
 CASL Compliance: User provided explicit consent for email communications.
 Submission Date: ${new Date().toISOString()}
-IP Address: ${req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'Unknown'}
+IP Address: ${ipAddress}
       `,
       html: `
 <h2>New Contact Form Submission</h2>
@@ -79,16 +103,16 @@ IP Address: ${req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'Unk
   <p><strong>✅ CASL Compliant Submission</strong></p>
   <p style="font-size: 12px;">User provided explicit consent for email communications as required by Canada's Anti-Spam Legislation.</p>
 </div>
-<p><strong>Name:</strong> ${name}</p>
-<p><strong>Email:</strong> ${email}</p>
+<p><strong>Name:</strong> ${escapeHtml(name)}</p>
+<p><strong>Email:</strong> ${escapeHtml(email)}</p>
 <p><strong>Message:</strong></p>
-<p style="background-color: #f5f5f5; padding: 10px; border-radius: 5px;">${message}</p>
+<p style="background-color: #f5f5f5; padding: 10px; border-radius: 5px;">${escapeHtml(message)}</p>
 <hr>
 <p style="font-size: 12px; color: #666;">
   <strong>Submission Details:</strong><br>
-  Date: ${new Date().toLocaleString('en-CA', { timeZone: 'America/Toronto' })}<br>
-  IP: ${req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'Unknown'}<br>
-  User Agent: ${req.headers['user-agent'] || 'Unknown'}
+  Date: ${new Date().toLocaleString("en-CA", { timeZone: "America/Toronto" })}<br>
+  IP: ${escapeHtml(ipAddress)}<br>
+  User Agent: ${escapeHtml(userAgent)}
 </p>
       `,
     });

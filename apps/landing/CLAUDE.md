@@ -25,14 +25,16 @@ npm run dev      # Start development server (Turbopack)
 npm run build    # Build for production
 npm start        # Start production server
 npm run lint     # Run ESLint (flat config; `next lint` was removed in Next 16)
+npm run format   # Prettier write (printWidth 100; .md files and public/ are ignored)
 ```
 
 ## Project Structure
 
 ### Shared Data (`src/lib/`)
 
-- **`site.ts`**: Single source of truth for external URLs (`REGISTER_URL`, `LOGIN_URL`, `CONTACT_EMAIL`, `LINKEDIN_URL`), header nav links (`NAV_LINKS`), and footer link groups (`FOOTER_LINK_GROUPS`). Add/remove nav entries here, not in components.
+- **`site.ts`**: Single source of truth for external URLs (`REGISTER_URL`, `LOGIN_URL`, `CONTACT_EMAIL`, `LINKEDIN_URL`), default meta strings (`SITE_TITLE`, `SITE_DESCRIPTION`), header nav links (`NAV_LINKS`), and footer link groups (`FOOTER_LINK_GROUPS`). Add/remove nav entries here, not in components. `next.config.ts` imports the auth URLs from here for its redirects.
 - **`features.ts`**: Feature and challenge copy (`FEATURES`, `HOME_FEATURES`, `CHALLENGES`). The home page shows the first three features; the features page shows all six.
+- **`contact.ts`**: `ContactFormPayload`, the contact form's POST contract shared by the contact page and the API route.
 - **`utils.ts`**: `cn()` helper (clsx + tailwind-merge).
 
 ### Components (`src/components/`)
@@ -42,13 +44,14 @@ npm run lint     # Run ESLint (flat config; `next lint` was removed in Next 16)
 - **`TextLink.tsx`**: Standard inline text link (stone underline, warms on hover; auto `target="_blank"` for external URLs).
 - **`Header.tsx`**: Fixed full-bleed nav in a three-zone grid: logo far left, page links dead-center, Login/Get started far right (Notion-style). Scroll-aware hairline, active-route highlighting, working mobile dropdown. Nav items come from `NAV_LINKS` (no "Home" link; the logo links home).
 - **`Footer.tsx`**: Data-driven from `FOOTER_LINK_GROUPS` (Product incl. Login/Get started, Company, Legal) on a stone-50 band; brand block with tagline + LinkedIn, "Ontario, Canada" sign-off. No decorative wordmark (tried and rejected as tacky).
-- **`Button.tsx`**: `ButtonLink` with `primary` (solid amber) / `ghost` (quiet text link) variants, `md`/`lg` sizes, optional arrow icon and analytics `trackLabel`. Also exports `ArrowIcon`.
+- **`Button.tsx`**: `ButtonLink` with `primary` (solid amber) / `ghost` (quiet text link) variants, `md`/`lg` sizes, optional arrow icon and analytics `trackLabel`. Also exports `Button`, the native-button counterpart with identical styling (form submits, in-page actions); never hand-roll button class strings.
+- **`icons.tsx`**: All shared inline SVG icons (`ArrowIcon`, `CloseIcon`, `MenuIcon`, `CheckIcon`, `ZoomInIcon`, `ChevronsLeftRightIcon`, `SpinnerIcon`, `LinkedInIcon`). Add new icons here instead of inlining `<svg>` in components.
 - **`Reveal.tsx`**: Scroll-into-view fade-up wrapper (Motion `whileInView`, respects reduced motion). Use this for entrance animations instead of custom CSS classes.
 - **`PageHero.tsx`** / **`SectionHeading.tsx`**: Heading blocks for page tops (h1) and in-page sections (h2). No badges/eyebrows — title + subtitle only. `SectionHeading` supports `align="split"` (editorial two-column: title left, lead right) used on the home content sections; `center` is for CTAs and symmetric blocks.
 - **`FeatureGrid.tsx`**: Feature card grid with shared click-to-zoom `ImageModal`. Three layouts: `uniform` (equal tiles), `featured` (first tile full-row horizontal; home page), `bento` (alternating wide/narrow spans, wide tiles horizontal; features page).
 - **`ContentSection.tsx`**: Plain prose section (heading + paragraphs) used on the About page.
 - **`CTAPanel.tsx`**: The standardized closing CTA on every page (+ `CTAPanelCard`). Self-contained section that owns its own max-width, surface, and vertical spacing — place it directly under page content, **outside** any narrower content container, so it renders identically everywhere.
-- **`LegalPage.tsx`**: Document-style shell for legal pages — left-aligned header with last-updated date up top, sticky "On this page" sidebar on desktop (anchors via exported `slugify`), plus primitives (`LegalSection`, `BulletList`, `Callout`, `QuickSummary`, `EmailContactCard`). All boxes are neutral stone (no color on legal pages). Pages define a `SECTIONS` array so the TOC derives automatically.
+- **`LegalPage.tsx`**: Document-style shell for legal pages — left-aligned header with last-updated date up top, sticky "On this page" sidebar on desktop, plus primitives (`BulletList`, `Callout`, `QuickSummary`, `EmailContactCard`). All boxes are neutral stone (no color on legal pages). Pages define a `SECTIONS: LegalSectionData[]` array and pass it as the `sections` prop; the shell renders the sections and derives the TOC from their titles. `QuickSummary` takes a flat `entries` list and splits it into two columns itself.
 - **`ImageModal.tsx`**: Full-size image lightbox.
 - **`ui/image-comparison.tsx`**: Draggable before/after slider used for the dashboard preview on the home page.
 
@@ -79,7 +82,7 @@ npm run lint     # Run ESLint (flat config; `next lint` was removed in Next 16)
 ## External Integrations
 
 - **Redirects** (in `next.config.ts`): `/login` → `https://asetta.me/login`, `/register` → `https://asetta.me/register`; legacy `/story` + `/founders-note` → `/about`, `/pricing` → `/` (all permanent)
-- **Analytics**: GA4 component renders only when `NEXT_PUBLIC_GA_MEASUREMENT_ID` is set; helpers in `src/utils/analytics.ts` (`trackCTAClick`, `trackContactFormSubmission`, `trackPageView`)
+- **Analytics**: GA4 component renders only when `NEXT_PUBLIC_GA_MEASUREMENT_ID` is set. Page views (including client-side route changes) are tracked automatically by GA4 Enhanced Measurement (history events enabled on the property June 12, 2026); do not add manual page-view tracking. Helpers in `src/utils/analytics.ts` (`trackCTAClick`, `trackContactFormSubmission`) cover CTA and form events only.
 - **Social**: LinkedIn link in the footer (from `site.ts`)
 
 ## Environment Variables
@@ -94,7 +97,8 @@ npm run lint     # Run ESLint (flat config; `next lint` was removed in Next 16)
 - Content/copy lives in `src/lib/` data files or page JSX; components stay copy-free where practical
 - All internal/external CTAs route through `ButtonLink`; URLs come from `src/lib/site.ts`
 - Entrance animations use `Reveal`; do not add bespoke CSS keyframe utilities
-- Run `npm run lint` and `npm run build` before committing
+- Shared SVG icons live in `src/components/icons.tsx`; native buttons use `Button` from `Button.tsx`
+- Formatting is enforced by Prettier; run `npm run lint`, `npm run format:check`, and `npm run build` before committing
 
 ## Content Strategy
 

@@ -1,21 +1,10 @@
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { trackCTAClick } from "@/utils/analytics";
+import { ArrowIcon } from "./icons";
 
-export function ArrowIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      className={cn("h-4 w-4", className)}
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={2}
-      viewBox="0 0 24 24"
-      aria-hidden="true"
-    >
-      <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-    </svg>
-  );
-}
+const BASE_CLASSES =
+  "group inline-flex items-center justify-center gap-2 rounded-lg font-semibold transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600";
 
 const VARIANT_CLASSES = {
   primary: "bg-primary-600 text-white shadow-xs hover:bg-primary-700",
@@ -28,11 +17,23 @@ const SIZE_CLASSES = {
   lg: "px-5 py-3 text-base",
 } as const;
 
+type ButtonVariant = keyof typeof VARIANT_CLASSES;
+type ButtonSize = keyof typeof SIZE_CLASSES;
+
+/** Class list shared by ButtonLink and Button so links and buttons stay visually identical. */
+function buttonClasses(variant: ButtonVariant, size: ButtonSize, className?: string) {
+  return cn(BASE_CLASSES, VARIANT_CLASSES[variant], SIZE_CLASSES[size], className);
+}
+
+function ArrowAffix() {
+  return <ArrowIcon className="transition-transform duration-150 group-hover:translate-x-0.5" />;
+}
+
 interface ButtonLinkProps {
   href: string;
   children: React.ReactNode;
-  variant?: keyof typeof VARIANT_CLASSES;
-  size?: keyof typeof SIZE_CLASSES;
+  variant?: ButtonVariant;
+  size?: ButtonSize;
   withArrow?: boolean;
   /** When set, clicks are reported to analytics under this label. */
   trackLabel?: string;
@@ -52,17 +53,42 @@ export default function ButtonLink({
     <Link
       href={href}
       onClick={trackLabel ? () => trackCTAClick(trackLabel, href) : undefined}
-      className={cn(
-        "group inline-flex items-center justify-center gap-2 rounded-lg font-semibold transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600",
-        VARIANT_CLASSES[variant],
-        SIZE_CLASSES[size],
-        className
-      )}
+      className={buttonClasses(variant, size, className)}
     >
       {children}
-      {withArrow && (
-        <ArrowIcon className="transition-transform duration-150 group-hover:translate-x-0.5" />
-      )}
+      {withArrow && <ArrowAffix />}
     </Link>
+  );
+}
+
+interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  variant?: ButtonVariant;
+  size?: ButtonSize;
+  withArrow?: boolean;
+}
+
+/** Native-button counterpart of ButtonLink, for form submits and in-page actions. */
+export function Button({
+  variant = "primary",
+  size = "md",
+  withArrow = false,
+  type = "button",
+  className,
+  children,
+  ...rest
+}: ButtonProps) {
+  return (
+    <button
+      type={type}
+      className={buttonClasses(
+        variant,
+        size,
+        cn("disabled:cursor-not-allowed disabled:opacity-70", className),
+      )}
+      {...rest}
+    >
+      {children}
+      {withArrow && <ArrowAffix />}
+    </button>
   );
 }

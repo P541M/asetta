@@ -7,12 +7,7 @@ declare global {
   }
 }
 
-export const trackEvent = (
-  action: string,
-  category: string,
-  label?: string,
-  value?: number
-) => {
+export const trackEvent = (action: string, category: string, label?: string, value?: number) => {
   if (typeof window !== "undefined" && window.gtag) {
     window.gtag("event", action, {
       event_category: category,
@@ -26,21 +21,10 @@ export const trackContactFormSubmission = (success: boolean) => {
   trackEvent(
     success ? "contact_form_success" : "contact_form_error",
     "engagement",
-    success ? "Contact form submitted successfully" : "Contact form submission failed"
+    success ? "Contact form submitted successfully" : "Contact form submission failed",
   );
 };
 
 export const trackCTAClick = (buttonName: string, destination: string) => {
   trackEvent("cta_click", "navigation", `${buttonName} -> ${destination}`);
-};
-
-// Manual page-view tracking for client-side route changes.
-export const trackPageView = (url: string, title?: string) => {
-  const measurementId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
-  if (typeof window !== "undefined" && window.gtag && measurementId) {
-    window.gtag("config", measurementId, {
-      page_path: url,
-      page_title: title,
-    });
-  }
 };
