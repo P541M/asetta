@@ -1,0 +1,16 @@
+# Build output
+.next/
+out/
+build/
+coverage/
+
+# Generated
+package-lock.json
+next-env.d.ts
+tsconfig.tsbuildinfo
+
+# Static assets
+public/
+
+# Prose stays hand-formatted
+*.md

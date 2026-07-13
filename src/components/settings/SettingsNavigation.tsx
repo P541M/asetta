@@ -5,10 +5,7 @@ interface SettingsNavigationProps {
   setActiveTab: (tab: TabType) => void;
 }
 
-const SettingsNavigation = ({
-  activeTab,
-  setActiveTab,
-}: SettingsNavigationProps) => {
+const SettingsNavigation = ({ activeTab, setActiveTab }: SettingsNavigationProps) => {
   return (
     <div className="bg-light-bg-primary dark:bg-dark-bg-secondary rounded-xl p-1 border border-light-border-primary dark:border-dark-border-primary">
       {/* Desktop Navigation */}

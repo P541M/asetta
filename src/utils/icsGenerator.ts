@@ -1,9 +1,6 @@
 import { Assessment } from "../types/assessment";
 
-export function generateICSFile(
-  assessments: Assessment[],
-  semesterName: string
-): string {
+export function generateICSFile(assessments: Assessment[], semesterName: string): string {
   // ICS file header
   const icsContent = [
     "BEGIN:VCALENDAR",
@@ -22,15 +19,9 @@ export function generateICSFile(
 
   // Add each assessment as a VEVENT
   assessments.forEach((assessment) => {
-    const startDateTime = formatICSDateTime(
-      assessment.dueDate,
-      assessment.dueTime
-    );
+    const startDateTime = formatICSDateTime(assessment.dueDate, assessment.dueTime);
     // For simplicity, set the event duration to 1 hour (arbitrary)
-    const endDateTime = formatICSDateTime(
-      assessment.dueDate,
-      incrementHour(assessment.dueTime)
-    );
+    const endDateTime = formatICSDateTime(assessment.dueDate, incrementHour(assessment.dueTime));
     const uid = `${assessment.id}@asetta.app`; // Unique identifier
     const summary = `${assessment.courseName}: ${assessment.assignmentName}`;
     const description = `Weight: ${assessment.weight}%\nStatus: ${assessment.status}`;
@@ -48,7 +39,7 @@ export function generateICSFile(
       "ACTION:DISPLAY",
       "DESCRIPTION:Reminder",
       "END:VALARM",
-      "END:VEVENT"
+      "END:VEVENT",
     );
   });
 
@@ -63,7 +54,5 @@ export function generateICSFile(
 function incrementHour(timeStr: string): string {
   const [hours, minutes] = timeStr.split(":").map(Number);
   const newHours = (hours + 1) % 24;
-  return `${newHours.toString().padStart(2, "0")}:${minutes
-    .toString()
-    .padStart(2, "0")}`;
+  return `${newHours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}`;
 }

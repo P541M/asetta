@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
-import { useOnboarding } from '../../../contexts/OnboardingContext';
-import { StepNavigation } from '../ui/StepNavigation';
-import { OnboardingUploadForm } from '../OnboardingUploadForm';
-import { ExtractionResult } from '../../../types/upload';
+import React, { useState } from "react";
+import { useOnboarding } from "../../../contexts/OnboardingContext";
+import { StepNavigation } from "../ui/StepNavigation";
+import { OnboardingUploadForm } from "../OnboardingUploadForm";
+import { ExtractionResult } from "../../../types/upload";
 
 export function UploadStep() {
   const { state, setUploadComplete } = useOnboarding();
@@ -25,8 +25,18 @@ export function UploadStep() {
       {/* Header */}
       <div className="text-center mb-8">
         <div className="w-16 h-16 bg-light-button-primary/10 dark:bg-dark-button-primary/10 rounded-xl flex items-center justify-center mx-auto mb-4">
-          <svg className="w-8 h-8 text-light-button-primary dark:text-dark-button-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+          <svg
+            className="w-8 h-8 text-light-button-primary dark:text-dark-button-primary"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+            />
           </svg>
         </div>
         <h2 className="text-2xl font-bold text-light-text-primary dark:text-dark-text-primary mb-2">
@@ -54,8 +64,18 @@ export function UploadStep() {
         <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-6 mb-8">
           <div className="flex items-start space-x-3">
             <div className="w-8 h-8 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center flex-shrink-0">
-              <svg className="w-5 h-5 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              <svg
+                className="w-5 h-5 text-green-600 dark:text-green-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M5 13l4 4L19 7"
+                />
               </svg>
             </div>
             <div>
@@ -63,14 +83,15 @@ export function UploadStep() {
                 Upload successful!
               </h4>
               <p className="text-sm text-green-700 dark:text-green-400">
-                Found {state.extractionResults.totalAssessments} assessment(s) from {state.extractionResults.processedFiles} file(s).
+                Found {state.extractionResults.totalAssessments} assessment(s) from{" "}
+                {state.extractionResults.processedFiles} file(s).
               </p>
             </div>
           </div>
         </div>
       )}
 
-      <StepNavigation 
+      <StepNavigation
         canGoNext={state.hasCompletedUpload || hasAttemptedUpload}
         nextLabel={state.hasCompletedUpload ? "Complete Setup" : "Continue without upload"}
         showSkip={!state.hasCompletedUpload && !hasAttemptedUpload}

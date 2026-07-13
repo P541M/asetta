@@ -32,9 +32,7 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
   const dropdownRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
 
-  const selectedOption = value
-    ? options.find((option) => option.value === value)
-    : null;
+  const selectedOption = value ? options.find((option) => option.value === value) : null;
 
   // Size variants
   const sizeClasses = {
@@ -49,10 +47,7 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
   // Close dropdown on outside click
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
-      ) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setIsOpen(false);
         setFocusedIndex(-1);
       }
@@ -76,7 +71,7 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
       setFocusedIndex(-1);
       triggerRef.current?.focus();
     },
-    [onChange]
+    [onChange],
   );
 
   // Handle keyboard navigation
@@ -87,15 +82,11 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
       switch (event.key) {
         case "ArrowDown":
           event.preventDefault();
-          setFocusedIndex((prev) =>
-            prev < options.length - 1 ? prev + 1 : 0
-          );
+          setFocusedIndex((prev) => (prev < options.length - 1 ? prev + 1 : 0));
           break;
         case "ArrowUp":
           event.preventDefault();
-          setFocusedIndex((prev) =>
-            prev > 0 ? prev - 1 : options.length - 1
-          );
+          setFocusedIndex((prev) => (prev > 0 ? prev - 1 : options.length - 1));
           break;
         case "Enter":
           event.preventDefault();
@@ -150,12 +141,14 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
           {selectedOption ? (
             <>
               {selectedOption.icon && (
-                <span className={`flex-shrink-0 ${selectedOption.colorClass || 'text-light-text-primary dark:text-dark-text-primary'}`}>
+                <span
+                  className={`flex-shrink-0 ${selectedOption.colorClass || "text-light-text-primary dark:text-dark-text-primary"}`}
+                >
                   {selectedOption.icon}
                 </span>
               )}
               <span
-                className={`truncate font-medium ${selectedOption.colorClass || 'text-light-text-primary dark:text-dark-text-primary'} min-w-0`}
+                className={`truncate font-medium ${selectedOption.colorClass || "text-light-text-primary dark:text-dark-text-primary"} min-w-0`}
               >
                 {selectedOption.label}
               </span>
@@ -176,22 +169,14 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
           stroke="currentColor"
           viewBox="0 0 24 24"
         >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="2"
-            d="M19 9l-7 7-7-7"
-          />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
         </svg>
       </button>
 
       {/* Dropdown Menu */}
       {isOpen && (
         <div className="absolute z-50 w-full min-w-[160px] mt-1 bg-white dark:bg-dark-bg-tertiary border border-light-border-primary dark:border-dark-border-primary rounded-lg shadow-lg animate-scale-in">
-          <div
-            role="listbox"
-            className="max-h-60 overflow-auto"
-          >
+          <div role="listbox" className="max-h-60 overflow-auto">
             {options.map((option, index) => (
               <button
                 key={option.value}
@@ -203,7 +188,7 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
                   w-full px-3 py-2 text-left flex items-center justify-between min-w-0 transition-colors duration-150 ${textSizeClass}
                   ${
                     value === option.value
-                      ? `${option.bgClass || 'bg-light-button-primary/10 dark:bg-dark-button-primary/20'} ${option.colorClass || 'text-light-button-primary dark:text-dark-button-primary'}`
+                      ? `${option.bgClass || "bg-light-button-primary/10 dark:bg-dark-button-primary/20"} ${option.colorClass || "text-light-button-primary dark:text-dark-button-primary"}`
                       : "hover:bg-light-hover-primary dark:hover:bg-dark-hover-primary"
                   }
                   ${
@@ -215,23 +200,21 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
               >
                 <div className="flex items-center space-x-2 min-w-0 flex-1">
                   {option.icon && (
-                    <span className={`flex-shrink-0 ${option.colorClass || 'text-light-text-primary dark:text-dark-text-primary'}`}>
+                    <span
+                      className={`flex-shrink-0 ${option.colorClass || "text-light-text-primary dark:text-dark-text-primary"}`}
+                    >
                       {option.icon}
                     </span>
                   )}
                   <span
-                    className={`font-medium ${option.colorClass || 'text-light-text-primary dark:text-dark-text-primary'} truncate min-w-0`}
+                    className={`font-medium ${option.colorClass || "text-light-text-primary dark:text-dark-text-primary"} truncate min-w-0`}
                   >
                     {option.label}
                   </span>
                 </div>
                 {value === option.value && (
                   <span className="flex-shrink-0">
-                    <svg
-                      className="w-4 h-4"
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
-                    >
+                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                       <path
                         fillRule="evenodd"
                         d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"

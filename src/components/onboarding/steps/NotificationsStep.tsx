@@ -21,10 +21,7 @@ export function NotificationsStep() {
     }
   }, [formData.notificationDaysBefore]);
 
-  const handleInputChange = (
-    field: string,
-    value: string | boolean | number
-  ) => {
+  const handleInputChange = (field: string, value: string | boolean | number) => {
     const newFormData = { ...formData, [field]: value };
 
     // Auto-sync consent with email notifications
@@ -54,12 +51,12 @@ export function NotificationsStep() {
 
   const handleCustomDaysChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value;
-    
+
     // Allow only digits
     if (inputValue && !/^\d+$/.test(inputValue)) {
       return;
     }
-    
+
     setCustomDays(inputValue ? parseInt(inputValue) : 1);
   };
 
@@ -77,8 +74,7 @@ export function NotificationsStep() {
   };
 
   const canContinue =
-    !formData.emailNotifications ||
-    (formData.emailNotifications && isValidEmail(formData.email));
+    !formData.emailNotifications || (formData.emailNotifications && isValidEmail(formData.email));
 
   return (
     <div className="max-w-2xl mx-auto">
@@ -113,9 +109,8 @@ export function NotificationsStep() {
             Email Notifications
           </h3>
           <p className="mt-1 text-sm text-light-text-secondary dark:text-dark-text-secondary">
-            Receive automated email reminders about upcoming assessment
-            deadlines to help you stay organized and never miss important due
-            dates.
+            Receive automated email reminders about upcoming assessment deadlines to help you stay
+            organized and never miss important due dates.
           </p>
           <div className="mt-3 flex items-center space-x-2 text-xs text-light-text-tertiary dark:text-dark-text-tertiary">
             <svg
@@ -130,20 +125,12 @@ export function NotificationsStep() {
                 clipRule="evenodd"
               />
             </svg>
-            <span>
-              Your email is secure and will only be used for assessment
-              notifications
-            </span>
+            <span>Your email is secure and will only be used for assessment notifications</span>
           </div>
         </div>
         <button
           type="button"
-          onClick={() =>
-            handleInputChange(
-              "emailNotifications",
-              !formData.emailNotifications
-            )
-          }
+          onClick={() => handleInputChange("emailNotifications", !formData.emailNotifications)}
           className={`relative inline-flex h-7 w-14 items-center rounded-full transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-light-button-primary dark:focus:ring-dark-button-primary focus:ring-offset-2 ${
             formData.emailNotifications
               ? "bg-light-button-primary dark:bg-dark-button-primary"
@@ -201,9 +188,7 @@ export function NotificationsStep() {
                       clipRule="evenodd"
                     />
                   </svg>
-                  <span>
-                    Reminder: Notifications might end up in your spam folder
-                  </span>
+                  <span>Reminder: Notifications might end up in your spam folder</span>
                 </div>
               )}
             </div>
@@ -219,11 +204,7 @@ export function NotificationsStep() {
               <div className="relative">
                 <select
                   id="notification-days"
-                  value={
-                    isCustomDays
-                      ? "custom"
-                      : formData.notificationDaysBefore.toString()
-                  }
+                  value={isCustomDays ? "custom" : formData.notificationDaysBefore.toString()}
                   onChange={(e) => handleDaysChange(e.target.value)}
                   className="input appearance-none pr-10"
                 >
@@ -232,9 +213,7 @@ export function NotificationsStep() {
                   <option value="3">3 days before due date (recommended)</option>
                   <option value="7">1 week before due date</option>
                   <option value="custom">
-                    {isCustomDays
-                      ? `Custom (${customDays} days)`
-                      : "Custom timing"}
+                    {isCustomDays ? `Custom (${customDays} days)` : "Custom timing"}
                   </option>
                 </select>
                 <svg
@@ -270,8 +249,7 @@ export function NotificationsStep() {
                     placeholder="Enter number of days (1-30)"
                   />
                   <p className="mt-2 text-sm text-light-text-tertiary dark:text-dark-text-tertiary">
-                    Choose between 1 and 30 days. Notifications will be sent
-                    daily at 9:00 PM.
+                    Choose between 1 and 30 days. Notifications will be sent daily at 9:00 PM.
                   </p>
                 </div>
               )}
@@ -287,9 +265,8 @@ export function NotificationsStep() {
             Stay organized with reminders
           </h4>
           <p className="text-sm text-light-text-tertiary dark:text-dark-text-tertiary max-w-md mx-auto">
-            Enable notifications above to receive reminders about upcoming
-            assessment deadlines. You can always change this later in your
-            settings.
+            Enable notifications above to receive reminders about upcoming assessment deadlines. You
+            can always change this later in your settings.
           </p>
         </div>
       )}

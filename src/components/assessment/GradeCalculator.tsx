@@ -13,7 +13,7 @@ import EmptyState from "../ui/EmptyState";
 interface GradeCalculatorProps {
   semesterId: string;
   selectedCourse: string | null;
-  onAutoSaveStatusChange?: (status: 'idle' | 'saving' | 'saved' | 'error', error?: string) => void;
+  onAutoSaveStatusChange?: (status: "idle" | "saving" | "saved" | "error", error?: string) => void;
 }
 
 interface GradeInfo {
@@ -44,52 +44,50 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
     assessments: fetchedAssessments,
     loading: isLoading,
     error,
-  } = useAssessments(
-    semesterId,
-    selectedCourse ? { courseName: selectedCourse } : {}
-  );
+  } = useAssessments(semesterId, selectedCourse ? { courseName: selectedCourse } : {});
 
   const [assessments, setAssessments] = useState<Assessment[]>([]);
 
   // Prepare data for auto-save (only include modified fields)
-  const assessmentData = useMemo(() => 
-    assessments.map(assessment => ({
-      id: assessment.id,
-      mark: assessment.mark,
-      weight: assessment.weight,
-      status: assessment.status
-    }))
-  , [assessments]);
+  const assessmentData = useMemo(
+    () =>
+      assessments.map((assessment) => ({
+        id: assessment.id,
+        mark: assessment.mark,
+        weight: assessment.weight,
+        status: assessment.status,
+      })),
+    [assessments],
+  );
 
   // Auto-save function
-  const handleAutoSave = useCallback(async (data: typeof assessmentData) => {
-    if (!user || !semesterId) return;
+  const handleAutoSave = useCallback(
+    async (data: typeof assessmentData) => {
+      if (!user || !semesterId) return;
 
-    for (const assessmentUpdate of data) {
-      if (!assessmentUpdate.id) continue;
-      const assessmentRef = getAssessmentDocRef(
-        user.uid,
-        semesterId,
-        assessmentUpdate.id
-      );
-      const mark = assessmentUpdate.mark === undefined ? null : assessmentUpdate.mark;
+      for (const assessmentUpdate of data) {
+        if (!assessmentUpdate.id) continue;
+        const assessmentRef = getAssessmentDocRef(user.uid, semesterId, assessmentUpdate.id);
+        const mark = assessmentUpdate.mark === undefined ? null : assessmentUpdate.mark;
 
-      await updateDoc(assessmentRef, {
-        mark,
-        weight: assessmentUpdate.weight,
-        status: assessmentUpdate.status,
-      });
-    }
+        await updateDoc(assessmentRef, {
+          mark,
+          weight: assessmentUpdate.weight,
+          status: assessmentUpdate.status,
+        });
+      }
 
-    // No need to refetch - local state is already updated optimistically
-    // and represents the correct current state after Firebase update
-  }, [user, semesterId]);
+      // No need to refetch - local state is already updated optimistically
+      // and represents the correct current state after Firebase update
+    },
+    [user, semesterId],
+  );
 
   // Auto-save hook
   const { status: saveStatus, error: saveError } = useAutoSave({
     data: assessmentData,
     onSave: handleAutoSave,
-    enabled: Boolean(user && semesterId)
+    enabled: Boolean(user && semesterId),
   });
 
   // Notify parent of auto-save status changes
@@ -200,30 +198,23 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
 
     setAssessments(sortedAssessments);
 
-    const total = sortedAssessments.reduce(
-      (sum, assessment) => sum + assessment.weight,
-      0
-    );
+    const total = sortedAssessments.reduce((sum, assessment) => sum + assessment.weight, 0);
     setTotalWeight(total);
 
     const completedAssessments = sortedAssessments.filter(
-      (a) => ["Submitted", "Missed"].includes(a.status) && a.mark !== null && a.mark !== undefined
+      (a) => ["Submitted", "Missed"].includes(a.status) && a.mark !== null && a.mark !== undefined,
     );
 
     if (completedAssessments.length > 0) {
       const weightedSum = completedAssessments.reduce((sum, assessment) => {
-        if (assessment.mark === null || assessment.mark === undefined)
-          return sum;
+        if (assessment.mark === null || assessment.mark === undefined) return sum;
         return sum + (assessment.mark * assessment.weight) / 100;
       }, 0);
       const completedWeight = completedAssessments.reduce((sum, assessment) => {
-        if (assessment.mark === null || assessment.mark === undefined)
-          return sum;
+        if (assessment.mark === null || assessment.mark === undefined) return sum;
         return sum + assessment.weight;
       }, 0);
-      setCurrentGrade(
-        completedWeight > 0 ? (weightedSum / completedWeight) * 100 : 0
-      );
+      setCurrentGrade(completedWeight > 0 ? (weightedSum / completedWeight) * 100 : 0);
     } else {
       setCurrentGrade(null);
     }
@@ -234,43 +225,31 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
 
     setAssessments((prevAssessments) =>
       prevAssessments.map((assessment) =>
-        assessment.id === assessmentId
-          ? { ...assessment, mark, status: "Submitted" }
-          : assessment
-      )
+        assessment.id === assessmentId ? { ...assessment, mark, status: "Submitted" } : assessment,
+      ),
     );
 
     recalculateGrade(
       assessments.map((assessment) =>
-        assessment.id === assessmentId
-          ? { ...assessment, mark, status: "Submitted" }
-          : assessment
-      )
+        assessment.id === assessmentId ? { ...assessment, mark, status: "Submitted" } : assessment,
+      ),
     );
   };
 
   const handleWeightChange = (assessmentId: string, value: string) => {
-    const newWeight =
-      value === "" ? 0 : Math.min(100, Math.max(0, parseFloat(value) || 0));
+    const newWeight = value === "" ? 0 : Math.min(100, Math.max(0, parseFloat(value) || 0));
 
     setAssessments((prevAssessments) =>
       prevAssessments.map((assessment) =>
-        assessment.id === assessmentId
-          ? { ...assessment, weight: newWeight }
-          : assessment
-      )
+        assessment.id === assessmentId ? { ...assessment, weight: newWeight } : assessment,
+      ),
     );
 
     const updatedAssessments = assessments.map((assessment) =>
-      assessment.id === assessmentId
-        ? { ...assessment, weight: newWeight }
-        : assessment
+      assessment.id === assessmentId ? { ...assessment, weight: newWeight } : assessment,
     );
 
-    const total = updatedAssessments.reduce(
-      (sum, assessment) => sum + assessment.weight,
-      0
-    );
+    const total = updatedAssessments.reduce((sum, assessment) => sum + assessment.weight, 0);
     setTotalWeight(total);
 
     recalculateGrade(updatedAssessments);
@@ -278,77 +257,80 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
 
   const recalculateGrade = (updatedAssessments: Assessment[]) => {
     const completedAssessments = updatedAssessments.filter(
-      (a) => ["Submitted", "Missed"].includes(a.status) && a.mark !== null && a.mark !== undefined
+      (a) => ["Submitted", "Missed"].includes(a.status) && a.mark !== null && a.mark !== undefined,
     );
 
     if (completedAssessments.length > 0) {
       const weightedSum = completedAssessments.reduce((sum, assessment) => {
-        if (assessment.mark === null || assessment.mark === undefined)
-          return sum;
+        if (assessment.mark === null || assessment.mark === undefined) return sum;
         return sum + (assessment.mark * assessment.weight) / 100;
       }, 0);
       const completedWeight = completedAssessments.reduce((sum, assessment) => {
-        if (assessment.mark === null || assessment.mark === undefined)
-          return sum;
+        if (assessment.mark === null || assessment.mark === undefined) return sum;
         return sum + assessment.weight;
       }, 0);
-      setCurrentGrade(
-        completedWeight > 0 ? (weightedSum / completedWeight) * 100 : 0
-      );
+      setCurrentGrade(completedWeight > 0 ? (weightedSum / completedWeight) * 100 : 0);
     }
   };
 
   const calculateRequiredGrade = () => {
     if (!coursePreferences) return null;
-    
+
     const completedAssessments = assessments.filter(
-      (a) => ["Submitted", "Missed"].includes(a.status) && a.mark !== null && a.mark !== undefined
+      (a) => ["Submitted", "Missed"].includes(a.status) && a.mark !== null && a.mark !== undefined,
     );
     const remainingAssessments = assessments.filter(
-      (a) => !["Submitted", "Missed"].includes(a.status) || a.mark === null || a.mark === undefined
+      (a) => !["Submitted", "Missed"].includes(a.status) || a.mark === null || a.mark === undefined,
     );
 
     if (remainingAssessments.length === 0) return null;
 
-    const currentWeightedSum = completedAssessments.reduce(
-      (sum, assessment) => {
-        if (assessment.mark === null || assessment.mark === undefined)
-          return sum;
-        return sum + (assessment.mark * assessment.weight) / 100;
-      },
-      0
-    );
+    const currentWeightedSum = completedAssessments.reduce((sum, assessment) => {
+      if (assessment.mark === null || assessment.mark === undefined) return sum;
+      return sum + (assessment.mark * assessment.weight) / 100;
+    }, 0);
 
     const remainingWeight = remainingAssessments.reduce(
       (sum, assessment) => sum + assessment.weight,
-      0
+      0,
     );
     const targetWeightedSum = (coursePreferences.targetGrade * totalWeight) / 100;
     const requiredWeightedSum = targetWeightedSum - currentWeightedSum;
 
-    return remainingWeight > 0
-      ? (requiredWeightedSum / remainingWeight) * 100
-      : 0;
+    return remainingWeight > 0 ? (requiredWeightedSum / remainingWeight) * 100 : 0;
   };
-
 
   const getAssessmentStatus = (assessment: Assessment) => {
     const now = new Date();
     const dueDate = new Date(`${assessment.dueDate}T${assessment.dueTime}`);
 
     if (assessment.status === "Submitted") {
-      return { icon: "✓", color: "text-light-status-submitted-text dark:text-dark-status-submitted-text", bgColor: "bg-light-status-submitted-bg dark:bg-dark-status-submitted-bg" };
+      return {
+        icon: "✓",
+        color: "text-light-status-submitted-text dark:text-dark-status-submitted-text",
+        bgColor: "bg-light-status-submitted-bg dark:bg-dark-status-submitted-bg",
+      };
     } else if (dueDate < now) {
-      return { icon: "!", color: "text-light-status-overdue-text dark:text-dark-status-overdue-text", bgColor: "bg-light-status-overdue-bg dark:bg-dark-status-overdue-bg" };
+      return {
+        icon: "!",
+        color: "text-light-status-overdue-text dark:text-dark-status-overdue-text",
+        bgColor: "bg-light-status-overdue-bg dark:bg-dark-status-overdue-bg",
+      };
     } else {
-      return { icon: "○", color: "text-light-status-pending-text dark:text-dark-status-pending-text", bgColor: "bg-light-status-pending-bg dark:bg-dark-status-pending-bg" };
+      return {
+        icon: "○",
+        color: "text-light-status-pending-text dark:text-dark-status-pending-text",
+        bgColor: "bg-light-status-pending-bg dark:bg-dark-status-pending-bg",
+      };
     }
   };
 
   const getProgressBarColor = (percentage: number) => {
-    if (percentage >= 85) return "bg-light-performance-excellent-bg dark:bg-dark-performance-excellent-bg";
+    if (percentage >= 85)
+      return "bg-light-performance-excellent-bg dark:bg-dark-performance-excellent-bg";
     if (percentage >= 70) return "bg-light-performance-good-bg dark:bg-dark-performance-good-bg";
-    if (percentage >= 60) return "bg-light-performance-average-bg dark:bg-dark-performance-average-bg";
+    if (percentage >= 60)
+      return "bg-light-performance-average-bg dark:bg-dark-performance-average-bg";
     return "bg-light-performance-poor-bg dark:bg-dark-performance-poor-bg";
   };
 
@@ -393,18 +375,21 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
     return <ErrorMessage message={`Course preferences error: ${preferencesError}`} />;
   }
 
-  const currentGradeInfo =
-    currentGrade !== null ? getGradeInfo(currentGrade) : null;
+  const currentGradeInfo = currentGrade !== null ? getGradeInfo(currentGrade) : null;
   const requiredGrade = calculateRequiredGrade();
 
   return (
     <div className="space-y-6">
-
-      {saveStatus === 'error' && saveError && (
+      {saveStatus === "error" && saveError && (
         <div className="p-4 bg-light-error-bg dark:bg-dark-error-bg rounded-md text-light-error-text dark:text-dark-error-text animate-fade-in shadow-sm">
           <div className="flex items-center space-x-2">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
             </svg>
             <p>{saveError}</p>
           </div>
@@ -435,7 +420,7 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
               <div className="w-full bg-light-bg-tertiary dark:bg-dark-bg-tertiary rounded-full h-1.5">
                 <div
                   className={`h-1.5 rounded-full transition-all duration-300 ${getProgressBarColor(
-                    currentGrade
+                    currentGrade,
                   )}`}
                   style={{ width: `${Math.min(currentGrade, 100)}%` }}
                 ></div>
@@ -468,8 +453,8 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
                   totalWeight === 100
                     ? "bg-light-performance-excellent-bg dark:bg-dark-performance-excellent-bg"
                     : totalWeight >= 90
-                    ? "bg-light-performance-average-bg dark:bg-dark-performance-average-bg"
-                    : "bg-light-performance-poor-bg dark:bg-dark-performance-poor-bg"
+                      ? "bg-light-performance-average-bg dark:bg-dark-performance-average-bg"
+                      : "bg-light-performance-poor-bg dark:bg-dark-performance-poor-bg"
                 }`}
                 style={{ width: `${Math.min(totalWeight, 100)}%` }}
               ></div>
@@ -478,8 +463,8 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
               {totalWeight === 100
                 ? "Complete"
                 : totalWeight > 100
-                ? "Over 100%"
-                : `${(100 - totalWeight).toFixed(2)}% remaining`}
+                  ? "Over 100%"
+                  : `${(100 - totalWeight).toFixed(2)}% remaining`}
             </p>
           </div>
         </div>
@@ -501,7 +486,7 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
                   try {
                     await updateTargetGrade(newTargetGrade);
                   } catch (error) {
-                    console.error('Failed to update target grade:', error);
+                    console.error("Failed to update target grade:", error);
                   }
                 }}
                 disabled={preferencesLoading}
@@ -517,7 +502,9 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
                   Need avg of{" "}
                   <span
                     className={`font-medium ${
-                      requiredGrade > 100 ? "text-light-status-overdue-text dark:text-dark-status-overdue-text" : "text-light-status-submitted-text dark:text-dark-status-submitted-text"
+                      requiredGrade > 100
+                        ? "text-light-status-overdue-text dark:text-dark-status-overdue-text"
+                        : "text-light-status-submitted-text dark:text-dark-status-submitted-text"
                     }`}
                   >
                     {requiredGrade.toFixed(1)}%
@@ -644,11 +631,7 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
                                 step="0.1"
                                 value={assessment.weight}
                                 onChange={(e) =>
-                                  assessment.id &&
-                                  handleWeightChange(
-                                    assessment.id,
-                                    e.target.value
-                                  )
+                                  assessment.id && handleWeightChange(assessment.id, e.target.value)
                                 }
                                 className="input w-full px-4 py-3 text-base hover:shadow-sm transition-all duration-200 dark:bg-dark-input-bg dark:text-dark-input-text dark:border-dark-input-border [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none min-h-[44px] rounded-lg"
                               />
@@ -668,8 +651,7 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
                                 step="0.1"
                                 value={assessment.mark ?? ""}
                                 onChange={(e) =>
-                                  assessment.id &&
-                                  handleMarkChange(assessment.id, e.target.value)
+                                  assessment.id && handleMarkChange(assessment.id, e.target.value)
                                 }
                                 className="input w-full px-4 py-3 text-base hover:shadow-sm transition-all duration-200 dark:bg-dark-input-bg dark:text-dark-input-text dark:border-dark-input-border [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none min-h-[44px] rounded-lg"
                                 placeholder="--"
@@ -699,8 +681,7 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
                             {assessment.assignmentName}
                           </h3>
                           <p className="text-xs text-light-text-tertiary dark:text-dark-text-tertiary mt-1">
-                            Due:{" "}
-                            {new Date(assessment.dueDate).toLocaleDateString()}
+                            Due: {new Date(assessment.dueDate).toLocaleDateString()}
                           </p>
                         </div>
                         <div className="col-span-2">
@@ -720,11 +701,7 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
                               step="0.1"
                               value={assessment.weight}
                               onChange={(e) =>
-                                assessment.id &&
-                                handleWeightChange(
-                                  assessment.id,
-                                  e.target.value
-                                )
+                                assessment.id && handleWeightChange(assessment.id, e.target.value)
                               }
                               className="input w-16 px-2 py-1 text-sm hover:shadow-sm transition-all duration-200 dark:bg-dark-input-bg dark:text-dark-input-text dark:border-dark-input-border [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                             />
@@ -741,8 +718,7 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
                               step="0.1"
                               value={assessment.mark ?? ""}
                               onChange={(e) =>
-                                assessment.id &&
-                                handleMarkChange(assessment.id, e.target.value)
+                                assessment.id && handleMarkChange(assessment.id, e.target.value)
                               }
                               className="input w-16 px-2 py-1 text-sm hover:shadow-sm transition-all duration-200 dark:bg-dark-input-bg dark:text-dark-input-text dark:border-dark-input-border [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                               placeholder="--"

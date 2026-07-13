@@ -1,4 +1,4 @@
-import { useOnboarding } from '../../../contexts/OnboardingContext';
+import { useOnboarding } from "../../../contexts/OnboardingContext";
 
 interface StepNavigationProps {
   canGoNext?: boolean;
@@ -16,10 +16,10 @@ interface StepNavigationProps {
 export function StepNavigation({
   canGoNext = true,
   canGoBack = true,
-  nextLabel = 'Continue',
-  backLabel = 'Back',
+  nextLabel = "Continue",
+  backLabel = "Back",
   showSkip = false,
-  skipLabel = 'Skip',
+  skipLabel = "Skip",
   onNext,
   onBack,
   onSkip,
@@ -62,7 +62,12 @@ export function StepNavigation({
             className="btn-secondary flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M15 19l-7-7 7-7"
+              />
             </svg>
             <span>{backLabel}</span>
           </button>
@@ -98,7 +103,12 @@ export function StepNavigation({
             <>
               <span>{nextLabel}</span>
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 5l7 7-7 7"
+                />
               </svg>
             </>
           )}

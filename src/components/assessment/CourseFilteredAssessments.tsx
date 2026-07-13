@@ -63,8 +63,8 @@ const CourseFilteredAssessments = ({
             No assessments found for this course
           </p>
           <p>
-            This course doesn&apos;t have any assessments yet. Add assessments
-            manually or upload a course outline.
+            This course doesn&apos;t have any assessments yet. Add assessments manually or upload a
+            course outline.
           </p>
         </div>
       ) : (

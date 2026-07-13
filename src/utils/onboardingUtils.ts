@@ -1,6 +1,6 @@
-import { User } from 'firebase/auth';
-import { doc, getDoc } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
+import { User } from "firebase/auth";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "@/lib/firebase";
 
 export interface OnboardingStatus {
   hasCompletedOnboarding: boolean;
@@ -15,9 +15,9 @@ export async function getUserOnboardingStatus(user: User | null): Promise<Onboar
   }
 
   try {
-    const userDocRef = doc(db, 'users', user.uid);
+    const userDocRef = doc(db, "users", user.uid);
     const userDoc = await getDoc(userDocRef);
-    
+
     if (!userDoc.exists()) {
       return {
         hasCompletedOnboarding: false,
@@ -30,10 +30,10 @@ export async function getUserOnboardingStatus(user: User | null): Promise<Onboar
     const userData = userDoc.data();
     const hasCompletedOnboarding = userData.hasCompletedOnboarding ?? false;
     const onboardingCompletedAt = userData.onboardingCompletedAt?.toDate();
-    
+
     // Consider a user "new" if they don't have onboarding completion data
     const isNewUser = !hasCompletedOnboarding && !onboardingCompletedAt;
-    
+
     return {
       hasCompletedOnboarding,
       onboardingCompletedAt,
@@ -41,7 +41,7 @@ export async function getUserOnboardingStatus(user: User | null): Promise<Onboar
       needsOnboarding: !hasCompletedOnboarding,
     };
   } catch (error) {
-    console.error('Error fetching user onboarding status:', error);
+    console.error("Error fetching user onboarding status:", error);
     // Default to safe state - assume needs onboarding
     return {
       hasCompletedOnboarding: false,
@@ -54,30 +54,33 @@ export async function getUserOnboardingStatus(user: User | null): Promise<Onboar
 
 export function saveOnboardingProgress(stepData: Record<string, unknown>) {
   try {
-    localStorage.setItem('onboarding-progress', JSON.stringify({
-      ...stepData,
-      lastSaved: new Date().toISOString(),
-    }));
+    localStorage.setItem(
+      "onboarding-progress",
+      JSON.stringify({
+        ...stepData,
+        lastSaved: new Date().toISOString(),
+      }),
+    );
   } catch (error) {
-    console.error('Error saving onboarding progress:', error);
+    console.error("Error saving onboarding progress:", error);
   }
 }
 
 export function getOnboardingProgress(): Record<string, unknown> | null {
   try {
-    const saved = localStorage.getItem('onboarding-progress');
+    const saved = localStorage.getItem("onboarding-progress");
     return saved ? JSON.parse(saved) : null;
   } catch (error) {
-    console.error('Error retrieving onboarding progress:', error);
+    console.error("Error retrieving onboarding progress:", error);
     return null;
   }
 }
 
 export function clearOnboardingProgress() {
   try {
-    localStorage.removeItem('onboarding-progress');
+    localStorage.removeItem("onboarding-progress");
   } catch (error) {
-    console.error('Error clearing onboarding progress:', error);
+    console.error("Error clearing onboarding progress:", error);
   }
 }
 
@@ -90,8 +93,8 @@ export function shouldRedirectToOnboarding(onboardingStatus: OnboardingStatus | 
 }
 
 export async function loadUserDataForOnboarding(user: User | null): Promise<{
-  userData?: Partial<import('../types/onboarding').OnboardingUserData>;
-  semesterData?: Partial<import('../types/onboarding').OnboardingSemesterData>;
+  userData?: Partial<import("../types/onboarding").OnboardingUserData>;
+  semesterData?: Partial<import("../types/onboarding").OnboardingSemesterData>;
   currentStep?: number;
 } | null> {
   if (!user) return null;
@@ -99,26 +102,27 @@ export async function loadUserDataForOnboarding(user: User | null): Promise<{
   try {
     // Priority 1: Check for saved onboarding progress in localStorage
     const savedProgress = getOnboardingProgress();
-    
+
     // Priority 2: Load existing user data from Firebase
-    const userDocRef = doc(db, 'users', user.uid);
+    const userDocRef = doc(db, "users", user.uid);
     const userDoc = await getDoc(userDocRef);
-    
+
     let userData = {};
     if (userDoc.exists()) {
       const firebaseData = userDoc.data();
       userData = {
-        institution: firebaseData.institution || '',
-        studyProgram: firebaseData.studyProgram || firebaseData.program || '', // Handle old field name
-        graduationYear: firebaseData.graduationYear || 
-          (typeof firebaseData.expectedGraduation === 'string' ? 
-            parseInt(firebaseData.expectedGraduation) || new Date().getFullYear() + 4 : 
-            new Date().getFullYear() + 4),
-        avatarIconId: firebaseData.avatarIconId || '',
+        institution: firebaseData.institution || "",
+        studyProgram: firebaseData.studyProgram || firebaseData.program || "", // Handle old field name
+        graduationYear:
+          firebaseData.graduationYear ||
+          (typeof firebaseData.expectedGraduation === "string"
+            ? parseInt(firebaseData.expectedGraduation) || new Date().getFullYear() + 4
+            : new Date().getFullYear() + 4),
+        avatarIconId: firebaseData.avatarIconId || "",
         emailNotifications: firebaseData.emailNotifications || false,
         hasConsentedToNotifications: firebaseData.hasConsentedToNotifications || false,
         notificationDaysBefore: firebaseData.notificationDaysBefore || 1,
-        email: firebaseData.email || '',
+        email: firebaseData.email || "",
       };
     }
 
@@ -128,13 +132,16 @@ export async function loadUserDataForOnboarding(user: User | null): Promise<{
         ...userData,
         ...(savedProgress?.userData || {}),
       },
-      semesterData: (savedProgress?.semesterData && typeof savedProgress.semesterData === 'object' ? savedProgress.semesterData : { name: '' }),
-      currentStep: (typeof savedProgress?.currentStep === 'number' ? savedProgress.currentStep : 1),
+      semesterData:
+        savedProgress?.semesterData && typeof savedProgress.semesterData === "object"
+          ? savedProgress.semesterData
+          : { name: "" },
+      currentStep: typeof savedProgress?.currentStep === "number" ? savedProgress.currentStep : 1,
     };
 
     return mergedData;
   } catch (error) {
-    console.error('Error loading user data for onboarding:', error);
+    console.error("Error loading user data for onboarding:", error);
     return null;
   }
 }

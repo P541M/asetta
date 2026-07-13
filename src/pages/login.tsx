@@ -42,11 +42,7 @@ const Login = () => {
       const result = await signInWithEmailAndPassword(auth, email, password);
       await handlePostAuthRedirect(result.user);
     } catch (error: unknown) {
-      setError(
-        error instanceof Error
-          ? `Login failed: ${error.message}`
-          : "Login failed."
-      );
+      setError(error instanceof Error ? `Login failed: ${error.message}` : "Login failed.");
       setIsSubmitting(false);
     }
   };
@@ -62,7 +58,7 @@ const Login = () => {
       setError(
         error instanceof Error
           ? `Google sign-in failed: ${error.message}`
-          : "Google sign-in failed."
+          : "Google sign-in failed.",
       );
       setIsSubmitting(false);
     }
@@ -72,10 +68,7 @@ const Login = () => {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-light-bg-secondary to-light-bg-primary dark:from-dark-bg-primary dark:to-dark-bg-secondary p-4">
       <Head>
         <title>Asetta - Sign In</title>
-        <meta
-          name="description"
-          content="Sign in to Asetta to manage your academic tasks."
-        />
+        <meta name="description" content="Sign in to Asetta to manage your academic tasks." />
       </Head>
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
@@ -214,12 +207,7 @@ const Login = () => {
             disabled={isSubmitting}
             className="w-full flex items-center justify-center gap-3 py-3 px-4 border border-light-border-primary dark:border-dark-border-primary rounded-lg text-light-text-primary dark:text-dark-text-primary bg-light-bg-primary dark:bg-dark-bg-secondary hover:bg-light-hover-primary dark:hover:bg-dark-hover-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-light-button-primary dark:focus:ring-dark-button-primary transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="20"
-              height="20"
-              viewBox="0 0 48 48"
-            >
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 48 48">
               <path
                 fill="#FFC107"
                 d="M43.611 20.083H42V20H24v8h11.303c-1.649 4.657-6.08 8-11.303 8-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 12.955 4 4 12.955 4 24s8.955 20 20 20 20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z"

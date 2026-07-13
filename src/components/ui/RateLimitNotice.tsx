@@ -6,11 +6,7 @@ interface RateLimitNoticeProps {
   autoRetry?: boolean;
 }
 
-const RateLimitNotice = ({ 
-  onRetry, 
-  retryAfter = 120, 
-  autoRetry = true 
-}: RateLimitNoticeProps) => {
+const RateLimitNotice = ({ onRetry, retryAfter = 120, autoRetry = true }: RateLimitNoticeProps) => {
   const [countdown, setCountdown] = useState(retryAfter);
   const [isRetrying, setIsRetrying] = useState(false);
 
@@ -43,17 +39,17 @@ const RateLimitNotice = ({
         <div className="flex-shrink-0">
           <div className="relative">
             <div className="w-8 h-8 bg-amber-100 dark:bg-amber-800/50 rounded-full flex items-center justify-center">
-              <svg 
-                className="w-5 h-5 text-amber-600 dark:text-amber-400" 
-                fill="none" 
-                stroke="currentColor" 
+              <svg
+                className="w-5 h-5 text-amber-600 dark:text-amber-400"
+                fill="none"
+                stroke="currentColor"
                 viewBox="0 0 24 24"
               >
-                <path 
-                  strokeLinecap="round" 
-                  strokeLinejoin="round" 
-                  strokeWidth={2} 
-                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" 
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
                 />
               </svg>
             </div>
@@ -62,22 +58,22 @@ const RateLimitNotice = ({
             )}
           </div>
         </div>
-        
+
         <div className="flex-1 min-w-0">
           <h3 className="text-lg font-medium text-amber-800 dark:text-amber-300 mb-2">
             Servers Temporarily Busy
           </h3>
-          
+
           <p className="text-amber-700 dark:text-amber-400 mb-4">
-            Our AI processing servers are currently handling a high volume of requests. 
-            This is normal during peak usage times and will resolve shortly.
+            Our AI processing servers are currently handling a high volume of requests. This is
+            normal during peak usage times and will resolve shortly.
           </p>
-          
+
           {countdown > 0 ? (
             <div className="space-y-3">
               <div className="flex items-center space-x-2">
                 <div className="w-full bg-amber-200 dark:bg-amber-800/30 rounded-full h-2">
-                  <div 
+                  <div
                     className="bg-amber-500 dark:bg-amber-400 h-2 rounded-full transition-all duration-1000 ease-linear"
                     style={{ width: `${((retryAfter - countdown) / retryAfter) * 100}%` }}
                   ></div>
@@ -86,12 +82,12 @@ const RateLimitNotice = ({
                   {formatTime(countdown)}
                 </span>
               </div>
-              
+
               <div className="flex items-center justify-between">
                 <p className="text-sm text-amber-600 dark:text-amber-500">
                   {autoRetry ? "Auto-retrying in" : "Please wait"} {formatTime(countdown)}
                 </p>
-                
+
                 <button
                   onClick={handleManualRetry}
                   disabled={isRetrying}
@@ -111,11 +107,12 @@ const RateLimitNotice = ({
           )}
         </div>
       </div>
-      
+
       <div className="mt-4 p-3 bg-amber-100 dark:bg-amber-800/30 rounded-md">
         <p className="text-xs text-amber-700 dark:text-amber-400">
-          <strong>Why is this happening?</strong> We share AI processing resources across all users to keep the service free. 
-          During busy periods, we may hit rate limits but service typically resumes within 1-2 minutes.
+          <strong>Why is this happening?</strong> We share AI processing resources across all users
+          to keep the service free. During busy periods, we may hit rate limits but service
+          typically resumes within 1-2 minutes.
         </p>
       </div>
     </div>

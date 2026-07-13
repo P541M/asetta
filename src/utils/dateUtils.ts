@@ -5,10 +5,7 @@
 /**
  * Converts a date string (YYYY-MM-DD) and time string (HH:MM) to a Date object
  */
-const parseLocalDateTime = (
-  dateStr: string,
-  timeStr: string = "23:59"
-): Date => {
+const parseLocalDateTime = (dateStr: string, timeStr: string = "23:59"): Date => {
   const [year, month, day] = dateStr.split("-").map(Number);
   const [hours, minutes] = timeStr.split(":").map(Number);
   return new Date(year, month - 1, day, hours, minutes);
@@ -31,10 +28,7 @@ export const formatLocalDate = (dateStr: string | null): string => {
 /**
  * Formats a date string (YYYY-MM-DD) and time string (HH:MM) according to the user's locale
  */
-export const formatLocalDateTime = (
-  dateStr: string,
-  timeStr: string = "23:59"
-): string => {
+export const formatLocalDateTime = (dateStr: string, timeStr: string = "23:59"): string => {
   const date = parseLocalDateTime(dateStr, timeStr);
   return date.toLocaleString(undefined, {
     month: "short",
@@ -48,25 +42,16 @@ export const formatLocalDateTime = (
 /**
  * Calculates the number of days between now and a given date
  */
-export const getDaysUntil = (
-  dateStr: string,
-  timeStr: string = "23:59"
-): number => {
+export const getDaysUntil = (dateStr: string, timeStr: string = "23:59"): number => {
   const dueDate = parseLocalDateTime(dateStr, timeStr);
   const now = new Date();
-  return Math.floor(
-    (dueDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
-  );
+  return Math.floor((dueDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
 };
 
 /**
  * Checks if a date is upcoming (within the next 7 days)
  */
-export const isUpcoming = (
-  dateStr: string,
-  timeStr: string = "23:59"
-): boolean => {
+export const isUpcoming = (dateStr: string, timeStr: string = "23:59"): boolean => {
   const daysUntil = getDaysUntil(dateStr, timeStr);
   return daysUntil >= 0 && daysUntil <= 7;
 };
-

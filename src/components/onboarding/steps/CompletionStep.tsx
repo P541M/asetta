@@ -18,12 +18,7 @@ export function CompletionStep() {
             stroke="currentColor"
             viewBox="0 0 24 24"
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M5 13l4 4L19 7"
-            />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
           </svg>
         </div>
 
@@ -81,10 +76,7 @@ export function CompletionStep() {
                 </h4>
                 <div className="grid gap-2">
                   {state.extractionResults.courseBreakdown.map(
-                    (
-                      course: { courseName: string; assessmentCount: number },
-                      index: number
-                    ) => (
+                    (course: { courseName: string; assessmentCount: number }, index: number) => (
                       <div
                         key={index}
                         className="flex justify-between items-center py-2 px-3 bg-light-bg-primary dark:bg-dark-bg-primary rounded-lg"
@@ -97,7 +89,7 @@ export function CompletionStep() {
                           {course.assessmentCount !== 1 ? "s" : ""}
                         </span>
                       </div>
-                    )
+                    ),
                   )}
                 </div>
               </div>
@@ -233,12 +225,7 @@ export function CompletionStep() {
           ) : (
             <>
               <span>Go to Dashboard</span>
-              <svg
-                className="w-4 h-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"

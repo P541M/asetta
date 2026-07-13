@@ -25,12 +25,7 @@ const statusOptions: StatusOption[] = [
     value: "Not started",
     label: "Not Started",
     icon: (
-      <svg
-        className="w-4 h-4"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
+      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <circle cx="12" cy="12" r="10" strokeWidth="2" />
         <path strokeWidth="2" d="M12 6v6l4 2" />
       </svg>
@@ -42,12 +37,7 @@ const statusOptions: StatusOption[] = [
     value: "In progress",
     label: "In Progress",
     icon: (
-      <svg
-        className="w-4 h-4"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
+      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <circle cx="12" cy="12" r="10" strokeWidth="2" />
         <polyline points="12,6 12,12 16,14" strokeWidth="2" />
       </svg>
@@ -59,18 +49,8 @@ const statusOptions: StatusOption[] = [
     value: "Submitted",
     label: "Submitted",
     icon: (
-      <svg
-        className="w-4 h-4"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth="2"
-          d="M5 13l4 4L19 7"
-        />
+      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
       </svg>
     ),
     colorClass: "text-emerald-600 dark:text-emerald-400",
@@ -80,12 +60,7 @@ const statusOptions: StatusOption[] = [
     value: "Missed",
     label: "Missed",
     icon: (
-      <svg
-        className="w-4 h-4"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
+      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -112,9 +87,7 @@ const StatusSelect: React.FC<StatusSelectProps> = ({
   const dropdownRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
 
-  const selectedOption = value
-    ? statusOptions.find((option) => option.value === value)
-    : null;
+  const selectedOption = value ? statusOptions.find((option) => option.value === value) : null;
 
   // Size variants
   const sizeClasses = {
@@ -129,10 +102,7 @@ const StatusSelect: React.FC<StatusSelectProps> = ({
   // Close dropdown on outside click
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
-      ) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setIsOpen(false);
         setFocusedIndex(-1);
       }
@@ -156,7 +126,7 @@ const StatusSelect: React.FC<StatusSelectProps> = ({
       setFocusedIndex(-1);
       triggerRef.current?.focus();
     },
-    [onChange]
+    [onChange],
   );
 
   // Handle keyboard navigation
@@ -167,15 +137,11 @@ const StatusSelect: React.FC<StatusSelectProps> = ({
       switch (event.key) {
         case "ArrowDown":
           event.preventDefault();
-          setFocusedIndex((prev) =>
-            prev < statusOptions.length - 1 ? prev + 1 : 0
-          );
+          setFocusedIndex((prev) => (prev < statusOptions.length - 1 ? prev + 1 : 0));
           break;
         case "ArrowUp":
           event.preventDefault();
-          setFocusedIndex((prev) =>
-            prev > 0 ? prev - 1 : statusOptions.length - 1
-          );
+          setFocusedIndex((prev) => (prev > 0 ? prev - 1 : statusOptions.length - 1));
           break;
         case "Enter":
           event.preventDefault();
@@ -233,9 +199,7 @@ const StatusSelect: React.FC<StatusSelectProps> = ({
               <span className={`flex-shrink-0 ${selectedOption.colorClass}`}>
                 {selectedOption.icon}
               </span>
-              <span
-                className={`truncate font-medium ${selectedOption.colorClass} min-w-0`}
-              >
+              <span className={`truncate font-medium ${selectedOption.colorClass} min-w-0`}>
                 {selectedOption.label}
               </span>
             </>
@@ -255,12 +219,7 @@ const StatusSelect: React.FC<StatusSelectProps> = ({
           stroke="currentColor"
           viewBox="0 0 24 24"
         >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="2"
-            d="M19 9l-7 7-7-7"
-          />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
         </svg>
       </button>
 
@@ -294,22 +253,14 @@ const StatusSelect: React.FC<StatusSelectProps> = ({
                 `}
               >
                 <div className="flex items-center space-x-2 min-w-0 flex-1">
-                  <span className={`flex-shrink-0 ${option.colorClass}`}>
-                    {option.icon}
-                  </span>
-                  <span
-                    className={`font-medium ${option.colorClass} truncate min-w-0`}
-                  >
+                  <span className={`flex-shrink-0 ${option.colorClass}`}>{option.icon}</span>
+                  <span className={`font-medium ${option.colorClass} truncate min-w-0`}>
                     {option.label}
                   </span>
                 </div>
                 {value === option.value && (
                   <span className="flex-shrink-0">
-                    <svg
-                      className="w-4 h-4"
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
-                    >
+                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                       <path
                         fillRule="evenodd"
                         d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"

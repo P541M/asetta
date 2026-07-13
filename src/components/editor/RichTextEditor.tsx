@@ -18,7 +18,6 @@ import {
   MdRedo,
 } from "react-icons/md";
 import { RichTextEditorProps } from "../../types/editor";
-import "./rich-text-editor.css";
 
 interface LinkModalProps {
   isOpen: boolean;
@@ -104,11 +103,7 @@ const LinkModal = ({ isOpen, onClose, onAddLink }: LinkModalProps) => {
             />
           </div>
           <div className="modal-footer">
-            <button
-              type="button"
-              onClick={onClose}
-              className="btn-outline py-1.5 px-4"
-            >
+            <button type="button" onClick={onClose} className="btn-outline py-1.5 px-4">
               Cancel
             </button>
             <button type="submit" className="btn-primary py-1.5 px-4">
@@ -128,9 +123,9 @@ const RichTextEditor = ({
   onAddLink,
 }: RichTextEditorProps) => {
   const [showLinkModal, setShowLinkModal] = useState(false);
-  const [linkCallback, setLinkCallback] = useState<
-    ((url: string, text: string) => void) | null
-  >(null);
+  const [linkCallback, setLinkCallback] = useState<((url: string, text: string) => void) | null>(
+    null,
+  );
 
   const editor = useEditor({
     extensions: [
@@ -181,9 +176,7 @@ const RichTextEditor = ({
         <button
           onClick={() => editor.chain().focus().toggleBold().run()}
           className={`p-1.5 rounded hover:bg-gray-100 dark:hover:bg-dark-bg-tertiary ${
-            editor.isActive("bold")
-              ? "bg-gray-100 dark:bg-dark-bg-tertiary"
-              : ""
+            editor.isActive("bold") ? "bg-gray-100 dark:bg-dark-bg-tertiary" : ""
           }`}
           title="Bold"
         >
@@ -192,9 +185,7 @@ const RichTextEditor = ({
         <button
           onClick={() => editor.chain().focus().toggleItalic().run()}
           className={`p-1.5 rounded hover:bg-gray-100 dark:hover:bg-dark-bg-tertiary ${
-            editor.isActive("italic")
-              ? "bg-gray-100 dark:bg-dark-bg-tertiary"
-              : ""
+            editor.isActive("italic") ? "bg-gray-100 dark:bg-dark-bg-tertiary" : ""
           }`}
           title="Italic"
         >
@@ -203,9 +194,7 @@ const RichTextEditor = ({
         <button
           onClick={() => editor.chain().focus().toggleBulletList().run()}
           className={`p-1.5 rounded hover:bg-gray-100 dark:hover:bg-dark-bg-tertiary ${
-            editor.isActive("bulletList")
-              ? "bg-gray-100 dark:bg-dark-bg-tertiary"
-              : ""
+            editor.isActive("bulletList") ? "bg-gray-100 dark:bg-dark-bg-tertiary" : ""
           }`}
           title="Bullet List"
         >
@@ -214,9 +203,7 @@ const RichTextEditor = ({
         <button
           onClick={() => editor.chain().focus().toggleOrderedList().run()}
           className={`p-1.5 rounded hover:bg-gray-100 dark:hover:bg-dark-bg-tertiary ${
-            editor.isActive("orderedList")
-              ? "bg-gray-100 dark:bg-dark-bg-tertiary"
-              : ""
+            editor.isActive("orderedList") ? "bg-gray-100 dark:bg-dark-bg-tertiary" : ""
           }`}
           title="Numbered List"
         >
@@ -225,9 +212,7 @@ const RichTextEditor = ({
         <button
           onClick={() => editor.chain().focus().setTextAlign("left").run()}
           className={`p-1.5 rounded hover:bg-gray-100 dark:hover:bg-dark-bg-tertiary ${
-            editor.isActive({ textAlign: "left" })
-              ? "bg-gray-100 dark:bg-dark-bg-tertiary"
-              : ""
+            editor.isActive({ textAlign: "left" }) ? "bg-gray-100 dark:bg-dark-bg-tertiary" : ""
           }`}
           title="Align Left"
         >
@@ -236,9 +221,7 @@ const RichTextEditor = ({
         <button
           onClick={() => editor.chain().focus().setTextAlign("center").run()}
           className={`p-1.5 rounded hover:bg-gray-100 dark:hover:bg-dark-bg-tertiary ${
-            editor.isActive({ textAlign: "center" })
-              ? "bg-gray-100 dark:bg-dark-bg-tertiary"
-              : ""
+            editor.isActive({ textAlign: "center" }) ? "bg-gray-100 dark:bg-dark-bg-tertiary" : ""
           }`}
           title="Align Center"
         >
@@ -247,9 +230,7 @@ const RichTextEditor = ({
         <button
           onClick={() => editor.chain().focus().setTextAlign("right").run()}
           className={`p-1.5 rounded hover:bg-gray-100 dark:hover:bg-dark-bg-tertiary ${
-            editor.isActive({ textAlign: "right" })
-              ? "bg-gray-100 dark:bg-dark-bg-tertiary"
-              : ""
+            editor.isActive({ textAlign: "right" }) ? "bg-gray-100 dark:bg-dark-bg-tertiary" : ""
           }`}
           title="Align Right"
         >
@@ -278,9 +259,7 @@ const RichTextEditor = ({
         <button
           onClick={handleAddLink}
           className={`p-1.5 rounded hover:bg-gray-100 dark:hover:bg-dark-bg-tertiary ${
-            editor.isActive("link")
-              ? "bg-gray-100 dark:bg-dark-bg-tertiary"
-              : ""
+            editor.isActive("link") ? "bg-gray-100 dark:bg-dark-bg-tertiary" : ""
           }`}
           title="Add Link"
         >

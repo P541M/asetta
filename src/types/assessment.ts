@@ -5,7 +5,7 @@ export interface Assessment {
   dueDate: string;
   dueTime: string;
   weight: number;
-  status: 'Not started' | 'In progress' | 'Submitted' | 'Missed'; // More specific typing
+  status: "Not started" | "In progress" | "Submitted" | "Missed"; // More specific typing
   notes?: string;
   mark?: number | null;
   createdAt?: Date | FirebaseFirestore.Timestamp; // Firebase timestamp
@@ -20,5 +20,8 @@ export interface AddAssessmentFormProps {
 export interface AssessmentsTableProps {
   assessments: Assessment[];
   semesterId: string;
-  onStatusChange?: (assessmentId: string, newStatus: 'Not started' | 'In progress' | 'Submitted' | 'Missed') => void;
+  onStatusChange?: (
+    assessmentId: string,
+    newStatus: "Not started" | "In progress" | "Submitted" | "Missed",
+  ) => void;
 }

@@ -61,7 +61,6 @@ const DashboardHeader = ({ onLogout }: DashboardHeaderProps) => {
     };
   }, [user, profile]);
 
-
   // Handle logout with proper dropdown closing
   const handleLogout = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -127,11 +126,7 @@ const DashboardHeader = ({ onLogout }: DashboardHeaderProps) => {
             </div>
 
             {/* Right side - User Settings Menu */}
-            <div
-              className={`relative ${
-                isHeaderReady ? "animate-fade-in-up" : "opacity-0"
-              }`}
-            >
+            <div className={`relative ${isHeaderReady ? "animate-fade-in-up" : "opacity-0"}`}>
               <button
                 ref={avatarRef}
                 onClick={toggleDropdown}
@@ -175,9 +170,7 @@ const DashboardHeader = ({ onLogout }: DashboardHeaderProps) => {
       </div>
 
       {/* Settings Modal */}
-      {showSettings && (
-        <UserSettings isOpen={showSettings} onClose={closeSettings} />
-      )}
+      {showSettings && <UserSettings isOpen={showSettings} onClose={closeSettings} />}
     </>
   );
 };

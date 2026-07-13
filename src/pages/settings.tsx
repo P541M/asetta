@@ -26,9 +26,7 @@ const SettingsPage = () => {
       <div className="min-h-screen flex items-center justify-center bg-light-bg-secondary dark:bg-dark-bg-primary">
         <div className="flex flex-col items-center">
           <div className="animate-spin rounded-full h-12 w-12 border-2 border-light-button-primary border-t-transparent dark:border-dark-button-primary dark:border-t-transparent"></div>
-          <p className="mt-4 text-light-text-secondary dark:text-dark-text-secondary">
-            Loading...
-          </p>
+          <p className="mt-4 text-light-text-secondary dark:text-dark-text-secondary">Loading...</p>
         </div>
       </div>
     );
@@ -42,10 +40,7 @@ const SettingsPage = () => {
     <div className="min-h-safe-screen bg-light-bg-secondary dark:bg-dark-bg-primary transition-theme">
       <Head>
         <title>Settings - Asetta</title>
-        <meta
-          name="description"
-          content="Manage your account settings and preferences"
-        />
+        <meta name="description" content="Manage your account settings and preferences" />
       </Head>
       <DashboardHeader onLogout={handleLogout} />
       <div className="p-4 md:p-6 pl-safe pr-safe pt-safe pb-safe">

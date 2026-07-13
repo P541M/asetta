@@ -1,7 +1,7 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
-import { useDebounce } from './useDebounce';
+import { useState, useEffect, useRef, useCallback } from "react";
+import { useDebounce } from "./useDebounce";
 
-export type AutoSaveStatus = 'idle' | 'saving' | 'saved' | 'error';
+export type AutoSaveStatus = "idle" | "saving" | "saved" | "error";
 
 interface UseAutoSaveProps<T> {
   data: T;
@@ -28,9 +28,9 @@ export function useAutoSave<T>({
   data,
   onSave,
   delay = 750,
-  enabled = true
+  enabled = true,
 }: UseAutoSaveProps<T>): UseAutoSaveReturn {
-  const [status, setStatus] = useState<AutoSaveStatus>('idle');
+  const [status, setStatus] = useState<AutoSaveStatus>("idle");
   const [error, setError] = useState<string | null>(null);
   const debouncedData = useDebounce(data, delay);
   const initialRender = useRef(true);
@@ -41,20 +41,20 @@ export function useAutoSave<T>({
     if (!enabled) return;
 
     try {
-      setStatus('saving');
+      setStatus("saving");
       setError(null);
       await onSave(data);
       lastSavedData.current = data;
-      setStatus('saved');
+      setStatus("saved");
 
       // Reset to idle after showing 'saved' status for 2 seconds
       setTimeout(() => {
-        setStatus('idle');
+        setStatus("idle");
       }, 2000);
     } catch (err) {
-      console.error('Auto-save error:', err);
-      setError(err instanceof Error ? err.message : 'Failed to save changes');
-      setStatus('error');
+      console.error("Auto-save error:", err);
+      setError(err instanceof Error ? err.message : "Failed to save changes");
+      setStatus("error");
     }
   }, [enabled, onSave, data]);
 
@@ -78,6 +78,6 @@ export function useAutoSave<T>({
   return {
     status,
     error,
-    save
+    save,
   };
 }

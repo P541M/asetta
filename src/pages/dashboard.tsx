@@ -16,7 +16,7 @@ const Dashboard = () => {
       if (loading || onboardingLoading) {
         return;
       }
-      
+
       if (!user) {
         router.push("/login");
         return;
@@ -59,9 +59,7 @@ const Dashboard = () => {
       <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-dark-bg-primary">
         <div className="flex flex-col items-center">
           <div className="animate-spin rounded-full h-12 w-12 border-2 border-light-button-primary border-t-transparent dark:border-dark-button-primary dark:border-t-transparent"></div>
-          <p className="mt-4 text-gray-600 dark:text-dark-text-secondary">
-            Loading...
-          </p>
+          <p className="mt-4 text-gray-600 dark:text-dark-text-secondary">Loading...</p>
         </div>
       </div>
     );

@@ -41,17 +41,20 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
     switch (variant) {
       case "danger":
         return {
-          button: "bg-light-error-text hover:bg-light-error-text/90 focus:ring-light-error-text dark:bg-dark-error-text dark:hover:bg-dark-error-text/90 dark:focus:ring-dark-error-text",
+          button:
+            "bg-light-error-text hover:bg-light-error-text/90 focus:ring-light-error-text dark:bg-dark-error-text dark:hover:bg-dark-error-text/90 dark:focus:ring-dark-error-text",
           icon: "text-light-error-text dark:text-dark-error-text",
         };
       case "warning":
         return {
-          button: "bg-light-warning-text hover:bg-light-warning-text/90 focus:ring-light-warning-text dark:bg-dark-warning-text dark:hover:bg-dark-warning-text/90 dark:focus:ring-dark-warning-text",
+          button:
+            "bg-light-warning-text hover:bg-light-warning-text/90 focus:ring-light-warning-text dark:bg-dark-warning-text dark:hover:bg-dark-warning-text/90 dark:focus:ring-dark-warning-text",
           icon: "text-light-warning-text dark:text-dark-warning-text",
         };
       default:
         return {
-          button: "bg-light-button-primary hover:bg-light-button-primary-hover focus:ring-light-button-primary dark:bg-dark-button-primary dark:hover:bg-dark-button-primary-hover dark:focus:ring-dark-button-primary",
+          button:
+            "bg-light-button-primary hover:bg-light-button-primary-hover focus:ring-light-button-primary dark:bg-dark-button-primary dark:hover:bg-dark-button-primary-hover dark:focus:ring-dark-button-primary",
           icon: "text-light-button-primary dark:text-dark-button-primary",
         };
     }
@@ -60,21 +63,11 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
   const variantClasses = getVariantClasses();
 
   return (
-    <div
-      className="modal-backdrop"
-      onClick={onClose}
-    >
-      <div
-        className="modal-container w-full max-w-sm mx-4"
-        onClick={(e) => e.stopPropagation()}
-      >
+    <div className="modal-backdrop" onClick={onClose}>
+      <div className="modal-container w-full max-w-sm mx-4" onClick={(e) => e.stopPropagation()}>
         <div className="modal-content">
           <div className="flex items-start gap-4">
-            {icon && (
-              <div className={`flex-shrink-0 ${variantClasses.icon}`}>
-                {icon}
-              </div>
-            )}
+            {icon && <div className={`flex-shrink-0 ${variantClasses.icon}`}>{icon}</div>}
             <div className="flex-1 min-w-0">
               <h3 className="text-base font-medium text-light-text-primary dark:text-dark-text-primary">
                 {title}

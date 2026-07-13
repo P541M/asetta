@@ -3,13 +3,13 @@ import { sendEmail } from "./email";
 
 // Helper functions for development-only logging
 const devLog = (...args: unknown[]) => {
-  if (process.env.NODE_ENV === 'development') {
+  if (process.env.NODE_ENV === "development") {
     console.log(...args);
   }
 };
 
 const devError = (...args: unknown[]) => {
-  if (process.env.NODE_ENV === 'development') {
+  if (process.env.NODE_ENV === "development") {
     console.error(...args);
   }
 };
@@ -34,7 +34,7 @@ interface Assessment {
 export async function checkAndSendNotifications() {
   const startTime = new Date();
   devLog("=== NOTIFICATION CHECK STARTED ===", startTime.toISOString());
-  
+
   try {
     const admin = await getAdmin();
     const db = admin.firestore();
@@ -51,20 +51,22 @@ export async function checkAndSendNotifications() {
 
     for (const userDoc of usersSnapshot.docs) {
       totalUsersProcessed++;
-      devLog(`\n--- Processing User ${userDoc.id} (${totalUsersProcessed}/${usersSnapshot.docs.length}) ---`);
-      
+      devLog(
+        `\n--- Processing User ${userDoc.id} (${totalUsersProcessed}/${usersSnapshot.docs.length}) ---`,
+      );
+
       try {
         const userData = userDoc.data();
         devLog("📋 Raw user data:", {
-          hasEmailNotifications: 'emailNotifications' in userData,
-          hasNotificationDaysBefore: 'notificationDaysBefore' in userData,
-          hasEmail: 'email' in userData,
-          hasConsent: 'hasConsentedToNotifications' in userData,
+          hasEmailNotifications: "emailNotifications" in userData,
+          hasNotificationDaysBefore: "notificationDaysBefore" in userData,
+          hasEmail: "email" in userData,
+          hasConsent: "hasConsentedToNotifications" in userData,
         });
 
         // Validate user preferences
         const preferencesValidation = validateNotificationPreferences(userData);
-        
+
         if (!preferencesValidation.isValid) {
           devLog(`⚠️ Invalid user preferences for ${userDoc.id}:`, preferencesValidation.errors);
           continue;
@@ -109,7 +111,9 @@ export async function checkAndSendNotifications() {
         for (const semesterDoc of semestersSnapshot.docs) {
           const assessmentsRef = semesterDoc.ref.collection("assessments");
           const assessmentsSnapshot = await assessmentsRef.get();
-          devLog(`📝 Found ${assessmentsSnapshot.docs.length} assessments in semester ${semesterDoc.id}`);
+          devLog(
+            `📝 Found ${assessmentsSnapshot.docs.length} assessments in semester ${semesterDoc.id}`,
+          );
 
           const semesterAssessments = assessmentsSnapshot.docs.map((doc) => {
             const data = doc.data();
@@ -122,7 +126,7 @@ export async function checkAndSendNotifications() {
               dueDateType: typeof data.dueDate,
               dueTimeType: typeof data.dueTime,
             });
-            
+
             return {
               id: doc.id,
               userId: userDoc.id,
@@ -142,18 +146,22 @@ export async function checkAndSendNotifications() {
         for (const assessment of allAssessments) {
           try {
             let dueDate: Date;
-            
+
             // Handle different date formats from Firestore
-            if (assessment.dueDate && typeof assessment.dueDate === 'object' && 'toDate' in assessment.dueDate) {
+            if (
+              assessment.dueDate &&
+              typeof assessment.dueDate === "object" &&
+              "toDate" in assessment.dueDate
+            ) {
               // Firestore Timestamp
               dueDate = (assessment.dueDate as { toDate: () => Date }).toDate();
               if (assessment.dueTime) {
-                const [hours, minutes] = assessment.dueTime.split(':');
+                const [hours, minutes] = assessment.dueTime.split(":");
                 dueDate.setHours(parseInt(hours), parseInt(minutes), 0, 0);
               }
-            } else if (typeof assessment.dueDate === 'string') {
+            } else if (typeof assessment.dueDate === "string") {
               // String date
-              const dateTimeString = assessment.dueTime 
+              const dateTimeString = assessment.dueTime
                 ? `${assessment.dueDate}T${assessment.dueTime}`
                 : assessment.dueDate;
               dueDate = new Date(dateTimeString);
@@ -206,32 +214,37 @@ export async function checkAndSendNotifications() {
           });
 
           // Check if we should send a notification (with some tolerance for timing)
-          if (daysUntilDue === preferences.notificationDaysBefore || 
-              (preferences.notificationDaysBefore === 1 && hoursUntilDue <= 36 && hoursUntilDue >= 12)) {
-            
+          if (
+            daysUntilDue === preferences.notificationDaysBefore ||
+            (preferences.notificationDaysBefore === 1 && hoursUntilDue <= 36 && hoursUntilDue >= 12)
+          ) {
             // Check if we've already sent a notification for this assessment
             const notificationId = `${userDoc.id}_${assessment.id}_${daysUntilDue}`;
             const notificationRef = db.collection("notifications").doc(notificationId);
             const existingNotification = await notificationRef.get();
-            
+
             if (existingNotification.exists) {
-              devLog(`⏭️ Notification already sent for "${assessment.assignmentName}" (${daysUntilDue} days)`);
+              devLog(
+                `⏭️ Notification already sent for "${assessment.assignmentName}" (${daysUntilDue} days)`,
+              );
               continue;
             }
-            
+
             const subject = `Assessment Reminder: ${assessment.courseName} - ${assessment.assignmentName}`;
 
-            devLog(`📧 Sending notification for "${assessment.assignmentName}" (${daysUntilDue} days until due)`);
-            
+            devLog(
+              `📧 Sending notification for "${assessment.assignmentName}" (${daysUntilDue} days until due)`,
+            );
+
             try {
               await sendEmail(
                 preferences.email,
                 subject,
                 assessment.assignmentName,
                 daysUntilDue,
-                assessment.courseName
+                assessment.courseName,
               );
-              
+
               // Record the notification to prevent duplicates
               await notificationRef.set({
                 userId: userDoc.id,
@@ -241,15 +254,17 @@ export async function checkAndSendNotifications() {
                 daysUntilDue,
                 email: preferences.email,
                 sentAt: new Date(),
-                notificationType: 'email',
-                status: 'sent'
+                notificationType: "email",
+                status: "sent",
               });
-              
+
               totalNotificationsSent++;
-              devLog(`✅ Email sent successfully to ${preferences.email} and notification recorded`);
+              devLog(
+                `✅ Email sent successfully to ${preferences.email} and notification recorded`,
+              );
             } catch (emailError) {
               devError(`❌ Failed to send email:`, emailError);
-              
+
               // Record the failed notification attempt
               await notificationRef.set({
                 userId: userDoc.id,
@@ -259,15 +274,17 @@ export async function checkAndSendNotifications() {
                 daysUntilDue,
                 email: preferences.email,
                 sentAt: new Date(),
-                notificationType: 'email',
-                status: 'failed',
-                error: emailError instanceof Error ? emailError.message : String(emailError)
+                notificationType: "email",
+                status: "failed",
+                error: emailError instanceof Error ? emailError.message : String(emailError),
               });
-              
+
               totalErrors++;
             }
           } else {
-            devLog(`⏭️ Not sending notification - timing doesn't match (${daysUntilDue} days vs ${preferences.notificationDaysBefore} required)`);
+            devLog(
+              `⏭️ Not sending notification - timing doesn't match (${daysUntilDue} days vs ${preferences.notificationDaysBefore} required)`,
+            );
           }
         }
       } catch (userError) {
@@ -278,14 +295,13 @@ export async function checkAndSendNotifications() {
 
     const endTime = new Date();
     const duration = endTime.getTime() - startTime.getTime();
-    
+
     devLog("\n=== NOTIFICATION CHECK COMPLETED ===");
     devLog(`⏱️ Duration: ${duration}ms`);
     devLog(`👥 Users processed: ${totalUsersProcessed}`);
     devLog(`📧 Notifications sent: ${totalNotificationsSent}`);
     devLog(`❌ Errors encountered: ${totalErrors}`);
     devLog("=== END SUMMARY ===");
-
   } catch (error) {
     devError("💥 CRITICAL ERROR in notification system:", error);
     devError("Stack trace:", error instanceof Error ? error.stack : String(error));
@@ -299,7 +315,6 @@ export function isValidEmail(email: string): boolean {
   return emailRegex.test(email);
 }
 
-
 // Function to validate user notification preferences
 export function validateNotificationPreferences(preferences: unknown): {
   isValid: boolean;
@@ -307,9 +322,9 @@ export function validateNotificationPreferences(preferences: unknown): {
   sanitized: NotificationPreferences | null;
 } {
   const errors: string[] = [];
-  
+
   // Check required fields exist
-  if (typeof preferences !== 'object' || preferences === null) {
+  if (typeof preferences !== "object" || preferences === null) {
     errors.push("Preferences must be an object");
     return { isValid: false, errors, sanitized: null };
   }
@@ -317,20 +332,22 @@ export function validateNotificationPreferences(preferences: unknown): {
   const prefs = preferences as Record<string, unknown>;
 
   // Validate emailNotifications
-  if (typeof prefs.emailNotifications !== 'boolean') {
+  if (typeof prefs.emailNotifications !== "boolean") {
     errors.push("emailNotifications must be a boolean");
   }
 
   // Validate notificationDaysBefore
-  if (typeof prefs.notificationDaysBefore !== 'number' || 
-      prefs.notificationDaysBefore < 1 || 
-      prefs.notificationDaysBefore > 30) {
+  if (
+    typeof prefs.notificationDaysBefore !== "number" ||
+    prefs.notificationDaysBefore < 1 ||
+    prefs.notificationDaysBefore > 30
+  ) {
     errors.push("notificationDaysBefore must be a number between 1 and 30");
   }
 
   // Validate email if email notifications are enabled
   if (prefs.emailNotifications && prefs.email) {
-    if (typeof prefs.email === 'string' && !isValidEmail(prefs.email)) {
+    if (typeof prefs.email === "string" && !isValidEmail(prefs.email)) {
       errors.push("Invalid email format");
     }
   } else if (prefs.emailNotifications && !prefs.email) {
@@ -338,7 +355,7 @@ export function validateNotificationPreferences(preferences: unknown): {
   }
 
   // Validate consent
-  if (typeof prefs.hasConsentedToNotifications !== 'boolean') {
+  if (typeof prefs.hasConsentedToNotifications !== "boolean") {
     errors.push("hasConsentedToNotifications must be a boolean");
   }
 
@@ -352,7 +369,6 @@ export function validateNotificationPreferences(preferences: unknown): {
   return {
     isValid: errors.length === 0,
     errors,
-    sanitized: errors.length === 0 ? sanitized : null
+    sanitized: errors.length === 0 ? sanitized : null,
   };
 }
-

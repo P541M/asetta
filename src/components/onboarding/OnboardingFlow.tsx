@@ -1,13 +1,13 @@
-import { useOnboarding } from '../../contexts/OnboardingContext';
-import { OnboardingLayout } from './ui/OnboardingLayout';
-import { ProgressBar } from './ui/ProgressBar';
-import { WelcomeStep } from './steps/WelcomeStep';
-import { ProfileStep } from './steps/ProfileStep';
-import { SemesterStep } from './steps/SemesterStep';
-import { UploadStep } from './steps/UploadStep';
-import { NotificationsStep } from './steps/NotificationsStep';
-import { CompletionStep } from './steps/CompletionStep';
-import ConfirmationModal from '../common/ConfirmationModal';
+import { useOnboarding } from "../../contexts/OnboardingContext";
+import { OnboardingLayout } from "./ui/OnboardingLayout";
+import { ProgressBar } from "./ui/ProgressBar";
+import { WelcomeStep } from "./steps/WelcomeStep";
+import { ProfileStep } from "./steps/ProfileStep";
+import { SemesterStep } from "./steps/SemesterStep";
+import { UploadStep } from "./steps/UploadStep";
+import { NotificationsStep } from "./steps/NotificationsStep";
+import { CompletionStep } from "./steps/CompletionStep";
+import ConfirmationModal from "../common/ConfirmationModal";
 
 export function OnboardingFlow() {
   const { state, requestExit, cancelExit, confirmExit } = useOnboarding();
@@ -37,10 +37,7 @@ export function OnboardingFlow() {
         <div className="w-full max-w-2xl mx-auto">
           {/* Progress Bar */}
           <div className="mb-8">
-            <ProgressBar 
-              currentStep={state.currentStep} 
-              totalSteps={state.totalSteps}
-            />
+            <ProgressBar currentStep={state.currentStep} totalSteps={state.totalSteps} />
           </div>
 
           {/* Error Display */}
@@ -53,9 +50,7 @@ export function OnboardingFlow() {
           )}
 
           {/* Current Step Content */}
-          <div className="animate-fade-in-up">
-            {renderCurrentStep()}
-          </div>
+          <div className="animate-fade-in-up">{renderCurrentStep()}</div>
         </div>
       </OnboardingLayout>
 
@@ -78,8 +73,12 @@ export function OnboardingFlow() {
         variant="warning"
         icon={
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
-                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L4.268 15.5c-.77.833.192 2.5 1.732 2.5z" />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L4.268 15.5c-.77.833.192 2.5 1.732 2.5z"
+            />
           </svg>
         }
       />

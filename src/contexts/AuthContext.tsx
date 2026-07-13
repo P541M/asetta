@@ -1,11 +1,5 @@
 // src/contexts/AuthContext.tsx
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useState,
-  ReactNode,
-} from "react";
+import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import { User, onAuthStateChanged, signOut } from "firebase/auth";
 import { auth, db } from "../lib/firebase";
 import { doc, getDoc, setDoc } from "firebase/firestore";
@@ -27,12 +21,12 @@ export const useAuth = () => useContext(AuthContext);
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  
+
   // Use the onboarding status hook
-  const { 
-    onboardingStatus, 
-    loading: onboardingLoading, 
-    refreshStatus: refreshOnboardingStatus 
+  const {
+    onboardingStatus,
+    loading: onboardingLoading,
+    refreshStatus: refreshOnboardingStatus,
   } = useOnboardingStatus(user);
 
   useEffect(() => {
@@ -58,10 +52,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
           // Send welcome email for new Google OAuth users (non-blocking)
           try {
-            const response = await fetch('/api/welcome-email', {
-              method: 'POST',
+            const response = await fetch("/api/welcome-email", {
+              method: "POST",
               headers: {
-                'Content-Type': 'application/json',
+                "Content-Type": "application/json",
               },
               body: JSON.stringify({
                 displayName: defaultSettings.displayName,
@@ -72,17 +66,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             });
 
             if (response.ok) {
-              if (process.env.NODE_ENV === 'development') {
-                console.log('✅ Welcome email sent successfully for Google OAuth user');
+              if (process.env.NODE_ENV === "development") {
+                console.log("✅ Welcome email sent successfully for Google OAuth user");
               }
             } else {
-              if (process.env.NODE_ENV === 'development') {
-                console.warn('⚠️ Welcome email failed to send for Google OAuth user');
+              if (process.env.NODE_ENV === "development") {
+                console.warn("⚠️ Welcome email failed to send for Google OAuth user");
               }
             }
           } catch {
-            if (process.env.NODE_ENV === 'development') {
-              console.warn('⚠️ Welcome email error for Google OAuth user');
+            if (process.env.NODE_ENV === "development") {
+              console.warn("⚠️ Welcome email error for Google OAuth user");
             }
           }
         } else {
@@ -98,19 +92,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const logout = async () => {
     // Clear user-specific cached data before signing out
-    removeFromLocalStorage('avatarIconId');
+    removeFromLocalStorage("avatarIconId");
     await signOut(auth);
   };
 
   return (
-    <AuthContext.Provider 
-      value={{ 
-        user, 
-        loading, 
-        onboardingStatus, 
-        onboardingLoading, 
-        refreshOnboardingStatus, 
-        logout 
+    <AuthContext.Provider
+      value={{
+        user,
+        loading,
+        onboardingStatus,
+        onboardingLoading,
+        refreshOnboardingStatus,
+        logout,
       }}
     >
       {children}

@@ -1,4 +1,4 @@
-import { ExtractionResult } from './upload';
+import { ExtractionResult } from "./upload";
 
 export interface OnboardingUserData {
   institution?: string;
@@ -49,9 +49,4 @@ export interface OnboardingContextType {
   confirmExit: () => Promise<void>;
 }
 
-export type OnboardingStep = 
-  | 'welcome'
-  | 'profile'
-  | 'semester'
-  | 'upload'
-  | 'completion';
+export type OnboardingStep = "welcome" | "profile" | "semester" | "upload" | "completion";

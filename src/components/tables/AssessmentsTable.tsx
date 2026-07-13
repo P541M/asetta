@@ -1,18 +1,10 @@
 import React from "react";
 import { useState, useEffect, useRef } from "react";
-import {
-  updateDoc,
-  deleteDoc,
-  getDoc,
-  serverTimestamp,
-} from "firebase/firestore";
+import { updateDoc, deleteDoc, getDoc, serverTimestamp } from "firebase/firestore";
 import { getAssessmentDocRef, getUserDocRef } from "../../lib/firebaseUtils";
 import { useAuth } from "../../contexts/AuthContext";
 import RichTextEditor from "../editor/RichTextEditor";
-import {
-  getFromLocalStorage,
-  setToLocalStorage,
-} from "../../utils/localStorage";
+import { getFromLocalStorage, setToLocalStorage } from "../../utils/localStorage";
 import { getStatusTextClasses, getStatusBadgeClasses } from "../../utils/statusUtils";
 import { formatLocalDateTime, getDaysUntil } from "../../utils/dateUtils";
 import { Assessment, AssessmentsTableProps } from "../../types/assessment";
@@ -25,12 +17,7 @@ const filterOptions: SelectOption[] = [
     value: "all",
     label: "All Tasks",
     icon: (
-      <svg
-        className="w-4 h-4"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
+      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -45,12 +32,7 @@ const filterOptions: SelectOption[] = [
     value: "not_submitted",
     label: "Not Submitted",
     icon: (
-      <svg
-        className="w-4 h-4"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
+      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -65,18 +47,8 @@ const filterOptions: SelectOption[] = [
     value: "submitted",
     label: "Submitted",
     icon: (
-      <svg
-        className="w-4 h-4"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth="2"
-          d="M5 13l4 4L19 7"
-        />
+      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
       </svg>
     ),
     colorClass: "text-emerald-600 dark:text-emerald-400",
@@ -89,21 +61,20 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
   onStatusChange,
 }) => {
   const { user } = useAuth();
-  const [localAssessments, setLocalAssessments] =
-    useState<Assessment[]>(assessments);
+  const [localAssessments, setLocalAssessments] = useState<Assessment[]>(assessments);
 
   // Update local assessments when props change
   useEffect(() => {
     setLocalAssessments(assessments);
   }, [assessments]);
   const [sortKey] = useState<keyof Assessment>(() =>
-    getFromLocalStorage<keyof Assessment>("assessmentSortKey", "dueDate")
+    getFromLocalStorage<keyof Assessment>("assessmentSortKey", "dueDate"),
   );
   const [sortOrder] = useState<"asc" | "desc">(() =>
-    getFromLocalStorage<"asc" | "desc">("assessmentSortOrder", "asc")
+    getFromLocalStorage<"asc" | "desc">("assessmentSortOrder", "asc"),
   );
   const [filter, setFilter] = useState<string>(() =>
-    getFromLocalStorage<string>("assessmentFilter", "all")
+    getFromLocalStorage<string>("assessmentFilter", "all"),
   );
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -120,14 +91,12 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
     notes: "",
     weight: 0,
   });
-  const [selectedAssessment, setSelectedAssessment] =
-    useState<Assessment | null>(null);
+  const [selectedAssessment, setSelectedAssessment] = useState<Assessment | null>(null);
   const [notesInput, setNotesInput] = useState<string>("");
   const [showNotesModal, setShowNotesModal] = useState<string | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [assessmentToDelete, setAssessmentToDelete] =
-    useState<Assessment | null>(null);
+  const [assessmentToDelete, setAssessmentToDelete] = useState<Assessment | null>(null);
   const [showBulkDeleteModal, setShowBulkDeleteModal] = useState(false);
   const [showBulkStatusUpdate, setShowBulkStatusUpdate] = useState(false);
   const [selectedStatus, setSelectedStatus] = useState<string>("");
@@ -168,16 +137,13 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
       }
     };
 
-    window.addEventListener(
-      "userPreferencesUpdated",
-      handlePreferencesUpdate as EventListener
-    );
+    window.addEventListener("userPreferencesUpdated", handlePreferencesUpdate as EventListener);
 
     // Cleanup
     return () => {
       window.removeEventListener(
         "userPreferencesUpdated",
-        handlePreferencesUpdate as EventListener
+        handlePreferencesUpdate as EventListener,
       );
     };
   }, [user]);
@@ -196,24 +162,12 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
   }, [filter]);
 
   // Existing helper functions remain largely unchanged; updating only where necessary
-  const formatDateTimeForDisplay = (
-    dateStr: string,
-    timeStr: string
-  ): string => {
+  const formatDateTimeForDisplay = (dateStr: string, timeStr: string): string => {
     return formatLocalDateTime(dateStr, timeStr);
   };
 
-  const getDaysTillDue = (
-    dueDate: string,
-    dueTime: string,
-    status: string
-  ): number | null => {
-    const completedStatuses = [
-      "Submitted",
-      "Under Review",
-      "Completed",
-      "Missed",
-    ];
+  const getDaysTillDue = (dueDate: string, dueTime: string, status: string): number | null => {
+    const completedStatuses = ["Submitted", "Under Review", "Completed", "Missed"];
     if (completedStatuses.includes(status)) return null;
 
     return getDaysUntil(dueDate, dueTime);
@@ -221,10 +175,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
-      ) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         if (
           showNotesModal &&
           event.target instanceof Node &&
@@ -265,25 +216,19 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
 
   const handleStatusChange = async (
     assessmentId: string,
-    newStatus: "Not started" | "In progress" | "Submitted" | "Missed"
+    newStatus: "Not started" | "In progress" | "Submitted" | "Missed",
   ) => {
     if (!user || !assessmentId) return;
 
     // Optimistic update: Update UI immediately
     setLocalAssessments((prev) =>
       prev.map((assessment) =>
-        assessment.id === assessmentId
-          ? { ...assessment, status: newStatus }
-          : assessment
-      )
+        assessment.id === assessmentId ? { ...assessment, status: newStatus } : assessment,
+      ),
     );
 
     try {
-      const assessmentRef = getAssessmentDocRef(
-        user.uid,
-        semesterId,
-        assessmentId
-      );
+      const assessmentRef = getAssessmentDocRef(user.uid, semesterId, assessmentId);
       await updateDoc(assessmentRef, {
         status: newStatus,
         updatedAt: serverTimestamp(),
@@ -302,11 +247,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
     if (!user || !assessment.id) return;
 
     try {
-      const assessmentRef = getAssessmentDocRef(
-        user.uid,
-        semesterId,
-        assessment.id
-      );
+      const assessmentRef = getAssessmentDocRef(user.uid, semesterId, assessment.id);
       await deleteDoc(assessmentRef);
       // Remove from local state after successful deletion
       setLocalAssessments((prev) => prev.filter((a) => a.id !== assessment.id));
@@ -326,9 +267,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
         await deleteDoc(assessmentRef);
       }
       // Remove deleted assessments from local state
-      setLocalAssessments((prev) =>
-        prev.filter((a) => !selectedRows.includes(a.id || ""))
-      );
+      setLocalAssessments((prev) => prev.filter((a) => !selectedRows.includes(a.id || "")));
       setSelectedRows([]);
       setShowBulkDeleteModal(false);
     } catch (error) {
@@ -338,10 +277,9 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
 
   const toggleSelectAll = () => {
     setSelectedRows(
-      selectedRows.length === sortedAssessments.length &&
-        sortedAssessments.length > 0
+      selectedRows.length === sortedAssessments.length && sortedAssessments.length > 0
         ? []
-        : sortedAssessments.map((a) => a.id || "").filter(Boolean)
+        : sortedAssessments.map((a) => a.id || "").filter(Boolean),
     );
   };
 
@@ -349,7 +287,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
     setSelectedRows(
       selectedRows.includes(id)
         ? selectedRows.filter((rowId) => rowId !== id)
-        : [...selectedRows, id]
+        : [...selectedRows, id],
     );
   };
 
@@ -365,9 +303,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
   const handleCancelEdit = () => setEditingId(null);
 
   const handleEditFormChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-    >
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>,
   ) => {
     const { name, value } = e.target;
     setEditFormData((prev) => ({
@@ -379,11 +315,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
   const handleSaveEdit = async (assessmentId: string) => {
     if (!user) return;
     try {
-      const assessmentRef = getAssessmentDocRef(
-        user.uid,
-        semesterId,
-        assessmentId
-      );
+      const assessmentRef = getAssessmentDocRef(user.uid, semesterId, assessmentId);
       await updateDoc(assessmentRef, {
         ...editFormData,
         updatedAt: new Date(),
@@ -404,11 +336,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
   const handleSaveNotes = async () => {
     if (!user || !selectedAssessment?.id) return;
     try {
-      const assessmentRef = getAssessmentDocRef(
-        user.uid,
-        semesterId,
-        selectedAssessment.id
-      );
+      const assessmentRef = getAssessmentDocRef(user.uid, semesterId, selectedAssessment.id);
 
       // Strip HTML tags and whitespace to check if content is truly empty
       const strippedContent = notesInput.replace(/<[^>]*>/g, "").trim();
@@ -446,7 +374,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
 
   // Add new function for bulk status update
   const handleBulkStatusUpdate = async (
-    newStatus: "Not started" | "In progress" | "Submitted" | "Missed"
+    newStatus: "Not started" | "In progress" | "Submitted" | "Missed",
   ) => {
     if (!user || selectedRows.length === 0) return;
 
@@ -463,8 +391,8 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
         prev.map((assessment) =>
           selectedRows.includes(assessment.id || "")
             ? { ...assessment, status: newStatus }
-            : assessment
-        )
+            : assessment,
+        ),
       );
       setSelectedRows([]);
       setShowBulkStatusUpdate(false);
@@ -511,11 +439,10 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
           <div className="lg:hidden space-y-4">
             <div className="text-center">
               <span className="text-base font-medium text-gray-700 dark:text-dark-text-primary">
-                {selectedRows.length}{" "}
-                {selectedRows.length === 1 ? "item" : "items"} selected
+                {selectedRows.length} {selectedRows.length === 1 ? "item" : "items"} selected
               </span>
             </div>
-            
+
             <div className="space-y-3">
               {!showBulkStatusUpdate ? (
                 <div className="w-full">
@@ -531,19 +458,14 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                 <div className="space-y-3">
                   <div className="text-center">
                     <span className="text-sm text-light-text-secondary dark:text-dark-text-secondary">
-                      Update to:{" "}
-                      <span className="font-medium">{selectedStatus}</span>
+                      Update to: <span className="font-medium">{selectedStatus}</span>
                     </span>
                   </div>
                   <div className="flex space-x-2">
                     <button
                       onClick={() =>
                         handleBulkStatusUpdate(
-                          selectedStatus as
-                            | "Not started"
-                            | "In progress"
-                            | "Submitted"
-                            | "Missed"
+                          selectedStatus as "Not started" | "In progress" | "Submitted" | "Missed",
                         )
                       }
                       className="btn-primary flex-1 py-2.5 px-4 text-sm min-h-[44px]"
@@ -560,7 +482,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                 </div>
               )}
             </div>
-            
+
             <div className="flex flex-col space-y-2 pt-2 border-t border-gray-200 dark:border-dark-border-primary">
               <button
                 onClick={() => setShowBulkDeleteModal(true)}
@@ -581,8 +503,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
           <div className="hidden lg:flex items-center justify-between">
             <div className="flex items-center space-x-4">
               <span className="text-md font-medium text-gray-700 dark:text-dark-text-primary">
-                {selectedRows.length}{" "}
-                {selectedRows.length === 1 ? "item" : "items"} selected
+                {selectedRows.length} {selectedRows.length === 1 ? "item" : "items"} selected
               </span>
               <div className="flex items-center space-x-2">
                 {!showBulkStatusUpdate ? (
@@ -598,17 +519,12 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                 ) : (
                   <div className="flex items-center space-x-2">
                     <span className="text-sm text-light-text-secondary dark:text-dark-text-secondary">
-                      Update to:{" "}
-                      <span className="font-medium">{selectedStatus}</span>
+                      Update to: <span className="font-medium">{selectedStatus}</span>
                     </span>
                     <button
                       onClick={() =>
                         handleBulkStatusUpdate(
-                          selectedStatus as
-                            | "Not started"
-                            | "In progress"
-                            | "Submitted"
-                            | "Missed"
+                          selectedStatus as "Not started" | "In progress" | "Submitted" | "Missed",
                         )
                       }
                       className="btn-primary py-1.5 px-3 text-sm"
@@ -674,8 +590,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
               <input
                 type="checkbox"
                 checked={
-                  selectedRows.length === sortedAssessments.length &&
-                  sortedAssessments.length > 0
+                  selectedRows.length === sortedAssessments.length && sortedAssessments.length > 0
                 }
                 onChange={toggleSelectAll}
                 className="h-4 w-4 rounded border-gray-300 dark:border-dark-border-primary text-light-button-primary dark:text-dark-button-primary focus:ring-light-focus-ring dark:focus:ring-dark-focus-ring"
@@ -717,8 +632,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
               <input
                 type="checkbox"
                 checked={
-                  selectedRows.length === sortedAssessments.length &&
-                  sortedAssessments.length > 0
+                  selectedRows.length === sortedAssessments.length && sortedAssessments.length > 0
                 }
                 onChange={toggleSelectAll}
                 className="h-5 w-5 rounded border-gray-300 dark:border-dark-border-primary text-light-button-primary dark:text-dark-button-primary focus:ring-light-focus-ring dark:focus:ring-dark-focus-ring"
@@ -739,7 +653,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
               const daysTillDue = getDaysTillDue(
                 assessment.dueDate,
                 assessment.dueTime,
-                assessment.status
+                assessment.status,
               );
               return editingId === assessment.id ? (
                 <div
@@ -758,7 +672,9 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                       <div className="flex-1">
                         <StatusSelect
                           value={editFormData.status}
-                          onChange={(value) => setEditFormData(prev => ({ ...prev, status: value }))}
+                          onChange={(value) =>
+                            setEditFormData((prev) => ({ ...prev, status: value }))
+                          }
                           size="md"
                           className="w-full"
                         />
@@ -779,7 +695,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                           className="input py-3 px-4 text-base w-full dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border-primary rounded-md min-h-[44px]"
                         />
                       </div>
-                      
+
                       <div>
                         <label className="block text-xs font-medium text-gray-700 dark:text-dark-text-secondary mb-1">
                           Assignment
@@ -849,9 +765,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                         Cancel
                       </button>
                       <button
-                        onClick={() =>
-                          assessment.id && handleSaveEdit(assessment.id)
-                        }
+                        onClick={() => assessment.id && handleSaveEdit(assessment.id)}
                         className="btn-primary py-2.5 px-4 text-sm min-h-[44px] min-w-[80px]"
                       >
                         Save
@@ -870,7 +784,9 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                       />
                       <StatusSelect
                         value={editFormData.status}
-                        onChange={(value) => setEditFormData(prev => ({ ...prev, status: value }))}
+                        onChange={(value) =>
+                          setEditFormData((prev) => ({ ...prev, status: value }))
+                        }
                         size="sm"
                         className="flex-1"
                       />
@@ -925,9 +841,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                       )}
                       <div className="flex items-center space-x-1">
                         <button
-                          onClick={() =>
-                            assessment.id && handleSaveEdit(assessment.id)
-                          }
+                          onClick={() => assessment.id && handleSaveEdit(assessment.id)}
                           className="text-emerald-600 dark:text-emerald-400 hover:text-emerald-800 dark:hover:text-emerald-300 p-1.5 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 rounded-md transition-colors"
                         >
                           <svg
@@ -983,8 +897,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                         <StatusSelect
                           value={assessment.status}
                           onChange={(value) =>
-                            assessment.id &&
-                            handleStatusChange(assessment.id, value)
+                            assessment.id && handleStatusChange(assessment.id, value)
                           }
                           size="md"
                           className="w-full"
@@ -1014,10 +927,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                       <span
                         className={`text-sm font-medium ${getStatusTextClasses(assessment.status)}`}
                       >
-                        Due: {formatDateTimeForDisplay(
-                          assessment.dueDate,
-                          assessment.dueTime
-                        )}
+                        Due: {formatDateTimeForDisplay(assessment.dueDate, assessment.dueTime)}
                       </span>
                       {showDaysTillDue && daysTillDue !== null && (
                         <div
@@ -1025,15 +935,15 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                             daysTillDue <= 3
                               ? "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300"
                               : daysTillDue <= 7
-                              ? "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300"
-                              : "bg-gray-100 text-gray-600 dark:bg-gray-800/30 dark:text-gray-400"
+                                ? "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300"
+                                : "bg-gray-100 text-gray-600 dark:bg-gray-800/30 dark:text-gray-400"
                           }`}
                         >
                           {daysTillDue === 0
                             ? "Due today"
                             : daysTillDue === 1
-                            ? "Due tomorrow"
-                            : `${daysTillDue} days left`}
+                              ? "Due tomorrow"
+                              : `${daysTillDue} days left`}
                         </div>
                       )}
                     </div>
@@ -1048,11 +958,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                               ? "text-light-button-primary dark:text-dark-button-primary bg-blue-50 dark:bg-blue-900/30"
                               : "text-gray-500 dark:text-dark-text-tertiary"
                           } hover:bg-gray-100 dark:hover:bg-dark-bg-tertiary p-3 rounded-md transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center`}
-                          title={
-                            assessment.notes
-                              ? "View/Edit Notes"
-                              : "Add Notes"
-                          }
+                          title={assessment.notes ? "View/Edit Notes" : "Add Notes"}
                         >
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -1116,8 +1022,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                       <StatusSelect
                         value={assessment.status}
                         onChange={(value) =>
-                          assessment.id &&
-                          handleStatusChange(assessment.id, value)
+                          assessment.id && handleStatusChange(assessment.id, value)
                         }
                         size="sm"
                         className="flex-1"
@@ -1135,13 +1040,8 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                     </div>
                     <div className="col-span-4 flex items-center justify-between">
                       <div className="flex flex-col space-y-0.5">
-                        <span
-                          className={`text-md ${getStatusTextClasses(assessment.status)}`}
-                        >
-                          {formatDateTimeForDisplay(
-                            assessment.dueDate,
-                            assessment.dueTime
-                          )}
+                        <span className={`text-md ${getStatusTextClasses(assessment.status)}`}>
+                          {formatDateTimeForDisplay(assessment.dueDate, assessment.dueTime)}
                         </span>
                         {showDaysTillDue && daysTillDue !== null && (
                           <span
@@ -1149,15 +1049,15 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                               daysTillDue <= 3
                                 ? "text-red-600 dark:text-red-400"
                                 : daysTillDue <= 7
-                                ? "text-amber-600 dark:text-amber-400"
-                                : "text-gray-500 dark:text-dark-text-tertiary"
+                                  ? "text-amber-600 dark:text-amber-400"
+                                  : "text-gray-500 dark:text-dark-text-tertiary"
                             }`}
                           >
                             {daysTillDue === 0
                               ? "Due today"
                               : daysTillDue === 1
-                              ? "Due tomorrow"
-                              : `${daysTillDue} days left`}
+                                ? "Due tomorrow"
+                                : `${daysTillDue} days left`}
                           </span>
                         )}
                       </div>
@@ -1176,11 +1076,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                                   ? "text-light-button-primary dark:text-dark-button-primary"
                                   : "text-gray-500 dark:text-dark-text-tertiary"
                               } hover:text-gray-700 dark:hover:text-dark-text-secondary p-1 hover:bg-gray-100 dark:hover:bg-dark-bg-tertiary rounded-md transition-colors`}
-                              title={
-                                assessment.notes
-                                  ? "View/Edit Notes"
-                                  : "Add Notes"
-                              }
+                              title={assessment.notes ? "View/Edit Notes" : "Add Notes"}
                             >
                               <svg
                                 xmlns="http://www.w3.org/2000/svg"
@@ -1258,15 +1154,13 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                       Due:{" "}
                       {formatDateTimeForDisplay(
                         selectedAssessment.dueDate,
-                        selectedAssessment.dueTime
+                        selectedAssessment.dueTime,
                       )}
                     </span>
                     <span className="text-light-text-secondary dark:text-dark-text-secondary">
                       Weight: {selectedAssessment.weight}%
                     </span>
-                    <span
-                      className={getStatusBadgeClasses(selectedAssessment.status)}
-                    >
+                    <span className={getStatusBadgeClasses(selectedAssessment.status)}>
                       {selectedAssessment.status}
                     </span>
                   </div>
@@ -1274,13 +1168,11 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                 <div className="flex items-center space-x-2">
                   <button
                     onClick={() => {
-                      const text = `Assignment: ${
-                        selectedAssessment.assignmentName
-                      }\nCourse: ${
+                      const text = `Assignment: ${selectedAssessment.assignmentName}\nCourse: ${
                         selectedAssessment.courseName
                       }\nDue: ${formatDateTimeForDisplay(
                         selectedAssessment.dueDate,
-                        selectedAssessment.dueTime
+                        selectedAssessment.dueTime,
                       )}\nWeight: ${selectedAssessment.weight}%\nStatus: ${
                         selectedAssessment.status
                       }\n\nNotes:\n${notesInput}`;
@@ -1299,14 +1191,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                       strokeLinecap="round"
                       strokeLinejoin="round"
                     >
-                      <rect
-                        x="9"
-                        y="9"
-                        width="13"
-                        height="13"
-                        rx="2"
-                        ry="2"
-                      ></rect>
+                      <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
                       <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
                     </svg>
                     Copy
@@ -1375,9 +1260,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
           setShowDeleteModal(false);
           setAssessmentToDelete(null);
         }}
-        onConfirm={() =>
-          assessmentToDelete && handleDeleteAssessment(assessmentToDelete)
-        }
+        onConfirm={() => assessmentToDelete && handleDeleteAssessment(assessmentToDelete)}
         title="Confirm Delete"
         message={`Are you sure you want to delete "${assessmentToDelete?.assignmentName}"? This action cannot be undone.`}
         confirmText="Delete"
@@ -1405,9 +1288,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
         onClose={() => setShowBulkDeleteModal(false)}
         onConfirm={handleConfirmBulkDelete}
         title="Confirm Bulk Delete"
-        message={`Are you sure you want to delete ${
-          selectedRows.length
-        } selected assessment${
+        message={`Are you sure you want to delete ${selectedRows.length} selected assessment${
           selectedRows.length === 1 ? "" : "s"
         }? This action cannot be undone.`}
         confirmText="Delete"

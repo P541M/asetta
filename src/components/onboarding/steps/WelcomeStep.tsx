@@ -9,12 +9,7 @@ export function WelcomeStep() {
     <div className="text-center">
       <div className="mb-12">
         <div className="w-16 h-16 bg-light-button-primary dark:bg-dark-button-primary rounded-xl flex items-center justify-center mx-auto mb-6">
-          <svg
-            className="w-8 h-8 text-white"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
+          <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -27,7 +22,8 @@ export function WelcomeStep() {
           Welcome to Asetta, {userName}!
         </h1>
         <p className="text-lg text-light-text-secondary dark:text-dark-text-secondary max-w-lg mx-auto">
-          Upload your course outlines and we&apos;ll automatically track all your assessments and deadlines.
+          Upload your course outlines and we&apos;ll automatically track all your assessments and
+          deadlines.
         </p>
       </div>
 

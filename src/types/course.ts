@@ -4,7 +4,6 @@ export interface CourseFilteredAssessmentsProps {
   onBack: () => void;
 }
 
-
 export interface SemesterTabsProps {
   selectedSemester: string;
   onSelect: (semester: string) => void;

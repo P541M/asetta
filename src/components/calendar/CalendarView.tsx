@@ -14,12 +14,7 @@ const statusFilterOptions: SelectOption[] = [
     value: "all",
     label: "All Status",
     icon: (
-      <svg
-        className="w-4 h-4"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
+      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -34,12 +29,7 @@ const statusFilterOptions: SelectOption[] = [
     value: "Not started",
     label: "Not Started",
     icon: (
-      <svg
-        className="w-4 h-4"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
+      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <circle cx="12" cy="12" r="10" strokeWidth="2" />
         <path strokeWidth="2" d="M12 6v6l4 2" />
       </svg>
@@ -51,12 +41,7 @@ const statusFilterOptions: SelectOption[] = [
     value: "In progress",
     label: "In Progress",
     icon: (
-      <svg
-        className="w-4 h-4"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
+      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <circle cx="12" cy="12" r="10" strokeWidth="2" />
         <polyline points="12,6 12,12 16,14" strokeWidth="2" />
       </svg>
@@ -68,18 +53,8 @@ const statusFilterOptions: SelectOption[] = [
     value: "Submitted",
     label: "Submitted",
     icon: (
-      <svg
-        className="w-4 h-4"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth="2"
-          d="M5 13l4 4L19 7"
-        />
+      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
       </svg>
     ),
     colorClass: "text-emerald-600 dark:text-emerald-400",
@@ -127,7 +102,7 @@ const CalendarView = ({ selectedSemester, semesterId, refreshTrigger }: Calendar
           user.uid,
           "semesters",
           semesterId,
-          "assessments"
+          "assessments",
         );
         const q = query(assessmentsRef);
         const querySnapshot = await getDocs(q);
@@ -154,18 +129,13 @@ const CalendarView = ({ selectedSemester, semesterId, refreshTrigger }: Calendar
         const matchesDate = assessment.dueDate === dateStr;
         const matchesSearch =
           searchTerm === "" ||
-          assessment.assignmentName
-            .toLowerCase()
-            .includes(searchTerm.toLowerCase()) ||
-          assessment.courseName
-            .toLowerCase()
-            .includes(searchTerm.toLowerCase());
-        const matchesStatus =
-          statusFilter === "all" || assessment.status === statusFilter;
+          assessment.assignmentName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          assessment.courseName.toLowerCase().includes(searchTerm.toLowerCase());
+        const matchesStatus = statusFilter === "all" || assessment.status === statusFilter;
         return matchesDate && matchesSearch && matchesStatus;
       });
     },
-    [assessments, searchTerm, statusFilter]
+    [assessments, searchTerm, statusFilter],
   );
 
   // Generate calendar days
@@ -244,25 +214,19 @@ const CalendarView = ({ selectedSemester, semesterId, refreshTrigger }: Calendar
 
   // Navigation handlers
   const previousMonth = () => {
-    setCurrentMonth(
-      new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1)
-    );
+    setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1));
     setSelectedDay(null);
   };
 
   const nextMonth = () => {
-    setCurrentMonth(
-      new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1)
-    );
+    setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1));
     setSelectedDay(null);
   };
 
   const goToToday = () => {
     const today = new Date();
     setCurrentMonth(new Date(today.getFullYear(), today.getMonth(), 1));
-    const todayDay = calendarDays.find(
-      (day) => day.date.getTime() === today.getTime()
-    );
+    const todayDay = calendarDays.find((day) => day.date.getTime() === today.getTime());
     if (todayDay) {
       setSelectedDay(todayDay);
     }
@@ -304,7 +268,7 @@ const CalendarView = ({ selectedSemester, semesterId, refreshTrigger }: Calendar
         "semesters",
         semesterId,
         "assessments",
-        assessmentId
+        assessmentId,
       );
       await updateDoc(assessmentRef, { dueDate: newDate });
     } catch (error) {
@@ -456,9 +420,7 @@ const CalendarView = ({ selectedSemester, semesterId, refreshTrigger }: Calendar
             {calendarDays.map((day, index) => (
               <div
                 key={index}
-                onClick={() =>
-                  day.assessments.length > 0 && setSelectedDay(day)
-                }
+                onClick={() => day.assessments.length > 0 && setSelectedDay(day)}
                 className={`relative p-2 min-h-[120px] border-r border-b dark:border-dark-border-primary transition-colors ${
                   day.isCurrentMonth
                     ? "bg-white dark:bg-dark-bg-secondary"
@@ -480,9 +442,7 @@ const CalendarView = ({ selectedSemester, semesterId, refreshTrigger }: Calendar
                         ? "text-gray-900 dark:text-dark-text-primary"
                         : "text-gray-400 dark:text-dark-text-tertiary"
                     } ${
-                      day.isToday
-                        ? "text-light-button-primary dark:text-dark-button-primary"
-                        : ""
+                      day.isToday ? "text-light-button-primary dark:text-dark-button-primary" : ""
                     }`}
                   >
                     {day.date.getDate()}
@@ -498,21 +458,20 @@ const CalendarView = ({ selectedSemester, semesterId, refreshTrigger }: Calendar
                     <div
                       key={assessment.id}
                       className={`text-xs px-2 py-1.5 rounded-md truncate ${getStatusBackgroundClasses(
-                        assessment.status
+                        assessment.status,
                       )} hover:shadow-sm transition-all duration-200`}
                     >
                       <div className="flex items-center justify-between">
-                        <span className="truncate font-medium">
-                          {assessment.assignmentName}
-                        </span>
+                        <span className="truncate font-medium">{assessment.assignmentName}</span>
                         <span className="ml-2 text-[10px] font-medium opacity-75">
-                          {new Date(
-                            `2000-01-01T${assessment.dueTime}`
-                          ).toLocaleTimeString("en-US", {
-                            hour: "numeric",
-                            minute: "2-digit",
-                            hour12: true,
-                          })}
+                          {new Date(`2000-01-01T${assessment.dueTime}`).toLocaleTimeString(
+                            "en-US",
+                            {
+                              hour: "numeric",
+                              minute: "2-digit",
+                              hour12: true,
+                            },
+                          )}
                         </span>
                       </div>
                     </div>
@@ -583,20 +542,13 @@ const CalendarView = ({ selectedSemester, semesterId, refreshTrigger }: Calendar
                         {assessment.courseName}
                       </p>
                     </div>
-                    <span
-                      className={getStatusBadgeClasses(assessment.status)}
-                    >
+                    <span className={getStatusBadgeClasses(assessment.status)}>
                       {assessment.status}
                     </span>
                   </div>
                   <div className="mt-2 text-sm text-light-text-secondary dark:text-dark-text-secondary">
-                    <p>
-                      Due:{" "}
-                      {formatDateTime(selectedDay.date, assessment.dueTime)}
-                    </p>
-                    {assessment.weight > 0 && (
-                      <p>Weight: {assessment.weight}%</p>
-                    )}
+                    <p>Due: {formatDateTime(selectedDay.date, assessment.dueTime)}</p>
+                    {assessment.weight > 0 && <p>Weight: {assessment.weight}%</p>}
                   </div>
                 </div>
               ))}

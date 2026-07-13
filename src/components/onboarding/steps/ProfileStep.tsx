@@ -21,9 +21,9 @@ export function ProfileStep() {
   };
 
   const handleIconSelect = (iconId: string) => {
-    const newFormData = { 
-      ...formData, 
-      avatarIconId: iconId
+    const newFormData = {
+      ...formData,
+      avatarIconId: iconId,
     };
     setFormData(newFormData);
     updateUserData(newFormData);
@@ -60,11 +60,7 @@ export function ProfileStep() {
 
       {/* Avatar Section */}
       <div className="flex flex-col items-center space-y-4 mb-8">
-        <Avatar 
-          size="lg" 
-          iconId={formData.avatarIconId}
-          className="shadow-lg" 
-        />
+        <Avatar size="lg" iconId={formData.avatarIconId} className="shadow-lg" />
         <div className="text-center">
           <p className="text-sm text-light-text-secondary dark:text-dark-text-secondary">
             Choose your profile avatar
@@ -125,13 +121,15 @@ export function ProfileStep() {
             max={new Date().getFullYear() + 10}
             value={formData.graduationYear}
             onChange={(e) =>
-              handleInputChange("graduationYear", parseInt(e.target.value) || new Date().getFullYear() + 4)
+              handleInputChange(
+                "graduationYear",
+                parseInt(e.target.value) || new Date().getFullYear() + 4,
+              )
             }
             placeholder="e.g., 2026, 2025"
             className="input"
           />
         </div>
-
       </div>
 
       <StepNavigation

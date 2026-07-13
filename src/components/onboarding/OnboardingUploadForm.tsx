@@ -1,10 +1,6 @@
 import React, { useState, useRef, useCallback } from "react";
 import { useAuth } from "../../contexts/AuthContext";
-import {
-  FileProgress,
-  UploadStatus,
-  ExtractionResult,
-} from "../../types/upload";
+import { FileProgress, UploadStatus, ExtractionResult } from "../../types/upload";
 import ApiLimitReachedModal from "../modals/ApiLimitReachedModal";
 
 interface OnboardingUploadFormProps {
@@ -60,12 +56,11 @@ export function OnboardingUploadForm({
       setIsDragOver(false);
       handleFileSelect(e.dataTransfer.files);
     },
-    [handleFileSelect]
+    [handleFileSelect],
   );
 
   const handleUpload = async () => {
-    if (!user || !fileInputRef.current?.files?.length || !copyrightAgreed)
-      return;
+    if (!user || !fileInputRef.current?.files?.length || !copyrightAgreed) return;
 
     try {
       setUploadStatus("uploading");
@@ -79,10 +74,8 @@ export function OnboardingUploadForm({
         formData.append("files", file);
         setFiles((prev) =>
           prev.map((f, i) =>
-            i === index
-              ? { ...f, status: "uploading" as UploadStatus, progress: 50 }
-              : f
-          )
+            i === index ? { ...f, status: "uploading" as UploadStatus, progress: 50 } : f,
+          ),
         );
       });
 
@@ -117,7 +110,7 @@ export function OnboardingUploadForm({
           ...f,
           status: "processing" as UploadStatus,
           progress: 75,
-        }))
+        })),
       );
 
       const result = await response.json();
@@ -127,39 +120,35 @@ export function OnboardingUploadForm({
           ...f,
           status: "success" as UploadStatus,
           progress: 100,
-        }))
+        })),
       );
 
       setUploadStatus("success");
       setMessage(
         `Successfully processed ${
           result.data?.processedFiles || result.processedFiles || 0
-        } file(s)!`
+        } file(s)!`,
       );
 
       // The API response has data nested under 'data' property
       const extractionData = {
-        processedFiles:
-          result.data?.processedFiles || result.processedFiles || 0,
-        totalAssessments:
-          result.data?.totalAssessments || result.totalAssessments || 0,
-        courseBreakdown:
-          result.data?.courseBreakdown || result.courseBreakdown || [],
+        processedFiles: result.data?.processedFiles || result.processedFiles || 0,
+        totalAssessments: result.data?.totalAssessments || result.totalAssessments || 0,
+        courseBreakdown: result.data?.courseBreakdown || result.courseBreakdown || [],
         failedFiles: result.data?.failedFiles || result.failedFiles || 0,
-        processingTime:
-          result.data?.processingTime || result.processingTime || 0,
+        processingTime: result.data?.processingTime || result.processingTime || 0,
       };
 
       onUploadSuccess(extractionData);
     } catch (err) {
       console.error("Upload error:", err);
-      
+
       // Check for daily quota errors in catch block as well
       if (
         err instanceof Error &&
         (err.message.includes("DAILY_QUOTA_EXCEEDED") ||
-         err.message.includes("daily limit") ||
-         err.message.includes("quota exceeded"))
+          err.message.includes("daily limit") ||
+          err.message.includes("quota exceeded"))
       ) {
         setUploadStatus("daily_quota_exceeded");
         setShowApiLimitModal(true);
@@ -173,7 +162,7 @@ export function OnboardingUploadForm({
         prev.map((f) => ({
           ...f,
           status: "error" as UploadStatus,
-        }))
+        })),
       );
     }
   };
@@ -217,12 +206,12 @@ export function OnboardingUploadForm({
           isDragOver
             ? "border-light-button-primary dark:border-dark-button-primary bg-light-button-primary/5 dark:bg-dark-button-primary/5"
             : uploadStatus === "success"
-            ? "border-green-300 dark:border-green-700 bg-green-50 dark:bg-green-900/20"
-            : uploadStatus === "error"
-            ? "border-red-300 dark:border-red-700 bg-red-50 dark:bg-red-900/20"
-            : files.length > 0
-            ? "border-light-button-primary dark:border-dark-button-primary bg-light-button-primary/5 dark:bg-dark-button-primary/5"
-            : "border-light-border-secondary dark:border-dark-border-secondary hover:border-light-button-primary dark:hover:border-dark-button-primary hover:bg-light-button-primary/5 dark:hover:bg-dark-button-primary/5"
+              ? "border-green-300 dark:border-green-700 bg-green-50 dark:bg-green-900/20"
+              : uploadStatus === "error"
+                ? "border-red-300 dark:border-red-700 bg-red-50 dark:bg-red-900/20"
+                : files.length > 0
+                  ? "border-light-button-primary dark:border-dark-button-primary bg-light-button-primary/5 dark:bg-dark-button-primary/5"
+                  : "border-light-border-secondary dark:border-dark-border-secondary hover:border-light-button-primary dark:hover:border-dark-button-primary hover:bg-light-button-primary/5 dark:hover:bg-dark-button-primary/5"
         }`}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
@@ -235,9 +224,7 @@ export function OnboardingUploadForm({
           accept=".pdf,.doc,.docx"
           onChange={(e) => handleFileSelect(e.target.files)}
           className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-          disabled={
-            uploadStatus === "uploading" || uploadStatus === "processing"
-          }
+          disabled={uploadStatus === "uploading" || uploadStatus === "processing"}
         />
 
         {files.length === 0 ? (
@@ -302,8 +289,7 @@ export function OnboardingUploadForm({
                     </div>
                   </div>
                   <div className="flex items-center space-x-2">
-                    {file.status === "uploading" ||
-                    file.status === "processing" ? (
+                    {file.status === "uploading" || file.status === "processing" ? (
                       <div className="flex items-center space-x-2">
                         <div className="w-4 h-4 border-2 border-light-button-primary border-t-transparent rounded-full animate-spin"></div>
                         <span className="text-xs text-light-text-secondary dark:text-dark-text-secondary">
@@ -394,7 +380,9 @@ export function OnboardingUploadForm({
             onClick={handleUpload}
             disabled={!copyrightAgreed || (uploadStatus as UploadStatus) === "daily_quota_exceeded"}
             className={`btn-primary ${
-              (!copyrightAgreed || (uploadStatus as UploadStatus) === "daily_quota_exceeded") ? "opacity-50 cursor-not-allowed" : ""
+              !copyrightAgreed || (uploadStatus as UploadStatus) === "daily_quota_exceeded"
+                ? "opacity-50 cursor-not-allowed"
+                : ""
             }`}
           >
             Upload & Process Files
@@ -411,9 +399,7 @@ export function OnboardingUploadForm({
 
       {error && (
         <div className="mt-4 p-3 bg-light-error-bg dark:bg-dark-error-bg border border-light-error-border dark:border-dark-error-border rounded-lg">
-          <p className="text-sm text-light-error-text dark:text-dark-error-text">
-            {error}
-          </p>
+          <p className="text-sm text-light-error-text dark:text-dark-error-text">{error}</p>
           <button
             onClick={resetUpload}
             className="mt-2 text-xs text-light-button-primary dark:text-dark-button-primary hover:underline"
@@ -439,10 +425,7 @@ export function OnboardingUploadForm({
       )}
 
       {/* API Limit Reached Modal */}
-      <ApiLimitReachedModal
-        isOpen={showApiLimitModal}
-        onClose={handleCloseApiLimitModal}
-      />
+      <ApiLimitReachedModal isOpen={showApiLimitModal} onClose={handleCloseApiLimitModal} />
     </div>
   );
 }

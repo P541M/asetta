@@ -18,9 +18,7 @@ async function initializeAdmin() {
     try {
       const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
       config = {
-        credential: admin.credential.cert(
-          serviceAccount as admin.ServiceAccount
-        ),
+        credential: admin.credential.cert(serviceAccount as admin.ServiceAccount),
       };
       console.log("Firebase Admin initialized with service account from env");
     } catch (error) {

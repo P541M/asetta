@@ -1,23 +1,10 @@
 // src/pages/_app.tsx
 import type { AppProps } from "next/app";
 import Head from "next/head";
-import "../app/globals.css";
+import "../styles/globals.css";
+import "../styles/rich-text-editor.css";
 import { AuthProvider } from "../contexts/AuthContext";
 import { ThemeProvider } from "../contexts/ThemeContext";
-import { Outfit, Lexend } from "next/font/google";
-
-const outfit = Outfit({
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
-  variable: "--font-outfit",
-  display: "swap",
-});
-const lexend = Lexend({
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
-  variable: "--font-lexend",
-  display: "swap",
-});
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (
@@ -32,23 +19,9 @@ function MyApp({ Component, pageProps }: AppProps) {
           <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
           <meta charSet="utf-8" />
           <link rel="icon" href="/images/favicon.ico" />
-          <link
-            rel="apple-touch-icon"
-            sizes="180x180"
-            href="/images/apple-touch-icon.png"
-          />
-          <link
-            rel="icon"
-            type="image/png"
-            sizes="32x32"
-            href="/images/favicon-32x32.png"
-          />
-          <link
-            rel="icon"
-            type="image/png"
-            sizes="16x16"
-            href="/images/favicon-16x16.png"
-          />
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png" />
+          <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png" />
+          <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png" />
           <link
             rel="icon"
             type="image/png"
@@ -63,7 +36,7 @@ function MyApp({ Component, pageProps }: AppProps) {
           />
           <meta name="theme-color" content="#ffffff" />
         </Head>
-        <main className={`${outfit.variable} ${lexend.variable} font-body`}>
+        <main>
           <Component {...pageProps} />
         </main>
       </ThemeProvider>

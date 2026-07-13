@@ -5,7 +5,9 @@ interface ErrorMessageProps {
 
 const ErrorMessage = ({ message, className = "" }: ErrorMessageProps) => {
   return (
-    <div className={`p-4 bg-light-error-bg border border-light-error-bg rounded-lg text-light-error-text animate-fade-in-up dark:bg-dark-error-bg dark:border-dark-error-bg dark:text-dark-error-text ${className}`}>
+    <div
+      className={`p-4 bg-light-error-bg border border-light-error-bg rounded-lg text-light-error-text animate-fade-in-up dark:bg-dark-error-bg dark:border-dark-error-bg dark:text-dark-error-text ${className}`}
+    >
       <div className="flex items-start">
         <svg
           className="h-5 w-5 mr-3 mt-0.5 text-light-error-text dark:text-dark-error-text flex-shrink-0"

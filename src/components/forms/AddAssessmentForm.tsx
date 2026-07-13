@@ -10,12 +10,7 @@ const statusOptions: SelectOption[] = [
     value: "Not started",
     label: "Not Started",
     icon: (
-      <svg
-        className="w-4 h-4"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
+      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <circle cx="12" cy="12" r="10" strokeWidth="2" />
         <path strokeWidth="2" d="M12 6v6l4 2" />
       </svg>
@@ -27,12 +22,7 @@ const statusOptions: SelectOption[] = [
     value: "In progress",
     label: "In Progress",
     icon: (
-      <svg
-        className="w-4 h-4"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
+      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <circle cx="12" cy="12" r="10" strokeWidth="2" />
         <polyline points="12,6 12,12 16,14" strokeWidth="2" />
       </svg>
@@ -44,18 +34,8 @@ const statusOptions: SelectOption[] = [
     value: "Submitted",
     label: "Submitted",
     icon: (
-      <svg
-        className="w-4 h-4"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth="2"
-          d="M5 13l4 4L19 7"
-        />
+      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
       </svg>
     ),
     colorClass: "text-emerald-600 dark:text-emerald-400",
@@ -65,12 +45,7 @@ const statusOptions: SelectOption[] = [
     value: "Missed",
     label: "Missed",
     icon: (
-      <svg
-        className="w-4 h-4"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
+      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -84,10 +59,7 @@ const statusOptions: SelectOption[] = [
   },
 ];
 
-const AddAssessmentForm = ({
-  semesterId,
-  onSuccess,
-}: AddAssessmentFormProps) => {
+const AddAssessmentForm = ({ semesterId, onSuccess }: AddAssessmentFormProps) => {
   const { user } = useAuth();
 
   const getTodayDateString = (): string => {
@@ -124,9 +96,7 @@ const AddAssessmentForm = ({
     }
   }, [formSuccess]);
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
@@ -172,131 +142,107 @@ const AddAssessmentForm = ({
 
   return (
     <div className="card p-6">
-      <div
-        className={`transition-all duration-300 ${
-          formSuccess ? "form-success" : ""
-        }`}
-      >
+      <div className={`transition-all duration-300 ${formSuccess ? "form-success" : ""}`}>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="form-group">
-                <label
-                  htmlFor="courseName"
-                  className="form-label dark:text-dark-text-primary"
-                >
-                  Course Name/Code <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  id="courseName"
-                  name="courseName"
-                  value={formData.courseName}
-                  onChange={handleChange}
-                  ref={courseNameRef}
-                  className="input"
-                  placeholder="e.g., CS101"
-                  required
-                />
-              </div>
-              <div className="form-group">
-                <label
-                  htmlFor="assignmentName"
-                  className="form-label dark:text-dark-text-primary"
-                >
-                  Assessment Name <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  id="assignmentName"
-                  name="assignmentName"
-                  value={formData.assignmentName}
-                  onChange={handleChange}
-                  className="input"
-                  placeholder="e.g., Midterm Exam"
-                  required
-                />
-              </div>
+            <div className="form-group">
+              <label htmlFor="courseName" className="form-label dark:text-dark-text-primary">
+                Course Name/Code <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                id="courseName"
+                name="courseName"
+                value={formData.courseName}
+                onChange={handleChange}
+                ref={courseNameRef}
+                className="input"
+                placeholder="e.g., CS101"
+                required
+              />
+            </div>
+            <div className="form-group">
+              <label htmlFor="assignmentName" className="form-label dark:text-dark-text-primary">
+                Assessment Name <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                id="assignmentName"
+                name="assignmentName"
+                value={formData.assignmentName}
+                onChange={handleChange}
+                className="input"
+                placeholder="e.g., Midterm Exam"
+                required
+              />
+            </div>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="form-group">
-                <label
-                  htmlFor="dueDate"
-                  className="form-label dark:text-dark-text-primary"
-                >
-                  Due Date <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="date"
-                  id="dueDate"
-                  name="dueDate"
-                  value={formData.dueDate}
-                  onChange={handleChange}
-                  className="input"
-                  required
-                />
-              </div>
-              <div className="form-group">
-                <label
-                  htmlFor="dueTime"
-                  className="form-label dark:text-dark-text-primary"
-                >
-                  Due Time <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="time"
-                  id="dueTime"
-                  name="dueTime"
-                  value={formData.dueTime}
-                  onChange={handleChange}
-                  className="input"
-                  required
-                />
-              </div>
-              <div className="form-group">
-                <label
-                  htmlFor="weight"
-                  className="form-label dark:text-dark-text-primary"
-                >
-                  Weight (%)
-                </label>
-                <input
-                  type="number"
-                  id="weight"
-                  name="weight"
-                  value={formData.weight}
-                  onChange={handleChange}
-                  min="0"
-                  max="100"
-                  step="0.1"
-                  className="input"
-                  placeholder="Optional"
-                />
-              </div>
+            <div className="form-group">
+              <label htmlFor="dueDate" className="form-label dark:text-dark-text-primary">
+                Due Date <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="date"
+                id="dueDate"
+                name="dueDate"
+                value={formData.dueDate}
+                onChange={handleChange}
+                className="input"
+                required
+              />
+            </div>
+            <div className="form-group">
+              <label htmlFor="dueTime" className="form-label dark:text-dark-text-primary">
+                Due Time <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="time"
+                id="dueTime"
+                name="dueTime"
+                value={formData.dueTime}
+                onChange={handleChange}
+                className="input"
+                required
+              />
+            </div>
+            <div className="form-group">
+              <label htmlFor="weight" className="form-label dark:text-dark-text-primary">
+                Weight (%)
+              </label>
+              <input
+                type="number"
+                id="weight"
+                name="weight"
+                value={formData.weight}
+                onChange={handleChange}
+                min="0"
+                max="100"
+                step="0.1"
+                className="input"
+                placeholder="Optional"
+              />
+            </div>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="form-group">
-                <label
-                  htmlFor="status"
-                  className="form-label dark:text-dark-text-primary"
-                >
-                  Status
-                </label>
-                <CustomSelect
-                  value={formData.status}
-                  onChange={(value) => setFormData((prev) => ({ ...prev, status: value }))}
-                  options={statusOptions}
-                  placeholder="Select status"
-                  className="w-full"
-                />
-              </div>
+            <div className="form-group">
+              <label htmlFor="status" className="form-label dark:text-dark-text-primary">
+                Status
+              </label>
+              <CustomSelect
+                value={formData.status}
+                onChange={(value) => setFormData((prev) => ({ ...prev, status: value }))}
+                options={statusOptions}
+                placeholder="Select status"
+                className="w-full"
+              />
+            </div>
           </div>
           <div className="flex items-center justify-end pt-4">
             <button
               type="submit"
               disabled={isSubmitting}
-              className={`btn-primary px-6 ${
-                isSubmitting ? "opacity-70 cursor-not-allowed" : ""
-              }`}
+              className={`btn-primary px-6 ${isSubmitting ? "opacity-70 cursor-not-allowed" : ""}`}
             >
               {isSubmitting ? (
                 <span className="flex items-center justify-center">

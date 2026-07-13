@@ -3,24 +3,11 @@ import { useAuth } from "../../../contexts/AuthContext";
 import { useOnboarding } from "../../../contexts/OnboardingContext";
 import { StepNavigation } from "../ui/StepNavigation";
 import { db } from "../../../lib/firebase";
-import {
-  collection,
-  addDoc,
-  query,
-  orderBy,
-  limit,
-  getDocs,
-} from "firebase/firestore";
+import { collection, addDoc, query, orderBy, limit, getDocs } from "firebase/firestore";
 
 export function SemesterStep() {
   const { user } = useAuth();
-  const {
-    state,
-    updateSemesterData,
-    setCreatedSemesterId,
-    setError,
-    nextStep,
-  } = useOnboarding();
+  const { state, updateSemesterData, setCreatedSemesterId, setError, nextStep } = useOnboarding();
   const [formData, setFormData] = useState({
     name: state.semesterData.name || "",
     startDate: state.semesterData.startDate || "",
@@ -32,9 +19,9 @@ export function SemesterStep() {
     const newFormData = { ...formData, [field]: value };
     setFormData(newFormData);
     updateSemesterData(newFormData);
-    
+
     // Clear error when user starts typing a new semester name
-    if (field === 'name' && state.error) {
+    if (field === "name" && state.error) {
       setError(null);
     }
   };
@@ -53,13 +40,11 @@ export function SemesterStep() {
       const existingQuery = query(semColRef, orderBy("name"));
       const existingSnapshot = await getDocs(existingQuery);
       const exists = existingSnapshot.docs.some(
-        (doc) => doc.data().name.toLowerCase() === semesterName.toLowerCase()
+        (doc) => doc.data().name.toLowerCase() === semesterName.toLowerCase(),
       );
 
       if (exists) {
-        setError(
-          `Semester "${semesterName}" already exists. Please choose a different name.`
-        );
+        setError(`Semester "${semesterName}" already exists. Please choose a different name.`);
         setIsCreating(false); // Allow user to try again
         return;
       }
@@ -137,7 +122,6 @@ export function SemesterStep() {
             required
           />
         </div>
-
       </div>
 
       <StepNavigation

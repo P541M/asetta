@@ -25,7 +25,7 @@ const transporter = nodemailer.createTransport({
 function generateEmailHTML(
   assessmentTitle: string,
   daysUntilDue: number,
-  courseName: string
+  courseName: string,
 ): string {
   return `
     <!DOCTYPE html>
@@ -134,9 +134,7 @@ function generateEmailHTML(
             <p class="message">Hey there! 👋 Just a friendly heads up about your upcoming assessment. We want to make sure you have everything you need to succeed!</p>
             <div class="due-date">
               <p style="margin: 0; color: #374151;">Time remaining:</p>
-              <div class="days-remaining">${daysUntilDue} day${
-    daysUntilDue === 1 ? "" : "s"
-  }</div>
+              <div class="days-remaining">${daysUntilDue} day${daysUntilDue === 1 ? "" : "s"}</div>
             </div>
             <p class="message">Need a quick refresher on the details? <a href="${
               process.env.NEXT_PUBLIC_APP_URL
@@ -157,7 +155,7 @@ function generateWelcomeEmailHTML(
   displayName: string,
   email: string,
   institution?: string,
-  studyProgram?: string
+  studyProgram?: string,
 ): string {
   return `
     <!DOCTYPE html>
@@ -321,7 +319,7 @@ export async function sendWelcomeEmail(
   displayName: string,
   email: string,
   institution?: string,
-  studyProgram?: string
+  studyProgram?: string,
 ) {
   if (process.env.NODE_ENV === "development") {
     devLog("📧 Attempting to send welcome email");
@@ -345,12 +343,7 @@ export async function sendWelcomeEmail(
       devLog("✅ Email transporter connection verified");
     }
 
-    const html = generateWelcomeEmailHTML(
-      displayName,
-      email,
-      institution,
-      studyProgram
-    );
+    const html = generateWelcomeEmailHTML(displayName, email, institution, studyProgram);
 
     const mailOptions = {
       from: `"Asetta" <${process.env.EMAIL_USER}>`,
@@ -393,7 +386,7 @@ export async function sendEmail(
   subject: string,
   assessmentTitle: string,
   daysUntilDue: number,
-  courseName: string
+  courseName: string,
 ) {
   if (process.env.NODE_ENV === "development") {
     devLog("📧 Attempting to send assessment email");

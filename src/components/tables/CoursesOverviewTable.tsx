@@ -1,9 +1,6 @@
-import { useState } from 'react';
-import { useRouter } from 'next/router';
-import {
-  formatLocalDate,
-  isUpcoming as isDateUpcoming,
-} from "../../utils/dateUtils";
+import { useState } from "react";
+import { useRouter } from "next/router";
+import { formatLocalDate, isUpcoming as isDateUpcoming } from "../../utils/dateUtils";
 import { CoursesOverviewTableProps } from "../../types/course";
 import { useCourseRename } from "../../hooks/useCourseRename";
 
@@ -15,13 +12,13 @@ const CoursesOverviewTable = ({
 }: CoursesOverviewTableProps) => {
   const router = useRouter();
   const [editingCourse, setEditingCourse] = useState<string | null>(null);
-  const [editValue, setEditValue] = useState<string>('');
+  const [editValue, setEditValue] = useState<string>("");
 
   const { renameCourse, isRenaming } = useCourseRename(semesterId, {
     onSuccess: (oldName, newName) => {
       setEditingCourse(null);
       onCourseRenamed?.();
-      
+
       // Update navigation if user is currently viewing the renamed course
       if (router.query.course === oldName) {
         const newQuery = { ...router.query };
@@ -32,9 +29,9 @@ const CoursesOverviewTable = ({
       }
     },
     onError: (error) => {
-      console.error('Course rename failed:', error);
+      console.error("Course rename failed:", error);
       setEditingCourse(null);
-    }
+    },
   });
 
   const handleEditStart = (courseName: string, e: React.MouseEvent) => {
@@ -49,14 +46,14 @@ const CoursesOverviewTable = ({
       setEditingCourse(null);
       return;
     }
-    
+
     await renameCourse(oldName, newName);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent, courseName: string) => {
-    if (e.key === 'Enter') {
+    if (e.key === "Enter") {
       handleEditSubmit(courseName);
-    } else if (e.key === 'Escape') {
+    } else if (e.key === "Escape") {
       setEditingCourse(null);
     }
   };
@@ -103,12 +100,10 @@ const CoursesOverviewTable = ({
             course.progress >= 80
               ? "bg-emerald-500"
               : course.progress >= 50
-              ? "bg-amber-500"
-              : "bg-red-500";
+                ? "bg-amber-500"
+                : "bg-red-500";
 
-          const isUpcoming = course.nextDueDate
-            ? isDateUpcoming(course.nextDueDate)
-            : false;
+          const isUpcoming = course.nextDueDate ? isDateUpcoming(course.nextDueDate) : false;
 
           return (
             <div
@@ -133,7 +128,9 @@ const CoursesOverviewTable = ({
                   ) : (
                     <div className="flex items-center group">
                       <h3 className="text-lg font-medium text-light-text-primary dark:text-dark-text-primary line-clamp-2 flex-1">
-                        {isRenaming && editingCourse === course.courseName ? 'Updating...' : course.courseName}
+                        {isRenaming && editingCourse === course.courseName
+                          ? "Updating..."
+                          : course.courseName}
                       </h3>
                       <button
                         onClick={(e) => handleEditStart(course.courseName, e)}
@@ -141,8 +138,18 @@ const CoursesOverviewTable = ({
                         title="Edit course name"
                         disabled={isRenaming}
                       >
-                        <svg className="w-4 h-4 text-light-text-secondary dark:text-dark-text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        <svg
+                          className="w-4 h-4 text-light-text-secondary dark:text-dark-text-secondary"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                          />
                         </svg>
                       </button>
                     </div>
@@ -216,7 +223,6 @@ const CoursesOverviewTable = ({
           );
         })}
       </div>
-
     </div>
   );
 };

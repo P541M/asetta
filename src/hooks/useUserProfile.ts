@@ -1,9 +1,13 @@
-import { useState, useEffect } from 'react';
-import { doc, getDoc } from 'firebase/firestore';
-import { useAuth } from '../contexts/AuthContext';
-import { db } from '../lib/firebase';
-import { getFromLocalStorage, setToLocalStorage, removeFromLocalStorage } from '../utils/localStorage';
-import { DEFAULT_ICON, isValidIconId } from '../data/profileIcons';
+import { useState, useEffect } from "react";
+import { doc, getDoc } from "firebase/firestore";
+import { useAuth } from "../contexts/AuthContext";
+import { db } from "../lib/firebase";
+import {
+  getFromLocalStorage,
+  setToLocalStorage,
+  removeFromLocalStorage,
+} from "../utils/localStorage";
+import { DEFAULT_ICON, isValidIconId } from "../data/profileIcons";
 
 interface UserProfile {
   avatarIconId: string;
@@ -31,29 +35,32 @@ export const useUserProfile = () => {
   useEffect(() => {
     if (!user) {
       setProfile(null);
-      removeFromLocalStorage('avatarIconId');
+      removeFromLocalStorage("avatarIconId");
       return;
     }
 
     // Get cached avatar data for immediate display
     const cachedAvatarIconId = getFromLocalStorage<string>("avatarIconId", DEFAULT_ICON.id);
-    
+
     // Set initial profile with cached data to prevent flash
-    setProfile(prev => prev || {
-      avatarIconId: isValidIconId(cachedAvatarIconId) ? cachedAvatarIconId : DEFAULT_ICON.id,
-      displayName: "",
-      institution: "",
-      studyProgram: "",
-      graduationYear: new Date().getFullYear() + 4,
-      showDaysTillDue: true,
-      showWeight: true,
-      showNotes: true,
-      showStatsBar: false,
-      emailNotifications: false,
-      notificationDaysBefore: 1,
-      email: "",
-      hasConsentedToNotifications: false,
-    });
+    setProfile(
+      (prev) =>
+        prev || {
+          avatarIconId: isValidIconId(cachedAvatarIconId) ? cachedAvatarIconId : DEFAULT_ICON.id,
+          displayName: "",
+          institution: "",
+          studyProgram: "",
+          graduationYear: new Date().getFullYear() + 4,
+          showDaysTillDue: true,
+          showWeight: true,
+          showNotes: true,
+          showStatsBar: false,
+          emailNotifications: false,
+          notificationDaysBefore: 1,
+          email: "",
+          hasConsentedToNotifications: false,
+        },
+    );
   }, [user]);
 
   useEffect(() => {
@@ -72,15 +79,16 @@ export const useUserProfile = () => {
 
         if (userSnapshot.exists()) {
           const userData = userSnapshot.data();
-          
+
           // Handle avatar preferences with emoji->icon migration
-          const avatarIconId = userData.avatarIconId && isValidIconId(userData.avatarIconId)
-            ? userData.avatarIconId
-            : DEFAULT_ICON.id; // Migrate from emoji or set default
-          
+          const avatarIconId =
+            userData.avatarIconId && isValidIconId(userData.avatarIconId)
+              ? userData.avatarIconId
+              : DEFAULT_ICON.id; // Migrate from emoji or set default
+
           // Cache avatar data for immediate future loads
           setToLocalStorage("avatarIconId", avatarIconId);
-          
+
           setProfile({
             avatarIconId: avatarIconId,
             displayName: userData.displayName || "",

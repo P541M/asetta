@@ -74,7 +74,7 @@ const SettingsActions = ({
           )}
         </button>
       </div>
-      
+
       {hasChanges && (
         <div className="mt-4 flex items-center space-x-2 text-sm text-light-text-tertiary dark:text-dark-text-tertiary">
           <svg

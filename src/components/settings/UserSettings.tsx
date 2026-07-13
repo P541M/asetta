@@ -24,9 +24,7 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
   const [displayName, setDisplayName] = useState(user?.displayName || "");
   const [institution, setInstitution] = useState("");
   const [studyProgram, setStudyProgram] = useState("");
-  const [graduationYear, setGraduationYear] = useState<number>(
-    new Date().getFullYear() + 4
-  );
+  const [graduationYear, setGraduationYear] = useState<number>(new Date().getFullYear() + 4);
   const [showDaysTillDue, setShowDaysTillDue] = useState<boolean>(true);
   const [showWeight, setShowWeight] = useState<boolean>(true);
   const [showNotes, setShowNotes] = useState<boolean>(true);
@@ -38,16 +36,15 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
     type: "success" | "error";
   }>({ text: "", type: "success" });
   const [avatarIconId, setAvatarIconId] = useState<string>(DEFAULT_ICON.id);
-  const [activeTab, setActiveTab] = useState<
-    "profile" | "preferences" | "notifications"
-  >("profile");
+  const [activeTab, setActiveTab] = useState<"profile" | "preferences" | "notifications">(
+    "profile",
+  );
 
   // Notification preferences
   const [emailNotifications, setEmailNotifications] = useState<boolean>(false);
-  const [notificationDaysBefore, setNotificationDaysBefore] =
-    useState<number>(1);
+  const [notificationDaysBefore, setNotificationDaysBefore] = useState<number>(1);
   const [email, setEmail] = useState<string>("");
-  
+
   // Auto-sync consent with email notifications - no separate state needed
   const hasConsentedToNotifications = emailNotifications;
   const setHasConsentedToNotifications = setEmailNotifications;
@@ -105,17 +102,21 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
           const newInstitution = userData.institution || "";
           // Migration support: handle both old and new field names
           const newStudyProgram = userData.studyProgram || userData.program || "";
-          const newGraduationYear = userData.graduationYear || (typeof userData.expectedGraduation === 'string' ? parseInt(userData.expectedGraduation) || currentYear + 4 : currentYear + 4);
+          const newGraduationYear =
+            userData.graduationYear ||
+            (typeof userData.expectedGraduation === "string"
+              ? parseInt(userData.expectedGraduation) || currentYear + 4
+              : currentYear + 4);
           const newShowDaysTillDue = userData.showDaysTillDue ?? true;
           const newShowWeight = userData.showWeight ?? true;
           const newShowNotes = userData.showNotes ?? true;
           const newShowStatsBar = userData.showStatsBar ?? false;
           const newEmailNotifications = userData.emailNotifications ?? false;
-          const newNotificationDaysBefore =
-            userData.notificationDaysBefore ?? 1;
+          const newNotificationDaysBefore = userData.notificationDaysBefore ?? 1;
           const newEmail = userData.email || "";
           // Handle migration from emoji to icon if needed
-          const newAvatarIconId = userData.avatarIconId || (userData.avatarEmoji ? DEFAULT_ICON.id : DEFAULT_ICON.id);
+          const newAvatarIconId =
+            userData.avatarIconId || (userData.avatarEmoji ? DEFAULT_ICON.id : DEFAULT_ICON.id);
 
           // Set current values
           setInstitution(newInstitution);
@@ -181,7 +182,6 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
         updates.displayName = displayName;
       }
 
-
       // Update profile if there are any auth updates
       if (Object.keys(updates).length > 0) {
         await updateProfile(user, updates);
@@ -227,7 +227,6 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
         notificationDaysBefore,
         email,
       });
-
 
       // Trigger a custom event to notify other components of the preference change
       const event = new CustomEvent("userPreferencesUpdated", {

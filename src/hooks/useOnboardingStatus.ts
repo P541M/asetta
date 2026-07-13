@@ -1,6 +1,6 @@
-import { useState, useEffect, useCallback } from 'react';
-import { User } from 'firebase/auth';
-import { getUserOnboardingStatus, OnboardingStatus } from '@/utils/onboardingUtils';
+import { useState, useEffect, useCallback } from "react";
+import { User } from "firebase/auth";
+import { getUserOnboardingStatus, OnboardingStatus } from "@/utils/onboardingUtils";
 
 interface UseOnboardingStatusReturn {
   onboardingStatus: OnboardingStatus | null;
@@ -28,8 +28,8 @@ export function useOnboardingStatus(user: User | null): UseOnboardingStatusRetur
       const status = await getUserOnboardingStatus(user);
       setOnboardingStatus(status);
     } catch (err) {
-      console.error('Error fetching onboarding status:', err);
-      setError('Failed to fetch onboarding status');
+      console.error("Error fetching onboarding status:", err);
+      setError("Failed to fetch onboarding status");
       // Set safe default
       setOnboardingStatus({
         hasCompletedOnboarding: false,

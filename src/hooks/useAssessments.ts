@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react';
-import { getDocs, query, where, Query } from 'firebase/firestore';
-import { useAuth } from '../contexts/AuthContext';
-import { getAssessmentsRef } from '../lib/firebaseUtils';
-import { Assessment } from '../types/assessment';
+import { useState, useEffect } from "react";
+import { getDocs, query, where, Query } from "firebase/firestore";
+import { useAuth } from "../contexts/AuthContext";
+import { getAssessmentsRef } from "../lib/firebaseUtils";
+import { Assessment } from "../types/assessment";
 
 interface UseAssessmentsOptions {
   courseName?: string;
@@ -22,11 +22,11 @@ interface UseAssessmentsReturn {
  */
 export const useAssessments = (
   semesterId: string,
-  options: UseAssessmentsOptions = {}
+  options: UseAssessmentsOptions = {},
 ): UseAssessmentsReturn => {
   const { user } = useAuth();
   const { courseName, autoFetch = true } = options;
-  
+
   const [assessments, setAssessments] = useState<Assessment[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -42,12 +42,12 @@ export const useAssessments = (
 
     try {
       const assessmentsRef = getAssessmentsRef(user.uid, semesterId);
-      
+
       let assessmentsQuery: Query = assessmentsRef;
-      
+
       // Add course filter if specified
       if (courseName) {
-        assessmentsQuery = query(assessmentsRef, where('courseName', '==', courseName));
+        assessmentsQuery = query(assessmentsRef, where("courseName", "==", courseName));
       }
 
       const querySnapshot = await getDocs(assessmentsQuery);
@@ -56,14 +56,14 @@ export const useAssessments = (
       querySnapshot.forEach((doc) => {
         assessmentsList.push({
           id: doc.id,
-          ...(doc.data() as Omit<Assessment, 'id'>),
+          ...(doc.data() as Omit<Assessment, "id">),
         });
       });
 
       setAssessments(assessmentsList);
     } catch (err) {
-      console.error('Error fetching assessments:', err);
-      setError(`Failed to load assessments${courseName ? ' for this course' : ''}.`);
+      console.error("Error fetching assessments:", err);
+      setError(`Failed to load assessments${courseName ? " for this course" : ""}.`);
     } finally {
       setLoading(false);
     }

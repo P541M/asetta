@@ -34,12 +34,12 @@ const NotificationsSection = ({
 
   const handleCustomDaysChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value;
-    
+
     // Allow only digits
     if (inputValue && !/^\d+$/.test(inputValue)) {
       return;
     }
-    
+
     setCustomDays(inputValue ? parseInt(inputValue) : 1);
   };
 
@@ -81,9 +81,8 @@ const NotificationsSection = ({
             Email Notifications
           </h3>
           <p className="mt-1 text-sm text-light-text-secondary dark:text-dark-text-secondary">
-            Receive automated email reminders about upcoming assessment
-            deadlines. You can customize when and how you receive these
-            notifications below.
+            Receive automated email reminders about upcoming assessment deadlines. You can customize
+            when and how you receive these notifications below.
           </p>
           <div className="mt-3 flex items-center space-x-2 text-xs text-light-text-tertiary dark:text-dark-text-tertiary">
             <svg
@@ -98,10 +97,7 @@ const NotificationsSection = ({
                 clipRule="evenodd"
               />
             </svg>
-            <span>
-              Your email is secure and will only be used for assessment
-              notifications
-            </span>
+            <span>Your email is secure and will only be used for assessment notifications</span>
           </div>
         </div>
         <button
@@ -163,9 +159,7 @@ const NotificationsSection = ({
                       clipRule="evenodd"
                     />
                   </svg>
-                  <span>
-                    Reminder: Notifications might end up in your spam folder
-                  </span>
+                  <span>Reminder: Notifications might end up in your spam folder</span>
                 </div>
               )}
             </div>
@@ -184,9 +178,7 @@ const NotificationsSection = ({
               <div className="relative">
                 <select
                   id="notification-days"
-                  value={
-                    isCustomDays ? "custom" : notificationDaysBefore.toString()
-                  }
+                  value={isCustomDays ? "custom" : notificationDaysBefore.toString()}
                   onChange={(e) => handleDaysChange(e.target.value)}
                   className="w-full px-4 py-3 pr-10 border border-light-border-primary dark:border-dark-border-primary rounded-xl bg-light-bg-primary dark:bg-dark-bg-primary text-light-text-primary dark:text-dark-text-primary shadow-sm focus:ring-2 focus:ring-light-button-primary dark:focus:ring-dark-button-primary focus:border-light-button-primary dark:focus:border-dark-button-primary transition-all duration-200 appearance-none"
                 >
@@ -195,9 +187,7 @@ const NotificationsSection = ({
                   <option value="3">3 days before due date</option>
                   <option value="7">1 week before due date</option>
                   <option value="custom">
-                    {isCustomDays
-                      ? `Custom (${customDays} days)`
-                      : "Custom timing"}
+                    {isCustomDays ? `Custom (${customDays} days)` : "Custom timing"}
                   </option>
                 </select>
                 <svg
@@ -233,8 +223,7 @@ const NotificationsSection = ({
                     placeholder="Enter number of days (1-30)"
                   />
                   <p className="mt-2 text-sm text-light-text-tertiary dark:text-dark-text-tertiary">
-                    Choose between 1 and 30 days. Notifications will be sent
-                    daily at 9:00 PM.
+                    Choose between 1 and 30 days. Notifications will be sent daily at 9:00 PM.
                   </p>
                 </div>
               )}
@@ -263,8 +252,8 @@ const NotificationsSection = ({
             Email Notifications Disabled
           </h4>
           <p className="text-sm text-light-text-tertiary dark:text-dark-text-tertiary max-w-md mx-auto">
-            Enable email notifications above to receive reminders about upcoming
-            assessment deadlines and never miss an important due date.
+            Enable email notifications above to receive reminders about upcoming assessment
+            deadlines and never miss an important due date.
           </p>
         </div>
       )}

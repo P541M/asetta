@@ -86,25 +86,15 @@ const DashboardLayout = ({
     const courseStatsList: CourseStats[] = [];
     courseMap.forEach((assessments, courseName) => {
       const completedStatuses = ["Submitted", "Missed"];
-      const completed = assessments.filter((a) =>
-        completedStatuses.includes(a.status)
-      );
+      const completed = assessments.filter((a) => completedStatuses.includes(a.status));
       const now = new Date();
       const upcomingAssessments = assessments
-        .filter(
-          (a) =>
-            !completedStatuses.includes(a.status) && new Date(a.dueDate) >= now
-        )
-        .sort(
-          (a, b) =>
-            new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime()
-        );
+        .filter((a) => !completedStatuses.includes(a.status) && new Date(a.dueDate) >= now)
+        .sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime());
 
       const nextUpcoming = upcomingAssessments[0];
       const progress =
-        assessments.length > 0
-          ? Math.round((completed.length / assessments.length) * 100)
-          : 0;
+        assessments.length > 0 ? Math.round((completed.length / assessments.length) * 100) : 0;
 
       courseStatsList.push({
         courseName,
@@ -117,9 +107,7 @@ const DashboardLayout = ({
       });
     });
 
-    return courseStatsList.sort((a, b) =>
-      a.courseName.localeCompare(b.courseName)
-    );
+    return courseStatsList.sort((a, b) => a.courseName.localeCompare(b.courseName));
   };
 
   useEffect(() => {
@@ -139,13 +127,7 @@ const DashboardLayout = ({
       // If forceSemesterId is provided, use it directly
       if (forceSemesterId) {
         try {
-          const semesterRef = doc(
-            db,
-            "users",
-            user.uid,
-            "semesters",
-            forceSemesterId
-          );
+          const semesterRef = doc(db, "users", user.uid, "semesters", forceSemesterId);
           const semesterSnap = await getDoc(semesterRef);
           if (semesterSnap.exists()) {
             setSelectedSemesterId(forceSemesterId);
@@ -202,7 +184,7 @@ const DashboardLayout = ({
       user.uid,
       "semesters",
       selectedSemesterId,
-      "assessments"
+      "assessments",
     );
     const q = query(assessmentsRef, orderBy("dueDate", "asc"));
     let unsubscribe: (() => void) | undefined;
@@ -234,7 +216,7 @@ const DashboardLayout = ({
 
           // Extract available courses (sorted alphabetically)
           const uniqueCourses = Array.from(
-            new Set(assessmentsList.map((a) => a.courseName))
+            new Set(assessmentsList.map((a) => a.courseName)),
           ).sort();
           setAvailableCourses(uniqueCourses);
 
@@ -242,26 +224,18 @@ const DashboardLayout = ({
           const oneWeek = new Date();
           oneWeek.setDate(now.getDate() + 7);
           const totalCount = assessmentsList.length;
-          const notStartedCount = assessmentsList.filter(
-            (a) => a.status === "Not started"
-          ).length;
-          const inProgressCount = assessmentsList.filter(
-            (a) => a.status === "In progress"
-          ).length;
+          const notStartedCount = assessmentsList.filter((a) => a.status === "Not started").length;
+          const inProgressCount = assessmentsList.filter((a) => a.status === "In progress").length;
           const completedStatuses = ["Submitted", "Missed"];
           const completedCount = assessmentsList.filter((a) =>
-            completedStatuses.includes(a.status)
+            completedStatuses.includes(a.status),
           ).length;
           const upcomingCount = assessmentsList.filter((a) => {
             const dueDate = new Date(a.dueDate);
-            return (
-              dueDate > now && dueDate <= oneWeek && !completedStatuses.includes(a.status)
-            );
+            return dueDate > now && dueDate <= oneWeek && !completedStatuses.includes(a.status);
           }).length;
           const completionRate =
-            totalCount > 0
-              ? Math.round((completedCount / totalCount) * 100)
-              : 0;
+            totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
           setStats({
             total: totalCount,
             notStarted: notStartedCount,
@@ -282,7 +256,7 @@ const DashboardLayout = ({
           setError("Failed to load assessments. Please try again.");
           setIsLoading(false);
           setIsDataReady(true);
-        }
+        },
       );
     } catch (error) {
       console.error("Error setting up assessments listener:", error);
@@ -323,15 +297,12 @@ const DashboardLayout = ({
       }
     };
 
-    window.addEventListener(
-      "userPreferencesUpdated",
-      handlePreferencesUpdate as EventListener
-    );
+    window.addEventListener("userPreferencesUpdated", handlePreferencesUpdate as EventListener);
 
     return () => {
       window.removeEventListener(
         "userPreferencesUpdated",
-        handlePreferencesUpdate as EventListener
+        handlePreferencesUpdate as EventListener,
       );
     };
   }, [user]);
@@ -342,8 +313,7 @@ const DashboardLayout = ({
   };
 
   const refreshAssessments = () => {
-    console.log("Assessment data refreshed");
-    setRefreshTrigger(prev => prev + 1);
+    setRefreshTrigger((prev) => prev + 1);
   };
 
   if (loading) {
@@ -351,9 +321,7 @@ const DashboardLayout = ({
       <div className="min-h-screen flex items-center justify-center bg-light-bg-secondary dark:bg-dark-bg-primary">
         <div className="flex flex-col items-center">
           <div className="animate-spin rounded-full h-12 w-12 border-2 border-light-button-primary border-t-transparent dark:border-dark-button-primary dark:border-t-transparent"></div>
-          <p className="mt-4 text-light-text-secondary dark:text-dark-text-secondary">
-            Loading...
-          </p>
+          <p className="mt-4 text-light-text-secondary dark:text-dark-text-secondary">Loading...</p>
         </div>
       </div>
     );

@@ -19,7 +19,7 @@ AI-powered academic planner for students that transforms course outlines into or
 
 **Backend:** Firebase Authentication, Firestore, Storage
 
-**AI:** Google Gemini 2.0 Flash
+**AI:** Google Gemini 2.5 Flash
 
 **Email:** Nodemailer
 
@@ -52,21 +52,24 @@ NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=
 NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=
 NEXT_PUBLIC_FIREBASE_APP_ID=
 
-# Firebase Admin (for server-side operations)
-FIREBASE_ADMIN_PROJECT_ID=
-FIREBASE_ADMIN_CLIENT_EMAIL=
-FIREBASE_ADMIN_PRIVATE_KEY=
+# Firebase Admin (complete service account JSON as a single line)
+FIREBASE_SERVICE_ACCOUNT=
 
 # Google Gemini
 GEMINI_API_KEY=
 
-# Email (Nodemailer)
-SMTP_HOST=
-SMTP_PORT=
-SMTP_USER=
-SMTP_PASS=
-EMAIL_FROM=
+# Email (Gmail via Nodemailer)
+EMAIL_USER=
+EMAIL_APP_PASSWORD=
+
+# Vercel Cron auth token for /api/cron/notifications
+CRON_SECRET=
+
+# Application URL (used in email links)
+NEXT_PUBLIC_APP_URL=
 ```
+
+See `.env.example` for the same list with placeholder values.
 
 ### Development
 

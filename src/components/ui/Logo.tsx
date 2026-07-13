@@ -47,10 +47,10 @@ const Logo = ({
             color === "primary"
               ? "filter-primary-main"
               : color === "white"
-              ? "filter-white-main"
-              : color === "dark"
-              ? "filter-dark-main"
-              : ""
+                ? "filter-white-main"
+                : color === "dark"
+                  ? "filter-dark-main"
+                  : ""
           }`}
           priority
         />
@@ -70,9 +70,7 @@ const Logo = ({
   if (href) {
     return (
       <Link href={href} className="group">
-        <div className="group-hover:scale-105 transition-transform duration-300">
-          {logoElement}
-        </div>
+        <div className="group-hover:scale-105 transition-transform duration-300">{logoElement}</div>
       </Link>
     );
   }

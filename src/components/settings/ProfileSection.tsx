@@ -31,11 +31,7 @@ const ProfileSection = ({
       {/* Avatar Section */}
       <div className="flex flex-col items-center space-y-6">
         <div className="flex flex-col items-center space-y-4">
-          <Avatar 
-            size="lg" 
-            iconId={avatarIconId}
-            className="shadow-lg" 
-          />
+          <Avatar size="lg" iconId={avatarIconId} className="shadow-lg" />
           <div className="text-center">
             <p className="text-sm text-light-text-secondary dark:text-dark-text-secondary">
               Your profile avatar

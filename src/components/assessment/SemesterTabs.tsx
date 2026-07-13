@@ -45,12 +45,7 @@ const DragHandle = () => (
     viewBox="0 0 24 24"
     stroke="currentColor"
   >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth={2}
-      d="M8 9h8M8 15h8"
-    />
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 9h8M8 15h8" />
   </svg>
 );
 
@@ -66,7 +61,7 @@ const SemesterTabsSkeleton = () => (
         <div className="h-7 w-7 bg-light-bg-tertiary dark:bg-dark-bg-tertiary rounded-md animate-pulse"></div>
       </div>
     </div>
-    
+
     {/* Skeleton tabs - horizontally scrollable */}
     <div className="relative px-4 py-2">
       <div className="flex items-center space-x-2 overflow-x-auto pb-1 hide-scrollbar">
@@ -91,14 +86,9 @@ function SortableSemester({
   onEdit: (id: string, name: string) => void;
   onDelete: (id: string) => void;
 }) {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id: semester.id });
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: semester.id,
+  });
   const [isEditing, setIsEditing] = useState(false);
   const [editValue, setEditValue] = useState(semester.name);
   const editInputRef = useRef<HTMLInputElement>(null);
@@ -123,9 +113,7 @@ function SortableSemester({
     }
   };
 
-  const handleEditSaveWithEvent = (
-    e: React.MouseEvent | React.KeyboardEvent
-  ) => {
+  const handleEditSaveWithEvent = (e: React.MouseEvent | React.KeyboardEvent) => {
     e.stopPropagation();
     handleEditSave();
   };
@@ -155,9 +143,7 @@ function SortableSemester({
       ref={setNodeRef}
       style={style}
       className={`py-2 px-4 hover:bg-light-hover-primary dark:hover:bg-dark-hover-primary flex items-center justify-between ${
-        isDragging
-          ? "bg-light-hover-primary dark:bg-dark-hover-primary shadow-lg rounded-lg"
-          : ""
+        isDragging ? "bg-light-hover-primary dark:bg-dark-hover-primary shadow-lg rounded-lg" : ""
       }`}
     >
       <div className="flex items-center space-x-3 flex-grow">
@@ -269,11 +255,7 @@ function SortableSemester({
   );
 }
 
-const SemesterTabs = ({
-  selectedSemester,
-  onSelect,
-  className = "",
-}: SemesterTabsProps) => {
+const SemesterTabs = ({ selectedSemester, onSelect, className = "" }: SemesterTabsProps) => {
   const { user } = useAuth();
   const router = useRouter();
   const [newSemester, setNewSemester] = useState("");
@@ -286,9 +268,7 @@ const SemesterTabs = ({
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [showManageModal, setShowManageModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [semesterToDelete, setSemesterToDelete] = useState<Semester | null>(
-    null
-  );
+  const [semesterToDelete, setSemesterToDelete] = useState<Semester | null>(null);
 
   const dropdownRef = useRef<HTMLDivElement>(null);
   const newInputRef = useRef<HTMLInputElement>(null);
@@ -381,7 +361,7 @@ const SemesterTabs = ({
         console.error("Error listening to semesters:", error);
         setIsLoading(false);
         setIsDataReady(true);
-      }
+      },
     );
 
     return () => unsubscribe();
@@ -400,7 +380,7 @@ const SemesterTabs = ({
       const querySnapshot = await getDocs(q);
 
       const exists = querySnapshot.docs.some(
-        (doc) => doc.data().name.toLowerCase() === semesterName.toLowerCase()
+        (doc) => doc.data().name.toLowerCase() === semesterName.toLowerCase(),
       );
 
       if (exists) {
@@ -443,9 +423,7 @@ const SemesterTabs = ({
         const snapshot = await getDocs(semColRef);
 
         // Check if any semesters are missing the order field
-        const needsMigration = snapshot.docs.some(
-          (doc) => !doc.data().hasOwnProperty("order")
-        );
+        const needsMigration = snapshot.docs.some((doc) => !doc.data().hasOwnProperty("order"));
 
         if (needsMigration) {
           const batch = writeBatch(db);
@@ -456,7 +434,6 @@ const SemesterTabs = ({
             }
           });
           await batch.commit();
-          console.log("Migration completed: Added order field to semesters");
         }
       } catch (error) {
         console.error("Error during migration:", error);
@@ -483,13 +460,7 @@ const SemesterTabs = ({
 
     try {
       const batch = writeBatch(db);
-      const semDocRef = doc(
-        db,
-        "users",
-        user.uid,
-        "semesters",
-        semesterToDelete.id
-      );
+      const semDocRef = doc(db, "users", user.uid, "semesters", semesterToDelete.id);
       batch.delete(semDocRef);
 
       const assessmentsRef = collection(
@@ -498,7 +469,7 @@ const SemesterTabs = ({
         user.uid,
         "semesters",
         semesterToDelete.id,
-        "assessments"
+        "assessments",
       );
 
       const assessmentSnapshot = await getDocs(assessmentsRef);
@@ -511,8 +482,8 @@ const SemesterTabs = ({
             "semesters",
             semesterToDelete.id,
             "assessments",
-            assessmentDoc.id
-          )
+            assessmentDoc.id,
+          ),
         );
       });
 
@@ -520,8 +491,7 @@ const SemesterTabs = ({
 
       if (semesterToDelete.name === selectedSemester) {
         if (semesters.length > 1) {
-          const nextSemIndex =
-            semesters.findIndex((s) => s.id === semesterToDelete.id) - 1;
+          const nextSemIndex = semesters.findIndex((s) => s.id === semesterToDelete.id) - 1;
           const nextSem = semesters[nextSemIndex >= 0 ? nextSemIndex : 1];
           onSelect(nextSem.id === semesterToDelete.id ? "" : nextSem.name);
         } else {
@@ -545,8 +515,7 @@ const SemesterTabs = ({
     try {
       const updatedName = newName.trim();
       const existingWithSameName = semesters.some(
-        (sem) =>
-          sem.id !== id && sem.name.toLowerCase() === updatedName.toLowerCase()
+        (sem) => sem.id !== id && sem.name.toLowerCase() === updatedName.toLowerCase(),
       );
 
       if (existingWithSameName) {
@@ -567,7 +536,7 @@ const SemesterTabs = ({
 
       // Update local state
       setSemesters((prev) =>
-        prev.map((sem) => (sem.id === id ? { ...sem, name: updatedName } : sem))
+        prev.map((sem) => (sem.id === id ? { ...sem, name: updatedName } : sem)),
       );
     } catch (error) {
       console.error("Error updating semester:", error);
@@ -606,7 +575,7 @@ const SemesterTabs = ({
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
-    })
+    }),
   );
 
   // Replace handleDragEnd with dnd-kit version
@@ -641,7 +610,9 @@ const SemesterTabs = ({
   }
 
   return (
-    <div className={`semester-tabs-container mb-6 ${className} ${isDataReady ? "animate-fade-in-up" : "opacity-0"}`}>
+    <div
+      className={`semester-tabs-container mb-6 ${className} ${isDataReady ? "animate-fade-in-up" : "opacity-0"}`}
+    >
       <div className="flex items-center justify-between px-4 py-2 border-b border-light-border-primary dark:border-dark-border-primary">
         <div className="flex items-center space-x-2">
           <h2 className="text-sm font-medium text-light-text-primary dark:text-dark-text-primary">
@@ -823,8 +794,7 @@ const SemesterTabs = ({
             </div>
             <div className="modal-content">
               <p className="text-sm text-light-text-tertiary dark:text-dark-text-tertiary mb-4">
-                Drag and drop to reorder semesters. Click the edit or delete
-                icons to modify.
+                Drag and drop to reorder semesters. Click the edit or delete icons to modify.
               </p>
               <div className="max-h-64 overflow-y-auto border border-light-border-primary dark:border-dark-border-primary rounded-md">
                 {semesters.length === 0 ? (

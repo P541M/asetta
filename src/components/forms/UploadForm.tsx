@@ -1,20 +1,11 @@
 import { useState, useRef, useCallback } from "react";
 import { useAuth } from "../../contexts/AuthContext";
-import {
-  UploadFormProps,
-  UploadStatus,
-  FileProgress,
-  ExtractionResult,
-} from "../../types/upload";
+import { UploadFormProps, UploadStatus, FileProgress, ExtractionResult } from "../../types/upload";
 import RateLimitNotice from "../ui/RateLimitNotice";
 import ExtractionSuccessModal from "../modals/ExtractionSuccessModal";
 import ApiLimitReachedModal from "../modals/ApiLimitReachedModal";
 
-const UploadForm = ({
-  semesterId,
-  semesterName,
-  onUploadSuccess,
-}: UploadFormProps) => {
+const UploadForm = ({ semesterId, semesterName, onUploadSuccess }: UploadFormProps) => {
   const { user } = useAuth();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [files, setFiles] = useState<FileProgress[]>([]);
@@ -24,8 +15,7 @@ const UploadForm = ({
   const [retryAfter, setRetryAfter] = useState<number>(120);
   const [showSuccessModal, setShowSuccessModal] = useState<boolean>(false);
   const [showApiLimitModal, setShowApiLimitModal] = useState<boolean>(false);
-  const [extractionResult, setExtractionResult] =
-    useState<ExtractionResult | null>(null);
+  const [extractionResult, setExtractionResult] = useState<ExtractionResult | null>(null);
   const [isDragActive, setIsDragActive] = useState<boolean>(false);
   const [copyrightAgreed, setCopyrightAgreed] = useState<boolean>(false);
 
@@ -33,9 +23,7 @@ const UploadForm = ({
     if (selectedFiles.length === 0) return;
 
     // Filter for PDF files only
-    const pdfFiles = selectedFiles.filter(
-      (file) => file.type === "application/pdf"
-    );
+    const pdfFiles = selectedFiles.filter((file) => file.type === "application/pdf");
 
     if (pdfFiles.length === 0) {
       setError("Please select PDF files only.");
@@ -72,7 +60,7 @@ const UploadForm = ({
       e.stopPropagation();
       if (!isDragActive) setIsDragActive(true);
     },
-    [isDragActive]
+    [isDragActive],
   );
 
   const handleDragLeave = useCallback((e: React.DragEvent) => {
@@ -98,7 +86,7 @@ const UploadForm = ({
       const droppedFiles = Array.from(e.dataTransfer.files);
       processFiles(droppedFiles);
     },
-    [processFiles]
+    [processFiles],
   );
 
   const handleUpload = async () => {
@@ -155,9 +143,7 @@ const UploadForm = ({
           } else if (result.error === "RATE_LIMITED") {
             setUploadStatus("rate_limited");
             setRetryAfter(result.retryAfter || 120);
-            setError(
-              result.message || "Servers are busy. Please wait and try again."
-            );
+            setError(result.message || "Servers are busy. Please wait and try again.");
           } else {
             throw new Error(result.error || "Upload failed");
           }
@@ -170,9 +156,9 @@ const UploadForm = ({
       // Check if it's a network-level error indicating quotas or rate limits
       if (
         err instanceof Error &&
-        (err.message.includes("429") || 
-         err.message.includes("rate limit") ||
-         err.message.includes("quota"))
+        (err.message.includes("429") ||
+          err.message.includes("rate limit") ||
+          err.message.includes("quota"))
       ) {
         if (err.message.includes("daily") || err.message.includes("quota exceeded")) {
           setUploadStatus("daily_quota_exceeded");
@@ -254,9 +240,8 @@ const UploadForm = ({
           </h3>
         </div>
         <p className="text-light-text-secondary dark:text-dark-text-secondary mb-4 leading-relaxed">
-          Transform your PDF course outlines into organized assessments
-          automatically. Our AI extracts deadlines, requirements, and details in
-          seconds.
+          Transform your PDF course outlines into organized assessments automatically. Our AI
+          extracts deadlines, requirements, and details in seconds.
         </p>
 
         <div className="p-4 bg-light-warning-bg dark:bg-dark-warning-bg border border-light-warning-text/20 dark:border-dark-warning-text/20 rounded-lg">
@@ -281,8 +266,8 @@ const UploadForm = ({
                 AI-Powered Extraction
               </h4>
               <p className="text-sm text-light-warning-text dark:text-dark-warning-text">
-                Please review extracted data for accuracy. Files are processed
-                securely and never stored.
+                Please review extracted data for accuracy. Files are processed securely and never
+                stored.
               </p>
             </div>
           </div>
@@ -352,9 +337,7 @@ const UploadForm = ({
                     : "text-light-text-primary dark:text-dark-text-primary"
                 }`}
               >
-                {isDragActive
-                  ? "Drop your PDFs here!"
-                  : "Drop PDFs or click to browse"}
+                {isDragActive ? "Drop your PDFs here!" : "Drop PDFs or click to browse"}
               </h4>
               <p
                 className={`text-sm mt-2 transition-colors duration-200 ${
@@ -456,24 +439,16 @@ const UploadForm = ({
 
         {message && !showSuccessModal && (
           <div className="p-4 bg-light-success-bg dark:bg-dark-success-bg rounded-md">
-            <p className="text-sm text-light-success-text dark:text-dark-success-text">
-              {message}
-            </p>
+            <p className="text-sm text-light-success-text dark:text-dark-success-text">{message}</p>
           </div>
         )}
 
         {uploadStatus === "rate_limited" ? (
-          <RateLimitNotice
-            onRetry={handleRetry}
-            retryAfter={retryAfter}
-            autoRetry={true}
-          />
+          <RateLimitNotice onRetry={handleRetry} retryAfter={retryAfter} autoRetry={true} />
         ) : (
           error && (
             <div className="p-4 bg-light-error-bg dark:bg-dark-error-bg rounded-md">
-              <p className="text-sm text-light-error-text dark:text-dark-error-text">
-                {error}
-              </p>
+              <p className="text-sm text-light-error-text dark:text-dark-error-text">{error}</p>
             </div>
           )
         )}
@@ -528,12 +503,7 @@ const UploadForm = ({
               </>
             ) : (
               <>
-                <svg
-                  className="w-4 h-4"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -548,9 +518,7 @@ const UploadForm = ({
 
           {files.length > 0 && uploadStatus !== "uploading" && (
             <button onClick={handleReset} className="btn-secondary px-4 py-3">
-              {uploadStatus === "rate_limited"
-                ? "Cancel & Clear"
-                : "Clear Files"}
+              {uploadStatus === "rate_limited" ? "Cancel & Clear" : "Clear Files"}
             </button>
           )}
         </div>
@@ -567,10 +535,7 @@ const UploadForm = ({
       )}
 
       {/* API Limit Reached Modal */}
-      <ApiLimitReachedModal
-        isOpen={showApiLimitModal}
-        onClose={handleCloseApiLimitModal}
-      />
+      <ApiLimitReachedModal isOpen={showApiLimitModal} onClose={handleCloseApiLimitModal} />
     </div>
   );
 };
