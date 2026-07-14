@@ -298,7 +298,7 @@ const AddAssessmentForm = ({ semesterId, onSuccess }: AddAssessmentFormProps) =>
               {message.type === "error" ? (
                 <div className="flex items-start">
                   <svg
-                    className="h-5 w-5 mr-3 mt-0.5 text-light-error-text dark:text-dark-error-text flex-shrink-0"
+                    className="h-5 w-5 mr-3 mt-0.5 text-light-error-text dark:text-dark-error-text shrink-0"
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 20 20"
                     fill="currentColor"
@@ -314,7 +314,7 @@ const AddAssessmentForm = ({ semesterId, onSuccess }: AddAssessmentFormProps) =>
               ) : (
                 <div className="flex items-start">
                   <svg
-                    className="h-5 w-5 mr-3 mt-0.5 text-light-success-text dark:text-dark-success-text flex-shrink-0"
+                    className="h-5 w-5 mr-3 mt-0.5 text-light-success-text dark:text-dark-success-text shrink-0"
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 20 20"
                     fill="currentColor"

@@ -37,7 +37,7 @@ const Logo = ({
   const logoElement = (
     <div className={`flex items-center space-x-3 ${className}`}>
       {/* SVG Logo */}
-      <div className={`${sizeClasses[size]} relative flex-shrink-0`}>
+      <div className={`${sizeClasses[size]} relative shrink-0`}>
         <Image
           src="/images/Asetta_Logo.svg"
           alt="Asetta Logo"
@@ -59,7 +59,7 @@ const Logo = ({
       {/* Text Logo */}
       {(variant === "logo-with-text" || showText) && (
         <span
-          className={`font-extrabold text-light-text-primary dark:text-dark-text-primary transition-all duration-300 tracking-tight ${textSizeClasses[size]}`}
+          className={`font-extrabold text-foreground transition-all duration-300 tracking-tight ${textSizeClasses[size]}`}
         >
           Asetta
         </span>

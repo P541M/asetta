@@ -320,7 +320,12 @@ const CalendarView = ({ selectedSemester, semesterId, refreshTrigger }: Calendar
         </div>
       </div>
 
-      <div ref={calendarRef} tabIndex={0} onKeyDown={handleKeyDown} className="focus:outline-none">
+      <div
+        ref={calendarRef}
+        tabIndex={0}
+        onKeyDown={handleKeyDown}
+        className="focus:outline-hidden"
+      >
         <CalendarGrid calendarDays={calendarDays} onSelectDay={setSelectedDay} />
       </div>
 

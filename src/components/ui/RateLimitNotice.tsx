@@ -36,7 +36,7 @@ const RateLimitNotice = ({ onRetry, retryAfter = 120, autoRetry = true }: RateLi
   return (
     <div className="p-6 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/50 rounded-lg animate-fade-in">
       <div className="flex items-start space-x-3">
-        <div className="flex-shrink-0">
+        <div className="shrink-0">
           <div className="relative">
             <div className="w-8 h-8 bg-amber-100 dark:bg-amber-800/50 rounded-full flex items-center justify-center">
               <svg

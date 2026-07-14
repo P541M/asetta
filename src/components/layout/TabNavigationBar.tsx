@@ -149,7 +149,7 @@ const TabNavigationBar = ({ className = "" }: TabNavigationBarProps) => {
               className={`${getMobileTabButtonClass(tab.id)} flex-1 text-center overflow-hidden`}
             >
               <div className="flex flex-col items-center justify-center space-y-0.5 w-full h-full">
-                <div className="h-5 w-5 flex-shrink-0">
+                <div className="h-5 w-5 shrink-0">
                   {React.cloneElement(tab.icon, {
                     className: "h-5 w-5",
                   } as React.SVGProps<SVGSVGElement>)}

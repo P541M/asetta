@@ -2,6 +2,11 @@
 
 This file contains important information for Claude Code to understand and work with the Asetta project effectively.
 
+## ⚠️ REQUIRED READING ⚠️
+**Before writing or modifying ANY code, read `standards.md` in this directory.** It is the single
+source of truth for code norms, the shadcn/ui design system, theme tokens, and dark/light mode
+rules. Code that conflicts with `standards.md` is wrong by definition.
+
 ## Project Overview
 Asetta is a student assessment management platform built with Next.js, React, TypeScript, and Firebase. It helps students track academic assessments, deadlines, and grades across semesters.
 
@@ -22,7 +27,8 @@ When working on this project, prioritize:
 - **Frontend**: Next.js 15 with React 19 and TypeScript
 - **Database**: Firebase Firestore with real-time updates
 - **Auth**: Firebase Authentication
-- **Styling**: Tailwind CSS with custom dark theme variables
+- **Styling**: Tailwind CSS v4 (CSS-first config in `src/styles/globals.css`) + shadcn/ui primitives in `src/components/ui/` — see `standards.md`
+- **Theming**: next-themes (class-based dark mode); semantic tokens, never manual DOM/localStorage access
 - **Rich Text**: Tiptap editor for notes functionality
 
 ## Important Patterns

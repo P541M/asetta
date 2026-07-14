@@ -9,9 +9,3 @@ export interface AuthContextType {
   refreshOnboardingStatus: () => Promise<void>;
   logout: () => Promise<void>;
 }
-
-export interface ThemeContextType {
-  isDarkMode: boolean;
-  toggleDarkMode: () => void;
-  setDarkMode: (isDark: boolean) => void;
-}

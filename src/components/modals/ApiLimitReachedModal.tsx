@@ -94,15 +94,15 @@ const ApiLimitReachedModal: React.FC<ApiLimitReachedModalProps> = ({ isOpen, onC
               </h4>
               <ul className="text-sm text-light-text-secondary dark:text-dark-text-secondary space-y-1 text-left">
                 <li className="flex items-center space-x-2">
-                  <span className="w-1.5 h-1.5 bg-light-button-primary dark:bg-dark-button-primary rounded-full flex-shrink-0"></span>
+                  <span className="w-1.5 h-1.5 bg-light-button-primary dark:bg-dark-button-primary rounded-full shrink-0"></span>
                   <span>Add assessments manually using the Quick Add form</span>
                 </li>
                 <li className="flex items-center space-x-2">
-                  <span className="w-1.5 h-1.5 bg-light-button-primary dark:bg-dark-button-primary rounded-full flex-shrink-0"></span>
+                  <span className="w-1.5 h-1.5 bg-light-button-primary dark:bg-dark-button-primary rounded-full shrink-0"></span>
                   <span>Review and manage your existing assessments</span>
                 </li>
                 <li className="flex items-center space-x-2">
-                  <span className="w-1.5 h-1.5 bg-light-button-primary dark:bg-dark-button-primary rounded-full flex-shrink-0"></span>
+                  <span className="w-1.5 h-1.5 bg-light-button-primary dark:bg-dark-button-primary rounded-full shrink-0"></span>
                   <span>Come back tomorrow for AI-powered extraction</span>
                 </li>
               </ul>

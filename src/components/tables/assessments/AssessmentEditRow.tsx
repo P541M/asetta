@@ -34,7 +34,7 @@ const AssessmentEditRow = ({
           type="checkbox"
           checked={isSelected}
           onChange={onToggleSelect}
-          className="h-5 w-5 rounded border-gray-300 dark:border-dark-border-primary text-light-button-primary dark:text-dark-button-primary focus:ring-light-focus-ring dark:focus:ring-dark-focus-ring"
+          className="h-5 w-5 rounded-sm border-gray-300 dark:border-dark-border-primary text-light-button-primary dark:text-dark-button-primary focus:ring-light-focus-ring dark:focus:ring-dark-focus-ring"
         />
         <div className="flex-1">
           <StatusSelect
@@ -145,7 +145,7 @@ const AssessmentEditRow = ({
           type="checkbox"
           checked={isSelected}
           onChange={onToggleSelect}
-          className="h-4 w-4 rounded border-gray-300 dark:border-dark-border-primary text-light-button-primary dark:text-dark-button-primary focus:ring-light-focus-ring dark:focus:ring-dark-focus-ring"
+          className="h-4 w-4 rounded-sm border-gray-300 dark:border-dark-border-primary text-light-button-primary dark:text-dark-button-primary focus:ring-light-focus-ring dark:focus:ring-dark-focus-ring"
         />
         <StatusSelect
           value={editFormData.status}

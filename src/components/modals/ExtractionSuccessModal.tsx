@@ -157,7 +157,7 @@ const ExtractionSuccessModal: React.FC<ExtractionSuccessModalProps> = ({
           <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/50 rounded-lg p-3">
             <div className="flex items-start space-x-2">
               <svg
-                className="w-4 h-4 text-amber-600 dark:text-amber-400 mt-0.5 flex-shrink-0"
+                className="w-4 h-4 text-amber-600 dark:text-amber-400 mt-0.5 shrink-0"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"

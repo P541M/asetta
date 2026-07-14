@@ -1,15 +1,21 @@
 // src/pages/_app.tsx
 import type { AppProps } from "next/app";
 import Head from "next/head";
+import { ThemeProvider } from "next-themes";
 import "../styles/globals.css";
 import "../styles/rich-text-editor.css";
 import { AuthProvider } from "../contexts/AuthContext";
-import { ThemeProvider } from "../contexts/ThemeContext";
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (
     <AuthProvider>
-      <ThemeProvider>
+      {/* enableSystem lands with the settings redesign; "light" matches the legacy default */}
+      <ThemeProvider
+        attribute="class"
+        defaultTheme="light"
+        enableSystem={false}
+        disableTransitionOnChange
+      >
         <Head>
           <title>Asetta - Academic Dashboard</title>
           <meta

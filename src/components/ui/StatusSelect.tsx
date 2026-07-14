@@ -196,9 +196,7 @@ const StatusSelect: React.FC<StatusSelectProps> = ({
         <div className="flex items-center space-x-2 min-w-0 flex-1">
           {selectedOption ? (
             <>
-              <span className={`flex-shrink-0 ${selectedOption.colorClass}`}>
-                {selectedOption.icon}
-              </span>
+              <span className={`shrink-0 ${selectedOption.colorClass}`}>{selectedOption.icon}</span>
               <span className={`truncate font-medium ${selectedOption.colorClass} min-w-0`}>
                 {selectedOption.label}
               </span>
@@ -212,7 +210,7 @@ const StatusSelect: React.FC<StatusSelectProps> = ({
 
         {/* Dropdown Arrow */}
         <svg
-          className={`w-4 h-4 ml-1 flex-shrink-0 transition-transform duration-200 text-light-text-tertiary dark:text-dark-text-tertiary ${
+          className={`w-4 h-4 ml-1 shrink-0 transition-transform duration-200 text-light-text-tertiary dark:text-dark-text-tertiary ${
             isOpen ? "transform rotate-180" : ""
           }`}
           fill="none"
@@ -253,13 +251,13 @@ const StatusSelect: React.FC<StatusSelectProps> = ({
                 `}
               >
                 <div className="flex items-center space-x-2 min-w-0 flex-1">
-                  <span className={`flex-shrink-0 ${option.colorClass}`}>{option.icon}</span>
+                  <span className={`shrink-0 ${option.colorClass}`}>{option.icon}</span>
                   <span className={`font-medium ${option.colorClass} truncate min-w-0`}>
                     {option.label}
                   </span>
                 </div>
                 {value === option.value && (
-                  <span className="flex-shrink-0">
+                  <span className="shrink-0">
                     <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                       <path
                         fillRule="evenodd"

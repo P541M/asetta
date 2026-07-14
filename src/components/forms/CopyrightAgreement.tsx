@@ -16,7 +16,7 @@ const CopyrightAgreement = ({ id, checked, onChange, className = "" }: Copyright
         id={id}
         checked={checked}
         onChange={(e) => onChange(e.target.checked)}
-        className="mt-1 w-4 h-4 text-light-button-primary dark:text-dark-button-primary border-gray-300 rounded focus:ring-light-button-primary dark:focus:ring-dark-button-primary"
+        className="mt-1 w-4 h-4 text-light-button-primary dark:text-dark-button-primary border-gray-300 rounded-sm focus:ring-light-button-primary dark:focus:ring-dark-button-primary"
       />
       <label
         htmlFor={id}

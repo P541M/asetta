@@ -46,7 +46,7 @@ const ManageSemestersModal = ({
   );
 
   return (
-    <div className="modal-backdrop z-[150] modal-open">
+    <div className="modal-backdrop z-150 modal-open">
       <div ref={modalRef} className="modal-container w-full max-w-sm">
         <div className="modal-header">
           <div className="flex justify-between items-center">

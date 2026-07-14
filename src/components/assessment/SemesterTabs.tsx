@@ -352,7 +352,7 @@ const SemesterTabs = ({ selectedSemester, onSelect, className = "" }: SemesterTa
       <div className="relative px-4 py-2">
         <div className="flex items-center space-x-2 overflow-x-auto pb-1 hide-scrollbar">
           {semesters.map((sem) => (
-            <div key={sem.id} className="flex-shrink-0">
+            <div key={sem.id} className="shrink-0">
               <button
                 onClick={() => handleSemesterSelect(sem.name)}
                 className={`px-3 py-1.5 rounded-lg text-sm font-medium whitespace-nowrap transition-all duration-200 ${

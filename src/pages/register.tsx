@@ -1,42 +1,37 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
-import { auth } from "../lib/firebase";
-import { createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 import Link from "next/link";
+import { Circle, CircleCheck, Loader2 } from "lucide-react";
+import { createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
+import { auth } from "../lib/firebase";
 import { redirectAfterAuth } from "../utils/authRedirect";
+import { getAuthErrorMessage } from "../utils/authErrors";
 import AuthShell from "../components/auth/AuthShell";
 import AuthMessageBanner from "../components/auth/AuthMessageBanner";
 import GoogleSignInButton from "../components/auth/GoogleSignInButton";
-import ButtonSpinner from "../components/auth/ButtonSpinner";
+import { Button } from "../components/ui/button";
+import { Input } from "../components/ui/input";
+import { PasswordInput } from "../components/ui/password-input";
+import { Label } from "../components/ui/label";
 
-/** One "✓ / ○" password requirement line. */
-const CriteriaRow = ({ met, label }: { met: boolean; label: React.ReactNode }) => (
-  <div className="flex items-center text-sm">
-    <span
-      className={`mr-2 ${
-        met
-          ? "text-light-status-submitted-text dark:text-dark-status-submitted-text"
-          : "text-light-text-tertiary dark:text-dark-text-tertiary"
-      }`}
-    >
-      {met ? "✓" : "○"}
-    </span>
-    <span
-      className={
-        met
-          ? "text-light-status-submitted-text dark:text-dark-status-submitted-text"
-          : "text-light-text-tertiary dark:text-dark-text-tertiary"
-      }
-    >
-      {label}
-    </span>
+/** One password requirement; the check animates in as the rule is met. */
+const CriteriaRow = ({ met, label }: { met: boolean; label: string }) => (
+  <div className="flex items-center gap-1.5 text-xs">
+    {met ? (
+      <CircleCheck
+        className="size-3.5 shrink-0 text-success motion-safe:animate-scale-in"
+        aria-hidden
+      />
+    ) : (
+      <Circle className="size-3.5 shrink-0 text-muted-foreground/50" aria-hidden />
+    )}
+    <span className={met ? "text-success" : "text-muted-foreground"}>{label}</span>
   </div>
 );
 
 const Register = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [passwordCriteria, setPasswordCriteria] = useState({
@@ -63,12 +58,7 @@ const Register = () => {
     e.preventDefault();
     setError(null);
 
-    if (password !== confirmPassword) {
-      setError("Passwords do not match");
-      return;
-    }
-
-    // Check if all password criteria are met
+    // The visibility toggle replaces a confirm-password field; criteria still gate submission
     if (!Object.values(passwordCriteria).every(Boolean)) {
       setError("Please meet all password requirements");
       return;
@@ -79,9 +69,11 @@ const Register = () => {
       const result = await createUserWithEmailAndPassword(auth, email, password);
       await redirectAfterAuth(result.user, router);
     } catch (error: unknown) {
-      setError(
-        error instanceof Error ? `Registration failed: ${error.message}` : "Registration failed.",
+      const message = getAuthErrorMessage(
+        error,
+        "Something went wrong creating your account. Please try again.",
       );
+      if (message) setError(message);
       setIsSubmitting(false);
     }
   };
@@ -94,11 +86,11 @@ const Register = () => {
       const result = await signInWithPopup(auth, provider);
       await redirectAfterAuth(result.user, router);
     } catch (error: unknown) {
-      setError(
-        error instanceof Error
-          ? `Google sign-in failed: ${error.message}`
-          : "Google sign-in failed.",
+      const message = getAuthErrorMessage(
+        error,
+        "Something went wrong with Google sign-in. Please try again.",
       );
+      if (message) setError(message);
       setIsSubmitting(false);
     }
   };
@@ -107,37 +99,34 @@ const Register = () => {
     <AuthShell
       title="Asetta - Sign Up"
       description="Create your Asetta account to start managing your academic tasks."
-      heading="Create Your Account"
+      heading="Create your account"
       subheading="Join Asetta to streamline your academic journey"
     >
-      {error && <AuthMessageBanner type="error" title="Registration Error" text={error} />}
+      {error && (
+        <AuthMessageBanner type="error" title="Couldn't create your account" text={error} />
+      )}
 
       <form onSubmit={handleSubmit} className="space-y-5">
-        <div className="form-group">
-          <label htmlFor="email" className="form-label">
-            Email Address
-          </label>
-          <input
+        <div className="space-y-2">
+          <Label htmlFor="email">Email address</Label>
+          <Input
             id="email"
             type="email"
+            autoComplete="email"
+            autoFocus
             placeholder="you@example.com"
-            className="input"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
             disabled={isSubmitting}
-            aria-label="Email address"
           />
         </div>
-        <div className="form-group">
-          <label htmlFor="password" className="form-label">
-            Password
-          </label>
-          <input
+        <div className="space-y-2">
+          <Label htmlFor="password">Password</Label>
+          <PasswordInput
             id="password"
-            type="password"
+            autoComplete="new-password"
             placeholder="Create a password"
-            className="input"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             onFocus={() => setPasswordFocused(true)}
@@ -145,73 +134,41 @@ const Register = () => {
             required
             disabled={isSubmitting}
             minLength={8}
-            aria-label="Password"
           />
           {(passwordFocused || password) && (
-            <div className="mt-2 space-y-1">
-              <CriteriaRow met={passwordCriteria.minLength} label="At least 8 characters" />
-              <CriteriaRow met={passwordCriteria.hasUppercase} label="One uppercase letter" />
-              <CriteriaRow met={passwordCriteria.hasLowercase} label="One lowercase letter" />
-              <CriteriaRow met={passwordCriteria.hasNumber} label="One number" />
-              <CriteriaRow
-                met={passwordCriteria.hasSpecialChar}
-                label={<>One special character (!@#$%^&*(),.?&quot;:{}|&lt;&gt;)</>}
-              />
+            <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 pt-1">
+              <CriteriaRow met={passwordCriteria.minLength} label="8+ characters" />
+              <CriteriaRow met={passwordCriteria.hasUppercase} label="Uppercase letter" />
+              <CriteriaRow met={passwordCriteria.hasLowercase} label="Lowercase letter" />
+              <CriteriaRow met={passwordCriteria.hasNumber} label="Number" />
+              <CriteriaRow met={passwordCriteria.hasSpecialChar} label="Special character" />
             </div>
           )}
         </div>
-        <div className="form-group">
-          <label htmlFor="confirmPassword" className="form-label">
-            Confirm Password
-          </label>
-          <input
-            id="confirmPassword"
-            type="password"
-            placeholder="Confirm your password"
-            className="input"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            required
-            disabled={isSubmitting}
-            minLength={8}
-            aria-label="Confirm password"
-          />
-        </div>
-        <button
-          type="submit"
-          disabled={isSubmitting}
-          className={`btn-primary w-full ${isSubmitting ? "opacity-70 cursor-not-allowed" : ""}`}
-          aria-label={isSubmitting ? "Signing up..." : "Sign up"}
-        >
+        <Button type="submit" size="lg" className="w-full" disabled={isSubmitting}>
           {isSubmitting ? (
             <>
-              <ButtonSpinner />
+              <Loader2 className="animate-spin" aria-hidden />
               Signing up...
             </>
           ) : (
-            "Sign up with Email"
+            "Create account"
           )}
-        </button>
+        </Button>
       </form>
 
       <GoogleSignInButton
         onClick={handleGoogleSignIn}
         disabled={isSubmitting}
         label={isSubmitting ? "Signing up..." : "Continue with Google"}
-        className="btn-outline w-full flex items-center justify-center gap-3 py-3 disabled:opacity-50 disabled:cursor-not-allowed"
       />
 
-      <div className="mt-6 text-center">
-        <p className="text-sm text-light-text-secondary dark:text-dark-text-secondary">
-          Already have an account?{" "}
-          <Link
-            href="/login"
-            className="text-light-button-primary hover:text-light-button-primary-hover dark:text-dark-button-primary dark:hover:text-dark-button-primary-hover font-medium transition-colors duration-200"
-          >
-            Sign in
-          </Link>
-        </p>
-      </div>
+      <p className="mt-8 text-center text-sm text-muted-foreground">
+        Already have an account?{" "}
+        <Link href="/login" className="font-medium text-primary underline-offset-4 hover:underline">
+          Sign in
+        </Link>
+      </p>
     </AuthShell>
   );
 };

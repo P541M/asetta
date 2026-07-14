@@ -20,6 +20,17 @@ const config: NextConfig = {
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
   },
   async redirects() {
+    // Locally, "/" goes to the login page instead of the production landing site
+    // (non-permanent so browsers never cache a 308 for localhost).
+    if (process.env.NODE_ENV === "development") {
+      return [
+        {
+          source: "/",
+          destination: "/login",
+          permanent: false,
+        },
+      ];
+    }
     return [
       {
         source: "/",

@@ -85,19 +85,19 @@ function SortableSemester({ semester, isSelected, onEdit, onDelete }: SortableSe
         isDragging ? "bg-light-hover-primary dark:bg-dark-hover-primary shadow-lg rounded-lg" : ""
       }`}
     >
-      <div className="flex items-center space-x-3 flex-grow">
+      <div className="flex items-center space-x-3 grow">
         <div {...attributes} {...listeners}>
           <DragHandle />
         </div>
         {isEditing ? (
-          <div className="flex items-center flex-grow">
+          <div className="flex items-center grow">
             <input
               ref={editInputRef}
               type="text"
               value={editValue}
               onChange={(e) => setEditValue(e.target.value)}
               onKeyDown={handleKeyDown}
-              className="input text-sm py-1 px-2 flex-grow min-w-0"
+              className="input text-sm py-1 px-2 grow min-w-0"
               onClick={(e) => e.stopPropagation()}
             />
             <div className="flex items-center px-1">

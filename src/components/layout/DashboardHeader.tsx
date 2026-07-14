@@ -103,7 +103,7 @@ const DashboardHeader = ({ onLogout }: DashboardHeaderProps) => {
     <>
       <div className="bg-light-bg-primary dark:bg-dark-bg-secondary border-b border-light-border-primary dark:border-dark-border-primary">
         <div className="max-w-7xl mx-auto px-4 md:px-6 py-4">
-          <div className="flex items-center justify-between min-h-[4rem]">
+          <div className="flex items-center justify-between min-h-16">
             {/* Left side - Personalized Greeting */}
             <div
               className={`flex items-center space-x-3 ${
@@ -130,7 +130,7 @@ const DashboardHeader = ({ onLogout }: DashboardHeaderProps) => {
               <button
                 ref={avatarRef}
                 onClick={toggleDropdown}
-                className="flex items-center space-x-2 text-light-text-secondary dark:text-dark-text-secondary hover:text-light-button-primary dark:hover:text-dark-button-primary transition-colors duration-200 focus:outline-none bg-light-bg-secondary dark:bg-dark-bg-tertiary rounded-lg shadow-sm border border-light-border-primary dark:border-dark-border-primary px-3 py-2 focus:ring-2 focus:ring-light-focus-ring dark:focus:ring-dark-focus-ring focus:ring-opacity-50"
+                className="flex items-center space-x-2 text-light-text-secondary dark:text-dark-text-secondary hover:text-light-button-primary dark:hover:text-dark-button-primary transition-colors duration-200 focus:outline-hidden bg-light-bg-secondary dark:bg-dark-bg-tertiary rounded-lg shadow-sm border border-light-border-primary dark:border-dark-border-primary px-3 py-2 focus:ring-2 focus:ring-light-focus-ring dark:focus:ring-dark-focus-ring focus:ring-opacity-50"
                 aria-label="User menu"
                 aria-expanded={showDropdown}
                 aria-haspopup="true"

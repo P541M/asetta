@@ -129,7 +129,7 @@ const AssessmentBreakdown = ({
                         </p>
                       </div>
                       <span
-                        className={`inline-flex items-center justify-center w-8 h-8 rounded-full text-sm font-medium ${status.bgColor} ${status.color} flex-shrink-0 ml-3`}
+                        className={`inline-flex items-center justify-center w-8 h-8 rounded-full text-sm font-medium ${status.bgColor} ${status.color} shrink-0 ml-3`}
                         title={assessment.status}
                       >
                         {status.icon}
@@ -154,7 +154,7 @@ const AssessmentBreakdown = ({
                             }
                             className="input w-full px-4 py-3 text-base hover:shadow-sm transition-all duration-200 dark:bg-dark-input-bg dark:text-dark-input-text dark:border-dark-input-border [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none min-h-[44px] rounded-lg"
                           />
-                          <span className="text-sm text-light-text-tertiary dark:text-dark-text-tertiary flex-shrink-0">
+                          <span className="text-sm text-light-text-tertiary dark:text-dark-text-tertiary shrink-0">
                             %
                           </span>
                         </div>
@@ -175,7 +175,7 @@ const AssessmentBreakdown = ({
                             className="input w-full px-4 py-3 text-base hover:shadow-sm transition-all duration-200 dark:bg-dark-input-bg dark:text-dark-input-text dark:border-dark-input-border [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none min-h-[44px] rounded-lg"
                             placeholder="--"
                           />
-                          <span className="text-sm text-light-text-tertiary dark:text-dark-text-tertiary flex-shrink-0">
+                          <span className="text-sm text-light-text-tertiary dark:text-dark-text-tertiary shrink-0">
                             %
                           </span>
                         </div>

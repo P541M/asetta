@@ -63,7 +63,7 @@ export function UploadStep() {
       {state.hasCompletedUpload && state.extractionResults && (
         <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-6 mb-8">
           <div className="flex items-start space-x-3">
-            <div className="w-8 h-8 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center flex-shrink-0">
+            <div className="w-8 h-8 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center shrink-0">
               <svg
                 className="w-5 h-5 text-green-600 dark:text-green-400"
                 fill="none"

@@ -1,9 +1,11 @@
+@reference "./globals.css";
+
 .rich-text-editor {
   @apply bg-transparent;
 }
 
 .rich-text-editor .ProseMirror {
-  @apply min-h-[200px] max-h-[500px] outline-none focus:outline-none focus:ring-0 text-light-text-primary dark:text-dark-text-primary overflow-y-auto;
+  @apply min-h-[200px] max-h-[500px] outline-hidden focus:outline-hidden focus:ring-0 text-light-text-primary dark:text-dark-text-primary overflow-y-auto;
 }
 
 .rich-text-editor .ProseMirror p {

@@ -22,7 +22,7 @@ const TableHeader = ({
           type="checkbox"
           checked={allSelected}
           onChange={onToggleSelectAll}
-          className="h-4 w-4 rounded border-gray-300 dark:border-dark-border-primary text-light-button-primary dark:text-dark-button-primary focus:ring-light-focus-ring dark:focus:ring-dark-focus-ring"
+          className="h-4 w-4 rounded-sm border-gray-300 dark:border-dark-border-primary text-light-button-primary dark:text-dark-button-primary focus:ring-light-focus-ring dark:focus:ring-dark-focus-ring"
         />
         <span className="text-xs font-medium text-gray-500 dark:text-dark-text-tertiary uppercase tracking-wider">
           Status
@@ -62,7 +62,7 @@ const TableHeader = ({
           type="checkbox"
           checked={allSelected}
           onChange={onToggleSelectAll}
-          className="h-5 w-5 rounded border-gray-300 dark:border-dark-border-primary text-light-button-primary dark:text-dark-button-primary focus:ring-light-focus-ring dark:focus:ring-dark-focus-ring"
+          className="h-5 w-5 rounded-sm border-gray-300 dark:border-dark-border-primary text-light-button-primary dark:text-dark-button-primary focus:ring-light-focus-ring dark:focus:ring-dark-focus-ring"
         />
         <span className="text-sm font-medium text-gray-700 dark:text-dark-text-primary">
           Select All ({totalCount})

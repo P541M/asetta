@@ -11,15 +11,19 @@ export default function Document() {
         />
       </Head>
       <body>
-        <Script id="theme-script" strategy="beforeInteractive">
+        {/* One-time migration: seed next-themes ("theme") from the legacy "darkMode" key
+            so existing users keep their saved preference. Runs before next-themes' own
+            pre-hydration script, which handles all theming from here on. */}
+        <Script id="theme-migration" strategy="beforeInteractive">
           {`
-            (function() {
+            (function () {
               try {
-                const darkMode = localStorage.getItem('darkMode') === 'true';
-                document.documentElement.classList.toggle('dark', darkMode);
-              } catch (e) {
-                console.error('Error setting initial theme:', e);
-              }
+                var theme = localStorage.getItem('theme');
+                var legacy = localStorage.getItem('darkMode');
+                if (!theme && legacy !== null) {
+                  localStorage.setItem('theme', legacy === 'true' ? 'dark' : 'light');
+                }
+              } catch (e) {}
             })();
           `}
         </Script>

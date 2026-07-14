@@ -1,27 +1,38 @@
+import { Button } from "../ui/button";
+
 interface GoogleSignInButtonProps {
   onClick: () => void;
   disabled: boolean;
   label: string;
-  /** Full class string; the login and register pages style this button differently. */
-  className: string;
 }
 
-/** "Continue with Google" button with the divider above it. */
-const GoogleSignInButton = ({ onClick, disabled, label, className }: GoogleSignInButtonProps) => (
+/** "Continue with Google" outline button with the divider above it (identical on every auth page). */
+const GoogleSignInButton = ({ onClick, disabled, label }: GoogleSignInButtonProps) => (
   <>
     <div className="relative my-6">
       <div className="absolute inset-0 flex items-center">
-        <div className="w-full border-t border-light-border-primary dark:border-dark-border-primary"></div>
+        <div className="w-full border-t border-border"></div>
       </div>
-      <div className="relative flex justify-center text-sm">
-        <span className="px-2 bg-light-bg-primary dark:bg-dark-bg-secondary text-light-text-tertiary dark:text-dark-text-tertiary">
-          Or continue with Google
-        </span>
+      <div className="relative flex justify-center">
+        <span className="bg-background px-3 text-sm text-muted-foreground">or</span>
       </div>
     </div>
 
-    <button onClick={onClick} disabled={disabled} className={className}>
-      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 48 48">
+    <Button
+      type="button"
+      variant="secondary"
+      size="lg"
+      className="w-full"
+      onClick={onClick}
+      disabled={disabled}
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="20"
+        height="20"
+        viewBox="0 0 48 48"
+        className="size-5"
+      >
         <path
           fill="#FFC107"
           d="M43.611 20.083H42V20H24v8h11.303c-1.649 4.657-6.08 8-11.303 8-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 12.955 4 4 12.955 4 24s8.955 20 20 20 20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z"
@@ -40,7 +51,7 @@ const GoogleSignInButton = ({ onClick, disabled, label, className }: GoogleSignI
         />
       </svg>
       {label}
-    </button>
+    </Button>
   </>
 );
 

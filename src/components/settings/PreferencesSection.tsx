@@ -78,7 +78,7 @@ const PreferencesSection = ({
           <button
             type="button"
             onClick={() => setIsDarkMode(!isDarkMode)}
-            className={`relative inline-flex h-8 w-16 items-center rounded-full transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-light-button-primary dark:focus:ring-dark-button-primary focus:ring-offset-2 shadow-sm ${
+            className={`relative inline-flex h-8 w-16 items-center rounded-full transition-all duration-200 focus:outline-hidden focus:ring-2 focus:ring-light-button-primary dark:focus:ring-dark-button-primary focus:ring-offset-2 shadow-sm ${
               isDarkMode
                 ? "bg-light-button-primary dark:bg-dark-button-primary"
                 : "bg-light-border-secondary dark:bg-dark-border-secondary"
@@ -130,7 +130,7 @@ const PreferencesSection = ({
             <button
               type="button"
               onClick={() => setShowStatsBar(!showStatsBar)}
-              className={`relative inline-flex h-7 w-14 items-center rounded-full transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-light-button-primary dark:focus:ring-dark-button-primary focus:ring-offset-2 ${
+              className={`relative inline-flex h-7 w-14 items-center rounded-full transition-all duration-200 focus:outline-hidden focus:ring-2 focus:ring-light-button-primary dark:focus:ring-dark-button-primary focus:ring-offset-2 ${
                 showStatsBar
                   ? "bg-light-button-primary dark:bg-dark-button-primary"
                   : "bg-light-border-secondary dark:bg-dark-border-secondary"
@@ -157,7 +157,7 @@ const PreferencesSection = ({
             <button
               type="button"
               onClick={() => setShowDaysTillDue(!showDaysTillDue)}
-              className={`relative inline-flex h-7 w-14 items-center rounded-full transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-light-button-primary dark:focus:ring-dark-button-primary focus:ring-offset-2 ${
+              className={`relative inline-flex h-7 w-14 items-center rounded-full transition-all duration-200 focus:outline-hidden focus:ring-2 focus:ring-light-button-primary dark:focus:ring-dark-button-primary focus:ring-offset-2 ${
                 showDaysTillDue
                   ? "bg-light-button-primary dark:bg-dark-button-primary"
                   : "bg-light-border-secondary dark:bg-dark-border-secondary"
@@ -184,7 +184,7 @@ const PreferencesSection = ({
             <button
               type="button"
               onClick={() => setShowWeight(!showWeight)}
-              className={`relative inline-flex h-7 w-14 items-center rounded-full transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-light-button-primary dark:focus:ring-dark-button-primary focus:ring-offset-2 ${
+              className={`relative inline-flex h-7 w-14 items-center rounded-full transition-all duration-200 focus:outline-hidden focus:ring-2 focus:ring-light-button-primary dark:focus:ring-dark-button-primary focus:ring-offset-2 ${
                 showWeight
                   ? "bg-light-button-primary dark:bg-dark-button-primary"
                   : "bg-light-border-secondary dark:bg-dark-border-secondary"
@@ -211,7 +211,7 @@ const PreferencesSection = ({
             <button
               type="button"
               onClick={() => setShowNotes(!showNotes)}
-              className={`relative inline-flex h-7 w-14 items-center rounded-full transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-light-button-primary dark:focus:ring-dark-button-primary focus:ring-offset-2 ${
+              className={`relative inline-flex h-7 w-14 items-center rounded-full transition-all duration-200 focus:outline-hidden focus:ring-2 focus:ring-light-button-primary dark:focus:ring-dark-button-primary focus:ring-offset-2 ${
                 showNotes
                   ? "bg-light-button-primary dark:bg-dark-button-primary"
                   : "bg-light-border-secondary dark:bg-dark-border-secondary"

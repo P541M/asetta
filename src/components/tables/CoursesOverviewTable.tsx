@@ -121,7 +121,7 @@ const CoursesOverviewTable = ({
                       onBlur={() => handleEditSubmit(course.courseName)}
                       onKeyDown={(e) => handleKeyDown(e, course.courseName)}
                       onClick={(e) => e.stopPropagation()}
-                      className="text-lg font-medium bg-transparent border-b-2 border-light-button-primary dark:border-dark-button-primary text-light-text-primary dark:text-dark-text-primary focus:outline-none w-full"
+                      className="text-lg font-medium bg-transparent border-b-2 border-light-button-primary dark:border-dark-button-primary text-light-text-primary dark:text-dark-text-primary focus:outline-hidden w-full"
                       autoFocus
                       disabled={isRenaming}
                     />
@@ -134,7 +134,7 @@ const CoursesOverviewTable = ({
                       </h3>
                       <button
                         onClick={(e) => handleEditStart(course.courseName, e)}
-                        className="ml-2 p-1 rounded opacity-0 group-hover:opacity-100 hover:bg-light-hover-primary dark:hover:bg-dark-hover-primary transition-all duration-200"
+                        className="ml-2 p-1 rounded-sm opacity-0 group-hover:opacity-100 hover:bg-light-hover-primary dark:hover:bg-dark-hover-primary transition-all duration-200"
                         title="Edit course name"
                         disabled={isRenaming}
                       >

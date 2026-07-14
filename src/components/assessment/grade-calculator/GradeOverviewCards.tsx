@@ -29,7 +29,7 @@ const GradeOverviewCards = ({
         </h3>
         {currentGradeInfo && (
           <span
-            className={`px-2 py-1 rounded text-xs font-medium ${currentGradeInfo.bgColor} ${currentGradeInfo.color}`}
+            className={`px-2 py-1 rounded-sm text-xs font-medium ${currentGradeInfo.bgColor} ${currentGradeInfo.color}`}
           >
             {currentGradeInfo.letter}
           </span>
@@ -106,7 +106,7 @@ const GradeOverviewCards = ({
             value={targetGrade}
             onChange={(e) => onTargetGradeChange(parseFloat(e.target.value) || 0)}
             disabled={preferencesLoading}
-            className="input w-20 sm:w-16 px-3 py-2 sm:px-2 sm:py-1 text-base sm:text-sm hover:shadow-sm transition-all duration-200 dark:bg-dark-input-bg dark:text-dark-input-text dark:border-dark-input-border min-h-[44px] sm:min-h-[auto] disabled:opacity-50 disabled:cursor-not-allowed"
+            className="input w-20 sm:w-16 px-3 py-2 sm:px-2 sm:py-1 text-base sm:text-sm hover:shadow-sm transition-all duration-200 dark:bg-dark-input-bg dark:text-dark-input-text dark:border-dark-input-border min-h-[44px] sm:min-h-auto disabled:opacity-50 disabled:cursor-not-allowed"
           />
           <span className="text-light-text-tertiary dark:text-dark-text-tertiary text-sm">%</span>
         </div>

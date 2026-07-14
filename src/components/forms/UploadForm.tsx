@@ -241,7 +241,7 @@ const UploadForm = ({ semesterId, semesterName, onUploadSuccess }: UploadFormPro
 
         <div className="p-4 bg-light-warning-bg dark:bg-dark-warning-bg border border-light-warning-text/20 dark:border-dark-warning-text/20 rounded-lg">
           <div className="flex items-start space-x-3">
-            <div className="flex-shrink-0 mt-0.5">
+            <div className="shrink-0 mt-0.5">
               <svg
                 className="w-5 h-5 text-light-warning-text dark:text-dark-warning-text"
                 fill="none"
@@ -366,7 +366,7 @@ const UploadForm = ({ semesterId, semesterName, onUploadSuccess }: UploadFormPro
                   className="group relative bg-light-bg-primary dark:bg-dark-bg-tertiary rounded-lg border border-light-border-primary dark:border-dark-border-secondary p-4 transition-all duration-200 hover:shadow-md hover:border-light-button-primary dark:hover:border-dark-button-primary"
                 >
                   <div className="flex items-center space-x-4">
-                    <div className="flex-shrink-0">
+                    <div className="shrink-0">
                       <div className="w-12 h-12 bg-light-error-bg dark:bg-dark-error-bg rounded-lg flex items-center justify-center">
                         <svg
                           className="w-6 h-6 text-light-error-text dark:text-dark-error-text"
@@ -399,7 +399,7 @@ const UploadForm = ({ semesterId, semesterName, onUploadSuccess }: UploadFormPro
                         </span>
                       </div>
                     </div>
-                    <div className="flex-shrink-0">
+                    <div className="shrink-0">
                       {uploadStatus === "uploading" ? (
                         <div className="flex items-center space-x-2">
                           <div className="animate-spin rounded-full h-5 w-5 border-2 border-light-button-primary dark:border-dark-button-primary border-t-transparent"></div>

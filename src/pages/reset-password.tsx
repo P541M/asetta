@@ -1,116 +1,124 @@
 // src/pages/reset-password.tsx
 import { useState } from "react";
-import { auth } from "../lib/firebase";
-import { sendPasswordResetEmail } from "firebase/auth";
+import { useRouter } from "next/router";
 import Link from "next/link";
+import { Loader2, MailCheck } from "lucide-react";
+import { sendPasswordResetEmail } from "firebase/auth";
+import { auth } from "../lib/firebase";
+import { getAuthErrorMessage } from "../utils/authErrors";
 import AuthShell from "../components/auth/AuthShell";
 import AuthMessageBanner from "../components/auth/AuthMessageBanner";
-import ButtonSpinner from "../components/auth/ButtonSpinner";
+import { Button } from "../components/ui/button";
+import { Input } from "../components/ui/input";
+import { Label } from "../components/ui/label";
 
 const ResetPassword = () => {
   const [email, setEmail] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [message, setMessage] = useState<{
-    text: string;
-    type: "success" | "error";
-  } | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [sentTo, setSentTo] = useState<string | null>(null);
+  const router = useRouter();
 
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!email.trim()) {
-      setMessage({ text: "Please enter your email address", type: "error" });
+      setError("Please enter your email address");
       return;
     }
 
     setIsSubmitting(true);
-    setMessage(null);
+    setError(null);
 
     try {
       await sendPasswordResetEmail(auth, email);
-      setMessage({
-        text: "Password reset link sent! Check your email inbox.",
-        type: "success",
-      });
+      setSentTo(email);
       setEmail("");
-    } catch (error) {
-      let errorMessage = "Failed to send reset email. ";
-
-      if (error instanceof Error) {
-        if (error.message.includes("auth/user-not-found")) {
-          errorMessage += "No account found with this email address.";
-        } else if (error.message.includes("auth/invalid-email")) {
-          errorMessage += "Please enter a valid email address.";
-        } else {
-          errorMessage += error.message;
-        }
-      }
-
-      setMessage({ text: errorMessage, type: "error" });
+    } catch (error: unknown) {
+      const message = getAuthErrorMessage(
+        error,
+        "We couldn't send the reset email. Please try again.",
+      );
+      if (message) setError(message);
     } finally {
       setIsSubmitting(false);
     }
   };
 
+  if (sentTo) {
+    return (
+      <AuthShell
+        title="Asetta - Reset Password"
+        description="Reset your Asetta account password to regain access to your academic dashboard."
+        heading="Check your inbox"
+        subheading="Follow the link in the email to set a new password"
+      >
+        <div className="text-center">
+          <div className="mx-auto flex size-12 items-center justify-center rounded-full bg-success/10">
+            <MailCheck className="size-6 text-success" aria-hidden />
+          </div>
+          <p className="mt-5 text-sm text-muted-foreground">
+            We sent a password reset link to{" "}
+            <span className="font-medium text-foreground">{sentTo}</span>. It can take a minute to
+            arrive, and it&apos;s worth checking spam.
+          </p>
+          <Button size="lg" className="mt-8 w-full" onClick={() => router.push("/login")}>
+            Back to login
+          </Button>
+          <button
+            type="button"
+            onClick={() => setSentTo(null)}
+            className="mt-4 text-sm font-medium text-primary underline-offset-4 outline-hidden hover:underline focus-visible:ring-2 focus-visible:ring-ring rounded-sm"
+          >
+            Use a different email
+          </button>
+        </div>
+      </AuthShell>
+    );
+  }
+
   return (
     <AuthShell
       title="Asetta - Reset Password"
       description="Reset your Asetta account password to regain access to your academic dashboard."
-      heading="Reset Password"
+      heading="Reset password"
       subheading="Enter your email and we'll send you a link to reset your password"
-      showLogo
     >
-      {message && (
-        <AuthMessageBanner
-          type={message.type}
-          title={message.type === "error" ? "Reset Error" : "Success"}
-          text={message.text}
-        />
-      )}
+      {error && <AuthMessageBanner type="error" title="Couldn't send the link" text={error} />}
 
       <form onSubmit={handleResetPassword} className="space-y-5">
-        <div className="form-group">
-          <label htmlFor="email" className="form-label">
-            Email Address
-          </label>
-          <input
+        <div className="space-y-2">
+          <Label htmlFor="email">Email address</Label>
+          <Input
             id="email"
             type="email"
+            autoComplete="email"
+            autoFocus
             placeholder="you@example.com"
-            className="input"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
             disabled={isSubmitting}
-            aria-label="Email address"
           />
         </div>
 
-        <button
-          type="submit"
-          disabled={isSubmitting}
-          className={`btn-primary w-full ${isSubmitting ? "opacity-70 cursor-not-allowed" : ""}`}
-          aria-label={isSubmitting ? "Sending..." : "Send reset link"}
-        >
+        <Button type="submit" size="lg" className="w-full" disabled={isSubmitting}>
           {isSubmitting ? (
             <>
-              <ButtonSpinner />
+              <Loader2 className="animate-spin" aria-hidden />
               Sending...
             </>
           ) : (
-            "Send Reset Link"
+            "Send reset link"
           )}
-        </button>
+        </Button>
       </form>
 
-      <div className="mt-6 text-center">
-        <Link
-          href="/login"
-          className="text-light-button-primary hover:text-light-button-primary-hover dark:text-dark-button-primary dark:hover:text-dark-button-primary-hover text-sm font-medium transition-colors duration-200"
-        >
-          Back to Login
+      <p className="mt-8 text-center text-sm text-muted-foreground">
+        <Link href="/login" className="font-medium text-primary underline-offset-4 hover:underline">
+          Back to login
         </Link>
-      </div>
+      </p>
     </AuthShell>
   );
 };

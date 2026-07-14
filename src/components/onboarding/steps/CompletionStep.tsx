@@ -11,7 +11,7 @@ export function CompletionStep() {
     <div className="text-center max-w-2xl mx-auto">
       {/* Success Animation */}
       <div className="mb-8">
-        <div className="w-24 h-24 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center mx-auto mb-6 animate-scale-in">
+        <div className="w-24 h-24 bg-linear-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center mx-auto mb-6 animate-scale-in">
           <svg
             className="w-12 h-12 text-white"
             fill="none"
@@ -105,7 +105,7 @@ export function CompletionStep() {
 
         <div className="grid md:grid-cols-2 gap-4 text-left">
           <div className="flex items-start space-x-3">
-            <div className="w-8 h-8 bg-light-button-primary/10 dark:bg-dark-button-primary/10 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
+            <div className="w-8 h-8 bg-light-button-primary/10 dark:bg-dark-button-primary/10 rounded-lg flex items-center justify-center shrink-0 mt-0.5">
               <svg
                 className="w-4 h-4 text-light-button-primary dark:text-dark-button-primary"
                 fill="none"
@@ -131,7 +131,7 @@ export function CompletionStep() {
           </div>
 
           <div className="flex items-start space-x-3">
-            <div className="w-8 h-8 bg-light-button-primary/10 dark:bg-dark-button-primary/10 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
+            <div className="w-8 h-8 bg-light-button-primary/10 dark:bg-dark-button-primary/10 rounded-lg flex items-center justify-center shrink-0 mt-0.5">
               <svg
                 className="w-4 h-4 text-light-button-primary dark:text-dark-button-primary"
                 fill="none"
@@ -157,7 +157,7 @@ export function CompletionStep() {
           </div>
 
           <div className="flex items-start space-x-3">
-            <div className="w-8 h-8 bg-light-button-primary/10 dark:bg-dark-button-primary/10 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
+            <div className="w-8 h-8 bg-light-button-primary/10 dark:bg-dark-button-primary/10 rounded-lg flex items-center justify-center shrink-0 mt-0.5">
               <svg
                 className="w-4 h-4 text-light-button-primary dark:text-dark-button-primary"
                 fill="none"
@@ -183,7 +183,7 @@ export function CompletionStep() {
           </div>
 
           <div className="flex items-start space-x-3">
-            <div className="w-8 h-8 bg-light-button-primary/10 dark:bg-dark-button-primary/10 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
+            <div className="w-8 h-8 bg-light-button-primary/10 dark:bg-dark-button-primary/10 rounded-lg flex items-center justify-center shrink-0 mt-0.5">
               <svg
                 className="w-4 h-4 text-light-button-primary dark:text-dark-button-primary"
                 fill="none"

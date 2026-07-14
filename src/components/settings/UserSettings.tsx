@@ -10,7 +10,7 @@ import NotificationsSection from "./NotificationsSection";
 import SettingsNavigation from "./SettingsNavigation";
 import SettingsActions from "./SettingsActions";
 import SettingsMessage from "./SettingsMessage";
-import { useTheme } from "../../contexts/ThemeContext";
+import { useTheme } from "next-themes";
 import { DEFAULT_ICON } from "../../data/profileIcons";
 
 interface UserSettingsProps {
@@ -20,7 +20,8 @@ interface UserSettingsProps {
 
 const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
   const { user } = useAuth();
-  const { isDarkMode, setDarkMode } = useTheme();
+  const { resolvedTheme, setTheme } = useTheme();
+  const isDarkMode = resolvedTheme === "dark";
   const [displayName, setDisplayName] = useState(user?.displayName || "");
   const [institution, setInstitution] = useState("");
   const [studyProgram, setStudyProgram] = useState("");
@@ -208,7 +209,7 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
 
       // Update dark mode if changed
       if (isDarkModeLocal !== initialValues.isDarkMode) {
-        setDarkMode(isDarkModeLocal);
+        setTheme(isDarkModeLocal ? "dark" : "light");
       }
 
       // Update initial values to match current values

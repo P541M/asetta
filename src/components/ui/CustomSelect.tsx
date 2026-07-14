@@ -142,7 +142,7 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
             <>
               {selectedOption.icon && (
                 <span
-                  className={`flex-shrink-0 ${selectedOption.colorClass || "text-light-text-primary dark:text-dark-text-primary"}`}
+                  className={`shrink-0 ${selectedOption.colorClass || "text-light-text-primary dark:text-dark-text-primary"}`}
                 >
                   {selectedOption.icon}
                 </span>
@@ -162,7 +162,7 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
 
         {/* Dropdown Arrow */}
         <svg
-          className={`w-4 h-4 ml-1 flex-shrink-0 transition-transform duration-200 text-light-text-tertiary dark:text-dark-text-tertiary ${
+          className={`w-4 h-4 ml-1 shrink-0 transition-transform duration-200 text-light-text-tertiary dark:text-dark-text-tertiary ${
             isOpen ? "transform rotate-180" : ""
           }`}
           fill="none"
@@ -201,7 +201,7 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
                 <div className="flex items-center space-x-2 min-w-0 flex-1">
                   {option.icon && (
                     <span
-                      className={`flex-shrink-0 ${option.colorClass || "text-light-text-primary dark:text-dark-text-primary"}`}
+                      className={`shrink-0 ${option.colorClass || "text-light-text-primary dark:text-dark-text-primary"}`}
                     >
                       {option.icon}
                     </span>
@@ -213,7 +213,7 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
                   </span>
                 </div>
                 {value === option.value && (
-                  <span className="flex-shrink-0">
+                  <span className="shrink-0">
                     <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                       <path
                         fillRule="evenodd"

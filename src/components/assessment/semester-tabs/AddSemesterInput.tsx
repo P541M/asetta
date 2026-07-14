@@ -37,7 +37,7 @@ const AddSemesterInput = ({
           value={value}
           onChange={(e) => onChange(e.target.value)}
           placeholder="Enter semester name"
-          className="flex-1 px-3 py-1.5 text-sm border border-light-border-primary dark:border-dark-border-primary rounded-md focus:outline-none focus:ring-2 focus:ring-light-focus-ring dark:focus:ring-dark-focus-ring focus:border-transparent bg-light-input-bg dark:bg-dark-input-bg text-light-input-text dark:text-dark-input-text"
+          className="flex-1 px-3 py-1.5 text-sm border border-light-border-primary dark:border-dark-border-primary rounded-md focus:outline-hidden focus:ring-2 focus:ring-light-focus-ring dark:focus:ring-dark-focus-ring focus:border-transparent bg-light-input-bg dark:bg-dark-input-bg text-light-input-text dark:text-dark-input-text"
           onKeyDown={(e) => {
             if (e.key === "Enter") {
               onAdd();
