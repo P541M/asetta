@@ -1,66 +1,49 @@
 import { useState, useEffect, useRef, KeyboardEvent, useCallback } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import { db } from "../../lib/firebase";
-import { collection, getDocs, query, updateDoc, doc } from "firebase/firestore";
+import { collection, getDocs, query } from "firebase/firestore";
 import { generateICSFile } from "../../utils/icsGenerator";
-import { getStatusBackgroundClasses, getStatusBadgeClasses } from "../../utils/statusUtils";
-import { DndContext, DragEndEvent } from "@dnd-kit/core";
 import { Assessment } from "../../types/assessment";
 import { Day, CalendarViewProps } from "../../types/calendar";
-import CustomSelect, { type SelectOption } from "../ui/CustomSelect";
+import CustomSelect from "../ui/CustomSelect";
+import { statusFilterOptions } from "./statusFilterOptions";
+import CalendarGrid from "./CalendarGrid";
+import DayDetailModal from "./DayDetailModal";
 
-const statusFilterOptions: SelectOption[] = [
-  {
-    value: "all",
-    label: "All Status",
-    icon: (
-      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth="2"
-          d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-        />
-      </svg>
-    ),
-    colorClass: "text-light-text-primary dark:text-dark-text-primary",
-  },
-  {
-    value: "Not started",
-    label: "Not Started",
-    icon: (
-      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <circle cx="12" cy="12" r="10" strokeWidth="2" />
-        <path strokeWidth="2" d="M12 6v6l4 2" />
-      </svg>
-    ),
-    colorClass: "text-gray-600 dark:text-gray-400",
-    bgClass: "bg-gray-100 dark:bg-gray-800",
-  },
-  {
-    value: "In progress",
-    label: "In Progress",
-    icon: (
-      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <circle cx="12" cy="12" r="10" strokeWidth="2" />
-        <polyline points="12,6 12,12 16,14" strokeWidth="2" />
-      </svg>
-    ),
-    colorClass: "text-amber-600 dark:text-amber-400",
-    bgClass: "bg-amber-100 dark:bg-amber-900/30",
-  },
-  {
-    value: "Submitted",
-    label: "Submitted",
-    icon: (
-      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-      </svg>
-    ),
-    colorClass: "text-emerald-600 dark:text-emerald-400",
-    bgClass: "bg-emerald-100 dark:bg-emerald-900/30",
-  },
+const monthNames = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
 ];
+
+// Date formatting helpers
+const formatDateForComparison = (date: Date): string => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};
+
+const formatDateTime = (date: Date, time: string): string => {
+  const [hours, minutes] = time.split(":").map((num) => parseInt(num, 10));
+  date.setHours(hours, minutes);
+  return date.toLocaleString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+};
 
 const CalendarView = ({ selectedSemester, semesterId, refreshTrigger }: CalendarViewProps) => {
   const { user } = useAuth();
@@ -71,22 +54,6 @@ const CalendarView = ({ selectedSemester, semesterId, refreshTrigger }: Calendar
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const calendarRef = useRef<HTMLDivElement>(null);
-
-  const monthNames = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
-  ];
-  const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
   // Fetch assessments
   useEffect(() => {
@@ -192,26 +159,6 @@ const CalendarView = ({ selectedSemester, semesterId, refreshTrigger }: Calendar
     generateCalendarDays();
   }, [currentMonth, getAssessmentsForDate]);
 
-  // Date formatting helpers
-  const formatDateForComparison = (date: Date): string => {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const day = String(date.getDate()).padStart(2, "0");
-    return `${year}-${month}-${day}`;
-  };
-
-  const formatDateTime = (date: Date, time: string): string => {
-    const [hours, minutes] = time.split(":").map((num) => parseInt(num, 10));
-    date.setHours(hours, minutes);
-    return date.toLocaleString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  };
-
   // Navigation handlers
   const previousMonth = () => {
     setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1));
@@ -251,32 +198,6 @@ const CalendarView = ({ selectedSemester, semesterId, refreshTrigger }: Calendar
         break;
     }
   };
-
-  // Drag and drop handlers
-  const handleDragEnd = async (event: DragEndEvent) => {
-    const { active, over } = event;
-    if (!over || !user) return;
-
-    const assessmentId = active.id as string;
-    const newDate = over.id as string;
-
-    try {
-      const assessmentRef = doc(
-        db,
-        "users",
-        user.uid,
-        "semesters",
-        semesterId,
-        "assessments",
-        assessmentId,
-      );
-      await updateDoc(assessmentRef, { dueDate: newDate });
-    } catch (error) {
-      console.error("Error updating assessment date:", error);
-    }
-  };
-
-  // Status color mapping
 
   // Export calendar
   const handleExportCalendar = () => {
@@ -399,162 +320,17 @@ const CalendarView = ({ selectedSemester, semesterId, refreshTrigger }: Calendar
         </div>
       </div>
 
-      <DndContext onDragEnd={handleDragEnd}>
-        <div
-          ref={calendarRef}
-          tabIndex={0}
-          onKeyDown={handleKeyDown}
-          className="focus:outline-none"
-        >
-          <div className="grid grid-cols-7 border-b dark:border-dark-border-primary bg-gray-50 dark:bg-dark-bg-tertiary rounded-t-xl">
-            {dayNames.map((day, index) => (
-              <div
-                key={index}
-                className="p-2 text-center text-sm font-medium text-gray-700 dark:text-dark-text-primary"
-              >
-                {day}
-              </div>
-            ))}
-          </div>
-          <div className="grid grid-cols-7 auto-rows-fr bg-white dark:bg-dark-bg-secondary border-l border-t dark:border-dark-border-primary rounded-b-xl overflow-hidden">
-            {calendarDays.map((day, index) => (
-              <div
-                key={index}
-                onClick={() => day.assessments.length > 0 && setSelectedDay(day)}
-                className={`relative p-2 min-h-[120px] border-r border-b dark:border-dark-border-primary transition-colors ${
-                  day.isCurrentMonth
-                    ? "bg-white dark:bg-dark-bg-secondary"
-                    : "bg-gray-50/50 dark:bg-dark-bg-tertiary/50"
-                } ${
-                  day.isToday
-                    ? "ring-2 ring-light-button-primary dark:ring-dark-button-primary ring-inset"
-                    : ""
-                } ${
-                  day.assessments.length > 0
-                    ? "cursor-pointer hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary"
-                    : ""
-                }`}
-              >
-                <div className="flex items-center justify-between mb-2">
-                  <span
-                    className={`text-sm font-medium ${
-                      day.isCurrentMonth
-                        ? "text-gray-900 dark:text-dark-text-primary"
-                        : "text-gray-400 dark:text-dark-text-tertiary"
-                    } ${
-                      day.isToday ? "text-light-button-primary dark:text-dark-button-primary" : ""
-                    }`}
-                  >
-                    {day.date.getDate()}
-                  </span>
-                  {day.assessments.length > 0 && (
-                    <span className="flex h-5 w-5 items-center justify-center text-xs font-medium text-light-button-primary dark:text-dark-button-primary bg-light-button-secondary dark:bg-dark-button-secondary rounded-full">
-                      {day.assessments.length}
-                    </span>
-                  )}
-                </div>
-                <div className="space-y-1.5">
-                  {day.assessments.slice(0, 3).map((assessment) => (
-                    <div
-                      key={assessment.id}
-                      className={`text-xs px-2 py-1.5 rounded-md truncate ${getStatusBackgroundClasses(
-                        assessment.status,
-                      )} hover:shadow-sm transition-all duration-200`}
-                    >
-                      <div className="flex items-center justify-between">
-                        <span className="truncate font-medium">{assessment.assignmentName}</span>
-                        <span className="ml-2 text-[10px] font-medium opacity-75">
-                          {new Date(`2000-01-01T${assessment.dueTime}`).toLocaleTimeString(
-                            "en-US",
-                            {
-                              hour: "numeric",
-                              minute: "2-digit",
-                              hour12: true,
-                            },
-                          )}
-                        </span>
-                      </div>
-                    </div>
-                  ))}
-                  {day.assessments.length > 3 && (
-                    <div className="text-xs text-gray-500 dark:text-dark-text-tertiary font-medium bg-gray-50 dark:bg-dark-bg-tertiary px-2 py-1 rounded-md border border-gray-200 dark:border-dark-border-primary">
-                      +{day.assessments.length - 3} more
-                    </div>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </DndContext>
+      <div ref={calendarRef} tabIndex={0} onKeyDown={handleKeyDown} className="focus:outline-none">
+        <CalendarGrid calendarDays={calendarDays} onSelectDay={setSelectedDay} />
+      </div>
 
       {/* Day detail modal */}
       {selectedDay && (
-        <div className="modal-backdrop z-50">
-          <div className="modal-container w-full max-w-2xl">
-            <div className="modal-header">
-              <div className="flex justify-between items-center">
-                <div>
-                  <h3 className="text-lg font-medium text-light-text-primary dark:text-dark-text-primary">
-                    {selectedDay.date.toLocaleDateString(undefined, {
-                      weekday: "long",
-                      month: "long",
-                      day: "numeric",
-                      year: "numeric",
-                    })}
-                  </h3>
-                  <p className="text-sm text-light-text-tertiary dark:text-dark-text-tertiary">
-                    {selectedDay.assessments.length} assessment
-                    {selectedDay.assessments.length !== 1 ? "s" : ""}
-                  </p>
-                </div>
-                <button
-                  onClick={() => setSelectedDay(null)}
-                  className="text-light-text-tertiary dark:text-dark-text-tertiary hover:text-light-text-secondary dark:hover:text-dark-text-secondary"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                </button>
-              </div>
-            </div>
-            <div className="modal-content space-y-3 max-h-[60vh] overflow-y-auto">
-              {selectedDay.assessments.map((assessment) => (
-                <div
-                  key={assessment.id}
-                  className="p-4 rounded-lg border border-light-border-primary dark:border-dark-border-primary bg-light-bg-primary dark:bg-dark-bg-tertiary hover:shadow-sm transition-shadow"
-                >
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <h4 className="text-base font-medium text-light-text-primary dark:text-dark-text-primary">
-                        {assessment.assignmentName}
-                      </h4>
-                      <p className="text-sm text-light-text-tertiary dark:text-dark-text-tertiary font-medium">
-                        {assessment.courseName}
-                      </p>
-                    </div>
-                    <span className={getStatusBadgeClasses(assessment.status)}>
-                      {assessment.status}
-                    </span>
-                  </div>
-                  <div className="mt-2 text-sm text-light-text-secondary dark:text-dark-text-secondary">
-                    <p>Due: {formatDateTime(selectedDay.date, assessment.dueTime)}</p>
-                    {assessment.weight > 0 && <p>Weight: {assessment.weight}%</p>}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
+        <DayDetailModal
+          day={selectedDay}
+          onClose={() => setSelectedDay(null)}
+          formatDateTime={formatDateTime}
+        />
       )}
     </div>
   );

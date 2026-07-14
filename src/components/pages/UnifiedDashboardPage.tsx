@@ -114,7 +114,10 @@ const GradesTab = ({ data, urlSemesterId }: TabComponentProps) => {
     }
   }, [router.query.course]);
 
-  // Auto-select first course if none selected and courses are available
+  // Auto-select first course if none selected and courses are available.
+  // Deliberate "adjust state during render" (see react.dev: You Might Not Need an Effect):
+  // the guard prevents loops, and unlike a useEffect this re-renders before paint,
+  // so the tab never flashes an unselected state once courses load.
   if (!selectedCourse && availableCourses.length > 0) {
     setSelectedCourse(availableCourses[0]);
   }

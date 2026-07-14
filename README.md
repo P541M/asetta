@@ -86,6 +86,12 @@ npm run build
 npm start
 ```
 
+## Deployment & CI
+
+- **Deploys**: Vercel is connected to this GitHub repo. Every push to `main` automatically deploys to production; pushes to other branches get preview deployments with their own URLs.
+- **CI quality gate**: GitHub Actions (`.github/workflows/ci.yml`) runs on every push and pull request: ESLint, Prettier check (`npm run format:check`), TypeScript check (`npx tsc --noEmit`), and a production build. The build uses harmless placeholder Firebase values — real credentials stay in Vercel.
+- **Recommended**: enable branch protection on `main` (GitHub → Settings → Branches) requiring the "CI / verify" check to pass, so nothing broken can be merged and auto-deployed.
+
 ## Let's Connect!
 
 [![Email](https://img.shields.io/badge/Email-D14836?style=for-the-badge&logo=gmail&logoColor=white)](mailto:videna.psalmeleazar@gmail.com)

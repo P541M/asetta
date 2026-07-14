@@ -1,18 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { sendWelcomeEmail } from "../../lib/email";
-
-// Helper functions for development-only logging
-const devLog = (...args: unknown[]) => {
-  if (process.env.NODE_ENV === "development") {
-    console.log(...args);
-  }
-};
-
-const devError = (...args: unknown[]) => {
-  if (process.env.NODE_ENV === "development") {
-    console.error(...args);
-  }
-};
+import { devLog, devError } from "../../utils/devLog";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "POST") {

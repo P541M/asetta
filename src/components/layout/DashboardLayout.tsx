@@ -2,22 +2,15 @@ import { useEffect, useState } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import { useRouter } from "next/router";
 import Head from "next/head";
-import { db } from "../../lib/firebase";
-import {
-  collection,
-  getDocs,
-  query,
-  where,
-  orderBy,
-  onSnapshot,
-  doc,
-  getDoc,
-} from "firebase/firestore";
 import SemesterTabs from "../assessment/SemesterTabs";
 import DashboardHeader from "./DashboardHeader";
 import TabNavigationBar from "./TabNavigationBar";
 import { Assessment } from "../../types/assessment";
 import { CourseStats } from "../../types/course";
+import LoadingScreen from "../ui/LoadingScreen";
+import { useSemesterSelection } from "../../hooks/useSemesterSelection";
+import { useSemesterAssessments, DashboardStats } from "../../hooks/useSemesterAssessments";
+import { useDisplayPreferences } from "../../hooks/useDisplayPreferences";
 
 interface DashboardLayoutProps {
   children: (props: {
@@ -29,14 +22,7 @@ interface DashboardLayoutProps {
     isLoading: boolean;
     isDataReady: boolean;
     error: string | null;
-    stats: {
-      total: number;
-      notStarted: number;
-      inProgress: number;
-      submitted: number;
-      upcomingDeadlines: number;
-      completionRate: number;
-    };
+    stats: DashboardStats;
     refreshAssessments: () => void;
     refreshTrigger: number;
   }) => React.ReactNode;
@@ -53,259 +39,21 @@ const DashboardLayout = ({
 }: DashboardLayoutProps) => {
   const { user, loading, logout } = useAuth();
   const router = useRouter();
-  const [selectedSemester, setSelectedSemester] = useState<string>("");
-  const [selectedSemesterId, setSelectedSemesterId] = useState<string>("");
-  const [assessments, setAssessments] = useState<Assessment[]>([]);
-  const [courses, setCourses] = useState<CourseStats[]>([]);
-  const [availableCourses, setAvailableCourses] = useState<string[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isDataReady, setIsDataReady] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [showStatsBar, setShowStatsBar] = useState(false);
+  const { showStatsBar } = useDisplayPreferences(user);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
-  const [stats, setStats] = useState({
-    total: 0,
-    notStarted: 0,
-    inProgress: 0,
-    submitted: 0,
-    upcomingDeadlines: 0,
-    completionRate: 0,
-  });
-
-  // Helper function to process course statistics from assessments
-  const processCourseStats = (assessmentsList: Assessment[]): CourseStats[] => {
-    const courseMap = new Map<string, Assessment[]>();
-    assessmentsList.forEach((assessment) => {
-      if (!courseMap.has(assessment.courseName)) {
-        courseMap.set(assessment.courseName, []);
-      }
-      courseMap.get(assessment.courseName)?.push(assessment);
-    });
-
-    const courseStatsList: CourseStats[] = [];
-    courseMap.forEach((assessments, courseName) => {
-      const completedStatuses = ["Submitted", "Missed"];
-      const completed = assessments.filter((a) => completedStatuses.includes(a.status));
-      const now = new Date();
-      const upcomingAssessments = assessments
-        .filter((a) => !completedStatuses.includes(a.status) && new Date(a.dueDate) >= now)
-        .sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime());
-
-      const nextUpcoming = upcomingAssessments[0];
-      const progress =
-        assessments.length > 0 ? Math.round((completed.length / assessments.length) * 100) : 0;
-
-      courseStatsList.push({
-        courseName,
-        totalAssessments: assessments.length,
-        pendingAssessments: assessments.length - completed.length,
-        completedAssessments: completed.length,
-        nextDueDate: nextUpcoming ? nextUpcoming.dueDate : null,
-        nextAssignment: nextUpcoming ? nextUpcoming.assignmentName : null,
-        progress,
-      });
-    });
-
-    return courseStatsList.sort((a, b) => a.courseName.localeCompare(b.courseName));
-  };
+  const { selectedSemester, setSelectedSemester, selectedSemesterId } = useSemesterSelection(
+    user,
+    forceSemesterId,
+  );
+  const { assessments, courses, availableCourses, isLoading, isDataReady, error, stats } =
+    useSemesterAssessments(user, selectedSemesterId);
 
   useEffect(() => {
     if (!loading && !user) {
       router.push("/login");
     }
   }, [user, loading, router]);
-
-  useEffect(() => {
-    const findSemesterId = async () => {
-      if (!user) {
-        setSelectedSemesterId("");
-        setSelectedSemester("");
-        return;
-      }
-
-      // If forceSemesterId is provided, use it directly
-      if (forceSemesterId) {
-        try {
-          const semesterRef = doc(db, "users", user.uid, "semesters", forceSemesterId);
-          const semesterSnap = await getDoc(semesterRef);
-          if (semesterSnap.exists()) {
-            setSelectedSemesterId(forceSemesterId);
-            setSelectedSemester(semesterSnap.data().name);
-          } else {
-            setSelectedSemesterId("");
-            setSelectedSemester("");
-          }
-        } catch (err) {
-          console.error("Error finding forced semester:", err);
-          setSelectedSemesterId("");
-          setSelectedSemester("");
-        }
-        return;
-      }
-
-      // Original logic for when no forceSemesterId is provided
-      if (!selectedSemester) {
-        setSelectedSemesterId("");
-        return;
-      }
-      try {
-        const semestersRef = collection(db, "users", user.uid, "semesters");
-        const q = query(semestersRef, where("name", "==", selectedSemester));
-        const querySnapshot = await getDocs(q);
-        if (!querySnapshot.empty) {
-          setSelectedSemesterId(querySnapshot.docs[0].id);
-        } else {
-          setSelectedSemesterId("");
-        }
-      } catch (err) {
-        console.error("Error finding semester ID:", err);
-        setSelectedSemesterId("");
-      }
-    };
-    findSemesterId();
-  }, [selectedSemester, user, forceSemesterId]);
-
-  useEffect(() => {
-    if (!user || !selectedSemesterId) {
-      setAssessments([]);
-      return;
-    }
-
-    // Only show loading spinner on initial load or when there's no previous data
-    if (assessments.length === 0) {
-      setIsLoading(true);
-    }
-    setIsDataReady(false);
-    setError(null);
-    const assessmentsRef = collection(
-      db,
-      "users",
-      user.uid,
-      "semesters",
-      selectedSemesterId,
-      "assessments",
-    );
-    const q = query(assessmentsRef, orderBy("dueDate", "asc"));
-    let unsubscribe: (() => void) | undefined;
-
-    try {
-      unsubscribe = onSnapshot(
-        q,
-        (snapshot) => {
-          const assessmentsList: Assessment[] = snapshot.docs.map((doc) => {
-            const data = doc.data();
-            const today = new Date().toISOString().split("T")[0];
-            return {
-              id: doc.id,
-              title: data.assignmentName || "Unknown Assessment",
-              dueDate: data.dueDate || today,
-              status: data.status || "Not started",
-              notes: data.notes || "",
-              courseName: data.courseName || "Unknown Course",
-              assignmentName: data.assignmentName || "Unknown Assessment",
-              dueTime: data.dueTime || "23:59",
-              weight: data.weight || 0,
-            };
-          });
-          setAssessments(assessmentsList);
-
-          // Process course statistics
-          const courseStats = processCourseStats(assessmentsList);
-          setCourses(courseStats);
-
-          // Extract available courses (sorted alphabetically)
-          const uniqueCourses = Array.from(
-            new Set(assessmentsList.map((a) => a.courseName)),
-          ).sort();
-          setAvailableCourses(uniqueCourses);
-
-          const now = new Date();
-          const oneWeek = new Date();
-          oneWeek.setDate(now.getDate() + 7);
-          const totalCount = assessmentsList.length;
-          const notStartedCount = assessmentsList.filter((a) => a.status === "Not started").length;
-          const inProgressCount = assessmentsList.filter((a) => a.status === "In progress").length;
-          const completedStatuses = ["Submitted", "Missed"];
-          const completedCount = assessmentsList.filter((a) =>
-            completedStatuses.includes(a.status),
-          ).length;
-          const upcomingCount = assessmentsList.filter((a) => {
-            const dueDate = new Date(a.dueDate);
-            return dueDate > now && dueDate <= oneWeek && !completedStatuses.includes(a.status);
-          }).length;
-          const completionRate =
-            totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
-          setStats({
-            total: totalCount,
-            notStarted: notStartedCount,
-            inProgress: inProgressCount,
-            submitted: completedCount,
-            upcomingDeadlines: upcomingCount,
-            completionRate: completionRate,
-          });
-          setIsLoading(false);
-
-          // Add a small delay before marking data as ready to ensure smooth animations
-          setTimeout(() => {
-            setIsDataReady(true);
-          }, 50);
-        },
-        (err) => {
-          console.error("Error fetching assessments:", err);
-          setError("Failed to load assessments. Please try again.");
-          setIsLoading(false);
-          setIsDataReady(true);
-        },
-      );
-    } catch (error) {
-      console.error("Error setting up assessments listener:", error);
-      setError("Failed to set up assessments listener. Please try again.");
-      setIsLoading(false);
-      setIsDataReady(true);
-    }
-
-    return () => {
-      if (unsubscribe) {
-        unsubscribe();
-      }
-    };
-  }, [selectedSemesterId, user, assessments.length]);
-
-  useEffect(() => {
-    const fetchUserPreferences = async () => {
-      if (!user) return;
-      try {
-        const userDocRef = doc(db, "users", user.uid);
-        const userSnapshot = await getDoc(userDocRef);
-        if (userSnapshot.exists()) {
-          const userData = userSnapshot.data();
-          setShowStatsBar(userData.showStatsBar ?? false);
-        }
-      } catch (error) {
-        console.error("Error fetching user preferences:", error);
-      }
-    };
-
-    fetchUserPreferences();
-
-    const handlePreferencesUpdate = (event: CustomEvent) => {
-      if (event.detail) {
-        if ("showStatsBar" in event.detail) {
-          setShowStatsBar(event.detail.showStatsBar);
-        }
-      }
-    };
-
-    window.addEventListener("userPreferencesUpdated", handlePreferencesUpdate as EventListener);
-
-    return () => {
-      window.removeEventListener(
-        "userPreferencesUpdated",
-        handlePreferencesUpdate as EventListener,
-      );
-    };
-  }, [user]);
 
   const handleLogout = async () => {
     await logout();
@@ -317,14 +65,7 @@ const DashboardLayout = ({
   };
 
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-light-bg-secondary dark:bg-dark-bg-primary">
-        <div className="flex flex-col items-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-2 border-light-button-primary border-t-transparent dark:border-dark-button-primary dark:border-t-transparent"></div>
-          <p className="mt-4 text-light-text-secondary dark:text-dark-text-secondary">Loading...</p>
-        </div>
-      </div>
-    );
+    return <LoadingScreen />;
   }
 
   return (

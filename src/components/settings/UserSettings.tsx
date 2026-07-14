@@ -228,19 +228,6 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
         email,
       });
 
-      // Trigger a custom event to notify other components of the preference change
-      const event = new CustomEvent("userPreferencesUpdated", {
-        detail: {
-          showDaysTillDue,
-          showWeight,
-          showNotes,
-          showStatsBar,
-          emailNotifications,
-          notificationDaysBefore,
-        },
-      });
-      window.dispatchEvent(event);
-
       setMessage({
         text: "Settings updated successfully!",
         type: "success",

@@ -1,18 +1,6 @@
 import { getAdmin } from "./firebase-admin";
 import { sendEmail } from "./email";
-
-// Helper functions for development-only logging
-const devLog = (...args: unknown[]) => {
-  if (process.env.NODE_ENV === "development") {
-    console.log(...args);
-  }
-};
-
-const devError = (...args: unknown[]) => {
-  if (process.env.NODE_ENV === "development") {
-    console.error(...args);
-  }
-};
+import { devLog, devError } from "../utils/devLog";
 
 interface NotificationPreferences {
   emailNotifications: boolean;

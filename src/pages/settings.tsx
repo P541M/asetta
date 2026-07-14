@@ -4,6 +4,7 @@ import UserSettings from "../components/settings/UserSettings";
 import { useEffect } from "react";
 import Head from "next/head";
 import DashboardHeader from "../components/layout/DashboardHeader";
+import LoadingScreen from "../components/ui/LoadingScreen";
 
 const SettingsPage = () => {
   const router = useRouter();
@@ -22,14 +23,7 @@ const SettingsPage = () => {
   };
 
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-light-bg-secondary dark:bg-dark-bg-primary">
-        <div className="flex flex-col items-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-2 border-light-button-primary border-t-transparent dark:border-dark-button-primary dark:border-t-transparent"></div>
-          <p className="mt-4 text-light-text-secondary dark:text-dark-text-secondary">Loading...</p>
-        </div>
-      </div>
-    );
+    return <LoadingScreen />;
   }
 
   if (!user) {

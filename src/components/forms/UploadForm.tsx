@@ -4,6 +4,8 @@ import { UploadFormProps, UploadStatus, FileProgress, ExtractionResult } from ".
 import RateLimitNotice from "../ui/RateLimitNotice";
 import ExtractionSuccessModal from "../modals/ExtractionSuccessModal";
 import ApiLimitReachedModal from "../modals/ApiLimitReachedModal";
+import CopyrightAgreement from "./CopyrightAgreement";
+import { postUploadForm } from "../../lib/uploadClient";
 
 const UploadForm = ({ semesterId, semesterName, onUploadSuccess }: UploadFormProps) => {
   const { user } = useAuth();
@@ -107,14 +109,7 @@ const UploadForm = ({ semesterId, semesterName, onUploadSuccess }: UploadFormPro
         });
       }
 
-      const token = await user.getIdToken();
-      const response = await fetch("/api/upload", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        body: formData,
-      });
+      const response = await postUploadForm(user, formData);
 
       const result = await response.json();
 
@@ -455,32 +450,11 @@ const UploadForm = ({ semesterId, semesterName, onUploadSuccess }: UploadFormPro
 
         {/* Copyright Agreement */}
         {files.length > 0 && uploadStatus === "idle" && (
-          <div className="p-4 bg-light-bg-secondary dark:bg-dark-bg-secondary rounded-lg border border-light-border-secondary dark:border-dark-border-secondary">
-            <div className="flex items-start space-x-3">
-              <input
-                type="checkbox"
-                id="upload-copyright-agreement"
-                checked={copyrightAgreed}
-                onChange={(e) => setCopyrightAgreed(e.target.checked)}
-                className="mt-1 w-4 h-4 text-light-button-primary dark:text-dark-button-primary border-gray-300 rounded focus:ring-light-button-primary dark:focus:ring-dark-button-primary"
-              />
-              <label
-                htmlFor="upload-copyright-agreement"
-                className="text-sm text-light-text-secondary dark:text-dark-text-secondary"
-              >
-                By uploading, I agree to the{" "}
-                <a
-                  href="https://www.asetta.me/terms"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-light-button-primary dark:text-dark-button-primary hover:underline"
-                >
-                  Terms of Service
-                </a>{" "}
-                and confirm I have permission to upload these materials.
-              </label>
-            </div>
-          </div>
+          <CopyrightAgreement
+            id="upload-copyright-agreement"
+            checked={copyrightAgreed}
+            onChange={setCopyrightAgreed}
+          />
         )}
 
         <div className="flex space-x-3">

@@ -2,6 +2,8 @@ import React, { useState, useRef, useCallback } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import { FileProgress, UploadStatus, ExtractionResult } from "../../types/upload";
 import ApiLimitReachedModal from "../modals/ApiLimitReachedModal";
+import CopyrightAgreement from "../forms/CopyrightAgreement";
+import { postUploadForm } from "../../lib/uploadClient";
 
 interface OnboardingUploadFormProps {
   semesterId: string;
@@ -81,14 +83,7 @@ export function OnboardingUploadForm({
 
       setMessage("Uploading files...");
 
-      const token = await user.getIdToken();
-      const response = await fetch("/api/upload", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        body: formData,
-      });
+      const response = await postUploadForm(user, formData);
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -339,32 +334,12 @@ export function OnboardingUploadForm({
 
       {/* Copyright Agreement */}
       {files.length > 0 && uploadStatus === "idle" && (
-        <div className="mt-4 p-4 bg-light-bg-secondary dark:bg-dark-bg-secondary rounded-lg border border-light-border-secondary dark:border-dark-border-secondary">
-          <div className="flex items-start space-x-3">
-            <input
-              type="checkbox"
-              id="copyright-agreement"
-              checked={copyrightAgreed}
-              onChange={(e) => setCopyrightAgreed(e.target.checked)}
-              className="mt-1 w-4 h-4 text-light-button-primary dark:text-dark-button-primary border-gray-300 rounded focus:ring-light-button-primary dark:focus:ring-dark-button-primary"
-            />
-            <label
-              htmlFor="copyright-agreement"
-              className="text-sm text-light-text-secondary dark:text-dark-text-secondary"
-            >
-              By uploading, I agree to the{" "}
-              <a
-                href="https://www.asetta.me/terms"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-light-button-primary dark:text-dark-button-primary hover:underline"
-              >
-                Terms of Service
-              </a>{" "}
-              and confirm I have permission to upload these materials.
-            </label>
-          </div>
-        </div>
+        <CopyrightAgreement
+          id="copyright-agreement"
+          checked={copyrightAgreed}
+          onChange={setCopyrightAgreed}
+          className="mt-4"
+        />
       )}
 
       {/* Upload Controls */}
