@@ -1,3 +1,5 @@
+import { Checkbox } from "../../ui/checkbox";
+
 interface TableHeaderProps {
   allSelected: boolean;
   onToggleSelectAll: () => void;
@@ -16,39 +18,38 @@ const TableHeader = ({
 }: TableHeaderProps) => (
   <>
     {/* Headers - Hidden on mobile, visible on desktop */}
-    <div className="hidden lg:grid grid-cols-12 gap-2 px-4 py-3 bg-gray-100/50 dark:bg-dark-bg-tertiary/50 rounded-lg">
-      <div className="col-span-2 flex items-center space-x-3">
-        <input
-          type="checkbox"
+    <div className="hidden lg:grid grid-cols-12 gap-2 px-4 pb-2">
+      <div className="col-span-2 flex items-center gap-3">
+        <Checkbox
           checked={allSelected}
-          onChange={onToggleSelectAll}
-          className="h-4 w-4 rounded-sm border-gray-300 dark:border-dark-border-primary text-light-button-primary dark:text-dark-button-primary focus:ring-light-focus-ring dark:focus:ring-dark-focus-ring"
+          onCheckedChange={onToggleSelectAll}
+          aria-label="Select all assessments"
         />
-        <span className="text-xs font-medium text-gray-500 dark:text-dark-text-tertiary uppercase tracking-wider">
+        <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
           Status
         </span>
       </div>
       <div className="col-span-2 flex items-center">
-        <span className="text-xs font-medium text-gray-500 dark:text-dark-text-tertiary uppercase tracking-wider">
+        <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
           Course
         </span>
       </div>
       <div className="col-span-4 flex items-center">
-        <span className="text-xs font-medium text-gray-500 dark:text-dark-text-tertiary uppercase tracking-wider">
+        <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
           Task
         </span>
       </div>
       <div className="col-span-4 flex items-center justify-between">
-        <span className="text-xs font-medium text-gray-500 dark:text-dark-text-tertiary uppercase tracking-wider">
-          Due Date
+        <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+          Due date
         </span>
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center gap-4">
           {showWeight && (
-            <span className="text-xs font-medium text-gray-500 dark:text-dark-text-tertiary uppercase tracking-wider">
+            <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
               Weight
             </span>
           )}
-          <span className="text-xs font-medium text-gray-500 dark:text-dark-text-tertiary uppercase tracking-wider">
+          <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
             Actions
           </span>
         </div>
@@ -56,21 +57,16 @@ const TableHeader = ({
     </div>
 
     {/* Mobile Select All Header */}
-    <div className="lg:hidden flex items-center justify-between p-3 bg-gray-100/50 dark:bg-dark-bg-tertiary/50 rounded-lg">
-      <div className="flex items-center space-x-3">
-        <input
-          type="checkbox"
+    <div className="lg:hidden flex items-center justify-between px-4 py-2">
+      <div className="flex items-center gap-3">
+        <Checkbox
           checked={allSelected}
-          onChange={onToggleSelectAll}
-          className="h-5 w-5 rounded-sm border-gray-300 dark:border-dark-border-primary text-light-button-primary dark:text-dark-button-primary focus:ring-light-focus-ring dark:focus:ring-dark-focus-ring"
+          onCheckedChange={onToggleSelectAll}
+          aria-label="Select all assessments"
         />
-        <span className="text-sm font-medium text-gray-700 dark:text-dark-text-primary">
-          Select All ({totalCount})
-        </span>
+        <span className="text-sm font-medium text-foreground">Select all ({totalCount})</span>
       </div>
-      <span className="text-xs text-gray-500 dark:text-dark-text-tertiary">
-        {selectedCount} selected
-      </span>
+      <span className="text-xs font-medium text-muted-foreground">{selectedCount} selected</span>
     </div>
   </>
 );

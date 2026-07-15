@@ -25,6 +25,9 @@ const buttonVariants = cva(
         sm: "h-9 px-3",
         lg: "h-11 px-6 text-base",
         icon: "size-10",
+        // Dense table rows / 44px mobile touch targets (standards.md quality bar)
+        "icon-sm": "size-8",
+        "icon-lg": "size-11",
       },
     },
     defaultVariants: {

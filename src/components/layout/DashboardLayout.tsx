@@ -69,12 +69,12 @@ const DashboardLayout = ({
   }
 
   const statCards = [
-    { label: "Total Assessments", value: stats.total },
-    { label: "Completion Rate", value: `${stats.completionRate}%` },
+    { label: "Total assessments", value: stats.total },
+    { label: "Completion rate", value: `${stats.completionRate}%` },
     { label: "Upcoming", value: stats.upcomingDeadlines },
     { label: "Submitted", value: stats.submitted },
-    { label: "In Progress", value: stats.inProgress },
-    { label: "Not Started", value: stats.notStarted },
+    { label: "In progress", value: stats.inProgress },
+    { label: "Not started", value: stats.notStarted },
   ];
 
   return (
@@ -92,10 +92,8 @@ const DashboardLayout = ({
             <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 md:gap-4 lg:grid-cols-6">
               {statCards.map(({ label, value }) => (
                 <div key={label} className="rounded-xl bg-card p-4 shadow-soft md:p-5">
-                  <p className="text-xs font-medium text-muted-foreground sm:text-sm">{label}</p>
-                  <p className="mt-1 text-lg font-semibold text-foreground sm:text-xl md:text-2xl">
-                    {value}
-                  </p>
+                  <p className="text-xs font-medium text-muted-foreground">{label}</p>
+                  <p className="mt-1 text-xl font-semibold text-foreground md:text-2xl">{value}</p>
                 </div>
               ))}
             </div>

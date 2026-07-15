@@ -1,4 +1,5 @@
-import StatusSelect from "../../ui/StatusSelect";
+import { Button } from "../../ui/button";
+import StatusSelect from "./StatusSelect";
 
 interface BulkActionsBarProps {
   selectedCount: number;
@@ -22,109 +23,75 @@ const BulkActionsBar = ({
   onDeleteSelected,
   onClearSelection,
 }: BulkActionsBarProps) => (
-  <div className="mb-4 p-4 bg-white dark:bg-dark-bg-secondary rounded-lg shadow-sm border border-gray-100 dark:border-dark-border-primary animate-fade-in">
+  <div className="mb-4 rounded-xl bg-primary/10 p-4 motion-safe:animate-fade-in">
     {/* Mobile Layout */}
     <div className="lg:hidden space-y-4">
-      <div className="text-center">
-        <span className="text-base font-medium text-gray-700 dark:text-dark-text-primary">
-          {selectedCount} {selectedCount === 1 ? "item" : "items"} selected
-        </span>
-      </div>
+      <p className="text-center text-sm font-medium text-primary">
+        {selectedCount} {selectedCount === 1 ? "item" : "items"} selected
+      </p>
 
-      <div className="space-y-3">
-        {!showBulkStatusUpdate ? (
-          <div className="w-full">
-            <StatusSelect
-              value={null}
-              onChange={(value) => onStatusSelect(value)}
-              size="md"
-              placeholder="Update Status"
-              className="w-full"
-            />
+      {!showBulkStatusUpdate ? (
+        <StatusSelect value={null} onChange={onStatusSelect} placeholder="Update status" />
+      ) : (
+        <div className="space-y-3">
+          <p className="text-center text-sm text-foreground">
+            Update to <span className="font-medium">{selectedStatus}</span>
+          </p>
+          <div className="flex gap-2">
+            <Button onClick={onConfirmStatusUpdate} className="flex-1">
+              Confirm
+            </Button>
+            <Button variant="secondary" onClick={onCancelStatusUpdate} className="flex-1">
+              Cancel
+            </Button>
           </div>
-        ) : (
-          <div className="space-y-3">
-            <div className="text-center">
-              <span className="text-sm text-light-text-secondary dark:text-dark-text-secondary">
-                Update to: <span className="font-medium">{selectedStatus}</span>
-              </span>
-            </div>
-            <div className="flex space-x-2">
-              <button
-                onClick={onConfirmStatusUpdate}
-                className="btn-primary flex-1 py-2.5 px-4 text-sm min-h-[44px]"
-              >
-                Confirm
-              </button>
-              <button
-                onClick={onCancelStatusUpdate}
-                className="btn-outline flex-1 py-2.5 px-4 text-sm min-h-[44px]"
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        )}
-      </div>
+        </div>
+      )}
 
-      <div className="flex flex-col space-y-2 pt-2 border-t border-gray-200 dark:border-dark-border-primary">
-        <button
-          onClick={onDeleteSelected}
-          className="btn-danger py-2.5 px-4 text-sm w-full min-h-[44px]"
-        >
-          Delete Selected
-        </button>
-        <button
-          onClick={onClearSelection}
-          className="text-sm text-light-text-tertiary dark:text-dark-text-tertiary hover:text-light-text-secondary dark:hover:text-dark-text-secondary py-2 min-h-[44px]"
-        >
-          Clear Selection
-        </button>
+      <div className="flex flex-col gap-2">
+        <Button variant="destructive" onClick={onDeleteSelected}>
+          Delete selected
+        </Button>
+        <Button variant="ghost" onClick={onClearSelection}>
+          Clear selection
+        </Button>
       </div>
     </div>
 
     {/* Desktop Layout */}
-    <div className="hidden lg:flex items-center justify-between">
-      <div className="flex items-center space-x-4">
-        <span className="text-md font-medium text-gray-700 dark:text-dark-text-primary">
+    <div className="hidden lg:flex items-center justify-between gap-4">
+      <div className="flex items-center gap-4">
+        <span className="text-sm font-medium text-primary">
           {selectedCount} {selectedCount === 1 ? "item" : "items"} selected
         </span>
-        <div className="flex items-center space-x-2">
-          {!showBulkStatusUpdate ? (
-            <div className="min-w-[140px]">
-              <StatusSelect
-                value={null}
-                onChange={(value) => onStatusSelect(value)}
-                size="sm"
-                placeholder="Update Status"
-                className="text-sm"
-              />
-            </div>
-          ) : (
-            <div className="flex items-center space-x-2">
-              <span className="text-sm text-light-text-secondary dark:text-dark-text-secondary">
-                Update to: <span className="font-medium">{selectedStatus}</span>
-              </span>
-              <button onClick={onConfirmStatusUpdate} className="btn-primary py-1.5 px-3 text-sm">
-                Confirm
-              </button>
-              <button onClick={onCancelStatusUpdate} className="btn-outline py-1.5 px-3 text-sm">
-                Cancel
-              </button>
-            </div>
-          )}
-        </div>
+        {!showBulkStatusUpdate ? (
+          <StatusSelect
+            value={null}
+            onChange={onStatusSelect}
+            size="sm"
+            placeholder="Update status"
+          />
+        ) : (
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-foreground">
+              Update to <span className="font-medium">{selectedStatus}</span>
+            </span>
+            <Button size="sm" onClick={onConfirmStatusUpdate}>
+              Confirm
+            </Button>
+            <Button variant="secondary" size="sm" onClick={onCancelStatusUpdate}>
+              Cancel
+            </Button>
+          </div>
+        )}
       </div>
-      <div className="flex items-center space-x-2">
-        <button onClick={onDeleteSelected} className="btn-danger py-1.5 px-3 text-sm">
-          Delete Selected
-        </button>
-        <button
-          onClick={onClearSelection}
-          className="text-sm text-light-text-tertiary dark:text-dark-text-tertiary hover:text-light-text-secondary dark:hover:text-dark-text-secondary"
-        >
-          Clear Selection
-        </button>
+      <div className="flex items-center gap-2">
+        <Button variant="destructive" size="sm" onClick={onDeleteSelected}>
+          Delete selected
+        </Button>
+        <Button variant="ghost" size="sm" onClick={onClearSelection}>
+          Clear selection
+        </Button>
       </div>
     </div>
   </div>

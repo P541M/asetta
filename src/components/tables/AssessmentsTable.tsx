@@ -1,22 +1,35 @@
 import React from "react";
 import { useState, useEffect } from "react";
 import { updateDoc, deleteDoc, serverTimestamp } from "firebase/firestore";
+import { Check, ChevronsUpDown, FileText, ListFilter } from "lucide-react";
 import { getAssessmentDocRef } from "../../lib/firebaseUtils";
 import { useAuth } from "../../contexts/AuthContext";
 import { useDisplayPreferences } from "../../hooks/useDisplayPreferences";
 import { getDaysUntil } from "../../utils/dateUtils";
 import { Assessment, AssessmentStatus, AssessmentsTableProps } from "../../types/assessment";
 import { isCompletedStatus } from "../../constants/assessment";
+import { cn } from "@/lib/utils";
 import ConfirmationModal from "../common/ConfirmationModal";
-import CustomSelect from "../ui/CustomSelect";
 import { TrashOutlineIcon } from "../ui/icons";
-import { filterOptions } from "./assessments/filterOptions";
+import { Button } from "../ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "../ui/dropdown-menu";
 import { useTableSettings } from "./assessments/useTableSettings";
 import BulkActionsBar from "./assessments/BulkActionsBar";
 import TableHeader from "./assessments/TableHeader";
 import AssessmentRow from "./assessments/AssessmentRow";
 import AssessmentEditRow from "./assessments/AssessmentEditRow";
 import NotesModal from "./assessments/NotesModal";
+
+const filterOptions = [
+  { value: "all", label: "All tasks" },
+  { value: "not_submitted", label: "Not submitted" },
+  { value: "submitted", label: "Submitted" },
+];
 
 const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
   assessments,
@@ -279,22 +292,37 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
 
   return (
     <div className="p-6">
-      <div className="flex flex-col gap-4 mb-6">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <h2 className="text-xl font-medium text-light-text-primary dark:text-dark-text-primary mb-6">
-            Assessments
-          </h2>
-          <div className="w-full sm:w-auto">
-            <CustomSelect
-              value={filter}
-              onChange={setFilter}
-              options={filterOptions}
-              placeholder="Filter tasks"
-              className="w-full sm:max-w-xs"
-              size="md"
-            />
-          </div>
-        </div>
+      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <h2 className="text-xl font-semibold tracking-tight text-foreground">Assessments</h2>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              type="button"
+              variant="secondary"
+              className="w-full justify-between sm:w-auto sm:min-w-44"
+              aria-label="Filter assessments"
+            >
+              <span className="flex min-w-0 items-center gap-2">
+                <ListFilter className="text-muted-foreground" aria-hidden />
+                <span className="truncate">
+                  {filterOptions.find((option) => option.value === filter)?.label ?? "All tasks"}
+                </span>
+              </span>
+              <ChevronsUpDown className="text-muted-foreground" aria-hidden />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="min-w-44">
+            {filterOptions.map((option) => (
+              <DropdownMenuItem key={option.value} onSelect={() => setFilter(option.value)}>
+                <Check
+                  className={cn(filter === option.value ? "opacity-100" : "opacity-0")}
+                  aria-hidden
+                />
+                {option.label}
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
 
       {/* Bulk Actions Toolbar */}
@@ -312,25 +340,10 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
       )}
 
       {sortedAssessments.length === 0 ? (
-        <div className="text-center py-10 text-gray-500 dark:text-dark-text-tertiary">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-12 w-12 mx-auto mb-4 text-gray-300 dark:text-dark-text-tertiary"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-            />
-          </svg>
-          <p className="text-base font-medium mb-2 text-light-text-primary dark:text-dark-text-primary">
-            No assessments found
-          </p>
-          <p className="text-light-text-secondary dark:text-dark-text-secondary">
+        <div className="py-10 text-center">
+          <FileText className="mx-auto mb-4 size-12 text-muted-foreground/50" aria-hidden />
+          <p className="mb-2 text-base font-semibold text-foreground">No assessments found</p>
+          <p className="text-sm text-muted-foreground">
             Upload a course outline or add assessments manually to get started.
           </p>
         </div>

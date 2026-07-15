@@ -30,7 +30,7 @@ const TabNavigationBar = ({ className = "" }: TabNavigationBarProps) => {
               aria-selected={isActive}
               onClick={() => setActiveTab(id)}
               className={cn(
-                "flex min-h-11 flex-1 items-center justify-center rounded-lg px-2 text-sm font-medium outline-hidden transition-all duration-200 focus-visible:ring-2 focus-visible:ring-ring md:px-6",
+                "flex min-h-11 flex-1 items-center justify-center rounded-lg px-2 font-medium outline-hidden transition-all duration-200 focus-visible:ring-2 focus-visible:ring-ring md:px-6",
                 isActive
                   ? "bg-primary/10 text-primary"
                   : "text-muted-foreground hover:text-foreground",

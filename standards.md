@@ -4,8 +4,10 @@
 platform.** Read it before writing or reviewing any code. If a change conflicts with this file,
 either the change is wrong or this file must be updated in the same commit — never let them drift.
 
-Last updated: 2026-07-14 (v3 — surface language locked after the auth remodel: borderless tonal
-surfaces, filled inputs, flat buttons, View Transitions theme crossfade).
+Last updated: 2026-07-15 (v3.2 — type ramp locked and applied to all migrated sections;
+assessments table migrated; `checkbox` primitive and button `icon-sm`/`icon-lg` sizes added.
+Surface language unchanged since the 2026-07-14 v3 lock: borderless tonal surfaces, filled
+inputs, flat buttons, View Transitions theme crossfade).
 
 ---
 
@@ -160,11 +162,36 @@ stays visible in both themes by construction.
 **Type**: Manrope everywhere (`--font-sans`/`--font-heading`); headings `font-semibold
 tracking-tight` in **sentence case** ("Welcome back", not "Welcome Back").
 
+### Type ramp (locked 2026-07-15)
+
+Five tiers; every piece of text in migrated code states its tier explicitly. If text doesn't fit
+a tier, the ramp is wrong — update it here, don't invent a sixth size at the call site.
+
+| Tier | Classes | Used for |
+| --- | --- | --- |
+| Page title | `text-2xl md:text-3xl font-semibold tracking-tight text-foreground` | one per screen: dashboard greeting, auth headings |
+| Section heading | `text-xl font-semibold tracking-tight text-foreground` | panel headings ("Assessments") |
+| Item title | `text-base font-semibold text-foreground` | mobile card titles, empty-state titles, overlay titles |
+| Body | `text-sm text-foreground`; `font-medium` for emphasis and control labels; `text-muted-foreground` for supporting text | the app default: table cells, buttons, menus, form labels, descriptions |
+| Caption | `text-xs font-medium text-muted-foreground` | column headers (add `uppercase tracking-wider`), counts, stat labels, timestamps |
+
+- **Stat/display numbers**: `text-xl md:text-2xl font-semibold text-foreground` (numbers, not
+  headings — no tracking-tight needed).
+- **Two weights only** in app UI: `font-medium` (emphasis) and `font-semibold` (titles). No
+  `font-bold`, no `font-light`.
+- `text-base` appears ONLY as item titles (and the 16px input text that prevents iOS zoom) —
+  running app text is `text-sm`. The content hierarchy decides the tier: the row's entity (the
+  assignment) is the emphasized text, its grouping labels (course) are supporting.
+- The `h1`–`h6` base styles in `globals.css` serve legacy sections only; migrated components
+  always set their tier classes explicitly.
+- Deliberate exception: the auth brand panel hero (`text-5xl/6xl`) is marketing-scale on purpose
+  (shared with the landing); nothing inside the app uses it.
+
 ### Component rules
 
 - **shadcn primitives live in `src/components/ui/` with lowercase filenames** (`button.tsx`,
   `input.tsx`, `card.tsx`, …) — the shadcn CLI convention. Existing PascalCase files in the same
-  folder (`CustomSelect.tsx`, `StatusSelect.tsx`, …) are legacy app components; the casing makes
+  folder (`CustomSelect.tsx`, `EmptyState.tsx`, …) are legacy app components; the casing makes
   the distinction visible at a glance. Legacy ones are replaced or rebuilt on primitives as their
   sections are migrated.
 - **Customize centrally, never at call sites.** Asetta's look is achieved by editing the variant
@@ -221,7 +248,7 @@ tracking-tight` in **sentence case** ("Welcome back", not "Welcome Back").
 | Auth flow (login/register/reset) | ✅ migrated 2026-07-14 |
 | Dashboard shell (header, user menu, tabs, semester bar, stats, page frame, body base styles) | ✅ migrated 2026-07-14 — semester manage/delete modals excluded, queued with the modals pass |
 | Onboarding | legacy |
-| Assessments table | legacy |
+| Assessments table (incl. course-filtered view; `StatusSelect` rebuilt on primitives as a tinted status chip, new `checkbox` primitive) | ✅ migrated 2026-07-15 — notes modal + delete confirmation modals excluded, queued with the modals pass |
 | Grades / Calendar / Add (+ all `.modal-*` overlays) | legacy |
 | Settings | legacy (toggle already rewired to next-themes) |
 
@@ -255,4 +282,6 @@ related actions (add/manage) in one menu. No pill rows with satellite icon butto
 This file + `CLAUDE.md` (which mandates reading it) are the complete context for continuing the
 UI migration — prior chat history is NOT required. Current state lives in the migration table
 below; work section by section, one approval per section, founder pushes to GitHub (never the
-agent). The verification loop (Part 1) runs after every task. Next up: **assessments table**.
+agent). The verification loop (Part 1) runs after every task. Next up: founder's pick from the
+remaining legacy sections — onboarding, grades/calendar/add (whose modals pass also unblocks the
+overlays excluded from earlier sections), or settings.

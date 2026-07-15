@@ -1,6 +1,10 @@
-import { Assessment, AssessmentStatus } from "../../../types/assessment";
-import StatusSelect from "../../ui/StatusSelect";
-import { CheckSolidIcon, CloseSolidIcon } from "../../ui/icons";
+import { Check, X } from "lucide-react";
+import { Assessment, AssessmentStatus } from "@/types/assessment";
+import { Button } from "../../ui/button";
+import { Checkbox } from "../../ui/checkbox";
+import { Input } from "../../ui/input";
+import { Label } from "../../ui/label";
+import StatusSelect from "./StatusSelect";
 
 interface AssessmentEditRowProps {
   isSelected: boolean;
@@ -26,88 +30,73 @@ const AssessmentEditRow = ({
   onCancel,
   showWeight,
 }: AssessmentEditRowProps) => (
-  <div className="bg-gray-50/50 dark:bg-dark-bg-tertiary/30 rounded-lg transition-all duration-300 p-4 animate-fade-in">
+  <div className="rounded-xl bg-secondary/50 p-4 motion-safe:animate-fade-in">
     {/* Mobile Edit Form */}
     <div className="lg:hidden space-y-4">
-      <div className="flex items-center space-x-3">
-        <input
-          type="checkbox"
+      <div className="flex items-center gap-3">
+        <Checkbox
           checked={isSelected}
-          onChange={onToggleSelect}
-          className="h-5 w-5 rounded-sm border-gray-300 dark:border-dark-border-primary text-light-button-primary dark:text-dark-button-primary focus:ring-light-focus-ring dark:focus:ring-dark-focus-ring"
+          onCheckedChange={onToggleSelect}
+          aria-label={`Select ${editFormData.assignmentName}`}
         />
         <div className="flex-1">
-          <StatusSelect
-            value={editFormData.status}
-            onChange={onStatusChange}
-            size="md"
-            className="w-full"
-          />
+          <StatusSelect value={editFormData.status} onChange={onStatusChange} size="md" />
         </div>
       </div>
 
       <div className="space-y-3">
-        <div>
-          <label className="block text-xs font-medium text-gray-700 dark:text-dark-text-secondary mb-1">
-            Course
-          </label>
-          <input
+        <div className="space-y-1.5">
+          <Label htmlFor="edit-course">Course</Label>
+          <Input
+            id="edit-course"
             type="text"
             name="courseName"
             value={editFormData.courseName}
             onChange={onFieldChange}
-            placeholder="Course Name"
-            className="input py-3 px-4 text-base w-full dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border-primary rounded-md min-h-[44px]"
+            placeholder="Course name"
           />
         </div>
 
-        <div>
-          <label className="block text-xs font-medium text-gray-700 dark:text-dark-text-secondary mb-1">
-            Assignment
-          </label>
-          <input
+        <div className="space-y-1.5">
+          <Label htmlFor="edit-assignment">Assignment</Label>
+          <Input
+            id="edit-assignment"
             type="text"
             name="assignmentName"
             value={editFormData.assignmentName}
             onChange={onFieldChange}
-            placeholder="Assignment Name"
-            className="input py-3 px-4 text-base w-full dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border-primary rounded-md min-h-[44px]"
+            placeholder="Assignment name"
           />
         </div>
 
         <div className="grid grid-cols-2 gap-3">
-          <div>
-            <label className="block text-xs font-medium text-gray-700 dark:text-dark-text-secondary mb-1">
-              Due Date
-            </label>
-            <input
+          <div className="space-y-1.5">
+            <Label htmlFor="edit-due-date">Due date</Label>
+            <Input
+              id="edit-due-date"
               type="date"
               name="dueDate"
               value={editFormData.dueDate}
               onChange={onFieldChange}
-              className="input py-3 px-4 text-base w-full dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border-primary rounded-md min-h-[44px]"
             />
           </div>
-          <div>
-            <label className="block text-xs font-medium text-gray-700 dark:text-dark-text-secondary mb-1">
-              Due Time
-            </label>
-            <input
+          <div className="space-y-1.5">
+            <Label htmlFor="edit-due-time">Due time</Label>
+            <Input
+              id="edit-due-time"
               type="time"
               name="dueTime"
               value={editFormData.dueTime}
               onChange={onFieldChange}
-              className="input py-3 px-4 text-base w-full dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border-primary rounded-md min-h-[44px]"
             />
           </div>
         </div>
 
         {showWeight && (
-          <div>
-            <label className="block text-xs font-medium text-gray-700 dark:text-dark-text-secondary mb-1">
-              Weight (%)
-            </label>
-            <input
+          <div className="space-y-1.5">
+            <Label htmlFor="edit-weight">Weight (%)</Label>
+            <Input
+              id="edit-weight"
               type="number"
               name="weight"
               value={editFormData.weight}
@@ -116,81 +105,74 @@ const AssessmentEditRow = ({
               max="100"
               step="0.1"
               placeholder="Weight"
-              className="input py-3 px-4 text-base w-full dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border-primary rounded-md min-h-[44px]"
             />
           </div>
         )}
       </div>
 
-      <div className="flex items-center justify-end space-x-3 pt-2">
-        <button
-          onClick={onCancel}
-          className="btn-outline py-2.5 px-4 text-sm min-h-[44px] min-w-[80px]"
-        >
+      <div className="flex items-center justify-end gap-3 pt-2">
+        <Button variant="secondary" onClick={onCancel} className="min-w-20">
           Cancel
-        </button>
-        <button
-          onClick={onSave}
-          className="btn-primary py-2.5 px-4 text-sm min-h-[44px] min-w-[80px]"
-        >
+        </Button>
+        <Button onClick={onSave} className="min-w-20">
           Save
-        </button>
+        </Button>
       </div>
     </div>
 
     {/* Desktop Edit Form */}
-    <div className="hidden lg:grid grid-cols-12 gap-2">
-      <div className="col-span-2 flex items-center space-x-2">
-        <input
-          type="checkbox"
+    <div className="hidden lg:grid grid-cols-12 gap-2 items-center">
+      <div className="col-span-2 flex items-center gap-3">
+        <Checkbox
           checked={isSelected}
-          onChange={onToggleSelect}
-          className="h-4 w-4 rounded-sm border-gray-300 dark:border-dark-border-primary text-light-button-primary dark:text-dark-button-primary focus:ring-light-focus-ring dark:focus:ring-dark-focus-ring"
+          onCheckedChange={onToggleSelect}
+          aria-label={`Select ${editFormData.assignmentName}`}
         />
         <StatusSelect
           value={editFormData.status}
           onChange={onStatusChange}
-          size="sm"
-          className="flex-1"
+          className="min-w-0 flex-1"
         />
       </div>
       <div className="col-span-2">
-        <input
+        <Input
           type="text"
           name="courseName"
           value={editFormData.courseName}
           onChange={onFieldChange}
-          placeholder="Course Name"
-          className="input py-1 px-2 text-md w-full dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border-primary rounded-md"
+          placeholder="Course name"
+          aria-label="Course name"
         />
       </div>
       <div className="col-span-4">
-        <input
+        <Input
           type="text"
           name="assignmentName"
           value={editFormData.assignmentName}
           onChange={onFieldChange}
-          placeholder="Assignment Name"
-          className="input py-1 px-2 text-md w-full dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border-primary rounded-md"
+          placeholder="Assignment name"
+          aria-label="Assignment name"
         />
       </div>
-      <div className="col-span-4 flex items-center space-x-2">
-        <input
+      <div className="col-span-4 flex items-center gap-2">
+        <Input
           type="date"
           name="dueDate"
           value={editFormData.dueDate}
           onChange={onFieldChange}
-          className="input py-1 px-2 text-md flex-1 dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border-primary rounded-md"
+          aria-label="Due date"
+          className="flex-1"
         />
-        <input
+        <Input
           type="time"
           name="dueTime"
           value={editFormData.dueTime}
           onChange={onFieldChange}
-          className="input py-1 px-2 text-md w-24 dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border-primary rounded-md"
+          aria-label="Due time"
+          className="w-24"
         />
         {showWeight && (
-          <input
+          <Input
             type="number"
             name="weight"
             value={editFormData.weight}
@@ -199,22 +181,23 @@ const AssessmentEditRow = ({
             max="100"
             step="0.1"
             placeholder="Weight"
-            className="input py-1 px-2 text-md w-20 dark:bg-dark-bg-tertiary dark:text-dark-text-primary dark:border-dark-border-primary rounded-md"
+            aria-label="Weight (%)"
+            className="w-20"
           />
         )}
-        <div className="flex items-center space-x-1">
-          <button
-            onClick={onSave}
-            className="text-emerald-600 dark:text-emerald-400 hover:text-emerald-800 dark:hover:text-emerald-300 p-1.5 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 rounded-md transition-colors"
-          >
-            <CheckSolidIcon className="h-4 w-4" />
-          </button>
-          <button
+        <div className="flex items-center gap-0.5">
+          <Button variant="ghost" size="icon-sm" onClick={onSave} title="Save" aria-label="Save">
+            <Check className="text-success" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon-sm"
             onClick={onCancel}
-            className="text-gray-600 dark:text-dark-text-tertiary hover:text-gray-800 dark:hover:text-dark-text-secondary p-1.5 hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary rounded-md transition-colors"
+            title="Cancel"
+            aria-label="Cancel"
           >
-            <CloseSolidIcon className="h-4 w-4" />
-          </button>
+            <X className="text-muted-foreground" />
+          </Button>
         </div>
       </div>
     </div>
