@@ -1,5 +1,6 @@
 import { Day } from "../../types/calendar";
-import { getStatusBackgroundClasses } from "../../utils/statusUtils";
+import { cn } from "@/lib/utils";
+import { statusTintClasses } from "../tables/assessments/StatusSelect";
 
 const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
@@ -10,48 +11,44 @@ interface CalendarGridProps {
 
 /** Month grid: weekday header row plus one cell per day with assessment chips. */
 const CalendarGrid = ({ calendarDays, onSelectDay }: CalendarGridProps) => (
-  <>
-    <div className="grid grid-cols-7 border-b dark:border-dark-border-primary bg-gray-50 dark:bg-dark-bg-tertiary rounded-t-xl">
-      {dayNames.map((day, index) => (
+  <div className="overflow-hidden rounded-xl border border-border">
+    <div className="grid grid-cols-7 border-b border-border bg-secondary/50">
+      {dayNames.map((day) => (
         <div
-          key={index}
-          className="p-2 text-center text-sm font-medium text-gray-700 dark:text-dark-text-primary"
+          key={day}
+          className="p-2 text-center text-xs font-medium uppercase tracking-wider text-muted-foreground"
         >
           {day}
         </div>
       ))}
     </div>
-    <div className="grid grid-cols-7 auto-rows-fr bg-white dark:bg-dark-bg-secondary border-l border-t dark:border-dark-border-primary rounded-b-xl overflow-hidden">
+    {/* gap-px over bg-border draws the structural cell hairlines */}
+    <div className="grid auto-rows-fr grid-cols-7 gap-px bg-border">
       {calendarDays.map((day, index) => (
         <div
           key={index}
           onClick={() => day.assessments.length > 0 && onSelectDay(day)}
-          className={`relative p-2 min-h-[120px] border-r border-b dark:border-dark-border-primary transition-colors ${
-            day.isCurrentMonth
-              ? "bg-white dark:bg-dark-bg-secondary"
-              : "bg-gray-50/50 dark:bg-dark-bg-tertiary/50"
-          } ${
-            day.isToday
-              ? "ring-2 ring-light-button-primary dark:ring-dark-button-primary ring-inset"
-              : ""
-          } ${
-            day.assessments.length > 0
-              ? "cursor-pointer hover:bg-gray-50 dark:hover:bg-dark-bg-tertiary"
-              : ""
-          }`}
+          className={cn(
+            "relative min-h-[120px] p-2 transition-colors",
+            day.isCurrentMonth ? "bg-card" : "bg-secondary",
+            day.assessments.length > 0 && "cursor-pointer hover:bg-accent",
+          )}
         >
-          <div className="flex items-center justify-between mb-2">
+          <div className="mb-2 flex items-center justify-between">
             <span
-              className={`text-sm font-medium ${
-                day.isCurrentMonth
-                  ? "text-gray-900 dark:text-dark-text-primary"
-                  : "text-gray-400 dark:text-dark-text-tertiary"
-              } ${day.isToday ? "text-light-button-primary dark:text-dark-button-primary" : ""}`}
+              className={cn(
+                "flex size-6 items-center justify-center rounded-full text-sm font-medium",
+                day.isToday
+                  ? "bg-primary/10 text-primary"
+                  : day.isCurrentMonth
+                    ? "text-foreground"
+                    : "text-muted-foreground/60",
+              )}
             >
               {day.date.getDate()}
             </span>
             {day.assessments.length > 0 && (
-              <span className="flex h-5 w-5 items-center justify-center text-xs font-medium text-light-button-primary dark:text-dark-button-primary bg-light-button-secondary dark:bg-dark-button-secondary rounded-full">
+              <span className="flex size-5 items-center justify-center rounded-full bg-primary/10 text-xs font-medium text-primary">
                 {day.assessments.length}
               </span>
             )}
@@ -60,13 +57,14 @@ const CalendarGrid = ({ calendarDays, onSelectDay }: CalendarGridProps) => (
             {day.assessments.slice(0, 3).map((assessment) => (
               <div
                 key={assessment.id}
-                className={`text-xs px-2 py-1.5 rounded-md truncate ${getStatusBackgroundClasses(
-                  assessment.status,
-                )} hover:shadow-sm transition-all duration-200`}
+                className={cn(
+                  "rounded-md px-2 py-1.5 text-xs font-medium",
+                  statusTintClasses[assessment.status],
+                )}
               >
-                <div className="flex items-center justify-between">
-                  <span className="truncate font-medium">{assessment.assignmentName}</span>
-                  <span className="ml-2 text-[10px] font-medium opacity-75">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="truncate">{assessment.assignmentName}</span>
+                  <span className="shrink-0 text-xs opacity-70">
                     {new Date(`2000-01-01T${assessment.dueTime}`).toLocaleTimeString("en-US", {
                       hour: "numeric",
                       minute: "2-digit",
@@ -77,7 +75,7 @@ const CalendarGrid = ({ calendarDays, onSelectDay }: CalendarGridProps) => (
               </div>
             ))}
             {day.assessments.length > 3 && (
-              <div className="text-xs text-gray-500 dark:text-dark-text-tertiary font-medium bg-gray-50 dark:bg-dark-bg-tertiary px-2 py-1 rounded-md border border-gray-200 dark:border-dark-border-primary">
+              <div className="px-2 text-xs font-medium text-muted-foreground">
                 +{day.assessments.length - 3} more
               </div>
             )}
@@ -85,7 +83,7 @@ const CalendarGrid = ({ calendarDays, onSelectDay }: CalendarGridProps) => (
         </div>
       ))}
     </div>
-  </>
+  </div>
 );
 
 export default CalendarGrid;

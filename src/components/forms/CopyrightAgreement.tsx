@@ -1,3 +1,7 @@
+import { cn } from "@/lib/utils";
+import { Checkbox } from "../ui/checkbox";
+import { Label } from "../ui/label";
+
 interface CopyrightAgreementProps {
   id: string;
   checked: boolean;
@@ -6,33 +10,27 @@ interface CopyrightAgreementProps {
 }
 
 /** Terms-of-service consent checkbox shown before syllabus uploads. */
-const CopyrightAgreement = ({ id, checked, onChange, className = "" }: CopyrightAgreementProps) => (
-  <div
-    className={`p-4 bg-light-bg-secondary dark:bg-dark-bg-secondary rounded-lg border border-light-border-secondary dark:border-dark-border-secondary ${className}`.trim()}
-  >
-    <div className="flex items-start space-x-3">
-      <input
-        type="checkbox"
+const CopyrightAgreement = ({ id, checked, onChange, className }: CopyrightAgreementProps) => (
+  <div className={cn("rounded-xl bg-secondary/50 p-4", className)}>
+    <div className="flex items-start gap-3">
+      <Checkbox
         id={id}
         checked={checked}
-        onChange={(e) => onChange(e.target.checked)}
-        className="mt-1 w-4 h-4 text-light-button-primary dark:text-dark-button-primary border-gray-300 rounded-sm focus:ring-light-button-primary dark:focus:ring-dark-button-primary"
+        onCheckedChange={(value) => onChange(value === true)}
+        className="mt-0.5"
       />
-      <label
-        htmlFor={id}
-        className="text-sm text-light-text-secondary dark:text-dark-text-secondary"
-      >
+      <Label htmlFor={id} className="font-normal leading-normal text-muted-foreground">
         By uploading, I agree to the{" "}
         <a
           href="https://www.asetta.me/terms"
           target="_blank"
           rel="noopener noreferrer"
-          className="text-light-button-primary dark:text-dark-button-primary hover:underline"
+          className="text-primary hover:underline"
         >
           Terms of Service
         </a>{" "}
         and confirm I have permission to upload these materials.
-      </label>
+      </Label>
     </div>
   </div>
 );

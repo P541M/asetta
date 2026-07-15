@@ -1,8 +1,14 @@
 import { useState } from "react";
 import { useRouter } from "next/router";
+import { BookOpen, Pencil } from "lucide-react";
 import { formatLocalDate, isUpcoming as isDateUpcoming } from "../../utils/dateUtils";
 import { CoursesOverviewTableProps } from "../../types/course";
 import { useCourseRename } from "../../hooks/useCourseRename";
+import { getProgressBarColor } from "../../utils/gradeCalculations";
+import { cn } from "@/lib/utils";
+import { Button } from "../ui/button";
+import { Input } from "../ui/input";
+import EmptyState from "../ui/EmptyState";
 
 const CoursesOverviewTable = ({
   courses,
@@ -60,151 +66,120 @@ const CoursesOverviewTable = ({
   if (courses.length === 0) {
     return (
       <div className="p-6">
-        <h2 className="text-xl font-medium text-light-text-primary dark:text-dark-text-primary mb-6">
-          Courses
-        </h2>
-        <div className="text-center py-10">
-          <svg
-            className="mx-auto h-12 w-12 text-gray-400 mb-4"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
-            />
-          </svg>
-          <h3 className="text-lg font-medium text-light-text-primary dark:text-dark-text-primary mb-1">
-            No courses yet
-          </h3>
-          <p className="text-light-text-tertiary dark:text-dark-text-tertiary">
-            Add some assessments to see your courses here.
-          </p>
-        </div>
+        <h2 className="mb-6 text-xl font-semibold tracking-tight text-foreground">Courses</h2>
+        <EmptyState
+          icon={<BookOpen className="size-12" aria-hidden />}
+          title="No courses yet"
+          description="Add some assessments to see your courses here."
+          className="py-10"
+        />
       </div>
     );
   }
 
   return (
     <div className="p-6">
-      <h2 className="text-xl font-medium text-light-text-primary dark:text-dark-text-primary mb-6">
-        Courses
-      </h2>
+      <h2 className="mb-6 text-xl font-semibold tracking-tight text-foreground">Courses</h2>
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         {courses.map((course) => {
-          const progressColor =
-            course.progress >= 80
-              ? "bg-emerald-500"
-              : course.progress >= 50
-                ? "bg-amber-500"
-                : "bg-red-500";
-
           const isUpcoming = course.nextDueDate ? isDateUpcoming(course.nextDueDate) : false;
 
           return (
             <div
               key={course.courseName}
+              role="button"
+              tabIndex={0}
               onClick={() => onSelectCourse(course.courseName)}
-              className="bg-light-bg-primary dark:bg-dark-bg-tertiary rounded-lg p-6 border border-light-border-primary dark:border-dark-border-primary hover:shadow-md transition-all duration-200 cursor-pointer hover:scale-[1.02]"
+              onKeyDown={(e) => {
+                // Only when the card itself is focused; ignore keys from the rename controls
+                if (e.target === e.currentTarget && (e.key === "Enter" || e.key === " ")) {
+                  e.preventDefault();
+                  onSelectCourse(course.courseName);
+                }
+              }}
+              aria-label={`View ${course.courseName} assessments`}
+              className="cursor-pointer rounded-xl bg-secondary/50 p-6 outline-hidden transition-colors hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card"
             >
-              <div className="flex items-start justify-between mb-4">
-                <div className="flex-1 mr-3">
+              <div className="mb-4 flex items-start justify-between gap-3">
+                <div className="min-w-0 flex-1">
                   {editingCourse === course.courseName ? (
-                    <input
-                      type="text"
+                    <Input
                       value={editValue}
                       onChange={(e) => setEditValue(e.target.value)}
                       onBlur={() => handleEditSubmit(course.courseName)}
-                      onKeyDown={(e) => handleKeyDown(e, course.courseName)}
+                      onKeyDown={(e) => {
+                        e.stopPropagation();
+                        handleKeyDown(e, course.courseName);
+                      }}
                       onClick={(e) => e.stopPropagation()}
-                      className="text-lg font-medium bg-transparent border-b-2 border-light-button-primary dark:border-dark-button-primary text-light-text-primary dark:text-dark-text-primary focus:outline-hidden w-full"
+                      className="h-9"
+                      aria-label="Course name"
                       autoFocus
                       disabled={isRenaming}
                     />
                   ) : (
-                    <div className="flex items-center group">
-                      <h3 className="text-lg font-medium text-light-text-primary dark:text-dark-text-primary line-clamp-2 flex-1">
+                    <div className="group flex items-center gap-1">
+                      <h3 className="line-clamp-2 flex-1 text-base font-semibold text-foreground">
                         {isRenaming && editingCourse === course.courseName
                           ? "Updating..."
                           : course.courseName}
                       </h3>
-                      <button
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon-sm"
                         onClick={(e) => handleEditStart(course.courseName, e)}
-                        className="ml-2 p-1 rounded-sm opacity-0 group-hover:opacity-100 hover:bg-light-hover-primary dark:hover:bg-dark-hover-primary transition-all duration-200"
-                        title="Edit course name"
+                        aria-label={`Rename ${course.courseName}`}
                         disabled={isRenaming}
+                        className="shrink-0 text-muted-foreground opacity-0 transition-opacity focus-visible:opacity-100 group-hover:opacity-100"
                       >
-                        <svg
-                          className="w-4 h-4 text-light-text-secondary dark:text-dark-text-secondary"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                          />
-                        </svg>
-                      </button>
+                        <Pencil aria-hidden />
+                      </Button>
                     </div>
                   )}
                 </div>
-                <div className="flex flex-col items-end">
-                  <div className="text-2xl font-bold text-light-button-primary dark:text-dark-button-primary">
+                <div className="flex shrink-0 flex-col items-end">
+                  <span className="text-xl font-semibold text-foreground md:text-2xl">
                     {course.progress}%
-                  </div>
-                  <div className="w-12 bg-gray-200 dark:bg-dark-bg-primary rounded-full h-2 mt-1">
+                  </span>
+                  <div className="mt-1 h-1.5 w-12 rounded-full bg-foreground/10">
                     <div
-                      className={`h-2 rounded-full transition-all duration-300 ${progressColor}`}
+                      className={cn(
+                        "h-1.5 rounded-full transition-all duration-300",
+                        getProgressBarColor(course.progress),
+                      )}
                       style={{ width: `${course.progress}%` }}
-                    ></div>
+                    />
                   </div>
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4 mb-4">
+              <div className="mb-4 grid grid-cols-2 gap-4">
                 <div>
-                  <p className="text-sm text-light-text-tertiary dark:text-dark-text-tertiary">
-                    Total
-                  </p>
-                  <p className="text-xl font-semibold text-light-text-primary dark:text-dark-text-primary">
+                  <p className="text-xs font-medium text-muted-foreground">Total</p>
+                  <p className="mt-1 text-xl font-semibold text-foreground">
                     {course.totalAssessments}
                   </p>
                 </div>
                 <div>
-                  <p className="text-sm text-light-text-tertiary dark:text-dark-text-tertiary">
-                    Pending
-                  </p>
-                  <p className="text-xl font-semibold text-amber-600 dark:text-amber-400">
+                  <p className="text-xs font-medium text-muted-foreground">Pending</p>
+                  <p className="mt-1 text-xl font-semibold text-foreground">
                     {course.pendingAssessments}
                   </p>
                 </div>
               </div>
 
               {course.nextDueDate && course.nextAssignment && (
-                <div className="border-t border-light-border-primary dark:border-dark-border-primary pt-4">
-                  <p className="text-sm text-light-text-tertiary dark:text-dark-text-tertiary mb-1">
-                    Next Due
-                  </p>
-                  <p className="font-medium text-light-text-primary dark:text-dark-text-primary text-sm line-clamp-2 mb-1">
+                <div className="border-t border-border pt-4">
+                  <p className="text-xs font-medium text-muted-foreground">Next due</p>
+                  <p className="mt-1 line-clamp-2 text-sm font-medium text-foreground">
                     {course.nextAssignment}
                   </p>
-                  <p
-                    className={`text-sm font-medium ${
-                      isUpcoming
-                        ? "text-amber-600 dark:text-amber-400"
-                        : "text-light-text-secondary dark:text-dark-text-secondary"
-                    }`}
-                  >
+                  <p className="mt-1 flex items-center gap-2 text-sm text-muted-foreground">
                     {formatLocalDate(course.nextDueDate)}
                     {isUpcoming && (
-                      <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800 dark:bg-amber-900/20 dark:text-amber-400">
+                      <span className="inline-flex items-center rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
                         Upcoming
                       </span>
                     )}
@@ -213,10 +188,8 @@ const CoursesOverviewTable = ({
               )}
 
               {!course.nextDueDate && (
-                <div className="border-t border-light-border-primary dark:border-dark-border-primary pt-4">
-                  <p className="text-sm text-emerald-600 dark:text-emerald-400 font-medium">
-                    All assessments completed! 🎉
-                  </p>
+                <div className="border-t border-border pt-4">
+                  <p className="text-sm font-medium text-success">All assessments completed</p>
                 </div>
               )}
             </div>

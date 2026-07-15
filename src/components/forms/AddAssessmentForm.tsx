@@ -1,63 +1,14 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
+import { CircleAlert, CircleCheck, Loader2, Plus } from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
 import { addDoc } from "firebase/firestore";
 import { getAssessmentsRef } from "../../lib/firebaseUtils";
-import { AddAssessmentFormProps } from "../../types/assessment";
-import CustomSelect, { type SelectOption } from "../ui/CustomSelect";
-
-const statusOptions: SelectOption[] = [
-  {
-    value: "Not started",
-    label: "Not Started",
-    icon: (
-      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <circle cx="12" cy="12" r="10" strokeWidth="2" />
-        <path strokeWidth="2" d="M12 6v6l4 2" />
-      </svg>
-    ),
-    colorClass: "text-gray-600 dark:text-gray-400",
-    bgClass: "bg-gray-100 dark:bg-gray-800",
-  },
-  {
-    value: "In progress",
-    label: "In Progress",
-    icon: (
-      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <circle cx="12" cy="12" r="10" strokeWidth="2" />
-        <polyline points="12,6 12,12 16,14" strokeWidth="2" />
-      </svg>
-    ),
-    colorClass: "text-amber-600 dark:text-amber-400",
-    bgClass: "bg-amber-100 dark:bg-amber-900/30",
-  },
-  {
-    value: "Submitted",
-    label: "Submitted",
-    icon: (
-      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-      </svg>
-    ),
-    colorClass: "text-emerald-600 dark:text-emerald-400",
-    bgClass: "bg-emerald-100 dark:bg-emerald-900/30",
-  },
-  {
-    value: "Missed",
-    label: "Missed",
-    icon: (
-      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth="2"
-          d="M6 18L18 6M6 6l12 12"
-        />
-      </svg>
-    ),
-    colorClass: "text-red-600 dark:text-red-400",
-    bgClass: "bg-red-100 dark:bg-red-900/30",
-  },
-];
+import { AddAssessmentFormProps, AssessmentStatus } from "../../types/assessment";
+import { Alert, AlertDescription } from "../ui/alert";
+import { Button } from "../ui/button";
+import { Input } from "../ui/input";
+import { Label } from "../ui/label";
+import StatusSelect from "../tables/assessments/StatusSelect";
 
 const AddAssessmentForm = ({ semesterId, onSuccess }: AddAssessmentFormProps) => {
   const { user } = useAuth();
@@ -76,27 +27,20 @@ const AddAssessmentForm = ({ semesterId, onSuccess }: AddAssessmentFormProps) =>
     dueDate: getTodayDateString(),
     dueTime: "23:59", // Default to 11:59 PM
     weight: 0,
-    status: "Not started",
+    status: "Not started" as AssessmentStatus,
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState({ text: "", type: "" });
-  const [formSuccess, setFormSuccess] = useState(false);
-  const courseNameRef = useRef<HTMLInputElement>(null);
 
+  // One-shot success feedback clears itself; errors stay until the next attempt
   useEffect(() => {
-    if (courseNameRef.current) {
-      courseNameRef.current.focus();
-    }
-  }, []);
-
-  useEffect(() => {
-    if (formSuccess) {
-      const timer = setTimeout(() => setFormSuccess(false), 1000);
+    if (message.type === "success") {
+      const timer = setTimeout(() => setMessage({ text: "", type: "" }), 4000);
       return () => clearTimeout(timer);
     }
-  }, [formSuccess]);
+  }, [message]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
@@ -127,7 +71,7 @@ const AddAssessmentForm = ({ semesterId, onSuccess }: AddAssessmentFormProps) =>
         weight: 0,
         status: "Not started",
       });
-      setFormSuccess(true);
+      setMessage({ text: "Assessment added", type: "success" });
       onSuccess?.();
     } catch (error) {
       console.error("Error adding assessment:", error);
@@ -141,198 +85,110 @@ const AddAssessmentForm = ({ semesterId, onSuccess }: AddAssessmentFormProps) =>
   };
 
   return (
-    <div className="card p-6">
-      <div className={`transition-all duration-300 ${formSuccess ? "form-success" : ""}`}>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="form-group">
-              <label htmlFor="courseName" className="form-label dark:text-dark-text-primary">
-                Course Name/Code <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                id="courseName"
-                name="courseName"
-                value={formData.courseName}
-                onChange={handleChange}
-                ref={courseNameRef}
-                className="input"
-                placeholder="e.g., CS101"
-                required
-              />
-            </div>
-            <div className="form-group">
-              <label htmlFor="assignmentName" className="form-label dark:text-dark-text-primary">
-                Assessment Name <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                id="assignmentName"
-                name="assignmentName"
-                value={formData.assignmentName}
-                onChange={handleChange}
-                className="input"
-                placeholder="e.g., Midterm Exam"
-                required
-              />
-            </div>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="form-group">
-              <label htmlFor="dueDate" className="form-label dark:text-dark-text-primary">
-                Due Date <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="date"
-                id="dueDate"
-                name="dueDate"
-                value={formData.dueDate}
-                onChange={handleChange}
-                className="input"
-                required
-              />
-            </div>
-            <div className="form-group">
-              <label htmlFor="dueTime" className="form-label dark:text-dark-text-primary">
-                Due Time <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="time"
-                id="dueTime"
-                name="dueTime"
-                value={formData.dueTime}
-                onChange={handleChange}
-                className="input"
-                required
-              />
-            </div>
-            <div className="form-group">
-              <label htmlFor="weight" className="form-label dark:text-dark-text-primary">
-                Weight (%)
-              </label>
-              <input
-                type="number"
-                id="weight"
-                name="weight"
-                value={formData.weight}
-                onChange={handleChange}
-                min="0"
-                max="100"
-                step="0.1"
-                className="input"
-                placeholder="Optional"
-              />
-            </div>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="form-group">
-              <label htmlFor="status" className="form-label dark:text-dark-text-primary">
-                Status
-              </label>
-              <CustomSelect
-                value={formData.status}
-                onChange={(value) => setFormData((prev) => ({ ...prev, status: value }))}
-                options={statusOptions}
-                placeholder="Select status"
-                className="w-full"
-              />
-            </div>
-          </div>
-          <div className="flex items-center justify-end pt-4">
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className={`btn-primary px-6 ${isSubmitting ? "opacity-70 cursor-not-allowed" : ""}`}
-            >
-              {isSubmitting ? (
-                <span className="flex items-center justify-center">
-                  <svg
-                    className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                  >
-                    <circle
-                      className="opacity-25"
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      strokeWidth="4"
-                    ></circle>
-                    <path
-                      className="opacity-75"
-                      fill="currentColor"
-                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                    ></path>
-                  </svg>
-                  Adding...
-                </span>
-              ) : (
-                <span className="flex items-center">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-4 w-4 mr-2"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                  Add Assessment
-                </span>
-              )}
-            </button>
-          </div>
-          {message.text && (
-            <div
-              className={`mt-4 p-4 rounded-lg text-sm animate-fade-in-up ${
-                message.type === "error"
-                  ? "bg-light-error-bg border border-light-error-bg text-light-error-text dark:bg-dark-error-bg dark:text-dark-error-text dark:border-dark-error-bg"
-                  : "bg-light-success-bg border border-light-success-bg text-light-success-text dark:bg-dark-success-bg dark:text-dark-success-text dark:border-dark-success-bg"
-              }`}
-            >
-              {message.type === "error" ? (
-                <div className="flex items-start">
-                  <svg
-                    className="h-5 w-5 mr-3 mt-0.5 text-light-error-text dark:text-dark-error-text shrink-0"
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                  <span className="font-medium">{message.text}</span>
-                </div>
-              ) : (
-                <div className="flex items-start">
-                  <svg
-                    className="h-5 w-5 mr-3 mt-0.5 text-light-success-text dark:text-dark-success-text shrink-0"
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                  <span className="font-medium">{message.text}</span>
-                </div>
-              )}
-            </div>
-          )}
-        </form>
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <div className="space-y-1.5">
+          <Label htmlFor="courseName">
+            Course name/code <span className="text-destructive">*</span>
+          </Label>
+          <Input
+            type="text"
+            id="courseName"
+            name="courseName"
+            value={formData.courseName}
+            onChange={handleChange}
+            placeholder="e.g., CS101"
+            required
+          />
+        </div>
+        <div className="space-y-1.5">
+          <Label htmlFor="assignmentName">
+            Assessment name <span className="text-destructive">*</span>
+          </Label>
+          <Input
+            type="text"
+            id="assignmentName"
+            name="assignmentName"
+            value={formData.assignmentName}
+            onChange={handleChange}
+            placeholder="e.g., Midterm exam"
+            required
+          />
+        </div>
       </div>
-    </div>
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+        <div className="space-y-1.5">
+          <Label htmlFor="dueDate">
+            Due date <span className="text-destructive">*</span>
+          </Label>
+          <Input
+            type="date"
+            id="dueDate"
+            name="dueDate"
+            value={formData.dueDate}
+            onChange={handleChange}
+            required
+          />
+        </div>
+        <div className="space-y-1.5">
+          <Label htmlFor="dueTime">
+            Due time <span className="text-destructive">*</span>
+          </Label>
+          <Input
+            type="time"
+            id="dueTime"
+            name="dueTime"
+            value={formData.dueTime}
+            onChange={handleChange}
+            required
+          />
+        </div>
+        <div className="space-y-1.5">
+          <Label htmlFor="weight">Weight (%)</Label>
+          <Input
+            type="number"
+            id="weight"
+            name="weight"
+            value={formData.weight}
+            onChange={handleChange}
+            min="0"
+            max="100"
+            step="0.1"
+            placeholder="Optional"
+          />
+        </div>
+      </div>
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+        <div className="space-y-1.5">
+          <Label>Status</Label>
+          <StatusSelect
+            value={formData.status}
+            onChange={(value) => setFormData((prev) => ({ ...prev, status: value }))}
+          />
+        </div>
+      </div>
+      <div className="flex items-center justify-end pt-2">
+        <Button type="submit" disabled={isSubmitting}>
+          {isSubmitting ? (
+            <>
+              <Loader2 className="motion-safe:animate-spin" aria-hidden />
+              Adding...
+            </>
+          ) : (
+            <>
+              <Plus aria-hidden />
+              Add assessment
+            </>
+          )}
+        </Button>
+      </div>
+      {message.text && (
+        <Alert variant={message.type === "error" ? "destructive" : "success"}>
+          {message.type === "error" ? <CircleAlert aria-hidden /> : <CircleCheck aria-hidden />}
+          <AlertDescription>{message.text}</AlertDescription>
+        </Alert>
+      )}
+    </form>
   );
 };
 

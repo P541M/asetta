@@ -4,8 +4,8 @@ import { isCompletedStatus } from "../constants/assessment";
 export interface GradeInfo {
   letter: string;
   gpa: number;
-  color: string;
-  bgColor: string;
+  /** Tint chip classes (bg + text) for the letter badge, e.g. `bg-success/10 text-success`. */
+  tintClass: string;
 }
 
 /** An assessment counts toward the grade once completed AND given a mark. */
@@ -65,105 +65,31 @@ export function calculateRequiredGrade(
   return remainingWeight > 0 ? (requiredWeightedSum / remainingWeight) * 100 : 0;
 }
 
-/** Letter grade / GPA scale, including the theme classes each band renders with. */
+// Three semantic tints instead of five raw-palette bands: A reads as success,
+// B/C as the neutral amber, D/F as trouble (2026-07-15 judgment call).
+const successTint = "bg-success/10 text-success";
+const primaryTint = "bg-primary/10 text-primary";
+const destructiveTint = "bg-destructive/10 text-destructive";
+
+/** Letter grade / GPA scale, including the tint chip classes each band renders with. */
 export function getGradeInfo(percentage: number): GradeInfo {
-  if (percentage >= 90)
-    return {
-      letter: "A+",
-      gpa: 4.0,
-      color: "text-light-grade-a-text dark:text-dark-grade-a-text",
-      bgColor: "bg-light-grade-a-bg dark:bg-dark-grade-a-bg",
-    };
-  if (percentage >= 85)
-    return {
-      letter: "A",
-      gpa: 4.0,
-      color: "text-light-grade-a-text dark:text-dark-grade-a-text",
-      bgColor: "bg-light-grade-a-bg dark:bg-dark-grade-a-bg",
-    };
-  if (percentage >= 80)
-    return {
-      letter: "A-",
-      gpa: 3.7,
-      color: "text-light-grade-a-text dark:text-dark-grade-a-text",
-      bgColor: "bg-light-grade-a-bg dark:bg-dark-grade-a-bg",
-    };
-  if (percentage >= 77)
-    return {
-      letter: "B+",
-      gpa: 3.3,
-      color: "text-light-grade-b-text dark:text-dark-grade-b-text",
-      bgColor: "bg-light-grade-b-bg dark:bg-dark-grade-b-bg",
-    };
-  if (percentage >= 73)
-    return {
-      letter: "B",
-      gpa: 3.0,
-      color: "text-light-grade-b-text dark:text-dark-grade-b-text",
-      bgColor: "bg-light-grade-b-bg dark:bg-dark-grade-b-bg",
-    };
-  if (percentage >= 70)
-    return {
-      letter: "B-",
-      gpa: 2.7,
-      color: "text-light-grade-b-text dark:text-dark-grade-b-text",
-      bgColor: "bg-light-grade-b-bg dark:bg-dark-grade-b-bg",
-    };
-  if (percentage >= 67)
-    return {
-      letter: "C+",
-      gpa: 2.3,
-      color: "text-light-grade-c-text dark:text-dark-grade-c-text",
-      bgColor: "bg-light-grade-c-bg dark:bg-dark-grade-c-bg",
-    };
-  if (percentage >= 63)
-    return {
-      letter: "C",
-      gpa: 2.0,
-      color: "text-light-grade-c-text dark:text-dark-grade-c-text",
-      bgColor: "bg-light-grade-c-bg dark:bg-dark-grade-c-bg",
-    };
-  if (percentage >= 60)
-    return {
-      letter: "C-",
-      gpa: 1.7,
-      color: "text-light-grade-c-text dark:text-dark-grade-c-text",
-      bgColor: "bg-light-grade-c-bg dark:bg-dark-grade-c-bg",
-    };
-  if (percentage >= 57)
-    return {
-      letter: "D+",
-      gpa: 1.3,
-      color: "text-light-grade-d-text dark:text-dark-grade-d-text",
-      bgColor: "bg-light-grade-d-bg dark:bg-dark-grade-d-bg",
-    };
-  if (percentage >= 53)
-    return {
-      letter: "D",
-      gpa: 1.0,
-      color: "text-light-grade-d-text dark:text-dark-grade-d-text",
-      bgColor: "bg-light-grade-d-bg dark:bg-dark-grade-d-bg",
-    };
-  if (percentage >= 50)
-    return {
-      letter: "D-",
-      gpa: 0.7,
-      color: "text-light-grade-f-text dark:text-dark-grade-f-text",
-      bgColor: "bg-light-grade-f-bg dark:bg-dark-grade-f-bg",
-    };
-  return {
-    letter: "F",
-    gpa: 0.0,
-    color: "text-light-grade-f-text dark:text-dark-grade-f-text",
-    bgColor: "bg-light-grade-f-bg dark:bg-dark-grade-f-bg",
-  };
+  if (percentage >= 90) return { letter: "A+", gpa: 4.0, tintClass: successTint };
+  if (percentage >= 85) return { letter: "A", gpa: 4.0, tintClass: successTint };
+  if (percentage >= 80) return { letter: "A-", gpa: 3.7, tintClass: successTint };
+  if (percentage >= 77) return { letter: "B+", gpa: 3.3, tintClass: primaryTint };
+  if (percentage >= 73) return { letter: "B", gpa: 3.0, tintClass: primaryTint };
+  if (percentage >= 70) return { letter: "B-", gpa: 2.7, tintClass: primaryTint };
+  if (percentage >= 67) return { letter: "C+", gpa: 2.3, tintClass: primaryTint };
+  if (percentage >= 63) return { letter: "C", gpa: 2.0, tintClass: primaryTint };
+  if (percentage >= 60) return { letter: "C-", gpa: 1.7, tintClass: primaryTint };
+  if (percentage >= 57) return { letter: "D+", gpa: 1.3, tintClass: destructiveTint };
+  if (percentage >= 53) return { letter: "D", gpa: 1.0, tintClass: destructiveTint };
+  if (percentage >= 50) return { letter: "D-", gpa: 0.7, tintClass: destructiveTint };
+  return { letter: "F", gpa: 0.0, tintClass: destructiveTint };
 }
 
 export function getProgressBarColor(percentage: number): string {
-  if (percentage >= 85)
-    return "bg-light-performance-excellent-bg dark:bg-dark-performance-excellent-bg";
-  if (percentage >= 70) return "bg-light-performance-good-bg dark:bg-dark-performance-good-bg";
-  if (percentage >= 60)
-    return "bg-light-performance-average-bg dark:bg-dark-performance-average-bg";
-  return "bg-light-performance-poor-bg dark:bg-dark-performance-poor-bg";
+  if (percentage >= 85) return "bg-success";
+  if (percentage >= 60) return "bg-primary";
+  return "bg-destructive";
 }

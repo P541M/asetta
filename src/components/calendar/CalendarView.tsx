@@ -1,12 +1,29 @@
 import { useState, useEffect, useRef, KeyboardEvent, useCallback } from "react";
-import { useAuth } from "../../contexts/AuthContext";
-import { db } from "../../lib/firebase";
-import { collection, getDocs, query } from "firebase/firestore";
+import {
+  Check,
+  ChevronLeft,
+  ChevronRight,
+  CircleCheck,
+  CircleDashed,
+  CircleX,
+  Clock,
+  Download,
+  ListFilter,
+  type LucideIcon,
+} from "lucide-react";
+import { useAssessments } from "../../hooks/useAssessments";
 import { generateICSFile } from "../../utils/icsGenerator";
 import { Assessment } from "../../types/assessment";
 import { Day, CalendarViewProps } from "../../types/calendar";
-import CustomSelect from "../ui/CustomSelect";
-import { statusFilterOptions } from "./statusFilterOptions";
+import { cn } from "@/lib/utils";
+import { Button } from "../ui/button";
+import { Input } from "../ui/input";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "../ui/dropdown-menu";
 import CalendarGrid from "./CalendarGrid";
 import DayDetailModal from "./DayDetailModal";
 
@@ -23,6 +40,14 @@ const monthNames = [
   "October",
   "November",
   "December",
+];
+
+const statusFilterOptions: { value: string; label: string; icon: LucideIcon }[] = [
+  { value: "all", label: "All statuses", icon: ListFilter },
+  { value: "Not started", label: "Not started", icon: CircleDashed },
+  { value: "In progress", label: "In progress", icon: Clock },
+  { value: "Submitted", label: "Submitted", icon: CircleCheck },
+  { value: "Missed", label: "Missed", icon: CircleX },
 ];
 
 // Date formatting helpers
@@ -46,47 +71,25 @@ const formatDateTime = (date: Date, time: string): string => {
 };
 
 const CalendarView = ({ selectedSemester, semesterId, refreshTrigger }: CalendarViewProps) => {
-  const { user } = useAuth();
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [calendarDays, setCalendarDays] = useState<Day[]>([]);
-  const [assessments, setAssessments] = useState<Assessment[]>([]);
   const [selectedDay, setSelectedDay] = useState<Day | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const calendarRef = useRef<HTMLDivElement>(null);
 
-  // Fetch assessments
+  const { assessments, refetch } = useAssessments(semesterId);
+
+  // The hook fetches on mount and on semester change; this covers external
+  // refreshes (e.g. a new assessment added from another tab).
+  const lastTriggerRef = useRef(refreshTrigger);
   useEffect(() => {
-    const fetchAssessments = async () => {
-      if (!user || !semesterId) {
-        setAssessments([]);
-        return;
-      }
-      try {
-        const assessmentsRef = collection(
-          db,
-          "users",
-          user.uid,
-          "semesters",
-          semesterId,
-          "assessments",
-        );
-        const q = query(assessmentsRef);
-        const querySnapshot = await getDocs(q);
-        const assessmentsList: Assessment[] = [];
-        querySnapshot.forEach((doc) => {
-          assessmentsList.push({
-            id: doc.id,
-            ...(doc.data() as Omit<Assessment, "id">),
-          });
-        });
-        setAssessments(assessmentsList);
-      } catch (error) {
-        console.error("Error fetching assessments for calendar:", error);
-      }
-    };
-    fetchAssessments();
-  }, [user, semesterId, refreshTrigger]);
+    if (refreshTrigger !== lastTriggerRef.current) {
+      lastTriggerRef.current = refreshTrigger;
+      refetch();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [refreshTrigger]);
 
   // Filter assessments based on search and status
   const getAssessmentsForDate = useCallback(
@@ -199,13 +202,8 @@ const CalendarView = ({ selectedSemester, semesterId, refreshTrigger }: Calendar
     }
   };
 
-  // Export calendar
+  // Export calendar (the button is disabled when there is nothing to export)
   const handleExportCalendar = () => {
-    if (assessments.length === 0) {
-      alert("No assessments to export.");
-      return;
-    }
-
     const icsContent = generateICSFile(assessments, selectedSemester);
     const blob = new Blob([icsContent], { type: "text/calendar" });
     const url = window.URL.createObjectURL(blob);
@@ -218,105 +216,90 @@ const CalendarView = ({ selectedSemester, semesterId, refreshTrigger }: Calendar
     window.URL.revokeObjectURL(url);
   };
 
+  const activeFilter =
+    statusFilterOptions.find((option) => option.value === statusFilter) ?? statusFilterOptions[0];
+  const ActiveFilterIcon = activeFilter.icon;
+
   return (
     <div className="p-6">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 space-y-4 md:space-y-0">
+      <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div>
-          <h2 className="text-xl font-medium text-light-text-primary dark:text-dark-text-primary">
-            Calendar
-          </h2>
-          <p className="text-sm text-light-text-tertiary dark:text-dark-text-tertiary">
+          <h2 className="text-xl font-semibold tracking-tight text-foreground">Calendar</h2>
+          <p className="text-sm text-muted-foreground">
             {monthNames[currentMonth.getMonth()]} {currentMonth.getFullYear()}
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-4">
-          {/* Search and filter */}
-          <div className="flex items-center space-x-2">
-            <input
-              type="text"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Search assessments..."
-              className="input py-1.5 px-3 text-sm w-48"
-            />
-            <CustomSelect
-              value={statusFilter}
-              onChange={setStatusFilter}
-              options={statusFilterOptions}
-              placeholder="Filter by status"
-              className="min-w-[140px]"
-              size="sm"
-            />
+        <div className="flex flex-wrap items-center gap-2">
+          <Input
+            type="text"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder="Search assessments"
+            aria-label="Search assessments"
+            className="h-10 w-full sm:w-48"
+          />
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                type="button"
+                variant="secondary"
+                className="min-w-40 justify-between"
+                aria-label="Filter by status"
+              >
+                <span className="flex min-w-0 items-center gap-2">
+                  <ActiveFilterIcon className="text-muted-foreground" aria-hidden />
+                  <span className="truncate">{activeFilter.label}</span>
+                </span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="min-w-44">
+              {statusFilterOptions.map(({ value, label, icon: OptionIcon }) => (
+                <DropdownMenuItem key={value} onSelect={() => setStatusFilter(value)}>
+                  <Check
+                    className={cn(statusFilter === value ? "opacity-100" : "opacity-0")}
+                    aria-hidden
+                  />
+                  <OptionIcon aria-hidden />
+                  {label}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          <div className="flex items-center gap-1">
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              onClick={previousMonth}
+              aria-label="Previous month"
+            >
+              <ChevronLeft aria-hidden />
+            </Button>
+            <Button type="button" variant="secondary" onClick={goToToday}>
+              Today
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              onClick={nextMonth}
+              aria-label="Next month"
+            >
+              <ChevronRight aria-hidden />
+            </Button>
           </div>
 
-          {/* Navigation controls */}
-          <div className="flex items-center space-x-2">
-            <button
-              onClick={previousMonth}
-              className="p-2 rounded-full hover:bg-light-hover-primary dark:hover:bg-dark-hover-primary transition-colors"
-              title="Previous Month"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5 text-light-text-tertiary dark:text-dark-text-tertiary"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M15 19l-7-7 7-7"
-                />
-              </svg>
-            </button>
-            <button
-              onClick={goToToday}
-              className="px-3 py-1.5 text-sm bg-light-button-primary/10 dark:bg-dark-button-primary/10 text-light-button-primary dark:text-dark-button-primary rounded-md hover:bg-light-button-primary/20 dark:hover:bg-dark-button-primary/20 transition-colors"
-            >
-              Today
-            </button>
-            <button
-              onClick={nextMonth}
-              className="p-2 rounded-full hover:bg-light-hover-primary dark:hover:bg-dark-hover-primary transition-colors"
-              title="Next Month"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5 text-light-text-tertiary dark:text-dark-text-tertiary"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 5l7 7-7 7"
-                />
-              </svg>
-            </button>
-            <button
-              onClick={handleExportCalendar}
-              className="btn-primary ml-2 px-3 py-1.5 text-sm flex items-center"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-4 w-4 mr-2"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"
-                  clipRule="evenodd"
-                />
-              </svg>
-              Export
-            </button>
-          </div>
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={handleExportCalendar}
+            disabled={assessments.length === 0}
+          >
+            <Download aria-hidden />
+            Export
+          </Button>
         </div>
       </div>
 
@@ -324,7 +307,8 @@ const CalendarView = ({ selectedSemester, semesterId, refreshTrigger }: Calendar
         ref={calendarRef}
         tabIndex={0}
         onKeyDown={handleKeyDown}
-        className="focus:outline-hidden"
+        aria-label="Calendar. Use the arrow keys to change month"
+        className="rounded-xl outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
       >
         <CalendarGrid calendarDays={calendarDays} onSelectDay={setSelectedDay} />
       </div>

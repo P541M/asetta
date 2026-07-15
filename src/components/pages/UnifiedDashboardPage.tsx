@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
+import { BookOpen, Check, ChevronsUpDown, CircleAlert, GraduationCap, Loader2 } from "lucide-react";
 import { TabProvider, useTab, TabType } from "../../contexts/TabContext";
 import DashboardLayout from "../layout/DashboardLayout";
 import { DashboardData, TabComponentProps, CoursesTabProps } from "../../types/dashboard";
+import { cn } from "../../lib/utils";
 
 // Import existing tab content components
 import CoursesOverviewTable from "../tables/CoursesOverviewTable";
@@ -12,9 +14,25 @@ import GradeCalculator from "../assessment/GradeCalculator";
 import CalendarView from "../calendar/CalendarView";
 import AddAssessmentForm from "../forms/AddAssessmentForm";
 import UploadForm from "../forms/UploadForm";
-import ErrorMessage from "../ui/ErrorMessage";
+import { Alert, AlertDescription } from "../ui/alert";
+import { Button } from "../ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "../ui/dropdown-menu";
 import EmptyState from "../ui/EmptyState";
-import CustomSelect, { type SelectOption } from "../ui/CustomSelect";
+
+/** Inline error banner for tab content (padded to sit inside the panel). */
+const TabError = ({ message }: { message: string }) => (
+  <div className="p-6">
+    <Alert variant="destructive">
+      <CircleAlert aria-hidden />
+      <AlertDescription>{message}</AlertDescription>
+    </Alert>
+  </div>
+);
 
 interface UnifiedDashboardPageProps {
   forceSemesterId?: string;
@@ -32,7 +50,7 @@ const CoursesTab = ({ data, onSelectCourse }: CoursesTabProps) => {
   return (
     <>
       {error ? (
-        <ErrorMessage message={error} />
+        <TabError message={error} />
       ) : (
         <CoursesOverviewTable
           courses={courses}
@@ -83,7 +101,7 @@ const AssessmentsTab = ({ data }: { data: DashboardData }) => {
       ) : (
         <>
           {error ? (
-            <ErrorMessage message={error} />
+            <TabError message={error} />
           ) : (
             <AssessmentsTable
               assessments={assessments}
@@ -138,21 +156,7 @@ const GradesTab = ({ data, urlSemesterId }: TabComponentProps) => {
   if (!selectedSemesterId) {
     return (
       <EmptyState
-        icon={
-          <svg
-            className="mx-auto h-12 w-12 text-gray-400"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
-            />
-          </svg>
-        }
+        icon={<GraduationCap className="size-12" aria-hidden />}
         title="No semester selected"
         description="Select a semester above to view grade calculations for your courses."
       />
@@ -162,117 +166,82 @@ const GradesTab = ({ data, urlSemesterId }: TabComponentProps) => {
   return (
     <div>
       <div className="p-6">
-        {/* Header with Course Selection */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4">
+        {/* Header with course selection */}
+        <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h2 className="text-xl font-medium text-light-text-primary dark:text-dark-text-primary">
-              Grade Calculator
+            <h2 className="text-xl font-semibold tracking-tight text-foreground">
+              Grade calculator
             </h2>
-            <p className="text-sm text-light-text-tertiary dark:text-dark-text-tertiary">
-              {selectedCourse || "Select a course"}
-            </p>
+            <p className="text-sm text-muted-foreground">{selectedCourse || "Select a course"}</p>
           </div>
 
-          {/* Auto-Save Status & Course Selector */}
-          <div className="flex items-center space-x-4">
-            {/* Auto-Save Status Indicator */}
-            <div className="flex items-center space-x-2 min-h-[20px]">
+          {/* Auto-save status & course selector */}
+          <div className="flex items-center gap-4">
+            {/* Feedback motion only: the indicator responds to a save the user triggered */}
+            <div className="flex min-h-5 items-center">
               {autoSaveStatus === "saving" && (
-                <div className="flex items-center space-x-2 text-sm text-light-text-secondary dark:text-dark-text-secondary animate-fade-in transition-all duration-200 ease-out">
-                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-light-button-primary border-t-transparent"></div>
-                  <span>Saving...</span>
-                </div>
+                <span className="flex items-center gap-2 text-sm text-muted-foreground motion-safe:animate-fade-in">
+                  <Loader2 className="size-4 motion-safe:animate-spin" aria-hidden />
+                  Saving...
+                </span>
               )}
               {autoSaveStatus === "saved" && (
-                <div className="flex items-center space-x-2 text-sm text-green-600 dark:text-green-400 animate-fade-in transition-all duration-200 ease-out">
-                  <svg
-                    className="w-4 h-4 transform transition-transform duration-200"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M5 13l4 4L19 7"
-                    />
-                  </svg>
-                  <span>Saved</span>
-                </div>
+                <span className="flex items-center gap-2 text-sm text-success motion-safe:animate-fade-in">
+                  <Check className="size-4" aria-hidden />
+                  Saved
+                </span>
               )}
               {autoSaveStatus === "error" && autoSaveError && (
-                <div className="flex items-center space-x-2 text-sm text-red-600 dark:text-red-400 animate-fade-in transition-all duration-200 ease-out">
-                  <svg
-                    className="w-4 h-4 transform transition-transform duration-200"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                    />
-                  </svg>
-                  <span>Error saving</span>
-                </div>
+                <span className="flex items-center gap-2 text-sm text-destructive motion-safe:animate-fade-in">
+                  <CircleAlert className="size-4" aria-hidden />
+                  Error saving
+                </span>
               )}
             </div>
 
-            <CustomSelect
-              value={selectedCourse}
-              onChange={(value) => setSelectedCourse(value || null)}
-              options={availableCourses.map((course: string): SelectOption => ({
-                value: course,
-                label: course,
-                icon: (
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  className="min-w-48 justify-between"
+                  disabled={availableCourses.length === 0}
+                  aria-label="Switch course"
+                >
+                  <span className="flex min-w-0 items-center gap-2">
+                    <BookOpen className="text-muted-foreground" aria-hidden />
+                    <span className="truncate">{selectedCourse || "Select a course"}</span>
+                  </span>
+                  <ChevronsUpDown className="text-muted-foreground" aria-hidden />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="min-w-48">
+                {availableCourses.map((course: string) => (
+                  <DropdownMenuItem key={course} onSelect={() => setSelectedCourse(course)}>
+                    <Check
+                      className={cn(selectedCourse === course ? "opacity-100" : "opacity-0")}
+                      aria-hidden
                     />
-                  </svg>
-                ),
-                colorClass: "text-light-text-primary dark:text-dark-text-primary",
-              }))}
-              disabled={availableCourses.length === 0}
-              placeholder="Select a course..."
-              className="min-w-48"
-              size="sm"
-            />
+                    <span className="truncate">{course}</span>
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
 
-        {/* No Courses Message */}
+        {/* No courses message */}
         {availableCourses.length === 0 && (
           <EmptyState
-            icon={
-              <svg
-                className="mx-auto h-12 w-12 text-gray-400 mb-4"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-                />
-              </svg>
-            }
+            icon={<BookOpen className="size-12" aria-hidden />}
             title="No courses found"
             description="This semester doesn't have any assessments yet."
             action={
-              <button onClick={handleAddAssessment} className="btn-primary">
-                Add Assessment
-              </button>
+              <Button type="button" onClick={handleAddAssessment}>
+                Add assessment
+              </Button>
             }
-            className="py-10 text-gray-500 dark:text-dark-text-tertiary animate-fade-in"
+            className="py-10"
           />
         )}
 
@@ -311,31 +280,36 @@ const AddTab = ({ data, urlSemesterId }: TabComponentProps) => {
     <div>
       {selectedSemesterId ? (
         <div className="p-6">
-          <h2 className="text-xl font-medium text-light-text-primary dark:text-dark-text-primary mb-6">
-            Add Assessment
+          <h2 className="mb-6 text-xl font-semibold tracking-tight text-foreground">
+            Add assessment
           </h2>
 
-          <div className="flex space-x-4 mb-6">
-            <button
-              onClick={() => setAddMode("upload")}
-              className={`flex-1 py-3 px-4 rounded-md text-sm font-medium transition-all duration-200 ${
-                addMode === "upload"
-                  ? "bg-light-button-primary text-white shadow-sm dark:bg-dark-button-primary"
-                  : "bg-gray-50 dark:bg-dark-bg-tertiary text-gray-600 dark:text-dark-text-secondary hover:bg-gray-100 dark:hover:bg-dark-bg-hover"
-              }`}
-            >
-              Upload File
-            </button>
-            <button
-              onClick={() => setAddMode("manual")}
-              className={`flex-1 py-3 px-4 rounded-md text-sm font-medium transition-all duration-200 ${
-                addMode === "manual"
-                  ? "bg-light-button-primary text-white shadow-sm dark:bg-dark-button-primary"
-                  : "bg-gray-50 dark:bg-dark-bg-tertiary text-gray-600 dark:text-dark-text-secondary hover:bg-gray-100 dark:hover:bg-dark-bg-hover"
-              }`}
-            >
-              Quick Add
-            </button>
+          {/* Mode toggle on the segmented-control language (see TabNavigationBar) */}
+          <div className="mb-6 rounded-xl bg-secondary p-1">
+            <div className="flex gap-1">
+              {(
+                [
+                  { id: "upload", label: "Upload file" },
+                  { id: "manual", label: "Quick add" },
+                ] as const
+              ).map(({ id, label }) => (
+                <button
+                  key={id}
+                  type="button"
+                  role="tab"
+                  aria-selected={addMode === id}
+                  onClick={() => setAddMode(id)}
+                  className={cn(
+                    "min-h-11 flex-1 rounded-lg px-4 text-sm font-medium outline-hidden transition-all duration-200 focus-visible:ring-2 focus-visible:ring-ring",
+                    addMode === id
+                      ? "bg-primary/10 text-primary"
+                      : "text-muted-foreground hover:text-foreground",
+                  )}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
           </div>
 
           {addMode === "upload" ? (
@@ -350,7 +324,7 @@ const AddTab = ({ data, urlSemesterId }: TabComponentProps) => {
         </div>
       ) : (
         <div className="p-6 text-center">
-          <p className="text-gray-600 dark:text-dark-text-secondary">
+          <p className="text-sm text-muted-foreground">
             {urlSemesterId
               ? "Unable to load semester data. Please check the URL or return to the dashboard."
               : "Please select a semester to add assessments."}

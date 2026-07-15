@@ -1,6 +1,18 @@
 import { useState, useRef, useCallback } from "react";
+import {
+  CircleAlert,
+  CircleCheck,
+  CloudUpload,
+  FileText,
+  Loader2,
+  Sparkles,
+  Zap,
+} from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
 import { UploadFormProps, UploadStatus, FileProgress, ExtractionResult } from "../../types/upload";
+import { cn } from "@/lib/utils";
+import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
+import { Button } from "../ui/button";
 import RateLimitNotice from "../ui/RateLimitNotice";
 import ExtractionSuccessModal from "../modals/ExtractionSuccessModal";
 import ApiLimitReachedModal from "../modals/ApiLimitReachedModal";
@@ -212,76 +224,37 @@ const UploadForm = ({ semesterId, semesterName, onUploadSuccess }: UploadFormPro
   };
 
   return (
-    <div className="bg-light-bg-primary dark:bg-dark-bg-secondary rounded-xl border border-light-border-primary dark:border-dark-border-primary p-6 transition-all duration-200">
-      <div className="mb-6">
-        <div className="flex items-center space-x-3 mb-4">
-          <div className="p-2 bg-light-button-primary dark:bg-dark-button-primary rounded-lg">
-            <svg
-              className="w-5 h-5 text-white"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
-              />
-            </svg>
-          </div>
-          <h3 className="text-xl font-semibold text-light-text-primary dark:text-dark-text-primary">
-            Upload Course Outlines
-          </h3>
+    <div>
+      <div className="mb-6 space-y-4">
+        <div>
+          <h3 className="text-base font-semibold text-foreground">Upload course outlines</h3>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Transform your PDF course outlines into organized assessments automatically. Our AI
+            extracts deadlines, requirements, and details in seconds.
+          </p>
         </div>
-        <p className="text-light-text-secondary dark:text-dark-text-secondary mb-4 leading-relaxed">
-          Transform your PDF course outlines into organized assessments automatically. Our AI
-          extracts deadlines, requirements, and details in seconds.
-        </p>
 
-        <div className="p-4 bg-light-warning-bg dark:bg-dark-warning-bg border border-light-warning-text/20 dark:border-dark-warning-text/20 rounded-lg">
-          <div className="flex items-start space-x-3">
-            <div className="shrink-0 mt-0.5">
-              <svg
-                className="w-5 h-5 text-light-warning-text dark:text-dark-warning-text"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-            </div>
-            <div>
-              <h4 className="text-sm font-semibold text-light-warning-text dark:text-dark-warning-text mb-1">
-                AI-Powered Extraction
-              </h4>
-              <p className="text-sm text-light-warning-text dark:text-dark-warning-text">
-                Please review extracted data for accuracy. Files are processed securely and never
-                stored.
-              </p>
-            </div>
-          </div>
-        </div>
+        <Alert>
+          <Sparkles aria-hidden />
+          <AlertTitle>AI-powered extraction</AlertTitle>
+          <AlertDescription>
+            Please review extracted data for accuracy. Files are processed securely and never
+            stored.
+          </AlertDescription>
+        </Alert>
       </div>
 
       <div className="space-y-6">
-        {/* Drag and Drop Zone */}
+        {/* Drag and drop zone */}
         <div
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
-          className={`relative cursor-pointer transition-all duration-200 ${
-            isDragActive
-              ? "border-light-button-primary dark:border-dark-button-primary bg-light-button-primary/5 dark:bg-dark-button-primary/10"
-              : "border-light-border-secondary dark:border-dark-border-secondary hover:border-light-button-primary dark:hover:border-dark-button-primary"
-          } ${
-            uploadStatus === "uploading" ? "cursor-not-allowed opacity-75" : ""
-          } border-2 border-dashed rounded-xl p-8 text-center bg-light-bg-tertiary dark:bg-dark-bg-tertiary`}
+          className={cn(
+            "relative rounded-xl border-2 border-dashed p-8 text-center transition-colors",
+            isDragActive ? "border-primary bg-primary/5" : "border-border bg-secondary/30",
+            uploadStatus === "uploading" ? "cursor-not-allowed opacity-75" : "cursor-pointer",
+          )}
         >
           <input
             ref={fileInputRef}
@@ -290,57 +263,40 @@ const UploadForm = ({ semesterId, semesterName, onUploadSuccess }: UploadFormPro
             accept="application/pdf"
             onChange={handleFileSelect}
             disabled={uploadStatus === "uploading"}
-            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
+            aria-label="Upload PDF course outlines"
+            className="absolute inset-0 h-full w-full cursor-pointer opacity-0 disabled:cursor-not-allowed"
           />
 
           <div className="space-y-4">
             <div
-              className={`mx-auto flex items-center justify-center w-16 h-16 rounded-full transition-all duration-200 ${
-                isDragActive
-                  ? "bg-light-button-primary/20 dark:bg-dark-button-primary/20"
-                  : "bg-light-bg-secondary dark:bg-dark-bg-secondary"
-              }`}
+              className={cn(
+                "mx-auto flex size-16 items-center justify-center rounded-full transition-colors",
+                isDragActive ? "bg-primary/10" : "bg-secondary",
+              )}
             >
               {uploadStatus === "uploading" ? (
-                <div className="animate-spin rounded-full h-8 w-8 border-3 border-light-button-primary dark:border-dark-button-primary border-t-transparent"></div>
+                <Loader2 className="size-8 text-primary motion-safe:animate-spin" aria-hidden />
               ) : (
-                <svg
-                  className={`w-8 h-8 transition-colors duration-200 ${
-                    isDragActive
-                      ? "text-light-button-primary dark:text-dark-button-primary"
-                      : "text-light-text-tertiary dark:text-dark-text-tertiary"
-                  }`}
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
-                  />
-                </svg>
+                <CloudUpload
+                  className={cn(
+                    "size-8 transition-colors",
+                    isDragActive ? "text-primary" : "text-muted-foreground",
+                  )}
+                  aria-hidden
+                />
               )}
             </div>
 
             <div>
               <h4
-                className={`text-lg font-semibold transition-colors duration-200 ${
-                  isDragActive
-                    ? "text-light-button-primary dark:text-dark-button-primary"
-                    : "text-light-text-primary dark:text-dark-text-primary"
-                }`}
+                className={cn(
+                  "text-base font-semibold transition-colors",
+                  isDragActive ? "text-primary" : "text-foreground",
+                )}
               >
-                {isDragActive ? "Drop your PDFs here!" : "Drop PDFs or click to browse"}
+                {isDragActive ? "Drop your PDFs here" : "Drop PDFs or click to browse"}
               </h4>
-              <p
-                className={`text-sm mt-2 transition-colors duration-200 ${
-                  isDragActive
-                    ? "text-light-button-primary dark:text-dark-button-primary"
-                    : "text-light-text-secondary dark:text-dark-text-secondary"
-                }`}
-              >
+              <p className="mt-1 text-sm text-muted-foreground">
                 {uploadStatus === "uploading"
                   ? "Processing your files..."
                   : "Supports multiple PDF files • Max 10MB per file"}
@@ -350,79 +306,32 @@ const UploadForm = ({ semesterId, semesterName, onUploadSuccess }: UploadFormPro
         </div>
 
         {files.length > 0 && (
-          <div className="space-y-4">
+          <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <h4 className="text-lg font-semibold text-light-text-primary dark:text-dark-text-primary">
-                Ready to Process
-              </h4>
-              <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-light-button-primary/10 text-light-button-primary dark:bg-dark-button-primary/20 dark:text-dark-button-primary">
+              <h4 className="text-base font-semibold text-foreground">Ready to process</h4>
+              <span className="inline-flex items-center rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary">
                 {files.length} file{files.length !== 1 ? "s" : ""}
               </span>
             </div>
             <div className="grid gap-3">
               {files.map((file, index) => (
-                <div
-                  key={index}
-                  className="group relative bg-light-bg-primary dark:bg-dark-bg-tertiary rounded-lg border border-light-border-primary dark:border-dark-border-secondary p-4 transition-all duration-200 hover:shadow-md hover:border-light-button-primary dark:hover:border-dark-button-primary"
-                >
-                  <div className="flex items-center space-x-4">
-                    <div className="shrink-0">
-                      <div className="w-12 h-12 bg-light-error-bg dark:bg-dark-error-bg rounded-lg flex items-center justify-center">
-                        <svg
-                          className="w-6 h-6 text-light-error-text dark:text-dark-error-text"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"
-                          />
-                        </svg>
-                      </div>
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-light-text-primary dark:text-dark-text-primary truncate group-hover:text-light-button-primary dark:group-hover:text-dark-button-primary transition-colors">
-                        {file.name}
+                <div key={index} className="rounded-xl bg-secondary/50 p-4">
+                  <div className="flex items-center gap-4">
+                    <FileText className="size-8 shrink-0 text-muted-foreground" aria-hidden />
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm font-medium text-foreground">{file.name}</p>
+                      <p className="mt-0.5 text-xs font-medium text-muted-foreground">
+                        {formatFileSize(file.size)} • PDF
                       </p>
-                      <div className="flex items-center space-x-2 mt-1">
-                        <span className="text-xs text-light-text-tertiary dark:text-dark-text-tertiary">
-                          {formatFileSize(file.size)}
-                        </span>
-                        <span className="text-xs text-light-text-tertiary dark:text-dark-text-tertiary">
-                          •
-                        </span>
-                        <span className="text-xs text-light-success-text dark:text-dark-success-text font-medium">
-                          PDF Document
-                        </span>
-                      </div>
                     </div>
                     <div className="shrink-0">
                       {uploadStatus === "uploading" ? (
-                        <div className="flex items-center space-x-2">
-                          <div className="animate-spin rounded-full h-5 w-5 border-2 border-light-button-primary dark:border-dark-button-primary border-t-transparent"></div>
-                          <span className="text-xs text-light-button-primary dark:text-dark-button-primary font-medium">
-                            Processing...
-                          </span>
-                        </div>
+                        <span className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
+                          <Loader2 className="size-4 motion-safe:animate-spin" aria-hidden />
+                          Processing...
+                        </span>
                       ) : (
-                        <div className="w-8 h-8 bg-light-success-bg dark:bg-dark-success-bg rounded-full flex items-center justify-center">
-                          <svg
-                            className="w-4 h-4 text-light-success-text dark:text-dark-success-text"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M5 13l4 4L19 7"
-                            />
-                          </svg>
-                        </div>
+                        <CircleCheck className="size-5 text-success" aria-hidden />
                       )}
                     </div>
                   </div>
@@ -433,22 +342,24 @@ const UploadForm = ({ semesterId, semesterName, onUploadSuccess }: UploadFormPro
         )}
 
         {message && !showSuccessModal && (
-          <div className="p-4 bg-light-success-bg dark:bg-dark-success-bg rounded-md">
-            <p className="text-sm text-light-success-text dark:text-dark-success-text">{message}</p>
-          </div>
+          <Alert variant="success">
+            <CircleCheck aria-hidden />
+            <AlertDescription>{message}</AlertDescription>
+          </Alert>
         )}
 
         {uploadStatus === "rate_limited" ? (
           <RateLimitNotice onRetry={handleRetry} retryAfter={retryAfter} autoRetry={true} />
         ) : (
           error && (
-            <div className="p-4 bg-light-error-bg dark:bg-dark-error-bg rounded-md">
-              <p className="text-sm text-light-error-text dark:text-dark-error-text">{error}</p>
-            </div>
+            <Alert variant="destructive">
+              <CircleAlert aria-hidden />
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
           )
         )}
 
-        {/* Copyright Agreement */}
+        {/* Copyright agreement */}
         {files.length > 0 && uploadStatus === "idle" && (
           <CopyrightAgreement
             id="upload-copyright-agreement"
@@ -457,8 +368,9 @@ const UploadForm = ({ semesterId, semesterName, onUploadSuccess }: UploadFormPro
           />
         )}
 
-        <div className="flex space-x-3">
-          <button
+        <div className="flex gap-3">
+          <Button
+            type="button"
             onClick={handleUpload}
             disabled={
               files.length === 0 ||
@@ -468,37 +380,30 @@ const UploadForm = ({ semesterId, semesterName, onUploadSuccess }: UploadFormPro
               !user ||
               !copyrightAgreed
             }
-            className="btn-primary flex-1 py-3 px-4 flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex-1"
           >
             {uploadStatus === "uploading" ? (
               <>
-                <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
-                <span>Processing Your Files...</span>
+                <Loader2 className="motion-safe:animate-spin" aria-hidden />
+                Processing files...
               </>
             ) : (
               <>
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M13 10V3L4 14h7v7l9-11h-7z"
-                  />
-                </svg>
-                <span>Extract Assessments</span>
+                <Zap aria-hidden />
+                Extract assessments
               </>
             )}
-          </button>
+          </Button>
 
           {files.length > 0 && uploadStatus !== "uploading" && (
-            <button onClick={handleReset} className="btn-secondary px-4 py-3">
-              {uploadStatus === "rate_limited" ? "Cancel & Clear" : "Clear Files"}
-            </button>
+            <Button type="button" variant="secondary" onClick={handleReset}>
+              {uploadStatus === "rate_limited" ? "Cancel and clear" : "Clear files"}
+            </Button>
           )}
         </div>
       </div>
 
-      {/* Success Modal */}
+      {/* Success modal */}
       {showSuccessModal && extractionResult && (
         <ExtractionSuccessModal
           isOpen={showSuccessModal}
@@ -508,7 +413,7 @@ const UploadForm = ({ semesterId, semesterName, onUploadSuccess }: UploadFormPro
         />
       )}
 
-      {/* API Limit Reached Modal */}
+      {/* API limit reached modal */}
       <ApiLimitReachedModal isOpen={showApiLimitModal} onClose={handleCloseApiLimitModal} />
     </div>
   );

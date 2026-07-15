@@ -12,8 +12,9 @@ import {
   calculateRequiredGrade,
   getGradeInfo,
 } from "../../utils/gradeCalculations";
+import { ChartColumn, CircleAlert } from "lucide-react";
+import { Alert, AlertDescription } from "../ui/alert";
 import LoadingSpinner from "../ui/LoadingSpinner";
-import ErrorMessage from "../ui/ErrorMessage";
 import EmptyState from "../ui/EmptyState";
 import GradeOverviewCards from "./grade-calculator/GradeOverviewCards";
 import AssessmentBreakdown from "./grade-calculator/AssessmentBreakdown";
@@ -160,24 +161,10 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
   if (!selectedCourse) {
     return (
       <EmptyState
-        icon={
-          <svg
-            className="mx-auto h-12 w-12 text-light-text-tertiary dark:text-dark-text-tertiary mb-4"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-            />
-          </svg>
-        }
+        icon={<ChartColumn className="size-12" aria-hidden />}
         title="No course selected"
         description="Select a course from the dropdown to view grade calculations."
-        className="py-10 text-light-text-tertiary dark:text-dark-text-tertiary"
+        className="py-10"
       />
     );
   }
@@ -191,11 +178,21 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
   }
 
   if (error) {
-    return <ErrorMessage message={error} />;
+    return (
+      <Alert variant="destructive">
+        <CircleAlert aria-hidden />
+        <AlertDescription>{error}</AlertDescription>
+      </Alert>
+    );
   }
 
   if (preferencesError) {
-    return <ErrorMessage message={`Course preferences error: ${preferencesError}`} />;
+    return (
+      <Alert variant="destructive">
+        <CircleAlert aria-hidden />
+        <AlertDescription>Course preferences error: {preferencesError}</AlertDescription>
+      </Alert>
+    );
   }
 
   const currentGradeInfo = currentGrade !== null ? getGradeInfo(currentGrade) : null;
@@ -206,19 +203,10 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
   return (
     <div className="space-y-6">
       {saveStatus === "error" && saveError && (
-        <div className="p-4 bg-light-error-bg dark:bg-dark-error-bg rounded-md text-light-error-text dark:text-dark-error-text animate-fade-in shadow-sm">
-          <div className="flex items-center space-x-2">
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-            <p>{saveError}</p>
-          </div>
-        </div>
+        <Alert variant="destructive">
+          <CircleAlert aria-hidden />
+          <AlertDescription>{saveError}</AlertDescription>
+        </Alert>
       )}
 
       {/* Grade Overview Cards */}

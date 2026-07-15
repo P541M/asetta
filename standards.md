@@ -4,9 +4,10 @@
 platform.** Read it before writing or reviewing any code. If a change conflicts with this file,
 either the change is wrong or this file must be updated in the same commit — never let them drift.
 
-Last updated: 2026-07-15 (v3.3 — modals pass: every `.modal-*` overlay except the calendar's
-`DayDetailModal` rebuilt on the overlay recipe — ConfirmationModal, notes modal + rich-text
-editor + link modal, extraction success, API limit. Surface language unchanged since the
+Last updated: 2026-07-15 (v3.4 — dashboard complete: Courses, Grades, Calendar, and Add tabs
+migrated. The last `.modal-*` overlay (`DayDetailModal`) is on the recipe and the `.modal-*`
+utilities, the `grade-*`/`status-*`/`performance-*` legacy token families, `CustomSelect`,
+`ErrorMessage`, and `utils/statusUtils.ts` are deleted. Surface language unchanged since the
 2026-07-14 v3 lock: borderless tonal surfaces, filled inputs, flat buttons, View Transitions
 theme crossfade).
 
@@ -216,9 +217,10 @@ a tier, the ramp is wrong — update it here, don't invent a sixth size at the c
 - **Exact token values ("Theme Tokens" table): locked during the auth-flow redesign** and recorded
   here. Brand anchor: Asetta amber (`#D97706` light / `#F59E0B` dark) as `--primary`, preserved
   from the current design.
-- **Legacy tokens** (`light-*`/`dark-*` in `tailwind.config.ts` and the `.btn-*`/`.input`/
-  `.form-*`/`.badge*`/`.modal-*`/`.stat*` classes in `globals.css`) stay until the last section
-  using them is migrated. Deleting a legacy class requires a grep proving zero usages.
+- **Legacy tokens** (`light-*`/`dark-*` and the `.btn-*`/`.input`/`.form-*`/`.badge*` classes in
+  `globals.css`) stay until the last section using them is migrated — that is now onboarding and
+  settings only. Deleting a legacy class requires a grep proving zero usages (already deleted
+  this way: `.modal-*`, the `grade-*`/`status-*`/`performance-*` token families).
 
 ### Dark/light mode rules
 
@@ -248,10 +250,11 @@ a tier, the ramp is wrong — update it here, don't invent a sixth size at the c
 | Theme engine (next-themes) + tokens + primitives (`button`, `input`, `label`, `card`, `alert`, `dropdown-menu`, `password-input`) | ✅ migrated 2026-07-14 |
 | Auth flow (login/register/reset) | ✅ migrated 2026-07-14 |
 | Dashboard shell (header, user menu, tabs, semester bar, stats, page frame, body base styles) | ✅ migrated 2026-07-14 |
-| Modals pass (`ConfirmationModal`, semester manage/delete modals, notes modal incl. rich-text editor toolbar/content + link modal, extraction success, API limit) | ✅ migrated 2026-07-15 — only the calendar's `DayDetailModal` still uses `.modal-*`; it migrates with the calendar section, then the `.modal-*` classes can be deleted |
+| Modals pass (`ConfirmationModal`, semester manage/delete modals, notes modal incl. rich-text editor toolbar/content + link modal, extraction success, API limit, `DayDetailModal`) | ✅ migrated 2026-07-15 — all overlays are on the recipe; the `.modal-*` classes are deleted |
 | Onboarding | legacy (its exit confirmation already renders the migrated `ConfirmationModal`) |
 | Assessments table (incl. course-filtered view; `StatusSelect` rebuilt on primitives as a tinted status chip, new `checkbox` primitive) | ✅ migrated 2026-07-15 |
-| Grades / Calendar / Add (incl. `DayDetailModal`, the last `.modal-*` overlay) | legacy |
+| Courses tab (`CoursesOverviewTable`: tonal keyboard-accessible course cards) | ✅ migrated 2026-07-15 |
+| Grades / Calendar / Add (grade calculator + tonal stat tiles, calendar grid + `DayDetailModal`, upload/quick-add forms; `EmptyState`/`LoadingSpinner`/`RateLimitNotice` rebuilt on tokens; `CustomSelect`, `ErrorMessage`, `utils/statusUtils.ts` deleted — status tints all come from `statusTintClasses`) | ✅ migrated 2026-07-15 |
 | Settings | legacy (toggle already rewired to next-themes) |
 
 **Placement rule for the theme toggle** (founder decision, 2026-07-14): visible on auth pages
@@ -282,8 +285,8 @@ related actions (add/manage) in one menu. No pill rows with satellite icon butto
   confirmations.
 - Modals that must escape a legacy stacking context (`ExtractionSuccessModal`,
   `ApiLimitReachedModal`) portal to `document.body`; recipe `z-150` still applies.
-- All `.modal-*` overlays are migrated except the calendar's `DayDetailModal` (goes with the
-  calendar section — the `.modal-*` classes in `globals.css` stay until then).
+- Content-listing overlays (e.g. `DayDetailModal`) may widen to `max-w-md`; `max-w-sm` is the
+  confirmation-dialog size.
 
 ### Handoff notes for new sessions
 
@@ -291,4 +294,4 @@ This file + `CLAUDE.md` (which mandates reading it) are the complete context for
 UI migration — prior chat history is NOT required. Current state lives in the migration table
 below; work section by section, one approval per section, founder pushes to GitHub (never the
 agent). The verification loop (Part 1) runs after every task. Next up: founder's pick from the
-remaining legacy sections — onboarding, grades/calendar/add, or settings.
+remaining legacy sections — onboarding or settings.

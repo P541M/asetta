@@ -1,20 +1,27 @@
+import { cn } from "@/lib/utils";
+
 interface LoadingSpinnerProps {
   size?: "sm" | "md" | "lg";
   className?: string;
 }
 
-const LoadingSpinner = ({ size = "md", className = "" }: LoadingSpinnerProps) => {
-  const sizeClasses = {
-    sm: "h-5 w-5 border-2",
-    md: "h-8 w-8 border-2",
-    lg: "h-12 w-12 border-2",
-  };
-
-  return (
-    <div
-      className={`animate-spin rounded-full border-light-button-primary border-t-transparent dark:border-dark-button-primary dark:border-t-transparent ${sizeClasses[size]} ${className}`}
-    />
-  );
+const sizeClasses = {
+  sm: "size-5 border-2",
+  md: "size-8 border-[3px]",
+  lg: "size-12 border-4",
 };
+
+/** Inline activity spinner: tonal track with an amber head. */
+const LoadingSpinner = ({ size = "md", className }: LoadingSpinnerProps) => (
+  <div
+    role="status"
+    aria-label="Loading"
+    className={cn(
+      "rounded-full border-secondary border-t-primary motion-safe:animate-spin",
+      sizeClasses[size],
+      className,
+    )}
+  />
+);
 
 export default LoadingSpinner;

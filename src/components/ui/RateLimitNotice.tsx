@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import { Clock, Loader2 } from "lucide-react";
+import { Button } from "./button";
 
 interface RateLimitNoticeProps {
   onRetry: () => void;
@@ -34,86 +36,59 @@ const RateLimitNotice = ({ onRetry, retryAfter = 120, autoRetry = true }: RateLi
   };
 
   return (
-    <div className="p-6 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/50 rounded-lg animate-fade-in">
-      <div className="flex items-start space-x-3">
-        <div className="shrink-0">
-          <div className="relative">
-            <div className="w-8 h-8 bg-amber-100 dark:bg-amber-800/50 rounded-full flex items-center justify-center">
-              <svg
-                className="w-5 h-5 text-amber-600 dark:text-amber-400"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-            </div>
-            {countdown > 0 && (
-              <div className="absolute -top-1 -right-1 w-4 h-4 bg-amber-500 rounded-full animate-pulse"></div>
-            )}
+    <div className="rounded-xl bg-muted p-5">
+      <div className="flex items-start gap-3">
+        <Clock className="mt-0.5 size-5 shrink-0 text-muted-foreground" aria-hidden />
+        <div className="min-w-0 flex-1 space-y-3">
+          <div>
+            <h3 className="text-base font-semibold text-foreground">Servers temporarily busy</h3>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Our AI processing servers are handling a high volume of requests. This is normal
+              during peak times and resolves shortly.
+            </p>
           </div>
-        </div>
-
-        <div className="flex-1 min-w-0">
-          <h3 className="text-lg font-medium text-amber-800 dark:text-amber-300 mb-2">
-            Servers Temporarily Busy
-          </h3>
-
-          <p className="text-amber-700 dark:text-amber-400 mb-4">
-            Our AI processing servers are currently handling a high volume of requests. This is
-            normal during peak usage times and will resolve shortly.
-          </p>
 
           {countdown > 0 ? (
-            <div className="space-y-3">
-              <div className="flex items-center space-x-2">
-                <div className="w-full bg-amber-200 dark:bg-amber-800/30 rounded-full h-2">
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <div className="h-1.5 w-full rounded-full bg-foreground/10">
                   <div
-                    className="bg-amber-500 dark:bg-amber-400 h-2 rounded-full transition-all duration-1000 ease-linear"
+                    className="h-1.5 rounded-full bg-primary transition-all duration-1000 ease-linear"
                     style={{ width: `${((retryAfter - countdown) / retryAfter) * 100}%` }}
-                  ></div>
+                  />
                 </div>
-                <span className="text-sm font-medium text-amber-700 dark:text-amber-400 whitespace-nowrap">
+                <span className="whitespace-nowrap text-xs font-medium text-muted-foreground">
                   {formatTime(countdown)}
                 </span>
               </div>
-
-              <div className="flex items-center justify-between">
-                <p className="text-sm text-amber-600 dark:text-amber-500">
+              <div className="flex items-center justify-between gap-3">
+                <p className="text-sm text-muted-foreground">
                   {autoRetry ? "Auto-retrying in" : "Please wait"} {formatTime(countdown)}
                 </p>
-
-                <button
+                <Button
+                  type="button"
+                  variant="secondary"
+                  size="sm"
                   onClick={handleManualRetry}
                   disabled={isRetrying}
-                  className="text-sm bg-amber-500 hover:bg-amber-600 text-white px-3 py-1.5 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {isRetrying ? "Retrying..." : "Try Now"}
-                </button>
+                  {isRetrying ? "Retrying..." : "Try now"}
+                </Button>
               </div>
             </div>
           ) : (
-            <div className="flex items-center space-x-3">
-              <div className="animate-spin rounded-full h-4 w-4 border-2 border-light-button-primary border-t-transparent dark:border-dark-button-primary dark:border-t-transparent"></div>
-              <span className="text-amber-700 dark:text-amber-400 font-medium">
-                Retrying your request...
-              </span>
+            <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+              <Loader2 className="size-4 motion-safe:animate-spin" aria-hidden />
+              Retrying your request...
             </div>
           )}
-        </div>
-      </div>
 
-      <div className="mt-4 p-3 bg-amber-100 dark:bg-amber-800/30 rounded-md">
-        <p className="text-xs text-amber-700 dark:text-amber-400">
-          <strong>Why is this happening?</strong> We share AI processing resources across all users
-          to keep the service free. During busy periods, we may hit rate limits but service
-          typically resumes within 1-2 minutes.
-        </p>
+          <p className="text-xs text-muted-foreground">
+            <span className="font-medium">Why is this happening?</span> We share AI processing
+            resources across all users to keep the service free. During busy periods we may hit rate
+            limits, but service typically resumes within 1-2 minutes.
+          </p>
+        </div>
       </div>
     </div>
   );
