@@ -1,7 +1,10 @@
 import React, { useEffect } from "react";
 import { createPortal } from "react-dom";
 import { useRouter } from "next/router";
+import { CalendarDays, Clock, Info, ListChecks, Plus, X } from "lucide-react";
 import { ExtractionResult } from "../../types/upload";
+import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
+import { Button } from "../ui/button";
 
 interface ExtractionSuccessModalProps {
   isOpen: boolean;
@@ -20,7 +23,7 @@ const ExtractionSuccessModal: React.FC<ExtractionSuccessModalProps> = ({
 }) => {
   const router = useRouter();
 
-  // Prevent body scroll when modal is open
+  // Prevent body scroll while open
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = "hidden";
@@ -39,203 +42,122 @@ const ExtractionSuccessModal: React.FC<ExtractionSuccessModalProps> = ({
     router.push(`/dashboard/${semesterId}/assessments`);
   };
 
-  const handleAddMoreFiles = () => {
-    onClose();
-    // Keep user on current page to upload more files
-  };
-
   const handleGoToCalendar = () => {
     onClose();
     router.push(`/dashboard/${semesterId}/calendar`);
   };
 
+  const hiddenCourseCount = (result.courseBreakdown?.length ?? 0) - COURSE_DISPLAY_LIMIT;
+
   const modalContent = (
     <div
-      className="fixed inset-0 bg-black/60 flex items-center justify-center p-4"
-      style={{ zIndex: 10000 }}
+      className="fixed inset-0 z-150 flex items-center justify-center bg-black/60 p-4"
       onClick={onClose}
     >
       <div
-        className="bg-light-bg-primary dark:bg-dark-bg-secondary rounded-2xl shadow-2xl max-w-md w-full mx-4 max-h-[85vh] overflow-y-auto"
+        className="max-h-[85vh] w-full max-w-sm overflow-y-auto rounded-2xl bg-card shadow-lg"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Extraction complete"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header with Success Animation */}
-        <div className="p-6 text-center border-b border-gray-200 dark:border-gray-700">
-          <div className="mx-auto flex items-center justify-center w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-full mb-3">
-            <svg
-              className="w-6 h-6 text-green-600 dark:text-green-400"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-          </div>
-          <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-1">
-            🎉 Extraction Complete!
-          </h2>
-          <p className="text-sm text-gray-600 dark:text-gray-300">
-            Your course outline has been successfully processed
-          </p>
+        <div className="flex items-center justify-between px-5 pb-1 pt-4">
+          <h3 className="text-base font-semibold text-foreground">Extraction complete</h3>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon-sm"
+            className="text-muted-foreground"
+            onClick={onClose}
+            aria-label="Close"
+          >
+            <X aria-hidden />
+          </Button>
         </div>
+        <div className="px-5 pb-5">
+          <p className="text-sm text-muted-foreground">Your course outline has been processed.</p>
 
-        {/* Results Summary */}
-        <div className="p-5 space-y-4">
-          {/* Main Stats */}
-          <div className="grid grid-cols-2 gap-3">
-            <div className="bg-light-bg-tertiary dark:bg-dark-bg-tertiary rounded-lg p-3 text-center">
-              <div className="text-xl font-bold text-light-button-primary dark:text-dark-button-primary">
-                {result.processedFiles}
-              </div>
-              <div className="text-xs text-light-text-secondary dark:text-dark-text-secondary">
-                File{result.processedFiles !== 1 ? "s" : ""} Processed
+          <div className="mt-4 grid grid-cols-2 gap-2">
+            <div className="rounded-xl bg-secondary/50 p-3 text-center">
+              <div className="text-xl font-semibold text-foreground">{result.processedFiles}</div>
+              <div className="text-xs font-medium text-muted-foreground">
+                File{result.processedFiles !== 1 ? "s" : ""} processed
               </div>
             </div>
-            <div className="bg-light-bg-tertiary dark:bg-dark-bg-tertiary rounded-lg p-3 text-center">
-              <div className="text-xl font-bold text-light-button-primary dark:text-dark-button-primary">
-                {result.totalAssessments}
-              </div>
-              <div className="text-xs text-light-text-secondary dark:text-dark-text-secondary">
-                Assessment{result.totalAssessments !== 1 ? "s" : ""} Found
+            <div className="rounded-xl bg-secondary/50 p-3 text-center">
+              <div className="text-xl font-semibold text-foreground">{result.totalAssessments}</div>
+              <div className="text-xs font-medium text-muted-foreground">
+                Assessment{result.totalAssessments !== 1 ? "s" : ""} found
               </div>
             </div>
           </div>
 
-          {/* Course Breakdown (if available) */}
           {result.courseBreakdown && result.courseBreakdown.length > 0 && (
-            <div className="space-y-2">
-              <h4 className="text-sm font-medium text-light-text-primary dark:text-dark-text-primary">
-                Courses Detected:
-              </h4>
-              <div className="space-y-1.5">
+            <div className="mt-4">
+              <p className="mb-2 text-xs font-medium text-muted-foreground">Courses detected</p>
+              <div className="rounded-xl bg-secondary/50 p-1.5">
                 {result.courseBreakdown.slice(0, COURSE_DISPLAY_LIMIT).map((course, index) => (
                   <div
                     key={index}
-                    className="flex items-center justify-between p-2.5 bg-light-bg-tertiary dark:bg-dark-bg-tertiary rounded-lg"
+                    className="flex items-center justify-between gap-2 rounded-lg px-2.5 py-2"
                   >
-                    <span className="text-sm font-medium text-light-text-primary dark:text-dark-text-primary">
+                    <span className="truncate text-sm font-medium text-foreground">
                       {course.courseName}
                     </span>
-                    <span className="text-xs text-light-text-secondary dark:text-dark-text-secondary">
+                    <span className="shrink-0 text-xs text-muted-foreground">
                       {course.assessmentCount} assessment{course.assessmentCount !== 1 ? "s" : ""}
                     </span>
                   </div>
                 ))}
-                {result.courseBreakdown.length > COURSE_DISPLAY_LIMIT && (
-                  <div className="flex items-center justify-center p-2.5 bg-light-bg-tertiary dark:bg-dark-bg-tertiary rounded-lg border-2 border-dashed border-light-border-secondary dark:border-dark-border-secondary">
-                    <span className="text-xs text-light-text-secondary dark:text-dark-text-secondary">
-                      and {result.courseBreakdown.length - COURSE_DISPLAY_LIMIT} other
-                      {result.courseBreakdown.length - COURSE_DISPLAY_LIMIT !== 1 ? "s" : ""}
-                    </span>
-                  </div>
+                {hiddenCourseCount > 0 && (
+                  <p className="px-2.5 py-2 text-center text-xs text-muted-foreground">
+                    and {hiddenCourseCount} other{hiddenCourseCount !== 1 ? "s" : ""}
+                  </p>
                 )}
               </div>
             </div>
           )}
 
-          {/* Processing Time */}
           {result.processingTime && (
-            <div className="flex items-center justify-center space-x-2 text-xs text-light-text-tertiary dark:text-dark-text-tertiary">
-              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
+            <div className="mt-3 flex items-center justify-center gap-1.5 text-xs font-medium text-muted-foreground">
+              <Clock className="size-3" aria-hidden />
               <span>Processed in {result.processingTime}s</span>
             </div>
           )}
 
-          {/* AI Accuracy Reminder */}
-          <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/50 rounded-lg p-3">
-            <div className="flex items-start space-x-2">
-              <svg
-                className="w-4 h-4 text-amber-600 dark:text-amber-400 mt-0.5 shrink-0"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-              <div>
-                <h5 className="text-xs font-medium text-amber-800 dark:text-amber-300 mb-1">
-                  Please Review Your Data
-                </h5>
-                <p className="text-xs text-amber-700 dark:text-amber-400">
-                  AI extraction may not be 100% accurate. Please review your assessments and edit
-                  any incorrect details.
-                </p>
-              </div>
+          <Alert className="mt-4">
+            <Info aria-hidden />
+            <AlertTitle>Review your data</AlertTitle>
+            <AlertDescription className="text-muted-foreground">
+              AI extraction may not be 100% accurate. Check your assessments and edit any incorrect
+              details.
+            </AlertDescription>
+          </Alert>
+
+          <div className="mt-5 space-y-2">
+            <Button type="button" className="w-full" onClick={handleViewAssessments}>
+              <ListChecks aria-hidden />
+              Review your assessments
+            </Button>
+            <div className="grid grid-cols-2 gap-2">
+              <Button type="button" variant="secondary" onClick={onClose}>
+                <Plus aria-hidden />
+                Add more
+              </Button>
+              <Button type="button" variant="secondary" onClick={handleGoToCalendar}>
+                <CalendarDays aria-hidden />
+                Calendar
+              </Button>
             </div>
-          </div>
-        </div>
-
-        {/* Action Buttons */}
-        <div className="p-5 pt-0 space-y-2.5">
-          <button
-            onClick={handleViewAssessments}
-            className="w-full bg-light-button-primary hover:bg-light-button-primary-hover dark:bg-dark-button-primary dark:hover:bg-dark-button-primary-hover text-white font-medium py-2.5 px-4 rounded-lg transition-all duration-200 transform hover:scale-[1.02] shadow-md hover:shadow-lg flex items-center justify-center space-x-2"
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
-              />
-            </svg>
-            <span>Review Your Assessments</span>
-          </button>
-
-          <div className="grid grid-cols-2 gap-2.5">
-            <button
-              onClick={handleAddMoreFiles}
-              className="bg-light-bg-primary dark:bg-dark-bg-primary border border-light-border-primary dark:border-dark-border-primary text-light-text-primary dark:text-dark-text-primary font-medium py-2 px-3 rounded-lg hover:bg-light-hover-primary dark:hover:bg-dark-hover-primary transition-colors flex items-center justify-center space-x-1.5"
+            <Button
+              type="button"
+              variant="ghost"
+              className="w-full text-muted-foreground"
+              onClick={onClose}
             >
-              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                />
-              </svg>
-              <span className="text-sm">Add More</span>
-            </button>
-            <button
-              onClick={handleGoToCalendar}
-              className="bg-light-bg-primary dark:bg-dark-bg-primary border border-light-border-primary dark:border-dark-border-primary text-light-text-primary dark:text-dark-text-primary font-medium py-2 px-3 rounded-lg hover:bg-light-hover-primary dark:hover:bg-dark-hover-primary transition-colors flex items-center justify-center space-x-1.5"
-            >
-              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                />
-              </svg>
-              <span className="text-sm">Calendar</span>
-            </button>
+              I&apos;ll do this later
+            </Button>
           </div>
-
-          <button
-            onClick={onClose}
-            className="w-full text-light-text-secondary dark:text-dark-text-secondary hover:text-light-text-primary dark:hover:text-dark-text-primary py-2 text-xs transition-colors"
-          >
-            I&apos;ll do this later
-          </button>
         </div>
       </div>
     </div>

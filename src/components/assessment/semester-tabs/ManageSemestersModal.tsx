@@ -69,8 +69,8 @@ const ManageSemestersModal = ({
           <Button
             type="button"
             variant="ghost"
-            size="icon"
-            className="size-8 text-muted-foreground"
+            size="icon-sm"
+            className="text-muted-foreground"
             onClick={onClose}
             aria-label="Close"
           >

@@ -59,28 +59,17 @@ export function OnboardingFlow() {
         isOpen={state.showExitModal}
         onClose={cancelExit}
         onConfirm={confirmExit}
-        title="Skip Onboarding?"
+        title="Skip onboarding?"
         message={
           <>
             <p>Are you sure you want to skip the setup process?</p>
-            <p className="mt-2 text-sm text-light-text-secondary dark:text-dark-text-secondary">
+            <p className="mt-2">
               You can complete your profile and add semesters later from your dashboard.
             </p>
           </>
         }
         confirmText="Skip"
-        cancelText="Continue Setup"
-        variant="warning"
-        icon={
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L4.268 15.5c-.77.833.192 2.5 1.732 2.5z"
-            />
-          </svg>
-        }
+        cancelText="Continue setup"
       />
     </>
   );

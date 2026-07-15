@@ -1,50 +1,31 @@
 @reference "./globals.css";
 
-.rich-text-editor {
-  @apply bg-transparent;
-}
+/* Tiptap content styles (semantic tokens only). The editor chrome (toolbar,
+   container fill, focus ring) is styled in RichTextEditor.tsx / NotesModal.tsx;
+   these rules cover the ProseMirror-generated content markup. */
 
 .rich-text-editor .ProseMirror {
-  @apply min-h-[200px] max-h-[500px] outline-hidden focus:outline-hidden focus:ring-0 text-light-text-primary dark:text-dark-text-primary overflow-y-auto;
+  /* text-base: editor content is input text (16px also prevents iOS zoom) */
+  @apply max-h-[500px] min-h-[200px] overflow-y-auto text-base text-foreground outline-hidden;
 }
 
 .rich-text-editor .ProseMirror p {
-  @apply mb-4 text-light-text-primary dark:text-dark-text-primary;
+  @apply mb-4;
 }
 
 .rich-text-editor .ProseMirror ul {
-  @apply list-disc pl-4 mb-4 text-light-text-primary dark:text-dark-text-primary;
+  @apply mb-4 list-disc pl-4;
 }
 
 .rich-text-editor .ProseMirror ol {
-  @apply list-decimal pl-4 mb-4 text-light-text-primary dark:text-dark-text-primary;
+  @apply mb-4 list-decimal pl-4;
 }
 
 .rich-text-editor .ProseMirror a {
-  @apply text-light-button-primary hover:text-light-button-primary-hover underline dark:text-dark-button-primary dark:hover:bg-dark-button-primary-hover;
+  @apply text-primary underline hover:text-primary-hover;
 }
 
 .rich-text-editor .ProseMirror p.is-editor-empty:first-child::before {
-  @apply text-light-text-tertiary float-left h-0 pointer-events-none dark:text-dark-text-tertiary;
+  @apply pointer-events-none float-left h-0 text-muted-foreground/70;
   content: attr(data-placeholder);
-}
-
-.rich-text-editor .toolbar {
-  @apply bg-light-bg-primary dark:bg-dark-bg-primary border-b border-light-border-primary dark:border-dark-border-primary p-2 flex flex-wrap gap-2;
-}
-
-.rich-text-editor .toolbar button {
-  @apply text-light-text-tertiary hover:text-light-text-primary transition-colors dark:text-dark-text-tertiary dark:hover:text-dark-text-primary;
-}
-
-.rich-text-editor .toolbar button svg {
-  @apply text-inherit;
-}
-
-.rich-text-editor .toolbar button.is-active {
-  @apply text-light-button-primary bg-light-button-primary/10 dark:text-dark-button-primary dark:bg-dark-button-primary/10;
-}
-
-.rich-text-editor .toolbar button.is-active svg {
-  @apply text-inherit;
 }

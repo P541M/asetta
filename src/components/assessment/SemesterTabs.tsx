@@ -21,7 +21,6 @@ import { Semester } from "@/types/semester";
 import { SemesterTabsProps } from "@/types/course";
 import { cn } from "@/lib/utils";
 import ConfirmationModal from "../common/ConfirmationModal";
-import { TrashOutlineIcon } from "../ui/icons";
 import { Button } from "../ui/button";
 import {
   DropdownMenu,
@@ -318,11 +317,10 @@ const SemesterTabs = ({ selectedSemester, onSelect }: SemesterTabsProps) => {
           setSemesterToDelete(null);
         }}
         onConfirm={handleConfirmDelete}
-        title="Confirm Delete"
+        title="Delete semester"
         message={`Are you sure you want to delete the semester "${semesterToDelete?.name}" and all its assessments? This action cannot be undone.`}
         confirmText="Delete"
         variant="danger"
-        icon={<TrashOutlineIcon className="h-6 w-6" />}
       />
     </div>
   );

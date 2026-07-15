@@ -1,5 +1,7 @@
 import React, { useEffect } from "react";
 import { createPortal } from "react-dom";
+import { Clock, X } from "lucide-react";
+import { Button } from "../ui/button";
 
 interface ApiLimitReachedModalProps {
   isOpen: boolean;
@@ -7,7 +9,7 @@ interface ApiLimitReachedModalProps {
 }
 
 const ApiLimitReachedModal: React.FC<ApiLimitReachedModalProps> = ({ isOpen, onClose }) => {
-  // Prevent body scroll when modal is open
+  // Prevent body scroll while open
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = "hidden";
@@ -23,101 +25,59 @@ const ApiLimitReachedModal: React.FC<ApiLimitReachedModalProps> = ({ isOpen, onC
 
   const modalContent = (
     <div
-      className="fixed inset-0 bg-black/60 flex items-center justify-center p-4"
-      style={{ zIndex: 10000 }}
+      className="fixed inset-0 z-150 flex items-center justify-center bg-black/60 p-4"
       onClick={onClose}
     >
       <div
-        className="bg-light-bg-primary dark:bg-dark-bg-secondary rounded-2xl shadow-2xl max-w-md w-full mx-4"
+        className="w-full max-w-sm rounded-2xl bg-card shadow-lg"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Daily limit reached"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header */}
-        <div className="p-6 text-center border-b border-light-border-primary dark:border-dark-border-primary">
-          <div className="mx-auto flex items-center justify-center w-16 h-16 bg-amber-100 dark:bg-amber-900/30 rounded-full mb-4">
-            <svg
-              className="w-8 h-8 text-amber-600 dark:text-amber-400"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-          </div>
-          <h2 className="text-xl font-bold text-light-text-primary dark:text-dark-text-primary mb-2">
-            Daily Limit Reached
-          </h2>
-          <p className="text-sm text-light-text-secondary dark:text-dark-text-secondary">
-            We&apos;ve hit our daily processing capacity
-          </p>
-        </div>
-
-        {/* Content */}
-        <div className="p-6 space-y-4">
-          <div className="text-center">
-            <p className="text-light-text-primary dark:text-dark-text-primary mb-4 leading-relaxed">
-              Our AI-powered document processing has reached its daily limit. This helps us maintain
-              quality service for everyone!
-            </p>
-
-            <div className="bg-light-bg-tertiary dark:bg-dark-bg-tertiary rounded-lg p-4 mb-4">
-              <div className="flex items-center justify-center space-x-2 mb-2">
-                <svg
-                  className="w-5 h-5 text-light-button-primary dark:text-dark-button-primary"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
-                <span className="font-medium text-light-text-primary dark:text-dark-text-primary">
-                  Daily limits refresh at midnight UTC
-                </span>
-              </div>
-              <p className="text-sm text-light-text-secondary dark:text-dark-text-secondary">
-                Please check back tomorrow to continue using our AI extraction feature
-              </p>
-            </div>
-
-            <div className="bg-light-bg-secondary dark:bg-dark-bg-tertiary rounded-lg p-4">
-              <h4 className="font-medium text-light-text-primary dark:text-dark-text-primary mb-2">
-                What you can do now:
-              </h4>
-              <ul className="text-sm text-light-text-secondary dark:text-dark-text-secondary space-y-1 text-left">
-                <li className="flex items-center space-x-2">
-                  <span className="w-1.5 h-1.5 bg-light-button-primary dark:bg-dark-button-primary rounded-full shrink-0"></span>
-                  <span>Add assessments manually using the Quick Add form</span>
-                </li>
-                <li className="flex items-center space-x-2">
-                  <span className="w-1.5 h-1.5 bg-light-button-primary dark:bg-dark-button-primary rounded-full shrink-0"></span>
-                  <span>Review and manage your existing assessments</span>
-                </li>
-                <li className="flex items-center space-x-2">
-                  <span className="w-1.5 h-1.5 bg-light-button-primary dark:bg-dark-button-primary rounded-full shrink-0"></span>
-                  <span>Come back tomorrow for AI-powered extraction</span>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
-
-        {/* Footer */}
-        <div className="p-6 pt-0">
-          <button
+        <div className="flex items-center justify-between px-5 pb-1 pt-4">
+          <h3 className="text-base font-semibold text-foreground">Daily limit reached</h3>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon-sm"
+            className="text-muted-foreground"
             onClick={onClose}
-            className="w-full bg-light-button-primary hover:bg-light-button-primary-hover dark:bg-dark-button-primary dark:hover:bg-dark-button-primary-hover text-white font-medium py-3 px-4 rounded-lg transition-all duration-200 flex items-center justify-center space-x-2"
+            aria-label="Close"
           >
-            <span>I Understand</span>
-          </button>
+            <X aria-hidden />
+          </Button>
+        </div>
+        <div className="px-5 pb-5">
+          <p className="text-sm text-muted-foreground">
+            Our AI document processing has reached its daily capacity. This helps us keep the
+            service reliable for everyone.
+          </p>
+
+          <div className="mt-4 rounded-xl bg-secondary/50 p-4">
+            <div className="flex items-center gap-2">
+              <Clock className="size-4 shrink-0 text-muted-foreground" aria-hidden />
+              <span className="text-sm font-medium text-foreground">
+                Limits refresh at midnight UTC
+              </span>
+            </div>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Check back tomorrow to keep using AI extraction.
+            </p>
+          </div>
+
+          <div className="mt-4">
+            <p className="text-sm font-medium text-foreground">What you can do now</p>
+            <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-muted-foreground">
+              <li>Add assessments manually with the quick add form</li>
+              <li>Review and manage your existing assessments</li>
+              <li>Come back tomorrow for AI extraction</li>
+            </ul>
+          </div>
+
+          <Button type="button" className="mt-5 w-full" onClick={onClose}>
+            Got it
+          </Button>
         </div>
       </div>
     </div>

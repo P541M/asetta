@@ -89,8 +89,8 @@ function SortableSemester({ semester, isSelected, onEdit, onDelete }: SortableSe
             <Button
               type="button"
               variant="ghost"
-              size="icon"
-              className="size-8 text-primary"
+              size="icon-sm"
+              className="text-primary"
               onClick={handleEditSave}
               aria-label="Save name"
             >
@@ -99,8 +99,8 @@ function SortableSemester({ semester, isSelected, onEdit, onDelete }: SortableSe
             <Button
               type="button"
               variant="ghost"
-              size="icon"
-              className="size-8 text-muted-foreground"
+              size="icon-sm"
+              className="text-muted-foreground"
               onClick={handleEditCancel}
               aria-label="Cancel rename"
             >
@@ -123,8 +123,8 @@ function SortableSemester({ semester, isSelected, onEdit, onDelete }: SortableSe
           <Button
             type="button"
             variant="ghost"
-            size="icon"
-            className="size-8 text-muted-foreground hover:text-foreground"
+            size="icon-sm"
+            className="text-muted-foreground hover:text-foreground"
             onClick={() => {
               setIsEditing(true);
               setEditValue(semester.name);
@@ -136,8 +136,8 @@ function SortableSemester({ semester, isSelected, onEdit, onDelete }: SortableSe
           <Button
             type="button"
             variant="ghost"
-            size="icon"
-            className="size-8 text-muted-foreground hover:text-destructive"
+            size="icon-sm"
+            className="text-muted-foreground hover:text-destructive"
             onClick={() => onDelete(semester.id)}
             aria-label={`Delete ${semester.name}`}
           >

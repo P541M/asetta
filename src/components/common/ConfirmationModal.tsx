@@ -1,4 +1,6 @@
 import React, { ReactNode, useEffect } from "react";
+import { X } from "lucide-react";
+import { Button } from "../ui/button";
 
 interface ConfirmationModalProps {
   isOpen: boolean;
@@ -8,11 +10,11 @@ interface ConfirmationModalProps {
   message: ReactNode;
   confirmText?: string;
   cancelText?: string;
-  variant?: "danger" | "primary" | "warning";
-  icon?: ReactNode;
+  variant?: "danger" | "primary";
 }
 
-const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
+/** Small decision dialog on the standard overlay recipe; `danger` gets the destructive button. */
+const ConfirmationModal = ({
   isOpen,
   onClose,
   onConfirm,
@@ -21,9 +23,8 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
   confirmText = "Confirm",
   cancelText = "Cancel",
   variant = "primary",
-  icon,
-}) => {
-  // Prevent body scroll when modal is open
+}: ConfirmationModalProps) => {
+  // Prevent body scroll while open
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = "hidden";
@@ -37,62 +38,45 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
 
   if (!isOpen) return null;
 
-  const getVariantClasses = () => {
-    switch (variant) {
-      case "danger":
-        return {
-          button:
-            "bg-light-error-text hover:bg-light-error-text/90 focus:ring-light-error-text dark:bg-dark-error-text dark:hover:bg-dark-error-text/90 dark:focus:ring-dark-error-text",
-          icon: "text-light-error-text dark:text-dark-error-text",
-        };
-      case "warning":
-        return {
-          button:
-            "bg-light-warning-text hover:bg-light-warning-text/90 focus:ring-light-warning-text dark:bg-dark-warning-text dark:hover:bg-dark-warning-text/90 dark:focus:ring-dark-warning-text",
-          icon: "text-light-warning-text dark:text-dark-warning-text",
-        };
-      default:
-        return {
-          button:
-            "bg-light-button-primary hover:bg-light-button-primary-hover focus:ring-light-button-primary dark:bg-dark-button-primary dark:hover:bg-dark-button-primary-hover dark:focus:ring-dark-button-primary",
-          icon: "text-light-button-primary dark:text-dark-button-primary",
-        };
-    }
-  };
-
-  const variantClasses = getVariantClasses();
-
   return (
-    <div className="modal-backdrop" onClick={onClose}>
-      <div className="modal-container w-full max-w-sm mx-4" onClick={(e) => e.stopPropagation()}>
-        <div className="modal-content">
-          <div className="flex items-start gap-4">
-            {icon && <div className={`shrink-0 ${variantClasses.icon}`}>{icon}</div>}
-            <div className="flex-1 min-w-0">
-              <h3 className="text-base font-medium text-light-text-primary dark:text-dark-text-primary">
-                {title}
-              </h3>
-              <div className="mt-1 text-sm text-light-text-secondary dark:text-dark-text-secondary">
-                {message}
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className="modal-footer bg-light-bg-tertiary dark:bg-dark-bg-tertiary rounded-b-xl">
-          <button
+    <div
+      className="fixed inset-0 z-150 flex items-center justify-center bg-black/60 p-4"
+      onClick={onClose}
+    >
+      <div
+        className="w-full max-w-sm rounded-2xl bg-card shadow-lg"
+        role="dialog"
+        aria-modal="true"
+        aria-label={title}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between px-5 pb-1 pt-4">
+          <h3 className="text-base font-semibold text-foreground">{title}</h3>
+          <Button
             type="button"
+            variant="ghost"
+            size="icon-sm"
+            className="text-muted-foreground"
             onClick={onClose}
-            className="btn-outline px-4 py-3 sm:px-3 sm:py-1.5 text-base sm:text-sm min-h-[44px] flex-1 sm:flex-initial"
+            aria-label="Close"
           >
-            {cancelText}
-          </button>
-          <button
-            type="button"
-            onClick={onConfirm}
-            className={`px-4 py-3 sm:px-3 sm:py-1.5 text-base sm:text-sm font-medium text-white rounded-lg focus:outline-hidden focus:ring-2 focus:ring-offset-2 transition-colors min-h-[44px] flex-1 sm:flex-initial ${variantClasses.button}`}
-          >
-            {confirmText}
-          </button>
+            <X aria-hidden />
+          </Button>
+        </div>
+        <div className="px-5 pb-5">
+          <div className="text-sm text-muted-foreground">{message}</div>
+          <div className="mt-5 flex justify-end gap-2">
+            <Button type="button" variant="ghost" onClick={onClose}>
+              {cancelText}
+            </Button>
+            <Button
+              type="button"
+              variant={variant === "danger" ? "destructive" : "default"}
+              onClick={() => onConfirm()}
+            >
+              {confirmText}
+            </Button>
+          </div>
         </div>
       </div>
     </div>

@@ -10,7 +10,6 @@ import { Assessment, AssessmentStatus, AssessmentsTableProps } from "../../types
 import { isCompletedStatus } from "../../constants/assessment";
 import { cn } from "@/lib/utils";
 import ConfirmationModal from "../common/ConfirmationModal";
-import { TrashOutlineIcon } from "../ui/icons";
 import { Button } from "../ui/button";
 import {
   DropdownMenu,
@@ -429,24 +428,22 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
           setAssessmentToDelete(null);
         }}
         onConfirm={() => assessmentToDelete && handleDeleteAssessment(assessmentToDelete)}
-        title="Confirm Delete"
+        title="Delete assessment"
         message={`Are you sure you want to delete "${assessmentToDelete?.assignmentName}"? This action cannot be undone.`}
         confirmText="Delete"
         variant="danger"
-        icon={<TrashOutlineIcon className="h-6 w-6" />}
       />
       {/* Bulk Delete Confirmation Modal */}
       <ConfirmationModal
         isOpen={showBulkDeleteModal}
         onClose={() => setShowBulkDeleteModal(false)}
         onConfirm={handleConfirmBulkDelete}
-        title="Confirm Bulk Delete"
+        title="Delete assessments"
         message={`Are you sure you want to delete ${selectedRows.length} selected assessment${
           selectedRows.length === 1 ? "" : "s"
         }? This action cannot be undone.`}
         confirmText="Delete"
         variant="danger"
-        icon={<TrashOutlineIcon className="h-6 w-6" />}
       />
     </div>
   );

@@ -26,12 +26,20 @@ const statusOptions: { value: AssessmentStatus; icon: typeof Clock }[] = [
 ];
 
 /* Tinted chip per status (the bg-primary/10 text-primary recipe from standards.md);
-   the neutral tint uses foreground/5 so it reads on any surface in both themes. */
-const chipClasses: Record<AssessmentStatus, string> = {
-  "Not started": "bg-foreground/5 text-muted-foreground hover:bg-foreground/10",
-  "In progress": "bg-primary/10 text-primary hover:bg-primary/15",
-  Submitted: "bg-success/10 text-success hover:bg-success/15",
-  Missed: "bg-destructive/10 text-destructive hover:bg-destructive/15",
+   the neutral tint uses foreground/5 so it reads on any surface in both themes.
+   The static map is shared with read-only status chips (NotesModal). */
+export const statusTintClasses: Record<AssessmentStatus, string> = {
+  "Not started": "bg-foreground/5 text-muted-foreground",
+  "In progress": "bg-primary/10 text-primary",
+  Submitted: "bg-success/10 text-success",
+  Missed: "bg-destructive/10 text-destructive",
+};
+
+const chipHoverClasses: Record<AssessmentStatus, string> = {
+  "Not started": "hover:bg-foreground/10",
+  "In progress": "hover:bg-primary/15",
+  Submitted: "hover:bg-success/15",
+  Missed: "hover:bg-destructive/15",
 };
 
 const sizeClasses = {
@@ -61,7 +69,8 @@ const StatusSelect = ({
           "data-[state=open]:ring-2 data-[state=open]:ring-ring",
           "disabled:pointer-events-none disabled:opacity-50",
           sizeClasses[size],
-          value ? chipClasses[value] : chipClasses["Not started"],
+          value ? statusTintClasses[value] : statusTintClasses["Not started"],
+          value ? chipHoverClasses[value] : chipHoverClasses["Not started"],
           className,
         )}
       >

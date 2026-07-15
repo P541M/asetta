@@ -4,10 +4,11 @@
 platform.** Read it before writing or reviewing any code. If a change conflicts with this file,
 either the change is wrong or this file must be updated in the same commit — never let them drift.
 
-Last updated: 2026-07-15 (v3.2 — type ramp locked and applied to all migrated sections;
-assessments table migrated; `checkbox` primitive and button `icon-sm`/`icon-lg` sizes added.
-Surface language unchanged since the 2026-07-14 v3 lock: borderless tonal surfaces, filled
-inputs, flat buttons, View Transitions theme crossfade).
+Last updated: 2026-07-15 (v3.3 — modals pass: every `.modal-*` overlay except the calendar's
+`DayDetailModal` rebuilt on the overlay recipe — ConfirmationModal, notes modal + rich-text
+editor + link modal, extraction success, API limit. Surface language unchanged since the
+2026-07-14 v3 lock: borderless tonal surfaces, filled inputs, flat buttons, View Transitions
+theme crossfade).
 
 ---
 
@@ -246,10 +247,11 @@ a tier, the ramp is wrong — update it here, don't invent a sixth size at the c
 | --- | --- |
 | Theme engine (next-themes) + tokens + primitives (`button`, `input`, `label`, `card`, `alert`, `dropdown-menu`, `password-input`) | ✅ migrated 2026-07-14 |
 | Auth flow (login/register/reset) | ✅ migrated 2026-07-14 |
-| Dashboard shell (header, user menu, tabs, semester bar, stats, page frame, body base styles) | ✅ migrated 2026-07-14 — semester manage/delete modals excluded, queued with the modals pass |
-| Onboarding | legacy |
-| Assessments table (incl. course-filtered view; `StatusSelect` rebuilt on primitives as a tinted status chip, new `checkbox` primitive) | ✅ migrated 2026-07-15 — notes modal + delete confirmation modals excluded, queued with the modals pass |
-| Grades / Calendar / Add (+ all `.modal-*` overlays) | legacy |
+| Dashboard shell (header, user menu, tabs, semester bar, stats, page frame, body base styles) | ✅ migrated 2026-07-14 |
+| Modals pass (`ConfirmationModal`, semester manage/delete modals, notes modal incl. rich-text editor toolbar/content + link modal, extraction success, API limit) | ✅ migrated 2026-07-15 — only the calendar's `DayDetailModal` still uses `.modal-*`; it migrates with the calendar section, then the `.modal-*` classes can be deleted |
+| Onboarding | legacy (its exit confirmation already renders the migrated `ConfirmationModal`) |
+| Assessments table (incl. course-filtered view; `StatusSelect` rebuilt on primitives as a tinted status chip, new `checkbox` primitive) | ✅ migrated 2026-07-15 |
+| Grades / Calendar / Add (incl. `DayDetailModal`, the last `.modal-*` overlay) | legacy |
 | Settings | legacy (toggle already rewired to next-themes) |
 
 **Placement rule for the theme toggle** (founder decision, 2026-07-14): visible on auth pages
@@ -273,9 +275,15 @@ related actions (add/manage) in one menu. No pill rows with satellite icon butto
   the list is empty.
 - Lists inside overlays sit on a `bg-secondary/50 rounded-xl` tonal container, rows
   `hover:bg-accent` with ghost icon actions (pencil/trash), "Current"/status chips as
-  `bg-primary/10 text-primary` pills.
-- Legacy `.modal-*` overlays (ConfirmationModal, notes modal, extraction modals) are queued for
-  this exact treatment.
+  `bg-primary/10 text-primary` pills. Read-only status chips reuse `statusTintClasses`
+  exported from `StatusSelect` — never re-derive the tint mapping.
+- Confirmation dialogs are `common/ConfirmationModal` (recipe panel, ghost Cancel + filled
+  confirm; `variant="danger"` maps to the destructive button). No decorative icons in
+  confirmations.
+- Modals that must escape a legacy stacking context (`ExtractionSuccessModal`,
+  `ApiLimitReachedModal`) portal to `document.body`; recipe `z-150` still applies.
+- All `.modal-*` overlays are migrated except the calendar's `DayDetailModal` (goes with the
+  calendar section — the `.modal-*` classes in `globals.css` stay until then).
 
 ### Handoff notes for new sessions
 
@@ -283,5 +291,4 @@ This file + `CLAUDE.md` (which mandates reading it) are the complete context for
 UI migration — prior chat history is NOT required. Current state lives in the migration table
 below; work section by section, one approval per section, founder pushes to GitHub (never the
 agent). The verification loop (Part 1) runs after every task. Next up: founder's pick from the
-remaining legacy sections — onboarding, grades/calendar/add (whose modals pass also unblocks the
-overlays excluded from earlier sections), or settings.
+remaining legacy sections — onboarding, grades/calendar/add, or settings.

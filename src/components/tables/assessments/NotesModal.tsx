@@ -1,6 +1,9 @@
+import { Copy, X } from "lucide-react";
 import { Assessment } from "../../../types/assessment";
+import { cn } from "@/lib/utils";
+import { Button } from "../../ui/button";
 import RichTextEditor from "../../editor/RichTextEditor";
-import { getStatusBadgeClasses } from "../../../utils/statusUtils";
+import { statusTintClasses } from "./StatusSelect";
 import { formatLocalDateTime } from "../../../utils/dateUtils";
 
 interface NotesModalProps {
@@ -12,7 +15,7 @@ interface NotesModalProps {
   onSave: () => void;
 }
 
-/** Full-screen modal with the rich-text notes editor for one assessment. */
+/** Large overlay with the rich-text notes editor for one assessment. */
 const NotesModal = ({
   assessment,
   notesInput,
@@ -20,100 +23,89 @@ const NotesModal = ({
   onAddLink,
   onClose,
   onSave,
-}: NotesModalProps) => (
-  <div className="modal-backdrop">
-    <div id="notes-modal" className="modal-container w-full max-w-4xl max-h-[90vh] flex flex-col">
-      <div className="modal-header">
-        <div className="flex justify-between items-center">
-          <div>
-            <h3 className="text-xl font-medium text-light-text-primary dark:text-dark-text-primary">
+}: NotesModalProps) => {
+  const handleCopy = () => {
+    const text = `Assignment: ${assessment.assignmentName}\nCourse: ${
+      assessment.courseName
+    }\nDue: ${formatLocalDateTime(assessment.dueDate, assessment.dueTime)}\nWeight: ${
+      assessment.weight
+    }%\nStatus: ${assessment.status}\n\nNotes:\n${notesInput}`;
+    navigator.clipboard.writeText(text);
+  };
+
+  return (
+    <div
+      className="fixed inset-0 z-150 flex items-center justify-center bg-black/60 p-4"
+      onClick={onClose}
+    >
+      <div
+        className="flex max-h-[90vh] w-full max-w-4xl flex-col rounded-2xl bg-card shadow-lg"
+        role="dialog"
+        aria-modal="true"
+        aria-label={`Notes for ${assessment.assignmentName}`}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-start justify-between gap-3 px-5 pb-3 pt-4">
+          <div className="min-w-0">
+            <h3 className="truncate text-base font-semibold text-foreground">
               Notes for {assessment.assignmentName}
             </h3>
-            <p className="text-sm text-light-text-tertiary dark:text-dark-text-tertiary font-medium">
-              {assessment.courseName}
-            </p>
-            <div className="mt-2 flex items-center space-x-4 text-sm">
-              <span className="text-light-text-secondary dark:text-dark-text-secondary">
-                Due: {formatLocalDateTime(assessment.dueDate, assessment.dueTime)}
+            <p className="text-sm text-muted-foreground">{assessment.courseName}</p>
+            <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1.5">
+              <span className="text-xs font-medium text-muted-foreground">
+                Due {formatLocalDateTime(assessment.dueDate, assessment.dueTime)}
               </span>
-              <span className="text-light-text-secondary dark:text-dark-text-secondary">
-                Weight: {assessment.weight}%
+              <span className="text-xs font-medium text-muted-foreground">
+                Weight {assessment.weight}%
               </span>
-              <span className={getStatusBadgeClasses(assessment.status)}>{assessment.status}</span>
+              <span
+                className={cn(
+                  "inline-flex items-center rounded-lg px-2 py-0.5 text-xs font-medium",
+                  statusTintClasses[assessment.status],
+                )}
+              >
+                {assessment.status}
+              </span>
             </div>
           </div>
-          <div className="flex items-center space-x-2">
-            <button
-              onClick={() => {
-                const text = `Assignment: ${assessment.assignmentName}\nCourse: ${
-                  assessment.courseName
-                }\nDue: ${formatLocalDateTime(
-                  assessment.dueDate,
-                  assessment.dueTime,
-                )}\nWeight: ${assessment.weight}%\nStatus: ${
-                  assessment.status
-                }\n\nNotes:\n${notesInput}`;
-                navigator.clipboard.writeText(text);
-              }}
-              className="btn-outline px-3 py-1.5 text-sm"
-              title="Copy Notes"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-4 w-4 mr-1.5"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-              </svg>
+          <div className="flex shrink-0 items-center gap-1">
+            <Button type="button" variant="secondary" size="sm" onClick={handleCopy}>
+              <Copy aria-hidden />
               Copy
-            </button>
-            <button
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon-sm"
+              className="text-muted-foreground"
               onClick={onClose}
-              className="inline-flex items-center p-1.5 border border-transparent rounded-md text-light-text-tertiary dark:text-dark-text-tertiary hover:text-light-text-secondary dark:hover:text-dark-text-secondary hover:bg-light-hover-primary dark:hover:bg-dark-hover-primary transition-colors"
+              aria-label="Close"
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <line x1="18" y1="6" x2="6" y2="18"></line>
-                <line x1="6" y1="6" x2="18" y2="18"></line>
-              </svg>
-            </button>
+              <X aria-hidden />
+            </Button>
           </div>
         </div>
-      </div>
-      <div className="modal-content flex-1 min-h-0 overflow-y-auto">
-        <div className="border rounded-lg overflow-hidden border-light-border-primary dark:border-dark-border-primary">
-          <RichTextEditor
-            content={notesInput}
-            onChange={onNotesChange}
-            onAddLink={onAddLink}
-            placeholder={`Add your notes here...`}
-          />
+        <div className="min-h-0 flex-1 overflow-y-auto px-5">
+          <div className="overflow-hidden rounded-xl bg-input transition-shadow focus-within:ring-2 focus-within:ring-ring">
+            <RichTextEditor
+              content={notesInput}
+              onChange={onNotesChange}
+              onAddLink={onAddLink}
+              placeholder="Add your notes here..."
+            />
+          </div>
+        </div>
+        <div className="flex flex-none justify-end gap-2 px-5 py-4">
+          <Button type="button" variant="ghost" onClick={onClose}>
+            Cancel
+          </Button>
+          <Button type="button" onClick={onSave}>
+            Save notes
+          </Button>
         </div>
       </div>
-      <div className="modal-footer flex-none">
-        <button onClick={onClose} className="btn-outline py-1.5 px-4">
-          Cancel
-        </button>
-        <button onClick={onSave} className="btn-primary py-1.5 px-4">
-          Save Notes
-        </button>
-      </div>
     </div>
-  </div>
-);
+  );
+};
 
 export default NotesModal;

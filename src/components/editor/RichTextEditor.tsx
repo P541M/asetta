@@ -4,19 +4,24 @@ import Link from "@tiptap/extension-link";
 import Placeholder from "@tiptap/extension-placeholder";
 import Underline from "@tiptap/extension-underline";
 import TextAlign from "@tiptap/extension-text-align";
-import { useState } from "react";
+import { ReactNode, useState } from "react";
 import {
-  MdFormatBold,
-  MdFormatItalic,
-  MdFormatListBulleted,
-  MdFormatListNumbered,
-  MdLink,
-  MdFormatAlignLeft,
-  MdFormatAlignCenter,
-  MdFormatAlignRight,
-  MdUndo,
-  MdRedo,
-} from "react-icons/md";
+  AlignCenter,
+  AlignLeft,
+  AlignRight,
+  Bold,
+  Italic,
+  Link2,
+  List,
+  ListOrdered,
+  Redo2,
+  Undo2,
+  X,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
+import { Button } from "../ui/button";
+import { Input } from "../ui/input";
+import { Label } from "../ui/label";
 import { RichTextEditorProps } from "../../types/editor";
 
 interface LinkModalProps {
@@ -42,79 +47,94 @@ const LinkModal = ({ isOpen, onClose, onAddLink }: LinkModalProps) => {
   if (!isOpen) return null;
 
   return (
-    <div className="modal-backdrop">
-      <div className="modal-container w-full max-w-md">
-        <div className="modal-header">
-          <div className="flex justify-between items-center">
-            <h3 className="text-lg font-medium text-light-text-primary dark:text-dark-text-primary">
-              Add Link
-            </h3>
-            <button
-              onClick={onClose}
-              className="text-light-text-tertiary dark:text-dark-text-tertiary hover:text-light-text-secondary dark:hover:text-dark-text-secondary"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                  clipRule="evenodd"
-                />
-              </svg>
-            </button>
-          </div>
+    <div
+      className="fixed inset-0 z-150 flex items-center justify-center bg-black/60 p-4"
+      onClick={onClose}
+    >
+      <div
+        className="w-full max-w-sm rounded-2xl bg-card shadow-lg"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Add link"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between px-5 pb-1 pt-4">
+          <h3 className="text-base font-semibold text-foreground">Add link</h3>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon-sm"
+            className="text-muted-foreground"
+            onClick={onClose}
+            aria-label="Close"
+          >
+            <X aria-hidden />
+          </Button>
         </div>
-        <form onSubmit={handleSubmit} className="modal-content space-y-4">
-          <div>
-            <label
-              htmlFor="url"
-              className="block text-sm font-medium text-light-text-secondary dark:text-dark-text-secondary"
-            >
-              URL
-            </label>
-            <input
+        <form onSubmit={handleSubmit} className="space-y-4 px-5 pb-5">
+          <div className="space-y-1.5">
+            <Label htmlFor="link-url">URL</Label>
+            <Input
               type="url"
-              id="url"
+              id="link-url"
               value={url}
               onChange={(e) => setUrl(e.target.value)}
               placeholder="https://example.com"
-              className="mt-1 block w-full rounded-md border-gray-300 dark:border-dark-border-primary shadow-sm focus:border-light-focus-ring dark:focus:border-dark-focus-ring focus:ring-light-focus-ring dark:focus:ring-dark-focus-ring sm:text-sm dark:bg-dark-bg-tertiary dark:text-dark-text-primary"
+              autoFocus
               required
             />
           </div>
-          <div>
-            <label
-              htmlFor="text"
-              className="block text-sm font-medium text-light-text-secondary dark:text-dark-text-secondary"
-            >
-              Link Text (optional)
-            </label>
-            <input
+          <div className="space-y-1.5">
+            <Label htmlFor="link-text">Link text (optional)</Label>
+            <Input
               type="text"
-              id="text"
+              id="link-text"
               value={text}
               onChange={(e) => setText(e.target.value)}
               placeholder="Display text"
-              className="mt-1 block w-full rounded-md border-gray-300 dark:border-dark-border-primary shadow-sm focus:border-light-focus-ring dark:focus:border-dark-focus-ring focus:ring-light-focus-ring dark:focus:ring-dark-focus-ring sm:text-sm dark:bg-dark-bg-tertiary dark:text-dark-text-primary"
             />
           </div>
-          <div className="modal-footer">
-            <button type="button" onClick={onClose} className="btn-outline py-1.5 px-4">
+          <div className="flex justify-end gap-2 pt-1">
+            <Button type="button" variant="ghost" onClick={onClose}>
               Cancel
-            </button>
-            <button type="submit" className="btn-primary py-1.5 px-4">
-              Add Link
-            </button>
+            </Button>
+            <Button type="submit">Add link</Button>
           </div>
         </form>
       </div>
     </div>
   );
 };
+
+interface ToolbarButtonProps {
+  onClick: () => void;
+  title: string;
+  /** Toggle state for formatting buttons; omit for plain actions (undo/redo). */
+  active?: boolean;
+  disabled?: boolean;
+  children: ReactNode;
+}
+
+/* Active state uses the amber selection tint (standards.md) rather than a surface swap. */
+const ToolbarButton = ({ onClick, title, active, disabled, children }: ToolbarButtonProps) => (
+  <button
+    type="button"
+    onClick={onClick}
+    disabled={disabled}
+    title={title}
+    aria-label={title}
+    aria-pressed={active}
+    className={cn(
+      "flex size-9 items-center justify-center rounded-lg text-muted-foreground outline-hidden transition-colors",
+      "hover:bg-accent hover:text-foreground",
+      "focus-visible:ring-2 focus-visible:ring-ring",
+      "disabled:pointer-events-none disabled:opacity-50",
+      active && "bg-primary/10 text-primary hover:bg-primary/15 hover:text-primary",
+    )}
+  >
+    {children}
+  </button>
+);
 
 const RichTextEditor = ({
   content,
@@ -172,101 +192,75 @@ const RichTextEditor = ({
 
   return (
     <div className="rich-text-editor">
-      <div className="toolbar border-b border-gray-200 dark:border-dark-border-primary p-2 flex flex-wrap gap-2">
-        <button
+      <div className="flex flex-wrap gap-1 border-b border-border p-2">
+        <ToolbarButton
           onClick={() => editor.chain().focus().toggleBold().run()}
-          className={`p-1.5 rounded hover:bg-gray-100 dark:hover:bg-dark-bg-tertiary ${
-            editor.isActive("bold") ? "bg-gray-100 dark:bg-dark-bg-tertiary" : ""
-          }`}
           title="Bold"
+          active={editor.isActive("bold")}
         >
-          <MdFormatBold className="h-5 w-5" />
-        </button>
-        <button
+          <Bold className="size-4" aria-hidden />
+        </ToolbarButton>
+        <ToolbarButton
           onClick={() => editor.chain().focus().toggleItalic().run()}
-          className={`p-1.5 rounded hover:bg-gray-100 dark:hover:bg-dark-bg-tertiary ${
-            editor.isActive("italic") ? "bg-gray-100 dark:bg-dark-bg-tertiary" : ""
-          }`}
           title="Italic"
+          active={editor.isActive("italic")}
         >
-          <MdFormatItalic className="h-5 w-5" />
-        </button>
-        <button
+          <Italic className="size-4" aria-hidden />
+        </ToolbarButton>
+        <ToolbarButton
           onClick={() => editor.chain().focus().toggleBulletList().run()}
-          className={`p-1.5 rounded hover:bg-gray-100 dark:hover:bg-dark-bg-tertiary ${
-            editor.isActive("bulletList") ? "bg-gray-100 dark:bg-dark-bg-tertiary" : ""
-          }`}
-          title="Bullet List"
+          title="Bullet list"
+          active={editor.isActive("bulletList")}
         >
-          <MdFormatListBulleted className="h-5 w-5" />
-        </button>
-        <button
+          <List className="size-4" aria-hidden />
+        </ToolbarButton>
+        <ToolbarButton
           onClick={() => editor.chain().focus().toggleOrderedList().run()}
-          className={`p-1.5 rounded hover:bg-gray-100 dark:hover:bg-dark-bg-tertiary ${
-            editor.isActive("orderedList") ? "bg-gray-100 dark:bg-dark-bg-tertiary" : ""
-          }`}
-          title="Numbered List"
+          title="Numbered list"
+          active={editor.isActive("orderedList")}
         >
-          <MdFormatListNumbered className="h-5 w-5" />
-        </button>
-        <button
+          <ListOrdered className="size-4" aria-hidden />
+        </ToolbarButton>
+        <ToolbarButton
           onClick={() => editor.chain().focus().setTextAlign("left").run()}
-          className={`p-1.5 rounded hover:bg-gray-100 dark:hover:bg-dark-bg-tertiary ${
-            editor.isActive({ textAlign: "left" }) ? "bg-gray-100 dark:bg-dark-bg-tertiary" : ""
-          }`}
-          title="Align Left"
+          title="Align left"
+          active={editor.isActive({ textAlign: "left" })}
         >
-          <MdFormatAlignLeft className="h-5 w-5" />
-        </button>
-        <button
+          <AlignLeft className="size-4" aria-hidden />
+        </ToolbarButton>
+        <ToolbarButton
           onClick={() => editor.chain().focus().setTextAlign("center").run()}
-          className={`p-1.5 rounded hover:bg-gray-100 dark:hover:bg-dark-bg-tertiary ${
-            editor.isActive({ textAlign: "center" }) ? "bg-gray-100 dark:bg-dark-bg-tertiary" : ""
-          }`}
-          title="Align Center"
+          title="Align center"
+          active={editor.isActive({ textAlign: "center" })}
         >
-          <MdFormatAlignCenter className="h-5 w-5" />
-        </button>
-        <button
+          <AlignCenter className="size-4" aria-hidden />
+        </ToolbarButton>
+        <ToolbarButton
           onClick={() => editor.chain().focus().setTextAlign("right").run()}
-          className={`p-1.5 rounded hover:bg-gray-100 dark:hover:bg-dark-bg-tertiary ${
-            editor.isActive({ textAlign: "right" }) ? "bg-gray-100 dark:bg-dark-bg-tertiary" : ""
-          }`}
-          title="Align Right"
+          title="Align right"
+          active={editor.isActive({ textAlign: "right" })}
         >
-          <MdFormatAlignRight className="h-5 w-5" />
-        </button>
-        <button
+          <AlignRight className="size-4" aria-hidden />
+        </ToolbarButton>
+        <ToolbarButton
           onClick={() => editor.chain().focus().undo().run()}
-          className={`p-1.5 rounded hover:bg-gray-100 dark:hover:bg-dark-bg-tertiary ${
-            !editor.can().undo() ? "opacity-50 cursor-not-allowed" : ""
-          }`}
           title="Undo"
           disabled={!editor.can().undo()}
         >
-          <MdUndo className="h-5 w-5" />
-        </button>
-        <button
+          <Undo2 className="size-4" aria-hidden />
+        </ToolbarButton>
+        <ToolbarButton
           onClick={() => editor.chain().focus().redo().run()}
-          className={`p-1.5 rounded hover:bg-gray-100 dark:hover:bg-dark-bg-tertiary ${
-            !editor.can().redo() ? "opacity-50 cursor-not-allowed" : ""
-          }`}
           title="Redo"
           disabled={!editor.can().redo()}
         >
-          <MdRedo className="h-5 w-5" />
-        </button>
-        <button
-          onClick={handleAddLink}
-          className={`p-1.5 rounded hover:bg-gray-100 dark:hover:bg-dark-bg-tertiary ${
-            editor.isActive("link") ? "bg-gray-100 dark:bg-dark-bg-tertiary" : ""
-          }`}
-          title="Add Link"
-        >
-          <MdLink className="h-5 w-5" />
-        </button>
+          <Redo2 className="size-4" aria-hidden />
+        </ToolbarButton>
+        <ToolbarButton onClick={handleAddLink} title="Add link" active={editor.isActive("link")}>
+          <Link2 className="size-4" aria-hidden />
+        </ToolbarButton>
       </div>
-      <EditorContent editor={editor} className="prose max-w-none p-4" />
+      <EditorContent editor={editor} className="p-4" />
       <LinkModal
         isOpen={showLinkModal}
         onClose={() => {
