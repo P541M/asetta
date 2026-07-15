@@ -1,5 +1,5 @@
 // components/SemesterTabs.tsx
-import React, { useState, useEffect, useRef } from "react";
+import { useState } from "react";
 import { useRouter } from "next/router";
 import { useAuth } from "../../contexts/AuthContext";
 import { db } from "../../lib/firebase";
@@ -16,16 +16,26 @@ import {
 } from "firebase/firestore";
 import { arrayMove } from "@dnd-kit/sortable";
 import { DragEndEvent } from "@dnd-kit/core";
+import { Check, ChevronsUpDown, GraduationCap, Settings2 } from "lucide-react";
 import { Semester } from "@/types/semester";
 import { SemesterTabsProps } from "@/types/course";
+import { cn } from "@/lib/utils";
 import ConfirmationModal from "../common/ConfirmationModal";
 import { TrashOutlineIcon } from "../ui/icons";
+import { Button } from "../ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "../ui/dropdown-menu";
 import SemesterTabsSkeleton from "./semester-tabs/SemesterTabsSkeleton";
-import AddSemesterInput from "./semester-tabs/AddSemesterInput";
 import ManageSemestersModal from "./semester-tabs/ManageSemestersModal";
 import { useSemesters } from "./semester-tabs/useSemesters";
 
-const SemesterTabs = ({ selectedSemester, onSelect, className = "" }: SemesterTabsProps) => {
+const SemesterTabs = ({ selectedSemester, onSelect }: SemesterTabsProps) => {
   const { user } = useAuth();
   const router = useRouter();
   const [newSemester, setNewSemester] = useState("");
@@ -35,52 +45,9 @@ const SemesterTabs = ({ selectedSemester, onSelect, className = "" }: SemesterTa
     onSelect,
   );
   const [isAdding, setIsAdding] = useState(false);
-  const [showMoreOptions, setShowMoreOptions] = useState(false);
-  const [showAddInput, setShowAddInput] = useState(false);
   const [showManageModal, setShowManageModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [semesterToDelete, setSemesterToDelete] = useState<Semester | null>(null);
-
-  const addInputRef = useRef<HTMLDivElement>(null);
-  const moreOptionsRef = useRef<HTMLDivElement>(null);
-  const manageModalRef = useRef<HTMLDivElement>(null);
-
-  // Close dropdown when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      // Close more options dropdown
-      if (
-        showMoreOptions &&
-        moreOptionsRef.current &&
-        !moreOptionsRef.current.contains(event.target as Node)
-      ) {
-        setShowMoreOptions(false);
-      }
-
-      // Close add input
-      if (
-        showAddInput &&
-        addInputRef.current &&
-        !addInputRef.current.contains(event.target as Node)
-      ) {
-        setShowAddInput(false);
-        setNewSemester("");
-      }
-
-      // Close manage modal when clicking outside
-      if (
-        showManageModal &&
-        manageModalRef.current &&
-        !manageModalRef.current.contains(event.target as Node) &&
-        !document.querySelector(".modal-open") // Don't close if another modal is open
-      ) {
-        setShowManageModal(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [showMoreOptions, showAddInput, showManageModal]);
 
   // Add a new semester to Firestore
   const handleAddSemester = async () => {
@@ -118,7 +85,7 @@ const SemesterTabs = ({ selectedSemester, onSelect, className = "" }: SemesterTa
       // Navigate to the newly created semester's assessments page
       router.push(`/dashboard/${docRef.id}/assessments`);
       setNewSemester("");
-      setShowAddInput(false);
+      setShowManageModal(false);
     } catch (error) {
       console.error("Error adding semester:", error);
       alert("Failed to add semester. Please try again.");
@@ -284,126 +251,62 @@ const SemesterTabs = ({ selectedSemester, onSelect, className = "" }: SemesterTa
   }
 
   return (
-    <div
-      className={`semester-tabs-container mb-6 ${className} ${isDataReady ? "animate-fade-in-up" : "opacity-0"}`}
-    >
-      <div className="flex items-center justify-between px-4 py-2 border-b border-light-border-primary dark:border-dark-border-primary">
-        <div className="flex items-center space-x-2">
-          <h2 className="text-sm font-medium text-light-text-primary dark:text-dark-text-primary">
-            Semesters
-          </h2>
-        </div>
-        <div className="flex items-center space-x-1">
-          {/* Add button */}
-          <button
-            onClick={() => setShowAddInput(true)}
-            className="p-1.5 text-light-text-tertiary dark:text-dark-text-tertiary hover:text-light-button-primary dark:hover:text-dark-button-primary hover:bg-light-hover-primary dark:hover:bg-dark-hover-primary rounded-md transition-colors"
-            title="Add new semester"
+    // The early skeleton return guarantees data is ready here; fade covers the swap
+    <div className="mb-6 motion-safe:animate-fade-in">
+      {/* One switcher instead of pill clutter: current semester + everything else in the menu */}
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button
+            type="button"
+            variant="secondary"
+            className="min-w-44 justify-between md:min-w-56"
+            aria-label="Switch semester"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-4 w-4"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-            >
-              <path
-                fillRule="evenodd"
-                d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
-                clipRule="evenodd"
-              />
-            </svg>
-          </button>
+            <span className="flex min-w-0 items-center gap-2">
+              <GraduationCap className="text-muted-foreground" aria-hidden />
+              <span className="truncate">{selectedSemester || "Select semester"}</span>
+            </span>
+            <ChevronsUpDown className="text-muted-foreground" aria-hidden />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="start" className="min-w-56">
+          {semesters.length > 0 ? (
+            semesters.map((sem) => (
+              <DropdownMenuItem key={sem.id} onSelect={() => handleSemesterSelect(sem.name)}>
+                <Check
+                  className={cn(selectedSemester === sem.name ? "opacity-100" : "opacity-0")}
+                  aria-hidden
+                />
+                <span className="truncate">{sem.name}</span>
+              </DropdownMenuItem>
+            ))
+          ) : (
+            <DropdownMenuLabel>No semesters yet</DropdownMenuLabel>
+          )}
+          <DropdownMenuSeparator />
+          <DropdownMenuItem onSelect={() => setShowManageModal(true)}>
+            <Settings2 aria-hidden />
+            Manage semesters
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
 
-          {/* More options button */}
-          <div className="relative" ref={moreOptionsRef}>
-            <button
-              onClick={() => setShowMoreOptions(!showMoreOptions)}
-              className="p-1.5 text-light-text-tertiary dark:text-dark-text-tertiary hover:text-light-button-primary dark:hover:text-dark-button-primary hover:bg-light-hover-primary dark:hover:bg-dark-hover-primary rounded-md transition-colors"
-              title="More options"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-4 w-4"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-              >
-                <path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z" />
-              </svg>
-            </button>
-
-            {showMoreOptions && (
-              <div className="absolute right-0 top-full mt-1 bg-light-bg-primary dark:bg-dark-bg-secondary border border-light-border-primary dark:border-dark-border-primary rounded-md shadow-md z-20 animate-fade-in-down min-w-max">
-                <button
-                  onClick={() => {
-                    setShowMoreOptions(false);
-                    setShowManageModal(true);
-                  }}
-                  className="w-full px-4 py-2 text-left text-sm text-light-text-primary dark:text-dark-text-primary hover:bg-light-hover-primary dark:hover:bg-dark-hover-primary transition-colors whitespace-nowrap"
-                >
-                  Manage Semesters
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* Semester tabs - horizontally scrollable */}
-      <div className="relative px-4 py-2">
-        <div className="flex items-center space-x-2 overflow-x-auto pb-1 hide-scrollbar">
-          {semesters.map((sem) => (
-            <div key={sem.id} className="shrink-0">
-              <button
-                onClick={() => handleSemesterSelect(sem.name)}
-                className={`px-3 py-1.5 rounded-lg text-sm font-medium whitespace-nowrap transition-all duration-200 ${
-                  selectedSemester === sem.name
-                    ? "bg-light-button-primary/10 text-light-button-primary dark:bg-dark-button-primary/10 dark:text-dark-button-primary"
-                    : "text-light-text-secondary dark:text-dark-text-secondary hover:bg-light-hover-primary dark:hover:bg-dark-hover-primary hover:text-light-text-primary dark:hover:text-dark-text-primary"
-                }`}
-              >
-                {sem.name}
-              </button>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Empty state when no semesters exist */}
-      {semesters.length === 0 && !showAddInput && (
-        <div className="text-center py-3 text-light-text-tertiary dark:text-dark-text-tertiary text-sm">
-          <p>No semesters yet. Click &ldquo;+&rdquo; to add one.</p>
-        </div>
-      )}
-
-      {/* Add semester input */}
-      {showAddInput && (
-        <AddSemesterInput
-          containerRef={addInputRef}
-          value={newSemester}
-          onChange={setNewSemester}
-          onAdd={handleAddSemester}
-          onCancel={() => {
-            setShowAddInput(false);
-            setNewSemester("");
-          }}
-          isAdding={isAdding}
-        />
-      )}
-
-      {/* Manage Semesters Modal */}
+      {/* One surface owns all semester management: add, reorder, rename, delete */}
       {showManageModal && (
         <ManageSemestersModal
-          modalRef={manageModalRef}
           semesters={semesters}
           selectedSemester={selectedSemester}
-          onClose={() => setShowManageModal(false)}
-          onAddFirst={() => {
+          onClose={() => {
             setShowManageModal(false);
-            setShowAddInput(true);
+            setNewSemester("");
           }}
           onDragEnd={handleDragEnd}
           onEdit={handleEditSave}
           onDelete={handleDeleteSemester}
+          addValue={newSemester}
+          onAddValueChange={setNewSemester}
+          onAdd={handleAddSemester}
+          isAdding={isAdding}
         />
       )}
 
@@ -421,16 +324,6 @@ const SemesterTabs = ({ selectedSemester, onSelect, className = "" }: SemesterTa
         variant="danger"
         icon={<TrashOutlineIcon className="h-6 w-6" />}
       />
-
-      <style jsx>{`
-        .hide-scrollbar {
-          -ms-overflow-style: none; /* IE and Edge */
-          scrollbar-width: none; /* Firefox */
-        }
-        .hide-scrollbar::-webkit-scrollbar {
-          display: none; /* Chrome, Safari, Opera */
-        }
-      `}</style>
     </div>
   );
 };

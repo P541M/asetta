@@ -7,7 +7,6 @@ export interface CourseFilteredAssessmentsProps {
 export interface SemesterTabsProps {
   selectedSemester: string;
   onSelect: (semester: string) => void;
-  className?: string;
 }
 
 export interface CourseStats {

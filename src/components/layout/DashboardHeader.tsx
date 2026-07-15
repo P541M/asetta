@@ -1,10 +1,17 @@
-import { useAuth } from "../../contexts/AuthContext";
-import { useState, useRef, useEffect } from "react";
-import UserSettings from "../settings/UserSettings";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/router";
-import Avatar from "../ui/Avatar";
+import { ChevronDown, LogOut, Settings } from "lucide-react";
+import { useAuth } from "../../contexts/AuthContext";
 import { useUserProfile } from "../../hooks/useUserProfile";
-import UserMenuDropdown from "../ui/UserMenuDropdown";
+import Avatar from "../ui/Avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "../ui/dropdown-menu";
 import {
   getPersonalizedGreeting,
   getMillisecondsToNextGreetingUpdate,
@@ -18,12 +25,9 @@ interface DashboardHeaderProps {
 const DashboardHeader = ({ onLogout }: DashboardHeaderProps) => {
   const { user } = useAuth();
   const { profile } = useUserProfile();
-  const [showDropdown, setShowDropdown] = useState(false);
-  const [showSettings, setShowSettings] = useState(false);
   const [greeting, setGreeting] = useState("");
   const [subtitle, setSubtitle] = useState("");
   const [isHeaderReady, setIsHeaderReady] = useState(false);
-  const avatarRef = useRef<HTMLButtonElement>(null);
   const greetingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const router = useRouter();
 
@@ -35,7 +39,7 @@ const DashboardHeader = ({ onLogout }: DashboardHeaderProps) => {
     const updateGreeting = () => {
       setGreeting(getPersonalizedGreeting(user, profile));
       setSubtitle(getRotatingSubtitle());
-      // Small delay to ensure smooth animation
+      // Small delay so the greeting fades in once, not per keystroke of state
       setTimeout(() => setIsHeaderReady(true), 50);
     };
 
@@ -61,117 +65,60 @@ const DashboardHeader = ({ onLogout }: DashboardHeaderProps) => {
     };
   }, [user, profile]);
 
-  // Handle logout with proper dropdown closing
-  const handleLogout = async (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-
-    // Close dropdown before logging out
-    setShowDropdown(false);
-
-    // Small delay to ensure dropdown closes before logout
-    setTimeout(async () => {
-      if (onLogout) {
-        await onLogout();
-      }
-    }, 10);
-  };
-
-  // Toggle dropdown with proper event handling
-  const toggleDropdown = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setShowDropdown(!showDropdown);
-  };
-
-  // Open settings page
-  const openSettings = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setShowDropdown(false);
-    router.push("/settings");
-  };
-
-  // Close settings modal
-  const closeSettings = () => {
-    setShowSettings(false);
-  };
-
   if (!user) return null;
 
   return (
-    <>
-      <div className="bg-light-bg-primary dark:bg-dark-bg-secondary border-b border-light-border-primary dark:border-dark-border-primary">
-        <div className="max-w-7xl mx-auto px-4 md:px-6 py-4">
-          <div className="flex items-center justify-between min-h-16">
-            {/* Left side - Personalized Greeting */}
-            <div
-              className={`flex items-center space-x-3 ${
-                isHeaderReady ? "animate-fade-in-up" : "opacity-0"
-              }`}
+    <header className="bg-background">
+      <div className="mx-auto max-w-7xl px-4 py-5 md:px-6">
+        <div className="flex min-h-16 items-center justify-between gap-4">
+          {/* Personalized greeting */}
+          <div className={isHeaderReady ? "motion-safe:animate-fade-in" : "opacity-0"}>
+            <h1
+              className="text-2xl font-semibold tracking-tight text-foreground md:text-3xl"
+              role="banner"
+              aria-label={`Dashboard greeting: ${greeting}`}
             >
-              {/* Avatar removed for cleaner header layout */}
-              <div className="flex flex-col">
-                <h1
-                  className="text-2xl md:text-3xl font-bold text-light-text-primary dark:text-dark-text-primary transition-all duration-300"
-                  role="banner"
-                  aria-label={`Dashboard greeting: ${greeting}`}
-                >
-                  {greeting}
-                </h1>
-                <p className="text-sm text-light-text-tertiary dark:text-dark-text-tertiary">
-                  {subtitle}
-                </p>
-              </div>
-            </div>
-
-            {/* Right side - User Settings Menu */}
-            <div className={`relative ${isHeaderReady ? "animate-fade-in-up" : "opacity-0"}`}>
-              <button
-                ref={avatarRef}
-                onClick={toggleDropdown}
-                className="flex items-center space-x-2 text-light-text-secondary dark:text-dark-text-secondary hover:text-light-button-primary dark:hover:text-dark-button-primary transition-colors duration-200 focus:outline-hidden bg-light-bg-secondary dark:bg-dark-bg-tertiary rounded-lg shadow-sm border border-light-border-primary dark:border-dark-border-primary px-3 py-2 focus:ring-2 focus:ring-light-focus-ring dark:focus:ring-dark-focus-ring focus:ring-opacity-50"
-                aria-label="User menu"
-                aria-expanded={showDropdown}
-                aria-haspopup="true"
-              >
-                <Avatar size="sm" iconId={profile?.avatarIconId} />
-                <span className="hidden md:block truncate max-w-[150px] text-light-text-primary dark:text-dark-text-primary font-medium">
-                  {user?.displayName || user?.email}
-                </span>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className={`h-4 w-4 transition-transform duration-200 ${
-                    showDropdown ? "rotate-180" : ""
-                  }`}
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                  aria-hidden="true"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-              </button>
-
-              <UserMenuDropdown
-                isOpen={showDropdown}
-                onClose={() => setShowDropdown(false)}
-                userEmail={user?.email || ""}
-                onSettingsClick={openSettings}
-                onLogoutClick={handleLogout}
-                avatarRef={avatarRef}
-              />
-            </div>
+              {greeting}
+            </h1>
+            <p className="mt-0.5 text-sm text-muted-foreground">{subtitle}</p>
           </div>
+
+          {/* User menu */}
+          <DropdownMenu>
+            <DropdownMenuTrigger
+              className="flex items-center gap-2 rounded-lg px-2.5 py-2 text-sm font-medium text-foreground outline-hidden transition-colors hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring data-[state=open]:bg-accent"
+              aria-label="User menu"
+            >
+              <Avatar size="sm" iconId={profile?.avatarIconId} />
+              <span className="hidden max-w-37.5 truncate md:block">
+                {user?.displayName || user?.email}
+              </span>
+              <ChevronDown
+                className="size-4 text-muted-foreground transition-transform duration-200 [[data-state=open]>&]:rotate-180"
+                aria-hidden
+              />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuLabel>
+                Signed in as
+                <span className="mt-0.5 block truncate text-sm font-medium text-foreground">
+                  {user?.email}
+                </span>
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onSelect={() => router.push("/settings")}>
+                <Settings aria-hidden />
+                Settings
+              </DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => onLogout?.()}>
+                <LogOut aria-hidden />
+                Logout
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
-
-      {/* Settings Modal */}
-      {showSettings && <UserSettings isOpen={showSettings} onClose={closeSettings} />}
-    </>
+    </header>
   );
 };
 

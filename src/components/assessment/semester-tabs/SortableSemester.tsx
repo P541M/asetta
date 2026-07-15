@@ -1,20 +1,11 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { Check, GripVertical, Pencil, Trash2, X } from "lucide-react";
 import { Semester } from "@/types/semester";
-import { CheckSolidIcon, CloseSolidIcon, EditIcon, TrashIcon } from "../../ui/icons";
-
-const DragHandle = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    className="h-4 w-4 text-light-text-tertiary dark:text-dark-text-tertiary cursor-move"
-    fill="none"
-    viewBox="0 0 24 24"
-    stroke="currentColor"
-  >
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 9h8M8 15h8" />
-  </svg>
-);
+import { cn } from "@/lib/utils";
+import { Input } from "../../ui/input";
+import { Button } from "../../ui/button";
 
 interface SortableSemesterProps {
   semester: Semester;
@@ -39,12 +30,6 @@ function SortableSemester({ semester, isSelected, onEdit, onDelete }: SortableSe
     }
   }, [isEditing]);
 
-  const handleEditStart = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setIsEditing(true);
-    setEditValue(semester.name);
-  };
-
   const handleEditSave = async () => {
     if (editValue.trim() !== "") {
       await onEdit(semester.id, editValue.trim());
@@ -52,13 +37,7 @@ function SortableSemester({ semester, isSelected, onEdit, onDelete }: SortableSe
     }
   };
 
-  const handleEditSaveWithEvent = (e: React.MouseEvent | React.KeyboardEvent) => {
-    e.stopPropagation();
-    handleEditSave();
-  };
-
-  const handleEditCancel = (e: React.MouseEvent) => {
-    e.stopPropagation();
+  const handleEditCancel = () => {
     setIsEditing(false);
     setEditValue(semester.name);
   };
@@ -68,7 +47,7 @@ function SortableSemester({ semester, isSelected, onEdit, onDelete }: SortableSe
     if (e.key === "Enter") {
       handleEditSave();
     } else if (e.key === "Escape") {
-      handleEditCancel(e as unknown as React.MouseEvent);
+      handleEditCancel();
     }
   };
 
@@ -81,73 +60,89 @@ function SortableSemester({ semester, isSelected, onEdit, onDelete }: SortableSe
     <div
       ref={setNodeRef}
       style={style}
-      className={`py-2 px-4 hover:bg-light-hover-primary dark:hover:bg-dark-hover-primary flex items-center justify-between ${
-        isDragging ? "bg-light-hover-primary dark:bg-dark-hover-primary shadow-lg rounded-lg" : ""
-      }`}
+      className={cn(
+        "flex items-center justify-between gap-2 rounded-lg px-2 py-2 transition-colors hover:bg-accent",
+        isDragging && "bg-accent shadow-lg",
+      )}
     >
-      <div className="flex items-center space-x-3 grow">
-        <div {...attributes} {...listeners}>
-          <DragHandle />
-        </div>
+      <div className="flex min-w-0 flex-1 items-center gap-2">
+        <button
+          type="button"
+          className="cursor-move rounded-sm text-muted-foreground outline-hidden focus-visible:ring-2 focus-visible:ring-ring"
+          aria-label={`Reorder ${semester.name}`}
+          {...attributes}
+          {...listeners}
+        >
+          <GripVertical className="size-4" aria-hidden />
+        </button>
         {isEditing ? (
-          <div className="flex items-center grow">
-            <input
+          <div className="flex min-w-0 flex-1 items-center gap-1">
+            <Input
               ref={editInputRef}
               type="text"
               value={editValue}
               onChange={(e) => setEditValue(e.target.value)}
               onKeyDown={handleKeyDown}
-              className="input text-sm py-1 px-2 grow min-w-0"
               onClick={(e) => e.stopPropagation()}
+              className="h-8 min-w-0 flex-1 bg-card px-2 text-sm"
             />
-            <div className="flex items-center px-1">
-              <button
-                onClick={handleEditSaveWithEvent}
-                className="p-1.5 text-light-button-primary dark:text-dark-button-primary hover:text-light-button-primary-hover dark:hover:text-dark-button-primary-hover hover:bg-light-button-primary/10 dark:hover:bg-dark-button-primary/10 rounded-md transition-colors"
-                title="Save"
-              >
-                <CheckSolidIcon className="h-4 w-4" />
-              </button>
-              <button
-                onClick={handleEditCancel}
-                className="p-1.5 text-light-text-tertiary dark:text-dark-text-tertiary hover:text-light-text-secondary dark:hover:text-dark-text-secondary hover:bg-light-hover-primary dark:hover:bg-dark-hover-primary rounded-md transition-colors ml-1"
-                title="Cancel"
-              >
-                <CloseSolidIcon className="h-4 w-4" />
-              </button>
-            </div>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              className="size-8 text-primary"
+              onClick={handleEditSave}
+              aria-label="Save name"
+            >
+              <Check aria-hidden />
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              className="size-8 text-muted-foreground"
+              onClick={handleEditCancel}
+              aria-label="Cancel rename"
+            >
+              <X aria-hidden />
+            </Button>
           </div>
         ) : (
           <>
-            <span
-              className={`font-medium ${
-                isSelected
-                  ? "text-light-button-primary dark:text-dark-button-primary"
-                  : "dark:text-dark-text-primary"
-              }`}
-            >
-              {semester.name}
-            </span>
-            {isSelected && <span className="badge-primary">Current</span>}
+            <span className="truncate text-sm font-medium text-foreground">{semester.name}</span>
+            {isSelected && (
+              <span className="shrink-0 rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
+                Current
+              </span>
+            )}
           </>
         )}
       </div>
       {!isEditing && (
-        <div className="flex items-center space-x-2">
-          <button
-            onClick={handleEditStart}
-            className="text-light-text-tertiary dark:text-dark-text-tertiary hover:text-light-button-primary dark:hover:text-dark-button-primary p-1.5 rounded-md hover:bg-light-hover-primary dark:hover:bg-dark-hover-primary transition-colors"
-            title="Edit"
+        <div className="flex shrink-0 items-center">
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            className="size-8 text-muted-foreground hover:text-foreground"
+            onClick={() => {
+              setIsEditing(true);
+              setEditValue(semester.name);
+            }}
+            aria-label={`Rename ${semester.name}`}
           >
-            <EditIcon className="h-4 w-4" />
-          </button>
-          <button
+            <Pencil aria-hidden />
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            className="size-8 text-muted-foreground hover:text-destructive"
             onClick={() => onDelete(semester.id)}
-            className="text-light-text-tertiary dark:text-dark-text-tertiary hover:text-light-error-text dark:hover:text-dark-error-text p-1.5 rounded-md hover:bg-light-hover-primary dark:hover:bg-dark-hover-primary transition-colors"
-            title="Delete"
+            aria-label={`Delete ${semester.name}`}
           >
-            <TrashIcon className="h-4 w-4" />
-          </button>
+            <Trash2 aria-hidden />
+          </Button>
         </div>
       )}
     </div>

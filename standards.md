@@ -130,13 +130,13 @@ Defined in `globals.css` (`:root` = light, `.dark` = dark) and mapped to utiliti
 
 | Token | Light | Dark | Notes |
 | --- | --- | --- | --- |
-| `--background` | `#FAFAFA` | `#151515` | page background (soft dark, not near-black) |
+| `--background` | `#FAFAFA` | `#141414` | page background (soft dark, not near-black) |
 | `--foreground` | `#1A1A1A` | `#F5F5F4` | primary text |
 | `--card` / `--popover` | `#FFFFFF` | `#1E1E1E` | elevated surfaces |
-| `--muted` / `--secondary` | `#F0EFED` | `#1E1E1E` | tonal bands, tonal buttons |
-| `--accent` | `#E9E7E4` | `#282828` | hover tone (one step deeper/lighter) |
-| `--input` | `#F0EFED` | `#1E1E1E` | **input resting fill** (inputs are borderless) |
-| `--muted-foreground` | `#6B6B6B` | `#A3A3A3` | secondary text |
+| `--muted` / `--secondary` | `#F0EFED` | `#292929` | tonal fills (sit ON page or card — must contrast with both) |
+| `--accent` | `#E9E7E4` | `#333333` | hover tone (one step deeper/lighter) |
+| `--input` | `#F0EFED` | `#292929` | **input resting fill** (inputs are borderless) |
+| `--muted-foreground` | `#6B6B6B` | `#A6A6A6` | secondary text |
 | `--primary` | `#D97706` | `#F59E0B` | Asetta amber |
 | `--primary-hover` | `#B45309` | `#D97706` | primary button hover (darkens) |
 | `--primary-foreground` | `#FFFFFF` | `#1A1A1A` | text on primary |
@@ -145,10 +145,12 @@ Defined in `globals.css` (`:root` = light, `.dark` = dark) and mapped to utiliti
 | `--border` | `#E5E5E5` | `#2E2E2E` | structural rules only (no decorative borders) |
 | `--ring` | `#D97706` | `#F59E0B` | focus rings |
 
-**Dark-mode cohesion rule**: adjacent surfaces sit one gentle step apart on the ramp
-(`#151515` page → `#1E1E1E` band/surface → `#282828` hover). Never place a near-black next to a
-mid-grey; if two surfaces look like different apps side by side, the ramp is wrong. (Legacy
-sections still use the old `#0A0A0A` body until they migrate — expected during the transition.)
+**Dark-mode elevation ramp**: four distinct steps — `#141414` page → `#1E1E1E` surface →
+`#292929` fill → `#333333` hover. Soft (no near-black against mid-grey) but every adjacent pair
+must remain visibly distinct: a fill must read against both the page AND a card (2026-07-14
+lesson: the tab pill and its track were both `#1E1E1E` — invisible selection). Interactive
+selection states prefer the amber tint (`bg-primary/10 text-primary`) over surface swaps, which
+stays visible in both themes by construction.
 
 **Radius ladder** (no `--radius` indirection — we use the platform's existing scale):
 `rounded-lg` (0.5rem) for controls (buttons, inputs), `rounded-xl` (1rem) for cards/tiles,
@@ -215,10 +217,42 @@ tracking-tight` in **sentence case** ("Welcome back", not "Welcome Back").
 
 | Section | Status |
 | --- | --- |
-| Theme engine (next-themes) + tokens + primitives (`button`, `input`, `label`, `card`, `alert`) | ✅ migrated 2026-07-14 |
+| Theme engine (next-themes) + tokens + primitives (`button`, `input`, `label`, `card`, `alert`, `dropdown-menu`, `password-input`) | ✅ migrated 2026-07-14 |
 | Auth flow (login/register/reset) | ✅ migrated 2026-07-14 |
+| Dashboard shell (header, user menu, tabs, semester bar, stats, page frame, body base styles) | ✅ migrated 2026-07-14 — semester manage/delete modals excluded, queued with the modals pass |
 | Onboarding | legacy |
-| Dashboard shell (header, tabs, semester bar) | legacy |
 | Assessments table | legacy |
-| Grades / Calendar / Add | legacy |
+| Grades / Calendar / Add (+ all `.modal-*` overlays) | legacy |
 | Settings | legacy (toggle already rewired to next-themes) |
+
+**Placement rule for the theme toggle** (founder decision, 2026-07-14): visible on auth pages
+only; inside the app it lives ONLY in Settings — not in the header or user menu. Theme is a
+set-and-forget preference, not a daily control.
+
+**Selector pattern** (founder decision, 2026-07-14): context switchers (semester, and future
+course/term pickers) are a single dropdown control — current value + check-marked options +
+related actions (add/manage) in one menu. No pill rows with satellite icon buttons.
+
+### Overlays (the modal recipe)
+
+- Panel: `fixed inset-0 z-150 bg-black/60` backdrop (click closes; panel stops propagation),
+  `max-w-sm rounded-2xl bg-card shadow-lg`; header row = title + ghost X;
+  `role="dialog" aria-modal`. **No entrance animation** — overlays appear instantly (pop/scale
+  effects read as tacky; founder decision 2026-07-14).
+- **One surface owns one concept, one entry point opens it.** Creation and management of the
+  same object live in the SAME overlay (the Semesters modal has the add input at top — never a
+  separate floating input), and exactly ONE control leads there (a single "Manage semesters"
+  item — never two menu entries opening the same surface). Auto-focus the create input only when
+  the list is empty.
+- Lists inside overlays sit on a `bg-secondary/50 rounded-xl` tonal container, rows
+  `hover:bg-accent` with ghost icon actions (pencil/trash), "Current"/status chips as
+  `bg-primary/10 text-primary` pills.
+- Legacy `.modal-*` overlays (ConfirmationModal, notes modal, extraction modals) are queued for
+  this exact treatment.
+
+### Handoff notes for new sessions
+
+This file + `CLAUDE.md` (which mandates reading it) are the complete context for continuing the
+UI migration — prior chat history is NOT required. Current state lives in the migration table
+below; work section by section, one approval per section, founder pushes to GitHub (never the
+agent). The verification loop (Part 1) runs after every task. Next up: **assessments table**.

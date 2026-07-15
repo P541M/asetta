@@ -56,12 +56,7 @@ const Dashboard = () => {
   }, [user, loading, onboardingStatus, onboardingLoading, router, redirecting]);
 
   if (loading || onboardingLoading) {
-    return (
-      <LoadingScreen
-        backgroundClassName="bg-gray-50 dark:bg-dark-bg-primary"
-        textClassName="text-gray-600 dark:text-dark-text-secondary"
-      />
-    );
+    return <LoadingScreen />;
   }
 
   return null;

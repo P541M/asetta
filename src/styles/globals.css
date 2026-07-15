@@ -33,9 +33,10 @@
 }
 
 .dark {
-  /* Soft dark ramp: adjacent surfaces sit one gentle step apart (no harsh
-     near-black against grey). Legacy pages keep the old #0a0a0a until migrated. */
-  --background: #151515;
+  /* Dark elevation ramp — four distinct steps so adjacent surfaces stay soft
+     but never blend together (page -> surface -> fill -> hover):
+     #141414 -> #1e1e1e -> #292929 -> #333333 */
+  --background: #141414;
   --foreground: #f5f5f4;
   --card: #1e1e1e;
   --card-foreground: #f5f5f4;
@@ -44,17 +45,17 @@
   --primary: #f59e0b;
   --primary-hover: #d97706;
   --primary-foreground: #1a1a1a;
-  --secondary: #1e1e1e;
+  --secondary: #292929;
   --secondary-foreground: #f5f5f4;
-  --muted: #1e1e1e;
-  --muted-foreground: #a3a3a3;
-  --accent: #282828;
+  --muted: #292929;
+  --muted-foreground: #a6a6a6;
+  --accent: #333333;
   --accent-foreground: #f5f5f4;
   --destructive: #ef4444;
   --destructive-foreground: #f5f5f4;
   --success: #10b981;
-  --border: #2e2e2e;
-  --input: #1e1e1e;
+  --border: #333333;
+  --input: #292929;
   --ring: #f59e0b;
 }
 
@@ -365,59 +366,6 @@
   @apply bg-light-error-bg text-light-error-text badge dark:bg-dark-error-bg dark:text-dark-error-text;
 }
 
-@utility navbar {
-  /* Layout Components */
-  @apply bg-light-bg-primary/95 border-b border-light-border-primary py-4 sticky top-0 z-10 backdrop-blur-md dark:bg-dark-bg-secondary/95 dark:border-dark-border-primary;
-}
-
-@utility logo {
-  @apply text-light-button-primary font-bold text-xl dark:text-dark-button-primary;
-  font-family: "Manrope", sans-serif;
-  letter-spacing: 0.025em;
-}
-
-@utility tab {
-  /* Tab Components */
-  @apply relative px-6 py-4 font-medium text-sm text-light-text-secondary dark:text-dark-text-secondary transition-all duration-200 hover:text-light-text-primary dark:hover:text-dark-text-primary;
-
-  &.active {
-    @apply text-light-button-primary dark:text-dark-button-primary;
-  }
-
-  &.active::after {
-    @apply absolute bottom-0 left-0 right-0 h-0.5 bg-light-button-primary dark:bg-dark-button-primary;
-    content: "";
-  }
-}
-
-@utility active {
-  &.tab {
-    @apply text-light-button-primary dark:text-dark-button-primary;
-  }
-
-  &.tab::after {
-    @apply absolute bottom-0 left-0 right-0 h-0.5 bg-light-button-primary dark:bg-dark-button-primary;
-    content: "";
-  }
-}
-
-@utility stats-bar {
-  /* Stats Components */
-  @apply grid grid-cols-2 sm:grid-cols-3 md:grid-cols-2 lg:grid-cols-6 gap-3 md:gap-4 mb-8;
-}
-
-@utility stat-card {
-  @apply bg-light-bg-primary rounded-xl p-3 sm:p-4 md:p-5 border border-light-border-primary cursor-default dark:bg-dark-bg-secondary dark:border-dark-border-primary;
-}
-
-@utility stat-label {
-  @apply text-xs sm:text-sm font-medium text-light-text-tertiary dark:text-dark-text-tertiary mb-1 sm:mb-2;
-}
-
-@utility stat-value {
-  @apply text-lg sm:text-xl md:text-2xl font-bold text-light-text-primary dark:text-dark-text-primary;
-}
-
 @utility pt-safe {
   padding-top: max(1rem, env(safe-area-inset-top));
 }
@@ -477,7 +425,7 @@
     touch-action: manipulation;
   }
   body {
-    @apply bg-light-bg-secondary text-light-text-primary dark:bg-dark-bg-primary dark:text-dark-text-primary;
+    @apply bg-background text-foreground;
     font-family: "Manrope", sans-serif;
     line-height: 1.6;
   }
@@ -495,27 +443,27 @@
     font-size: 16px;
   }
   h1 {
-    @apply text-3xl font-semibold text-light-text-primary dark:text-dark-text-primary leading-tight;
+    @apply text-3xl font-semibold text-foreground leading-tight;
     font-family: "Manrope", sans-serif;
   }
   h2 {
-    @apply text-2xl font-semibold text-light-text-primary dark:text-dark-text-primary leading-tight;
+    @apply text-2xl font-semibold text-foreground leading-tight;
     font-family: "Manrope", sans-serif;
   }
   h3 {
-    @apply text-xl font-medium text-light-text-primary dark:text-dark-text-primary leading-tight;
+    @apply text-xl font-medium text-foreground leading-tight;
     font-family: "Manrope", sans-serif;
   }
   h4 {
-    @apply text-lg font-medium text-light-text-primary dark:text-dark-text-primary leading-tight;
+    @apply text-lg font-medium text-foreground leading-tight;
     font-family: "Manrope", sans-serif;
   }
   h5 {
-    @apply text-base font-medium text-light-text-primary dark:text-dark-text-primary leading-tight;
+    @apply text-base font-medium text-foreground leading-tight;
     font-family: "Manrope", sans-serif;
   }
   h6 {
-    @apply text-sm font-medium text-light-text-primary dark:text-dark-text-primary leading-tight;
+    @apply text-sm font-medium text-foreground leading-tight;
     font-family: "Manrope", sans-serif;
   }
 }

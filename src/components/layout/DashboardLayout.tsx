@@ -68,8 +68,17 @@ const DashboardLayout = ({
     return <LoadingScreen />;
   }
 
+  const statCards = [
+    { label: "Total Assessments", value: stats.total },
+    { label: "Completion Rate", value: `${stats.completionRate}%` },
+    { label: "Upcoming", value: stats.upcomingDeadlines },
+    { label: "Submitted", value: stats.submitted },
+    { label: "In Progress", value: stats.inProgress },
+    { label: "Not Started", value: stats.notStarted },
+  ];
+
   return (
-    <div className="min-h-safe-screen bg-light-bg-secondary dark:bg-dark-bg-primary transition-theme">
+    <div className="min-h-safe-screen bg-background">
       <Head>
         <title>{title}</title>
         <meta name="description" content={description} />
@@ -77,50 +86,30 @@ const DashboardLayout = ({
       <DashboardHeader onLogout={handleLogout} />
       <div className="p-4 md:p-6 pl-safe pr-safe pt-safe pb-safe">
         <div className="max-w-7xl mx-auto">
-          <SemesterTabs
-            selectedSemester={selectedSemester}
-            onSelect={setSelectedSemester}
-            className="bg-light-bg-primary dark:bg-dark-bg-secondary rounded-xl border border-light-border-primary dark:border-dark-border-primary"
-          />
+          <SemesterTabs selectedSemester={selectedSemester} onSelect={setSelectedSemester} />
 
           {showStatsBar && (
-            <div className="stats-bar mt-6">
-              <div className="stat-card">
-                <p className="stat-label">Total Assessments</p>
-                <h3 className="stat-value">{stats.total}</h3>
-              </div>
-              <div className="stat-card">
-                <p className="stat-label">Completion Rate</p>
-                <h3 className="stat-value">{stats.completionRate}%</h3>
-              </div>
-              <div className="stat-card">
-                <p className="stat-label">Upcoming</p>
-                <h3 className="stat-value">{stats.upcomingDeadlines}</h3>
-              </div>
-              <div className="stat-card">
-                <p className="stat-label">Submitted</p>
-                <h3 className="stat-value">{stats.submitted}</h3>
-              </div>
-              <div className="stat-card">
-                <p className="stat-label">In Progress</p>
-                <h3 className="stat-value">{stats.inProgress}</h3>
-              </div>
-              <div className="stat-card">
-                <p className="stat-label">Not Started</p>
-                <h3 className="stat-value">{stats.notStarted}</h3>
-              </div>
+            <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 md:gap-4 lg:grid-cols-6">
+              {statCards.map(({ label, value }) => (
+                <div key={label} className="rounded-xl bg-card p-4 shadow-soft md:p-5">
+                  <p className="text-xs font-medium text-muted-foreground sm:text-sm">{label}</p>
+                  <p className="mt-1 text-lg font-semibold text-foreground sm:text-xl md:text-2xl">
+                    {value}
+                  </p>
+                </div>
+              ))}
             </div>
           )}
 
           {/* Navigation Tabs */}
-          <div className="mt-8">
+          <div className="mt-6">
             <TabNavigationBar />
 
             {/* Tab Content Area */}
             <div className="mt-6">
               <div
-                className={`bg-light-bg-primary dark:bg-dark-bg-secondary rounded-xl border border-light-border-primary dark:border-dark-border-primary ${
-                  isDataReady ? "animate-fade-in-up" : "opacity-0"
+                className={`rounded-xl bg-card shadow-soft ${
+                  isDataReady ? "motion-safe:animate-fade-in" : "opacity-0"
                 }`}
               >
                 {children({
