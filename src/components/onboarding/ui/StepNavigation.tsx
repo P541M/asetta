@@ -1,4 +1,6 @@
+import { ArrowLeft, ArrowRight, Loader2 } from "lucide-react";
 import { useOnboarding } from "../../../contexts/OnboardingContext";
+import { Button } from "../../ui/button";
 
 interface StepNavigationProps {
   canGoNext?: boolean;
@@ -52,67 +54,47 @@ export function StepNavigation({
   };
 
   return (
-    <div className="flex items-center justify-between pt-6 mt-8 border-t border-light-border-primary dark:border-dark-border-primary">
-      {/* Back Button */}
+    <div className="mt-8 flex items-center justify-between border-t border-border pt-6">
+      {/* Back button */}
       <div>
         {state.currentStep > 1 && canGoBack && (
-          <button
-            onClick={handleBack}
-            disabled={isLoading}
-            className="btn-secondary flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M15 19l-7-7 7-7"
-              />
-            </svg>
-            <span>{backLabel}</span>
-          </button>
+          <Button type="button" variant="secondary" onClick={handleBack} disabled={isLoading}>
+            <ArrowLeft aria-hidden />
+            {backLabel}
+          </Button>
         )}
       </div>
 
-      {/* Skip Button (centered) */}
+      {/* Skip button (centered) */}
       <div>
         {showSkip && (
-          <button
+          <Button
+            type="button"
+            variant="ghost"
             onClick={handleSkip}
             disabled={isLoading}
-            className="text-light-text-tertiary dark:text-dark-text-tertiary hover:text-light-text-secondary dark:hover:text-dark-text-secondary text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed px-4 py-3 sm:px-2 sm:py-1 min-h-[44px] sm:min-h-auto rounded-md"
+            className="text-muted-foreground"
           >
             {skipLabel}
-          </button>
+          </Button>
         )}
       </div>
 
-      {/* Next Button */}
+      {/* Next button */}
       <div>
-        <button
-          onClick={handleNext}
-          disabled={!canGoNext || isLoading}
-          className="btn-primary flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
+        <Button type="button" onClick={handleNext} disabled={!canGoNext || isLoading}>
           {isLoading ? (
             <>
-              <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
-              <span>Processing...</span>
+              <Loader2 className="motion-safe:animate-spin" aria-hidden />
+              Processing...
             </>
           ) : (
             <>
-              <span>{nextLabel}</span>
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 5l7 7-7 7"
-                />
-              </svg>
+              {nextLabel}
+              <ArrowRight aria-hidden />
             </>
           )}
-        </button>
+        </Button>
       </div>
     </div>
   );

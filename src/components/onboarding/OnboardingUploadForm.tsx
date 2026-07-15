@@ -1,6 +1,18 @@
 import React, { useState, useRef, useCallback } from "react";
+import {
+  CircleAlert,
+  CircleCheck,
+  CircleX,
+  CloudUpload,
+  FileText,
+  Loader2,
+  Sparkles,
+} from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
 import { FileProgress, UploadStatus, ExtractionResult } from "../../types/upload";
+import { cn } from "@/lib/utils";
+import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
+import { Button } from "../ui/button";
 import ApiLimitReachedModal from "../modals/ApiLimitReachedModal";
 import CopyrightAgreement from "../forms/CopyrightAgreement";
 import { postUploadForm } from "../../lib/uploadClient";
@@ -178,36 +190,33 @@ export function OnboardingUploadForm({
     setShowApiLimitModal(false);
   };
 
+  const isBusy = uploadStatus === "uploading" || uploadStatus === "processing";
+
   return (
     <div className="w-full">
-      {/* Guidance Section */}
+      {/* Guidance section */}
       {showGuidance && uploadStatus === "idle" && (
-        <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
-          <h4 className="font-medium text-blue-900 dark:text-blue-300 mb-2 text-sm">
-            What types of files work best?
-          </h4>
-          <ul className="text-xs text-blue-800 dark:text-blue-400 space-y-1">
-            <li>• Course syllabi with assignment schedules</li>
-            <li>• Course outlines with assessment information</li>
-            <li>• Assignment calendars or timetables</li>
-            <li>• Any document containing due dates and weights</li>
-          </ul>
-        </div>
+        <Alert className="mb-6">
+          <Sparkles aria-hidden />
+          <AlertTitle>What types of files work best?</AlertTitle>
+          <AlertDescription>
+            <ul className="mt-1 space-y-1 text-xs">
+              <li>• Course syllabi with assignment schedules</li>
+              <li>• Course outlines with assessment information</li>
+              <li>• Assignment calendars or timetables</li>
+              <li>• Any document containing due dates and weights</li>
+            </ul>
+          </AlertDescription>
+        </Alert>
       )}
 
-      {/* Upload Area */}
+      {/* Upload area */}
       <div
-        className={`relative border-2 border-dashed rounded-xl p-8 text-center transition-all duration-200 ${
-          isDragOver
-            ? "border-light-button-primary dark:border-dark-button-primary bg-light-button-primary/5 dark:bg-dark-button-primary/5"
-            : uploadStatus === "success"
-              ? "border-green-300 dark:border-green-700 bg-green-50 dark:bg-green-900/20"
-              : uploadStatus === "error"
-                ? "border-red-300 dark:border-red-700 bg-red-50 dark:bg-red-900/20"
-                : files.length > 0
-                  ? "border-light-button-primary dark:border-dark-button-primary bg-light-button-primary/5 dark:bg-dark-button-primary/5"
-                  : "border-light-border-secondary dark:border-dark-border-secondary hover:border-light-button-primary dark:hover:border-dark-button-primary hover:bg-light-button-primary/5 dark:hover:bg-dark-button-primary/5"
-        }`}
+        className={cn(
+          "relative rounded-xl border-2 border-dashed p-8 text-center transition-colors",
+          isDragOver ? "border-primary bg-primary/5" : "border-border bg-secondary/30",
+          isBusy ? "cursor-not-allowed opacity-75" : "cursor-pointer",
+        )}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
@@ -218,111 +227,63 @@ export function OnboardingUploadForm({
           multiple
           accept=".pdf,.doc,.docx"
           onChange={(e) => handleFileSelect(e.target.files)}
-          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-          disabled={uploadStatus === "uploading" || uploadStatus === "processing"}
+          aria-label="Upload course files"
+          className="absolute inset-0 h-full w-full cursor-pointer opacity-0 disabled:cursor-not-allowed"
+          disabled={isBusy}
         />
 
         {files.length === 0 ? (
           <div>
-            <div className="w-12 h-12 bg-light-button-primary/10 dark:bg-dark-button-primary/10 rounded-lg flex items-center justify-center mx-auto mb-4">
-              <svg
-                className="w-6 h-6 text-light-button-primary dark:text-dark-button-primary"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
-                />
-              </svg>
+            <div
+              className={cn(
+                "mx-auto mb-4 flex size-12 items-center justify-center rounded-full transition-colors",
+                isDragOver ? "bg-primary/10" : "bg-secondary",
+              )}
+            >
+              <CloudUpload
+                className={cn(
+                  "size-6 transition-colors",
+                  isDragOver ? "text-primary" : "text-muted-foreground",
+                )}
+                aria-hidden
+              />
             </div>
-            <p className="text-light-text-primary dark:text-dark-text-primary font-medium mb-2">
-              Drop your course files here
-            </p>
-            <p className="text-sm text-light-text-secondary dark:text-dark-text-secondary mb-4">
-              or click to browse your computer
-            </p>
-            <p className="text-xs text-light-text-tertiary dark:text-dark-text-tertiary">
+            <p className="text-base font-semibold text-foreground">Drop your course files here</p>
+            <p className="mt-1 text-sm text-muted-foreground">or click to browse your computer</p>
+            <p className="mt-3 text-xs font-medium text-muted-foreground">
               Supports PDF, DOC, and DOCX files up to 10MB each
             </p>
           </div>
         ) : (
           <div>
-            <h4 className="font-medium text-light-text-primary dark:text-dark-text-primary mb-3">
-              Selected Files ({files.length})
+            <h4 className="mb-3 text-base font-semibold text-foreground">
+              Selected files ({files.length})
             </h4>
-            <div className="space-y-2 mb-4">
+            <div className="space-y-2">
               {files.map((file, index) => (
                 <div
                   key={index}
-                  className="flex items-center justify-between bg-light-bg-secondary dark:bg-dark-bg-secondary rounded-lg p-3"
+                  className="flex items-center justify-between gap-3 rounded-xl bg-secondary/50 p-3"
                 >
-                  <div className="flex items-center space-x-3">
-                    <svg
-                      className="w-5 h-5 text-light-text-tertiary dark:text-dark-text-tertiary"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                      />
-                    </svg>
-                    <div>
-                      <p className="text-sm font-medium text-light-text-primary dark:text-dark-text-primary">
-                        {file.name}
-                      </p>
-                      <p className="text-xs text-light-text-tertiary dark:text-dark-text-tertiary">
+                  <div className="flex min-w-0 items-center gap-3">
+                    <FileText className="size-5 shrink-0 text-muted-foreground" aria-hidden />
+                    <div className="min-w-0 text-left">
+                      <p className="truncate text-sm font-medium text-foreground">{file.name}</p>
+                      <p className="text-xs font-medium text-muted-foreground">
                         {(file.size / 1024 / 1024).toFixed(2)} MB
                       </p>
                     </div>
                   </div>
-                  <div className="flex items-center space-x-2">
+                  <div className="shrink-0">
                     {file.status === "uploading" || file.status === "processing" ? (
-                      <div className="flex items-center space-x-2">
-                        <div className="w-4 h-4 border-2 border-light-button-primary border-t-transparent rounded-full animate-spin"></div>
-                        <span className="text-xs text-light-text-secondary dark:text-dark-text-secondary">
-                          {file.progress}%
-                        </span>
-                      </div>
+                      <span className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
+                        <Loader2 className="size-4 motion-safe:animate-spin" aria-hidden />
+                        {file.progress}%
+                      </span>
                     ) : file.status === "success" ? (
-                      <div className="w-5 h-5 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center">
-                        <svg
-                          className="w-3 h-3 text-green-600 dark:text-green-400"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M5 13l4 4L19 7"
-                          />
-                        </svg>
-                      </div>
+                      <CircleCheck className="size-5 text-success" aria-hidden />
                     ) : file.status === "error" ? (
-                      <div className="w-5 h-5 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center">
-                        <svg
-                          className="w-3 h-3 text-red-600 dark:text-red-400"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M6 18L18 6M6 6l12 12"
-                          />
-                        </svg>
-                      </div>
+                      <CircleX className="size-5 text-destructive" aria-hidden />
                     ) : null}
                   </div>
                 </div>
@@ -332,7 +293,7 @@ export function OnboardingUploadForm({
         )}
       </div>
 
-      {/* Copyright Agreement */}
+      {/* Copyright agreement */}
       {files.length > 0 && uploadStatus === "idle" && (
         <CopyrightAgreement
           id="copyright-agreement"
@@ -342,64 +303,70 @@ export function OnboardingUploadForm({
         />
       )}
 
-      {/* Upload Controls */}
+      {/* Upload controls */}
       {files.length > 0 && uploadStatus === "idle" && (
-        <div className="flex items-center justify-between mt-4">
-          <button
+        <div className="mt-4 flex items-center justify-between gap-3">
+          <Button
+            type="button"
+            variant="ghost"
             onClick={resetUpload}
-            className="text-light-text-tertiary dark:text-dark-text-tertiary hover:text-light-text-secondary dark:hover:text-dark-text-secondary text-sm transition-colors"
+            className="text-muted-foreground"
           >
             Clear files
-          </button>
-          <button
-            onClick={handleUpload}
-            disabled={!copyrightAgreed || (uploadStatus as UploadStatus) === "daily_quota_exceeded"}
-            className={`btn-primary ${
-              !copyrightAgreed || (uploadStatus as UploadStatus) === "daily_quota_exceeded"
-                ? "opacity-50 cursor-not-allowed"
-                : ""
-            }`}
-          >
-            Upload & Process Files
-          </button>
+          </Button>
+          <Button type="button" onClick={handleUpload} disabled={!copyrightAgreed}>
+            <CloudUpload aria-hidden />
+            Upload and process files
+          </Button>
         </div>
       )}
 
-      {/* Status Messages */}
+      {/* Status messages */}
       {message && (
-        <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
-          <p className="text-sm text-blue-800 dark:text-blue-300">{message}</p>
-        </div>
+        <Alert className="mt-4">
+          {isBusy ? (
+            <Loader2 className="motion-safe:animate-spin" aria-hidden />
+          ) : (
+            <CircleCheck aria-hidden />
+          )}
+          <AlertDescription>{message}</AlertDescription>
+        </Alert>
       )}
 
       {error && (
-        <div className="mt-4 p-3 bg-light-error-bg dark:bg-dark-error-bg border border-light-error-border dark:border-dark-error-border rounded-lg">
-          <p className="text-sm text-light-error-text dark:text-dark-error-text">{error}</p>
-          <button
-            onClick={resetUpload}
-            className="mt-2 text-xs text-light-button-primary dark:text-dark-button-primary hover:underline"
-          >
-            Try again
-          </button>
-        </div>
+        <Alert variant="destructive" className="mt-4">
+          <CircleAlert aria-hidden />
+          <AlertDescription>
+            {error}
+            <div className="mt-2">
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={resetUpload}
+                className="text-destructive"
+              >
+                Try again
+              </Button>
+            </div>
+          </AlertDescription>
+        </Alert>
       )}
 
-      {/* Success State */}
+      {/* Success state */}
       {uploadStatus === "success" && (
-        <div className="mt-4 flex items-center justify-between">
-          <div className="text-sm text-green-700 dark:text-green-400">
-            ✓ Files processed successfully
-          </div>
-          <button
-            onClick={resetUpload}
-            className="text-sm text-light-button-primary dark:text-dark-button-primary hover:underline"
-          >
+        <div className="mt-4 flex items-center justify-between gap-3">
+          <p className="flex items-center gap-2 text-sm font-medium text-success">
+            <CircleCheck className="size-4" aria-hidden />
+            Files processed successfully
+          </p>
+          <Button type="button" variant="link" size="sm" onClick={resetUpload}>
             Upload more files
-          </button>
+          </Button>
         </div>
       )}
 
-      {/* API Limit Reached Modal */}
+      {/* API limit reached modal */}
       <ApiLimitReachedModal isOpen={showApiLimitModal} onClose={handleCloseApiLimitModal} />
     </div>
   );

@@ -1,4 +1,5 @@
 import React from "react";
+import { Button } from "../../ui/button";
 
 interface OnboardingLayoutProps {
   children: React.ReactNode;
@@ -8,37 +9,36 @@ interface OnboardingLayoutProps {
 
 export function OnboardingLayout({ children, onSkip, showSkip = true }: OnboardingLayoutProps) {
   return (
-    <div className="min-h-screen flex flex-col">
-      {/* Header with Skip Button */}
+    <div className="flex min-h-screen flex-col">
+      {/* Header with skip button */}
       {showSkip && onSkip && (
-        <header className="shrink-0 border-b border-light-border-primary dark:border-dark-border-primary bg-light-bg-primary dark:bg-dark-bg-primary">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+        <header className="shrink-0">
+          <div className="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8">
             <div className="flex justify-end">
-              <button
+              <Button
+                type="button"
+                variant="ghost"
                 onClick={onSkip}
-                className="text-sm text-light-text-secondary dark:text-dark-text-secondary hover:text-light-text-primary dark:hover:text-dark-text-primary transition-colors duration-200 focus:outline-hidden focus:ring-2 focus:ring-light-button-primary dark:focus:ring-dark-button-primary rounded-md px-4 py-3 sm:px-3 sm:py-1 min-h-[44px] sm:min-h-auto"
+                className="text-muted-foreground"
               >
                 Skip setup
-              </button>
+              </Button>
             </div>
           </div>
         </header>
       )}
 
-      {/* Main Content */}
-      <main className="flex-1 flex items-center justify-center p-4 sm:p-6 lg:p-8">
+      {/* Main content */}
+      <main className="flex flex-1 items-center justify-center p-4 sm:p-6 lg:p-8">
         <div className="w-full max-w-4xl">{children}</div>
       </main>
 
       {/* Footer */}
-      <footer className="shrink-0 border-t border-light-border-primary dark:border-dark-border-primary bg-light-bg-primary dark:bg-dark-bg-primary">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
-          <div className="text-center text-xs text-light-text-tertiary dark:text-dark-text-tertiary">
+      <footer className="shrink-0">
+        <div className="mx-auto max-w-7xl px-4 py-3 sm:px-6 lg:px-8">
+          <div className="text-center text-xs font-medium text-muted-foreground">
             Need help? Contact us at{" "}
-            <a
-              href="mailto:videna.psalmeleazar@gmail.com"
-              className="text-light-button-primary dark:text-dark-button-primary hover:underline"
-            >
+            <a href="mailto:videna.psalmeleazar@gmail.com" className="text-primary hover:underline">
               videna.psalmeleazar@gmail.com
             </a>
           </div>

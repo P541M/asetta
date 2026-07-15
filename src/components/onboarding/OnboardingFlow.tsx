@@ -1,4 +1,6 @@
+import { CircleAlert } from "lucide-react";
 import { useOnboarding } from "../../contexts/OnboardingContext";
+import { Alert, AlertDescription } from "../ui/alert";
 import { OnboardingLayout } from "./ui/OnboardingLayout";
 import { ProgressBar } from "./ui/ProgressBar";
 import { WelcomeStep } from "./steps/WelcomeStep";
@@ -42,15 +44,16 @@ export function OnboardingFlow() {
 
           {/* Error Display */}
           {state.error && (
-            <div className="mb-6 p-4 bg-light-error-bg dark:bg-dark-error-bg border border-light-error-border dark:border-dark-error-border rounded-lg animate-fade-in">
-              <p className="text-light-error-text dark:text-dark-error-text text-sm">
-                {state.error}
-              </p>
-            </div>
+            <Alert variant="destructive" className="mb-6">
+              <CircleAlert aria-hidden />
+              <AlertDescription>{state.error}</AlertDescription>
+            </Alert>
           )}
 
-          {/* Current Step Content */}
-          <div className="animate-fade-in-up">{renderCurrentStep()}</div>
+          {/* Step content fades on step CHANGE (feedback for Continue/Back), keyed per step */}
+          <div key={state.currentStep} className="motion-safe:animate-fade-in">
+            {renderCurrentStep()}
+          </div>
         </div>
       </OnboardingLayout>
 

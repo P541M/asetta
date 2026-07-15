@@ -15,7 +15,7 @@ export default function OnboardingPage() {
       </Head>
 
       <OnboardingProvider>
-        <div className="min-h-screen bg-light-bg-primary dark:bg-dark-bg-primary">
+        <div className="min-h-screen bg-background">
           <OnboardingFlow />
         </div>
       </OnboardingProvider>

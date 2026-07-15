@@ -1,4 +1,5 @@
 import { getIconById, DEFAULT_ICON } from "../../data/profileIcons";
+import { cn } from "@/lib/utils";
 
 interface AvatarProps {
   size?: "xs" | "sm" | "md" | "lg";
@@ -7,30 +8,34 @@ interface AvatarProps {
 }
 
 const sizeClasses = {
-  xs: "h-6 w-6",
-  sm: "h-8 w-8",
-  md: "h-10 w-10",
-  lg: "h-12 w-12",
+  xs: "size-6",
+  sm: "size-8",
+  md: "size-10",
+  lg: "size-12",
 };
 
 const iconSizeClasses = {
-  xs: "h-3 w-3",
-  sm: "h-4 w-4",
-  md: "h-5 w-5",
-  lg: "h-6 w-6",
+  xs: "size-3",
+  sm: "size-4",
+  md: "size-5",
+  lg: "size-6",
 };
 
-const Avatar = ({ size = "md", iconId = DEFAULT_ICON.id, className = "" }: AvatarProps) => {
-  const containerClasses = `${sizeClasses[size]} rounded-full flex items-center justify-center bg-light-bg-secondary dark:bg-dark-bg-secondary border border-light-border-primary dark:border-dark-border-primary ${className}`;
-
+const Avatar = ({ size = "md", iconId = DEFAULT_ICON.id, className }: AvatarProps) => {
   // Get icon data, fallback to default if invalid
   const iconData = getIconById(iconId) || DEFAULT_ICON;
   const IconComponent = iconData.icon;
 
   return (
-    <div className={containerClasses}>
+    <div
+      className={cn(
+        "flex items-center justify-center rounded-full bg-secondary",
+        sizeClasses[size],
+        className,
+      )}
+    >
       <IconComponent
-        className={`${iconSizeClasses[size]} text-light-text-primary dark:text-dark-text-primary`}
+        className={cn(iconSizeClasses[size], "text-foreground")}
         aria-label={`User avatar icon: ${iconData.name}`}
       />
     </div>

@@ -4,12 +4,12 @@
 platform.** Read it before writing or reviewing any code. If a change conflicts with this file,
 either the change is wrong or this file must be updated in the same commit — never let them drift.
 
-Last updated: 2026-07-15 (v3.4 — dashboard complete: Courses, Grades, Calendar, and Add tabs
-migrated. The last `.modal-*` overlay (`DayDetailModal`) is on the recipe and the `.modal-*`
-utilities, the `grade-*`/`status-*`/`performance-*` legacy token families, `CustomSelect`,
-`ErrorMessage`, and `utils/statusUtils.ts` are deleted. Surface language unchanged since the
-2026-07-14 v3 lock: borderless tonal surfaces, filled inputs, flat buttons, View Transitions
-theme crossfade).
+Last updated: 2026-07-15 (v3.5 — onboarding migrated: wizard shell, all six steps, and the
+onboarding upload form on the v3 language; new dependency-free `switch` primitive;
+`Avatar`/`AvatarPicker`/`IconPicker` rebuilt on tokens (they also render inside migrated
+chrome). Settings is the last legacy section. Surface language unchanged since the 2026-07-14
+v3 lock: borderless tonal surfaces, filled inputs, flat buttons, View Transitions theme
+crossfade).
 
 ---
 
@@ -247,11 +247,11 @@ a tier, the ramp is wrong — update it here, don't invent a sixth size at the c
 
 | Section | Status |
 | --- | --- |
-| Theme engine (next-themes) + tokens + primitives (`button`, `input`, `label`, `card`, `alert`, `dropdown-menu`, `password-input`) | ✅ migrated 2026-07-14 |
+| Theme engine (next-themes) + tokens + primitives (`button`, `input`, `label`, `card`, `alert`, `dropdown-menu`, `password-input`, `checkbox`, `switch`) | ✅ migrated 2026-07-14 (checkbox 07-15, switch 07-15) |
 | Auth flow (login/register/reset) | ✅ migrated 2026-07-14 |
 | Dashboard shell (header, user menu, tabs, semester bar, stats, page frame, body base styles) | ✅ migrated 2026-07-14 |
 | Modals pass (`ConfirmationModal`, semester manage/delete modals, notes modal incl. rich-text editor toolbar/content + link modal, extraction success, API limit, `DayDetailModal`) | ✅ migrated 2026-07-15 — all overlays are on the recipe; the `.modal-*` classes are deleted |
-| Onboarding | legacy (its exit confirmation already renders the migrated `ConfirmationModal`) |
+| Onboarding (wizard shell + 6 steps + `OnboardingUploadForm`; new `switch` primitive; `Avatar`/`AvatarPicker`/`IconPicker` rebuilt on tokens) | ✅ migrated 2026-07-15 |
 | Assessments table (incl. course-filtered view; `StatusSelect` rebuilt on primitives as a tinted status chip, new `checkbox` primitive) | ✅ migrated 2026-07-15 |
 | Courses tab (`CoursesOverviewTable`: tonal keyboard-accessible course cards) | ✅ migrated 2026-07-15 |
 | Grades / Calendar / Add (grade calculator + tonal stat tiles, calendar grid + `DayDetailModal`, upload/quick-add forms; `EmptyState`/`LoadingSpinner`/`RateLimitNotice` rebuilt on tokens; `CustomSelect`, `ErrorMessage`, `utils/statusUtils.ts` deleted — status tints all come from `statusTintClasses`) | ✅ migrated 2026-07-15 |
@@ -293,5 +293,6 @@ related actions (add/manage) in one menu. No pill rows with satellite icon butto
 This file + `CLAUDE.md` (which mandates reading it) are the complete context for continuing the
 UI migration — prior chat history is NOT required. Current state lives in the migration table
 below; work section by section, one approval per section, founder pushes to GitHub (never the
-agent). The verification loop (Part 1) runs after every task. Next up: founder's pick from the
-remaining legacy sections — onboarding or settings.
+agent). The verification loop (Part 1) runs after every task. Next up: settings — the final
+legacy section; its pass also deletes the remaining legacy utilities and `light-*`/`dark-*`
+tokens (grep-proofed) and brings the "system" theme option.

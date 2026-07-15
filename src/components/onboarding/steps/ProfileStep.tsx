@@ -1,6 +1,9 @@
 import React, { useState } from "react";
+import { UserRound } from "lucide-react";
 import { useOnboarding } from "../../../contexts/OnboardingContext";
 import { StepNavigation } from "../ui/StepNavigation";
+import { Input } from "../../ui/input";
+import { Label } from "../../ui/label";
 import Avatar from "../../ui/Avatar";
 import AvatarPicker from "../../ui/AvatarPicker";
 import { DEFAULT_ICON } from "../../../data/profileIcons";
@@ -32,40 +35,22 @@ export function ProfileStep() {
   const canContinue = formData.institution.trim() !== "";
 
   return (
-    <div className="max-w-lg mx-auto">
+    <div className="mx-auto max-w-lg">
       {/* Header */}
-      <div className="text-center mb-8">
-        <div className="w-16 h-16 bg-light-button-primary/10 dark:bg-dark-button-primary/10 rounded-xl flex items-center justify-center mx-auto mb-4">
-          <svg
-            className="w-8 h-8 text-light-button-primary dark:text-dark-button-primary"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-            />
-          </svg>
+      <div className="mb-8 text-center">
+        <div className="mx-auto mb-4 flex size-16 items-center justify-center rounded-xl bg-primary/10">
+          <UserRound className="size-8 text-primary" aria-hidden />
         </div>
-        <h2 className="text-2xl font-bold text-light-text-primary dark:text-dark-text-primary mb-2">
+        <h2 className="mb-2 text-2xl font-semibold tracking-tight text-foreground md:text-3xl">
           Set up your profile
         </h2>
-        <p className="text-light-text-secondary dark:text-dark-text-secondary">
-          Add some basic info to personalize your experience.
-        </p>
+        <p className="text-muted-foreground">Add some basic info to personalize your experience.</p>
       </div>
 
-      {/* Avatar Section */}
-      <div className="flex flex-col items-center space-y-4 mb-8">
-        <Avatar size="lg" iconId={formData.avatarIconId} className="shadow-lg" />
-        <div className="text-center">
-          <p className="text-sm text-light-text-secondary dark:text-dark-text-secondary">
-            Choose your profile avatar
-          </p>
-        </div>
+      {/* Avatar section */}
+      <div className="mb-8 flex flex-col items-center space-y-4">
+        <Avatar size="lg" iconId={formData.avatarIconId} />
+        <p className="text-sm text-muted-foreground">Choose your profile avatar</p>
         <div className="w-full max-w-md">
           <AvatarPicker
             selectedIconId={formData.avatarIconId}
@@ -79,42 +64,36 @@ export function ProfileStep() {
       {/* Form */}
       <div className="space-y-6">
         {/* Institution */}
-        <div className="form-group">
-          <label htmlFor="institution" className="form-label">
-            Institution *
-          </label>
-          <input
+        <div className="space-y-1.5">
+          <Label htmlFor="institution">
+            Institution <span className="text-destructive">*</span>
+          </Label>
+          <Input
             id="institution"
             type="text"
             value={formData.institution}
             onChange={(e) => handleInputChange("institution", e.target.value)}
             placeholder="e.g., University of Toronto"
-            className="input"
             required
           />
         </div>
 
         {/* Program */}
-        <div className="form-group">
-          <label htmlFor="studyProgram" className="form-label">
-            Program of Study
-          </label>
-          <input
+        <div className="space-y-1.5">
+          <Label htmlFor="studyProgram">Program of study</Label>
+          <Input
             id="studyProgram"
             type="text"
             value={formData.studyProgram}
             onChange={(e) => handleInputChange("studyProgram", e.target.value)}
             placeholder="e.g., Computer Science, Engineering, Business"
-            className="input"
           />
         </div>
 
-        {/* Expected Graduation */}
-        <div className="form-group">
-          <label htmlFor="graduationYear" className="form-label">
-            Expected Graduation
-          </label>
-          <input
+        {/* Expected graduation */}
+        <div className="space-y-1.5">
+          <Label htmlFor="graduationYear">Expected graduation</Label>
+          <Input
             id="graduationYear"
             type="number"
             min={new Date().getFullYear()}
@@ -127,7 +106,6 @@ export function ProfileStep() {
               )
             }
             placeholder="e.g., 2026, 2025"
-            className="input"
           />
         </div>
       </div>

@@ -1,7 +1,10 @@
 import React, { useState } from "react";
+import { CalendarDays } from "lucide-react";
 import { useAuth } from "../../../contexts/AuthContext";
 import { useOnboarding } from "../../../contexts/OnboardingContext";
 import { StepNavigation } from "../ui/StepNavigation";
+import { Input } from "../../ui/input";
+import { Label } from "../../ui/label";
 import { db } from "../../../lib/firebase";
 import { collection, addDoc, query, orderBy, limit, getDocs } from "firebase/firestore";
 
@@ -79,46 +82,31 @@ export function SemesterStep() {
   const canContinue = formData.name.trim() !== "";
 
   return (
-    <div className="max-w-lg mx-auto">
+    <div className="mx-auto max-w-lg">
       {/* Header */}
-      <div className="text-center mb-8">
-        <div className="w-16 h-16 bg-light-button-primary/10 dark:bg-dark-button-primary/10 rounded-xl flex items-center justify-center mx-auto mb-4">
-          <svg
-            className="w-8 h-8 text-light-button-primary dark:text-dark-button-primary"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
-            />
-          </svg>
+      <div className="mb-8 text-center">
+        <div className="mx-auto mb-4 flex size-16 items-center justify-center rounded-xl bg-primary/10">
+          <CalendarDays className="size-8 text-primary" aria-hidden />
         </div>
-        <h2 className="text-2xl font-bold text-light-text-primary dark:text-dark-text-primary mb-2">
+        <h2 className="mb-2 text-2xl font-semibold tracking-tight text-foreground md:text-3xl">
           Create your first semester
         </h2>
-        <p className="text-light-text-secondary dark:text-dark-text-secondary">
-          Give your semester a name to get started.
-        </p>
+        <p className="text-muted-foreground">Give your semester a name to get started.</p>
       </div>
 
       {/* Form */}
       <div className="space-y-6">
-        {/* Semester Name */}
-        <div className="form-group">
-          <label htmlFor="semesterName" className="form-label">
-            Semester Name *
-          </label>
-          <input
+        {/* Semester name */}
+        <div className="space-y-1.5">
+          <Label htmlFor="semesterName">
+            Semester name <span className="text-destructive">*</span>
+          </Label>
+          <Input
             id="semesterName"
             type="text"
             value={formData.name}
             onChange={(e) => handleInputChange("name", e.target.value)}
             placeholder="e.g., Fall 2025, Winter 2024, Spring Term"
-            className="input"
             required
           />
         </div>
@@ -126,7 +114,7 @@ export function SemesterStep() {
 
       <StepNavigation
         canGoNext={canContinue}
-        nextLabel={state.createdSemesterId ? "Continue" : "Create Semester"}
+        nextLabel={state.createdSemesterId ? "Continue" : "Create semester"}
         onNext={state.createdSemesterId ? undefined : createSemester}
         isLoading={isCreating}
       />
