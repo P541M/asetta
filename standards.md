@@ -88,7 +88,9 @@ are what make Asetta look like Asetta and not a default shadcn app:
   `card`), never by hairlines. `--border` exists for true structural rules only (table row
   dividers, typographic rules).
 - **Inputs are filled, not outlined**: resting on the `--input` tonal fill, borderless; focus
-  lifts to `card` with a 2px amber ring. Never add borders back to form fields.
+  lifts to `card` with a 2px amber ring. Never add borders back to form fields. Exception
+  (founder call 2026-07-16): large writing canvases (the notes rich-text editor) keep the tonal
+  fill with **no** focus ring — a persistent ring around a writing surface reads as noise.
 - **Buttons are flat fills**: `default` (amber, hover darkens via `--primary-hover`),
   `secondary` (tonal, hover deepens via `--accent`), `ghost`, `link`, `destructive`.
   **There is no `outline` variant** — boxed/bordered buttons don't exist in this language; pair

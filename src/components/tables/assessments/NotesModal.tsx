@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Copy, X } from "lucide-react";
 import { Assessment } from "../../../types/assessment";
 import { cn } from "@/lib/utils";
@@ -8,28 +9,20 @@ import { formatLocalDateTime } from "../../../utils/dateUtils";
 
 interface NotesModalProps {
   assessment: Assessment;
-  notesInput: string;
-  onNotesChange: (value: string) => void;
-  onAddLink: (callback: (url: string, text: string) => void) => void;
   onClose: () => void;
-  onSave: () => void;
+  onSave: (notes: string) => void;
 }
 
 /** Large overlay with the rich-text notes editor for one assessment. */
-const NotesModal = ({
-  assessment,
-  notesInput,
-  onNotesChange,
-  onAddLink,
-  onClose,
-  onSave,
-}: NotesModalProps) => {
+const NotesModal = ({ assessment, onClose, onSave }: NotesModalProps) => {
+  const [draft, setDraft] = useState(assessment.notes ?? "");
+
   const handleCopy = () => {
     const text = `Assignment: ${assessment.assignmentName}\nCourse: ${
       assessment.courseName
     }\nDue: ${formatLocalDateTime(assessment.dueDate, assessment.dueTime)}\nWeight: ${
       assessment.weight
-    }%\nStatus: ${assessment.status}\n\nNotes:\n${notesInput}`;
+    }%\nStatus: ${assessment.status}\n\nNotes:\n${draft}`;
     navigator.clipboard.writeText(text);
   };
 
@@ -86,11 +79,11 @@ const NotesModal = ({
           </div>
         </div>
         <div className="min-h-0 flex-1 overflow-y-auto px-5">
-          <div className="overflow-hidden rounded-xl bg-input transition-shadow focus-within:ring-2 focus-within:ring-ring">
+          {/* Writing canvas, not a form field: tonal fill only, no focus ring (founder call 2026-07-16) */}
+          <div className="overflow-hidden rounded-xl bg-input">
             <RichTextEditor
-              content={notesInput}
-              onChange={onNotesChange}
-              onAddLink={onAddLink}
+              content={draft}
+              onChange={setDraft}
               placeholder="Add your notes here..."
             />
           </div>
@@ -99,7 +92,7 @@ const NotesModal = ({
           <Button type="button" variant="ghost" onClick={onClose}>
             Cancel
           </Button>
-          <Button type="button" onClick={onSave}>
+          <Button type="button" onClick={() => onSave(draft)}>
             Save notes
           </Button>
         </div>

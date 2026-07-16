@@ -13,12 +13,28 @@
   @apply mb-4;
 }
 
+/* pl-6 keeps outside-positioned markers inside the scroll container (pl-4 clipped them) */
 .rich-text-editor .ProseMirror ul {
-  @apply mb-4 list-disc pl-4;
+  @apply mb-4 list-disc pl-6;
 }
 
 .rich-text-editor .ProseMirror ol {
-  @apply mb-4 list-decimal pl-4;
+  @apply mb-4 list-decimal pl-6;
+}
+
+/* Tiptap wraps each list item's text in a <p>; without this, bullets get paragraph-sized gaps */
+.rich-text-editor .ProseMirror li p {
+  @apply mb-0;
+}
+
+.rich-text-editor .ProseMirror li > ul,
+.rich-text-editor .ProseMirror li > ol {
+  @apply mb-0;
+}
+
+/* The content padding provides the bottom spacing; a trailing margin doubles it */
+.rich-text-editor .ProseMirror > :last-child {
+  @apply mb-0;
 }
 
 .rich-text-editor .ProseMirror a {

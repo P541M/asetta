@@ -1,3 +1,56 @@
+# Step 3: Notes editor simplification + link fix — Implementation Plan
+
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+
+**Goal:** A minimal, working notes editor: Tiptap slimmed to StarterKit + Link + Placeholder, a link button that actually works, and the dead `onAddLink` prop threading deleted.
+
+**Architecture:** `RichTextEditor` becomes self-contained: it owns the link dialog and applies links itself (to the selection when one exists, else by inserting linked text). `NotesModal` owns its draft state, seeded from the assessment; `AssessmentsTable` shrinks to "which assessment's notes are open" plus a save handler. The two broken link paths (the `callback("", "")` stub and the `setState(fn)`-as-updater bug) disappear with the plumbing that hosted them.
+
+**Tech Stack:** Tiptap 2 (`@tiptap/react`, `starter-kit`, `extension-link`, `extension-placeholder`, `pm`), existing modal recipe per standards.md.
+
+## Global Constraints
+
+- Same as step 1 (`2026-07-16-step1-motion-and-semester-flicker.md`): standards.md rules, verification loop from `asetta/`, no agent git operations, no test framework.
+- Existing notes were saved as HTML and may contain `text-align` styles or underline tags; without those extensions Tiptap silently drops the attributes on load — acceptable, no migration.
+
+---
+
+### Task 1: Slim the editor and fix the link dialog
+
+**Files:**
+- Modify: `package.json` (via `npm uninstall @tiptap/extension-underline @tiptap/extension-text-align`)
+- Modify: `src/types/editor.ts`
+- Rewrite: `src/components/editor/RichTextEditor.tsx`
+
+**Interfaces:**
+- Produces: `RichTextEditorProps` = `{ content: string; onChange: (content: string) => void; placeholder?: string }` (no `onAddLink`). Task 2's `NotesModal` renders `<RichTextEditor content onChange placeholder />`.
+
+- [ ] **Step 1: Uninstall the dead extensions**
+
+Run: `npm uninstall @tiptap/extension-underline @tiptap/extension-text-align`
+Expected: both removed from `package.json`; lockfile updated.
+
+- [ ] **Step 2: Update the props type**
+
+`src/types/editor.ts` becomes:
+
+```ts
+export interface RichTextEditorProps {
+  content: string;
+  onChange: (content: string) => void;
+  placeholder?: string;
+}
+```
+
+- [ ] **Step 3: Rewrite the editor**
+
+Replace `src/components/editor/RichTextEditor.tsx` in full. Key changes from the old file:
+Underline/TextAlign extensions and align buttons gone; `onAddLink`/`linkCallback` gone (the
+`setLinkCallback(fn)` updater bug with them); the link dialog is owned here and hides its
+text field when linking a selection; toolbar = bold, italic, bullet list, numbered list,
+link, undo, redo. LinkModal is rendered conditionally (its `isOpen` prop goes away).
+
+```tsx
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Link from "@tiptap/extension-link";
@@ -226,3 +279,87 @@ const RichTextEditor = ({
 };
 
 export default RichTextEditor;
+```
+
+- [ ] **Step 4: Verify** — `npm run lint && npx tsc --noEmit` fails at this point is EXPECTED
+(NotesModal/AssessmentsTable still pass `onAddLink`); proceed to Task 2, which removes those.
+
+---
+
+### Task 2: NotesModal owns its draft; AssessmentsTable slims
+
+**Files:**
+- Modify: `src/components/tables/assessments/NotesModal.tsx`
+- Modify: `src/components/tables/AssessmentsTable.tsx`
+
+**Interfaces:**
+- Produces: `NotesModalProps` = `{ assessment: Assessment; onClose: () => void; onSave: (notes: string) => void }`.
+
+- [ ] **Step 1: NotesModal**
+
+- Add `import { useState } from "react";` and seed a draft: `const [draft, setDraft] = useState(assessment.notes ?? "");`
+- Props interface becomes `{ assessment, onClose, onSave }` (delete `notesInput`, `onNotesChange`, `onAddLink`).
+- `handleCopy` reads `draft` instead of `notesInput`.
+- Editor usage: `<RichTextEditor content={draft} onChange={setDraft} placeholder="Add your notes here..." />`
+- Save button: `onClick={() => onSave(draft)}`.
+
+- [ ] **Step 2: AssessmentsTable**
+
+- Delete state: `notesInput`, `showNotesModal`; keep `selectedAssessment` as the single "notes modal open for this assessment" driver.
+- Delete `handleAddLink` entirely.
+- `handleNotesClick` becomes: `setSelectedAssessment(assessment);`
+- `handleSaveNotes` takes the draft and closes the modal itself:
+
+```ts
+const handleSaveNotes = async (notes: string) => {
+  if (!user || !selectedAssessment?.id) return;
+  try {
+    const assessmentRef = getAssessmentDocRef(user.uid, semesterId, selectedAssessment.id);
+
+    // Strip tags to detect visually-empty notes; empty notes remove the field
+    const strippedContent = notes.replace(/<[^>]*>/g, "").trim();
+    const updateData =
+      strippedContent === ""
+        ? { updatedAt: new Date(), notes: null }
+        : { notes, updatedAt: new Date() };
+
+    await updateDoc(assessmentRef, updateData);
+    onStatusChange?.(selectedAssessment.id, selectedAssessment.status);
+    setSelectedAssessment(null);
+  } catch (error) {
+    console.error("Error saving notes:", error);
+  }
+};
+```
+
+- Render block becomes:
+
+```tsx
+{selectedAssessment && (
+  <NotesModal
+    assessment={selectedAssessment}
+    onClose={() => setSelectedAssessment(null)}
+    onSave={handleSaveNotes}
+  />
+)}
+```
+
+- [ ] **Step 3: Confirm the plumbing is gone**
+
+Run: `Grep pattern "onAddLink|notesInput|showNotesModal" path src`
+Expected: zero hits.
+
+- [ ] **Step 4: Verify** — `npm run lint && npx tsc --noEmit` clean.
+
+---
+
+### Task 3: Verification loop + manual QA
+
+- [ ] **Step 1:** `npm run lint && npm run format:check && npx tsc --noEmit && npm run build` — all green. Run `npm run format` first if Prettier complains.
+- [ ] **Step 2: Manual QA** (`npm run dev`, both themes):
+  1. Open notes on an assessment; type text, bold/italic/lists work; toolbar shows exactly 7 buttons.
+  2. Link with no selection: dialog shows URL + text fields; submitting inserts linked text that opens the URL.
+  3. Link with text selected: dialog shows URL only; submitting turns the selection into a link.
+  4. Save persists after reload; Cancel discards; clearing all text and saving removes the note icon state.
+  5. Old notes that had centered/underlined text still open fine (formatting simply dropped).
+- [ ] **Step 3:** Hand off for commit (suggested: `refactor: slim notes editor to essentials and fix link insertion`). Note: teammates/other machines need `npm install` after pulling.

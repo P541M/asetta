@@ -57,8 +57,6 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
     weight: 0,
   });
   const [selectedAssessment, setSelectedAssessment] = useState<Assessment | null>(null);
-  const [notesInput, setNotesInput] = useState<string>("");
-  const [showNotesModal, setShowNotesModal] = useState<string | null>(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [assessmentToDelete, setAssessmentToDelete] = useState<Assessment | null>(null);
   const [showBulkDeleteModal, setShowBulkDeleteModal] = useState(false);
@@ -209,42 +207,26 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
 
   const handleNotesClick = (assessment: Assessment) => {
     setSelectedAssessment(assessment);
-    setNotesInput(assessment.notes || "");
-    setShowNotesModal(assessment.id || null);
   };
 
-  const handleSaveNotes = async () => {
+  const handleSaveNotes = async (notes: string) => {
     if (!user || !selectedAssessment?.id) return;
     try {
       const assessmentRef = getAssessmentDocRef(user.uid, semesterId, selectedAssessment.id);
 
-      // Strip HTML tags and whitespace to check if content is truly empty
-      const strippedContent = notesInput.replace(/<[^>]*>/g, "").trim();
-
-      // If strippedContent is empty, remove the notes field
+      // Strip tags to detect visually-empty notes; empty notes remove the field
+      const strippedContent = notes.replace(/<[^>]*>/g, "").trim();
       const updateData =
         strippedContent === ""
-          ? {
-              updatedAt: new Date(),
-              notes: null, // Set to null to remove the field
-            }
-          : {
-              notes: notesInput,
-              updatedAt: new Date(),
-            };
+          ? { updatedAt: new Date(), notes: null }
+          : { notes, updatedAt: new Date() };
 
       await updateDoc(assessmentRef, updateData);
+      onStatusChange?.(selectedAssessment.id, selectedAssessment.status);
       setSelectedAssessment(null);
-      if (selectedAssessment.id) {
-        onStatusChange?.(selectedAssessment.id, selectedAssessment.status);
-      }
     } catch (error) {
       console.error("Error saving notes:", error);
     }
-  };
-
-  const handleAddLink = (callback: (url: string, text: string) => void) => {
-    callback("", "");
   };
 
   const handleDeleteClick = (assessment: Assessment) => {
@@ -404,20 +386,11 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
         </div>
       )}
       {/* Notes Modal */}
-      {showNotesModal && selectedAssessment && (
+      {selectedAssessment && (
         <NotesModal
           assessment={selectedAssessment}
-          notesInput={notesInput}
-          onNotesChange={setNotesInput}
-          onAddLink={handleAddLink}
-          onClose={() => {
-            setShowNotesModal(null);
-            setSelectedAssessment(null);
-          }}
-          onSave={() => {
-            handleSaveNotes();
-            setShowNotesModal(null);
-          }}
+          onClose={() => setSelectedAssessment(null)}
+          onSave={handleSaveNotes}
         />
       )}
       {/* Delete Confirmation Modal */}
