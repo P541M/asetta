@@ -4,7 +4,9 @@ import Link from "next/link";
 import { Circle, CircleCheck, Loader2 } from "lucide-react";
 import { createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 import { auth } from "../lib/firebase";
+import { useAuth } from "../contexts/AuthContext";
 import { redirectAfterAuth } from "../utils/authRedirect";
+import LoadingScreen from "../components/ui/LoadingScreen";
 import { getAuthErrorMessage } from "../utils/authErrors";
 import AuthShell from "../components/auth/AuthShell";
 import AuthMessageBanner from "../components/auth/AuthMessageBanner";
@@ -43,6 +45,14 @@ const Register = () => {
   });
   const [passwordFocused, setPasswordFocused] = useState(false);
   const router = useRouter();
+  const { user, loading } = useAuth();
+
+  // A signed-in visitor skips the form; during an active submit the handler owns the redirect
+  useEffect(() => {
+    if (!loading && user && !isSubmitting) {
+      redirectAfterAuth(user, router);
+    }
+  }, [user, loading, isSubmitting, router]);
 
   useEffect(() => {
     setPasswordCriteria({
@@ -94,6 +104,10 @@ const Register = () => {
       setIsSubmitting(false);
     }
   };
+
+  if (loading || (user && !isSubmitting)) {
+    return <LoadingScreen />;
+  }
 
   return (
     <AuthShell

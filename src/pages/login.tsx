@@ -1,11 +1,13 @@
 // src/pages/login.tsx
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import { Loader2 } from "lucide-react";
 import { signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 import { auth } from "../lib/firebase";
+import { useAuth } from "../contexts/AuthContext";
 import { redirectAfterAuth } from "../utils/authRedirect";
+import LoadingScreen from "../components/ui/LoadingScreen";
 import { getAuthErrorMessage } from "../utils/authErrors";
 import AuthShell from "../components/auth/AuthShell";
 import AuthMessageBanner from "../components/auth/AuthMessageBanner";
@@ -21,6 +23,14 @@ const Login = () => {
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
+  const { user, loading } = useAuth();
+
+  // A signed-in visitor skips the form; during an active submit the handler owns the redirect
+  useEffect(() => {
+    if (!loading && user && !isSubmitting) {
+      redirectAfterAuth(user, router);
+    }
+  }, [user, loading, isSubmitting, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -55,6 +65,10 @@ const Login = () => {
       setIsSubmitting(false);
     }
   };
+
+  if (loading || (user && !isSubmitting)) {
+    return <LoadingScreen />;
+  }
 
   return (
     <AuthShell
