@@ -3,9 +3,9 @@
 @custom-variant dark (&:is(.dark *));
 
 /*
-  Semantic design tokens (shadcn/ui convention).
-  New code uses ONLY these via their utilities (bg-background, text-primary, ...);
-  the legacy "light-" and "dark-" palette below shrinks as sections migrate.
+  Semantic design tokens (shadcn/ui convention). All code uses ONLY these via
+  their utilities (bg-background, text-primary, ...). The legacy "light-"/"dark-"
+  palette was removed once the migration completed (2026-07-15).
   Values are locked in standards.md - change them there and here together.
 */
 :root {
@@ -84,62 +84,6 @@
 }
 
 @theme {
-  --color-light-bg-primary: #ffffff;
-  --color-light-bg-secondary: #fafafa;
-  --color-light-bg-tertiary: #f5f5f5;
-  --color-light-text-primary: #1a1a1a;
-  --color-light-text-secondary: #404040;
-  --color-light-text-tertiary: #8a8a8a;
-  --color-light-border-primary: #e5e5e5;
-  --color-light-border-secondary: #e5e5e5;
-  --color-light-hover-primary: #f5f5f5;
-  --color-light-hover-secondary: #f0f0f0;
-  --color-light-focus-ring: #d97706;
-  --color-light-input-bg: #ffffff;
-  --color-light-input-border: #e5e5e5;
-  --color-light-input-text: #1a1a1a;
-  --color-light-input-placeholder: #8a8a8a;
-  --color-light-button-primary: #d97706;
-  --color-light-button-primary-hover: #b45309;
-  --color-light-button-secondary: #f5f5f5;
-  --color-light-button-secondary-hover: #f0f0f0;
-  --color-light-success-bg: rgba(16, 185, 129, 0.1);
-  --color-light-success-text: #059669;
-  --color-light-warning-bg: rgba(245, 158, 11, 0.1);
-  --color-light-warning-text: #d97706;
-  --color-light-error-bg: rgba(239, 68, 68, 0.1);
-  --color-light-error-text: #dc2626;
-  --color-light-disabled-bg: #f3f4f6;
-  --color-light-disabled-text: #9ca3af;
-
-  --color-dark-bg-primary: #0a0a0a;
-  --color-dark-bg-secondary: #151515;
-  --color-dark-bg-tertiary: #202020;
-  --color-dark-text-primary: #fafafa;
-  --color-dark-text-secondary: #c0c0c0;
-  --color-dark-text-tertiary: #808080;
-  --color-dark-border-primary: #2a2a2a;
-  --color-dark-border-secondary: #2a2a2a;
-  --color-dark-hover-primary: #151515;
-  --color-dark-hover-secondary: #202020;
-  --color-dark-focus-ring: #f59e0b;
-  --color-dark-input-bg: #151515;
-  --color-dark-input-border: #2a2a2a;
-  --color-dark-input-text: #fafafa;
-  --color-dark-input-placeholder: #808080;
-  --color-dark-button-primary: #f59e0b;
-  --color-dark-button-primary-hover: #d97706;
-  --color-dark-button-secondary: #202020;
-  --color-dark-button-secondary-hover: #2a2a2a;
-  --color-dark-success-bg: rgba(16, 185, 129, 0.15);
-  --color-dark-success-text: #10b981;
-  --color-dark-warning-bg: rgba(245, 158, 11, 0.15);
-  --color-dark-warning-text: #f59e0b;
-  --color-dark-error-bg: rgba(239, 68, 68, 0.15);
-  --color-dark-error-text: #ef4444;
-  --color-dark-disabled-bg: #374151;
-  --color-dark-disabled-text: #6b7280;
-
   --radius-xl: 1rem;
   --radius-2xl: 1.5rem;
   --radius-3xl: 2rem;
@@ -158,10 +102,7 @@
 
   --animate-fade-in: fadeIn 0.3s ease-in-out;
   --animate-fade-in-down: fadeInDown 0.3s ease-in-out;
-  --animate-fade-in-up: fadeInUp 0.3s ease-in-out;
-  --animate-bounce-light: bounceLight 1s ease-in-out infinite;
   --animate-scale-in: scaleIn 0.2s ease-in-out;
-  --animate-slide-in: slideIn 0.3s ease-in-out;
   --animate-pulse: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 
   @keyframes fadeIn {
@@ -182,16 +123,6 @@
       transform: translateY(0);
     }
   }
-  @keyframes fadeInUp {
-    0% {
-      opacity: 0;
-      transform: translateY(10px);
-    }
-    100% {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
   @keyframes scaleIn {
     0% {
       transform: scale(0.95);
@@ -202,128 +133,6 @@
       opacity: 1;
     }
   }
-  @keyframes slideIn {
-    0% {
-      transform: translateX(-100%);
-      opacity: 0;
-    }
-    100% {
-      transform: translateX(0);
-      opacity: 1;
-    }
-  }
-  @keyframes bounceLight {
-    0%,
-    100% {
-      transform: translateY(0);
-    }
-    50% {
-      transform: translateY(-4px);
-    }
-  }
-}
-
-/*
-  The default border color has changed to `currentcolor` in Tailwind CSS v4,
-  so we've added these compatibility styles to make sure everything still
-  looks the same as it did with Tailwind CSS v3.
-
-  If we ever want to remove these styles, we need to add an explicit border
-  color utility to any element that depends on these defaults.
-*/
-@layer base {
-  *,
-  ::after,
-  ::before,
-  ::backdrop,
-  ::file-selector-button {
-    border-color: var(--color-gray-200, currentcolor);
-  }
-}
-
-@utility btn {
-  /* Base Components */
-  @apply px-4 py-2.5 rounded-lg font-medium inline-flex items-center justify-center transition-all duration-200 focus:outline-hidden focus:ring-2 focus:ring-light-button-primary focus:ring-offset-2 dark:focus:ring-dark-button-primary dark:focus:ring-offset-dark-bg-secondary;
-}
-
-@utility btn-primary {
-  @apply bg-light-button-primary text-white btn hover:bg-light-button-primary-hover dark:bg-dark-button-primary dark:hover:bg-dark-button-primary-hover;
-}
-
-@utility btn-secondary {
-  @apply bg-light-button-secondary text-light-text-primary btn hover:bg-light-button-secondary-hover dark:bg-dark-button-secondary dark:text-dark-text-primary dark:hover:bg-dark-button-secondary-hover;
-}
-
-@utility btn-success {
-  @apply bg-light-success-text text-white btn hover:bg-light-success-text/90 dark:bg-dark-success-text dark:hover:bg-dark-success-text/90;
-}
-
-@utility btn-danger {
-  @apply bg-light-error-text text-white btn hover:bg-light-error-text/90 dark:bg-dark-error-text dark:hover:bg-dark-error-text/90;
-}
-
-@utility btn-outline {
-  @apply border border-light-border-primary text-light-text-primary btn hover:bg-light-hover-primary dark:border-dark-border-primary dark:text-dark-text-primary dark:hover:bg-dark-hover-primary;
-}
-
-@utility input {
-  /* Form Components */
-  @apply w-full p-3 rounded-lg border border-light-input-border focus:ring-2 focus:ring-light-button-primary focus:border-light-button-primary outline-hidden bg-light-input-bg text-light-input-text placeholder-light-input-placeholder transition-all duration-200 dark:bg-dark-input-bg dark:border-dark-input-border dark:text-dark-input-text dark:placeholder-dark-input-placeholder dark:focus:ring-dark-button-primary dark:focus:border-dark-button-primary;
-}
-
-@utility form-group {
-  @apply mb-6;
-}
-
-@utility form-label {
-  @apply block text-sm font-medium text-light-text-primary mb-2 dark:text-dark-text-primary;
-}
-
-@utility animate-fade-in {
-  /* Animation Components */
-  animation: fadeIn 0.3s ease-out;
-}
-
-@utility animate-fade-in-up {
-  animation: fadeInUp 0.3s ease-out;
-}
-
-@utility animate-scale-in {
-  animation: scaleIn 0.3s ease-out;
-}
-
-@utility card {
-  /* Card Components */
-  @apply bg-light-bg-primary rounded-xl border border-light-border-primary dark:bg-dark-bg-secondary dark:border-dark-border-primary;
-}
-
-@utility card-header {
-  @apply px-6 py-5 border-b border-light-border-primary dark:border-dark-border-primary;
-}
-
-@utility card-body {
-  @apply p-6;
-}
-
-@utility badge {
-  /* Badge Components */
-  @apply px-2.5 py-1 text-xs font-medium rounded-full;
-}
-
-@utility badge-primary {
-  @apply bg-light-button-primary/10 text-light-button-primary badge dark:bg-dark-button-primary/10 dark:text-dark-button-primary;
-}
-
-@utility badge-success {
-  @apply bg-light-success-bg text-light-success-text badge dark:bg-dark-success-bg dark:text-dark-success-text;
-}
-
-@utility badge-warning {
-  @apply bg-light-warning-bg text-light-warning-text badge dark:bg-dark-warning-bg dark:text-dark-warning-text;
-}
-
-@utility badge-danger {
-  @apply bg-light-error-bg text-light-error-text badge dark:bg-dark-error-bg dark:text-dark-error-text;
 }
 
 @utility pt-safe {
@@ -378,7 +187,7 @@
 
 @layer base {
   * {
-    @apply border-light-border-primary dark:border-dark-border-primary;
+    @apply border-border;
     /* Improve touch scrolling on iOS */
     -webkit-overflow-scrolling: touch;
     /* Optimize touch interactions */
@@ -428,49 +237,6 @@
   }
 }
 
-@layer components {
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-    }
-    to {
-      opacity: 1;
-    }
-  }
-
-  @keyframes fadeInUp {
-    from {
-      opacity: 0;
-      transform: translateY(20px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  @keyframes scaleIn {
-    from {
-      opacity: 0;
-      transform: scale(0.95);
-    }
-    to {
-      opacity: 1;
-      transform: scale(1);
-    }
-  }
-
-  @keyframes bounce {
-    0%,
-    100% {
-      transform: scale(1);
-    }
-    50% {
-      transform: scale(1.1);
-    }
-  }
-}
-
 @layer utilities {
   /* Overlay Scrollbar Styles */
   * {
@@ -493,7 +259,7 @@
 
   ::-webkit-scrollbar-thumb {
     /* Style only the thumb with rounded corners */
-    @apply bg-light-border-primary dark:bg-dark-border-primary;
+    @apply bg-border;
     border-radius: 4px;
     /* Default opacity 50% */
     opacity: 0.5;
@@ -530,28 +296,6 @@
   html:hover {
     --scrollbar-thumb-light: rgba(229, 229, 229, 1);
     --scrollbar-thumb-dark: rgba(42, 42, 42, 1);
-  }
-
-  /* Utility classes for improved spacing */
-  .space-y-6 > :not(:first-child) {
-    margin-top: 1.5rem;
-  }
-
-  .space-y-8 > :not(:first-child) {
-    margin-top: 2rem;
-  }
-
-  /* Improved transitions */
-  .transition-theme {
-    transition:
-      background-color 0.2s ease,
-      border-color 0.2s ease,
-      color 0.2s ease;
-  }
-
-  /* Focus states */
-  .focus-visible {
-    @apply focus:ring-2 focus:ring-light-button-primary focus:ring-offset-2 dark:focus:ring-dark-button-primary dark:focus:ring-offset-dark-bg-secondary;
   }
 
   /* Safe Area Utilities */

@@ -10,7 +10,6 @@ import NotificationsSection from "./NotificationsSection";
 import SettingsNavigation from "./SettingsNavigation";
 import SettingsActions from "./SettingsActions";
 import SettingsMessage from "./SettingsMessage";
-import { useTheme } from "next-themes";
 import { DEFAULT_ICON } from "../../data/profileIcons";
 
 interface UserSettingsProps {
@@ -20,8 +19,6 @@ interface UserSettingsProps {
 
 const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
   const { user } = useAuth();
-  const { resolvedTheme, setTheme } = useTheme();
-  const isDarkMode = resolvedTheme === "dark";
   const [displayName, setDisplayName] = useState(user?.displayName || "");
   const [institution, setInstitution] = useState("");
   const [studyProgram, setStudyProgram] = useState("");
@@ -30,7 +27,6 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
   const [showWeight, setShowWeight] = useState<boolean>(true);
   const [showNotes, setShowNotes] = useState<boolean>(true);
   const [showStatsBar, setShowStatsBar] = useState<boolean>(false);
-  const [isDarkModeLocal, setIsDarkModeLocal] = useState(isDarkMode);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState<{
     text: string;
@@ -61,7 +57,6 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
     showNotes: true,
     showStatsBar: false,
     avatarIconId: DEFAULT_ICON.id,
-    isDarkMode: false,
     emailNotifications: false,
     notificationDaysBefore: 1,
     email: "",
@@ -82,7 +77,6 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
       showNotes !== initialValues.showNotes ||
       showStatsBar !== initialValues.showStatsBar ||
       avatarIconId !== initialValues.avatarIconId ||
-      isDarkModeLocal !== initialValues.isDarkMode ||
       emailNotifications !== initialValues.emailNotifications ||
       notificationDaysBefore !== initialValues.notificationDaysBefore ||
       email !== initialValues.email
@@ -127,7 +121,6 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
           setShowWeight(newShowWeight);
           setShowNotes(newShowNotes);
           setShowStatsBar(newShowStatsBar);
-          setIsDarkModeLocal(isDarkMode);
           setEmailNotifications(newEmailNotifications);
           setNotificationDaysBefore(newNotificationDaysBefore);
           setEmail(newEmail);
@@ -144,7 +137,6 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
             showNotes: newShowNotes,
             showStatsBar: newShowStatsBar,
             avatarIconId: newAvatarIconId,
-            isDarkMode: isDarkMode,
             emailNotifications: newEmailNotifications,
             notificationDaysBefore: newNotificationDaysBefore,
             email: newEmail,
@@ -156,7 +148,7 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
     };
 
     fetchUserData();
-  }, [user, currentYear, isDarkMode]);
+  }, [user, currentYear]);
 
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
@@ -207,11 +199,6 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
         updatedAt: new Date(),
       });
 
-      // Update dark mode if changed
-      if (isDarkModeLocal !== initialValues.isDarkMode) {
-        setTheme(isDarkModeLocal ? "dark" : "light");
-      }
-
       // Update initial values to match current values
       setInitialValues({
         displayName,
@@ -223,7 +210,6 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
         showNotes,
         showStatsBar,
         avatarIconId: avatarIconId,
-        isDarkMode: isDarkModeLocal,
         emailNotifications,
         notificationDaysBefore,
         email,
@@ -255,7 +241,6 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
     setShowWeight(initialValues.showWeight);
     setShowNotes(initialValues.showNotes);
     setShowStatsBar(initialValues.showStatsBar);
-    setIsDarkModeLocal(initialValues.isDarkMode);
     setEmailNotifications(initialValues.emailNotifications);
     setNotificationDaysBefore(initialValues.notificationDaysBefore);
     setEmail(initialValues.email);
@@ -274,7 +259,7 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
     <div className="space-y-6">
       <SettingsNavigation activeTab={activeTab} setActiveTab={setActiveTab} />
 
-      <div className="bg-light-bg-primary dark:bg-dark-bg-secondary rounded-xl border border-light-border-primary dark:border-dark-border-primary">
+      <div className="rounded-xl bg-card shadow-soft">
         <form onSubmit={handleSubmit} className="p-6 md:p-8">
           {activeTab === "profile" ? (
             <ProfileSection
@@ -299,8 +284,6 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
               setShowNotes={setShowNotes}
               showStatsBar={showStatsBar}
               setShowStatsBar={setShowStatsBar}
-              isDarkMode={isDarkModeLocal}
-              setIsDarkMode={setIsDarkModeLocal}
             />
           ) : (
             <NotificationsSection

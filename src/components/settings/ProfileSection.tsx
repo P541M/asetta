@@ -1,4 +1,6 @@
 import { ProfileSectionProps } from "../../types/profile";
+import { Input } from "../ui/input";
+import { Label } from "../ui/label";
 import Avatar from "../ui/Avatar";
 import AvatarPicker from "../ui/AvatarPicker";
 
@@ -18,31 +20,24 @@ const ProfileSection = ({
 
   return (
     <div className="space-y-8">
-      {/* Section Header */}
-      <div className="border-b border-light-border-primary dark:border-dark-border-primary pb-4">
-        <h3 className="text-lg font-semibold text-light-text-primary dark:text-dark-text-primary">
-          Profile Information
-        </h3>
-        <p className="text-sm text-light-text-secondary dark:text-dark-text-secondary mt-1">
-          Update your profile details and avatar
-        </p>
+      {/* Section header */}
+      <div className="border-b border-border pb-4">
+        <h3 className="text-base font-semibold text-foreground">Profile information</h3>
+        <p className="mt-1 text-sm text-muted-foreground">Update your profile details and avatar</p>
       </div>
 
-      {/* Avatar Section */}
+      {/* Avatar section */}
       <div className="flex flex-col items-center space-y-6">
         <div className="flex flex-col items-center space-y-4">
-          <Avatar size="lg" iconId={avatarIconId} className="shadow-lg" />
+          <Avatar size="lg" iconId={avatarIconId} />
           <div className="text-center">
-            <p className="text-sm text-light-text-secondary dark:text-dark-text-secondary">
-              Your profile avatar
-            </p>
-            <p className="text-xs text-light-text-tertiary dark:text-dark-text-tertiary mt-1">
+            <p className="text-sm text-muted-foreground">Your profile avatar</p>
+            <p className="mt-1 text-xs text-muted-foreground">
               Choose an icon to represent yourself
             </p>
           </div>
         </div>
 
-        {/* Avatar Picker */}
         <div className="w-full max-w-md">
           <AvatarPicker
             selectedIconId={avatarIconId}
@@ -53,74 +48,50 @@ const ProfileSection = ({
         </div>
       </div>
 
-      {/* Profile Information */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="space-y-3">
-          <label
-            htmlFor="displayName"
-            className="block text-sm font-medium text-light-text-primary dark:text-dark-text-primary"
-          >
-            Display Name
-          </label>
-          <input
+      {/* Profile fields */}
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+        <div className="space-y-1.5">
+          <Label htmlFor="displayName">Display name</Label>
+          <Input
             id="displayName"
             type="text"
             value={displayName}
             onChange={(e) => setDisplayName(e.target.value)}
-            className="w-full px-4 py-3 border border-light-border-primary dark:border-dark-border-primary rounded-xl bg-light-bg-primary dark:bg-dark-bg-primary text-light-text-primary dark:text-dark-text-primary shadow-sm focus:ring-2 focus:ring-light-button-primary dark:focus:ring-dark-button-primary focus:border-light-button-primary dark:focus:border-dark-button-primary transition-all duration-200 placeholder-light-text-tertiary dark:placeholder-dark-text-tertiary"
             placeholder="Your display name"
           />
         </div>
 
-        <div className="space-y-3">
-          <label
-            htmlFor="institution"
-            className="block text-sm font-medium text-light-text-primary dark:text-dark-text-primary"
-          >
-            Institution
-          </label>
-          <input
+        <div className="space-y-1.5">
+          <Label htmlFor="institution">Institution</Label>
+          <Input
             id="institution"
             type="text"
             value={institution}
             onChange={(e) => setInstitution(e.target.value)}
-            className="w-full px-4 py-3 border border-light-border-primary dark:border-dark-border-primary rounded-xl bg-light-bg-primary dark:bg-dark-bg-primary text-light-text-primary dark:text-dark-text-primary shadow-sm focus:ring-2 focus:ring-light-button-primary dark:focus:ring-dark-button-primary focus:border-light-button-primary dark:focus:border-dark-button-primary transition-all duration-200 placeholder-light-text-tertiary dark:placeholder-dark-text-tertiary"
             placeholder="Your university or school"
           />
         </div>
 
-        <div className="space-y-3">
-          <label
-            htmlFor="studyProgram"
-            className="block text-sm font-medium text-light-text-primary dark:text-dark-text-primary"
-          >
-            Study Program
-          </label>
-          <input
+        <div className="space-y-1.5">
+          <Label htmlFor="studyProgram">Study program</Label>
+          <Input
             id="studyProgram"
             type="text"
             value={studyProgram}
             onChange={(e) => setStudyProgram(e.target.value)}
-            className="w-full px-4 py-3 border border-light-border-primary dark:border-dark-border-primary rounded-xl bg-light-bg-primary dark:bg-dark-bg-primary text-light-text-primary dark:text-dark-text-primary shadow-sm focus:ring-2 focus:ring-light-button-primary dark:focus:ring-dark-button-primary focus:border-light-button-primary dark:focus:border-dark-button-primary transition-all duration-200 placeholder-light-text-tertiary dark:placeholder-dark-text-tertiary"
             placeholder="e.g., Computer Science, Business Administration"
           />
         </div>
 
-        <div className="space-y-3">
-          <label
-            htmlFor="graduationYear"
-            className="block text-sm font-medium text-light-text-primary dark:text-dark-text-primary"
-          >
-            Expected Graduation Year
-          </label>
-          <input
+        <div className="space-y-1.5">
+          <Label htmlFor="graduationYear">Expected graduation year</Label>
+          <Input
             id="graduationYear"
             type="number"
             min={currentYear}
             max={currentYear + 10}
             value={graduationYear}
             onChange={(e) => setGraduationYear(parseInt(e.target.value))}
-            className="w-full px-4 py-3 border border-light-border-primary dark:border-dark-border-primary rounded-xl bg-light-bg-primary dark:bg-dark-bg-primary text-light-text-primary dark:text-dark-text-primary shadow-sm focus:ring-2 focus:ring-light-button-primary dark:focus:ring-dark-button-primary focus:border-light-button-primary dark:focus:border-dark-button-primary transition-all duration-200"
           />
         </div>
       </div>

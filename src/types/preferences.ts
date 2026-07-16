@@ -7,8 +7,6 @@ export interface PreferencesSectionProps {
   setShowNotes: (value: boolean) => void;
   showStatsBar: boolean;
   setShowStatsBar: (value: boolean) => void;
-  isDarkMode: boolean;
-  setIsDarkMode: (value: boolean) => void;
 }
 
 export interface NotificationPreferencesProps {

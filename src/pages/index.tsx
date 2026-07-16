@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import { useRouter } from "next/router";
 import { useAuth } from "../contexts/AuthContext";
 import { shouldRedirectToOnboarding } from "../utils/onboardingUtils";
+import LoadingScreen from "../components/ui/LoadingScreen";
 
 export default function Index() {
   const router = useRouter();
@@ -25,12 +26,5 @@ export default function Index() {
   }, [user, loading, onboardingStatus, onboardingLoading, router]);
 
   // Show loading state while checking auth and onboarding status
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-white dark:bg-dark-bg-primary">
-      <div className="flex flex-col items-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-2 border-light-button-primary border-t-transparent dark:border-dark-button-primary dark:border-t-transparent"></div>
-        <p className="mt-4 text-gray-600 dark:text-dark-text-secondary">Loading...</p>
-      </div>
-    </div>
-  );
+  return <LoadingScreen />;
 }

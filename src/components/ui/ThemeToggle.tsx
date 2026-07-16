@@ -8,9 +8,10 @@ interface ThemeToggleProps {
 }
 
 /**
- * Standalone light/dark toggle (auth pages). Inside the app the toggle lives
- * in the user menu instead. The icon swap is pure CSS (`dark:` visibility),
- * so it is correct before hydration — no mounted-guard, no flicker.
+ * Standalone light/dark toggle (auth pages). Inside the app theme lives in
+ * Settings instead (a Light/Dark/System selector). The icon swap is pure CSS
+ * (`dark:` visibility), so it is correct before hydration — no mounted-guard,
+ * no flicker.
  */
 const ThemeToggle = ({ className }: ThemeToggleProps) => {
   const { resolvedTheme, setTheme } = useTheme();

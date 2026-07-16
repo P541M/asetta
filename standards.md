@@ -4,12 +4,13 @@
 platform.** Read it before writing or reviewing any code. If a change conflicts with this file,
 either the change is wrong or this file must be updated in the same commit — never let them drift.
 
-Last updated: 2026-07-15 (v3.5 — onboarding migrated: wizard shell, all six steps, and the
-onboarding upload form on the v3 language; new dependency-free `switch` primitive;
-`Avatar`/`AvatarPicker`/`IconPicker` rebuilt on tokens (they also render inside migrated
-chrome). Settings is the last legacy section. Surface language unchanged since the 2026-07-14
-v3 lock: borderless tonal surfaces, filled inputs, flat buttons, View Transitions theme
-crossfade).
+Last updated: 2026-07-15 (v4.0 — **migration complete**. Settings migrated (profile, preferences
+incl. a Light/Dark/System theme selector, notifications) plus the last pages (`404`, `index`).
+The legacy `light-*`/`dark-*` token families and every orphaned `.btn-*`/`.input`/`.form-*`/
+`.card*`/`.badge*` utility are deleted from `globals.css` (grep-proofed) — the platform now
+contains zero legacy styling. This file describes the steady state. Surface language unchanged
+since the 2026-07-14 v3 lock: borderless tonal surfaces, filled inputs, flat buttons, View
+Transitions theme crossfade).
 
 ---
 
@@ -184,8 +185,9 @@ a tier, the ramp is wrong — update it here, don't invent a sixth size at the c
 - `text-base` appears ONLY as item titles (and the 16px input text that prevents iOS zoom) —
   running app text is `text-sm`. The content hierarchy decides the tier: the row's entity (the
   assignment) is the emphasized text, its grouping labels (course) are supporting.
-- The `h1`–`h6` base styles in `globals.css` serve legacy sections only; migrated components
-  always set their tier classes explicitly.
+- The `h1`–`h6` base styles in `globals.css` are retained as a semantic baseline (they use
+  `text-foreground` + the tier sizes) so bare headings — e.g. rich-text notes content — render
+  sensibly; migrated components still set their tier classes explicitly rather than relying on it.
 - Deliberate exception: the auth brand panel hero (`text-5xl/6xl`) is marketing-scale on purpose
   (shared with the landing); nothing inside the app uses it.
 
@@ -217,17 +219,25 @@ a tier, the ramp is wrong — update it here, don't invent a sixth size at the c
 - **Exact token values ("Theme Tokens" table): locked during the auth-flow redesign** and recorded
   here. Brand anchor: Asetta amber (`#D97706` light / `#F59E0B` dark) as `--primary`, preserved
   from the current design.
-- **Legacy tokens** (`light-*`/`dark-*` and the `.btn-*`/`.input`/`.form-*`/`.badge*` classes in
-  `globals.css`) stay until the last section using them is migrated — that is now onboarding and
-  settings only. Deleting a legacy class requires a grep proving zero usages (already deleted
-  this way: `.modal-*`, the `grade-*`/`status-*`/`performance-*` token families).
+- **Legacy tokens are gone.** The `light-*`/`dark-*` families and the `.btn-*`/`.input`/`.form-*`/
+  `.card*`/`.badge*`/`.modal-*` utilities were removed from `globals.css` once the migration
+  completed (2026-07-15, each grep-proofed). Do not reintroduce them — reach for a semantic token
+  or a `ui/` primitive. What remains in `globals.css` is intentional: semantic tokens, the radius/
+  shadow/font/animation `@theme` scales, safe-area utilities, scrollbar styling, the `h1`–`h6`
+  baseline, and the SVG logo filters.
 
 ### Dark/light mode rules
 
 - Strategy: class-based (`.dark` on `<html>` via `@custom-variant`), managed by **next-themes**
-  (`ThemeProvider` in `_app.tsx`, currently `defaultTheme="light"`, system option arrives with the
-  settings redesign). It owns the no-flash pre-hydration script and persistence (`theme` key);
-  `_document.tsx` carries only the one-time seed that migrates the legacy `darkMode` key.
+  (`ThemeProvider` in `_app.tsx`, `defaultTheme="light"`). It owns the no-flash pre-hydration
+  script and persistence (`theme` key); `_document.tsx` carries only the one-time seed that
+  migrates the legacy `darkMode` key.
+- **Theme is a Light / Dark / System choice** set in Settings → Preferences (the radiogroup on the
+  amber selection language). It applies **immediately** via `setThemeWithTransition` (`utils/theme.ts`)
+  — the crossfade, not a Save round-trip. `defaultTheme` stays `"light"` on purpose: System is an
+  explicit opt-in, so no existing user's appearance changes without their action (zero-drift).
+  When rendering UI keyed off the selected theme, guard the highlight with a mounted flag (theme is
+  undefined pre-hydration) but always render the controls so layout doesn't shift.
 - **Never** read/write theme localStorage directly and **never** touch
   `document.documentElement.classList` manually — `useTheme()` from next-themes is the only API.
 - A surface that is deliberately the same in both themes (e.g. the auth brand panel) opts in by
@@ -255,11 +265,17 @@ a tier, the ramp is wrong — update it here, don't invent a sixth size at the c
 | Assessments table (incl. course-filtered view; `StatusSelect` rebuilt on primitives as a tinted status chip, new `checkbox` primitive) | ✅ migrated 2026-07-15 |
 | Courses tab (`CoursesOverviewTable`: tonal keyboard-accessible course cards) | ✅ migrated 2026-07-15 |
 | Grades / Calendar / Add (grade calculator + tonal stat tiles, calendar grid + `DayDetailModal`, upload/quick-add forms; `EmptyState`/`LoadingSpinner`/`RateLimitNotice` rebuilt on tokens; `CustomSelect`, `ErrorMessage`, `utils/statusUtils.ts` deleted — status tints all come from `statusTintClasses`) | ✅ migrated 2026-07-15 |
-| Settings | legacy (toggle already rewired to next-themes) |
+| Settings (profile, preferences incl. Light/Dark/System theme selector, notifications; nav on the tab-bar recipe; `Switch` for all toggles) + last pages (`404`, `index`) | ✅ migrated 2026-07-15 |
 
-**Placement rule for the theme toggle** (founder decision, 2026-07-14): visible on auth pages
-only; inside the app it lives ONLY in Settings — not in the header or user menu. Theme is a
-set-and-forget preference, not a daily control.
+**Migration complete (v4.0).** Every section is on the shadcn/Tailwind-v4 system; the legacy
+`light-*`/`dark-*` tokens and `.btn-*`/`.input`/`.form-*`/`.card*`/`.badge*` utilities are gone
+from `globals.css`. Any reintroduction of a `light-*`/`dark-*` class or a legacy utility is a
+regression.
+
+**Placement rule for the theme control** (founder decision, 2026-07-14): the light/dark
+`ThemeToggle` is on auth pages only; inside the app theme lives ONLY in Settings → Preferences
+(the Light/Dark/System selector) — not in the header or user menu. Theme is a set-and-forget
+preference, not a daily control.
 
 **Selector pattern** (founder decision, 2026-07-14): context switchers (semester, and future
 course/term pickers) are a single dropdown control — current value + check-marked options +
@@ -290,9 +306,10 @@ related actions (add/manage) in one menu. No pill rows with satellite icon butto
 
 ### Handoff notes for new sessions
 
-This file + `CLAUDE.md` (which mandates reading it) are the complete context for continuing the
-UI migration — prior chat history is NOT required. Current state lives in the migration table
-below; work section by section, one approval per section, founder pushes to GitHub (never the
-agent). The verification loop (Part 1) runs after every task. Next up: settings — the final
-legacy section; its pass also deletes the remaining legacy utilities and `light-*`/`dark-*`
-tokens (grep-proofed) and brings the "system" theme option.
+This file + `CLAUDE.md` (which mandates reading it) are the complete context — prior chat history
+is NOT required. **The section-by-section migration is complete (v4.0):** every section is on the
+shadcn/Tailwind-v4 system and the legacy CSS is gone. This file now describes the steady state,
+not a migration in progress. New work is ordinary feature/fix work under these rules — semantic
+tokens and `ui/` primitives only, no `light-*`/`dark-*` classes, customize primitives centrally
+(never at call sites), run the Part 1 verification loop after every task, and the founder owns all
+git operations (never the agent).

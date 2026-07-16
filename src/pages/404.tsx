@@ -1,5 +1,7 @@
 import Link from "next/link";
 import Head from "next/head";
+import { cn } from "@/lib/utils";
+import { buttonVariants } from "../components/ui/button";
 
 const Custom404 = () => {
   return (
@@ -8,29 +10,23 @@ const Custom404 = () => {
         <title>404 - Page Not Found | Asetta</title>
         <meta name="description" content="The page you're looking for doesn't exist." />
       </Head>
-      <div className="min-h-screen bg-gray-50 dark:bg-dark-bg-primary flex items-center justify-center px-4 sm:px-6 lg:px-8">
-        <div className="max-w-md w-full space-y-8 text-center">
+      <div className="flex min-h-screen items-center justify-center bg-background px-4 sm:px-6 lg:px-8">
+        <div className="w-full max-w-md space-y-8 text-center">
           <div>
-            <h1 className="text-9xl font-bold text-gray-300 dark:text-dark-text-tertiary">404</h1>
-            <h2 className="mt-6 text-3xl font-bold text-gray-900 dark:text-dark-text-primary">
+            <p className="text-8xl font-semibold text-muted-foreground/30">404</p>
+            <h1 className="mt-6 text-2xl font-semibold tracking-tight text-foreground md:text-3xl">
               Page not found
-            </h2>
-            <p className="mt-2 text-sm text-gray-600 dark:text-dark-text-secondary">
+            </h1>
+            <p className="mt-2 text-sm text-muted-foreground">
               Sorry, we couldn&apos;t find the page you&apos;re looking for.
             </p>
           </div>
-          <div className="space-y-4">
-            <Link
-              href="/dashboard"
-              className="block w-full bg-light-button-primary hover:bg-light-button-primary-hover dark:bg-dark-button-primary dark:hover:bg-dark-button-primary-hover text-white font-medium py-3 px-4 rounded-md transition-colors duration-200"
-            >
-              Go back to Dashboard
+          <div className="space-y-3">
+            <Link href="/dashboard" className={cn(buttonVariants(), "w-full")}>
+              Go back to dashboard
             </Link>
-            <Link
-              href="/"
-              className="block w-full bg-gray-100 dark:bg-dark-bg-secondary hover:bg-gray-200 dark:hover:bg-dark-bg-tertiary text-gray-900 dark:text-dark-text-primary font-medium py-3 px-4 rounded-md transition-colors duration-200"
-            >
-              Go to Home
+            <Link href="/" className={cn(buttonVariants({ variant: "secondary" }), "w-full")}>
+              Go to home
             </Link>
           </div>
         </div>
