@@ -23,6 +23,7 @@ import {
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import EmptyState from "../ui/EmptyState";
+import PanelHeader from "../ui/PanelHeader";
 
 /** Inline error banner for tab content (padded to sit inside the panel). */
 const TabError = ({ message }: { message: string }) => (
@@ -156,7 +157,7 @@ const GradesTab = ({ data, urlSemesterId }: TabComponentProps) => {
   if (!selectedSemesterId) {
     return (
       <EmptyState
-        icon={<GraduationCap className="size-12" aria-hidden />}
+        icon={GraduationCap}
         title="No semester selected"
         description="Select a semester above to view grade calculations for your courses."
       />
@@ -164,19 +165,11 @@ const GradesTab = ({ data, urlSemesterId }: TabComponentProps) => {
   }
 
   return (
-    <div>
-      <div className="p-6">
-        {/* Header with course selection */}
-        <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h2 className="text-xl font-semibold tracking-tight text-foreground">
-              Grade calculator
-            </h2>
-            <p className="text-sm text-muted-foreground">{selectedCourse || "Select a course"}</p>
-          </div>
-
-          {/* Auto-save status & course selector */}
-          <div className="flex items-center gap-4">
+    <div className="p-6">
+      <PanelHeader
+        title="Grade calculator"
+        actions={
+          <>
             {/* Feedback motion only: the indicator responds to a save the user triggered */}
             <div className="flex min-h-5 items-center">
               {autoSaveStatus === "saving" && (
@@ -227,33 +220,28 @@ const GradesTab = ({ data, urlSemesterId }: TabComponentProps) => {
                 ))}
               </DropdownMenuContent>
             </DropdownMenu>
-          </div>
-        </div>
+          </>
+        }
+      />
 
-        {/* No courses message */}
-        {availableCourses.length === 0 && (
-          <EmptyState
-            icon={<BookOpen className="size-12" aria-hidden />}
-            title="No courses found"
-            description="This semester doesn't have any assessments yet."
-            action={
-              <Button type="button" onClick={handleAddAssessment}>
-                Add assessment
-              </Button>
-            }
-            className="py-10"
-          />
-        )}
-
-        {/* Grade Calculator Component */}
-        {availableCourses.length > 0 && (
-          <GradeCalculator
-            semesterId={selectedSemesterId}
-            selectedCourse={selectedCourse}
-            onAutoSaveStatusChange={handleAutoSaveStatusChange}
-          />
-        )}
-      </div>
+      {availableCourses.length === 0 ? (
+        <EmptyState
+          icon={BookOpen}
+          title="No courses yet"
+          description="This semester doesn't have any assessments yet."
+          action={
+            <Button type="button" onClick={handleAddAssessment}>
+              Add assessment
+            </Button>
+          }
+        />
+      ) : (
+        <GradeCalculator
+          semesterId={selectedSemesterId}
+          selectedCourse={selectedCourse}
+          onAutoSaveStatusChange={handleAutoSaveStatusChange}
+        />
+      )}
     </div>
   );
 };
@@ -280,9 +268,7 @@ const AddTab = ({ data, urlSemesterId }: TabComponentProps) => {
     <div>
       {selectedSemesterId ? (
         <div className="p-6">
-          <h2 className="mb-6 text-xl font-semibold tracking-tight text-foreground">
-            Add assessment
-          </h2>
+          <PanelHeader title="Add assessment" />
 
           {/* Mode toggle on the segmented-control language (see TabNavigationBar) */}
           <div className="mb-6 rounded-xl bg-secondary p-1">
@@ -323,13 +309,15 @@ const AddTab = ({ data, urlSemesterId }: TabComponentProps) => {
           )}
         </div>
       ) : (
-        <div className="p-6 text-center">
-          <p className="text-sm text-muted-foreground">
-            {urlSemesterId
-              ? "Unable to load semester data. Please check the URL or return to the dashboard."
-              : "Please select a semester to add assessments."}
-          </p>
-        </div>
+        <EmptyState
+          icon={GraduationCap}
+          title={urlSemesterId ? "Semester not found" : "No semester selected"}
+          description={
+            urlSemesterId
+              ? "Check the URL or head back to your dashboard."
+              : "Select a semester above to add assessments."
+          }
+        />
       )}
     </div>
   );

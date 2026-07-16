@@ -201,10 +201,9 @@ const NotificationsSection = ({
 
       {!emailNotifications && (
         <EmptyState
-          icon={<BellOff className="size-12" aria-hidden />}
+          icon={BellOff}
           title="Email notifications disabled"
           description="Enable email notifications above to receive reminders about upcoming assessment deadlines and never miss an important due date."
-          className="py-8"
         />
       )}
     </div>

@@ -3,12 +3,14 @@ import { useRouter } from "next/router";
 import { BookOpen, Pencil } from "lucide-react";
 import { formatLocalDate, isUpcoming as isDateUpcoming } from "../../utils/dateUtils";
 import { CoursesOverviewTableProps } from "../../types/course";
+import { useTab } from "../../contexts/TabContext";
 import { useCourseRename } from "../../hooks/useCourseRename";
 import { getProgressBarColor } from "../../utils/gradeCalculations";
 import { cn } from "@/lib/utils";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import EmptyState from "../ui/EmptyState";
+import PanelHeader from "../ui/PanelHeader";
 
 const CoursesOverviewTable = ({
   courses,
@@ -17,6 +19,7 @@ const CoursesOverviewTable = ({
   onCourseRenamed,
 }: CoursesOverviewTableProps) => {
   const router = useRouter();
+  const { setActiveTab } = useTab();
   const [editingCourse, setEditingCourse] = useState<string | null>(null);
   const [editValue, setEditValue] = useState<string>("");
 
@@ -66,12 +69,16 @@ const CoursesOverviewTable = ({
   if (courses.length === 0) {
     return (
       <div className="p-6">
-        <h2 className="mb-6 text-xl font-semibold tracking-tight text-foreground">Courses</h2>
+        <PanelHeader title="Courses" />
         <EmptyState
-          icon={<BookOpen className="size-12" aria-hidden />}
+          icon={BookOpen}
           title="No courses yet"
-          description="Add some assessments to see your courses here."
-          className="py-10"
+          description="Add an assessment and its course will appear here."
+          action={
+            <Button type="button" onClick={() => setActiveTab("add")}>
+              Add assessment
+            </Button>
+          }
         />
       </div>
     );
@@ -79,7 +86,7 @@ const CoursesOverviewTable = ({
 
   return (
     <div className="p-6">
-      <h2 className="mb-6 text-xl font-semibold tracking-tight text-foreground">Courses</h2>
+      <PanelHeader title="Courses" />
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         {courses.map((course) => {

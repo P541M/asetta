@@ -24,6 +24,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
+import PanelHeader from "../ui/PanelHeader";
 import CalendarGrid from "./CalendarGrid";
 import DayDetailModal from "./DayDetailModal";
 
@@ -222,86 +223,86 @@ const CalendarView = ({ selectedSemester, semesterId, refreshTrigger }: Calendar
 
   return (
     <div className="p-6">
-      <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-        <div>
-          <h2 className="text-xl font-semibold tracking-tight text-foreground">Calendar</h2>
-          <p className="text-sm text-muted-foreground">
-            {monthNames[currentMonth.getMonth()]} {currentMonth.getFullYear()}
-          </p>
-        </div>
+      <PanelHeader
+        title="Calendar"
+        actions={
+          <>
+            <Input
+              type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Search assessments"
+              aria-label="Search assessments"
+              className="h-10 w-full sm:w-48"
+            />
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  className="min-w-40 justify-between"
+                  aria-label="Filter by status"
+                >
+                  <span className="flex min-w-0 items-center gap-2">
+                    <ActiveFilterIcon className="text-muted-foreground" aria-hidden />
+                    <span className="truncate">{activeFilter.label}</span>
+                  </span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="min-w-44">
+                {statusFilterOptions.map(({ value, label, icon: OptionIcon }) => (
+                  <DropdownMenuItem key={value} onSelect={() => setStatusFilter(value)}>
+                    <Check
+                      className={cn(statusFilter === value ? "opacity-100" : "opacity-0")}
+                      aria-hidden
+                    />
+                    <OptionIcon aria-hidden />
+                    {label}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
 
-        <div className="flex flex-wrap items-center gap-2">
-          <Input
-            type="text"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Search assessments"
-            aria-label="Search assessments"
-            className="h-10 w-full sm:w-48"
-          />
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
+            <div className="flex items-center gap-1">
               <Button
                 type="button"
-                variant="secondary"
-                className="min-w-40 justify-between"
-                aria-label="Filter by status"
+                variant="ghost"
+                size="icon"
+                onClick={previousMonth}
+                aria-label="Previous month"
               >
-                <span className="flex min-w-0 items-center gap-2">
-                  <ActiveFilterIcon className="text-muted-foreground" aria-hidden />
-                  <span className="truncate">{activeFilter.label}</span>
-                </span>
+                <ChevronLeft aria-hidden />
               </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="min-w-44">
-              {statusFilterOptions.map(({ value, label, icon: OptionIcon }) => (
-                <DropdownMenuItem key={value} onSelect={() => setStatusFilter(value)}>
-                  <Check
-                    className={cn(statusFilter === value ? "opacity-100" : "opacity-0")}
-                    aria-hidden
-                  />
-                  <OptionIcon aria-hidden />
-                  {label}
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
+              <span className="min-w-32 text-center text-sm font-medium text-foreground">
+                {monthNames[currentMonth.getMonth()]} {currentMonth.getFullYear()}
+              </span>
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                onClick={nextMonth}
+                aria-label="Next month"
+              >
+                <ChevronRight aria-hidden />
+              </Button>
+            </div>
 
-          <div className="flex items-center gap-1">
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              onClick={previousMonth}
-              aria-label="Previous month"
-            >
-              <ChevronLeft aria-hidden />
-            </Button>
             <Button type="button" variant="secondary" onClick={goToToday}>
               Today
             </Button>
+
             <Button
               type="button"
-              variant="ghost"
-              size="icon"
-              onClick={nextMonth}
-              aria-label="Next month"
+              variant="secondary"
+              onClick={handleExportCalendar}
+              disabled={assessments.length === 0}
             >
-              <ChevronRight aria-hidden />
+              <Download aria-hidden />
+              Export
             </Button>
-          </div>
-
-          <Button
-            type="button"
-            variant="secondary"
-            onClick={handleExportCalendar}
-            disabled={assessments.length === 0}
-          >
-            <Download aria-hidden />
-            Export
-          </Button>
-        </div>
-      </div>
+          </>
+        }
+      />
 
       <div
         ref={calendarRef}

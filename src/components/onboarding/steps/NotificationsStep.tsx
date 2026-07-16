@@ -228,10 +228,9 @@ export function NotificationsStep() {
 
       {!formData.emailNotifications && (
         <EmptyState
-          icon={<Bell className="size-12" aria-hidden />}
+          icon={Bell}
           title="Stay organized with reminders"
           description="Enable notifications above to receive reminders about upcoming assessment deadlines. You can always change this later in your settings."
-          className="py-8"
         />
       )}
 

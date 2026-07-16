@@ -46,10 +46,9 @@ const AssessmentBreakdown = ({
 
     {assessments.length === 0 ? (
       <EmptyState
-        icon={<ChartColumn className="size-12" aria-hidden />}
-        title="No assessments found"
+        icon={ChartColumn}
+        title="No assessments yet"
         description="This course doesn't have any assessments yet."
-        className="py-10"
       />
     ) : (
       <div className="space-y-4">

@@ -108,10 +108,13 @@ Copy drifts between "No X yet" / "No X found".
 
 **Changes.**
 
-- New `components/ui/PanelHeader.tsx`: `{ title, subtitle?, actions? }` — section-heading tier
-  title, optional body-tier subtitle, right-aligned actions slot; used by Courses, Assessments,
-  Grades, Calendar, Add, and CourseFilteredAssessments. Panels use uniform `p-6`; the extra
-  wrapper divs in `GradesTab`/`AddTab` are removed.
+- New `components/ui/PanelHeader.tsx`: `{ title, actions? }` — exactly ONE title line per header,
+  no subtitles (refined during step 4 QA, 2026-07-16: subtitles made header heights inconsistent).
+  The title sits on a fixed 40px line (`leading-10`) inside a `min-h-10` top-aligned row, so the
+  title position is identical on every tab regardless of actions; wrapping action clusters grow
+  downward. Calendar's month/year lives between the prev/next arrows (fixed-width slot); Grades'
+  course subtitle was dropped as redundant with its dropdown. Used by all five tabs inside a
+  uniform `p-6` panel; the extra wrapper divs in `GradesTab`/`AddTab` are removed.
 - `EmptyState.tsx` restyle (the one recipe): small icon (`size-5`) centered in a `size-10`
   tonal circle (`bg-secondary` circle, `text-muted-foreground` icon), item-title tier title,
   body-tier description (`max-w-md`), optional single action; standard `py-12` (callers stop

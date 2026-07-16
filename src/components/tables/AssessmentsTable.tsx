@@ -4,6 +4,7 @@ import { updateDoc, deleteDoc, serverTimestamp } from "firebase/firestore";
 import { Check, ChevronsUpDown, FileText, ListFilter } from "lucide-react";
 import { getAssessmentDocRef } from "../../lib/firebaseUtils";
 import { useAuth } from "../../contexts/AuthContext";
+import { useTab } from "../../contexts/TabContext";
 import { useDisplayPreferences } from "../../hooks/useDisplayPreferences";
 import { getDaysUntil } from "../../utils/dateUtils";
 import { Assessment, AssessmentStatus, AssessmentsTableProps } from "../../types/assessment";
@@ -11,6 +12,8 @@ import { isCompletedStatus } from "../../constants/assessment";
 import { cn } from "@/lib/utils";
 import ConfirmationModal from "../common/ConfirmationModal";
 import { Button } from "../ui/button";
+import EmptyState from "../ui/EmptyState";
+import PanelHeader from "../ui/PanelHeader";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -36,6 +39,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
   onStatusChange,
 }) => {
   const { user } = useAuth();
+  const { setActiveTab } = useTab();
   const [localAssessments, setLocalAssessments] = useState<Assessment[]>(assessments);
 
   // Update local assessments when props change
@@ -273,38 +277,40 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
 
   return (
     <div className="p-6">
-      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <h2 className="text-xl font-semibold tracking-tight text-foreground">Assessments</h2>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              type="button"
-              variant="secondary"
-              className="w-full justify-between sm:w-auto sm:min-w-44"
-              aria-label="Filter assessments"
-            >
-              <span className="flex min-w-0 items-center gap-2">
-                <ListFilter className="text-muted-foreground" aria-hidden />
-                <span className="truncate">
-                  {filterOptions.find((option) => option.value === filter)?.label ?? "All tasks"}
+      <PanelHeader
+        title="Assessments"
+        actions={
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                type="button"
+                variant="secondary"
+                className="w-full justify-between sm:w-auto sm:min-w-44"
+                aria-label="Filter assessments"
+              >
+                <span className="flex min-w-0 items-center gap-2">
+                  <ListFilter className="text-muted-foreground" aria-hidden />
+                  <span className="truncate">
+                    {filterOptions.find((option) => option.value === filter)?.label ?? "All tasks"}
+                  </span>
                 </span>
-              </span>
-              <ChevronsUpDown className="text-muted-foreground" aria-hidden />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="min-w-44">
-            {filterOptions.map((option) => (
-              <DropdownMenuItem key={option.value} onSelect={() => setFilter(option.value)}>
-                <Check
-                  className={cn(filter === option.value ? "opacity-100" : "opacity-0")}
-                  aria-hidden
-                />
-                {option.label}
-              </DropdownMenuItem>
-            ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
+                <ChevronsUpDown className="text-muted-foreground" aria-hidden />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="min-w-44">
+              {filterOptions.map((option) => (
+                <DropdownMenuItem key={option.value} onSelect={() => setFilter(option.value)}>
+                  <Check
+                    className={cn(filter === option.value ? "opacity-100" : "opacity-0")}
+                    aria-hidden
+                  />
+                  {option.label}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        }
+      />
 
       {/* Bulk Actions Toolbar */}
       {selectedRows.length > 0 && (
@@ -321,13 +327,24 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
       )}
 
       {sortedAssessments.length === 0 ? (
-        <div className="py-10 text-center">
-          <FileText className="mx-auto mb-4 size-12 text-muted-foreground/50" aria-hidden />
-          <p className="mb-2 text-base font-semibold text-foreground">No assessments found</p>
-          <p className="text-sm text-muted-foreground">
-            Upload a course outline or add assessments manually to get started.
-          </p>
-        </div>
+        localAssessments.length === 0 ? (
+          <EmptyState
+            icon={FileText}
+            title="No assessments yet"
+            description="Upload a course outline or add assessments manually to get started."
+            action={
+              <Button type="button" onClick={() => setActiveTab("add")}>
+                Add assessment
+              </Button>
+            }
+          />
+        ) : (
+          <EmptyState
+            icon={ListFilter}
+            title="No assessments found"
+            description="Nothing matches the current filter."
+          />
+        )
       ) : (
         <div className="space-y-2">
           <TableHeader

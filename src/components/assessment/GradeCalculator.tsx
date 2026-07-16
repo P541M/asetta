@@ -123,10 +123,9 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
   if (!selectedCourse) {
     return (
       <EmptyState
-        icon={<ChartColumn className="size-12" aria-hidden />}
+        icon={ChartColumn}
         title="No course selected"
         description="Select a course from the dropdown to view grade calculations."
-        className="py-10"
       />
     );
   }

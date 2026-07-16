@@ -5,6 +5,8 @@ import AssessmentsTable from "../tables/AssessmentsTable";
 import { CourseFilteredAssessmentsProps } from "../../types/course";
 import { Alert, AlertDescription } from "../ui/alert";
 import { Button } from "../ui/button";
+import EmptyState from "../ui/EmptyState";
+import LoadingSpinner from "../ui/LoadingSpinner";
 
 const CourseFilteredAssessments = ({
   semesterId,
@@ -35,12 +37,8 @@ const CourseFilteredAssessments = ({
       </div>
 
       {isLoading ? (
-        <div className="flex items-center justify-center py-12">
-          <div
-            className="size-10 rounded-full border-4 border-secondary border-t-primary motion-safe:animate-spin"
-            role="status"
-            aria-label="Loading assessments"
-          />
+        <div className="flex justify-center py-12">
+          <LoadingSpinner />
         </div>
       ) : error ? (
         <div className="px-6 pb-6">
@@ -50,16 +48,11 @@ const CourseFilteredAssessments = ({
           </Alert>
         </div>
       ) : assessments.length === 0 ? (
-        <div className="px-6 pb-10 text-center">
-          <FileText className="mx-auto mb-4 size-12 text-muted-foreground/50" aria-hidden />
-          <p className="mb-2 text-base font-semibold text-foreground">
-            No assessments found for this course
-          </p>
-          <p className="text-sm text-muted-foreground">
-            This course doesn&apos;t have any assessments yet. Add assessments manually or upload a
-            course outline.
-          </p>
-        </div>
+        <EmptyState
+          icon={FileText}
+          title="No assessments in this course yet"
+          description="Add assessments manually or upload a course outline."
+        />
       ) : (
         <AssessmentsTable
           assessments={assessments}
