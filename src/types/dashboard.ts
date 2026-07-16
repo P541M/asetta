@@ -7,8 +7,6 @@ export interface DashboardData {
   assessments: Assessment[];
   courses: CourseStats[];
   availableCourses: string[];
-  isLoading: boolean;
-  isDataReady: boolean;
   error: string | null;
   stats: {
     total: number;

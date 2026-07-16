@@ -97,7 +97,6 @@ export function useSemesterAssessments(user: User | null, selectedSemesterId: st
   const [courses, setCourses] = useState<CourseStats[]>([]);
   const [availableCourses, setAvailableCourses] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [isDataReady, setIsDataReady] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [stats, setStats] = useState<DashboardStats>(EMPTY_STATS);
   const hasDataRef = useRef(false);
@@ -113,7 +112,6 @@ export function useSemesterAssessments(user: User | null, selectedSemesterId: st
     if (!hasDataRef.current) {
       setIsLoading(true);
     }
-    setIsDataReady(false);
     setError(null);
     const assessmentsRef = collection(
       db,
@@ -159,24 +157,17 @@ export function useSemesterAssessments(user: User | null, selectedSemesterId: st
 
           setStats(computeStats(assessmentsList));
           setIsLoading(false);
-
-          // Add a small delay before marking data as ready to ensure smooth animations
-          setTimeout(() => {
-            setIsDataReady(true);
-          }, 50);
         },
         (err) => {
           console.error("Error fetching assessments:", err);
           setError("Failed to load assessments. Please try again.");
           setIsLoading(false);
-          setIsDataReady(true);
         },
       );
     } catch (error) {
       console.error("Error setting up assessments listener:", error);
       setError("Failed to set up assessments listener. Please try again.");
       setIsLoading(false);
-      setIsDataReady(true);
     }
 
     return () => {
@@ -186,5 +177,5 @@ export function useSemesterAssessments(user: User | null, selectedSemesterId: st
     };
   }, [selectedSemesterId, user]);
 
-  return { assessments, courses, availableCourses, isLoading, isDataReady, error, stats };
+  return { assessments, courses, availableCourses, isLoading, error, stats };
 }

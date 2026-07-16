@@ -27,37 +27,26 @@ const DashboardHeader = ({ onLogout }: DashboardHeaderProps) => {
   const { profile } = useUserProfile();
   const [greeting, setGreeting] = useState("");
   const [subtitle, setSubtitle] = useState("");
-  const [isHeaderReady, setIsHeaderReady] = useState(false);
   const greetingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const router = useRouter();
 
-  // Initialize and update greeting
   useEffect(() => {
-    // Reset ready state when user/profile changes
-    setIsHeaderReady(false);
-
     const updateGreeting = () => {
       setGreeting(getPersonalizedGreeting(user, profile));
       setSubtitle(getRotatingSubtitle());
-      // Small delay so the greeting fades in once, not per keystroke of state
-      setTimeout(() => setIsHeaderReady(true), 50);
     };
 
-    // Initial greeting
     updateGreeting();
 
-    // Schedule next update
     const scheduleNextUpdate = () => {
-      const msToNext = getMillisecondsToNextGreetingUpdate();
       greetingTimeoutRef.current = setTimeout(() => {
         updateGreeting();
-        scheduleNextUpdate(); // Schedule the next update
-      }, msToNext);
+        scheduleNextUpdate();
+      }, getMillisecondsToNextGreetingUpdate());
     };
 
     scheduleNextUpdate();
 
-    // Cleanup timeout on unmount
     return () => {
       if (greetingTimeoutRef.current) {
         clearTimeout(greetingTimeoutRef.current);
@@ -72,7 +61,7 @@ const DashboardHeader = ({ onLogout }: DashboardHeaderProps) => {
       <div className="mx-auto max-w-7xl px-4 py-5 md:px-6">
         <div className="flex min-h-16 items-center justify-between gap-4">
           {/* Personalized greeting */}
-          <div className={isHeaderReady ? "motion-safe:animate-fade-in" : "opacity-0"}>
+          <div>
             <h1
               className="text-2xl font-semibold tracking-tight text-foreground md:text-3xl"
               role="banner"

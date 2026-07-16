@@ -1,3 +1,6 @@
+import { Dispatch, SetStateAction } from "react";
+import { Semester } from "./semester";
+
 export interface CourseFilteredAssessmentsProps {
   semesterId: string;
   selectedCourse: string;
@@ -5,8 +8,10 @@ export interface CourseFilteredAssessmentsProps {
 }
 
 export interface SemesterTabsProps {
-  selectedSemester: string;
-  onSelect: (semester: string) => void;
+  semesters: Semester[];
+  setSemesters: Dispatch<SetStateAction<Semester[]>>;
+  activeSemester: Semester | null;
+  isLoading: boolean;
 }
 
 export interface CourseStats {

@@ -1,10 +1,8 @@
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "../../contexts/AuthContext";
-import { updateDoc } from "firebase/firestore";
 import { useAssessments } from "../../hooks/useAssessments";
-import { useAutoSave } from "../../hooks/useAutoSave";
+import { useAssessmentAutoSave } from "../../hooks/useAssessmentAutoSave";
 import { useCoursePreferences } from "../../hooks/useCoursePreferences";
-import { getAssessmentDocRef } from "../../lib/firebaseUtils";
 import { Assessment } from "../../types/assessment";
 import {
   computeCurrentGrade,
@@ -50,47 +48,11 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
 
   const [assessments, setAssessments] = useState<Assessment[]>([]);
 
-  // Prepare data for auto-save (only include modified fields)
-  const assessmentData = useMemo(
-    () =>
-      assessments.map((assessment) => ({
-        id: assessment.id,
-        mark: assessment.mark,
-        weight: assessment.weight,
-        status: assessment.status,
-      })),
-    [assessments],
-  );
-
-  // Auto-save function
-  const handleAutoSave = useCallback(
-    async (data: typeof assessmentData) => {
-      if (!user || !semesterId) return;
-
-      for (const assessmentUpdate of data) {
-        if (!assessmentUpdate.id) continue;
-        const assessmentRef = getAssessmentDocRef(user.uid, semesterId, assessmentUpdate.id);
-        const mark = assessmentUpdate.mark === undefined ? null : assessmentUpdate.mark;
-
-        await updateDoc(assessmentRef, {
-          mark,
-          weight: assessmentUpdate.weight,
-          status: assessmentUpdate.status,
-        });
-      }
-
-      // No need to refetch - local state is already updated optimistically
-      // and represents the correct current state after Firebase update
-    },
-    [user, semesterId],
-  );
-
-  // Auto-save hook
-  const { status: saveStatus, error: saveError } = useAutoSave({
-    data: assessmentData,
-    onSave: handleAutoSave,
-    enabled: Boolean(user && semesterId),
-  });
+  const {
+    queueSave,
+    status: saveStatus,
+    error: saveError,
+  } = useAssessmentAutoSave(user, semesterId);
 
   // Notify parent of auto-save status changes
   useEffect(() => {
@@ -120,34 +82,34 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
   const handleMarkChange = (assessmentId: string, value: string) => {
     const mark = value === "" ? null : Math.max(0, parseFloat(value) || 0);
 
-    setAssessments((prevAssessments) =>
-      prevAssessments.map((assessment) =>
-        assessment.id === assessmentId ? { ...assessment, mark, status: "Submitted" } : assessment,
-      ),
+    const updatedAssessments = assessments.map((assessment) =>
+      assessment.id === assessmentId
+        ? { ...assessment, mark, status: "Submitted" as const }
+        : assessment,
     );
+    setAssessments(updatedAssessments);
+    recalculateGrade(updatedAssessments);
 
-    recalculateGrade(
-      assessments.map((assessment) =>
-        assessment.id === assessmentId ? { ...assessment, mark, status: "Submitted" } : assessment,
-      ),
-    );
+    const edited = updatedAssessments.find((assessment) => assessment.id === assessmentId);
+    if (edited?.id) {
+      queueSave(edited.id, { mark, weight: edited.weight, status: edited.status });
+    }
   };
 
   const handleWeightChange = (assessmentId: string, value: string) => {
     const newWeight = value === "" ? 0 : Math.min(100, Math.max(0, parseFloat(value) || 0));
 
-    setAssessments((prevAssessments) =>
-      prevAssessments.map((assessment) =>
-        assessment.id === assessmentId ? { ...assessment, weight: newWeight } : assessment,
-      ),
-    );
-
     const updatedAssessments = assessments.map((assessment) =>
       assessment.id === assessmentId ? { ...assessment, weight: newWeight } : assessment,
     );
-
+    setAssessments(updatedAssessments);
     setTotalWeight(computeTotalWeight(updatedAssessments));
     recalculateGrade(updatedAssessments);
+
+    const edited = updatedAssessments.find((assessment) => assessment.id === assessmentId);
+    if (edited?.id) {
+      queueSave(edited.id, { mark: edited.mark ?? null, weight: newWeight, status: edited.status });
+    }
   };
 
   const handleTargetGradeChange = async (newTargetGrade: number) => {

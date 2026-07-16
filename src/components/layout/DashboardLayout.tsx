@@ -8,7 +8,8 @@ import TabNavigationBar from "./TabNavigationBar";
 import { Assessment } from "../../types/assessment";
 import { CourseStats } from "../../types/course";
 import LoadingScreen from "../ui/LoadingScreen";
-import { useSemesterSelection } from "../../hooks/useSemesterSelection";
+import LoadingSpinner from "../ui/LoadingSpinner";
+import { useSemesters } from "../../hooks/useSemesters";
 import { useSemesterAssessments, DashboardStats } from "../../hooks/useSemesterAssessments";
 import { useDisplayPreferences } from "../../hooks/useDisplayPreferences";
 
@@ -19,8 +20,6 @@ interface DashboardLayoutProps {
     assessments: Assessment[];
     courses: CourseStats[];
     availableCourses: string[];
-    isLoading: boolean;
-    isDataReady: boolean;
     error: string | null;
     stats: DashboardStats;
     refreshAssessments: () => void;
@@ -42,11 +41,15 @@ const DashboardLayout = ({
   const { showStatsBar } = useDisplayPreferences(user);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
-  const { selectedSemester, setSelectedSemester, selectedSemesterId } = useSemesterSelection(
-    user,
-    forceSemesterId,
-  );
-  const { assessments, courses, availableCourses, isLoading, isDataReady, error, stats } =
+  const {
+    semesters,
+    setSemesters,
+    isLoading: semestersLoading,
+    activeSemester,
+  } = useSemesters(user, forceSemesterId);
+  const selectedSemester = activeSemester?.name ?? "";
+  const selectedSemesterId = activeSemester?.id ?? "";
+  const { assessments, courses, availableCourses, isLoading, error, stats } =
     useSemesterAssessments(user, selectedSemesterId);
 
   useEffect(() => {
@@ -86,7 +89,12 @@ const DashboardLayout = ({
       <DashboardHeader onLogout={handleLogout} />
       <div className="p-4 md:p-6 pl-safe pr-safe pt-safe pb-safe">
         <div className="max-w-7xl mx-auto">
-          <SemesterTabs selectedSemester={selectedSemester} onSelect={setSelectedSemester} />
+          <SemesterTabs
+            semesters={semesters}
+            setSemesters={setSemesters}
+            activeSemester={activeSemester}
+            isLoading={semestersLoading}
+          />
 
           {showStatsBar && (
             <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 md:gap-4 lg:grid-cols-6">
@@ -105,24 +113,24 @@ const DashboardLayout = ({
 
             {/* Tab Content Area */}
             <div className="mt-6">
-              <div
-                className={`rounded-xl bg-card shadow-soft ${
-                  isDataReady ? "motion-safe:animate-fade-in" : "opacity-0"
-                }`}
-              >
-                {children({
-                  selectedSemester,
-                  selectedSemesterId,
-                  assessments,
-                  courses,
-                  availableCourses,
-                  isLoading,
-                  isDataReady,
-                  error,
-                  stats,
-                  refreshAssessments,
-                  refreshTrigger,
-                })}
+              <div className="rounded-xl bg-card shadow-soft">
+                {isLoading ? (
+                  <div className="flex justify-center py-16">
+                    <LoadingSpinner />
+                  </div>
+                ) : (
+                  children({
+                    selectedSemester,
+                    selectedSemesterId,
+                    assessments,
+                    courses,
+                    availableCourses,
+                    error,
+                    stats,
+                    refreshAssessments,
+                    refreshTrigger,
+                  })
+                )}
               </div>
             </div>
           </div>
