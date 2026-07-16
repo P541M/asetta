@@ -17,8 +17,3 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     res.status(500).json({ message: "Internal server error" });
   }
 }
-
-// This is the configuration for the Vercel Cron Job
-export const config = {
-  regions: ["iad1"], // Use the region closest to your users
-};
