@@ -4,7 +4,6 @@ import { User, onAuthStateChanged, signOut } from "firebase/auth";
 import { auth, db } from "../lib/firebase";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { AuthContextType } from "../types/context";
-import { removeFromLocalStorage } from "../utils/localStorage";
 import { useOnboardingStatus } from "../hooks/useOnboardingStatus";
 
 const AuthContext = createContext<AuthContextType>({
@@ -91,8 +90,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const logout = async () => {
-    // Clear user-specific cached data before signing out
-    removeFromLocalStorage("avatarIconId");
     await signOut(auth);
   };
 

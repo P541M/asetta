@@ -4,7 +4,6 @@ export interface OnboardingUserData {
   institution?: string;
   studyProgram?: string;
   graduationYear?: number;
-  avatarIconId?: string;
   hasConsentedToNotifications?: boolean;
   emailNotifications?: boolean;
   notificationDaysBefore?: number;

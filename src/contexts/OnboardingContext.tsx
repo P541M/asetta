@@ -11,7 +11,6 @@ import {
   OnboardingSemesterData,
 } from "../types/onboarding";
 import { ExtractionResult } from "../types/upload";
-import { DEFAULT_ICON } from "../data/profileIcons";
 
 // Initial state
 const initialState: OnboardingState = {
@@ -266,7 +265,6 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
         institution: state.userData.institution || "",
         studyProgram: state.userData.studyProgram || "",
         graduationYear: state.userData.graduationYear || new Date().getFullYear() + 4,
-        avatarIconId: state.userData.avatarIconId || DEFAULT_ICON.id,
         hasConsentedToNotifications: state.userData.hasConsentedToNotifications || false,
         emailNotifications: state.userData.emailNotifications || true,
         notificationDaysBefore: state.userData.notificationDaysBefore || 1,

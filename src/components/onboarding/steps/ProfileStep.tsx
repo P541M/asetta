@@ -1,33 +1,23 @@
 import React, { useState } from "react";
 import { UserRound } from "lucide-react";
 import { useOnboarding } from "../../../contexts/OnboardingContext";
+import { useAuth } from "../../../contexts/AuthContext";
 import { StepNavigation } from "../ui/StepNavigation";
 import { Input } from "../../ui/input";
 import { Label } from "../../ui/label";
 import Avatar from "../../ui/Avatar";
-import AvatarPicker from "../../ui/AvatarPicker";
-import { DEFAULT_ICON } from "../../../data/profileIcons";
 
 export function ProfileStep() {
   const { state, updateUserData } = useOnboarding();
+  const { user } = useAuth();
   const [formData, setFormData] = useState({
     institution: state.userData.institution || "",
     studyProgram: state.userData.studyProgram || "",
     graduationYear: state.userData.graduationYear || new Date().getFullYear() + 4,
-    avatarIconId: state.userData.avatarIconId || DEFAULT_ICON.id,
   });
 
   const handleInputChange = (field: string, value: string | number) => {
     const newFormData = { ...formData, [field]: value };
-    setFormData(newFormData);
-    updateUserData(newFormData);
-  };
-
-  const handleIconSelect = (iconId: string) => {
-    const newFormData = {
-      ...formData,
-      avatarIconId: iconId,
-    };
     setFormData(newFormData);
     updateUserData(newFormData);
   };
@@ -47,18 +37,9 @@ export function ProfileStep() {
         <p className="text-muted-foreground">Add some basic info to personalize your experience.</p>
       </div>
 
-      {/* Avatar section */}
-      <div className="mb-8 flex flex-col items-center space-y-4">
-        <Avatar size="lg" iconId={formData.avatarIconId} />
-        <p className="text-sm text-muted-foreground">Choose your profile avatar</p>
-        <div className="w-full max-w-md">
-          <AvatarPicker
-            selectedIconId={formData.avatarIconId}
-            onIconSelect={handleIconSelect}
-            variant="inline"
-            className="w-full"
-          />
-        </div>
+      {/* Avatar */}
+      <div className="mb-8 flex justify-center">
+        <Avatar size="lg" name={user?.displayName || user?.email || undefined} />
       </div>
 
       {/* Form */}

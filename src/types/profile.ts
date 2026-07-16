@@ -7,6 +7,4 @@ export interface ProfileSectionProps {
   setStudyProgram: (program: string) => void;
   graduationYear: number;
   setGraduationYear: (year: number) => void;
-  avatarIconId: string;
-  setAvatarIconId: (iconId: string) => void;
 }

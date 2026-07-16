@@ -78,7 +78,10 @@ const DashboardHeader = ({ onLogout }: DashboardHeaderProps) => {
               className="flex items-center gap-2 rounded-lg px-2.5 py-2 text-sm font-medium text-foreground outline-hidden transition-colors hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring data-[state=open]:bg-accent"
               aria-label="User menu"
             >
-              <Avatar size="sm" iconId={profile?.avatarIconId} />
+              <Avatar
+                size="sm"
+                name={profile?.displayName || user.displayName || user.email || undefined}
+              />
               <span className="hidden max-w-37.5 truncate md:block">
                 {user?.displayName || user?.email}
               </span>

@@ -118,7 +118,6 @@ export async function loadUserDataForOnboarding(user: User | null): Promise<{
           (typeof firebaseData.expectedGraduation === "string"
             ? parseInt(firebaseData.expectedGraduation) || new Date().getFullYear() + 4
             : new Date().getFullYear() + 4),
-        avatarIconId: firebaseData.avatarIconId || "",
         emailNotifications: firebaseData.emailNotifications || false,
         hasConsentedToNotifications: firebaseData.hasConsentedToNotifications || false,
         notificationDaysBefore: firebaseData.notificationDaysBefore || 1,

@@ -1,8 +1,6 @@
 import { ProfileSectionProps } from "../../types/profile";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
-import Avatar from "../ui/Avatar";
-import AvatarPicker from "../ui/AvatarPicker";
 
 const ProfileSection = ({
   displayName,
@@ -13,8 +11,6 @@ const ProfileSection = ({
   setStudyProgram,
   graduationYear,
   setGraduationYear,
-  avatarIconId,
-  setAvatarIconId,
 }: ProfileSectionProps) => {
   const currentYear = new Date().getFullYear();
 
@@ -23,29 +19,7 @@ const ProfileSection = ({
       {/* Section header */}
       <div className="border-b border-border pb-4">
         <h3 className="text-base font-semibold text-foreground">Profile information</h3>
-        <p className="mt-1 text-sm text-muted-foreground">Update your profile details and avatar</p>
-      </div>
-
-      {/* Avatar section */}
-      <div className="flex flex-col items-center space-y-6">
-        <div className="flex flex-col items-center space-y-4">
-          <Avatar size="lg" iconId={avatarIconId} />
-          <div className="text-center">
-            <p className="text-sm text-muted-foreground">Your profile avatar</p>
-            <p className="mt-1 text-xs text-muted-foreground">
-              Choose an icon to represent yourself
-            </p>
-          </div>
-        </div>
-
-        <div className="w-full max-w-md">
-          <AvatarPicker
-            selectedIconId={avatarIconId}
-            onIconSelect={setAvatarIconId}
-            variant="inline"
-            className="w-full"
-          />
-        </div>
+        <p className="mt-1 text-sm text-muted-foreground">Update your profile details</p>
       </div>
 
       {/* Profile fields */}

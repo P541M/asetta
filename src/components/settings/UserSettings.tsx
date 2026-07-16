@@ -10,7 +10,6 @@ import NotificationsSection from "./NotificationsSection";
 import SettingsNavigation from "./SettingsNavigation";
 import SettingsActions from "./SettingsActions";
 import SettingsMessage from "./SettingsMessage";
-import { DEFAULT_ICON } from "../../data/profileIcons";
 
 interface UserSettingsProps {
   isOpen: boolean;
@@ -32,7 +31,6 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
     text: string;
     type: "success" | "error";
   }>({ text: "", type: "success" });
-  const [avatarIconId, setAvatarIconId] = useState<string>(DEFAULT_ICON.id);
   const [activeTab, setActiveTab] = useState<"profile" | "preferences" | "notifications">(
     "profile",
   );
@@ -56,7 +54,6 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
     showWeight: true,
     showNotes: true,
     showStatsBar: false,
-    avatarIconId: DEFAULT_ICON.id,
     emailNotifications: false,
     notificationDaysBefore: 1,
     email: "",
@@ -76,7 +73,6 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
       showWeight !== initialValues.showWeight ||
       showNotes !== initialValues.showNotes ||
       showStatsBar !== initialValues.showStatsBar ||
-      avatarIconId !== initialValues.avatarIconId ||
       emailNotifications !== initialValues.emailNotifications ||
       notificationDaysBefore !== initialValues.notificationDaysBefore ||
       email !== initialValues.email
@@ -109,9 +105,6 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
           const newEmailNotifications = userData.emailNotifications ?? false;
           const newNotificationDaysBefore = userData.notificationDaysBefore ?? 1;
           const newEmail = userData.email || "";
-          // Handle migration from emoji to icon if needed
-          const newAvatarIconId =
-            userData.avatarIconId || (userData.avatarEmoji ? DEFAULT_ICON.id : DEFAULT_ICON.id);
 
           // Set current values
           setInstitution(newInstitution);
@@ -124,7 +117,6 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
           setEmailNotifications(newEmailNotifications);
           setNotificationDaysBefore(newNotificationDaysBefore);
           setEmail(newEmail);
-          setAvatarIconId(newAvatarIconId);
 
           // Set initial values
           setInitialValues({
@@ -136,7 +128,6 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
             showWeight: newShowWeight,
             showNotes: newShowNotes,
             showStatsBar: newShowStatsBar,
-            avatarIconId: newAvatarIconId,
             emailNotifications: newEmailNotifications,
             notificationDaysBefore: newNotificationDaysBefore,
             email: newEmail,
@@ -195,7 +186,6 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
         notificationDaysBefore: notificationDaysBefore,
         email: email,
         hasConsentedToNotifications: hasConsentedToNotifications,
-        avatarIconId: avatarIconId,
         updatedAt: new Date(),
       });
 
@@ -209,7 +199,6 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
         showWeight,
         showNotes,
         showStatsBar,
-        avatarIconId: avatarIconId,
         emailNotifications,
         notificationDaysBefore,
         email,
@@ -271,8 +260,6 @@ const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
               setStudyProgram={setStudyProgram}
               graduationYear={graduationYear}
               setGraduationYear={setGraduationYear}
-              avatarIconId={avatarIconId}
-              setAvatarIconId={setAvatarIconId}
             />
           ) : activeTab === "preferences" ? (
             <PreferencesSection
