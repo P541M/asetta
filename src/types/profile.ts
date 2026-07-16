@@ -1,10 +1,11 @@
-export interface ProfileSectionProps {
+export interface ProfileForm {
   displayName: string;
-  setDisplayName: (name: string) => void;
   institution: string;
-  setInstitution: (institution: string) => void;
   studyProgram: string;
-  setStudyProgram: (program: string) => void;
   graduationYear: number;
-  setGraduationYear: (year: number) => void;
+}
+
+export interface ProfileSectionProps {
+  form: ProfileForm;
+  onChange: <K extends keyof ProfileForm>(field: K, value: ProfileForm[K]) => void;
 }

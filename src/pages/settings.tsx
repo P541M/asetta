@@ -38,28 +38,20 @@ const SettingsPage = () => {
         <title>Settings - Asetta</title>
         <meta name="description" content="Manage your account settings and preferences" />
       </Head>
-      <DashboardHeader onLogout={handleLogout} />
+      <DashboardHeader onLogout={handleLogout} title="Settings" />
       <div className="p-4 md:p-6 pl-safe pr-safe pt-safe pb-safe">
-        <div className="mx-auto max-w-7xl">
-          {/* Page header */}
-          <div className="mb-8">
-            <h1 className="mb-4 text-2xl font-semibold tracking-tight text-foreground md:text-3xl">
-              Settings
-            </h1>
+        <div className="mx-auto max-w-3xl">
+          <Button
+            type="button"
+            variant="ghost"
+            onClick={() => router.back()}
+            className="mb-6 px-0 text-muted-foreground hover:bg-transparent hover:text-foreground"
+          >
+            <ArrowLeft aria-hidden />
+            Back to dashboard
+          </Button>
 
-            {/* Back navigation */}
-            <Button
-              type="button"
-              variant="ghost"
-              onClick={() => router.back()}
-              className="px-0 text-muted-foreground hover:bg-transparent hover:text-foreground"
-            >
-              <ArrowLeft aria-hidden />
-              Back to dashboard
-            </Button>
-          </div>
-
-          <UserSettings isOpen={true} onClose={() => router.back()} />
+          <UserSettings />
         </div>
       </div>
     </div>

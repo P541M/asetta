@@ -20,9 +20,10 @@ import {
 
 interface DashboardHeaderProps {
   onLogout?: () => Promise<void>;
+  title?: string;
 }
 
-const DashboardHeader = ({ onLogout }: DashboardHeaderProps) => {
+const DashboardHeader = ({ onLogout, title }: DashboardHeaderProps) => {
   const { user } = useAuth();
   const { profile } = useUserProfile();
   const [greeting, setGreeting] = useState("");
@@ -31,6 +32,8 @@ const DashboardHeader = ({ onLogout }: DashboardHeaderProps) => {
   const router = useRouter();
 
   useEffect(() => {
+    if (title) return;
+
     const updateGreeting = () => {
       setGreeting(getPersonalizedGreeting(user, profile));
       setSubtitle(getRotatingSubtitle());
@@ -52,7 +55,7 @@ const DashboardHeader = ({ onLogout }: DashboardHeaderProps) => {
         clearTimeout(greetingTimeoutRef.current);
       }
     };
-  }, [user, profile]);
+  }, [user, profile, title]);
 
   if (!user) return null;
 
@@ -60,17 +63,22 @@ const DashboardHeader = ({ onLogout }: DashboardHeaderProps) => {
     <header className="bg-background">
       <div className="mx-auto max-w-7xl px-4 py-5 md:px-6">
         <div className="flex min-h-16 items-center justify-between gap-4">
-          {/* Personalized greeting */}
-          <div>
-            <h1
-              className="text-2xl font-semibold tracking-tight text-foreground md:text-3xl"
-              role="banner"
-              aria-label={`Dashboard greeting: ${greeting}`}
-            >
-              {greeting}
+          {title ? (
+            <h1 className="text-2xl font-semibold tracking-tight text-foreground md:text-3xl">
+              {title}
             </h1>
-            <p className="mt-0.5 text-sm text-muted-foreground">{subtitle}</p>
-          </div>
+          ) : (
+            <div>
+              <h1
+                className="text-2xl font-semibold tracking-tight text-foreground md:text-3xl"
+                role="banner"
+                aria-label={`Dashboard greeting: ${greeting}`}
+              >
+                {greeting}
+              </h1>
+              <p className="mt-0.5 text-sm text-muted-foreground">{subtitle}</p>
+            </div>
+          )}
 
           {/* User menu */}
           <DropdownMenu>

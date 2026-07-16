@@ -2,16 +2,7 @@ import { ProfileSectionProps } from "../../types/profile";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 
-const ProfileSection = ({
-  displayName,
-  setDisplayName,
-  institution,
-  setInstitution,
-  studyProgram,
-  setStudyProgram,
-  graduationYear,
-  setGraduationYear,
-}: ProfileSectionProps) => {
+const ProfileSection = ({ form, onChange }: ProfileSectionProps) => {
   const currentYear = new Date().getFullYear();
 
   return (
@@ -29,8 +20,8 @@ const ProfileSection = ({
           <Input
             id="displayName"
             type="text"
-            value={displayName}
-            onChange={(e) => setDisplayName(e.target.value)}
+            value={form.displayName}
+            onChange={(e) => onChange("displayName", e.target.value)}
             placeholder="Your display name"
           />
         </div>
@@ -40,8 +31,8 @@ const ProfileSection = ({
           <Input
             id="institution"
             type="text"
-            value={institution}
-            onChange={(e) => setInstitution(e.target.value)}
+            value={form.institution}
+            onChange={(e) => onChange("institution", e.target.value)}
             placeholder="Your university or school"
           />
         </div>
@@ -51,8 +42,8 @@ const ProfileSection = ({
           <Input
             id="studyProgram"
             type="text"
-            value={studyProgram}
-            onChange={(e) => setStudyProgram(e.target.value)}
+            value={form.studyProgram}
+            onChange={(e) => onChange("studyProgram", e.target.value)}
             placeholder="e.g., Computer Science, Business Administration"
           />
         </div>
@@ -64,8 +55,8 @@ const ProfileSection = ({
             type="number"
             min={currentYear}
             max={currentYear + 10}
-            value={graduationYear}
-            onChange={(e) => setGraduationYear(parseInt(e.target.value))}
+            value={form.graduationYear}
+            onChange={(e) => onChange("graduationYear", parseInt(e.target.value))}
           />
         </div>
       </div>

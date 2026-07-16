@@ -33,16 +33,7 @@ const ToggleRow = ({
   </div>
 );
 
-const PreferencesSection = ({
-  showDaysTillDue,
-  setShowDaysTillDue,
-  showWeight,
-  setShowWeight,
-  showNotes,
-  setShowNotes,
-  showStatsBar,
-  setShowStatsBar,
-}: PreferencesSectionProps) => {
+const PreferencesSection = ({ prefs, onPrefChange }: PreferencesSectionProps) => {
   const { theme, setTheme } = useTheme();
   // next-themes has no theme value until mounted; render the buttons always
   // (stable layout) and only apply the active tint post-hydration.
@@ -98,26 +89,26 @@ const PreferencesSection = ({
           <ToggleRow
             title="Dashboard statistics"
             description="Show statistics overview at the top of your dashboard"
-            checked={showStatsBar}
-            onCheckedChange={setShowStatsBar}
+            checked={prefs.showStatsBar}
+            onCheckedChange={(value) => onPrefChange("showStatsBar", value)}
           />
           <ToggleRow
             title="Days until due"
             description="Show countdown of days remaining until assessment due dates"
-            checked={showDaysTillDue}
-            onCheckedChange={setShowDaysTillDue}
+            checked={prefs.showDaysTillDue}
+            onCheckedChange={(value) => onPrefChange("showDaysTillDue", value)}
           />
           <ToggleRow
             title="Assessment weight"
             description="Display the weight/percentage column in assessments table"
-            checked={showWeight}
-            onCheckedChange={setShowWeight}
+            checked={prefs.showWeight}
+            onCheckedChange={(value) => onPrefChange("showWeight", value)}
           />
           <ToggleRow
             title="Assessment notes"
             description="Show notes and additional information in the assessments table"
-            checked={showNotes}
-            onCheckedChange={setShowNotes}
+            checked={prefs.showNotes}
+            onCheckedChange={(value) => onPrefChange("showNotes", value)}
           />
         </div>
       </div>

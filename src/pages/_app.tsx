@@ -9,13 +9,8 @@ import { AuthProvider } from "../contexts/AuthContext";
 function MyApp({ Component, pageProps }: AppProps) {
   return (
     <AuthProvider>
-      {/* enableSystem lands with the settings redesign; "light" matches the legacy default */}
-      <ThemeProvider
-        attribute="class"
-        defaultTheme="light"
-        enableSystem={false}
-        disableTransitionOnChange
-      >
+      {/* defaultTheme stays "light": System is an explicit opt-in, so nobody's appearance changes without their action (zero drift - see standards.md) */}
+      <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
         <Head>
           <title>Asetta - Academic Dashboard</title>
           <meta

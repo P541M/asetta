@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { BellOff, Check, ChevronsUpDown, Info, Lock } from "lucide-react";
-import { NotificationPreferencesProps } from "../../types/preferences";
+import { NotificationsSectionProps } from "../../types/preferences";
 import { cn } from "@/lib/utils";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
@@ -21,34 +21,26 @@ const timingOptions = [
   { value: "7", label: "1 week before due date" },
 ];
 
-const NotificationsSection = ({
-  emailNotifications,
-  setEmailNotifications,
-  notificationDaysBefore,
-  setNotificationDaysBefore,
-  email,
-  setEmail,
-  setHasConsentedToNotifications,
-}: Omit<NotificationPreferencesProps, "hasConsentedToNotifications">) => {
+const NotificationsSection = ({ form, onChange }: NotificationsSectionProps) => {
   const [isCustomDays, setIsCustomDays] = useState(false);
-  const [customDays, setCustomDays] = useState(notificationDaysBefore);
+  const [customDays, setCustomDays] = useState(form.notificationDaysBefore);
 
   // Update isCustomDays when notificationDaysBefore changes
   useEffect(() => {
-    const isCustom = ![1, 2, 3, 7].includes(notificationDaysBefore);
+    const isCustom = ![1, 2, 3, 7].includes(form.notificationDaysBefore);
     setIsCustomDays(isCustom);
     if (isCustom) {
-      setCustomDays(notificationDaysBefore);
+      setCustomDays(form.notificationDaysBefore);
     }
-  }, [notificationDaysBefore]);
+  }, [form.notificationDaysBefore]);
 
   const handleDaysChange = (value: string) => {
     if (value === "custom") {
       setIsCustomDays(true);
-      setNotificationDaysBefore(customDays);
+      onChange("notificationDaysBefore", customDays);
     } else {
       setIsCustomDays(false);
-      setNotificationDaysBefore(Number(value));
+      onChange("notificationDaysBefore", Number(value));
     }
   };
 
@@ -66,7 +58,7 @@ const NotificationsSection = ({
   const handleCustomDaysBlur = () => {
     const value = Math.max(1, Math.min(30, customDays || 1));
     setCustomDays(value);
-    setNotificationDaysBefore(value);
+    onChange("notificationDaysBefore", value);
   };
 
   const isValidEmail = (value: string): boolean => {
@@ -76,8 +68,8 @@ const NotificationsSection = ({
 
   const selectedTiming = isCustomDays
     ? `Custom (${customDays} day${customDays !== 1 ? "s" : ""})`
-    : (timingOptions.find((option) => option.value === notificationDaysBefore.toString())?.label ??
-      "Select timing");
+    : (timingOptions.find((option) => option.value === form.notificationDaysBefore.toString())
+        ?.label ?? "Select timing");
 
   return (
     <div className="space-y-8">
@@ -103,16 +95,13 @@ const NotificationsSection = ({
           </p>
         </div>
         <Switch
-          checked={emailNotifications}
-          onCheckedChange={(checked) => {
-            setEmailNotifications(checked);
-            setHasConsentedToNotifications(checked); // Auto-sync consent
-          }}
+          checked={form.emailNotifications}
+          onCheckedChange={(checked) => onChange("emailNotifications", checked)}
           aria-label="Email notifications"
         />
       </div>
 
-      {emailNotifications && (
+      {form.emailNotifications && (
         <div className="space-y-6">
           {/* Email address */}
           <div className="space-y-1.5">
@@ -121,16 +110,16 @@ const NotificationsSection = ({
               type="email"
               id="email"
               autoComplete="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              value={form.email}
+              onChange={(e) => onChange("email", e.target.value)}
               placeholder="Enter your preferred email address"
             />
 
-            {email && !isValidEmail(email) && (
+            {form.email && !isValidEmail(form.email) && (
               <p className="text-sm text-destructive">Please enter a valid email address</p>
             )}
 
-            {email && isValidEmail(email) && (
+            {form.email && isValidEmail(form.email) && (
               <p className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
                 <Info className="size-3.5 shrink-0" aria-hidden />
                 Reminder: Notifications might end up in your spam folder
@@ -161,7 +150,7 @@ const NotificationsSection = ({
                   >
                     <Check
                       className={cn(
-                        !isCustomDays && notificationDaysBefore.toString() === option.value
+                        !isCustomDays && form.notificationDaysBefore.toString() === option.value
                           ? "opacity-100"
                           : "opacity-0",
                       )}
@@ -199,7 +188,7 @@ const NotificationsSection = ({
         </div>
       )}
 
-      {!emailNotifications && (
+      {!form.emailNotifications && (
         <EmptyState
           icon={BellOff}
           title="Email notifications disabled"

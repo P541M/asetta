@@ -1,5 +1,4 @@
-// components/UserSettings.tsx
-import { useState, useEffect } from "react";
+import { useState, useEffect, FormEvent } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import { updateProfile } from "firebase/auth";
 import { doc, updateDoc, getDoc } from "firebase/firestore";
@@ -7,292 +6,192 @@ import { db } from "../../lib/firebase";
 import ProfileSection from "./ProfileSection";
 import PreferencesSection from "./PreferencesSection";
 import NotificationsSection from "./NotificationsSection";
-import SettingsNavigation from "./SettingsNavigation";
 import SettingsActions from "./SettingsActions";
 import SettingsMessage from "./SettingsMessage";
+import { ProfileForm } from "../../types/profile";
+import { NotificationsForm } from "../../types/preferences";
+import { DisplayPreferences, DEFAULT_DISPLAY_PREFERENCES } from "../../hooks/useDisplayPreferences";
 
-interface UserSettingsProps {
-  isOpen: boolean;
-  onClose: () => void;
-}
+type Message = { text: string; type: "success" | "error" } | null;
 
-const UserSettings = ({ isOpen, onClose }: UserSettingsProps) => {
+const isDirty = <T extends object>(form: T, saved: T | null) =>
+  saved !== null && (Object.keys(form) as (keyof T)[]).some((key) => form[key] !== saved[key]);
+
+const isValidEmail = (value: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+
+const currentYear = new Date().getFullYear();
+
+const UserSettings = () => {
   const { user } = useAuth();
-  const [displayName, setDisplayName] = useState(user?.displayName || "");
-  const [institution, setInstitution] = useState("");
-  const [studyProgram, setStudyProgram] = useState("");
-  const [graduationYear, setGraduationYear] = useState<number>(new Date().getFullYear() + 4);
-  const [showDaysTillDue, setShowDaysTillDue] = useState<boolean>(true);
-  const [showWeight, setShowWeight] = useState<boolean>(true);
-  const [showNotes, setShowNotes] = useState<boolean>(true);
-  const [showStatsBar, setShowStatsBar] = useState<boolean>(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [message, setMessage] = useState<{
-    text: string;
-    type: "success" | "error";
-  }>({ text: "", type: "success" });
-  const [activeTab, setActiveTab] = useState<"profile" | "preferences" | "notifications">(
-    "profile",
-  );
 
-  // Notification preferences
-  const [emailNotifications, setEmailNotifications] = useState<boolean>(false);
-  const [notificationDaysBefore, setNotificationDaysBefore] = useState<number>(1);
-  const [email, setEmail] = useState<string>("");
-
-  // Auto-sync consent with email notifications - no separate state needed
-  const hasConsentedToNotifications = emailNotifications;
-  const setHasConsentedToNotifications = setEmailNotifications;
-
-  // Store initial values for comparison
-  const [initialValues, setInitialValues] = useState({
-    displayName: "",
+  const [profileForm, setProfileForm] = useState<ProfileForm>({
+    displayName: user?.displayName || "",
     institution: "",
     studyProgram: "",
-    graduationYear: 0,
-    showDaysTillDue: true,
-    showWeight: true,
-    showNotes: true,
-    showStatsBar: false,
+    graduationYear: currentYear + 4,
+  });
+  const [savedProfile, setSavedProfile] = useState<ProfileForm | null>(null);
+  const [profileSaving, setProfileSaving] = useState(false);
+  const [profileMessage, setProfileMessage] = useState<Message>(null);
+
+  const [prefs, setPrefs] = useState<DisplayPreferences>(DEFAULT_DISPLAY_PREFERENCES);
+  const [prefsError, setPrefsError] = useState<string | null>(null);
+
+  const [notifForm, setNotifForm] = useState<NotificationsForm>({
     emailNotifications: false,
     notificationDaysBefore: 1,
     email: "",
   });
+  const [savedNotif, setSavedNotif] = useState<NotificationsForm | null>(null);
+  const [notifSaving, setNotifSaving] = useState(false);
+  const [notifMessage, setNotifMessage] = useState<Message>(null);
 
-  // Current year for graduation year input
-  const currentYear = new Date().getFullYear();
+  const setProfileField = <K extends keyof ProfileForm>(field: K, value: ProfileForm[K]) =>
+    setProfileForm((form) => ({ ...form, [field]: value }));
 
-  // Check if there are any changes
-  const hasChanges = () => {
-    return (
-      displayName !== initialValues.displayName ||
-      institution !== initialValues.institution ||
-      studyProgram !== initialValues.studyProgram ||
-      graduationYear !== initialValues.graduationYear ||
-      showDaysTillDue !== initialValues.showDaysTillDue ||
-      showWeight !== initialValues.showWeight ||
-      showNotes !== initialValues.showNotes ||
-      showStatsBar !== initialValues.showStatsBar ||
-      emailNotifications !== initialValues.emailNotifications ||
-      notificationDaysBefore !== initialValues.notificationDaysBefore ||
-      email !== initialValues.email
-    );
-  };
+  const setNotifField = <K extends keyof NotificationsForm>(
+    field: K,
+    value: NotificationsForm[K],
+  ) => setNotifForm((form) => ({ ...form, [field]: value }));
 
-  // Fetch user data when component mounts
   useEffect(() => {
     const fetchUserData = async () => {
       if (!user) return;
 
       try {
-        const userDocRef = doc(db, "users", user.uid);
-        const userSnapshot = await getDoc(userDocRef);
+        const userSnapshot = await getDoc(doc(db, "users", user.uid));
+        if (!userSnapshot.exists()) return;
+        const userData = userSnapshot.data();
 
-        if (userSnapshot.exists()) {
-          const userData = userSnapshot.data();
-          const newInstitution = userData.institution || "";
+        const profile: ProfileForm = {
+          displayName: user.displayName || "",
+          institution: userData.institution || "",
           // Migration support: handle both old and new field names
-          const newStudyProgram = userData.studyProgram || userData.program || "";
-          const newGraduationYear =
+          studyProgram: userData.studyProgram || userData.program || "",
+          graduationYear:
             userData.graduationYear ||
             (typeof userData.expectedGraduation === "string"
               ? parseInt(userData.expectedGraduation) || currentYear + 4
-              : currentYear + 4);
-          const newShowDaysTillDue = userData.showDaysTillDue ?? true;
-          const newShowWeight = userData.showWeight ?? true;
-          const newShowNotes = userData.showNotes ?? true;
-          const newShowStatsBar = userData.showStatsBar ?? false;
-          const newEmailNotifications = userData.emailNotifications ?? false;
-          const newNotificationDaysBefore = userData.notificationDaysBefore ?? 1;
-          const newEmail = userData.email || "";
+              : currentYear + 4),
+        };
+        const notifications: NotificationsForm = {
+          emailNotifications: userData.emailNotifications ?? false,
+          notificationDaysBefore: userData.notificationDaysBefore ?? 1,
+          email: userData.email || "",
+        };
 
-          // Set current values
-          setInstitution(newInstitution);
-          setStudyProgram(newStudyProgram);
-          setGraduationYear(newGraduationYear);
-          setShowDaysTillDue(newShowDaysTillDue);
-          setShowWeight(newShowWeight);
-          setShowNotes(newShowNotes);
-          setShowStatsBar(newShowStatsBar);
-          setEmailNotifications(newEmailNotifications);
-          setNotificationDaysBefore(newNotificationDaysBefore);
-          setEmail(newEmail);
-
-          // Set initial values
-          setInitialValues({
-            displayName: user.displayName || "",
-            institution: newInstitution,
-            studyProgram: newStudyProgram,
-            graduationYear: newGraduationYear,
-            showDaysTillDue: newShowDaysTillDue,
-            showWeight: newShowWeight,
-            showNotes: newShowNotes,
-            showStatsBar: newShowStatsBar,
-            emailNotifications: newEmailNotifications,
-            notificationDaysBefore: newNotificationDaysBefore,
-            email: newEmail,
-          });
-        }
+        setProfileForm(profile);
+        setSavedProfile(profile);
+        setNotifForm(notifications);
+        setSavedNotif(notifications);
+        setPrefs({
+          showDaysTillDue: userData.showDaysTillDue ?? true,
+          showWeight: userData.showWeight ?? true,
+          showNotes: userData.showNotes ?? true,
+          showStatsBar: userData.showStatsBar ?? false,
+        });
       } catch (error) {
         console.error("Error fetching user data:", error);
       }
     };
 
     fetchUserData();
-  }, [user, currentYear]);
+  }, [user]);
 
-  // Handle form submission
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleProfileSave = async (e: FormEvent) => {
     e.preventDefault();
     if (!user) return;
 
-    // Validate email if notifications are enabled
-    if (emailNotifications && email && !isValidEmail(email)) {
-      setMessage({
-        text: "Please enter a valid email address",
-        type: "error",
-      });
+    setProfileSaving(true);
+    setProfileMessage(null);
+
+    try {
+      if (profileForm.displayName !== savedProfile?.displayName) {
+        await updateProfile(user, { displayName: profileForm.displayName });
+      }
+      await updateDoc(doc(db, "users", user.uid), { ...profileForm, updatedAt: new Date() });
+      setSavedProfile(profileForm);
+      setProfileMessage({ text: "Profile updated", type: "success" });
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      setProfileMessage({ text: "Failed to update profile. Please try again.", type: "error" });
+    } finally {
+      setProfileSaving(false);
+    }
+  };
+
+  const handlePrefChange = async (field: keyof DisplayPreferences, value: boolean) => {
+    const previous = prefs;
+    setPrefs({ ...prefs, [field]: value });
+    setPrefsError(null);
+    if (!user) return;
+
+    try {
+      await updateDoc(doc(db, "users", user.uid), { [field]: value, updatedAt: new Date() });
+    } catch (error) {
+      console.error("Error saving preference:", error);
+      setPrefs(previous);
+      setPrefsError("Failed to save preference. Please try again.");
+    }
+  };
+
+  const handleNotifSave = async (e: FormEvent) => {
+    e.preventDefault();
+    if (!user) return;
+
+    if (notifForm.emailNotifications && notifForm.email && !isValidEmail(notifForm.email)) {
+      setNotifMessage({ text: "Please enter a valid email address", type: "error" });
       return;
     }
 
-    setIsSubmitting(true);
-    setMessage({ text: "", type: "success" });
+    setNotifSaving(true);
+    setNotifMessage(null);
 
     try {
-      // Update profile data in Firebase Auth
-      const updates: { displayName?: string } = {};
-
-      if (displayName !== initialValues.displayName) {
-        updates.displayName = displayName;
-      }
-
-      // Update profile if there are any auth updates
-      if (Object.keys(updates).length > 0) {
-        await updateProfile(user, updates);
-      }
-
-      // Update user data in Firestore
-      const userRef = doc(db, "users", user.uid);
-      await updateDoc(userRef, {
-        displayName: displayName,
-        institution: institution,
-        studyProgram: studyProgram,
-        graduationYear: graduationYear,
-        showDaysTillDue: showDaysTillDue,
-        showWeight: showWeight,
-        showNotes: showNotes,
-        showStatsBar: showStatsBar,
-        emailNotifications: emailNotifications,
-        notificationDaysBefore: notificationDaysBefore,
-        email: email,
-        hasConsentedToNotifications: hasConsentedToNotifications,
+      await updateDoc(doc(db, "users", user.uid), {
+        ...notifForm,
+        // Consent mirrors the notifications toggle (one decision, stored in both fields)
+        hasConsentedToNotifications: notifForm.emailNotifications,
         updatedAt: new Date(),
       });
-
-      // Update initial values to match current values
-      setInitialValues({
-        displayName,
-        institution,
-        studyProgram,
-        graduationYear,
-        showDaysTillDue,
-        showWeight,
-        showNotes,
-        showStatsBar,
-        emailNotifications,
-        notificationDaysBefore,
-        email,
-      });
-
-      setMessage({
-        text: "Settings updated successfully!",
-        type: "success",
-      });
+      setSavedNotif(notifForm);
+      setNotifMessage({ text: "Notification settings updated", type: "success" });
     } catch (error) {
-      console.error("Error updating profile:", error);
-      setMessage({
-        text: "Failed to update settings. Please try again.",
+      console.error("Error updating notification settings:", error);
+      setNotifMessage({
+        text: "Failed to update notification settings. Please try again.",
         type: "error",
       });
     } finally {
-      setIsSubmitting(false);
+      setNotifSaving(false);
     }
   };
 
-  // Handle cancel
-  const handleCancel = () => {
-    // Reset all values to initial state
-    setDisplayName(initialValues.displayName);
-    setInstitution(initialValues.institution);
-    setStudyProgram(initialValues.studyProgram);
-    setGraduationYear(initialValues.graduationYear);
-    setShowDaysTillDue(initialValues.showDaysTillDue);
-    setShowWeight(initialValues.showWeight);
-    setShowNotes(initialValues.showNotes);
-    setShowStatsBar(initialValues.showStatsBar);
-    setEmailNotifications(initialValues.emailNotifications);
-    setNotificationDaysBefore(initialValues.notificationDaysBefore);
-    setEmail(initialValues.email);
-    onClose();
-  };
-
-  // Function to validate email format
-  function isValidEmail(email: string): boolean {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  }
-
-  if (!isOpen) return null;
-
   return (
     <div className="space-y-6">
-      <SettingsNavigation activeTab={activeTab} setActiveTab={setActiveTab} />
-
-      <div className="rounded-xl bg-card shadow-soft">
-        <form onSubmit={handleSubmit} className="p-6 md:p-8">
-          {activeTab === "profile" ? (
-            <ProfileSection
-              displayName={displayName}
-              setDisplayName={setDisplayName}
-              institution={institution}
-              setInstitution={setInstitution}
-              studyProgram={studyProgram}
-              setStudyProgram={setStudyProgram}
-              graduationYear={graduationYear}
-              setGraduationYear={setGraduationYear}
-            />
-          ) : activeTab === "preferences" ? (
-            <PreferencesSection
-              showDaysTillDue={showDaysTillDue}
-              setShowDaysTillDue={setShowDaysTillDue}
-              showWeight={showWeight}
-              setShowWeight={setShowWeight}
-              showNotes={showNotes}
-              setShowNotes={setShowNotes}
-              showStatsBar={showStatsBar}
-              setShowStatsBar={setShowStatsBar}
-            />
-          ) : (
-            <NotificationsSection
-              emailNotifications={emailNotifications}
-              setEmailNotifications={setEmailNotifications}
-              notificationDaysBefore={notificationDaysBefore}
-              setNotificationDaysBefore={setNotificationDaysBefore}
-              email={email}
-              setEmail={setEmail}
-              setHasConsentedToNotifications={setHasConsentedToNotifications}
-            />
-          )}
-
-          <SettingsMessage text={message.text} type={message.type} />
-          <SettingsActions
-            onCancel={handleCancel}
-            onSubmit={handleSubmit}
-            hasChanges={hasChanges()}
-            isSubmitting={isSubmitting}
+      <section className="rounded-xl bg-card p-6 shadow-soft md:p-8">
+        <form onSubmit={handleProfileSave}>
+          <ProfileSection form={profileForm} onChange={setProfileField} />
+          <SettingsMessage
+            text={profileMessage?.text ?? ""}
+            type={profileMessage?.type ?? "success"}
           />
+          <SettingsActions dirty={isDirty(profileForm, savedProfile)} saving={profileSaving} />
         </form>
-      </div>
+      </section>
+
+      <section className="rounded-xl bg-card p-6 shadow-soft md:p-8">
+        <PreferencesSection prefs={prefs} onPrefChange={handlePrefChange} />
+        <SettingsMessage text={prefsError ?? ""} type="error" />
+      </section>
+
+      <section className="rounded-xl bg-card p-6 shadow-soft md:p-8">
+        <form onSubmit={handleNotifSave}>
+          <NotificationsSection form={notifForm} onChange={setNotifField} />
+          <SettingsMessage text={notifMessage?.text ?? ""} type={notifMessage?.type ?? "success"} />
+          <SettingsActions dirty={isDirty(notifForm, savedNotif)} saving={notifSaving} />
+        </form>
+      </section>
     </div>
   );
 };

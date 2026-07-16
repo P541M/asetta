@@ -1,21 +1,17 @@
+import type { DisplayPreferences } from "../hooks/useDisplayPreferences";
+
 export interface PreferencesSectionProps {
-  showDaysTillDue: boolean;
-  setShowDaysTillDue: (value: boolean) => void;
-  showWeight: boolean;
-  setShowWeight: (value: boolean) => void;
-  showNotes: boolean;
-  setShowNotes: (value: boolean) => void;
-  showStatsBar: boolean;
-  setShowStatsBar: (value: boolean) => void;
+  prefs: DisplayPreferences;
+  onPrefChange: (field: keyof DisplayPreferences, value: boolean) => void;
 }
 
-export interface NotificationPreferencesProps {
+export interface NotificationsForm {
   emailNotifications: boolean;
-  setEmailNotifications: (value: boolean) => void;
   notificationDaysBefore: number;
-  setNotificationDaysBefore: (value: number) => void;
   email: string;
-  setEmail: (value: string) => void;
-  hasConsentedToNotifications: boolean;
-  setHasConsentedToNotifications: (value: boolean) => void;
+}
+
+export interface NotificationsSectionProps {
+  form: NotificationsForm;
+  onChange: <K extends keyof NotificationsForm>(field: K, value: NotificationsForm[K]) => void;
 }
