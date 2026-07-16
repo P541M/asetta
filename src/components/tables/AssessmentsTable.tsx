@@ -288,11 +288,8 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                 className="w-full justify-between sm:w-auto sm:min-w-44"
                 aria-label="Filter assessments"
               >
-                <span className="flex min-w-0 items-center gap-2">
-                  <ListFilter className="text-muted-foreground" aria-hidden />
-                  <span className="truncate">
-                    {filterOptions.find((option) => option.value === filter)?.label ?? "All tasks"}
-                  </span>
+                <span className="min-w-0 truncate">
+                  {filterOptions.find((option) => option.value === filter)?.label ?? "All tasks"}
                 </span>
                 <ChevronsUpDown className="text-muted-foreground" aria-hidden />
               </Button>

@@ -4,11 +4,11 @@
 platform.** Read it before writing or reviewing any code. If a change conflicts with this file,
 either the change is wrong or this file must be updated in the same commit — never let them drift.
 
-Last updated: 2026-07-15 (v4.0 — **migration complete**. Settings migrated (profile, preferences
-incl. a Light/Dark/System theme selector, notifications) plus the last pages (`404`, `index`).
-The legacy `light-*`/`dark-*` token families and every orphaned `.btn-*`/`.input`/`.form-*`/
-`.card*`/`.badge*` utility are deleted from `globals.css` (grep-proofed) — the platform now
-contains zero legacy styling. This file describes the steady state. Surface language unchanged
+Last updated: 2026-07-16 (v4.1 — 2026-07 housekeeping recipes codified: icon rules, panel-header
++ empty-state recipes, settings stacked-sections layout with instant preferences, URL-derived
+context-switcher state. v4.0 2026-07-15: **migration complete** — every section is on the
+shadcn/Tailwind-v4 system and the legacy token families and utilities are deleted from
+`globals.css` (grep-proofed); this file describes the steady state. Surface language unchanged
 since the 2026-07-14 v3 lock: borderless tonal surfaces, filled inputs, flat buttons, View
 Transitions theme crossfade).
 
@@ -210,6 +210,19 @@ a tier, the ramp is wrong — update it here, don't invent a sixth size at the c
 - **Composition over duplication**: build app-level components (e.g. `AuthShell`) *from*
   primitives (`Card`, `CardHeader`, …); don't fork primitive markup.
 
+### Icons (locked 2026-07-16)
+
+- **One icon max per element** (a button, a dropdown trigger, a menu item). Icons carry
+  meaning — selection (the check in menus), status (status chips, the save indicator),
+  navigation (tab bar, chevrons, back arrows) — **never decoration**.
+- **Dropdown triggers show value + chevron only.** No leading glyph next to the current value
+  (the semester switcher, course picker, and filter triggers all lost theirs in the 2026-07
+  housekeeping pass).
+- **Menu options lead with the selection check as their only glyph.** Action items in the same
+  menu (e.g. "Manage semesters") may keep one identifying icon.
+- Tab-bar icons stay — they are navigation aids, not decoration.
+- Empty states show one icon by recipe (see "Tab panels & empty states").
+
 ### Theming rules
 
 - **New code uses semantic tokens only**: `bg-background`, `text-foreground`,
@@ -282,6 +295,38 @@ preference, not a daily control.
 **Selector pattern** (founder decision, 2026-07-14): context switchers (semester, and future
 course/term pickers) are a single dropdown control — current value + check-marked options +
 related actions (add/manage) in one menu. No pill rows with satellite icon buttons.
+Context-switcher state derives from the URL: the active semester is the `[semester]` route
+segment (first semester when absent), switching is just a `router.push`, and selection state is
+never duplicated into component state (the source of the 2026-07-16 flicker fix).
+
+### Tab panels & empty states (locked 2026-07-16)
+
+- **Every tab renders inside a uniform `p-6` panel** and opens with `ui/PanelHeader`
+  (`{ title, actions? }`): exactly ONE section-heading-tier title line, no subtitles
+  (QA lesson: subtitles made header heights inconsistent). The title sits on a fixed 40px line
+  (`leading-10` inside a `min-h-10` top-aligned row) so its position is identical on every tab;
+  wrapping action clusters grow downward without moving it. Calendar's month/year lives between
+  the prev/next arrows on a fixed-width slot inside the actions cluster.
+- **Empty states are `ui/EmptyState`, never hand-rolled**: a `size-5` lucide icon (passed as the
+  component, sized by the recipe) centered in a `size-10` `bg-secondary` circle with
+  `text-muted-foreground`, item-title-tier title, one body-tier supporting sentence (`max-w-md`),
+  optional single action, `py-12` (callers pass no padding overrides).
+- **Empty-state copy formula**: "No {things} yet" for true-empty (or a state description like
+  "No semester selected"); "No {things} found" ONLY when items exist but a filter matched
+  nothing; sentence case, one supporting sentence, at most one action.
+
+### Settings page (locked 2026-07-16)
+
+- One `max-w-3xl` column of stacked `rounded-xl bg-card shadow-soft` cards — Profile,
+  Preferences, Notifications — on a single scroll. No tab bar.
+- **Preferences apply instantly**: theme and display toggles persist per field the moment they
+  change (optimistic state, reverted with an inline destructive alert on write failure). No Save
+  button on instant-apply cards.
+- **Profile and Notifications save per card**: each card is its own small form with its own
+  Save button, dirty check against the fetched snapshot, and success/error message scoped to
+  the card.
+- Subpages pass `title` to `DashboardHeader` for a static page title — the greeting/rotating
+  subtitle belongs to the dashboard only.
 
 ### Overlays (the modal recipe)
 

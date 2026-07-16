@@ -201,10 +201,7 @@ const GradesTab = ({ data, urlSemesterId }: TabComponentProps) => {
                   disabled={availableCourses.length === 0}
                   aria-label="Switch course"
                 >
-                  <span className="flex min-w-0 items-center gap-2">
-                    <BookOpen className="text-muted-foreground" aria-hidden />
-                    <span className="truncate">{selectedCourse || "Select a course"}</span>
-                  </span>
+                  <span className="min-w-0 truncate">{selectedCourse || "Select a course"}</span>
                   <ChevronsUpDown className="text-muted-foreground" aria-hidden />
                 </Button>
               </DropdownMenuTrigger>

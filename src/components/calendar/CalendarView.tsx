@@ -1,16 +1,5 @@
 import { useState, useEffect, useRef, KeyboardEvent, useCallback } from "react";
-import {
-  Check,
-  ChevronLeft,
-  ChevronRight,
-  CircleCheck,
-  CircleDashed,
-  CircleX,
-  Clock,
-  Download,
-  ListFilter,
-  type LucideIcon,
-} from "lucide-react";
+import { Check, ChevronLeft, ChevronRight, ChevronsUpDown, Download } from "lucide-react";
 import { useAssessments } from "../../hooks/useAssessments";
 import { generateICSFile } from "../../utils/icsGenerator";
 import { Assessment } from "../../types/assessment";
@@ -43,12 +32,12 @@ const monthNames = [
   "December",
 ];
 
-const statusFilterOptions: { value: string; label: string; icon: LucideIcon }[] = [
-  { value: "all", label: "All statuses", icon: ListFilter },
-  { value: "Not started", label: "Not started", icon: CircleDashed },
-  { value: "In progress", label: "In progress", icon: Clock },
-  { value: "Submitted", label: "Submitted", icon: CircleCheck },
-  { value: "Missed", label: "Missed", icon: CircleX },
+const statusFilterOptions: { value: string; label: string }[] = [
+  { value: "all", label: "All statuses" },
+  { value: "Not started", label: "Not started" },
+  { value: "In progress", label: "In progress" },
+  { value: "Submitted", label: "Submitted" },
+  { value: "Missed", label: "Missed" },
 ];
 
 // Date formatting helpers
@@ -219,7 +208,6 @@ const CalendarView = ({ selectedSemester, semesterId, refreshTrigger }: Calendar
 
   const activeFilter =
     statusFilterOptions.find((option) => option.value === statusFilter) ?? statusFilterOptions[0];
-  const ActiveFilterIcon = activeFilter.icon;
 
   return (
     <div className="p-6">
@@ -243,20 +231,17 @@ const CalendarView = ({ selectedSemester, semesterId, refreshTrigger }: Calendar
                   className="min-w-40 justify-between"
                   aria-label="Filter by status"
                 >
-                  <span className="flex min-w-0 items-center gap-2">
-                    <ActiveFilterIcon className="text-muted-foreground" aria-hidden />
-                    <span className="truncate">{activeFilter.label}</span>
-                  </span>
+                  <span className="min-w-0 truncate">{activeFilter.label}</span>
+                  <ChevronsUpDown className="text-muted-foreground" aria-hidden />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="min-w-44">
-                {statusFilterOptions.map(({ value, label, icon: OptionIcon }) => (
+                {statusFilterOptions.map(({ value, label }) => (
                   <DropdownMenuItem key={value} onSelect={() => setStatusFilter(value)}>
                     <Check
                       className={cn(statusFilter === value ? "opacity-100" : "opacity-0")}
                       aria-hidden
                     />
-                    <OptionIcon aria-hidden />
                     {label}
                   </DropdownMenuItem>
                 ))}

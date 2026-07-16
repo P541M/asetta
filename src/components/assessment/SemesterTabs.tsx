@@ -16,7 +16,7 @@ import {
 } from "firebase/firestore";
 import { arrayMove } from "@dnd-kit/sortable";
 import { DragEndEvent } from "@dnd-kit/core";
-import { Check, ChevronsUpDown, GraduationCap, Settings2 } from "lucide-react";
+import { Check, ChevronsUpDown, Settings2 } from "lucide-react";
 import { Semester } from "@/types/semester";
 import { SemesterTabsProps } from "@/types/course";
 import { cn } from "@/lib/utils";
@@ -186,10 +186,7 @@ const SemesterTabs = ({
             className="min-w-44 justify-between md:min-w-56"
             aria-label="Switch semester"
           >
-            <span className="flex min-w-0 items-center gap-2">
-              <GraduationCap className="text-muted-foreground" aria-hidden />
-              <span className="truncate">{activeSemester?.name ?? "Select semester"}</span>
-            </span>
+            <span className="min-w-0 truncate">{activeSemester?.name ?? "Select semester"}</span>
             <ChevronsUpDown className="text-muted-foreground" aria-hidden />
           </Button>
         </DropdownMenuTrigger>
