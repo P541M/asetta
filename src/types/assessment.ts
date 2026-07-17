@@ -1,3 +1,5 @@
+import type { Timestamp } from "firebase/firestore";
+
 export type AssessmentStatus = "Not started" | "In progress" | "Submitted" | "Missed";
 
 export interface Assessment {
@@ -10,8 +12,8 @@ export interface Assessment {
   status: AssessmentStatus;
   notes?: string;
   mark?: number | null;
-  createdAt?: Date | FirebaseFirestore.Timestamp; // Firebase timestamp
-  updatedAt?: Date | FirebaseFirestore.Timestamp; // Firebase timestamp
+  createdAt?: Date | Timestamp;
+  updatedAt?: Date | Timestamp;
 }
 
 export interface AddAssessmentFormProps {

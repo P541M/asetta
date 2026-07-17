@@ -3,6 +3,8 @@ import formidable, { IncomingForm, Fields, Files } from "formidable";
 import fs from "fs";
 import pdfParse from "pdf-parse";
 import { getAdmin } from "../../lib/firebase-admin";
+import { getAuth } from "firebase-admin/auth";
+import { getFirestore } from "firebase-admin/firestore";
 import { extractAssessmentsWithAI } from "../../lib/upload/gemini";
 import {
   ExtractedAssessment,
@@ -48,16 +50,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(401).json({ success: false, error: "Authentication required" });
     }
     const token = authHeader.split(" ")[1];
-    const admin = await getAdmin();
+    const adminApp = await getAdmin();
     let userId;
     try {
-      const decodedToken = await admin.auth().verifyIdToken(token);
+      const decodedToken = await getAuth(adminApp).verifyIdToken(token);
       userId = decodedToken.uid;
     } catch {
       return res.status(401).json({ success: false, error: "Invalid authentication token" });
     }
 
-    const adminDb = admin.firestore();
+    const adminDb = getFirestore(adminApp);
     // Verify the semester exists by checking if we can access it
     const semesterRef = adminDb.doc(`users/${userId}/semesters/${semesterId}`);
     const semesterDoc = await semesterRef.get();

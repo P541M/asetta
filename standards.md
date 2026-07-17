@@ -55,6 +55,10 @@ npm run lint && npm run format:check && npx tsc --noEmit && npm run build
 All four green before work is called done. CI (`.github/workflows/ci.yml`) enforces the same on
 GitHub. Agents never run `git commit`/`git push` — the founder owns all git operations.
 
+Note (2026-07-16): `next lint` prints a deprecation warning on Next 15.5 (removal in Next 16).
+The loop is unchanged for now; the pending migration to the ESLint CLI is documented in
+`docs/superpowers/plans/2026-07-16-dependency-pass.md`.
+
 ---
 
 ## Part 2 — UI System (shadcn/ui on Tailwind v4)

@@ -1,4 +1,5 @@
 import { getAdmin } from "./firebase-admin";
+import { getFirestore } from "firebase-admin/firestore";
 import { sendEmail } from "./email";
 import { devLog, devError } from "../utils/devLog";
 
@@ -24,8 +25,8 @@ export async function checkAndSendNotifications() {
   devLog("=== NOTIFICATION CHECK STARTED ===", startTime.toISOString());
 
   try {
-    const admin = await getAdmin();
-    const db = admin.firestore();
+    const adminApp = await getAdmin();
+    const db = getFirestore(adminApp);
     devLog("✅ Firebase Admin initialized successfully");
 
     // Get all users with notification preferences

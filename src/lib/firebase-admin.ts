@@ -1,56 +1,46 @@
 // src/lib/firebase-admin.ts
-import admin from "firebase-admin";
+import {
+  initializeApp,
+  getApps,
+  cert,
+  applicationDefault,
+  type App,
+  type ServiceAccount,
+} from "firebase-admin/app";
+import { devLog } from "../utils/devLog";
 
-// Prevent multiple initializations in development
-let adminInstance: admin.app.App;
+// firebase-admin v14 is modular-only: consumers get the App here and wrap it
+// with getAuth()/getFirestore() themselves.
+let adminApp: App | undefined;
 
-async function initializeAdmin() {
-  // Return existing instance if already initialized
-  if (admin.apps.length > 0) {
-    return admin.apps[0] as admin.app.App;
+function initializeAdmin(): App {
+  // Reuse the existing app across dev hot-reloads
+  const existingApps = getApps();
+  if (existingApps.length > 0) {
+    return existingApps[0];
   }
 
-  // Prepare configuration
-  let config: { credential: admin.credential.Credential; projectId?: string };
-
-  // Use service account from environment variable if provided
   if (process.env.FIREBASE_SERVICE_ACCOUNT) {
     try {
       const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
-      config = {
-        credential: admin.credential.cert(serviceAccount as admin.ServiceAccount),
-      };
-      console.log("Firebase Admin initialized with service account from env");
+      devLog("Firebase Admin initialized with service account from env");
+      return initializeApp({ credential: cert(serviceAccount as ServiceAccount) });
     } catch (error) {
       console.error("Error parsing FIREBASE_SERVICE_ACCOUNT:", error);
       throw error;
     }
-  } else {
-    // Fallback to application default credentials
-    config = {
-      credential: admin.credential.applicationDefault(),
-      projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-    };
-    console.log("Firebase Admin initialized with default credentials");
   }
 
-  // Initialize the app with the config
-  try {
-    return admin.initializeApp(config);
-  } catch (error: unknown) {
-    if (error instanceof Error && error.message.includes("already exists")) {
-      console.warn("Firebase admin app already initialized");
-      // Return the first initialized app from the apps array
-      return admin.apps[0] as admin.app.App;
-    }
-    console.error("Firebase admin initialization error:", error);
-    throw error;
-  }
+  devLog("Firebase Admin initialized with default credentials");
+  return initializeApp({
+    credential: applicationDefault(),
+    projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+  });
 }
 
-export const getAdmin = async () => {
-  if (!adminInstance) {
-    adminInstance = await initializeAdmin();
+export const getAdmin = async (): Promise<App> => {
+  if (!adminApp) {
+    adminApp = initializeAdmin();
   }
-  return adminInstance;
+  return adminApp;
 };
