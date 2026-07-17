@@ -11,12 +11,7 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-export async function sendWelcomeEmail(
-  displayName: string,
-  email: string,
-  institution?: string,
-  studyProgram?: string,
-) {
+export async function sendWelcomeEmail(displayName: string, email: string, institution?: string) {
   if (process.env.NODE_ENV === "development") {
     devLog("📧 Attempting to send welcome email");
   }
@@ -39,7 +34,7 @@ export async function sendWelcomeEmail(
       devLog("✅ Email transporter connection verified");
     }
 
-    const html = generateWelcomeEmailHTML(displayName, email, institution, studyProgram);
+    const html = generateWelcomeEmailHTML(displayName, email, institution);
 
     const mailOptions = {
       from: `"Asetta" <${process.env.EMAIL_USER}>`,

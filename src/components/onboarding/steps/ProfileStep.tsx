@@ -12,8 +12,6 @@ export function ProfileStep() {
   const { user } = useAuth();
   const [formData, setFormData] = useState({
     institution: state.userData.institution || "",
-    studyProgram: state.userData.studyProgram || "",
-    graduationYear: state.userData.graduationYear || new Date().getFullYear() + 4,
   });
 
   const handleInputChange = (field: string, value: string | number) => {
@@ -56,37 +54,6 @@ export function ProfileStep() {
             onChange={(e) => handleInputChange("institution", e.target.value)}
             placeholder="e.g., University of Toronto"
             required
-          />
-        </div>
-
-        {/* Program */}
-        <div className="space-y-1.5">
-          <Label htmlFor="studyProgram">Program of study</Label>
-          <Input
-            id="studyProgram"
-            type="text"
-            value={formData.studyProgram}
-            onChange={(e) => handleInputChange("studyProgram", e.target.value)}
-            placeholder="e.g., Computer Science, Engineering, Business"
-          />
-        </div>
-
-        {/* Expected graduation */}
-        <div className="space-y-1.5">
-          <Label htmlFor="graduationYear">Expected graduation</Label>
-          <Input
-            id="graduationYear"
-            type="number"
-            min={new Date().getFullYear()}
-            max={new Date().getFullYear() + 10}
-            value={formData.graduationYear}
-            onChange={(e) =>
-              handleInputChange(
-                "graduationYear",
-                parseInt(e.target.value) || new Date().getFullYear() + 4,
-              )
-            }
-            placeholder="e.g., 2026, 2025"
           />
         </div>
       </div>

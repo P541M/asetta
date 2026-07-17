@@ -212,7 +212,7 @@ a tier, the ramp is wrong — update it here, don't invent a sixth size at the c
 - **Use the `cn()` helper** (`src/lib/utils.ts`, clsx + tailwind-merge) for all conditional
   class composition. No template-literal class concatenation in new code.
 - **Composition over duplication**: build app-level components (e.g. `AuthShell`) *from*
-  primitives (`Card`, `CardHeader`, …); don't fork primitive markup.
+  primitives (`Button`, `Input`, `Label`, …); don't fork primitive markup.
 
 ### Icons (locked 2026-07-16)
 

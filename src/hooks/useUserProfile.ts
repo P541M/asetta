@@ -6,8 +6,6 @@ import { db } from "../lib/firebase";
 interface UserProfile {
   displayName: string;
   institution: string;
-  studyProgram: string;
-  graduationYear: number;
   showDaysTillDue: boolean;
   showWeight: boolean;
   showNotes: boolean;
@@ -44,8 +42,6 @@ export const useUserProfile = () => {
           setProfile({
             displayName: userData.displayName || "",
             institution: userData.institution || "",
-            studyProgram: userData.studyProgram || "",
-            graduationYear: userData.graduationYear || new Date().getFullYear() + 4,
             showDaysTillDue: userData.showDaysTillDue ?? true,
             showWeight: userData.showWeight ?? true,
             showNotes: userData.showNotes ?? true,
@@ -59,8 +55,6 @@ export const useUserProfile = () => {
           setProfile({
             displayName: "",
             institution: "",
-            studyProgram: "",
-            graduationYear: new Date().getFullYear() + 4,
             showDaysTillDue: true,
             showWeight: true,
             showNotes: true,

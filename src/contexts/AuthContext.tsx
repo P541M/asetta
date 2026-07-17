@@ -5,6 +5,7 @@ import { auth, db } from "../lib/firebase";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { AuthContextType } from "../types/context";
 import { useOnboardingStatus } from "../hooks/useOnboardingStatus";
+import { devLog, devError } from "../utils/devLog";
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
@@ -42,8 +43,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             displayName: usr.displayName || usr.email?.split("@")[0] || "User",
             email: usr.email || "",
             institution: "",
-            studyProgram: "",
-            graduationYear: new Date().getFullYear() + 4,
             createdAt: new Date(),
             lastLogin: new Date(),
           };
@@ -53,30 +52,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           try {
             const response = await fetch("/api/welcome-email", {
               method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
+              headers: { "Content-Type": "application/json" },
               body: JSON.stringify({
                 displayName: defaultSettings.displayName,
                 email: defaultSettings.email,
-                institution: defaultSettings.institution,
-                studyProgram: defaultSettings.studyProgram,
               }),
             });
-
             if (response.ok) {
-              if (process.env.NODE_ENV === "development") {
-                console.log("✅ Welcome email sent successfully for Google OAuth user");
-              }
+              devLog("Welcome email sent for new Google user");
             } else {
-              if (process.env.NODE_ENV === "development") {
-                console.warn("⚠️ Welcome email failed to send for Google OAuth user");
-              }
+              devError("Welcome email failed for new Google user");
             }
           } catch {
-            if (process.env.NODE_ENV === "development") {
-              console.warn("⚠️ Welcome email error for Google OAuth user");
-            }
+            devError("Welcome email error for new Google user");
           }
         } else {
           // Update lastLogin if document already exists

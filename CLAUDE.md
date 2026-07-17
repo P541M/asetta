@@ -37,11 +37,6 @@ When working on this project, prioritize:
 - Status updates trigger parent component refreshes via callbacks
 - Local storage is used for user preferences (filters, sorting)
 
-## Known Issues
-- Filter dropdown should always be visible (not conditionally rendered)
-- Assessment status needs "Missed" option added
-- Ensure consistent spacing and visual hierarchy
-
 ## File Structure
 - `/src/components/` - Reusable UI components
 - `/src/types/` - TypeScript type definitions

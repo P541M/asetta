@@ -10,14 +10,6 @@ export const getUserDocRef = (userId: string): DocumentReference => {
   return doc(db, "users", userId);
 };
 
-export const getUserSemestersRef = (userId: string): CollectionReference => {
-  return collection(db, "users", userId, "semesters");
-};
-
-export const getSemesterDocRef = (userId: string, semesterId: string): DocumentReference => {
-  return doc(db, "users", userId, "semesters", semesterId);
-};
-
 // Assessment document references
 export const getAssessmentsRef = (userId: string, semesterId: string): CollectionReference => {
   return collection(db, "users", userId, "semesters", semesterId, "assessments");
@@ -31,27 +23,7 @@ export const getAssessmentDocRef = (
   return doc(db, "users", userId, "semesters", semesterId, "assessments", assessmentId);
 };
 
-// Course document references
-export const getCoursesRef = (userId: string, semesterId: string): CollectionReference => {
-  return collection(db, "users", userId, "semesters", semesterId, "courses");
-};
-
-export const getCourseDocRef = (
-  userId: string,
-  semesterId: string,
-  courseId: string,
-): DocumentReference => {
-  return doc(db, "users", userId, "semesters", semesterId, "courses", courseId);
-};
-
 // Course preferences document references
-export const getCoursePreferencesRef = (
-  userId: string,
-  semesterId: string,
-): CollectionReference => {
-  return collection(db, "users", userId, "semesters", semesterId, "coursePreferences");
-};
-
 export const getCoursePreferencesDocRef = (
   userId: string,
   semesterId: string,

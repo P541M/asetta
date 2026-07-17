@@ -21,13 +21,3 @@ export const setToLocalStorage = <T>(key: string, value: T): void => {
     console.error(`Error writing ${key} to localStorage:`, error);
   }
 };
-
-export const removeFromLocalStorage = (key: string): void => {
-  if (typeof window === "undefined") return;
-
-  try {
-    window.localStorage.removeItem(key);
-  } catch (error) {
-    console.error(`Error removing ${key} from localStorage:`, error);
-  }
-};

@@ -1,5 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { sendWelcomeEmail } from "../../lib/email";
+import { isValidEmail } from "../../utils/validation";
 import { devLog, devError } from "../../utils/devLog";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -10,7 +11,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     });
   }
 
-  const { displayName, email, institution, studyProgram } = req.body;
+  const { displayName, email, institution } = req.body;
 
   // Validate required fields
   if (!displayName || !email) {
@@ -21,8 +22,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   // Basic email validation
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailRegex.test(email)) {
+  if (!isValidEmail(email)) {
     return res.status(400).json({
       error: "Invalid email format",
       message: "Please provide a valid email address",
@@ -34,7 +34,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       devLog("📧 Welcome email API called");
     }
 
-    await sendWelcomeEmail(displayName, email, institution, studyProgram);
+    await sendWelcomeEmail(displayName, email, institution);
 
     return res.status(200).json({
       success: true,

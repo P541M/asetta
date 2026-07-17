@@ -2,8 +2,6 @@ import { ExtractionResult } from "./upload";
 
 export interface OnboardingUserData {
   institution?: string;
-  studyProgram?: string;
-  graduationYear?: number;
   hasConsentedToNotifications?: boolean;
   emailNotifications?: boolean;
   notificationDaysBefore?: number;
@@ -47,5 +45,3 @@ export interface OnboardingContextType {
   cancelExit: () => void;
   confirmExit: () => Promise<void>;
 }
-
-export type OnboardingStep = "welcome" | "profile" | "semester" | "upload" | "completion";

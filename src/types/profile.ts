@@ -1,8 +1,6 @@
 export interface ProfileForm {
   displayName: string;
   institution: string;
-  studyProgram: string;
-  graduationYear: number;
 }
 
 export interface ProfileSectionProps {

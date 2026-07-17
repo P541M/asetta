@@ -1,6 +1,7 @@
 import { getAdmin } from "./firebase-admin";
 import { getFirestore } from "firebase-admin/firestore";
 import { sendEmail } from "./email";
+import { isValidEmail } from "../utils/validation";
 import { devLog, devError } from "../utils/devLog";
 
 interface NotificationPreferences {
@@ -12,7 +13,6 @@ interface NotificationPreferences {
 
 interface Assessment {
   id: string;
-  title: string;
   dueDate: Date | string | { toDate: () => Date }; // Can be Date, string, or Firestore Timestamp
   userId: string;
   courseName: string;
@@ -107,7 +107,6 @@ export async function checkAndSendNotifications() {
           const semesterAssessments = assessmentsSnapshot.docs.map((doc) => {
             const data = doc.data();
             devLog(`📄 Assessment data for ${doc.id}:`, {
-              title: data.title,
               assignmentName: data.assignmentName,
               dueDate: data.dueDate,
               dueTime: data.dueTime,
@@ -299,13 +298,9 @@ export async function checkAndSendNotifications() {
 }
 
 // Function to validate email format
-export function isValidEmail(email: string): boolean {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return emailRegex.test(email);
-}
 
 // Function to validate user notification preferences
-export function validateNotificationPreferences(preferences: unknown): {
+function validateNotificationPreferences(preferences: unknown): {
   isValid: boolean;
   errors: string[];
   sanitized: NotificationPreferences | null;

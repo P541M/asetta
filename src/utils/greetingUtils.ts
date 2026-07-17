@@ -25,7 +25,7 @@ interface UserProfile {
  * Get time-based greeting based on current local time
  * @returns Greeting string based on time of day
  */
-export const getTimeBasedGreeting = (): string => {
+const getTimeBasedGreeting = (): string => {
   const hour = new Date().getHours();
 
   if (hour >= 0 && hour < 12) {
@@ -44,7 +44,7 @@ export const getTimeBasedGreeting = (): string => {
  * @param profile User profile from useUserProfile hook
  * @returns User's display name
  */
-export const getUserDisplayName = (user: User | null, profile: UserProfile | null): string => {
+const getUserDisplayName = (user: User | null, profile: UserProfile | null): string => {
   // First priority: profile displayName
   if (profile?.displayName?.trim()) {
     return profile.displayName.trim();

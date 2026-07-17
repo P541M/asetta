@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { BellOff, Check, ChevronsUpDown, Info, Lock } from "lucide-react";
 import { NotificationsSectionProps } from "../../types/preferences";
+import { isValidEmail } from "../../utils/validation";
 import { cn } from "@/lib/utils";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
@@ -59,11 +60,6 @@ const NotificationsSection = ({ form, onChange }: NotificationsSectionProps) => 
     const value = Math.max(1, Math.min(30, customDays || 1));
     setCustomDays(value);
     onChange("notificationDaysBefore", value);
-  };
-
-  const isValidEmail = (value: string): boolean => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(value);
   };
 
   const selectedTiming = isCustomDays

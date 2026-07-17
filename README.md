@@ -5,9 +5,9 @@ AI-powered academic planner for students that transforms course outlines into or
 ## Features
 
 - **AI-Powered Extraction** - Upload course syllabi and automatically extract all assessments, due dates, and weights using Google Gemini
-- **Assessment Tracking** - Manage assignments with status tracking (Not Started, In Progress, Submitted, Missed) and rich-text notes
+- **Assessment Tracking** - Manage assignments with status tracking (Not started, In progress, Submitted, Missed) and rich-text notes
 - **Grade Calculator** - Calculate weighted grades per course with auto-save and target grade tracking
-- **Calendar Integration** - Visual calendar view with drag-and-drop and ICS export to Google Calendar, Outlook, or Apple Calendar
+- **Calendar Integration** - Visual calendar view with ICS export to Google Calendar, Outlook, or Apple Calendar
 - **Automated Reminders** - Email notifications for upcoming deadlines with customizable timing
 - **Multi-Semester Support** - Organize assessments across multiple semesters and courses
 - **Dark Mode** - Full dark theme with system preference detection
@@ -17,7 +17,7 @@ AI-powered academic planner for students that transforms course outlines into or
 
 **Frontend:** Next.js 15, React 19, TypeScript, Tailwind CSS, Tiptap
 
-**Backend:** Firebase Authentication, Firestore, Storage
+**Backend:** Firebase Authentication, Firestore
 
 **AI:** Google Gemini 2.5 Flash
 

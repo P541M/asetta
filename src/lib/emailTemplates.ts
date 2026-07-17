@@ -136,7 +136,6 @@ export function generateWelcomeEmailHTML(
   displayName: string,
   email: string,
   institution?: string,
-  studyProgram?: string,
 ): string {
   return `
     <!DOCTYPE html>
@@ -249,15 +248,11 @@ export function generateWelcomeEmailHTML(
             <p class="message">Thank you for joining Asetta! We're excited to help you manage your academic assessments and stay on top of your studies.</p>
             
             ${
-              institution || studyProgram
+              institution
                 ? `
             <div class="user-info">
               <p style="margin: 0; color: #374151; font-weight: 500;">Your Profile:</p>
-              <p style="margin: 8px 0 0 0; color: #6B7280;">
-                ${institution ? `📚 ${institution}` : ""}
-                ${institution && studyProgram ? "<br>" : ""}
-                ${studyProgram ? `🎓 ${studyProgram}` : ""}
-              </p>
+              <p style="margin: 8px 0 0 0; color: #6B7280;">📚 ${institution}</p>
             </div>
             `
                 : ""

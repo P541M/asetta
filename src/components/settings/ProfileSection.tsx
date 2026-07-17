@@ -3,8 +3,6 @@ import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 
 const ProfileSection = ({ form, onChange }: ProfileSectionProps) => {
-  const currentYear = new Date().getFullYear();
-
   return (
     <div className="space-y-8">
       {/* Section header */}
@@ -34,29 +32,6 @@ const ProfileSection = ({ form, onChange }: ProfileSectionProps) => {
             value={form.institution}
             onChange={(e) => onChange("institution", e.target.value)}
             placeholder="Your university or school"
-          />
-        </div>
-
-        <div className="space-y-1.5">
-          <Label htmlFor="studyProgram">Study program</Label>
-          <Input
-            id="studyProgram"
-            type="text"
-            value={form.studyProgram}
-            onChange={(e) => onChange("studyProgram", e.target.value)}
-            placeholder="e.g., Computer Science, Business Administration"
-          />
-        </div>
-
-        <div className="space-y-1.5">
-          <Label htmlFor="graduationYear">Expected graduation year</Label>
-          <Input
-            id="graduationYear"
-            type="number"
-            min={currentYear}
-            max={currentYear + 10}
-            value={form.graduationYear}
-            onChange={(e) => onChange("graduationYear", parseInt(e.target.value))}
           />
         </div>
       </div>

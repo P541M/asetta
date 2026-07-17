@@ -25,7 +25,7 @@ const AuthShell = ({ title, description, heading, subheading, children }: AuthSh
 
     {/* Brand panel */}
     <aside className="hidden w-[44%] flex-col justify-between bg-secondary p-12 lg:flex xl:p-16">
-      <Logo size="sm" variant="logo-with-text" color="primary" />
+      <Logo />
       <div>
         <h2 className="max-w-md font-heading text-5xl font-semibold leading-[1.05] tracking-tight text-foreground xl:text-6xl">
           Always ahead, never behind.
@@ -42,7 +42,7 @@ const AuthShell = ({ title, description, heading, subheading, children }: AuthSh
       <ThemeToggle className="absolute right-4 top-4 text-muted-foreground" />
       <div className="w-full max-w-sm">
         <div className="mb-10 lg:hidden">
-          <Logo size="sm" variant="logo-with-text" color="primary" />
+          <Logo />
         </div>
         <div className="mb-10">
           <h1 className="text-3xl font-semibold tracking-tight text-foreground">{heading}</h1>

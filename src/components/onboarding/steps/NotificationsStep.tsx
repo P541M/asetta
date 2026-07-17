@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Bell, Check, ChevronsUpDown, Info, Lock } from "lucide-react";
 import { useOnboarding } from "../../../contexts/OnboardingContext";
+import { isValidEmail } from "../../../utils/validation";
 import { StepNavigation } from "../ui/StepNavigation";
 import { cn } from "@/lib/utils";
 import { Button } from "../../ui/button";
@@ -86,11 +87,6 @@ export function NotificationsStep() {
     const newFormData = { ...formData, notificationDaysBefore: value };
     setFormData(newFormData);
     updateUserData(newFormData);
-  };
-
-  const isValidEmail = (email: string): boolean => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
   };
 
   const canContinue =

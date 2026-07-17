@@ -10,6 +10,7 @@ import SettingsActions from "./SettingsActions";
 import SettingsMessage from "./SettingsMessage";
 import { ProfileForm } from "../../types/profile";
 import { NotificationsForm } from "../../types/preferences";
+import { isValidEmail } from "../../utils/validation";
 import { DisplayPreferences, DEFAULT_DISPLAY_PREFERENCES } from "../../hooks/useDisplayPreferences";
 
 type Message = { text: string; type: "success" | "error" } | null;
@@ -17,18 +18,12 @@ type Message = { text: string; type: "success" | "error" } | null;
 const isDirty = <T extends object>(form: T, saved: T | null) =>
   saved !== null && (Object.keys(form) as (keyof T)[]).some((key) => form[key] !== saved[key]);
 
-const isValidEmail = (value: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
-
-const currentYear = new Date().getFullYear();
-
 const UserSettings = () => {
   const { user } = useAuth();
 
   const [profileForm, setProfileForm] = useState<ProfileForm>({
     displayName: user?.displayName || "",
     institution: "",
-    studyProgram: "",
-    graduationYear: currentYear + 4,
   });
   const [savedProfile, setSavedProfile] = useState<ProfileForm | null>(null);
   const [profileSaving, setProfileSaving] = useState(false);
@@ -66,13 +61,6 @@ const UserSettings = () => {
         const profile: ProfileForm = {
           displayName: user.displayName || "",
           institution: userData.institution || "",
-          // Migration support: handle both old and new field names
-          studyProgram: userData.studyProgram || userData.program || "",
-          graduationYear:
-            userData.graduationYear ||
-            (typeof userData.expectedGraduation === "string"
-              ? parseInt(userData.expectedGraduation) || currentYear + 4
-              : currentYear + 4),
         };
         const notifications: NotificationsForm = {
           emailNotifications: userData.emailNotifications ?? false,

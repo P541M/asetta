@@ -3,7 +3,7 @@ import { useRouter } from "next/router";
 import { useAuth } from "./AuthContext";
 import { db } from "../lib/firebase";
 import { doc, updateDoc } from "firebase/firestore";
-import { clearOnboardingProgress, loadUserDataForOnboarding } from "../utils/onboardingUtils";
+import { loadUserDataForOnboarding } from "../utils/onboardingUtils";
 import {
   OnboardingState,
   OnboardingContextType,
@@ -234,9 +234,6 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
         onboardingSkipped: true, // Flag to indicate it was skipped
       });
 
-      // Clear any partial progress saved in localStorage
-      clearOnboardingProgress();
-
       // Refresh the onboarding status in AuthContext
       await refreshOnboardingStatus();
 
@@ -263,16 +260,11 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
         hasCompletedOnboarding: true,
         onboardingCompletedAt: new Date(),
         institution: state.userData.institution || "",
-        studyProgram: state.userData.studyProgram || "",
-        graduationYear: state.userData.graduationYear || new Date().getFullYear() + 4,
         hasConsentedToNotifications: state.userData.hasConsentedToNotifications || false,
         emailNotifications: state.userData.emailNotifications || true,
         notificationDaysBefore: state.userData.notificationDaysBefore || 1,
         email: state.userData.email || "",
       });
-
-      // Clear any saved onboarding progress
-      clearOnboardingProgress();
 
       // Refresh the onboarding status in AuthContext
       await refreshOnboardingStatus();
