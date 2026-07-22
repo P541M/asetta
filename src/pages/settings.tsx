@@ -38,9 +38,12 @@ const SettingsPage = () => {
         <title>Settings - Asetta</title>
         <meta name="description" content="Manage your account settings and preferences" />
       </Head>
-      <DashboardHeader onLogout={handleLogout} title="Settings" />
+      <DashboardHeader onLogout={handleLogout} />
       <div className="p-4 md:p-6 pl-safe pr-safe pt-safe pb-safe">
         <div className="mx-auto max-w-3xl">
+          <h1 className="mb-4 text-2xl font-semibold tracking-tight text-foreground md:text-3xl">
+            Settings
+          </h1>
           <Button
             type="button"
             variant="ghost"

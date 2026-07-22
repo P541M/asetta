@@ -1,7 +1,7 @@
 import React from "react";
 import { useState, useEffect } from "react";
 import { updateDoc, deleteDoc, serverTimestamp } from "firebase/firestore";
-import { Check, ChevronsUpDown, FileText, ListFilter } from "lucide-react";
+import { ChevronsUpDown, FileText, ListFilter } from "lucide-react";
 import { getAssessmentDocRef } from "../../lib/firebaseUtils";
 import { useAuth } from "../../contexts/AuthContext";
 import { useTab } from "../../contexts/TabContext";
@@ -9,7 +9,6 @@ import { useDisplayPreferences } from "../../hooks/useDisplayPreferences";
 import { getDaysUntil } from "../../utils/dateUtils";
 import { Assessment, AssessmentStatus, AssessmentsTableProps } from "../../types/assessment";
 import { isCompletedStatus } from "../../constants/assessment";
-import { cn } from "@/lib/utils";
 import ConfirmationModal from "../common/ConfirmationModal";
 import { Button } from "../ui/button";
 import EmptyState from "../ui/EmptyState";
@@ -296,11 +295,11 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="min-w-44">
               {filterOptions.map((option) => (
-                <DropdownMenuItem key={option.value} onSelect={() => setFilter(option.value)}>
-                  <Check
-                    className={cn(filter === option.value ? "opacity-100" : "opacity-0")}
-                    aria-hidden
-                  />
+                <DropdownMenuItem
+                  key={option.value}
+                  data-selected={filter === option.value}
+                  onSelect={() => setFilter(option.value)}
+                >
                   {option.label}
                 </DropdownMenuItem>
               ))}

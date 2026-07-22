@@ -4,7 +4,6 @@ import { BookOpen, Check, ChevronsUpDown, CircleAlert, GraduationCap, Loader2 } 
 import { TabProvider, useTab, TabType } from "../../contexts/TabContext";
 import DashboardLayout from "../layout/DashboardLayout";
 import { DashboardData, TabComponentProps, CoursesTabProps } from "../../types/dashboard";
-import { cn } from "../../lib/utils";
 
 // Import existing tab content components
 import CoursesOverviewTable from "../tables/CoursesOverviewTable";
@@ -207,11 +206,11 @@ const GradesTab = ({ data, urlSemesterId }: TabComponentProps) => {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="min-w-48">
                 {availableCourses.map((course: string) => (
-                  <DropdownMenuItem key={course} onSelect={() => setSelectedCourse(course)}>
-                    <Check
-                      className={cn(selectedCourse === course ? "opacity-100" : "opacity-0")}
-                      aria-hidden
-                    />
+                  <DropdownMenuItem
+                    key={course}
+                    data-selected={selectedCourse === course}
+                    onSelect={() => setSelectedCourse(course)}
+                  >
                     <span className="truncate">{course}</span>
                   </DropdownMenuItem>
                 ))}
@@ -258,52 +257,28 @@ const CalendarTab = ({ data }: { data: DashboardData }) => {
 
 // Add Assessment Tab Component
 const AddTab = ({ data, urlSemesterId }: TabComponentProps) => {
-  const [addMode, setAddMode] = useState<"manual" | "upload">("upload");
   const { selectedSemester, selectedSemesterId, refreshAssessments } = data;
 
   return (
     <div>
       {selectedSemesterId ? (
         <div className="p-6">
-          <PanelHeader title="Add assessment" />
+          <PanelHeader title="Add assessments" />
 
-          {/* Mode toggle on the segmented-control language (see TabNavigationBar) */}
-          <div className="mb-6 rounded-xl bg-secondary p-1">
-            <div className="flex gap-1">
-              {(
-                [
-                  { id: "upload", label: "Upload file" },
-                  { id: "manual", label: "Quick add" },
-                ] as const
-              ).map(({ id, label }) => (
-                <button
-                  key={id}
-                  type="button"
-                  role="tab"
-                  aria-selected={addMode === id}
-                  onClick={() => setAddMode(id)}
-                  className={cn(
-                    "min-h-11 flex-1 rounded-lg px-4 text-sm font-medium outline-hidden transition-all duration-200 focus-visible:ring-2 focus-visible:ring-ring",
-                    addMode === id
-                      ? "bg-primary/10 text-primary"
-                      : "text-muted-foreground hover:text-foreground",
-                  )}
-                >
-                  {label}
-                </button>
-              ))}
-            </div>
+          <UploadForm
+            semesterId={selectedSemesterId}
+            semesterName={selectedSemester}
+            onUploadSuccess={refreshAssessments}
+          />
+
+          {/* Typographic rule between the two paths */}
+          <div className="my-8 flex items-center gap-3">
+            <div className="h-px flex-1 bg-border" />
+            <span className="text-xs font-medium text-muted-foreground">or add one manually</span>
+            <div className="h-px flex-1 bg-border" />
           </div>
 
-          {addMode === "upload" ? (
-            <UploadForm
-              semesterId={selectedSemesterId}
-              semesterName={selectedSemester}
-              onUploadSuccess={refreshAssessments}
-            />
-          ) : (
-            <AddAssessmentForm semesterId={selectedSemesterId} onSuccess={refreshAssessments} />
-          )}
+          <AddAssessmentForm semesterId={selectedSemesterId} onSuccess={refreshAssessments} />
         </div>
       ) : (
         <EmptyState

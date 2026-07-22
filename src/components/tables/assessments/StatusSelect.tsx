@@ -1,4 +1,4 @@
-import { Check, ChevronDown, CircleCheck, CircleDashed, CircleX, Clock } from "lucide-react";
+import { ChevronDown, CircleCheck, CircleDashed, CircleX, Clock } from "lucide-react";
 import { AssessmentStatus } from "@/types/assessment";
 import { cn } from "@/lib/utils";
 import {
@@ -82,8 +82,11 @@ const StatusSelect = ({
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start" className="min-w-44">
         {statusOptions.map(({ value: option, icon: OptionIcon }) => (
-          <DropdownMenuItem key={option} onSelect={() => onChange(option)}>
-            <Check className={cn(value === option ? "opacity-100" : "opacity-0")} aria-hidden />
+          <DropdownMenuItem
+            key={option}
+            data-selected={value === option}
+            onSelect={() => onChange(option)}
+          >
             <OptionIcon aria-hidden />
             {option}
           </DropdownMenuItem>

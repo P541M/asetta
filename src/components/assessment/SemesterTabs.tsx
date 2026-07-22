@@ -16,10 +16,9 @@ import {
 } from "firebase/firestore";
 import { arrayMove } from "@dnd-kit/sortable";
 import { DragEndEvent } from "@dnd-kit/core";
-import { Check, ChevronsUpDown, Settings2 } from "lucide-react";
+import { ChevronsUpDown, Settings2 } from "lucide-react";
 import { Semester } from "@/types/semester";
 import { SemesterTabsProps } from "@/types/course";
-import { cn } from "@/lib/utils";
 import ConfirmationModal from "../common/ConfirmationModal";
 import { Button } from "../ui/button";
 import {
@@ -176,18 +175,19 @@ const SemesterTabs = ({
   }
 
   return (
-    <div className="mb-6">
+    <div className="min-w-0">
       {/* One switcher instead of pill clutter: current semester + everything else in the menu */}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button
             type="button"
             variant="secondary"
-            className="min-w-44 justify-between md:min-w-56"
+            size="sm"
+            className="min-w-0 justify-start gap-1.5"
             aria-label="Switch semester"
           >
             <span className="min-w-0 truncate">{activeSemester?.name ?? "Select semester"}</span>
-            <ChevronsUpDown className="text-muted-foreground" aria-hidden />
+            <ChevronsUpDown className="shrink-0 text-muted-foreground" aria-hidden />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="start" className="min-w-56">
@@ -195,12 +195,9 @@ const SemesterTabs = ({
             semesters.map((sem) => (
               <DropdownMenuItem
                 key={sem.id}
+                data-selected={activeSemester?.id === sem.id}
                 onSelect={() => router.push(`/dashboard/${sem.id}/${activeTab}`)}
               >
-                <Check
-                  className={cn(activeSemester?.id === sem.id ? "opacity-100" : "opacity-0")}
-                  aria-hidden
-                />
                 <span className="truncate">{sem.name}</span>
               </DropdownMenuItem>
             ))

@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
  * platform has no decorative borders) and a `success` variant for auth flows.
  */
 const alertVariants = cva(
-  "relative w-full rounded-lg px-4 py-3 text-sm grid grid-cols-[auto_1fr] gap-x-3 items-start motion-safe:animate-fade-in-down [&>svg]:size-5 [&>svg]:mt-0.5",
+  "relative w-full rounded-lg px-4 py-3 text-sm grid grid-cols-[auto_1fr] gap-x-3 items-start [&>svg]:size-5 [&>svg]:mt-0.5",
   {
     variants: {
       variant: {

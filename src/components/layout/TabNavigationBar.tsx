@@ -1,27 +1,27 @@
-import { BookOpen, Calendar, ChartColumn, ListChecks, Plus, type LucideIcon } from "lucide-react";
+import { BookOpen, Calendar, ChartColumn, ListChecks, type LucideIcon } from "lucide-react";
 import { useTab, TabType } from "../../contexts/TabContext";
 import { cn } from "../../lib/utils";
-
-interface TabNavigationBarProps {
-  className?: string;
-}
 
 const TABS: { id: TabType; label: string; icon: LucideIcon }[] = [
   { id: "courses", label: "Courses", icon: BookOpen },
   { id: "assessments", label: "Assessments", icon: ListChecks },
   { id: "grades", label: "Grades", icon: ChartColumn },
   { id: "calendar", label: "Calendar", icon: Calendar },
-  { id: "add", label: "Add", icon: Plus },
 ];
 
-/** Segmented tab control: tonal track, elevated active pill. */
-const TabNavigationBar = ({ className = "" }: TabNavigationBarProps) => {
+/**
+ * Both navigations for the four destination tabs: text-only underline tabs on
+ * md+, a fixed bottom bar (icons as navigation aids) below md. "Add" is not a
+ * tab — it is the chrome's primary action.
+ */
+const TabNavigationBar = () => {
   const { activeTab, setActiveTab } = useTab();
 
   return (
-    <div className={cn("rounded-xl bg-secondary p-1", className)} role="tablist">
-      <div className="flex gap-1">
-        {TABS.map(({ id, label, icon: Icon }) => {
+    <>
+      {/* Desktop: underline tabs */}
+      <div className="hidden gap-6 md:flex" role="tablist">
+        {TABS.map(({ id, label }) => {
           const isActive = activeTab === id;
           return (
             <button
@@ -30,22 +30,46 @@ const TabNavigationBar = ({ className = "" }: TabNavigationBarProps) => {
               aria-selected={isActive}
               onClick={() => setActiveTab(id)}
               className={cn(
-                "flex min-h-11 flex-1 items-center justify-center rounded-lg px-2 font-medium outline-hidden transition-all duration-200 focus-visible:ring-2 focus-visible:ring-ring md:px-6",
+                "min-h-11 border-b-2 px-0.5 text-sm outline-hidden transition-colors focus-visible:ring-2 focus-visible:ring-ring",
                 isActive
-                  ? "bg-primary/10 text-primary"
-                  : "text-muted-foreground hover:text-foreground",
+                  ? "border-primary font-semibold text-foreground"
+                  : "border-transparent font-medium text-muted-foreground hover:text-foreground",
               )}
             >
-              {/* Icon over label on mobile, side by side on desktop */}
-              <span className="flex flex-col items-center gap-0.5 md:flex-row md:gap-2">
-                <Icon className="size-4.5 shrink-0" aria-hidden />
-                <span className="truncate text-xs leading-tight md:text-sm">{label}</span>
-              </span>
+              {label}
             </button>
           );
         })}
       </div>
-    </div>
+
+      {/* Mobile: fixed bottom navigation (below the overlay recipe's z-150) */}
+      <nav
+        className="pb-safe fixed inset-x-0 bottom-0 z-40 bg-card shadow-soft md:hidden"
+        role="tablist"
+        aria-label="Primary"
+      >
+        <div className="flex">
+          {TABS.map(({ id, label, icon: Icon }) => {
+            const isActive = activeTab === id;
+            return (
+              <button
+                key={id}
+                role="tab"
+                aria-selected={isActive}
+                onClick={() => setActiveTab(id)}
+                className={cn(
+                  "flex min-h-14 flex-1 flex-col items-center justify-center gap-1 outline-hidden transition-colors focus-visible:ring-2 focus-visible:ring-ring",
+                  isActive ? "text-primary" : "text-muted-foreground",
+                )}
+              >
+                <Icon className="size-5" aria-hidden />
+                <span className="text-xs font-medium leading-none">{label}</span>
+              </button>
+            );
+          })}
+        </div>
+      </nav>
+    </>
   );
 };
 

@@ -1,13 +1,5 @@
 import { useState, useRef, useCallback } from "react";
-import {
-  CircleAlert,
-  CircleCheck,
-  CloudUpload,
-  FileText,
-  Loader2,
-  Sparkles,
-  Zap,
-} from "lucide-react";
+import { CircleAlert, CircleCheck, CloudUpload, FileText, Loader2, Zap } from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
 import { UploadFormProps, UploadStatus, FileProgress, ExtractionResult } from "../../types/upload";
 import { cn } from "@/lib/utils";
@@ -226,20 +218,16 @@ const UploadForm = ({ semesterId, semesterName, onUploadSuccess }: UploadFormPro
   return (
     <div>
       <div className="mb-6 space-y-4">
-        <div>
-          <h3 className="text-base font-semibold text-foreground">Upload course outlines</h3>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Transform your PDF course outlines into organized assessments automatically. Our AI
-            extracts deadlines, requirements, and details in seconds.
-          </p>
-        </div>
+        <p className="text-sm text-muted-foreground">
+          Transform your PDF course outlines into organized assessments automatically. Our AI
+          extracts deadlines, requirements, and details in seconds.
+        </p>
 
         <Alert>
-          <Sparkles aria-hidden />
-          <AlertTitle>AI-powered extraction</AlertTitle>
+          <AlertTitle>Automatic extraction</AlertTitle>
           <AlertDescription>
-            Please review extracted data for accuracy. Files are processed securely and never
-            stored.
+            Verify the imported details before saving. Files are processed securely and discarded
+            immediately.
           </AlertDescription>
         </Alert>
       </div>

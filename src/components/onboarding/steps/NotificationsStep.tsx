@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { Bell, Check, ChevronsUpDown, Info, Lock } from "lucide-react";
+import { Bell, ChevronsUpDown, Info, Lock } from "lucide-react";
 import { useOnboarding } from "../../../contexts/OnboardingContext";
 import { isValidEmail } from "../../../utils/validation";
 import { StepNavigation } from "../ui/StepNavigation";
-import { cn } from "@/lib/utils";
 import { Button } from "../../ui/button";
 import { Input } from "../../ui/input";
 import { Label } from "../../ui/label";
@@ -180,21 +179,18 @@ export function NotificationsStep() {
                 {timingOptions.map((option) => (
                   <DropdownMenuItem
                     key={option.value}
+                    data-selected={
+                      !isCustomDays && formData.notificationDaysBefore.toString() === option.value
+                    }
                     onSelect={() => handleDaysChange(option.value)}
                   >
-                    <Check
-                      className={cn(
-                        !isCustomDays && formData.notificationDaysBefore.toString() === option.value
-                          ? "opacity-100"
-                          : "opacity-0",
-                      )}
-                      aria-hidden
-                    />
                     {option.label}
                   </DropdownMenuItem>
                 ))}
-                <DropdownMenuItem onSelect={() => handleDaysChange("custom")}>
-                  <Check className={cn(isCustomDays ? "opacity-100" : "opacity-0")} aria-hidden />
+                <DropdownMenuItem
+                  data-selected={isCustomDays}
+                  onSelect={() => handleDaysChange("custom")}
+                >
                   {isCustomDays ? `Custom (${customDays} days)` : "Custom timing"}
                 </DropdownMenuItem>
               </DropdownMenuContent>

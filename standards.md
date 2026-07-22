@@ -125,8 +125,13 @@ are what make Asetta look like Asetta and not a default shadcn app:
 
 - **No entrance animations on app screens.** Fade-up reveals belong to the marketing site; the
   platform is a tool people open many times a day — screens appear instantly. Motion is reserved
-  for *feedback*: responses to a user action (an alert appearing, a criteria check turning on,
-  button press states), always behind `motion-safe:`.
+  for *feedback*: responses to a user action (a criteria check turning on, button press states),
+  always behind `motion-safe:`.
+- **Alerts appear instantly, no drop-in fade** (founder decision 2026-07-22 — the "drop-in fader,"
+  `fadeInDown`, read as cheap and was firing even on static banners that aren't feedback to any
+  action). `ui/alert.tsx` has no entrance animation in its base class; this applies to every Alert
+  everywhere, including conditional error/success/rate-limit notices — same instant-appearance
+  rule overlays already followed.
 - **Theme switching**: `ThemeToggle` cross-fades the page via the View Transitions API (skipped
   under `prefers-reduced-motion`, falls back to instant). `disableTransitionOnChange` stays ON in
   `ThemeProvider` — per-element CSS transitions during a theme flip cause mismatched fades; the
@@ -217,13 +222,18 @@ a tier, the ramp is wrong — update it here, don't invent a sixth size at the c
 ### Icons (locked 2026-07-16)
 
 - **One icon max per element** (a button, a dropdown trigger, a menu item). Icons carry
-  meaning — selection (the check in menus), status (status chips, the save indicator),
-  navigation (tab bar, chevrons, back arrows) — **never decoration**.
+  meaning — status (status chips, the save indicator), navigation (tab bar, chevrons, back
+  arrows) — **never decoration**.
 - **Dropdown triggers show value + chevron only.** No leading glyph next to the current value
   (the semester switcher, course picker, and filter triggers all lost theirs in the 2026-07
   housekeeping pass).
-- **Menu options lead with the selection check as their only glyph.** Action items in the same
-  menu (e.g. "Manage semesters") may keep one identifying icon.
+- **Selected menu items get a highlighted background, not a checkmark** (founder decision
+  2026-07-22, supersedes the prior "selection check" recipe — the check cost an icon slot and a
+  layout gutter for a state a tint communicates better). `DropdownMenuItem` accepts
+  `data-selected`, styled `bg-primary/10 text-primary` — the same amber-tint recipe already locked
+  for selection under "Theme tokens," never a plain `bg-accent` swap (indistinguishable from the
+  item's own hover/focus state). Action items in the same menu (e.g. "Manage semesters") may keep
+  one identifying icon.
 - Tab-bar icons stay — they are navigation aids, not decoration.
 - Empty states show one icon by recipe (see "Tab panels & empty states").
 

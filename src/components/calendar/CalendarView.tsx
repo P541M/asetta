@@ -1,10 +1,9 @@
 import { useState, useEffect, useRef, KeyboardEvent, useCallback } from "react";
-import { Check, ChevronLeft, ChevronRight, ChevronsUpDown, Download } from "lucide-react";
+import { ChevronLeft, ChevronRight, ChevronsUpDown, Download } from "lucide-react";
 import { useAssessments } from "../../hooks/useAssessments";
 import { generateICSFile } from "../../utils/icsGenerator";
 import { Assessment } from "../../types/assessment";
 import { Day, CalendarViewProps } from "../../types/calendar";
-import { cn } from "@/lib/utils";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import {
@@ -237,11 +236,11 @@ const CalendarView = ({ selectedSemester, semesterId, refreshTrigger }: Calendar
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="min-w-44">
                 {statusFilterOptions.map(({ value, label }) => (
-                  <DropdownMenuItem key={value} onSelect={() => setStatusFilter(value)}>
-                    <Check
-                      className={cn(statusFilter === value ? "opacity-100" : "opacity-0")}
-                      aria-hidden
-                    />
+                  <DropdownMenuItem
+                    key={value}
+                    data-selected={statusFilter === value}
+                    onSelect={() => setStatusFilter(value)}
+                  >
                     {label}
                   </DropdownMenuItem>
                 ))}

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import { useRouter } from "next/router";
 import Head from "next/head";
-import SemesterTabs from "../assessment/SemesterTabs";
+import { useTab } from "../../contexts/TabContext";
 import DashboardHeader from "./DashboardHeader";
 import TabNavigationBar from "./TabNavigationBar";
 import { Assessment } from "../../types/assessment";
@@ -38,6 +38,7 @@ const DashboardLayout = ({
 }: DashboardLayoutProps) => {
   const { user, loading, logout } = useAuth();
   const router = useRouter();
+  const { setActiveTab } = useTab();
   const { showStatsBar } = useDisplayPreferences(user);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
@@ -86,15 +87,19 @@ const DashboardLayout = ({
         <title>{title}</title>
         <meta name="description" content={description} />
       </Head>
-      <DashboardHeader onLogout={handleLogout} />
-      <div className="p-4 md:p-6 pl-safe pr-safe pt-safe pb-safe">
+      <DashboardHeader
+        onLogout={handleLogout}
+        semesterProps={{
+          semesters,
+          setSemesters,
+          activeSemester,
+          isLoading: semestersLoading,
+        }}
+        onAddAssessment={() => setActiveTab("add")}
+      />
+      <div className="p-4 pb-24 md:p-6 md:pb-6 pl-safe pr-safe pt-safe">
         <div className="max-w-7xl mx-auto">
-          <SemesterTabs
-            semesters={semesters}
-            setSemesters={setSemesters}
-            activeSemester={activeSemester}
-            isLoading={semestersLoading}
-          />
+          <TabNavigationBar />
 
           {showStatsBar && (
             <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 md:gap-4 lg:grid-cols-6">
@@ -107,31 +112,26 @@ const DashboardLayout = ({
             </div>
           )}
 
-          {/* Navigation Tabs */}
+          {/* Tab Content Area */}
           <div className="mt-6">
-            <TabNavigationBar />
-
-            {/* Tab Content Area */}
-            <div className="mt-6">
-              <div className="rounded-xl bg-card shadow-soft">
-                {isLoading ? (
-                  <div className="flex justify-center py-16">
-                    <LoadingSpinner />
-                  </div>
-                ) : (
-                  children({
-                    selectedSemester,
-                    selectedSemesterId,
-                    assessments,
-                    courses,
-                    availableCourses,
-                    error,
-                    stats,
-                    refreshAssessments,
-                    refreshTrigger,
-                  })
-                )}
-              </div>
+            <div className="rounded-xl bg-card shadow-soft">
+              {isLoading ? (
+                <div className="flex justify-center py-16">
+                  <LoadingSpinner />
+                </div>
+              ) : (
+                children({
+                  selectedSemester,
+                  selectedSemesterId,
+                  assessments,
+                  courses,
+                  availableCourses,
+                  error,
+                  stats,
+                  refreshAssessments,
+                  refreshTrigger,
+                })
+              )}
             </div>
           </div>
         </div>

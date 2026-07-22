@@ -1,8 +1,6 @@
-/** Skeleton matching the semester switcher's footprint. */
+/** Loading placeholder matching the bar's ghost semester switcher footprint. */
 const SemesterTabsSkeleton = () => (
-  <div className="mb-6">
-    <div className="h-10 w-44 animate-pulse rounded-lg bg-muted md:w-56"></div>
-  </div>
+  <div className="h-9 w-32 animate-pulse rounded-lg bg-secondary" aria-hidden />
 );
 
 export default SemesterTabsSkeleton;
