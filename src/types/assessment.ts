@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import type { Timestamp } from "firebase/firestore";
 
 export type AssessmentStatus = "Not started" | "In progress" | "Submitted" | "Missed";
@@ -25,4 +26,6 @@ export interface AssessmentsTableProps {
   assessments: Assessment[];
   semesterId: string;
   onStatusChange?: (assessmentId: string, newStatus: AssessmentStatus) => void;
+  /** Panel title; the course-filtered view passes its breadcrumb here. */
+  title?: ReactNode;
 }

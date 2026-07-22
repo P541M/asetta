@@ -1,11 +1,18 @@
 import { useState } from "react";
+import dynamic from "next/dynamic";
 import { Copy, X } from "lucide-react";
 import { Assessment } from "../../../types/assessment";
 import { cn } from "@/lib/utils";
 import { Button } from "../../ui/button";
-import RichTextEditor from "../../editor/RichTextEditor";
 import { statusTintClasses } from "./StatusSelect";
 import { formatLocalDateTime } from "../../../utils/dateUtils";
+
+/* Tiptap is heavy to initialize and bundle; loading it lazily lets the modal
+   shell paint instantly and keeps the editor out of the dashboard's main chunk. */
+const RichTextEditor = dynamic(() => import("../../editor/RichTextEditor"), {
+  ssr: false,
+  loading: () => <div className="min-h-48" aria-hidden />,
+});
 
 interface NotesModalProps {
   assessment: Assessment;

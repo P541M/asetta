@@ -1,5 +1,5 @@
 import React from "react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { updateDoc, deleteDoc, serverTimestamp } from "firebase/firestore";
 import { ChevronsUpDown, FileText, ListFilter } from "lucide-react";
 import { getAssessmentDocRef } from "../../lib/firebaseUtils";
@@ -36,6 +36,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
   assessments,
   semesterId,
   onStatusChange,
+  title = "Assessments",
 }) => {
   const { user } = useAuth();
   const { setActiveTab } = useTab();
@@ -74,29 +75,30 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
     return getDaysUntil(dueDate, dueTime);
   };
 
-  const filteredAssessments = localAssessments.filter((assessment) => {
-    if (filter === "all") return true;
-    if (filter === "not_submitted") return !isCompletedStatus(assessment.status);
-    if (filter === "submitted") return isCompletedStatus(assessment.status);
-    return true;
-  });
+  const sortedAssessments = useMemo(() => {
+    const filtered = localAssessments.filter((assessment) => {
+      if (filter === "not_submitted") return !isCompletedStatus(assessment.status);
+      if (filter === "submitted") return isCompletedStatus(assessment.status);
+      return true;
+    });
 
-  const sortedAssessments = [...filteredAssessments].sort((a, b) => {
-    if (sortKey === "dueDate") {
-      const dateA = new Date(`${a.dueDate}T${a.dueTime}`);
-      const dateB = new Date(`${b.dueDate}T${b.dueTime}`);
-      return sortOrder === "asc"
-        ? dateA.getTime() - dateB.getTime()
-        : dateB.getTime() - dateA.getTime();
-    }
-    const valA = a[sortKey];
-    const valB = b[sortKey];
-    if (valA != null && valB != null) {
-      if (valA < valB) return sortOrder === "asc" ? -1 : 1;
-      if (valA > valB) return sortOrder === "asc" ? 1 : -1;
-    }
-    return 0;
-  });
+    return filtered.sort((a, b) => {
+      if (sortKey === "dueDate") {
+        const dateA = new Date(`${a.dueDate}T${a.dueTime}`);
+        const dateB = new Date(`${b.dueDate}T${b.dueTime}`);
+        return sortOrder === "asc"
+          ? dateA.getTime() - dateB.getTime()
+          : dateB.getTime() - dateA.getTime();
+      }
+      const valA = a[sortKey];
+      const valB = b[sortKey];
+      if (valA != null && valB != null) {
+        if (valA < valB) return sortOrder === "asc" ? -1 : 1;
+        if (valA > valB) return sortOrder === "asc" ? 1 : -1;
+      }
+      return 0;
+    });
+  }, [localAssessments, filter, sortKey, sortOrder]);
 
   const handleStatusChange = async (assessmentId: string, newStatus: AssessmentStatus) => {
     if (!user || !assessmentId) return;
@@ -277,7 +279,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
   return (
     <div className="p-6">
       <PanelHeader
-        title="Assessments"
+        title={title}
         actions={
           <DropdownMenu>
             <DropdownMenuTrigger asChild>

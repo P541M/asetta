@@ -1,10 +1,12 @@
 import { Assessment, AssessmentStatus } from "@/types/assessment";
 import { cn } from "@/lib/utils";
 import { formatLocalDateTime } from "../../../utils/dateUtils";
+import { daysUntilLabel, urgencyChipClass, urgencyTextClass } from "../../../utils/urgency";
 import { Button } from "../../ui/button";
 import { Checkbox } from "../../ui/checkbox";
 import { NotesIcon, EditIcon, TrashIcon } from "../../ui/icons";
 import StatusSelect from "./StatusSelect";
+import { assessmentGridClass } from "./tableGrid";
 
 interface AssessmentRowProps {
   assessment: Assessment;
@@ -20,29 +22,6 @@ interface AssessmentRowProps {
   onDeleteClick: () => void;
 }
 
-const daysTillDueLabel = (daysTillDue: number) =>
-  daysTillDue < 0
-    ? "Overdue"
-    : daysTillDue === 0
-      ? "Due today"
-      : daysTillDue === 1
-        ? "Due tomorrow"
-        : `${daysTillDue} days left`;
-
-const urgencyTextClass = (daysTillDue: number) =>
-  daysTillDue <= 3
-    ? "text-destructive"
-    : daysTillDue <= 7
-      ? "text-primary"
-      : "text-muted-foreground";
-
-const urgencyChipClass = (daysTillDue: number) =>
-  daysTillDue <= 3
-    ? "bg-destructive/10 text-destructive"
-    : daysTillDue <= 7
-      ? "bg-primary/10 text-primary"
-      : "bg-foreground/5 text-muted-foreground";
-
 /** Read-only assessment row (mobile card + desktop grid variants). */
 const AssessmentRow = ({
   assessment,
@@ -57,7 +36,7 @@ const AssessmentRow = ({
   onEditClick,
   onDeleteClick,
 }: AssessmentRowProps) => (
-  <div className="rounded-xl bg-secondary/50 p-4">
+  <div className="rounded-xl bg-secondary/50 p-4 transition-colors hover:bg-accent/50 lg:py-3">
     {/* Mobile Card Layout */}
     <div className="lg:hidden space-y-4">
       {/* Header with checkbox and status */}
@@ -97,7 +76,7 @@ const AssessmentRow = ({
               urgencyChipClass(daysTillDue),
             )}
           >
-            {daysTillDueLabel(daysTillDue)}
+            {daysUntilLabel(daysTillDue)}
           </span>
         )}
       </div>
@@ -138,79 +117,68 @@ const AssessmentRow = ({
       </div>
     </div>
 
-    {/* Desktop Table Layout */}
-    <div className="hidden lg:grid grid-cols-12 gap-2 items-center">
-      <div className="col-span-2 flex items-center gap-3">
-        <Checkbox
-          checked={isSelected}
-          onCheckedChange={onToggleSelect}
-          aria-label={`Select ${assessment.assignmentName}`}
-        />
-        <StatusSelect
-          value={assessment.status}
-          onChange={onStatusChange}
-          size="sm"
-          className="min-w-0 flex-1"
-        />
-      </div>
-      <div className="col-span-2">
-        <p className="truncate text-sm text-foreground">{assessment.courseName}</p>
-      </div>
-      <div className="col-span-4">
-        <p className="text-sm font-medium text-foreground">{assessment.assignmentName}</p>
-      </div>
-      <div className="col-span-4 flex items-center justify-between gap-3">
-        <div className="flex flex-col gap-0.5">
-          <span className="text-sm text-foreground">
-            {formatLocalDateTime(assessment.dueDate, assessment.dueTime)}
+    {/* Desktop Table Layout — same grid template as the header, one cell per column */}
+    <div className={assessmentGridClass(showWeight)}>
+      <Checkbox
+        checked={isSelected}
+        onCheckedChange={onToggleSelect}
+        aria-label={`Select ${assessment.assignmentName}`}
+      />
+      <StatusSelect
+        value={assessment.status}
+        onChange={onStatusChange}
+        size="sm"
+        className="w-full min-w-0"
+      />
+      <p className="truncate text-sm text-muted-foreground">{assessment.courseName}</p>
+      <p className="truncate text-sm font-medium text-foreground">{assessment.assignmentName}</p>
+      <div className="flex flex-col gap-0.5">
+        <span className="whitespace-nowrap text-sm text-foreground">
+          {formatLocalDateTime(assessment.dueDate, assessment.dueTime)}
+        </span>
+        {showDaysTillDue && daysTillDue !== null && (
+          <span className={cn("text-xs font-medium", urgencyTextClass(daysTillDue))}>
+            {daysUntilLabel(daysTillDue)}
           </span>
-          {showDaysTillDue && daysTillDue !== null && (
-            <span className={cn("text-xs font-medium", urgencyTextClass(daysTillDue))}>
-              {daysTillDueLabel(daysTillDue)}
-            </span>
-          )}
-        </div>
-        <div className="flex items-center gap-3">
-          {showWeight && assessment.weight > 0 && (
-            <span className="text-sm font-medium text-muted-foreground">{assessment.weight}%</span>
-          )}
-          <div className="flex items-center gap-0.5">
-            {showNotes && (
-              <Button
-                variant="ghost"
-                size="icon-sm"
-                onClick={onNotesClick}
-                title={assessment.notes ? "View or edit notes" : "Add notes"}
-                aria-label={assessment.notes ? "View or edit notes" : "Add notes"}
-              >
-                <NotesIcon
-                  className={cn(
-                    "h-4 w-4",
-                    assessment.notes ? "text-primary" : "text-muted-foreground",
-                  )}
-                />
-              </Button>
-            )}
-            <Button
-              variant="ghost"
-              size="icon-sm"
-              onClick={onEditClick}
-              title="Edit assessment"
-              aria-label="Edit assessment"
-            >
-              <EditIcon className="h-4 w-4 text-muted-foreground" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon-sm"
-              onClick={onDeleteClick}
-              title="Delete assessment"
-              aria-label="Delete assessment"
-            >
-              <TrashIcon className="h-4 w-4 text-muted-foreground" />
-            </Button>
-          </div>
-        </div>
+        )}
+      </div>
+      {showWeight && (
+        <p className="text-right text-sm tabular-nums text-muted-foreground">
+          {assessment.weight > 0 && `${assessment.weight}%`}
+        </p>
+      )}
+      <div className="flex items-center justify-end gap-0.5">
+        {showNotes && (
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            onClick={onNotesClick}
+            title={assessment.notes ? "View or edit notes" : "Add notes"}
+            aria-label={assessment.notes ? "View or edit notes" : "Add notes"}
+          >
+            <NotesIcon
+              className={cn("h-4 w-4", assessment.notes ? "text-primary" : "text-muted-foreground")}
+            />
+          </Button>
+        )}
+        <Button
+          variant="ghost"
+          size="icon-sm"
+          onClick={onEditClick}
+          title="Edit assessment"
+          aria-label="Edit assessment"
+        >
+          <EditIcon className="h-4 w-4 text-muted-foreground" />
+        </Button>
+        <Button
+          variant="ghost"
+          size="icon-sm"
+          onClick={onDeleteClick}
+          title="Delete assessment"
+          aria-label="Delete assessment"
+        >
+          <TrashIcon className="h-4 w-4 text-muted-foreground" />
+        </Button>
       </div>
     </div>
   </div>

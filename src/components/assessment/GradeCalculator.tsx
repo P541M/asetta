@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { memo, useState, useEffect } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import { useAssessments } from "../../hooks/useAssessments";
 import { useAssessmentAutoSave } from "../../hooks/useAssessmentAutoSave";
@@ -191,4 +191,6 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
   );
 };
 
-export default GradeCalculator;
+/* Memoized: the grades tab re-renders on every shallow route change (it reads
+   router.query), and this subtree is the heaviest on the dashboard */
+export default memo(GradeCalculator);

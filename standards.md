@@ -4,7 +4,14 @@
 platform.** Read it before writing or reviewing any code. If a change conflicts with this file,
 either the change is wrong or this file must be updated in the same commit — never let them drift.
 
-Last updated: 2026-07-16 (v4.1 — 2026-07 housekeeping recipes codified: icon rules, panel-header
+Last updated: 2026-07-22 (v4.2 — dashboard chrome codified: one-bar anatomy with an
+item-title-tier greeting, underline tabs on desktop, fixed bottom nav on mobile, Add as the
+chrome's primary CTA (actions never pose as navigation), chrome spacing rule; assessments-table
+shared grid template recipe; course-card recipe; shared urgency helpers in `utils/urgency.ts`;
+same-day polish: menu items separated by `space-y-1`, breadcrumb titles for filtered views,
+the `hover:bg-accent/50` list-row hover recipe, micro-motion capped at ~150ms, mounted-tab
+memoization + lazy-loaded notes editor.
+v4.1 2026-07-16: 2026-07 housekeeping recipes codified: icon rules, panel-header
 + empty-state recipes, settings stacked-sections layout with instant preferences, URL-derived
 context-switcher state. v4.0 2026-07-15: **migration complete** — every section is on the
 shadcn/Tailwind-v4 system and the legacy token families and utilities are deleted from
@@ -80,6 +87,11 @@ it must contain **zero** legacy styling.
   new names.
 - The `border-color: gray-200` compatibility block in `globals.css` exists for legacy pages;
   new code always states its border color explicitly.
+- **Clickable always shows the pointer cursor** (2026-07-22). v4's preflight stopped setting
+  `cursor: pointer` on buttons; `globals.css` restores it for `button:not(:disabled)` and
+  `[role="button"]:not(:disabled)`, and `DropdownMenuItem` is `cursor-pointer`. Don't add
+  per-element `cursor-pointer` to buttons/role-button elements (the base rule covers them);
+  clickable non-button elements (e.g. calendar day cells) state it explicitly.
 
 ### Surface language (locked 2026-07-14 — the "premium minimal" rules)
 
@@ -132,6 +144,10 @@ are what make Asetta look like Asetta and not a default shadcn app:
   action). `ui/alert.tsx` has no entrance animation in its base class; this applies to every Alert
   everywhere, including conditional error/success/rate-limit notices — same instant-appearance
   rule overlays already followed.
+- **Micro-motion stays under ~150ms** (2026-07-22): the `@theme` animation tokens are
+  fade-in 150ms / scale-in 120ms, and control transitions (buttons, inputs, chevrons) run at
+  150ms. Longer durations are reserved for genuine progress/timer animation (progress bars,
+  the rate-limit countdown), never for feedback — anything slower reads as lag.
 - **Theme switching**: `ThemeToggle` cross-fades the page via the View Transitions API (skipped
   under `prefers-reduced-motion`, falls back to instant). `disableTransitionOnChange` stays ON in
   `ThemeProvider` — per-element CSS transitions during a theme flip cause mismatched fades; the
@@ -183,9 +199,9 @@ a tier, the ramp is wrong — update it here, don't invent a sixth size at the c
 
 | Tier | Classes | Used for |
 | --- | --- | --- |
-| Page title | `text-2xl md:text-3xl font-semibold tracking-tight text-foreground` | one per screen: dashboard greeting, auth headings |
+| Page title | `text-2xl md:text-3xl font-semibold tracking-tight text-foreground` | one per screen: auth headings, the settings in-page title |
 | Section heading | `text-xl font-semibold tracking-tight text-foreground` | panel headings ("Assessments") |
-| Item title | `text-base font-semibold text-foreground` | mobile card titles, empty-state titles, overlay titles |
+| Item title | `text-base font-semibold text-foreground` | the app-bar greeting, card titles (mobile assessment cards, course cards), empty-state titles, overlay titles |
 | Body | `text-sm text-foreground`; `font-medium` for emphasis and control labels; `text-muted-foreground` for supporting text | the app default: table cells, buttons, menus, form labels, descriptions |
 | Caption | `text-xs font-medium text-muted-foreground` | column headers (add `uppercase tracking-wider`), counts, stat labels, timestamps |
 
@@ -234,7 +250,11 @@ a tier, the ramp is wrong — update it here, don't invent a sixth size at the c
   for selection under "Theme tokens," never a plain `bg-accent` swap (indistinguishable from the
   item's own hover/focus state). Action items in the same menu (e.g. "Manage semesters") may keep
   one identifying icon.
-- Tab-bar icons stay — they are navigation aids, not decoration.
+- **Menu items are separated by a subtle gap** (`space-y-1` on `DropdownMenuContent`, defined in
+  the primitive) so hover/selection tints read as discrete pills and never bleed into each other.
+- Navigation icons live in the **mobile bottom nav only** (navigation aids, not decoration);
+  desktop tabs are text-only underline tabs (v4.2, supersedes the v4.1 "tab-bar icons stay"
+  rule that described the retired pill tab bar).
 - Empty states show one icon by recipe (see "Tab panels & empty states").
 
 ### Theming rules
@@ -313,6 +333,66 @@ Context-switcher state derives from the URL: the active semester is the `[semest
 segment (first semester when absent), switching is just a `router.push`, and selection state is
 never duplicated into component state (the source of the 2026-07-16 flicker fix).
 
+### The chrome (locked 2026-07-17, codified 2026-07-22)
+
+- **One bar anchors the app** on `bg-background` (no chrome surface — tone separation), inside
+  the `max-w-7xl` container: greeting · semester switcher · spacer · primary "Add assessment"
+  CTA · user menu (avatar + chevron). No in-app branding — the wordmark lives on auth pages
+  only (founder decision 2026-07-17; the marketing site owns the brand).
+- **The greeting is item-title tier** (`text-base font-semibold`), one line, sentence case,
+  computed at render (no timers), with a hidden-on-mobile ` · {date}` suffix in body-tier
+  muted. It anchors the bar; it is NOT the page title.
+- **Desktop tabs are text-only underline tabs**: inactive `text-muted-foreground font-medium`,
+  active `text-foreground font-semibold` + 2px `border-primary` underline (the amber selection
+  language, not a decorative border). `role="tablist"`, `min-h-11` targets.
+- **Mobile navigation is a fixed bottom bar**: 4 items, `size-5` icon over caption-tier label,
+  active `text-primary`; surface `bg-card shadow-soft` with `pb-safe`, z-40 (below the overlay
+  recipe's z-150). Content keeps matching bottom padding (`pb-24`) so nothing hides behind it.
+- **Actions never pose as navigation**: "Add" is the chrome's primary CTA, not a fifth tab.
+- **Chrome spacing**: the content wrapper under the bar uses `pt-2` so the bar and tab row read
+  as one chrome unit; content below separates with `mt-6` steps. Safe-area top offset lives on
+  the header (`mt-safe`), not the content wrapper.
+
+### Assessments table (locked 2026-07-22)
+
+- **One grid template, three consumers.** The desktop column tracks live in
+  `tables/assessments/tableGrid.ts` (`assessmentGridClass(showWeight)`); the header, read rows,
+  and edit rows must all consume it — never re-declare columns, or headers drift off their data.
+  Columns: checkbox · status · course · task · due · (weight) · actions.
+- **Headers are caption tier** (`text-xs font-medium uppercase tracking-wider`); the actions
+  column has **no header label** (icon buttons are self-describing); numeric columns (weight)
+  are right-aligned `tabular-nums` in both header and cells.
+- **The task is the row's emphasized text** (`text-sm font-medium text-foreground`); its
+  grouping label (course) is supporting (`text-sm text-muted-foreground`) — the content
+  hierarchy rule from the type ramp, applied to tables.
+- Rows are tonal cards (`rounded-xl bg-secondary/50`), `p-4` on mobile, tightened to `lg:py-3`
+  on desktop; status chips render at the `sm` size and stretch to the status track so the chip
+  column reads as a uniform rail.
+- **List rows hover with `transition-colors hover:bg-accent/50`** — the shared row-hover recipe
+  (grades breakdown, assessment rows, overlay list rows). Full `hover:bg-accent` is reserved
+  for clickable *cards* that navigate (course cards).
+- **The course-filtered view titles the panel with a breadcrumb**: "Courses / {course}" as the
+  `PanelHeader` title — the parent crumb is a muted text button (`text-muted-foreground
+  hover:text-foreground`) that navigates back, the current name truncates. No separate back
+  row; `PanelHeader.title` accepts a ReactNode for exactly this.
+- **Urgency labels and tints come from `utils/urgency.ts`** (`daysUntilLabel`,
+  `urgencyTextClass`, `urgencyChipClass`) — shared with the course cards; never re-derive the
+  thresholds (≤3 destructive, ≤7 primary, else neutral).
+
+### Course cards (locked 2026-07-22)
+
+- A course card is a tonal card (`rounded-xl bg-secondary/50 p-5`, hover `bg-accent`,
+  keyboard-activatable) with exactly one emphasized element: the course name (item-title tier,
+  `line-clamp-2`), with a rename pencil that appears on card hover/focus.
+- Below the name, a **quiet completion meter**: full-width `h-1.5` rounded track
+  (`bg-foreground/10`) filled `bg-primary` (or `bg-success` at 100% — completion is not a
+  grade, so no destructive/red states), with a caption row "{done} of {total} completed" ·
+  "{n}%" (`tabular-nums`).
+- A `border-t` footer (structural rule) shows what's next: "Next due" caption, the assignment
+  (body-tier `font-medium`, truncated), date + an urgency chip from `utils/urgency.ts`. With
+  nothing upcoming: `text-success` "All assessments completed" when pending is 0, otherwise a
+  muted "No upcoming due dates".
+
 ### Tab panels & empty states (locked 2026-07-16)
 
 - **Every tab renders inside a uniform `p-6` panel** and opens with `ui/PanelHeader`
@@ -339,8 +419,9 @@ never duplicated into component state (the source of the 2026-07-16 flicker fix)
 - **Profile and Notifications save per card**: each card is its own small form with its own
   Save button, dirty check against the fetched snapshot, and success/error message scoped to
   the card.
-- Subpages pass `title` to `DashboardHeader` for a static page title — the greeting/rotating
-  subtitle belongs to the dashboard only.
+- Subpages render the slim bar (no semester switcher, no CTA — the greeting stays) plus their
+  own in-page page-title-tier heading ("Settings"); the header `title` prop is gone (v4.2).
+  Subpages never show the mobile bottom nav.
 
 ### Overlays (the modal recipe)
 
@@ -353,9 +434,9 @@ never duplicated into component state (the source of the 2026-07-16 flicker fix)
   separate floating input), and exactly ONE control leads there (a single "Manage semesters"
   item — never two menu entries opening the same surface). Auto-focus the create input only when
   the list is empty.
-- Lists inside overlays sit on a `bg-secondary/50 rounded-xl` tonal container, rows
-  `hover:bg-accent` with ghost icon actions (pencil/trash), "Current"/status chips as
-  `bg-primary/10 text-primary` pills. Read-only status chips reuse `statusTintClasses`
+- Lists inside overlays sit on a `bg-secondary/50 rounded-xl` tonal container, rows on the
+  shared row-hover recipe (`hover:bg-accent/50`) with ghost icon actions (pencil/trash),
+  "Current"/status chips as `bg-primary/10 text-primary` pills. Read-only status chips reuse `statusTintClasses`
   exported from `StatusSelect` — never re-derive the tint mapping.
 - Confirmation dialogs are `common/ConfirmationModal` (recipe panel, ghost Cancel + filled
   confirm; `variant="danger"` maps to the destructive button). No decorative icons in

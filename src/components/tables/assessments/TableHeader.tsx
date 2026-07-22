@@ -1,4 +1,5 @@
 import { Checkbox } from "../../ui/checkbox";
+import { assessmentGridClass } from "./tableGrid";
 
 interface TableHeaderProps {
   allSelected: boolean;
@@ -7,6 +8,8 @@ interface TableHeaderProps {
   selectedCount: number;
   showWeight: boolean;
 }
+
+const headerLabelClass = "text-xs font-medium uppercase tracking-wider text-muted-foreground";
 
 /** Desktop column headers plus the mobile select-all bar. */
 const TableHeader = ({
@@ -17,43 +20,19 @@ const TableHeader = ({
   showWeight,
 }: TableHeaderProps) => (
   <>
-    {/* Headers - Hidden on mobile, visible on desktop */}
-    <div className="hidden lg:grid grid-cols-12 gap-2 px-4 pb-2">
-      <div className="col-span-2 flex items-center gap-3">
-        <Checkbox
-          checked={allSelected}
-          onCheckedChange={onToggleSelectAll}
-          aria-label="Select all assessments"
-        />
-        <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-          Status
-        </span>
-      </div>
-      <div className="col-span-2 flex items-center">
-        <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-          Course
-        </span>
-      </div>
-      <div className="col-span-4 flex items-center">
-        <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-          Task
-        </span>
-      </div>
-      <div className="col-span-4 flex items-center justify-between">
-        <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-          Due date
-        </span>
-        <div className="flex items-center gap-4">
-          {showWeight && (
-            <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-              Weight
-            </span>
-          )}
-          <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-            Actions
-          </span>
-        </div>
-      </div>
+    {/* Desktop headers: same grid template as the rows, so every label sits over its column.
+        The actions column has no label — the icon buttons are self-describing. */}
+    <div className={`${assessmentGridClass(showWeight)} px-4 pb-2`}>
+      <Checkbox
+        checked={allSelected}
+        onCheckedChange={onToggleSelectAll}
+        aria-label="Select all assessments"
+      />
+      <span className={headerLabelClass}>Status</span>
+      <span className={headerLabelClass}>Course</span>
+      <span className={headerLabelClass}>Task</span>
+      <span className={headerLabelClass}>Due date</span>
+      {showWeight && <span className={`${headerLabelClass} text-right`}>Weight</span>}
     </div>
 
     {/* Mobile Select All Header */}

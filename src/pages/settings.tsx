@@ -39,7 +39,7 @@ const SettingsPage = () => {
         <meta name="description" content="Manage your account settings and preferences" />
       </Head>
       <DashboardHeader onLogout={handleLogout} />
-      <div className="p-4 md:p-6 pl-safe pr-safe pt-safe pb-safe">
+      <div className="p-4 pt-2 md:p-6 md:pt-2 pl-safe pr-safe pb-safe">
         <div className="mx-auto max-w-3xl">
           <h1 className="mb-4 text-2xl font-semibold tracking-tight text-foreground md:text-3xl">
             Settings

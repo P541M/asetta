@@ -12,7 +12,7 @@ const Input = React.forwardRef<HTMLInputElement, React.ComponentProps<"input">>(
       type={type}
       className={cn(
         "flex h-11 w-full rounded-lg bg-input px-4 py-2 text-base text-foreground outline-hidden",
-        "transition-[background-color,box-shadow] duration-200",
+        "transition-[background-color,box-shadow] duration-150",
         "placeholder:text-muted-foreground/70",
         // Focus lifts to white in light mode; in dark the fill is already the
         // brighter surface, so only the ring changes (bg-card would darken it)

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import { useRouter } from "next/router";
 import Head from "next/head";
@@ -64,9 +64,36 @@ const DashboardLayout = ({
     router.push("/login");
   };
 
-  const refreshAssessments = () => {
+  const refreshAssessments = useCallback(() => {
     setRefreshTrigger((prev) => prev + 1);
-  };
+  }, []);
+
+  /* Stable identity so the memoized tab components skip re-rendering when an
+     unrelated part of the layout (e.g. the active tab) changes */
+  const childData = useMemo(
+    () => ({
+      selectedSemester,
+      selectedSemesterId,
+      assessments,
+      courses,
+      availableCourses,
+      error,
+      stats,
+      refreshAssessments,
+      refreshTrigger,
+    }),
+    [
+      selectedSemester,
+      selectedSemesterId,
+      assessments,
+      courses,
+      availableCourses,
+      error,
+      stats,
+      refreshAssessments,
+      refreshTrigger,
+    ],
+  );
 
   if (loading) {
     return <LoadingScreen />;
@@ -97,7 +124,9 @@ const DashboardLayout = ({
         }}
         onAddAssessment={() => setActiveTab("add")}
       />
-      <div className="p-4 pb-24 md:p-6 md:pb-6 pl-safe pr-safe pt-safe">
+      {/* pt-2 keeps the bar and tab row reading as one chrome unit (safe-area top
+          offset lives on the header itself) */}
+      <div className="p-4 pt-2 pb-24 md:p-6 md:pt-2 md:pb-6 pl-safe pr-safe">
         <div className="max-w-7xl mx-auto">
           <TabNavigationBar />
 
@@ -120,17 +149,7 @@ const DashboardLayout = ({
                   <LoadingSpinner />
                 </div>
               ) : (
-                children({
-                  selectedSemester,
-                  selectedSemesterId,
-                  assessments,
-                  courses,
-                  availableCourses,
-                  error,
-                  stats,
-                  refreshAssessments,
-                  refreshTrigger,
-                })
+                children(childData)
               )}
             </div>
           </div>

@@ -57,9 +57,11 @@ const DashboardHeader = ({ onLogout, semesterProps, onAddAssessment }: Dashboard
   const displayName = profile?.displayName || user.displayName || user.email?.split("@")[0] || "";
 
   return (
-    <header className="bg-background">
+    // mt-safe clears a device notch in standalone mode; it is 0 in browsers
+    <header className="mt-safe bg-background">
       <div className="mx-auto flex min-h-14 max-w-7xl items-center gap-2 px-4 py-3 md:gap-3 md:px-6">
-        <p className="min-w-0 shrink truncate text-xl font-semibold tracking-tight text-foreground">
+        {/* Item-title tier per the chrome spec: the greeting anchors the bar, it is not a page heading */}
+        <p className="min-w-0 shrink truncate text-base font-semibold text-foreground">
           {getTimeGreeting()}
           {displayName && `, ${displayName}`}
           <span className="hidden text-sm font-normal text-muted-foreground md:inline">
@@ -100,7 +102,7 @@ const DashboardHeader = ({ onLogout, semesterProps, onAddAssessment }: Dashboard
               name={profile?.displayName || user.displayName || user.email || undefined}
             />
             <ChevronDown
-              className="size-4 text-muted-foreground transition-transform duration-200 [[data-state=open]>&]:rotate-180"
+              className="size-4 text-muted-foreground transition-transform duration-150 [[data-state=open]>&]:rotate-180"
               aria-hidden
             />
           </DropdownMenuTrigger>

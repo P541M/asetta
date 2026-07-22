@@ -5,6 +5,7 @@ import { Checkbox } from "../../ui/checkbox";
 import { Input } from "../../ui/input";
 import { Label } from "../../ui/label";
 import StatusSelect from "./StatusSelect";
+import { assessmentGridClass } from "./tableGrid";
 
 interface AssessmentEditRowProps {
   isSelected: boolean;
@@ -30,7 +31,7 @@ const AssessmentEditRow = ({
   onCancel,
   showWeight,
 }: AssessmentEditRowProps) => (
-  <div className="rounded-xl bg-secondary/50 p-4 motion-safe:animate-fade-in">
+  <div className="rounded-xl bg-secondary/50 p-4 motion-safe:animate-fade-in lg:py-3">
     {/* Mobile Edit Form */}
     <div className="lg:hidden space-y-4">
       <div className="flex items-center gap-3">
@@ -120,48 +121,45 @@ const AssessmentEditRow = ({
       </div>
     </div>
 
-    {/* Desktop Edit Form */}
-    <div className="hidden lg:grid grid-cols-12 gap-2 items-center">
-      <div className="col-span-2 flex items-center gap-3">
-        <Checkbox
-          checked={isSelected}
-          onCheckedChange={onToggleSelect}
-          aria-label={`Select ${editFormData.assignmentName}`}
-        />
-        <StatusSelect
-          value={editFormData.status}
-          onChange={onStatusChange}
-          className="min-w-0 flex-1"
-        />
-      </div>
-      <div className="col-span-2">
-        <Input
-          type="text"
-          name="courseName"
-          value={editFormData.courseName}
-          onChange={onFieldChange}
-          placeholder="Course name"
-          aria-label="Course name"
-        />
-      </div>
-      <div className="col-span-4">
-        <Input
-          type="text"
-          name="assignmentName"
-          value={editFormData.assignmentName}
-          onChange={onFieldChange}
-          placeholder="Assignment name"
-          aria-label="Assignment name"
-        />
-      </div>
-      <div className="col-span-4 flex items-center gap-2">
+    {/* Desktop Edit Form — same grid template as the read rows, inputs in place of text */}
+    <div className={assessmentGridClass(showWeight)}>
+      <Checkbox
+        checked={isSelected}
+        onCheckedChange={onToggleSelect}
+        aria-label={`Select ${editFormData.assignmentName}`}
+      />
+      <StatusSelect
+        value={editFormData.status}
+        onChange={onStatusChange}
+        size="sm"
+        className="w-full min-w-0"
+      />
+      <Input
+        type="text"
+        name="courseName"
+        value={editFormData.courseName}
+        onChange={onFieldChange}
+        placeholder="Course name"
+        aria-label="Course name"
+        className="min-w-0"
+      />
+      <Input
+        type="text"
+        name="assignmentName"
+        value={editFormData.assignmentName}
+        onChange={onFieldChange}
+        placeholder="Assignment name"
+        aria-label="Assignment name"
+        className="min-w-0"
+      />
+      <div className="flex items-center gap-2">
         <Input
           type="date"
           name="dueDate"
           value={editFormData.dueDate}
           onChange={onFieldChange}
           aria-label="Due date"
-          className="flex-1"
+          className="min-w-0 flex-1"
         />
         <Input
           type="time"
@@ -171,34 +169,34 @@ const AssessmentEditRow = ({
           aria-label="Due time"
           className="w-24"
         />
-        {showWeight && (
-          <Input
-            type="number"
-            name="weight"
-            value={editFormData.weight}
-            onChange={onFieldChange}
-            min="0"
-            max="100"
-            step="0.1"
-            placeholder="Weight"
-            aria-label="Weight (%)"
-            className="w-20"
-          />
-        )}
-        <div className="flex items-center gap-0.5">
-          <Button variant="ghost" size="icon-sm" onClick={onSave} title="Save" aria-label="Save">
-            <Check className="text-success" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon-sm"
-            onClick={onCancel}
-            title="Cancel"
-            aria-label="Cancel"
-          >
-            <X className="text-muted-foreground" />
-          </Button>
-        </div>
+      </div>
+      {showWeight && (
+        <Input
+          type="number"
+          name="weight"
+          value={editFormData.weight}
+          onChange={onFieldChange}
+          min="0"
+          max="100"
+          step="0.1"
+          placeholder="Weight"
+          aria-label="Weight (%)"
+          className="w-full min-w-0"
+        />
+      )}
+      <div className="flex items-center justify-end gap-0.5">
+        <Button variant="ghost" size="icon-sm" onClick={onSave} title="Save" aria-label="Save">
+          <Check className="text-success" />
+        </Button>
+        <Button
+          variant="ghost"
+          size="icon-sm"
+          onClick={onCancel}
+          title="Cancel"
+          aria-label="Cancel"
+        >
+          <X className="text-muted-foreground" />
+        </Button>
       </div>
     </div>
   </div>

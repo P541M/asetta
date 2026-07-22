@@ -47,11 +47,3 @@ export const getDaysUntil = (dateStr: string, timeStr: string = "23:59"): number
   const now = new Date();
   return Math.floor((dueDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
 };
-
-/**
- * Checks if a date is upcoming (within the next 7 days)
- */
-export const isUpcoming = (dateStr: string, timeStr: string = "23:59"): boolean => {
-  const daysUntil = getDaysUntil(dateStr, timeStr);
-  return daysUntil >= 0 && daysUntil <= 7;
-};

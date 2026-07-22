@@ -61,7 +61,7 @@ function SortableSemester({ semester, isSelected, onEdit, onDelete }: SortableSe
       ref={setNodeRef}
       style={style}
       className={cn(
-        "flex items-center justify-between gap-2 rounded-lg px-2 py-2 transition-colors hover:bg-accent",
+        "flex items-center justify-between gap-2 rounded-lg px-2 py-2 transition-colors hover:bg-accent/50",
         isDragging && "bg-accent shadow-lg",
       )}
     >

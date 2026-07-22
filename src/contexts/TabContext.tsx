@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/router";
 
 export type TabType = "courses" | "assessments" | "grades" | "calendar" | "add";
@@ -37,39 +37,40 @@ export const TabProvider: React.FC<TabProviderProps> = ({ children, initialTab =
     }
   }, [router.query, router.pathname]);
 
-  const setActiveTab = (tab: TabType) => {
-    setActiveTabState(tab);
+  const setActiveTab = useCallback(
+    (tab: TabType) => {
+      setActiveTabState(tab);
 
-    // Update URL without triggering a page reload
-    const currentPath = router.asPath.split("?")[0];
-    let newQuery = { ...router.query, tab };
+      // Update URL without triggering a page reload
+      const currentPath = router.asPath.split("?")[0];
+      let newQuery = { ...router.query, tab };
 
-    // Clean up course parameter when switching tabs to ensure clean state
-    // User expectation: any tab switch from filtered course view should reset to normal tab
-    // Also clear when clicking assessments tab while already in filtered assessments view
-    if (
-      (tab !== "assessments" && "course" in newQuery) ||
-      (tab === "assessments" && activeTab === "assessments" && "course" in newQuery)
-    ) {
-      const updatedQuery = { ...newQuery };
-      delete updatedQuery.course;
-      newQuery = updatedQuery;
-    }
+      // Clean up course parameter when switching tabs to ensure clean state
+      // User expectation: any tab switch from filtered course view should reset to normal tab
+      // Also clear when clicking assessments tab while already in filtered assessments view
+      if (
+        (tab !== "assessments" && "course" in newQuery) ||
+        (tab === "assessments" && activeTab === "assessments" && "course" in newQuery)
+      ) {
+        const updatedQuery = { ...newQuery };
+        delete updatedQuery.course;
+        newQuery = updatedQuery;
+      }
 
-    router.replace(
-      {
-        pathname: currentPath,
-        query: newQuery,
-      },
-      undefined,
-      { shallow: true },
-    );
-  };
+      router.replace(
+        {
+          pathname: currentPath,
+          query: newQuery,
+        },
+        undefined,
+        { shallow: true },
+      );
+    },
+    [router, activeTab],
+  );
 
-  const value = {
-    activeTab,
-    setActiveTab,
-  };
+  // Memoized so context consumers only re-render when the active tab changes
+  const value = useMemo(() => ({ activeTab, setActiveTab }), [activeTab, setActiveTab]);
 
   return <TabContext.Provider value={value}>{children}</TabContext.Provider>;
 };

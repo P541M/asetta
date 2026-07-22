@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { memo, useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { BookOpen, Check, ChevronsUpDown, CircleAlert, GraduationCap, Loader2 } from "lucide-react";
 import { TabProvider, useTab, TabType } from "../../contexts/TabContext";
@@ -38,14 +38,12 @@ interface UnifiedDashboardPageProps {
   forceSemesterId?: string;
 }
 
-// Courses Tab Component
-const CoursesTab = ({ data, onSelectCourse }: CoursesTabProps) => {
-  const { error, courses, selectedSemesterId, refreshAssessments } = data;
+/* The five tab panels stay mounted (display-toggled) so their state survives
+   switching; memo keeps the hidden ones from re-rendering on every interaction. */
 
-  const handleCourseRenamed = () => {
-    // Refresh assessments data to reflect the course name change
-    refreshAssessments();
-  };
+// Courses Tab Component
+const CoursesTab = memo(function CoursesTab({ data, onSelectCourse }: CoursesTabProps) {
+  const { error, courses, selectedSemesterId, refreshAssessments } = data;
 
   return (
     <>
@@ -56,15 +54,15 @@ const CoursesTab = ({ data, onSelectCourse }: CoursesTabProps) => {
           courses={courses}
           onSelectCourse={onSelectCourse}
           semesterId={selectedSemesterId}
-          onCourseRenamed={handleCourseRenamed}
+          onCourseRenamed={refreshAssessments}
         />
       )}
     </>
   );
-};
+});
 
 // Assessments Tab Component
-const AssessmentsTab = ({ data }: { data: DashboardData }) => {
+const AssessmentsTab = memo(function AssessmentsTab({ data }: { data: DashboardData }) {
   const router = useRouter();
   const { setActiveTab } = useTab();
   const [selectedCourse, setSelectedCourse] = useState<string | null>(null);
@@ -113,10 +111,10 @@ const AssessmentsTab = ({ data }: { data: DashboardData }) => {
       )}
     </div>
   );
-};
+});
 
 // Grades Tab Component
-const GradesTab = ({ data, urlSemesterId }: TabComponentProps) => {
+const GradesTab = memo(function GradesTab({ data, urlSemesterId }: TabComponentProps) {
   const router = useRouter();
   const [selectedCourse, setSelectedCourse] = useState<string | null>(null);
   const [autoSaveStatus, setAutoSaveStatus] = useState<"idle" | "saving" | "saved" | "error">(
@@ -145,13 +143,13 @@ const GradesTab = ({ data, urlSemesterId }: TabComponentProps) => {
     router.push(`${basePath}?tab=add`);
   };
 
-  const handleAutoSaveStatusChange = (
-    status: "idle" | "saving" | "saved" | "error",
-    error?: string,
-  ) => {
-    setAutoSaveStatus(status);
-    setAutoSaveError(error);
-  };
+  const handleAutoSaveStatusChange = useCallback(
+    (status: "idle" | "saving" | "saved" | "error", error?: string) => {
+      setAutoSaveStatus(status);
+      setAutoSaveError(error);
+    },
+    [],
+  );
 
   if (!selectedSemesterId) {
     return (
@@ -240,10 +238,10 @@ const GradesTab = ({ data, urlSemesterId }: TabComponentProps) => {
       )}
     </div>
   );
-};
+});
 
 // Calendar Tab Component
-const CalendarTab = ({ data }: { data: DashboardData }) => {
+const CalendarTab = memo(function CalendarTab({ data }: { data: DashboardData }) {
   const { selectedSemester, selectedSemesterId, refreshTrigger } = data;
 
   return (
@@ -253,10 +251,10 @@ const CalendarTab = ({ data }: { data: DashboardData }) => {
       refreshTrigger={refreshTrigger}
     />
   );
-};
+});
 
 // Add Assessment Tab Component
-const AddTab = ({ data, urlSemesterId }: TabComponentProps) => {
+const AddTab = memo(function AddTab({ data, urlSemesterId }: TabComponentProps) {
   const { selectedSemester, selectedSemesterId, refreshAssessments } = data;
 
   return (
@@ -293,24 +291,27 @@ const AddTab = ({ data, urlSemesterId }: TabComponentProps) => {
       )}
     </div>
   );
-};
+});
 
 // Main Content Component (with tab context)
 const DashboardContent = ({ urlSemesterId }: { urlSemesterId?: string }) => {
   const router = useRouter();
   const { activeTab } = useTab();
 
-  const handleSelectCourse = (courseName: string) => {
-    // Switch to assessments tab and set course filter
-    const newQuery = {
-      ...router.query,
-      tab: "assessments",
-      course: encodeURIComponent(courseName),
-    };
-    router.replace({ pathname: router.pathname, query: newQuery }, undefined, {
-      shallow: true,
-    });
-  };
+  const handleSelectCourse = useCallback(
+    (courseName: string) => {
+      // Switch to assessments tab and set course filter
+      const newQuery = {
+        ...router.query,
+        tab: "assessments",
+        course: encodeURIComponent(courseName),
+      };
+      router.replace({ pathname: router.pathname, query: newQuery }, undefined, {
+        shallow: true,
+      });
+    },
+    [router],
+  );
 
   return (
     <DashboardLayout

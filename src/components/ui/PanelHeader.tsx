@@ -1,7 +1,8 @@
 import { ReactNode } from "react";
 
 interface PanelHeaderProps {
-  title: string;
+  /** Usually a string; the course-filtered view passes a breadcrumb node. */
+  title: ReactNode;
   actions?: ReactNode;
 }
 
@@ -12,7 +13,9 @@ interface PanelHeaderProps {
  */
 const PanelHeader = ({ title, actions }: PanelHeaderProps) => (
   <div className="mb-6 flex min-h-10 flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-    <h2 className="text-xl font-semibold leading-10 tracking-tight text-foreground">{title}</h2>
+    <h2 className="min-w-0 text-xl font-semibold leading-10 tracking-tight text-foreground">
+      {title}
+    </h2>
     {actions && <div className="flex flex-wrap items-center gap-2">{actions}</div>}
   </div>
 );
