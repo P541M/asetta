@@ -2,7 +2,9 @@ import { CircleAlert, FileText } from "lucide-react";
 import { useAssessments } from "../../hooks/useAssessments";
 import AssessmentsTable from "../tables/AssessmentsTable";
 import { CourseFilteredAssessmentsProps } from "../../types/course";
+import { resolveCourseColor } from "../../constants/courseColors";
 import { Alert, AlertDescription } from "../ui/alert";
+import CourseColorDot from "../ui/CourseColorDot";
 import EmptyState from "../ui/EmptyState";
 import LoadingSpinner from "../ui/LoadingSpinner";
 import PanelHeader from "../ui/PanelHeader";
@@ -11,6 +13,7 @@ const CourseFilteredAssessments = ({
   semesterId,
   selectedCourse,
   onBack,
+  courseColors,
 }: CourseFilteredAssessmentsProps) => {
   const {
     assessments,
@@ -20,6 +23,8 @@ const CourseFilteredAssessments = ({
   } = useAssessments(semesterId, {
     courseName: selectedCourse,
   });
+
+  const courseColor = resolveCourseColor(courseColors[selectedCourse], selectedCourse);
 
   /* Breadcrumb title: "Courses" navigates back, the course name is the current
      location. Inherits the section-heading tier from PanelHeader's h2. */
@@ -36,7 +41,10 @@ const CourseFilteredAssessments = ({
       <span aria-hidden className="shrink-0 font-normal text-muted-foreground/60">
         /
       </span>
-      <span className="truncate">{selectedCourse}</span>
+      <span className="flex min-w-0 items-center gap-2">
+        <CourseColorDot color={courseColor} />
+        <span className="truncate">{selectedCourse}</span>
+      </span>
     </span>
   );
 
@@ -70,6 +78,7 @@ const CourseFilteredAssessments = ({
       assessments={assessments}
       semesterId={semesterId}
       onStatusChange={refetch}
+      courseColors={courseColors}
     />
   );
 };

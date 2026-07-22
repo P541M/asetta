@@ -34,12 +34,17 @@ export const useCoursePreferences = (
         const preferencesDoc = await getDoc(preferencesRef);
 
         if (preferencesDoc.exists()) {
-          const data = preferencesDoc.data() as CoursePreferences;
+          // Merge over defaults: a doc created color-first has no targetGrade yet
+          const data = {
+            ...DEFAULT_COURSE_PREFERENCES,
+            ...(preferencesDoc.data() as Partial<CoursePreferences>),
+          };
           setPreferences(data);
         } else {
-          // Create default preferences for new course
+          // Create default preferences for new course (merge: never clobber a
+          // concurrent color write)
           const defaultPrefs = { ...DEFAULT_COURSE_PREFERENCES };
-          await setDoc(preferencesRef, defaultPrefs);
+          await setDoc(preferencesRef, defaultPrefs, { merge: true });
           setPreferences(defaultPrefs);
         }
       } catch (err) {
@@ -71,11 +76,13 @@ export const useCoursePreferences = (
           // Update existing document
           await updateDoc(preferencesRef, { targetGrade });
         } else {
-          // Create new document with target grade
-          await setDoc(preferencesRef, {
-            ...DEFAULT_COURSE_PREFERENCES,
-            targetGrade,
-          });
+          // Create new document with target grade (merge: never clobber a
+          // concurrent color write)
+          await setDoc(
+            preferencesRef,
+            { ...DEFAULT_COURSE_PREFERENCES, targetGrade },
+            { merge: true },
+          );
         }
 
         // Update local state
@@ -91,29 +98,10 @@ export const useCoursePreferences = (
     [user, semesterId, courseName],
   );
 
-  const resetPreferences = useCallback(async () => {
-    if (!user || !semesterId || !courseName) {
-      throw new Error("Missing required parameters for resetting preferences");
-    }
-
-    try {
-      const preferencesRef = getCoursePreferencesDocRef(user.uid, semesterId, courseName);
-      const defaultPrefs = { ...DEFAULT_COURSE_PREFERENCES };
-
-      await setDoc(preferencesRef, defaultPrefs);
-      setPreferences(defaultPrefs);
-    } catch (err) {
-      console.error("Error resetting preferences:", err);
-      setError("Failed to reset preferences");
-      throw err;
-    }
-  }, [user, semesterId, courseName]);
-
   return {
     preferences,
     loading,
     error,
     updateTargetGrade,
-    resetPreferences,
   };
 };

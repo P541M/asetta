@@ -5,6 +5,7 @@ export interface CourseFilteredAssessmentsProps {
   semesterId: string;
   selectedCourse: string;
   onBack: () => void;
+  courseColors: Record<string, string>;
 }
 
 export interface SemesterTabsProps {
@@ -29,4 +30,6 @@ export interface CoursesOverviewTableProps {
   onSelectCourse: (courseName: string) => void;
   semesterId: string;
   onCourseRenamed?: () => void;
+  courseColors: Record<string, string>;
+  setCourseColor: (courseName: string, color: string) => Promise<void>;
 }

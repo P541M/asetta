@@ -1,15 +1,21 @@
 import { ChartColumn, CircleAlert, CircleCheck, CircleDashed, type LucideIcon } from "lucide-react";
 import { Assessment } from "../../../types/assessment";
 import { cn } from "@/lib/utils";
-import { Input } from "../../ui/input";
+import { formatLocalDate } from "../../../utils/dateUtils";
 import EmptyState from "../../ui/EmptyState";
 import { statusTintClasses } from "../../tables/assessments/StatusSelect";
+import NumberField from "./NumberField";
 
 interface AssessmentBreakdownProps {
   assessments: Assessment[];
   onWeightChange: (assessmentId: string, value: string) => void;
   onMarkChange: (assessmentId: string, value: string) => void;
 }
+
+/* One grid template, two consumers (header + rows) — the tableGrid.ts rule
+   applied to the breakdown. Columns: assessment · status · weight · mark · points. */
+const gradeGridClass =
+  "hidden lg:grid lg:grid-cols-[minmax(0,1fr)_5rem_7rem_7rem_5rem] lg:items-center lg:gap-4";
 
 /** Status marker (icon + tint) for a row; overdue is derived, not stored. */
 const getAssessmentStatus = (
@@ -27,9 +33,6 @@ const getAssessmentStatus = (
   return { icon: CircleDashed, tintClass: statusTintClasses["Not started"], label: "Pending" };
 };
 
-const hideNumberSpinners =
-  "[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none";
-
 /** Editable weight/mark list for all assessments in the selected course. */
 const AssessmentBreakdown = ({
   assessments,
@@ -37,12 +40,9 @@ const AssessmentBreakdown = ({
   onMarkChange,
 }: AssessmentBreakdownProps) => (
   <div>
-    <div className="mb-4">
-      <h3 className="text-base font-semibold text-foreground">Assessment breakdown</h3>
-      <p className="mt-1 text-sm text-muted-foreground">
-        Edit weights and marks to calculate your grade
-      </p>
-    </div>
+    {/* Item-title tier, no subtitle — the same "no header subtitles" call as
+        PanelHeader (editability is evident from the inputs themselves) */}
+    <h3 className="mb-3 text-base font-semibold text-foreground">Assessment breakdown</h3>
 
     {assessments.length === 0 ? (
       <EmptyState
@@ -51,27 +51,27 @@ const AssessmentBreakdown = ({
         description="This course doesn't have any assessments yet."
       />
     ) : (
-      <div className="space-y-4">
+      <div className="space-y-2">
         {/* Desktop headers - hidden on mobile */}
-        <div className="hidden grid-cols-12 gap-4 px-4 pb-1 lg:grid">
-          <span className="col-span-4 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+        <div className={cn(gradeGridClass, "px-4 pb-1")}>
+          <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
             Assessment
           </span>
-          <span className="col-span-2 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+          <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
             Status
           </span>
-          <span className="col-span-2 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+          <span className="text-right text-xs font-medium uppercase tracking-wider text-muted-foreground">
             Weight
           </span>
-          <span className="col-span-2 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+          <span className="text-right text-xs font-medium uppercase tracking-wider text-muted-foreground">
             Mark
           </span>
-          <span className="col-span-2 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+          <span className="text-right text-xs font-medium uppercase tracking-wider text-muted-foreground">
             Points
           </span>
         </div>
 
-        <div className="space-y-3">
+        <div className="space-y-2">
           {assessments.map((assessment) => {
             const status = getAssessmentStatus(assessment);
             const StatusIcon = status.icon;
@@ -83,7 +83,7 @@ const AssessmentBreakdown = ({
             return (
               <div
                 key={assessment.id}
-                className="rounded-xl bg-secondary/50 p-4 transition-colors hover:bg-accent/50"
+                className="rounded-xl bg-secondary/50 p-4 transition-colors hover:bg-accent/50 lg:py-3"
               >
                 {/* Mobile layout */}
                 <div className="space-y-4 lg:hidden">
@@ -93,7 +93,7 @@ const AssessmentBreakdown = ({
                         {assessment.assignmentName}
                       </h4>
                       <p className="mt-1 text-sm text-muted-foreground">
-                        Due: {new Date(assessment.dueDate).toLocaleDateString()}
+                        Due {formatLocalDate(assessment.dueDate)}
                       </p>
                     </div>
                     <span
@@ -117,17 +117,11 @@ const AssessmentBreakdown = ({
                         Weight
                       </label>
                       <div className="flex items-center gap-2">
-                        <Input
+                        <NumberField
                           id={`weight-${assessment.id}`}
-                          type="number"
-                          min="0"
-                          max="100"
-                          step="0.1"
                           value={assessment.weight}
-                          onChange={(e) =>
-                            assessment.id && onWeightChange(assessment.id, e.target.value)
-                          }
-                          className={hideNumberSpinners}
+                          onRawChange={(raw) => assessment.id && onWeightChange(assessment.id, raw)}
+                          className="text-right tabular-nums"
                         />
                         <span className="shrink-0 text-sm text-muted-foreground">%</span>
                       </div>
@@ -140,17 +134,12 @@ const AssessmentBreakdown = ({
                         Mark
                       </label>
                       <div className="flex items-center gap-2">
-                        <Input
+                        <NumberField
                           id={`mark-${assessment.id}`}
-                          type="number"
-                          min="0"
-                          step="0.1"
-                          value={assessment.mark ?? ""}
-                          onChange={(e) =>
-                            assessment.id && onMarkChange(assessment.id, e.target.value)
-                          }
+                          value={assessment.mark ?? null}
+                          onRawChange={(raw) => assessment.id && onMarkChange(assessment.id, raw)}
                           placeholder="--"
-                          className={hideNumberSpinners}
+                          className="text-right tabular-nums"
                         />
                         <span className="shrink-0 text-sm text-muted-foreground">%</span>
                       </div>
@@ -159,21 +148,23 @@ const AssessmentBreakdown = ({
 
                   <div className="flex items-center justify-between border-t border-border pt-3">
                     <span className="text-sm text-muted-foreground">Points contribution</span>
-                    <span className="text-base font-semibold text-foreground">{contribution}</span>
+                    <span className="text-base font-semibold tabular-nums text-foreground">
+                      {contribution}
+                    </span>
                   </div>
                 </div>
 
-                {/* Desktop layout */}
-                <div className="hidden grid-cols-12 items-center gap-4 lg:grid">
-                  <div className="col-span-4">
-                    <h4 className="text-sm font-medium text-foreground">
+                {/* Desktop layout — same grid template as the header, one cell per column */}
+                <div className={gradeGridClass}>
+                  <div className="min-w-0">
+                    <h4 className="truncate text-sm font-medium text-foreground">
                       {assessment.assignmentName}
                     </h4>
-                    <p className="mt-1 text-xs text-muted-foreground">
-                      Due: {new Date(assessment.dueDate).toLocaleDateString()}
+                    <p className="mt-0.5 text-xs text-muted-foreground">
+                      Due {formatLocalDate(assessment.dueDate)}
                     </p>
                   </div>
-                  <div className="col-span-2">
+                  <div>
                     <span
                       className={cn(
                         "flex size-7 items-center justify-center rounded-full",
@@ -185,37 +176,28 @@ const AssessmentBreakdown = ({
                       <span className="sr-only">{status.label}</span>
                     </span>
                   </div>
-                  <div className="col-span-2 flex items-center gap-2">
-                    <Input
-                      type="number"
-                      min="0"
-                      max="100"
-                      step="0.1"
+                  <div className="flex items-center justify-end gap-2">
+                    <NumberField
                       value={assessment.weight}
-                      onChange={(e) =>
-                        assessment.id && onWeightChange(assessment.id, e.target.value)
-                      }
+                      onRawChange={(raw) => assessment.id && onWeightChange(assessment.id, raw)}
                       aria-label="Weight"
-                      className={cn("h-9 w-20 px-2", hideNumberSpinners)}
+                      className="h-9 w-20 px-2 text-right tabular-nums"
                     />
                     <span className="text-xs text-muted-foreground">%</span>
                   </div>
-                  <div className="col-span-2 flex items-center gap-2">
-                    <Input
-                      type="number"
-                      min="0"
-                      step="0.1"
-                      value={assessment.mark ?? ""}
-                      onChange={(e) => assessment.id && onMarkChange(assessment.id, e.target.value)}
+                  <div className="flex items-center justify-end gap-2">
+                    <NumberField
+                      value={assessment.mark ?? null}
+                      onRawChange={(raw) => assessment.id && onMarkChange(assessment.id, raw)}
                       placeholder="--"
                       aria-label="Mark"
-                      className={cn("h-9 w-20 px-2", hideNumberSpinners)}
+                      className="h-9 w-20 px-2 text-right tabular-nums"
                     />
                     <span className="text-xs text-muted-foreground">%</span>
                   </div>
-                  <div className="col-span-2">
-                    <span className="text-sm font-medium text-foreground">{contribution}</span>
-                  </div>
+                  <p className="text-right text-sm font-medium tabular-nums text-foreground">
+                    {contribution}
+                  </p>
                 </div>
               </div>
             );

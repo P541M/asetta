@@ -4,6 +4,7 @@ import Head from "next/head";
 import { ThemeProvider } from "next-themes";
 import "../styles/globals.css";
 import "../styles/rich-text-editor.css";
+import "../styles/color-picker.css";
 import { AuthProvider } from "../contexts/AuthContext";
 
 function MyApp({ Component, pageProps }: AppProps) {

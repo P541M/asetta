@@ -6,6 +6,7 @@ AI-powered academic planner for students that transforms course outlines into or
 
 - **AI-Powered Extraction** - Upload course syllabi and automatically extract all assessments, due dates, and weights using Google Gemini
 - **Assessment Tracking** - Manage assignments with status tracking (Not started, In progress, Submitted, Missed) and rich-text notes
+- **Course Color-Coding** - Give every course its own color with a custom picker (any hex, plus curated presets); subtle dots keep courses recognizable at a glance across the assessments, courses, and grades views
 - **Grade Calculator** - Calculate weighted grades per course with auto-save and target grade tracking
 - **Calendar Integration** - Visual calendar view with ICS export to Google Calendar, Outlook, or Apple Calendar
 - **Automated Reminders** - Email notifications for upcoming deadlines with customizable timing
@@ -15,7 +16,7 @@ AI-powered academic planner for students that transforms course outlines into or
 
 ## Tech Stack
 
-**Frontend:** Next.js 15, React 19, TypeScript, Tailwind CSS, Tiptap
+**Frontend:** Next.js 15, React 19, TypeScript, Tailwind CSS, Radix UI, Tiptap
 
 **Backend:** Firebase Authentication, Firestore
 
@@ -27,7 +28,7 @@ AI-powered academic planner for students that transforms course outlines into or
 
 ### Prerequisites
 
-- Node.js 18+
+- Node.js 22
 - Firebase project with Firestore and Authentication enabled
 - Google AI API key (for Gemini)
 
@@ -97,7 +98,3 @@ npm start
 [![Email](https://img.shields.io/badge/Email-D14836?style=for-the-badge&logo=gmail&logoColor=white)](mailto:videna.psalmeleazar@gmail.com)
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/pevidena/)
 [![GitHub](https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/P541M)
-
----
-
-*Built for students, by a student*

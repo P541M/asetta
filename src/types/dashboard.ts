@@ -18,6 +18,9 @@ export interface DashboardData {
   };
   refreshAssessments: () => void;
   refreshTrigger: number;
+  /** Explicitly stored "#RRGGBB" colors only; resolve with resolveCourseColor(map[name], name). */
+  courseColors: Record<string, string>;
+  setCourseColor: (courseName: string, color: string) => Promise<void>;
 }
 
 export interface TabComponentProps {

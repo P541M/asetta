@@ -9,6 +9,7 @@ import { useDisplayPreferences } from "../../hooks/useDisplayPreferences";
 import { getDaysUntil } from "../../utils/dateUtils";
 import { Assessment, AssessmentStatus, AssessmentsTableProps } from "../../types/assessment";
 import { isCompletedStatus } from "../../constants/assessment";
+import { resolveCourseColor } from "../../constants/courseColors";
 import ConfirmationModal from "../common/ConfirmationModal";
 import { Button } from "../ui/button";
 import EmptyState from "../ui/EmptyState";
@@ -37,6 +38,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
   semesterId,
   onStatusChange,
   title = "Assessments",
+  courseColors,
 }) => {
   const { user } = useAuth();
   const { setActiveTab } = useTab();
@@ -382,6 +384,10 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
                 <AssessmentRow
                   key={assessment.id}
                   assessment={assessment}
+                  courseColor={resolveCourseColor(
+                    courseColors[assessment.courseName],
+                    assessment.courseName,
+                  )}
                   daysTillDue={daysTillDue}
                   isSelected={selectedRows.includes(assessment.id || "")}
                   onToggleSelect={() => toggleRowSelection(assessment.id || "")}

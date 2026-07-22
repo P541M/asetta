@@ -4,6 +4,7 @@ import { BookOpen, Check, ChevronsUpDown, CircleAlert, GraduationCap, Loader2 } 
 import { TabProvider, useTab, TabType } from "../../contexts/TabContext";
 import DashboardLayout from "../layout/DashboardLayout";
 import { DashboardData, TabComponentProps, CoursesTabProps } from "../../types/dashboard";
+import { resolveCourseColor } from "../../constants/courseColors";
 
 // Import existing tab content components
 import CoursesOverviewTable from "../tables/CoursesOverviewTable";
@@ -21,6 +22,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
+import CourseColorDot from "../ui/CourseColorDot";
 import EmptyState from "../ui/EmptyState";
 import PanelHeader from "../ui/PanelHeader";
 
@@ -43,7 +45,8 @@ interface UnifiedDashboardPageProps {
 
 // Courses Tab Component
 const CoursesTab = memo(function CoursesTab({ data, onSelectCourse }: CoursesTabProps) {
-  const { error, courses, selectedSemesterId, refreshAssessments } = data;
+  const { error, courses, selectedSemesterId, refreshAssessments, courseColors, setCourseColor } =
+    data;
 
   return (
     <>
@@ -55,6 +58,8 @@ const CoursesTab = memo(function CoursesTab({ data, onSelectCourse }: CoursesTab
           onSelectCourse={onSelectCourse}
           semesterId={selectedSemesterId}
           onCourseRenamed={refreshAssessments}
+          courseColors={courseColors}
+          setCourseColor={setCourseColor}
         />
       )}
     </>
@@ -66,7 +71,7 @@ const AssessmentsTab = memo(function AssessmentsTab({ data }: { data: DashboardD
   const router = useRouter();
   const { setActiveTab } = useTab();
   const [selectedCourse, setSelectedCourse] = useState<string | null>(null);
-  const { selectedSemesterId, assessments, error, refreshAssessments } = data;
+  const { selectedSemesterId, assessments, error, refreshAssessments, courseColors } = data;
 
   useEffect(() => {
     if (router.query.course && typeof router.query.course === "string") {
@@ -95,6 +100,7 @@ const AssessmentsTab = memo(function AssessmentsTab({ data }: { data: DashboardD
           semesterId={selectedSemesterId}
           selectedCourse={selectedCourse}
           onBack={handleClearCourseSelection}
+          courseColors={courseColors}
         />
       ) : (
         <>
@@ -105,6 +111,7 @@ const AssessmentsTab = memo(function AssessmentsTab({ data }: { data: DashboardD
               assessments={assessments}
               semesterId={selectedSemesterId}
               onStatusChange={refreshAssessments}
+              courseColors={courseColors}
             />
           )}
         </>
@@ -121,7 +128,7 @@ const GradesTab = memo(function GradesTab({ data, urlSemesterId }: TabComponentP
     "idle",
   );
   const [autoSaveError, setAutoSaveError] = useState<string | undefined>();
-  const { selectedSemesterId, availableCourses } = data;
+  const { selectedSemesterId, availableCourses, courseColors } = data;
 
   useEffect(() => {
     if (router.query.course && typeof router.query.course === "string") {
@@ -198,7 +205,14 @@ const GradesTab = memo(function GradesTab({ data, urlSemesterId }: TabComponentP
                   disabled={availableCourses.length === 0}
                   aria-label="Switch course"
                 >
-                  <span className="min-w-0 truncate">{selectedCourse || "Select a course"}</span>
+                  <span className="flex min-w-0 items-center gap-1.5">
+                    {selectedCourse && (
+                      <CourseColorDot
+                        color={resolveCourseColor(courseColors[selectedCourse], selectedCourse)}
+                      />
+                    )}
+                    <span className="min-w-0 truncate">{selectedCourse || "Select a course"}</span>
+                  </span>
                   <ChevronsUpDown className="text-muted-foreground" aria-hidden />
                 </Button>
               </DropdownMenuTrigger>
@@ -209,6 +223,7 @@ const GradesTab = memo(function GradesTab({ data, urlSemesterId }: TabComponentP
                     data-selected={selectedCourse === course}
                     onSelect={() => setSelectedCourse(course)}
                   >
+                    <CourseColorDot color={resolveCourseColor(courseColors[course], course)} />
                     <span className="truncate">{course}</span>
                   </DropdownMenuItem>
                 ))}

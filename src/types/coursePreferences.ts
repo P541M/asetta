@@ -1,9 +1,8 @@
 export interface CoursePreferences {
   targetGrade: number;
-  // Future course-specific preferences can be added here
-  // gradeScale?: 'percentage' | 'letter' | 'gpa';
-  // notifications?: boolean;
-  // customWeighting?: boolean;
+  /** User-chosen "#RRGGBB" hex; absent = derive the default from the course
+      name (constants/courseColors.ts). */
+  color?: string;
 }
 
 export interface CoursePreferencesHook {
@@ -11,7 +10,6 @@ export interface CoursePreferencesHook {
   loading: boolean;
   error: string | null;
   updateTargetGrade: (targetGrade: number) => Promise<void>;
-  resetPreferences: () => Promise<void>;
 }
 
 // Default preferences for new courses

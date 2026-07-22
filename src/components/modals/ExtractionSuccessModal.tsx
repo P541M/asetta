@@ -3,8 +3,10 @@ import { createPortal } from "react-dom";
 import { useRouter } from "next/router";
 import { CalendarDays, Clock, Info, ListChecks, Plus, X } from "lucide-react";
 import { ExtractionResult } from "../../types/upload";
+import { resolveCourseColor } from "../../constants/courseColors";
 import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
 import { Button } from "../ui/button";
+import CourseColorDot from "../ui/CourseColorDot";
 
 interface ExtractionSuccessModalProps {
   isOpen: boolean;
@@ -101,8 +103,11 @@ const ExtractionSuccessModal: React.FC<ExtractionSuccessModalProps> = ({
                     key={index}
                     className="flex items-center justify-between gap-2 rounded-lg px-2.5 py-2"
                   >
-                    <span className="truncate text-sm font-medium text-foreground">
-                      {course.courseName}
+                    <span className="flex min-w-0 items-center gap-1.5">
+                      <CourseColorDot color={resolveCourseColor(undefined, course.courseName)} />
+                      <span className="truncate text-sm font-medium text-foreground">
+                        {course.courseName}
+                      </span>
                     </span>
                     <span className="shrink-0 text-xs text-muted-foreground">
                       {course.assessmentCount} assessment{course.assessmentCount !== 1 ? "s" : ""}

@@ -1,14 +1,18 @@
 import { useState } from "react";
 import { useRouter } from "next/router";
-import { BookOpen, Pencil } from "lucide-react";
+import { BookOpen, CircleAlert, Pencil } from "lucide-react";
 import { formatLocalDate, getDaysUntil } from "../../utils/dateUtils";
 import { daysUntilLabel, urgencyChipClass } from "../../utils/urgency";
 import { CoursesOverviewTableProps } from "../../types/course";
+import { resolveCourseColor } from "../../constants/courseColors";
 import { useTab } from "../../contexts/TabContext";
 import { useCourseRename } from "../../hooks/useCourseRename";
 import { cn } from "@/lib/utils";
+import { Alert, AlertDescription } from "../ui/alert";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
+import CourseColorDot from "../ui/CourseColorDot";
+import CourseColorPicker from "../ui/CourseColorPicker";
 import EmptyState from "../ui/EmptyState";
 import PanelHeader from "../ui/PanelHeader";
 
@@ -17,11 +21,14 @@ const CoursesOverviewTable = ({
   onSelectCourse,
   semesterId,
   onCourseRenamed,
+  courseColors,
+  setCourseColor,
 }: CoursesOverviewTableProps) => {
   const router = useRouter();
   const { setActiveTab } = useTab();
   const [editingCourse, setEditingCourse] = useState<string | null>(null);
   const [editValue, setEditValue] = useState<string>("");
+  const [colorError, setColorError] = useState<string | null>(null);
 
   const { renameCourse, isRenaming } = useCourseRename(semesterId, {
     onSuccess: (oldName, newName) => {
@@ -66,6 +73,20 @@ const CoursesOverviewTable = ({
       setEditingCourse(null);
     }
   };
+
+  /* The live listener repaints from the local cache instantly, so no
+     optimistic state is needed; a server rejection reverts the snapshot and
+     we surface the alert. */
+  const handleColorSelect = async (courseName: string, color: string) => {
+    setColorError(null);
+    try {
+      await setCourseColor(courseName, color);
+    } catch (error) {
+      console.error("Error saving course color:", error);
+      setColorError("Failed to save course color. Please try again.");
+    }
+  };
+
   if (courses.length === 0) {
     return (
       <div className="p-6">
@@ -88,18 +109,34 @@ const CoursesOverviewTable = ({
     <div className="p-6">
       <PanelHeader title="Courses" />
 
+      {colorError && (
+        <Alert variant="destructive" className="mb-4">
+          <CircleAlert aria-hidden />
+          <AlertDescription>{colorError}</AlertDescription>
+        </Alert>
+      )}
+
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         {courses.map((course) => {
           const daysUntilDue = course.nextDueDate ? getDaysUntil(course.nextDueDate) : null;
+          const color = resolveCourseColor(courseColors[course.courseName], course.courseName);
 
           return (
             <div
               key={course.courseName}
               role="button"
               tabIndex={0}
-              onClick={() => onSelectCourse(course.courseName)}
+              onClick={() => {
+                /* A card with its editor open is not a navigation surface.
+                   Also swallows the click the browser synthesizes ON the card
+                   (nearest common ancestor) when a color-canvas drag starts in
+                   the non-portaled popover and is released over the card. */
+                if (editingCourse === course.courseName) return;
+                onSelectCourse(course.courseName);
+              }}
               onKeyDown={(e) => {
                 // Only when the card itself is focused; ignore keys from the rename controls
+                if (editingCourse === course.courseName) return;
                 if (e.target === e.currentTarget && (e.key === "Enter" || e.key === " ")) {
                   e.preventDefault();
                   onSelectCourse(course.courseName);
@@ -110,23 +147,46 @@ const CoursesOverviewTable = ({
             >
               {/* Course name is the card's single emphasized element */}
               {editingCourse === course.courseName ? (
-                <Input
-                  value={editValue}
-                  onChange={(e) => setEditValue(e.target.value)}
-                  onBlur={() => handleEditSubmit(course.courseName)}
+                <div
+                  onBlur={(e) => {
+                    /* Submit only when focus leaves the whole editor (input +
+                       swatches) — a swatch click must never close it mid-pick */
+                    if (!e.currentTarget.contains(e.relatedTarget as Node | null)) {
+                      handleEditSubmit(course.courseName);
+                    }
+                  }}
                   onKeyDown={(e) => {
-                    e.stopPropagation();
-                    handleKeyDown(e, course.courseName);
+                    if (e.key === "Escape") setEditingCourse(null);
                   }}
                   onClick={(e) => e.stopPropagation()}
-                  className="h-9"
-                  aria-label="Course name"
-                  autoFocus
-                  disabled={isRenaming}
-                />
+                >
+                  <Input
+                    value={editValue}
+                    onChange={(e) => setEditValue(e.target.value)}
+                    onKeyDown={(e) => {
+                      e.stopPropagation();
+                      handleKeyDown(e, course.courseName);
+                    }}
+                    className="h-9"
+                    aria-label="Course name"
+                    autoFocus
+                    disabled={isRenaming}
+                  />
+                  <div className="mt-3">
+                    <CourseColorPicker
+                      value={color}
+                      onSelect={(newColor) => handleColorSelect(course.courseName, newColor)}
+                      ariaLabel={`Change color for ${course.courseName}`}
+                    />
+                  </div>
+                </div>
               ) : (
                 <div className="flex min-h-9 items-center gap-1">
                   <h3 className="line-clamp-2 min-w-0 flex-1 text-base font-semibold text-foreground">
+                    <CourseColorDot
+                      color={color}
+                      className="mb-0.5 mr-2 inline-block align-middle"
+                    />
                     {course.courseName}
                   </h3>
                   <Button

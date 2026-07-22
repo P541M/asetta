@@ -133,7 +133,6 @@ export function useSemesterAssessments(user: User | null, selectedSemesterId: st
             const today = new Date().toISOString().split("T")[0];
             return {
               id: doc.id,
-              title: data.assignmentName || "Unknown Assessment",
               dueDate: data.dueDate || today,
               status: data.status || "Not started",
               notes: data.notes || "",

@@ -8,8 +8,12 @@ import {
   Loader2,
   type LucideIcon,
 } from "lucide-react";
+import { useAuth } from "../../../contexts/AuthContext";
 import { useOnboarding } from "../../../contexts/OnboardingContext";
+import { useCourseColors } from "../../../hooks/useCourseColors";
+import { resolveCourseColor } from "../../../constants/courseColors";
 import { Button } from "../../ui/button";
+import CourseColorDot from "../../ui/CourseColorDot";
 
 const nextSteps: { icon: LucideIcon; title: string; description: string }[] = [
   {
@@ -35,7 +39,9 @@ const nextSteps: { icon: LucideIcon; title: string; description: string }[] = [
 ];
 
 export function CompletionStep() {
+  const { user } = useAuth();
   const { state, completeOnboarding } = useOnboarding();
+  const { courseColors } = useCourseColors(user, state.createdSemesterId ?? "");
 
   const handleViewDashboard = () => {
     completeOnboarding();
@@ -100,8 +106,16 @@ export function CompletionStep() {
                         key={index}
                         className="flex items-center justify-between rounded-lg bg-card px-3 py-2"
                       >
-                        <span className="text-sm font-medium text-foreground">
-                          {course.courseName}
+                        <span className="flex min-w-0 items-center gap-1.5">
+                          <CourseColorDot
+                            color={resolveCourseColor(
+                              courseColors[course.courseName],
+                              course.courseName,
+                            )}
+                          />
+                          <span className="truncate text-sm font-medium text-foreground">
+                            {course.courseName}
+                          </span>
                         </span>
                         <span className="text-sm text-muted-foreground">
                           {course.assessmentCount} assessment

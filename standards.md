@@ -4,7 +4,12 @@
 platform.** Read it before writing or reviewing any code. If a change conflicts with this file,
 either the change is wrong or this file must be updated in the same commit — never let them drift.
 
-Last updated: 2026-07-22 (v4.2 — dashboard chrome codified: one-bar anatomy with an
+Last updated: 2026-07-22 (v4.3 — course colors: user-chosen hex per course via a custom
+picker (`ui/CourseColorPicker` on the new `ui/popover` primitive, react-colorful canvas),
+rendered inline-style as the sanctioned user-data exception; the course-dot recipe;
+name-hash preset defaults via `constants/courseColors.ts`; grade-calculator tiles and
+breakdown aligned to the stat-label and shared-grid-template recipes.
+v4.2 2026-07-22: dashboard chrome codified: one-bar anatomy with an
 item-title-tier greeting, underline tabs on desktop, fixed bottom nav on mobile, Add as the
 chrome's primary CTA (actions never pose as navigation), chrome spacing rule; assessments-table
 shared grid template recipe; course-card recipe; shared urgency helpers in `utils/urgency.ts`;
@@ -132,6 +137,13 @@ are what make Asetta look like Asetta and not a default shadcn app:
   "Check your inbox" view).
 - Inline requirement feedback (password criteria) is compact — small type, two-column grid,
   checks animate in as rules are met.
+- **Native number spinners are hidden at the `Input` primitive** (2026-07-22) — they never
+  match the filled-input language; don't re-add per-field spinner CSS.
+- **Numeric fields that live-parse keep the raw string in the field while focused**
+  (`assessment/grade-calculator/NumberField.tsx`): the parent owns parsed/clamped numbers,
+  the field snaps to canonical on blur. Controlling an input with a value reformatted on
+  every keystroke ("12." re-rendering as "12") resets the caret — the 2026-07-22
+  cursor-jump lesson.
 
 ### Motion
 
@@ -306,7 +318,7 @@ a tier, the ramp is wrong — update it here, don't invent a sixth size at the c
 
 | Section | Status |
 | --- | --- |
-| Theme engine (next-themes) + tokens + primitives (`button`, `input`, `label`, `card`, `alert`, `dropdown-menu`, `password-input`, `checkbox`, `switch`) | ✅ migrated 2026-07-14 (checkbox 07-15, switch 07-15) |
+| Theme engine (next-themes) + tokens + primitives (`button`, `input`, `label`, `card`, `alert`, `dropdown-menu`, `password-input`, `checkbox`, `switch`, `popover`) | ✅ migrated 2026-07-14 (checkbox 07-15, switch 07-15, popover added 07-22) |
 | Auth flow (login/register/reset) | ✅ migrated 2026-07-14 |
 | Dashboard shell (header, user menu, tabs, semester bar, stats, page frame, body base styles) | ✅ migrated 2026-07-14 |
 | Modals pass (`ConfirmationModal`, semester manage/delete modals, notes modal incl. rich-text editor toolbar/content + link modal, extraction success, API limit, `DayDetailModal`) | ✅ migrated 2026-07-15 — all overlays are on the recipe; the `.modal-*` classes are deleted |
@@ -384,6 +396,11 @@ never duplicated into component state (the source of the 2026-07-16 flicker fix)
 - A course card is a tonal card (`rounded-xl bg-secondary/50 p-5`, hover `bg-accent`,
   keyboard-activatable) with exactly one emphasized element: the course name (item-title tier,
   `line-clamp-2`), with a rename pencil that appears on card hover/focus.
+- **A card with its editor open is not a navigation surface** (2026-07-22): its click/key
+  handlers bail while editing. This also swallows the click browsers synthesize ON the card
+  (nearest common ancestor of press and release) when a drag starting inside the non-portaled
+  color popover is released over the card — `stopPropagation` inside the editor cannot catch
+  that click because it never bubbles through the editor.
 - Below the name, a **quiet completion meter**: full-width `h-1.5` rounded track
   (`bg-foreground/10`) filled `bg-primary` (or `bg-success` at 100% — completion is not a
   grade, so no destructive/red states), with a caption row "{done} of {total} completed" ·
@@ -392,6 +409,40 @@ never duplicated into component state (the source of the 2026-07-16 flicker fix)
   (body-tier `font-medium`, truncated), date + an urgency chip from `utils/urgency.ts`. With
   nothing upcoming: `text-success` "All assessments completed" when pending is 0, otherwise a
   muted "No upcoming due dates".
+
+### Course colors (locked 2026-07-22)
+
+- **A course's color is user data, not theme styling**: any `#RRGGBB` hex, chosen per course,
+  stored in `coursePreferences/{courseName}.color`, rendered via **inline style** — the one
+  sanctioned exception to the tokens-only rule (same class of exception as progress-bar
+  widths). The same hex renders in both themes; how a custom pick reads on each theme is the
+  user's call. Malformed stored values are dropped on read and the default takes over.
+- **`src/constants/courseColors.ts` owns resolution**: `resolveCourseColor(stored, courseName)`
+  returns the stored hex or a stable djb2 name-hash default from `COURSE_COLOR_PRESETS` (six
+  mid-range steps in spectral order, chosen to read on both themes; also the picker's
+  quick-picks — never reorder, hash defaults would shuffle). Defaults are derived, never
+  written; explicit choices survive renames via the existing rename batch.
+- **The dot recipe** (`ui/CourseColorDot`): `size-2 rounded-full` beside the course name,
+  `aria-hidden` — decorative reinforcement next to visible text, never the only identity
+  carrier, never interactive, no tooltip. Course names keep their type-ramp tier and text
+  tokens (no colored course-name text, no tinted badges, no colored borders).
+- **The picker** (`ui/CourseColorPicker`): a form-native trigger opening the `ui/popover`
+  primitive with a react-colorful saturation canvas + hue slider (skinned in
+  `styles/color-picker.css`), a hex field, and the preset quick-pick row. The trigger has two
+  variants — `field` (filled-input look: `bg-input` control with a `size-4 rounded-sm` swatch
+  + mono hex text, tonal hover) and `swatch` (compact square for dense rows) — **no scaling
+  hover effects anywhere** (transform motion on hover reads as jitter, 2026-07-22 lesson; the
+  same reason the popover has no entrance animation). Instant-apply: drags commit debounced
+  (~400ms, one Firestore write per gesture), presets and valid hex entry commit immediately,
+  closing or unmounting flushes any pending commit; failures surface an inline destructive
+  alert. **Never a native OS color input.** While the popover is open the trigger echoes the
+  live draft (the preview must never lag a drag; only the Firestore commit is debounced).
+  Duplicate colors across courses are allowed by design (founder call 2026-07-22).
+- **Popovers inside blur-scoped editors render without a portal**, so the editor's
+  `relatedTarget` containment check keeps working, and the popover stops Escape propagation —
+  Escape closes the popover, not its host editor. (The 2026-07-22 swatch-race lesson
+  generalized: an editor that submits on blur scopes the check to its whole container, and
+  inline pick targets either stay inside that container or never take focus.)
 
 ### Tab panels & empty states (locked 2026-07-16)
 

@@ -5,26 +5,16 @@ import Head from "next/head";
 import { useTab } from "../../contexts/TabContext";
 import DashboardHeader from "./DashboardHeader";
 import TabNavigationBar from "./TabNavigationBar";
-import { Assessment } from "../../types/assessment";
-import { CourseStats } from "../../types/course";
+import { DashboardData } from "../../types/dashboard";
 import LoadingScreen from "../ui/LoadingScreen";
 import LoadingSpinner from "../ui/LoadingSpinner";
 import { useSemesters } from "../../hooks/useSemesters";
-import { useSemesterAssessments, DashboardStats } from "../../hooks/useSemesterAssessments";
+import { useSemesterAssessments } from "../../hooks/useSemesterAssessments";
+import { useCourseColors } from "../../hooks/useCourseColors";
 import { useDisplayPreferences } from "../../hooks/useDisplayPreferences";
 
 interface DashboardLayoutProps {
-  children: (props: {
-    selectedSemester: string;
-    selectedSemesterId: string;
-    assessments: Assessment[];
-    courses: CourseStats[];
-    availableCourses: string[];
-    error: string | null;
-    stats: DashboardStats;
-    refreshAssessments: () => void;
-    refreshTrigger: number;
-  }) => React.ReactNode;
+  children: (props: DashboardData) => React.ReactNode;
   title?: string;
   description?: string;
   forceSemesterId?: string;
@@ -52,6 +42,7 @@ const DashboardLayout = ({
   const selectedSemesterId = activeSemester?.id ?? "";
   const { assessments, courses, availableCourses, isLoading, error, stats } =
     useSemesterAssessments(user, selectedSemesterId);
+  const { courseColors, setCourseColor } = useCourseColors(user, selectedSemesterId);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -81,6 +72,8 @@ const DashboardLayout = ({
       stats,
       refreshAssessments,
       refreshTrigger,
+      courseColors,
+      setCourseColor,
     }),
     [
       selectedSemester,
@@ -92,6 +85,8 @@ const DashboardLayout = ({
       stats,
       refreshAssessments,
       refreshTrigger,
+      courseColors,
+      setCourseColor,
     ],
   );
 

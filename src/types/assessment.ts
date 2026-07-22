@@ -28,4 +28,5 @@ export interface AssessmentsTableProps {
   onStatusChange?: (assessmentId: string, newStatus: AssessmentStatus) => void;
   /** Panel title; the course-filtered view passes its breadcrumb here. */
   title?: ReactNode;
+  courseColors: Record<string, string>;
 }

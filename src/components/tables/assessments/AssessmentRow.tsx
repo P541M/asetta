@@ -4,12 +4,15 @@ import { formatLocalDateTime } from "../../../utils/dateUtils";
 import { daysUntilLabel, urgencyChipClass, urgencyTextClass } from "../../../utils/urgency";
 import { Button } from "../../ui/button";
 import { Checkbox } from "../../ui/checkbox";
+import CourseColorDot from "../../ui/CourseColorDot";
 import { NotesIcon, EditIcon, TrashIcon } from "../../ui/icons";
 import StatusSelect from "./StatusSelect";
 import { assessmentGridClass } from "./tableGrid";
 
 interface AssessmentRowProps {
   assessment: Assessment;
+  /** Resolved "#RRGGBB" for the row's course. */
+  courseColor: string;
   daysTillDue: number | null;
   isSelected: boolean;
   onToggleSelect: () => void;
@@ -25,6 +28,7 @@ interface AssessmentRowProps {
 /** Read-only assessment row (mobile card + desktop grid variants). */
 const AssessmentRow = ({
   assessment,
+  courseColor,
   daysTillDue,
   isSelected,
   onToggleSelect,
@@ -54,9 +58,12 @@ const AssessmentRow = ({
       {/* Course and Assignment Info — the assignment is the card title, the course its label */}
       <div className="space-y-1">
         <div className="flex items-center justify-between gap-3">
-          <p className="truncate text-sm font-medium text-muted-foreground">
-            {assessment.courseName}
-          </p>
+          <div className="flex min-w-0 items-center gap-1.5">
+            <CourseColorDot color={courseColor} />
+            <p className="truncate text-sm font-medium text-muted-foreground">
+              {assessment.courseName}
+            </p>
+          </div>
           {showWeight && assessment.weight > 0 && (
             <span className="text-sm font-medium text-muted-foreground">{assessment.weight}%</span>
           )}
@@ -130,7 +137,10 @@ const AssessmentRow = ({
         size="sm"
         className="w-full min-w-0"
       />
-      <p className="truncate text-sm text-muted-foreground">{assessment.courseName}</p>
+      <div className="flex min-w-0 items-center gap-1.5">
+        <CourseColorDot color={courseColor} />
+        <p className="truncate text-sm text-muted-foreground">{assessment.courseName}</p>
+      </div>
       <p className="truncate text-sm font-medium text-foreground">{assessment.assignmentName}</p>
       <div className="flex flex-col gap-0.5">
         <span className="whitespace-nowrap text-sm text-foreground">

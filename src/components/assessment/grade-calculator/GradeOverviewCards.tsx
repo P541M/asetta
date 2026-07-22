@@ -1,6 +1,6 @@
 import { GradeInfo, getProgressBarColor } from "../../../utils/gradeCalculations";
 import { cn } from "@/lib/utils";
-import { Input } from "../../ui/input";
+import NumberField from "./NumberField";
 
 interface GradeOverviewCardsProps {
   currentGrade: number | null;
@@ -16,7 +16,13 @@ interface GradeOverviewCardsProps {
 const weightBarColor = (totalWeight: number) =>
   totalWeight === 100 ? "bg-success" : totalWeight > 100 ? "bg-destructive" : "bg-primary";
 
-/** The three summary tiles: current grade, course weight, target grade + projection. */
+/**
+ * The three summary tiles: current grade, course weight, target grade +
+ * projection. One shared anatomy so the set reads as a unit: caption label
+ * row, a fixed h-9 value row (number or the target input — tops align by
+ * construction), optional meter, and a caption support line pinned to the
+ * tile bottom.
+ */
 const GradeOverviewCards = ({
   currentGrade,
   currentGradeInfo,
@@ -26,11 +32,11 @@ const GradeOverviewCards = ({
   preferencesLoading,
   requiredGrade,
 }: GradeOverviewCardsProps) => (
-  <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+  <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
     {/* Current grade */}
-    <div className="rounded-xl bg-secondary/50 p-6">
-      <div className="mb-3 flex items-center justify-between">
-        <h3 className="text-sm font-medium text-foreground">Current grade</h3>
+    <div className="flex flex-col rounded-xl bg-secondary/50 p-4">
+      <div className="flex min-h-5 items-center justify-between gap-2">
+        <h3 className="text-xs font-medium text-muted-foreground">Current grade</h3>
         {currentGradeInfo && (
           <span
             className={cn(
@@ -42,89 +48,90 @@ const GradeOverviewCards = ({
           </span>
         )}
       </div>
-      {currentGrade !== null ? (
-        <div className="space-y-3">
-          <div className="text-xl font-semibold text-foreground md:text-2xl">
+      <div className="mt-1 flex h-9 items-center">
+        {currentGrade !== null ? (
+          <p className="text-xl font-semibold tabular-nums text-foreground md:text-2xl">
             {currentGrade.toFixed(1)}%
-          </div>
-          <div className="h-1.5 w-full rounded-full bg-foreground/10">
-            <div
-              className={cn(
-                "h-1.5 rounded-full transition-all duration-300",
-                getProgressBarColor(currentGrade),
-              )}
-              style={{ width: `${Math.min(currentGrade, 100)}%` }}
-            />
-          </div>
-          {currentGradeInfo && (
-            <p className="text-sm text-muted-foreground">GPA: {currentGradeInfo.gpa}</p>
-          )}
+          </p>
+        ) : (
+          <p className="text-sm text-muted-foreground">No completed assessments yet</p>
+        )}
+      </div>
+      {currentGrade !== null && (
+        <div className="mt-2 h-1.5 w-full rounded-full bg-foreground/10">
+          <div
+            className={cn(
+              "h-1.5 rounded-full transition-all duration-300",
+              getProgressBarColor(currentGrade),
+            )}
+            style={{ width: `${Math.min(currentGrade, 100)}%` }}
+          />
         </div>
-      ) : (
-        <p className="text-sm text-muted-foreground">No completed assessments yet</p>
+      )}
+      {currentGradeInfo && (
+        <p className="mt-auto pt-2 text-xs font-medium text-muted-foreground">
+          GPA: {currentGradeInfo.gpa}
+        </p>
       )}
     </div>
 
     {/* Course weight */}
-    <div className="rounded-xl bg-secondary/50 p-6">
-      <h3 className="mb-3 text-sm font-medium text-foreground">Course weight</h3>
-      <div className="space-y-3">
-        <div className="text-xl font-semibold text-foreground md:text-2xl">
+    <div className="flex flex-col rounded-xl bg-secondary/50 p-4">
+      <div className="flex min-h-5 items-center">
+        <h3 className="text-xs font-medium text-muted-foreground">Course weight</h3>
+      </div>
+      <div className="mt-1 flex h-9 items-center">
+        <p className="text-xl font-semibold tabular-nums text-foreground md:text-2xl">
           {totalWeight.toFixed(2)}%
-        </div>
-        <div className="h-1.5 w-full rounded-full bg-foreground/10">
-          <div
-            className={cn(
-              "h-1.5 rounded-full transition-all duration-300",
-              weightBarColor(totalWeight),
-            )}
-            style={{ width: `${Math.min(totalWeight, 100)}%` }}
-          />
-        </div>
-        <p className="text-sm text-muted-foreground">
-          {totalWeight === 100
-            ? "Complete"
-            : totalWeight > 100
-              ? "Over 100%"
-              : `${(100 - totalWeight).toFixed(2)}% remaining`}
         </p>
       </div>
+      <div className="mt-2 h-1.5 w-full rounded-full bg-foreground/10">
+        <div
+          className={cn(
+            "h-1.5 rounded-full transition-all duration-300",
+            weightBarColor(totalWeight),
+          )}
+          style={{ width: `${Math.min(totalWeight, 100)}%` }}
+        />
+      </div>
+      <p className="mt-auto pt-2 text-xs font-medium text-muted-foreground">
+        {totalWeight === 100
+          ? "Complete"
+          : totalWeight > 100
+            ? "Over 100%"
+            : `${(100 - totalWeight).toFixed(2)}% remaining`}
+      </p>
     </div>
 
     {/* Target grade & projection */}
-    <div className="rounded-xl bg-secondary/50 p-6">
-      <h3 className="mb-3 text-sm font-medium text-foreground">Target grade</h3>
-      <div className="space-y-3">
-        <div className="flex items-center gap-2">
-          <Input
-            type="number"
-            min="0"
-            max="100"
-            value={targetGrade}
-            onChange={(e) => onTargetGradeChange(parseFloat(e.target.value) || 0)}
-            disabled={preferencesLoading}
-            aria-label="Target grade"
-            className="w-24 px-3"
-          />
-          <span className="text-sm text-muted-foreground">%</span>
-        </div>
-        {requiredGrade !== null && (
-          <div className="text-sm">
-            <p className="text-foreground">
-              Need avg of{" "}
-              <span
-                className={cn(
-                  "font-medium",
-                  requiredGrade > 100 ? "text-destructive" : "text-success",
-                )}
-              >
-                {requiredGrade.toFixed(1)}%
-              </span>
-            </p>
-            <p className="text-muted-foreground">on remaining assessments</p>
-          </div>
-        )}
+    <div className="flex flex-col rounded-xl bg-secondary/50 p-4">
+      <div className="flex min-h-5 items-center">
+        <h3 className="text-xs font-medium text-muted-foreground">Target grade</h3>
       </div>
+      <div className="mt-1 flex h-9 items-center gap-2">
+        <NumberField
+          value={targetGrade}
+          onRawChange={(raw) => onTargetGradeChange(parseFloat(raw) || 0)}
+          disabled={preferencesLoading}
+          aria-label="Target grade"
+          className="h-9 w-20 px-3 text-right tabular-nums"
+        />
+        <span className="text-sm text-muted-foreground">%</span>
+      </div>
+      {requiredGrade !== null && (
+        <p className="mt-auto pt-2 text-xs font-medium text-muted-foreground">
+          Need{" "}
+          <span
+            className={cn(
+              "tabular-nums",
+              requiredGrade > 100 ? "text-destructive" : "text-success",
+            )}
+          >
+            {requiredGrade.toFixed(1)}%
+          </span>{" "}
+          average on remaining assessments
+        </p>
+      )}
     </div>
   </div>
 );
