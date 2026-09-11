@@ -9,7 +9,8 @@ import RateLimitNotice from "../ui/RateLimitNotice";
 import ExtractionSuccessModal from "../modals/ExtractionSuccessModal";
 import ApiLimitReachedModal from "../modals/ApiLimitReachedModal";
 import CopyrightAgreement from "./CopyrightAgreement";
-import { postUploadForm } from "../../lib/uploadClient";
+import { postUploadForm, parseUploadResponse } from "../../lib/uploadClient";
+import { validateUploadSelection } from "../../lib/upload/constants";
 
 const UploadForm = ({ semesterId, semesterName, onUploadSuccess }: UploadFormProps) => {
   const { user } = useAuth();
@@ -33,6 +34,17 @@ const UploadForm = ({ semesterId, semesterName, onUploadSuccess }: UploadFormPro
 
     if (pdfFiles.length === 0) {
       setError("Please select PDF files only.");
+      return;
+    }
+
+    const validationError = validateUploadSelection(pdfFiles);
+    if (validationError) {
+      setError(validationError);
+      setMessage("");
+      setFiles([]);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
       return;
     }
 
@@ -115,39 +127,42 @@ const UploadForm = ({ semesterId, semesterName, onUploadSuccess }: UploadFormPro
 
       const response = await postUploadForm(user, formData);
 
-      const result = await response.json();
+      // Never call response.json() directly: a platform-level failure (payload
+      // too large, function timeout) answers with an HTML page, which throws a
+      // confusing "Unexpected token '<'" and hides the real cause.
+      const { ok, status, payload, errorMessage } = await parseUploadResponse(response);
 
-      if (result.success) {
+      if (ok) {
         setUploadStatus("success");
-        setMessage(result.message);
+        setMessage(payload?.message || "Upload complete.");
         setFiles([]);
         if (fileInputRef.current) {
           fileInputRef.current.value = "";
         }
 
         // Show success modal with enhanced data
-        if (result.data) {
-          setExtractionResult(result.data);
+        if (payload?.data) {
+          setExtractionResult(payload.data);
           setShowSuccessModal(true);
         }
 
         onUploadSuccess(semesterName);
       } else {
         // Check for different types of errors
-        if (response.status === 429) {
-          if (result.error === "DAILY_QUOTA_EXCEEDED") {
+        if (status === 429) {
+          if (payload?.error === "DAILY_QUOTA_EXCEEDED") {
             setUploadStatus("daily_quota_exceeded");
             setShowApiLimitModal(true);
-            setError(result.message || "Daily processing limit reached");
-          } else if (result.error === "RATE_LIMITED") {
+            setError(payload.message || "Daily processing limit reached");
+          } else if (payload?.error === "RATE_LIMITED") {
             setUploadStatus("rate_limited");
-            setRetryAfter(result.retryAfter || 120);
-            setError(result.message || "Servers are busy. Please wait and try again.");
+            setRetryAfter(payload.retryAfter || 120);
+            setError(payload.message || "Servers are busy. Please wait and try again.");
           } else {
-            throw new Error(result.error || "Upload failed");
+            throw new Error(errorMessage || "Upload failed");
           }
         } else {
-          throw new Error(result.error || "Upload failed");
+          throw new Error(errorMessage || "Upload failed");
         }
       }
     } catch (err) {

@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import formidable, { IncomingForm, Fields, Files } from "formidable";
+import type { File as FormidableFile } from "formidable";
+import { IncomingForm, Fields, Files } from "formidable";
 import fs from "fs";
 import pdfParse from "pdf-parse";
 import { getAdmin } from "../../lib/firebase-admin";
@@ -11,6 +12,13 @@ import {
   extractAssessmentsBasic,
   extractCourseName,
 } from "../../lib/upload/textExtraction";
+import {
+  ACCEPTED_MIME_TYPE,
+  MAX_FILES_PER_UPLOAD,
+  MAX_FILE_BYTES,
+  MAX_TOTAL_UPLOAD_BYTES,
+  formatBytes,
+} from "../../lib/upload/constants";
 
 export const config = {
   api: {
@@ -18,15 +26,37 @@ export const config = {
   },
 };
 
+// formidable stamps its own errors with an httpCode, and every size/count
+// violation is a 413. Reading httpCode avoids importing formidable's error
+// constants, which are NOT reachable via `formidable.errors` once the bundler
+// applies ESM interop (it resolves to the default export, which has no
+// `.errors`) -- that lookup threw at module load and served an HTML 500.
+const FORMIDABLE_MAX_FILES_EXCEEDED = 1015;
+
+// Check isTooManyFilesError first: it also carries httpCode 413.
+const isTooManyFilesError = (error: unknown): boolean =>
+  (error as { code?: unknown })?.code === FORMIDABLE_MAX_FILES_EXCEEDED;
+
+const isPayloadTooLargeError = (error: unknown): boolean =>
+  (error as { httpCode?: unknown })?.httpCode === 413;
+
 const parseForm = (req: NextApiRequest): Promise<{ fields: Fields; files: Files }> => {
   return new Promise((resolve, reject) => {
     const form = new IncomingForm({
       multiples: true,
-      maxFileSize: 10 * 1024 * 1024, // 10MB limit
-      filter: ({ mimetype }) => mimetype === "application/pdf",
+      // Must stay under Vercel's 4.5 MB request-body cap. Anything larger is
+      // rejected at the edge with an HTML error page we never get to handle,
+      // so the browser validates against the same constants before sending.
+      maxFileSize: MAX_FILE_BYTES,
+      maxTotalFileSize: MAX_TOTAL_UPLOAD_BYTES,
+      maxFiles: MAX_FILES_PER_UPLOAD,
+      filter: ({ mimetype }) => mimetype === ACCEPTED_MIME_TYPE,
     });
     form.parse(req, (err, fields, files) => {
-      if (err) reject(err);
+      if (err) {
+        reject(err);
+        return;
+      }
       resolve({ fields, files });
     });
   });
@@ -38,7 +68,33 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   try {
-    const { fields, files } = await parseForm(req);
+    let fields: Fields;
+    let files: Files;
+    try {
+      ({ fields, files } = await parseForm(req));
+    } catch (error: unknown) {
+      if (isTooManyFilesError(error)) {
+        return res.status(413).json({
+          success: false,
+          error: "TOO_MANY_FILES",
+          message: `Please upload at most ${MAX_FILES_PER_UPLOAD} files at a time.`,
+        });
+      }
+      if (isPayloadTooLargeError(error)) {
+        return res.status(413).json({
+          success: false,
+          error: "PAYLOAD_TOO_LARGE",
+          message: `Files must be under ${formatBytes(MAX_FILE_BYTES)} each and ${formatBytes(
+            MAX_TOTAL_UPLOAD_BYTES,
+          )} per upload.`,
+        });
+      }
+      return res.status(400).json({
+        success: false,
+        error: "We couldn't read that upload. Please make sure you're sending PDF files.",
+      });
+    }
+
     const semesterIdField = fields.semesterId;
     const semesterId = Array.isArray(semesterIdField) ? semesterIdField[0] : semesterIdField;
     if (!semesterId) {
@@ -67,7 +123,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(400).json({ success: false, error: "Semester not found" });
     }
 
-    const uploadedFiles: formidable.File[] = [];
+    const uploadedFiles: FormidableFile[] = [];
     Object.keys(files).forEach((key) => {
       const file = files[key];
       if (Array.isArray(file)) {

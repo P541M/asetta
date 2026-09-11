@@ -15,7 +15,8 @@ import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
 import { Button } from "../ui/button";
 import ApiLimitReachedModal from "../modals/ApiLimitReachedModal";
 import CopyrightAgreement from "../forms/CopyrightAgreement";
-import { postUploadForm } from "../../lib/uploadClient";
+import { postUploadForm, parseUploadResponse } from "../../lib/uploadClient";
+import { ACCEPTED_MIME_TYPE, validateUploadSelection } from "../../lib/upload/constants";
 
 interface OnboardingUploadFormProps {
   semesterId: string;
@@ -42,7 +43,24 @@ export function OnboardingUploadForm({
   const handleFileSelect = useCallback((selectedFiles: FileList | null) => {
     if (!selectedFiles) return;
 
-    const newFiles: FileProgress[] = Array.from(selectedFiles).map((file) => ({
+    const pdfFiles = Array.from(selectedFiles).filter((file) => file.type === ACCEPTED_MIME_TYPE);
+
+    if (pdfFiles.length === 0) {
+      setError("Please select PDF files only.");
+      setMessage("");
+      setFiles([]);
+      return;
+    }
+
+    const validationError = validateUploadSelection(pdfFiles);
+    if (validationError) {
+      setError(validationError);
+      setMessage("");
+      setFiles([]);
+      return;
+    }
+
+    const newFiles: FileProgress[] = pdfFiles.map((file) => ({
       name: file.name,
       size: file.size,
       progress: 0,
@@ -52,6 +70,14 @@ export function OnboardingUploadForm({
     setFiles(newFiles);
     setError("");
     setMessage("");
+
+    // handleUpload reads from the input element, so dropped files have to be
+    // written back into it or a drag-and-drop upload silently does nothing.
+    if (fileInputRef.current) {
+      const dataTransfer = new DataTransfer();
+      pdfFiles.forEach((file) => dataTransfer.items.add(file));
+      fileInputRef.current.files = dataTransfer.files;
+    }
   }, []);
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
@@ -97,16 +123,20 @@ export function OnboardingUploadForm({
 
       const response = await postUploadForm(user, formData);
 
-      if (!response.ok) {
-        const errorData = await response.json();
+      // Never call response.json() directly: a platform-level failure (payload
+      // too large, function timeout) answers with an HTML page, which throws a
+      // confusing "Unexpected token '<'" and hides the real cause.
+      const { ok, status, payload, errorMessage } = await parseUploadResponse(response);
+
+      if (!ok) {
         // Handle daily quota exhaustion
-        if (response.status === 429 && errorData.error === "DAILY_QUOTA_EXCEEDED") {
+        if (status === 429 && payload?.error === "DAILY_QUOTA_EXCEEDED") {
           setUploadStatus("daily_quota_exceeded");
           setShowApiLimitModal(true);
-          setError(errorData.message || "Daily processing limit reached");
+          setError(payload.message || "Daily processing limit reached");
           return;
         }
-        throw new Error(errorData.error || "Upload failed");
+        throw new Error(errorMessage || "Upload failed");
       }
 
       setUploadStatus("processing");
@@ -120,8 +150,6 @@ export function OnboardingUploadForm({
         })),
       );
 
-      const result = await response.json();
-
       setFiles((prev) =>
         prev.map((f) => ({
           ...f,
@@ -130,20 +158,17 @@ export function OnboardingUploadForm({
         })),
       );
 
-      setUploadStatus("success");
-      setMessage(
-        `Successfully processed ${
-          result.data?.processedFiles || result.processedFiles || 0
-        } file(s)!`,
-      );
+      const extraction = payload?.data;
 
-      // The API response has data nested under 'data' property
+      setUploadStatus("success");
+      setMessage(`Successfully processed ${extraction?.processedFiles ?? 0} file(s)!`);
+
       const extractionData = {
-        processedFiles: result.data?.processedFiles || result.processedFiles || 0,
-        totalAssessments: result.data?.totalAssessments || result.totalAssessments || 0,
-        courseBreakdown: result.data?.courseBreakdown || result.courseBreakdown || [],
-        failedFiles: result.data?.failedFiles || result.failedFiles || 0,
-        processingTime: result.data?.processingTime || result.processingTime || 0,
+        processedFiles: extraction?.processedFiles ?? 0,
+        totalAssessments: extraction?.totalAssessments ?? 0,
+        courseBreakdown: extraction?.courseBreakdown ?? [],
+        failedFiles: extraction?.failedFiles ?? 0,
+        processingTime: extraction?.processingTime ?? 0,
       };
 
       onUploadSuccess(extractionData);
