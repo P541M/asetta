@@ -10,7 +10,7 @@ import ExtractionSuccessModal from "../modals/ExtractionSuccessModal";
 import ApiLimitReachedModal from "../modals/ApiLimitReachedModal";
 import CopyrightAgreement from "./CopyrightAgreement";
 import { postUploadForm, parseUploadResponse } from "../../lib/uploadClient";
-import { validateUploadSelection } from "../../lib/upload/constants";
+import { MAX_FILE_BYTES, formatBytes, validateUploadSelection } from "../../lib/upload/constants";
 
 const UploadForm = ({ semesterId, semesterName, onUploadSuccess }: UploadFormProps) => {
   const { user } = useAuth();
@@ -302,7 +302,7 @@ const UploadForm = ({ semesterId, semesterName, onUploadSuccess }: UploadFormPro
               <p className="mt-1 text-sm text-muted-foreground">
                 {uploadStatus === "uploading"
                   ? "Processing your files..."
-                  : "Supports multiple PDF files • Max 10MB per file"}
+                  : `Supports multiple PDF files • Max ${formatBytes(MAX_FILE_BYTES)} per file`}
               </p>
             </div>
           </div>

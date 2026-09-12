@@ -16,7 +16,12 @@ import { Button } from "../ui/button";
 import ApiLimitReachedModal from "../modals/ApiLimitReachedModal";
 import CopyrightAgreement from "../forms/CopyrightAgreement";
 import { postUploadForm, parseUploadResponse } from "../../lib/uploadClient";
-import { ACCEPTED_MIME_TYPE, validateUploadSelection } from "../../lib/upload/constants";
+import {
+  ACCEPTED_MIME_TYPE,
+  MAX_FILE_BYTES,
+  formatBytes,
+  validateUploadSelection,
+} from "../../lib/upload/constants";
 
 interface OnboardingUploadFormProps {
   semesterId: string;
@@ -276,7 +281,7 @@ export function OnboardingUploadForm({
             <p className="text-base font-semibold text-foreground">Drop your course files here</p>
             <p className="mt-1 text-sm text-muted-foreground">or click to browse your computer</p>
             <p className="mt-3 text-xs font-medium text-muted-foreground">
-              Supports PDF, DOC, and DOCX files up to 10MB each
+              Supports PDF files up to {formatBytes(MAX_FILE_BYTES)} each
             </p>
           </div>
         ) : (
