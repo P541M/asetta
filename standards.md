@@ -4,7 +4,10 @@
 platform.** Read it before writing or reviewing any code. If a change conflicts with this file,
 either the change is wrong or this file must be updated in the same commit — never let them drift.
 
-Last updated: 2026-07-22 (v4.3 — course colors: user-chosen hex per course via a custom
+Last updated: 2026-09-24 (v4.3.1 — due dates are local calendar days read from a live clock
+(`getDaysUntil` + `hooks/useNow`); blur-scoped editors are focusable containers so macOS
+button clicks don't close them.
+v4.3 2026-07-22: course colors: user-chosen hex per course via a custom
 picker (`ui/CourseColorPicker` on the new `ui/popover` primitive, react-colorful canvas),
 rendered inline-style as the sanctioned user-data exception; the course-dot recipe;
 name-hash preset defaults via `constants/courseColors.ts`; grade-calculator tiles and
@@ -390,6 +393,14 @@ never duplicated into component state (the source of the 2026-07-16 flicker fix)
 - **Urgency labels and tints come from `utils/urgency.ts`** (`daysUntilLabel`,
   `urgencyTextClass`, `urgencyChipClass`) — shared with the course cards; never re-derive the
   thresholds (≤3 destructive, ≤7 primary, else neutral).
+- **Due dates are local calendar days** (2026-09-24): day counts come from `getDaysUntil`
+  (`utils/dateUtils.ts`), which counts calendar days in the viewer's timezone (due tomorrow is
+  "Due tomorrow" at any hour) and goes negative once the due moment passes. Stored
+  `dueDate`/`dueTime` pairs are parsed only via `parseLocalDateTime`, never
+  `new Date("YYYY-MM-DD")` (UTC midnight, the wrong local day for most users) or
+  `` new Date(`${date}T${time}`) `` (Safari's strict parser rejects unpadded times). Anything
+  that renders time-relative text reads the clock from `hooks/useNow` (ticks each minute and on
+  tab wake), so labels on a page left open overnight stay true.
 
 ### Course cards (locked 2026-07-22)
 
@@ -442,7 +453,11 @@ never duplicated into component state (the source of the 2026-07-16 flicker fix)
   `relatedTarget` containment check keeps working, and the popover stops Escape propagation —
   Escape closes the popover, not its host editor. (The 2026-07-22 swatch-race lesson
   generalized: an editor that submits on blur scopes the check to its whole container, and
-  inline pick targets either stay inside that container or never take focus.)
+  inline pick targets either stay inside that container or never take focus.) **The editor
+  container itself is `tabIndex={-1}`** (2026-09-24 lesson): Safari and Firefox on macOS never
+  focus a clicked button; they move focus to its nearest focusable ancestor. Inside a
+  keyboard-activatable card that ancestor was the card, so clicking the picker trigger closed
+  the editor on Mac only.
 
 ### Tab panels & empty states (locked 2026-07-16)
 

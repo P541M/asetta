@@ -1,10 +1,12 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { User } from "firebase/auth";
 import { collection, onSnapshot, orderBy, query } from "firebase/firestore";
 import { db } from "../lib/firebase";
 import { Assessment } from "../types/assessment";
 import { CourseStats } from "../types/course";
 import { isCompletedStatus } from "../constants/assessment";
+import { getTodayDateString, parseLocalDateTime } from "../utils/dateUtils";
+import { useNow } from "./useNow";
 
 export interface DashboardStats {
   total: number;
@@ -15,17 +17,11 @@ export interface DashboardStats {
   completionRate: number;
 }
 
-const EMPTY_STATS: DashboardStats = {
-  total: 0,
-  notStarted: 0,
-  inProgress: 0,
-  submitted: 0,
-  upcomingDeadlines: 0,
-  completionRate: 0,
-};
+const dueAt = (assessment: Assessment): number =>
+  parseLocalDateTime(assessment.dueDate, assessment.dueTime).getTime();
 
 // Helper function to process course statistics from assessments
-function processCourseStats(assessmentsList: Assessment[]): CourseStats[] {
+function processCourseStats(assessmentsList: Assessment[], now: Date): CourseStats[] {
   const courseMap = new Map<string, Assessment[]>();
   assessmentsList.forEach((assessment) => {
     if (!courseMap.has(assessment.courseName)) {
@@ -37,10 +33,9 @@ function processCourseStats(assessmentsList: Assessment[]): CourseStats[] {
   const courseStatsList: CourseStats[] = [];
   courseMap.forEach((assessments, courseName) => {
     const completed = assessments.filter((a) => isCompletedStatus(a.status));
-    const now = new Date();
     const upcomingAssessments = assessments
-      .filter((a) => !isCompletedStatus(a.status) && new Date(a.dueDate) >= now)
-      .sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime());
+      .filter((a) => !isCompletedStatus(a.status) && dueAt(a) >= now.getTime())
+      .sort((a, b) => dueAt(a) - dueAt(b));
 
     const nextUpcoming = upcomingAssessments[0];
     const progress =
@@ -60,17 +55,16 @@ function processCourseStats(assessmentsList: Assessment[]): CourseStats[] {
   return courseStatsList.sort((a, b) => a.courseName.localeCompare(b.courseName));
 }
 
-function computeStats(assessmentsList: Assessment[]): DashboardStats {
-  const now = new Date();
-  const oneWeek = new Date();
+function computeStats(assessmentsList: Assessment[], now: Date): DashboardStats {
+  const oneWeek = new Date(now);
   oneWeek.setDate(now.getDate() + 7);
   const totalCount = assessmentsList.length;
   const notStartedCount = assessmentsList.filter((a) => a.status === "Not started").length;
   const inProgressCount = assessmentsList.filter((a) => a.status === "In progress").length;
   const completedCount = assessmentsList.filter((a) => isCompletedStatus(a.status)).length;
   const upcomingCount = assessmentsList.filter((a) => {
-    const dueDate = new Date(a.dueDate);
-    return dueDate > now && dueDate <= oneWeek && !isCompletedStatus(a.status);
+    const due = dueAt(a);
+    return due > now.getTime() && due <= oneWeek.getTime() && !isCompletedStatus(a.status);
   }).length;
   const completionRate = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
   return {
@@ -94,12 +88,15 @@ function computeStats(assessmentsList: Assessment[]): DashboardStats {
  */
 export function useSemesterAssessments(user: User | null, selectedSemesterId: string) {
   const [assessments, setAssessments] = useState<Assessment[]>([]);
-  const [courses, setCourses] = useState<CourseStats[]>([]);
   const [availableCourses, setAvailableCourses] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [stats, setStats] = useState<DashboardStats>(EMPTY_STATS);
   const hasDataRef = useRef(false);
+  const now = useNow();
+
+  // Derived at render, not in the snapshot callback, so they follow the clock
+  const courses = useMemo(() => processCourseStats(assessments, now), [assessments, now]);
+  const stats = useMemo(() => computeStats(assessments, now), [assessments, now]);
 
   useEffect(() => {
     if (!user || !selectedSemesterId) {
@@ -130,10 +127,9 @@ export function useSemesterAssessments(user: User | null, selectedSemesterId: st
         (snapshot) => {
           const assessmentsList: Assessment[] = snapshot.docs.map((doc) => {
             const data = doc.data();
-            const today = new Date().toISOString().split("T")[0];
             return {
               id: doc.id,
-              dueDate: data.dueDate || today,
+              dueDate: data.dueDate || getTodayDateString(),
               status: data.status || "Not started",
               notes: data.notes || "",
               courseName: data.courseName || "Unknown Course",
@@ -145,16 +141,11 @@ export function useSemesterAssessments(user: User | null, selectedSemesterId: st
           hasDataRef.current = assessmentsList.length > 0;
           setAssessments(assessmentsList);
 
-          // Process course statistics
-          setCourses(processCourseStats(assessmentsList));
-
           // Extract available courses (sorted alphabetically)
           const uniqueCourses = Array.from(
             new Set(assessmentsList.map((a) => a.courseName)),
           ).sort();
           setAvailableCourses(uniqueCourses);
-
-          setStats(computeStats(assessmentsList));
           setIsLoading(false);
         },
         (err) => {

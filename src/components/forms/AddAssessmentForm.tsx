@@ -4,6 +4,7 @@ import { useAuth } from "../../contexts/AuthContext";
 import { addDoc } from "firebase/firestore";
 import { getAssessmentsRef } from "../../lib/firebaseUtils";
 import { AddAssessmentFormProps, AssessmentStatus } from "../../types/assessment";
+import { getTodayDateString } from "../../utils/dateUtils";
 import { Alert, AlertDescription } from "../ui/alert";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
@@ -12,14 +13,6 @@ import StatusSelect from "../tables/assessments/StatusSelect";
 
 const AddAssessmentForm = ({ semesterId, onSuccess }: AddAssessmentFormProps) => {
   const { user } = useAuth();
-
-  const getTodayDateString = (): string => {
-    const today = new Date();
-    const year = today.getFullYear();
-    const month = String(today.getMonth() + 1).padStart(2, "0");
-    const day = String(today.getDate()).padStart(2, "0");
-    return `${year}-${month}-${day}`;
-  };
 
   const [formData, setFormData] = useState({
     courseName: "",

@@ -1,7 +1,7 @@
 import { ChartColumn, CircleAlert, CircleCheck, CircleDashed, type LucideIcon } from "lucide-react";
 import { Assessment } from "../../../types/assessment";
 import { cn } from "@/lib/utils";
-import { formatLocalDate } from "../../../utils/dateUtils";
+import { formatLocalDate, parseLocalDateTime } from "../../../utils/dateUtils";
 import EmptyState from "../../ui/EmptyState";
 import { statusTintClasses } from "../../tables/assessments/StatusSelect";
 import NumberField from "./NumberField";
@@ -22,7 +22,7 @@ const getAssessmentStatus = (
   assessment: Assessment,
 ): { icon: LucideIcon; tintClass: string; label: string } => {
   const now = new Date();
-  const dueDate = new Date(`${assessment.dueDate}T${assessment.dueTime}`);
+  const dueDate = parseLocalDateTime(assessment.dueDate, assessment.dueTime);
 
   if (assessment.status === "Submitted") {
     return { icon: CircleCheck, tintClass: statusTintClasses.Submitted, label: "Submitted" };

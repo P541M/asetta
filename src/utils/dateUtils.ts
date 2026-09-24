@@ -2,10 +2,14 @@
  * Date utility functions for handling dates and times
  */
 
+const MS_PER_DAY = 1000 * 60 * 60 * 24;
+
 /**
- * Converts a date string (YYYY-MM-DD) and time string (HH:MM) to a Date object
+ * Converts a date string (YYYY-MM-DD) and time string (HH:MM) to a Date in the
+ * viewer's own timezone. Never `new Date("YYYY-MM-DD")`: date-only strings parse
+ * as UTC midnight, which lands on the wrong local day for most of the world.
  */
-const parseLocalDateTime = (dateStr: string, timeStr: string = "23:59"): Date => {
+export const parseLocalDateTime = (dateStr: string, timeStr: string = "23:59"): Date => {
   const [year, month, day] = dateStr.split("-").map(Number);
   const [hours, minutes] = timeStr.split(":").map(Number);
   return new Date(year, month - 1, day, hours, minutes);
@@ -40,10 +44,30 @@ export const formatLocalDateTime = (dateStr: string, timeStr: string = "23:59"):
 };
 
 /**
- * Calculates the number of days between now and a given date
+ * Today's date as YYYY-MM-DD in the viewer's timezone (not UTC, unlike toISOString)
  */
-export const getDaysUntil = (dateStr: string, timeStr: string = "23:59"): number => {
+export const getTodayDateString = (): string => {
+  const today = new Date();
+  const month = String(today.getMonth() + 1).padStart(2, "0");
+  const day = String(today.getDate()).padStart(2, "0");
+  return `${today.getFullYear()}-${month}-${day}`;
+};
+
+const startOfDay = (date: Date): Date =>
+  new Date(date.getFullYear(), date.getMonth(), date.getDate());
+
+/**
+ * Calendar days from `now` to the due date in the viewer's timezone: due
+ * tomorrow is 1 whatever the hour. Negative once the due moment has passed,
+ * including earlier the same day.
+ */
+export const getDaysUntil = (
+  dateStr: string,
+  timeStr: string = "23:59",
+  now: Date = new Date(),
+): number => {
   const dueDate = parseLocalDateTime(dateStr, timeStr);
-  const now = new Date();
-  return Math.floor((dueDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+  // Round, not floor: days either side of a DST change are 23 or 25 hours long
+  const days = Math.round((startOfDay(dueDate).getTime() - startOfDay(now).getTime()) / MS_PER_DAY);
+  return dueDate.getTime() < now.getTime() ? Math.min(days, -1) : days;
 };

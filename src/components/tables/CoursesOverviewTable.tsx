@@ -147,7 +147,13 @@ const CoursesOverviewTable = ({
             >
               {/* Course name is the card's single emphasized element */}
               {editingCourse === course.courseName ? (
+                /* tabIndex -1: Safari and Firefox on macOS never focus a clicked
+                   button; they focus its nearest focusable ancestor instead. Without
+                   this that ancestor is the card, so clicking the color trigger read
+                   as focus leaving the editor and closed it. */
                 <div
+                  tabIndex={-1}
+                  className="outline-hidden"
                   onBlur={(e) => {
                     /* Submit only when focus leaves the whole editor (input +
                        swatches) — a swatch click must never close it mid-pick */

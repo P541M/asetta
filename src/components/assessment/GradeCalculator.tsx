@@ -4,6 +4,7 @@ import { useAssessments } from "../../hooks/useAssessments";
 import { useAssessmentAutoSave } from "../../hooks/useAssessmentAutoSave";
 import { useCoursePreferences } from "../../hooks/useCoursePreferences";
 import { Assessment } from "../../types/assessment";
+import { parseLocalDateTime } from "../../utils/dateUtils";
 import {
   computeCurrentGrade,
   computeTotalWeight,
@@ -61,8 +62,8 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
 
   useEffect(() => {
     const sortedAssessments = [...fetchedAssessments].sort((a, b) => {
-      const dateA = new Date(`${a.dueDate}T${a.dueTime}`);
-      const dateB = new Date(`${b.dueDate}T${b.dueTime}`);
+      const dateA = parseLocalDateTime(a.dueDate, a.dueTime);
+      const dateB = parseLocalDateTime(b.dueDate, b.dueTime);
       return dateA.getTime() - dateB.getTime();
     });
 

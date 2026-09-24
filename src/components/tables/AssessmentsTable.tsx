@@ -6,7 +6,8 @@ import { getAssessmentDocRef } from "../../lib/firebaseUtils";
 import { useAuth } from "../../contexts/AuthContext";
 import { useTab } from "../../contexts/TabContext";
 import { useDisplayPreferences } from "../../hooks/useDisplayPreferences";
-import { getDaysUntil } from "../../utils/dateUtils";
+import { useNow } from "../../hooks/useNow";
+import { getDaysUntil, parseLocalDateTime } from "../../utils/dateUtils";
 import { Assessment, AssessmentStatus, AssessmentsTableProps } from "../../types/assessment";
 import { isCompletedStatus } from "../../constants/assessment";
 import { resolveCourseColor } from "../../constants/courseColors";
@@ -52,6 +53,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
   const [editingId, setEditingId] = useState<string | null>(null);
   const { showDaysTillDue, showWeight, showNotes } = useDisplayPreferences(user);
+  const now = useNow();
   const [editFormData, setEditFormData] = useState<Assessment>({
     id: "",
     courseName: "",
@@ -74,7 +76,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
     const completedStatuses = ["Submitted", "Under Review", "Completed", "Missed"];
     if (completedStatuses.includes(status)) return null;
 
-    return getDaysUntil(dueDate, dueTime);
+    return getDaysUntil(dueDate, dueTime, now);
   };
 
   const sortedAssessments = useMemo(() => {
@@ -86,8 +88,8 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
 
     return filtered.sort((a, b) => {
       if (sortKey === "dueDate") {
-        const dateA = new Date(`${a.dueDate}T${a.dueTime}`);
-        const dateB = new Date(`${b.dueDate}T${b.dueTime}`);
+        const dateA = parseLocalDateTime(a.dueDate, a.dueTime);
+        const dateB = parseLocalDateTime(b.dueDate, b.dueTime);
         return sortOrder === "asc"
           ? dateA.getTime() - dateB.getTime()
           : dateB.getTime() - dateA.getTime();
