@@ -3,12 +3,14 @@ import { getFirestore } from "firebase-admin/firestore";
 import { sendEmail } from "./email";
 import { isValidEmail } from "../utils/validation";
 import { devLog, devError } from "../utils/devLog";
+import type { AssessmentStatus } from "../types/assessment";
 
 interface NotificationPreferences {
   emailNotifications: boolean;
   notificationDaysBefore: number;
   email: string;
   hasConsentedToNotifications: boolean;
+  notifySubmittedAssessments: boolean;
 }
 
 interface Assessment {
@@ -18,6 +20,7 @@ interface Assessment {
   courseName: string;
   assignmentName: string;
   dueTime: string;
+  status: AssessmentStatus;
 }
 
 export async function checkAndSendNotifications() {
@@ -68,6 +71,7 @@ export async function checkAndSendNotifications() {
           emailNotifications: preferences.emailNotifications,
           notificationDaysBefore: preferences.notificationDaysBefore,
           hasConsentedToNotifications: preferences.hasConsentedToNotifications,
+          notifySubmittedAssessments: preferences.notifySubmittedAssessments,
           email: preferences.email ? `${preferences.email.substring(0, 3)}***` : "not set",
         });
 
@@ -186,6 +190,11 @@ export async function checkAndSendNotifications() {
         devLog(`🔮 Future assessments: ${futureAssessments.length}`);
 
         for (const assessment of futureAssessments) {
+          if (assessment.status === "Submitted" && !preferences.notifySubmittedAssessments) {
+            devLog(`⏭️ Skipping submitted assessment "${assessment.assignmentName}"`);
+            continue;
+          }
+
           const dueDate = assessment.parsedDueDate;
           const timeDiffMs = dueDate.getTime() - now.getTime();
           const daysUntilDue = Math.floor(timeDiffMs / (1000 * 60 * 60 * 24));
@@ -348,6 +357,9 @@ function validateNotificationPreferences(preferences: unknown): {
     notificationDaysBefore: Math.max(1, Math.min(30, Number(prefs.notificationDaysBefore) || 1)),
     email: String(prefs.email || "").trim(),
     hasConsentedToNotifications: Boolean(prefs.hasConsentedToNotifications),
+    // Optional and not validated: user docs predating this setting lack the field, and a
+    // validation error would silently stop all of their reminders. Absent means opted in.
+    notifySubmittedAssessments: prefs.notifySubmittedAssessments !== false,
   };
 
   return {

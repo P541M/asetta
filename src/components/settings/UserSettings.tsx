@@ -36,6 +36,7 @@ const UserSettings = () => {
     emailNotifications: false,
     notificationDaysBefore: 1,
     email: "",
+    notifySubmittedAssessments: true,
   });
   const [savedNotif, setSavedNotif] = useState<NotificationsForm | null>(null);
   const [notifSaving, setNotifSaving] = useState(false);
@@ -66,6 +67,7 @@ const UserSettings = () => {
           emailNotifications: userData.emailNotifications ?? false,
           notificationDaysBefore: userData.notificationDaysBefore ?? 1,
           email: userData.email || "",
+          notifySubmittedAssessments: userData.notifySubmittedAssessments ?? true,
         };
 
         setProfileForm(profile);

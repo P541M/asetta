@@ -9,6 +9,7 @@ export interface NotificationsForm {
   emailNotifications: boolean;
   notificationDaysBefore: number;
   email: string;
+  notifySubmittedAssessments: boolean;
 }
 
 export interface NotificationsSectionProps {

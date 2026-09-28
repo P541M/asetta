@@ -13,6 +13,7 @@ import {
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import EmptyState from "../ui/EmptyState";
+import ToggleRow from "./ToggleRow";
 
 const timingOptions = [
   { value: "1", label: "1 day before due date" },
@@ -177,6 +178,13 @@ const NotificationsSection = ({ form, onChange }: NotificationsSectionProps) => 
               </div>
             )}
           </div>
+
+          <ToggleRow
+            title="Submitted assessments"
+            description="Keep sending reminders for assessments you've already marked as submitted"
+            checked={form.notifySubmittedAssessments}
+            onCheckedChange={(checked) => onChange("notifySubmittedAssessments", checked)}
+          />
         </div>
       )}
 
