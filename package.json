@@ -1,0 +1,21 @@
+{
+  "name": "asetta-monorepo",
+  "private": true,
+  "workspaces": [
+    "apps/*"
+  ],
+  "engines": {
+    "node": "22.x"
+  },
+  "scripts": {
+    "dev:web": "npm run dev -w apps/web",
+    "dev:landing": "npm run dev -w apps/landing",
+    "build": "npm run build -w apps/web && npm run build -w apps/landing",
+    "lint": "npm run lint -w apps/web && npm run lint -w apps/landing",
+    "format:check": "npm run format:check -w apps/web && npm run format:check -w apps/landing",
+    "typecheck": "tsc --noEmit -p apps/web"
+  },
+  "overrides": {
+    "jose": "^5.9.6"
+  }
+}

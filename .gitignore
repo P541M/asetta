@@ -1,0 +1,6 @@
+# Root ignores for the monorepo. Each app keeps its own .gitignore too.
+node_modules
+.next
+.env*.local
+.DS_Store
+.vercel
