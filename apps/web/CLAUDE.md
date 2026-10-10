@@ -1,56 +1,24 @@
-# Claude Development Configuration
+# apps/web: the Asetta platform (asetta.me)
 
-This file contains important information for Claude Code to understand and work with the Asetta project effectively.
+Students upload course outlines, Gemini extracts the assessments, and they track due dates, grades and notes per semester. Next.js 15 (Pages Router), React 19, TypeScript strict, Tailwind v4 + shadcn/ui, Firebase Auth + Firestore, firebase-admin on the server, Nodemailer over Gmail.
 
-## ⚠️ REQUIRED READING ⚠️
-**Before writing or modifying ANY code, read `standards.md` in this directory.** It is the single
-source of truth for code norms, the shadcn/ui design system, theme tokens, and dark/light mode
-rules. Code that conflicts with `standards.md` is wrong by definition.
+**Read `standards.md` before writing or changing any code.** It is the source of truth for code norms and the UI system; code that conflicts with it is wrong. Global rules (git, copy) are in the root `CLAUDE.md`.
 
-## Project Overview
-Asetta is a student assessment management platform built with Next.js, React, TypeScript, and Firebase. It helps students track academic assessments, deadlines, and grades across semesters.
+## Commands (from the repo root)
 
-## /init
-When working on this project, prioritize:
-1. **User Experience**: Ensure all features are intuitive and cohesive
-2. **Accessibility**: Maintain proper dark mode support and responsive design
-3. **Data Consistency**: Ensure Firebase operations maintain data integrity
-4. **Code Quality**: Follow existing TypeScript patterns and component structure
+- `npm run dev:web` (localhost:3000; `/` redirects to `/login` in development)
+- `npm run lint`, `npm run format:check`, `npm run typecheck`, `npm run build` (the verification loop in `standards.md`)
+- `npm run format -w apps/web` to write Prettier fixes; `npm install <pkg> -w apps/web` to add a dependency
 
-## Key Commands
-- `npm run dev` - Start development server with Turbopack
-- `npm run build` - Build for production
-- `npm run start` - Start production server
-- `npm run lint` - Run ESLint checks
+## Where things live (`src/`)
 
-## Architecture
-- **Frontend**: Next.js 15 with React 19 and TypeScript
-- **Database**: Firebase Firestore with real-time updates
-- **Auth**: Firebase Authentication
-- **Styling**: Tailwind CSS v4 (CSS-first config in `src/styles/globals.css`) + shadcn/ui primitives in `src/components/ui/` — see `standards.md`
-- **Theming**: next-themes (class-based dark mode); semantic tokens, never manual DOM/localStorage access
-- **Rich Text**: Tiptap editor for notes functionality
+- `pages/`: thin route files; `pages/api/`: server routes (`upload`, `welcome-email`, `cron/notifications`, `dev/email-preview`)
+- `components/`: markup, by feature; `components/ui/`: shadcn primitives (lowercase) and shared app components
+- `hooks/`: client Firestore reads and writes; `lib/`: Firebase setup, server logic (email, notifications, upload)
+- `utils/`: pure functions; `constants/`, `contexts/`, `types/`; `styles/globals.css`: theme tokens and Tailwind config
+- Outside `src/`: `vercel.json` (cron, function limits); `firestore.rules` at the repo root
 
-## Important Patterns
-- All components follow the existing dark theme pattern using CSS variables
-- Firebase operations should include proper error handling
-- Status updates trigger parent component refreshes via callbacks
-- Local storage is used for user preferences (filters, sorting)
+## Verifying
 
-## File Structure
-- `/src/components/` - Reusable UI components
-- `/src/types/` - TypeScript type definitions
-- `/src/lib/` - Firebase and utility configurations
-- `/src/utils/` - Helper functions
-- `/src/contexts/` - React contexts (Auth, etc.)
-- `/src/pages/` - Next.js pages and API routes
-
-## Testing
-Before committing changes:
-1. Run `npm run lint` to check for code issues
-2. Test in both light and dark modes
-3. Verify responsive behavior on mobile
-4. Check Firebase operations in browser dev tools
-
-## ⚠️ CRITICAL RULE ⚠️
-**NEVER commit or push code automatically. ONLY make file changes and let the user handle all git operations (add, commit, push). The user controls deployment timing and commit messages.**
+- Run the verification loop from `standards.md` and check UI changes in both themes and at mobile width. There are no unit tests yet (A7 in `docs/AUDIT.md`).
+- Never call `/api/cron/notifications` locally with the real `CRON_SECRET`: it reads production data and sends real emails. Test API routes against the emulators; see `docs/ops.md`.
