@@ -1,56 +1,41 @@
-# Claude Development Configuration
+# CLAUDE.md
 
-This file contains important information for Claude Code to understand and work with the Asetta project effectively.
+Asetta monorepo (npm workspaces). Two independent Next.js apps, each deployed as its own Vercel project.
 
-## ⚠️ REQUIRED READING ⚠️
-**Before writing or modifying ANY code, read `standards.md` in this directory.** It is the single
-source of truth for code norms, the shadcn/ui design system, theme tokens, and dark/light mode
-rules. Code that conflicts with `standards.md` is wrong by definition.
+## Layout
 
-## Project Overview
-Asetta is a student assessment management platform built with Next.js, React, TypeScript, and Firebase. It helps students track academic assessments, deadlines, and grades across semesters.
+| Path            | App                                | Domain        | Rules                                                         |
+| --------------- | ---------------------------------- | ------------- | ------------------------------------------------------------- |
+| `apps/web`      | Platform (Next.js 15, Firebase)    | asetta.me     | `apps/web/CLAUDE.md` and `apps/web/standards.md` (required)   |
+| `apps/landing`  | Marketing site (Next.js 16)        | www.asetta.me | `apps/landing/CLAUDE.md`                                      |
 
-## /init
-When working on this project, prioritize:
-1. **User Experience**: Ensure all features are intuitive and cohesive
-2. **Accessibility**: Maintain proper dark mode support and responsive design
-3. **Data Consistency**: Ensure Firebase operations maintain data integrity
-4. **Code Quality**: Follow existing TypeScript patterns and component structure
+- `docs/`: superpowers plans and specs.
+- `.github/workflows/ci.yml`: one CI job covering both apps.
+- Before working in an app, read its rules files. They are the source of truth for that app.
 
-## Key Commands
-- `npm run dev` - Start development server with Turbopack
-- `npm run build` - Build for production
-- `npm run start` - Start production server
-- `npm run lint` - Run ESLint checks
+## Commands (run from the repo root)
 
-## Architecture
-- **Frontend**: Next.js 15 with React 19 and TypeScript
-- **Database**: Firebase Firestore with real-time updates
-- **Auth**: Firebase Authentication
-- **Styling**: Tailwind CSS v4 (CSS-first config in `src/styles/globals.css`) + shadcn/ui primitives in `src/components/ui/` — see `standards.md`
-- **Theming**: next-themes (class-based dark mode); semantic tokens, never manual DOM/localStorage access
-- **Rich Text**: Tiptap editor for notes functionality
+```bash
+npm install            # one root lockfile; never add per-app lockfiles
+npm run dev:web        # platform on localhost:3000
+npm run dev:landing    # marketing site (moves to 3001 if web is already running)
+npm run build          # build both apps
+npm run lint           # lint both apps
+npm run format:check   # Prettier check, both apps
+npm run typecheck      # tsc for apps/web
+```
 
-## Important Patterns
-- All components follow the existing dark theme pattern using CSS variables
-- Firebase operations should include proper error handling
-- Status updates trigger parent component refreshes via callbacks
-- Local storage is used for user preferences (filters, sorting)
+Add a dependency to one app with `npm install <pkg> -w apps/web` (or `-w apps/landing`). Each app pins its own `next` and `eslint-config-next`. Both apps must share one `react`/`react-dom` version, because hoisted packages resolve React from the root.
 
-## File Structure
-- `/src/components/` - Reusable UI components
-- `/src/types/` - TypeScript type definitions
-- `/src/lib/` - Firebase and utility configurations
-- `/src/utils/` - Helper functions
-- `/src/contexts/` - React contexts (Auth, etc.)
-- `/src/pages/` - Next.js pages and API routes
+## Cross-app links
 
-## Testing
-Before committing changes:
-1. Run `npm run lint` to check for code issues
-2. Test in both light and dark modes
-3. Verify responsive behavior on mobile
-4. Check Firebase operations in browser dev tools
+The apps link to each other by URL only; no shared code.
+- `apps/landing/src/lib/site.ts`: `APP_URL` (`https://asetta.me`). Login/register links and the `/login` and `/register` redirects in `apps/landing/next.config.ts` point here.
+- `apps/web/next.config.ts`: production redirects `/`, `/terms`, `/privacy` (and `/legal/*`) to `https://www.asetta.me`.
 
-## ⚠️ CRITICAL RULE ⚠️
-**NEVER commit or push code automatically. ONLY make file changes and let the user handle all git operations (add, commit, push). The user controls deployment timing and commit messages.**
+Change one side and you probably need to change the other.
+
+## Rules
+
+- **No em dashes in copy, in either app.** Use commas, periods, or semicolons. Founder rule.
+- Git: the user handles commits and pushes unless they say otherwise for a specific task (see `apps/web/CLAUDE.md`).

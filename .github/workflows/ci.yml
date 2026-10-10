@@ -6,10 +6,11 @@ on:
   pull_request:
 
 env:
-  # Build-time placeholders only. `next build` initializes the Firebase client SDK
+  # Build-time placeholders for apps/web only. `next build` initializes the Firebase client SDK
   # while prerendering pages, which requires these to be non-empty — but it never
   # contacts Firebase during a build, so dummy values are safe here. Real values
   # live in Vercel, which builds production deploys with its own environment.
+  # apps/landing ignores them.
   NEXT_PUBLIC_FIREBASE_API_KEY: ci-placeholder-api-key
   NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: ci-placeholder.firebaseapp.com
   NEXT_PUBLIC_FIREBASE_PROJECT_ID: ci-placeholder
@@ -31,14 +32,14 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Lint
+      - name: Lint (web + landing)
         run: npm run lint
 
-      - name: Check formatting
+      - name: Check formatting (web + landing)
         run: npm run format:check
 
-      - name: Typecheck
-        run: npx tsc --noEmit
+      - name: Typecheck (web)
+        run: npm run typecheck
 
-      - name: Build
+      - name: Build (web + landing)
         run: npm run build
