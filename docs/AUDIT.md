@@ -39,12 +39,14 @@ branch. Tick the items off and add a session log entry when done. Don't commit.
 | D4 | When do reminders go out, and in which timezone? | A8 | **At 9:30 in each user's own timezone**, taken from their browser. (2026-10-10) |
 | D5 | What is the per-user upload limit? | A18 | **20 files per user per day.** (2026-10-10) |
 | D6 | What runs the reminder job often enough to hit 9:30 local time? Vercel Hobby cron runs once a day and fires anywhere within its hour. | A8 | **GitHub Actions, every 30 minutes**, calling the endpoint with the cron secret. The repo is public, so Actions minutes are free. The Vercel daily cron stays as a backstop. Details and gotchas in A8. (2026-10-10) |
+| D7 | Welcome email for unverified password sign-ups: wait for a verified address, drop the user-chosen name from the subject, or accept the risk? | A30 | |
 
 ## Batches (suggested order)
 
 | Batch | Items | Theme | Notes |
 | --- | --- | --- | --- |
 | B1 | A1 | Welcome email lockdown | Security; small |
+| B16 | A31, A30 | Email redesign | Founder priority: next after B1. A30 rides along (same subject and greeting) once D7 is answered |
 | B2 | A2 | Dependency security patch | Lockfile churn; nodemailer major as its own commit |
 | B3 | A6 | Docs cleanup | Docs only; the D2 part is done |
 | B4 | A7 | Vitest setup + first suites | The next stated goal |
@@ -65,7 +67,8 @@ Until A29 lands, run the format check locally with `npx prettier --check --end-o
 
 ## Fix now
 
-- [ ] **A1 · Lock down `/api/welcome-email`** · S · risk L
+- [x] **A1 · Lock down `/api/welcome-email`** · S · risk L (done 2026-10-10, PR #5)
+  - **Shipped:** the once-per-user marker is a server-only `welcomeEmails/{uid}` doc, not a user-doc field: owners can write any user-doc field today, so they could clear one and re-send without limit. No rule matches `welcomeEmails`, so clients can't touch it (keep it that way in A16). Escaping helper: `apps/web/src/utils/escapeHtml.ts`. Follow-up risk: A30.
   - **Where:** `apps/web/src/pages/api/welcome-email.ts`; `apps/web/src/lib/emailTemplates.ts` (welcome `displayName` :247, `institution` :255; reminder `courseName`/`assessmentTitle` :113-114); only caller `apps/web/src/contexts/AuthContext.tsx:53`.
   - **Problem:** No auth. Anyone can POST any `email` and `displayName`, and the server sends HTML mail from Asetta's Gmail with those values unescaped. That's phishing from your identity, and a Gmail suspension would also stop reminders.
   - **Fix:** Require `Authorization: Bearer <ID token>` and verify it with firebase-admin. Send only to the token's email and ignore the body's. Send at most once per uid (e.g. a `welcomeEmailSentAt` field written with the admin SDK). Escape every interpolated value in both templates with one shared `escapeHtml` (model: `apps/landing/src/pages/api/contact.ts:13`). Fix the AuthContext comment that says the email is for Google users only; it fires for every new user doc.
@@ -120,7 +123,7 @@ Until A29 lands, run the format check locally with `npx prettier --check --end-o
     | --- | --- | --- |
     | `CLAUDE.md` | Update | Add the read order and a doc map. Make it the only home of the git rule and the em dash rule. |
     | `apps/web/CLAUDE.md` | Rewrite to about 20 lines | Per-app commands vs the root's "run from the root"; "Testing" means lint only, contradicting the standards loop; says preferences live in localStorage (they're in Firestore); generic `/init` filler; repeats the git rule. |
-    | `apps/web/standards.md` | Update | Drop the 22-line changelog preamble and the migration-state table (history). Part 2's intro still says "migrating incrementally". Remove references to deleted `CustomSelect`, `card.tsx`, `statusUtils`, `AvatarPicker`/`IconPicker` and the `gray-200` compat block. The selector pattern says "check-marked options" while the Icons section says "no checkmark": keep the Icons rule. Use the root `npm run typecheck` in the loop. Add a Testing section (after A7) and an API/server section (auth before reading the body, validate input, log real failures, escape HTML in email). |
+    | `apps/web/standards.md` | Update | Drop the 22-line changelog preamble and the migration-state table (history). Part 2's intro still says "migrating incrementally". Remove references to deleted `CustomSelect`, `card.tsx`, `statusUtils`, `AvatarPicker`/`IconPicker` and the `gray-200` compat block. The selector pattern says "check-marked options" while the Icons section says "no checkmark": keep the Icons rule. Use the root `npm run typecheck` in the loop. Add a Testing section (after A7) and an API/server section (auth before reading the body, validate input, log real failures, escape HTML in email with `utils/escapeHtml.ts`). |
     | `apps/landing/CLAUDE.md` | Small fixes | Matches the code. Fix the per-app commands and the "Vercel/Netlify-style" deploy line. |
     | `apps/web/README.md` | Move to a root `README.md` | Good content, but written as a standalone repo (`npm run dev` doesn't exist at the root); CI step names are out of date. There is no root README today. |
     | `apps/landing/README.md` | Delete | Written before the rewrite: Next 15, Framer Motion, Outfit/Lexend, `tailwind.config.ts`, `pricing.tsx`, Netlify, Node 18. Contradicts the landing `CLAUDE.md` throughout. |
@@ -140,6 +143,13 @@ Until A29 lands, run the format check locally with `npx prettier --check --end-o
     - standards.md's selector rule vs its icon rule.
     - The git rule is repeated in the root `CLAUDE.md`, web `CLAUDE.md` and standards.md (twice).
   - **Done when:** no doc uses `asetta/` as a working directory, an absolute machine path, `npx tsc --noEmit`, or names deleted files; the git and em dash rules live only in the root `CLAUDE.md`; every path in the CLAUDE files resolves.
+
+- [ ] **A31 · Redesign the welcome and reminder emails** · M · risk L · founder priority (2026-10-10: "it is hideous")
+  - **Where:** `apps/web/src/lib/emailTemplates.ts`, `apps/web/src/lib/email.ts` (subjects, plain-text parts).
+  - **Problem:** Both emails ignore the platform's surface language (standards.md): emoji everywhere (🎉 👋 ✨ 💪 🚀 and one per feature line), a solid amber header band, bordered boxes and a left accent bar, drop shadows, Title Case headings ("Assessment Reminder") and cutesy copy ("Hey there! 👋 Just a friendly heads up", "You've got this! 💪", "Welcome to the Asetta family! 🚀"). No logo; the font is named Manrope, which mail clients won't load. The reminder shows the course name twice and never shows the actual due date or time, only "N days". Styling sits in a `<style>` block with classes, which some clients strip. Nothing links to turning reminders off.
+  - **Fix:** One shared layout for both emails: table-based, inline styles, a ~560px column, system font stack, stone neutrals, amber only on the single button and the logo. The logo as a hosted PNG (Gmail doesn't render SVG; `public/images/` has only `Asetta_Logo.svg` and the favicons today). Copy in the app's quiet voice: sentence case, no emoji, no em dashes. Reminder: the assessment as the emphasized line, the course as supporting text, the due date and time, one "Open Asetta" button, and a footer link to manage reminders in Settings. Welcome: a few lines and one button. Matching plain-text parts. A local preview (render to HTML files or a dev-only page) so changes can be reviewed without sending.
+  - **Pairs with:** A30 (the name in the welcome subject and greeting, D7) and A8 (time zone in the due line, the optional daily digest).
+  - **Done when:** both emails follow standards.md's surface language; they render cleanly in Gmail (web and mobile) and Apple Mail, light and dark; the founder signs off on a test send to their own address.
 
 ## Next
 
@@ -224,7 +234,7 @@ Until A29 lands, run the format check locally with `npx prettier --check --end-o
 - [ ] **A16 · Firestore rules: validate fields** · M · risk M
   - **Where:** `firestore.rules` (the live rules matched this file on 2026-10-10).
   - **Problem:** Owners can write any key, type or size on every doc, including the `email` that reminders go to (see A17). The `documents` and `courses` rules match collections nothing uses.
-  - **Fix:** Allow-list keys and types per collection (user doc, semesters, assessments, coursePreferences); cap string lengths; delete the dead matches. Test in the Firestore emulator before deploying. Agents can't deploy rules (`.claude/settings.json` denies it); the founder deploys.
+  - **Fix:** Allow-list keys and types per collection (user doc, semesters, assessments, coursePreferences); cap string lengths; delete the dead matches. Leave `welcomeEmails` without a client rule (server-only, A1). Test in the Firestore emulator before deploying. Agents can't deploy rules (`.claude/settings.json` denies it); the founder deploys.
   - **Done when:** emulator tests pass for every write the app makes and fail for out-of-schema writes.
 
 - [ ] **A17 · Verify the notification email before sending** · M · risk M · moved from `docs/backlog.md`
@@ -294,6 +304,12 @@ Until A29 lands, run the format check locally with `npx prettier --check --end-o
   - **Fix:** a root `.gitattributes` with `* text=auto eol=lf` (mark binaries such as images and fonts `binary`), then the founder renormalizes once: `git add --renormalize .` in its own commit. No Prettier config change needed.
   - **Done when:** `npm run format:check` passes on a fresh Windows checkout.
 
+- [ ] **A30 · Welcome email to unverified sign-up addresses** · S-M · risk L · needs D7 · found during A1
+  - **Where:** `apps/web/src/pages/api/welcome-email.ts`, `apps/web/src/lib/email.ts` (`sendWelcomeEmail` subject), `apps/web/src/pages/register.tsx`.
+  - **Problem:** Password sign-ups never verify their email, so anyone can register with someone else's address and a display name of their choosing (up to 100 characters, escaped, but plain text such as a URL still shows). Asetta's Gmail then sends that address one welcome email with the name in the subject and greeting. A1 limits this to one email per new account, but accounts are free to create, and each send counts toward the Gmail daily cap (D3).
+  - **Fix (pick with D7):** send the welcome email only once `email_verified` is true (needs a verification step; pairs with A17), or keep sending but leave the name out of the subject (and maybe the greeting), or accept the risk.
+  - **Recommended (2026-10-10):** use the name only when the token says `email_verified` (Google sign-ups); otherwise send the fixed "Welcome to Asetta" with "Hi there". Text an attacker chooses then never reaches an unverified inbox, at the cost of the name for password sign-ups (usually just their email prefix). A few lines in the route; ship it with A31, which rewrites the same subject and greeting. Gating on verification is heavier and belongs with A17. If abuse ever shows up, add a global daily cap on welcome emails so they can't eat the Gmail limit reminders need.
+
 ## Baseline (2026-10-10)
 
 Numbers to compare against when items land.
@@ -330,3 +346,16 @@ Newest last. One entry per session: date, branch, items, what changed, what's le
 - New A29: `npm run format:check` fails locally on all CRLF files (core.autocrlf); the formatting itself is clean. Fix with `.gitattributes`.
 - Untracked `.claude/settings.local.json` in the same commit (the local file stays on disk).
 - No app code changes.
+
+### 2026-10-10 · B1 (`fix/welcome-email-lockdown`, PR #5)
+
+- **A1 done.** `/api/welcome-email` now requires `Authorization: Bearer <ID token>` (verified with firebase-admin) and sends only to the token's email; a body `email` is ignored. The name comes from the body (whitespace collapsed, 100 characters max), falling back to the token's name, then the email's local part. Once per uid: the route creates `welcomeEmails/{uid}` with `create()` (atomic) before sending and deletes it again if the send fails, so a retry is possible. Failures go to `console.error` with the uid and SMTP codes only, never the address. No rules change: nothing matches `welcomeEmails`, so clients are denied.
+- New `apps/web/src/utils/escapeHtml.ts` (copied from the landing contact route); both templates escape every user value (welcome `displayName`, `institution`; reminder `courseName`, `assessmentTitle`). Dropped the unused `email` parameter of `generateWelcomeEmailHTML`.
+- `AuthContext`: sends the ID token and only `displayName`, and no longer awaits the request. It used to hold `loading` true until SMTP finished, despite its "non-blocking" comment. Comment fixed: it fires for every new user doc, not just Google sign-ups.
+- **Verified:** GET gives 405; POST with no header, a non-Bearer header or a junk token gives 401. Against the local Auth and Firestore emulators (dev server on :3005), with a test user on the founder's address: a body email (a `+a1body` alias of the same inbox) was ignored and the mail went to the token's address; a second call returned `sent: false`; two concurrent calls after clearing the marker sent one email; the user's own token gets 403 reading or deleting its marker. Exactly two real emails arrived, both to the founder's address, and the HTML reads `Hi &lt;b&gt;x&lt;/b&gt;!`. The reminder template's escaping was checked by rendering it locally (no send).
+- **Verification loop:** lint, typecheck and build green. `format:check` fails on line endings only (A29: 158 web and 38 landing files); `prettier --check --end-of-line auto .` passes in both apps. Build sizes unchanged.
+- **Left for the founder:** on the Vercel preview, sign up with a fresh address and expect exactly one welcome email. Not tested locally: the browser sign-up flow (it would need a new production account) and the SMTP-failure path that releases the marker.
+- Existing users have no marker. The client only calls the route when the user doc is missing, so nothing changes for them, but a direct call from an existing account would send it one welcome email at its own address.
+- **Gotchas:** the C: drive is full (17.5 MB free), so the Firestore emulator download failed with ENOSPC. Set `FIREBASE_EMULATORS_PATH`, `TEMP`/`TMP` and `JAVA_TOOL_OPTIONS=-Djava.io.tmpdir=<dir>` to folders under `node_modules/.cache/` on E:. The jar (v1.22.0, 131 MB) stays cached in `node_modules/.cache/a1-test/emulators` for A16 (`npm ci` deletes it). Emulator ID tokens are unsigned and only pass when the server has `FIREBASE_AUTH_EMULATOR_HOST` set; set `FIRESTORE_EMULATOR_HOST` with it so no write reaches production. Stopping a background dev server or emulator leaves its node/java children running on Windows; kill them by PID.
+- **New:** A30 and D7 (welcome email to unverified sign-up addresses; recommendation in A30). A31: redesign both emails, founder priority, queued as B16 right after B1.
+- The founder allowed the agent to commit, push and open the PR for this batch only; the founder merges.
