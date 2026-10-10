@@ -75,7 +75,7 @@ Until A29 lands, run the format check locally with `npx prettier --check --end-o
   - **Fix:** Require `Authorization: Bearer <ID token>` and verify it with firebase-admin. Send only to the token's email and ignore the body's. Send at most once per uid (e.g. a `welcomeEmailSentAt` field written with the admin SDK). Escape every interpolated value in both templates with one shared `escapeHtml` (model: `apps/landing/src/pages/api/contact.ts:13`). Fix the AuthContext comment that says the email is for Google users only; it fires for every new user doc.
   - **Done when:** an unauthenticated POST returns 401; a body `email` is ignored; a second call for the same user sends nothing; `<b>x</b>` as a name renders as text.
 
-- [x] **A2 · Patch vulnerable dependencies** · S (M for nodemailer) · risk L/M (done 2026-10-10, branch `fix/dependency-security`, PR not opened yet)
+- [x] **A2 · Patch vulnerable dependencies** · S (M for nodemailer) · risk L/M (done 2026-10-10, PR #7)
   - **Shipped:** web `next` and `eslint-config-next` 15.5.27 (still exact pins); landing `next`, `eslint-config-next` and `@next/third-parties` `~16.3.8`, not 16.4.0, which breaks Pages Router dev under Turbopack (A33); `npm audit fix`; nodemailer 10.1.0 in both apps as its own commit, with `@types/nodemailer` removed (nodemailer 10 ships its own types). `npm audit --omit=dev` went from 46 (1 critical, 12 high) to 38 (0 critical, 5 high); every remaining high and its reason is in the B2 session log.
   - **Where:** `apps/web/package.json:35` (`"next": "15.5.20"`, an exact pin; `eslint-config-next` is pinned the same), `apps/landing/package.json`, `package-lock.json`.
   - **Problem:** `npm audit --omit=dev` reports 46: 1 critical, 12 high, 33 moderate. The critical is `next` in both apps. Highs: `nodemailer` (both apps), a paste XSS in `prosemirror-view` (notes editor), `@firebase/firestore` via `@grpc/grpc-js`, `sharp` and `postcss` (through next), `@fastify/busboy`, `brace-expansion`, `nanoid`, `source-map-js`. The exact pin blocks the 15.5.27 fix.
@@ -409,7 +409,7 @@ Newest last. One entry per session: date, branch, items, what changed, what's le
   - The emulator setup from B1 still works (project `asetta-me`, jar cached in `node_modules/.cache/a1-test/emulators`). The Auth emulator's `projects/{id}/accounts:update` with `Authorization: Bearer owner` sets `emailVerified`.
   - Stopped the dev server and emulators with `taskkill /T` by PID.
 
-### 2026-10-10 · B2 (`fix/dependency-security`)
+### 2026-10-10 · B2 (`fix/dependency-security`, PR #7)
 
 - **A2 done.** After a final sweep the founder asked for a PR; the agent committed, pushed and opened it for this batch only (the founder merges). Three commits: Next pins plus `npm audit fix`; nodemailer 10 on its own; this tracker update.
 - **Part 1:**
