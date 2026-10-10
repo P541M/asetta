@@ -9,7 +9,8 @@ Asetta monorepo (npm workspaces). Two independent Next.js apps, each deployed as
 | `apps/web`      | Platform (Next.js 15, Firebase)    | asetta.me     | `apps/web/CLAUDE.md` and `apps/web/standards.md` (required)   |
 | `apps/landing`  | Marketing site (Next.js 16)        | www.asetta.me | `apps/landing/CLAUDE.md`                                      |
 
-- `docs/`: superpowers plans and specs.
+- `docs/superpowers/`: in-flight plans and specs only. Delete them in the PR that ships the work; git history keeps them, and the rules they produce go into the app's rules files.
+- `docs/AUDIT.md`: the work tracker (checklist with permanent IDs, open decisions, session log). Read it before starting a batch; update it before ending a session.
 - `.github/workflows/ci.yml`: one CI job covering both apps.
 - Before working in an app, read its rules files. They are the source of truth for that app.
 
@@ -38,4 +39,5 @@ Change one side and you probably need to change the other.
 ## Rules
 
 - **No em dashes in copy, in either app.** Use commas, periods, or semicolons. Founder rule.
+- **This repo is the only Asetta codebase.** Never reference, read from, or copy from another folder on the machine. Docs and config use repo-relative paths, never absolute machine paths.
 - Git: the user handles commits and pushes unless they say otherwise for a specific task (see `apps/web/CLAUDE.md`).

@@ -71,8 +71,8 @@ All four green before work is called done. CI (`.github/workflows/ci.yml`) enfor
 GitHub. Agents never run `git commit`/`git push` — the founder owns all git operations.
 
 Note (2026-07-16): `next lint` prints a deprecation warning on Next 15.5 (removal in Next 16).
-The loop is unchanged for now; the pending migration to the ESLint CLI is documented in
-`docs/superpowers/plans/2026-07-16-dependency-pass.md`.
+The loop is unchanged for now; the migration to the ESLint CLI is tracked as A25 in
+`docs/AUDIT.md`.
 
 ---
 
@@ -249,6 +249,9 @@ a tier, the ramp is wrong — update it here, don't invent a sixth size at the c
   class composition. No template-literal class concatenation in new code.
 - **Composition over duplication**: build app-level components (e.g. `AuthShell`) *from*
   primitives (`Button`, `Input`, `Label`, …); don't fork primitive markup.
+- **The notes editor stays slim** (founder call 2026-07-16): Tiptap with StarterKit + Link +
+  Placeholder only (`components/editor/RichTextEditor.tsx`). Underline and text-align were
+  removed on purpose; adding an extension needs a founder decision.
 
 ### Icons (locked 2026-07-16)
 
@@ -449,6 +452,10 @@ never duplicated into component state (the source of the 2026-07-16 flicker fix)
   alert. **Never a native OS color input.** While the popover is open the trigger echoes the
   live draft (the preview must never lag a drag; only the Firestore commit is debounced).
   Duplicate colors across courses are allowed by design (founder call 2026-07-22).
+- **Scope (founder call 2026-07-22)**: colors appear only as the dot beside course names.
+  Deliberately not in the Calendar tab, notification emails, or the ICS export; no
+  per-assessment colors; no color field on the Add assessment form (new courses get the hash
+  default).
 - **Popovers inside blur-scoped editors render without a portal**, so the editor's
   `relatedTarget` containment check keeps working, and the popover stops Escape propagation —
   Escape closes the popover, not its host editor. (The 2026-07-22 swatch-race lesson
@@ -479,6 +486,8 @@ never duplicated into component state (the source of the 2026-07-16 flicker fix)
 
 - One `max-w-3xl` column of stacked `rounded-xl bg-card shadow-soft` cards — Profile,
   Preferences, Notifications — on a single scroll. No tab bar.
+- **Avatars are initials only** (founder call 2026-07-16): `ui/Avatar` renders the first letter
+  of the display name. No photo uploads and no icon picker.
 - **Preferences apply instantly**: theme and display toggles persist per field the moment they
   change (optimistic state, reverted with an inline destructive alert on write failure). No Save
   button on instant-apply cards.
