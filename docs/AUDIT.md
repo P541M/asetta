@@ -144,7 +144,7 @@ Until A29 lands, run the format check locally with `npx prettier --check --end-o
     - The git rule is repeated in the root `CLAUDE.md`, web `CLAUDE.md` and standards.md (twice).
   - **Done when:** no doc uses `asetta/` as a working directory, an absolute machine path, `npx tsc --noEmit`, or names deleted files; the git and em dash rules live only in the root `CLAUDE.md`; every path in the CLAUDE files resolves.
 
-- [x] **A31 · Redesign the welcome and reminder emails** · M · risk L · founder priority (2026-10-10: "it is hideous") (done 2026-10-10, `feat/email-redesign`)
+- [x] **A31 · Redesign the welcome and reminder emails** · M · risk L · founder priority (2026-10-10: "it is hideous") (done 2026-10-10, PR #6)
   - **Shipped:** one shared layout and a builder per email in `lib/emailTemplates.ts`, a hosted amber logo PNG, Manrope with a system fallback, the platform's `sm` button, matching plain-text parts, and the dev preview at `/api/dev/email-preview`. The founder signed off on the test sends. The rules are in standards.md ("Email").
   - **Where:** `apps/web/src/lib/emailTemplates.ts`, `apps/web/src/lib/email.ts` (subjects, plain-text parts).
   - **Problem:** Both emails ignore the platform's surface language (standards.md): emoji everywhere (🎉 👋 ✨ 💪 🚀 and one per feature line), a solid amber header band, bordered boxes and a left accent bar, drop shadows, Title Case headings ("Assessment Reminder") and cutesy copy ("Hey there! 👋 Just a friendly heads up", "You've got this! 💪", "Welcome to the Asetta family! 🚀"). No logo; the font is named Manrope, which mail clients won't load. The reminder shows the course name twice and never shows the actual due date or time, only "N days". Styling sits in a `<style>` block with classes, which some clients strip. Nothing links to turning reminders off.
@@ -310,7 +310,7 @@ Until A29 lands, run the format check locally with `npx prettier --check --end-o
   - **Fix:** a root `.gitattributes` with `* text=auto eol=lf` (mark binaries such as images and fonts `binary`), then the founder renormalizes once: `git add --renormalize .` in its own commit. No Prettier config change needed.
   - **Done when:** `npm run format:check` passes on a fresh Windows checkout.
 
-- [x] **A30 · Welcome email to unverified sign-up addresses** · S-M · risk L · D7 decided · found during A1 (done 2026-10-10, `feat/email-redesign`, PR not opened yet)
+- [x] **A30 · Welcome email to unverified sign-up addresses** · S-M · risk L · D7 decided · found during A1 (done 2026-10-10, PR #6)
   - **Shipped:** the route reads `email_verified` from the verified ID token; only then does the name (body `displayName`, else the token's `name`) reach `welcomeEmail()`, which otherwise sends "Welcome to Asetta" and "Hi there". The unused `institution` body field is gone (the client never sent it, and it was one more piece of attacker-chosen text). A verified account with no name now also gets "Hi there" instead of its email prefix.
   - **Done when** (added at ship time; the item had none): a verified token puts the name in the subject and greeting; an unverified token gets the fixed subject and "Hi there" even when the body sends a name; the once-per-user rule from A1 still holds. All three checked against the emulators (session log).
   - **Where:** `apps/web/src/pages/api/welcome-email.ts`, `apps/web/src/lib/email.ts` (`sendWelcomeEmail` subject), `apps/web/src/pages/register.tsx`.
@@ -368,7 +368,7 @@ Newest last. One entry per session: date, branch, items, what changed, what's le
 - **New:** A30 and D7 (welcome email to unverified sign-up addresses; recommendation in A30). A31: redesign both emails, founder priority, queued as B16 right after B1.
 - The founder allowed the agent to commit, push and open the PR for this batch only; the founder merges.
 
-### 2026-10-10 · B16 (`feat/email-redesign`, not committed)
+### 2026-10-10 · B16 (`feat/email-redesign`, PR #6)
 
 - **D7 decided** as recommended (name only for a verified address). **A30 and A31 done**; the founder signed off on the test sends, then asked for a PR (the agent committed, pushed and opened it for this batch only).
 - **A31.** `lib/emailTemplates.ts` is rewritten as one shared layout plus `reminderEmail()` and `welcomeEmail()`, each returning `{ subject, html, text }`; `lib/email.ts` is one `deliver()` plus `sendReminderEmail` and `sendWelcomeEmail` (the old `sendEmail` and the subject line in `notifications.ts` are gone). The layout is tables, inline light styles, a `prefers-color-scheme` dark block for Apple Mail, a 560px column, the theme tokens, Manrope from Google Fonts with an Outlook guard and a system fallback, the platform's `sm` primary button, and a hidden preheader. New `public/images/email-logo.png` (the mark in amber, 84px, rendered from `Asetta_Logo.svg` with sharp). The reminder shows the assessment, the course and the real due date and time ("Tuesday, October 13 at 11:59 PM"), with a footer link to Settings. The due time is formatted on the server's clock, the same clock `notifications.ts` parses it on; A8 replaces both. The new "Email" section in standards.md records the rules.
