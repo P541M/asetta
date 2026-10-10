@@ -105,7 +105,7 @@ Until A29 lands, run the format check locally with `npx prettier --check --end-o
   - Root `.gitignore`: carry the secret patterns repo-wide (`serviceAccountKey*.json`, `firebase-adminsdk*.json`, `*.pem`); today only `apps/web/.gitignore` has them.
   - **Done when:** verification loop green; the logo renders on `/login` in both themes.
 
-- [x] **A6 · Docs cleanup** · S-M · risk L (done 2026-10-10, branch `docs/a6-cleanup`, PR not opened yet)
+- [x] **A6 · Docs cleanup** · S-M · risk L (done 2026-10-10, PR #8)
   - **Shipped (B3):** a root `README.md` (moved from `apps/web/README.md` and rewritten for the monorepo); `apps/web/README.md` and `apps/landing/README.md` deleted; new `docs/ops.md`; the root `CLAUDE.md` has the read order, a doc map, and the only copy of the git and em dash rules; `apps/web/CLAUDE.md` rewritten to 24 lines; `standards.md` cleaned up per the table below, plus a new "API routes and server code" section; small fixes to `apps/landing/CLAUDE.md`. Still open elsewhere: the standards.md Testing section ships with A7. The `apps/web/.env.example` line of the target structure is dropped (see A5). Details in the B3 session log.
   - **Done 2026-10-10 (D2):** all 12 plans and 3 specs under `docs/superpowers/` deleted (in git history). Their three spec-only decisions now live in `apps/web/standards.md` (notes editor extensions, initials-only avatar, course color scope). The `next lint` note in standards.md points at A25 instead of the deleted plan. The root `CLAUDE.md` says `docs/superpowers/` holds in-flight work only.
   - **Target structure:**
@@ -480,9 +480,9 @@ Newest last. One entry per session: date, branch, items, what changed, what's le
   - C: has about 20 MB free, so npm hit ENOSPC. Set `npm_config_cache` and `TEMP`/`TMP` to folders under `node_modules/.cache/` on E:.
   - Next 16 keeps a versioned Turbopack dev cache in `apps/landing/.next/dev`; deleting it is safe.
 
-### 2026-10-10 · B3 (`docs/a6-cleanup`, no PR yet)
+### 2026-10-10 · B3 (`docs/a6-cleanup`, PR #8)
 
-- **A6 done.** Docs only: no app code, config or dependency changes. Not committed (the founder commits).
+- **A6 done.** Docs only: no app code, config or dependency changes. The founder asked for a PR at the end of the session; the agent committed, pushed and opened it for this batch only (the founder merges).
 - **Files:**
   - New root `README.md`, moved from `apps/web/README.md`: a monorepo layout table, root commands (the old `npm run dev` doesn't exist at the root), `.env.local` blocks for both apps, both Vercel projects, and the CI job as it is (`verify`: install, lint, format check, typecheck, build). It has no pointer to `.env.example`; after the session the founder deleted that file as not needed.
   - Deleted `apps/web/README.md` and `apps/landing/README.md` (the landing one described the pre-rewrite site).
@@ -517,5 +517,5 @@ Newest last. One entry per session: date, branch, items, what changed, what's le
   - Markdown is Prettier-ignored in both apps and nothing checks root-level docs, so the loop can't catch doc problems; the greps above stand in for that.
 - **Tracker updates:** "Ending a session" gained a step to update the docs a change touches. A5's `.env.example` bullet is dropped (the founder deleted the file after B3). A7, A29, A33 and A34 name the doc lines they must update when they land.
 - **New:** A35 (em dashes left in standards.md and the landing `CLAUDE.md`, and whether the root rule should cover docs).
-- **Left for the founder:** review the diff, commit, push and open the PR. `/code-review` was not run: the diff is Markdown only. The Vercel preview only needs a green build (no app changes).
+- **Left for the founder:** review and merge. `/code-review` was not run: the diff is Markdown only. The Vercel preview only needs a green build (no app changes).
 - **Gotchas:** the Write tool saves LF, so git warns "LF will be replaced by CRLF" on the new and rewritten files; harmless (git stores LF either way, and the diff is content only).
