@@ -40,6 +40,7 @@ branch. Tick the items off and add a session log entry when done. Don't commit.
 | D5 | What is the per-user upload limit? | A18 | **20 files per user per day.** (2026-10-10) |
 | D6 | What runs the reminder job often enough to hit 9:30 local time? Vercel Hobby cron runs once a day and fires anywhere within its hour. | A8 | **GitHub Actions, every 30 minutes**, calling the endpoint with the cron secret. The repo is public, so Actions minutes are free. The Vercel daily cron stays as a backstop. Details and gotchas in A8. (2026-10-10) |
 | D7 | Welcome email for unverified password sign-ups: wait for a verified address, drop the user-chosen name from the subject, or accept the risk? | A30 | **Use the name only when the token says `email_verified` (Google sign-ups); everyone else gets a fixed "Welcome to Asetta" and "Hi there".** Small, no sign-up friction, and attacker-chosen text never reaches an unverified inbox. Shipped with A31. (2026-10-10, done the same day) |
+| D8 | `next dev` (16.3.8 and 16.4.0) keeps writing `apps/landing/AGENTS.md`: disable it with `agentRules: false`, gitignore it, or commit it? | A34 | Open. Recommended: `agentRules: false` (details in A34). |
 
 ## Batches (suggested order)
 
@@ -61,7 +62,7 @@ branch. Tick the items off and add a session log entry when done. Don't commit.
 | B13 | A15 | Bundle size | |
 | B14 | A18, A20 | Rate limits (upload quota, contact form) | D5 decided |
 | B15 | A19 | Cron throughput | After A8 |
-| any | A21 to A28 | Later items | As time allows |
+| any | A21 to A28, A33, A34 | Later items | As time allows; A34 needs D8 |
 
 Until A29 lands, run the format check locally with `npx prettier --check --end-of-line auto .` inside each app.
 
@@ -74,7 +75,8 @@ Until A29 lands, run the format check locally with `npx prettier --check --end-o
   - **Fix:** Require `Authorization: Bearer <ID token>` and verify it with firebase-admin. Send only to the token's email and ignore the body's. Send at most once per uid (e.g. a `welcomeEmailSentAt` field written with the admin SDK). Escape every interpolated value in both templates with one shared `escapeHtml` (model: `apps/landing/src/pages/api/contact.ts:13`). Fix the AuthContext comment that says the email is for Google users only; it fires for every new user doc.
   - **Done when:** an unauthenticated POST returns 401; a body `email` is ignored; a second call for the same user sends nothing; `<b>x</b>` as a name renders as text.
 
-- [ ] **A2 · Patch vulnerable dependencies** · S (M for nodemailer) · risk L/M
+- [x] **A2 · Patch vulnerable dependencies** · S (M for nodemailer) · risk L/M (done 2026-10-10, PR #7)
+  - **Shipped:** web `next` and `eslint-config-next` 15.5.27 (still exact pins); landing `next`, `eslint-config-next` and `@next/third-parties` `~16.3.8`, not 16.4.0, which breaks Pages Router dev under Turbopack (A33); `npm audit fix`; nodemailer 10.1.0 in both apps as its own commit, with `@types/nodemailer` removed (nodemailer 10 ships its own types). `npm audit --omit=dev` went from 46 (1 critical, 12 high) to 38 (0 critical, 5 high); every remaining high and its reason is in the B2 session log.
   - **Where:** `apps/web/package.json:35` (`"next": "15.5.20"`, an exact pin; `eslint-config-next` is pinned the same), `apps/landing/package.json`, `package-lock.json`.
   - **Problem:** `npm audit --omit=dev` reports 46: 1 critical, 12 high, 33 moderate. The critical is `next` in both apps. Highs: `nodemailer` (both apps), a paste XSS in `prosemirror-view` (notes editor), `@firebase/firestore` via `@grpc/grpc-js`, `sharp` and `postcss` (through next), `@fastify/busboy`, `brace-expansion`, `nanoid`, `source-map-js`. The exact pin blocks the 15.5.27 fix.
   - **Fix:** Web `next` and `eslint-config-next` to 15.5.27. `npm update` in the landing (`next` 16.4.0 is in range). `npm audit fix` (never `--force`). Then nodemailer 10 (a major, both apps) as its own commit; smoke-test the reminder, welcome and contact emails. If the firebase/grpc high needs a major, move it to A25 and log it.
@@ -289,13 +291,16 @@ Until A29 lands, run the format check locally with `npx prettier --check --end-o
   - `@google/generative-ai` is Google's deprecated legacy SDK; move to `@google/genai` (also unlocks structured output for A9).
   - `pdf-parse` 1.1.1 is from 2018 and unmaintained; move to a maintained parser.
   - Tiptap 2 to 3; firebase 11 to 12 or later.
-  - Web Next 15 to 16, to match the landing. `next lint` is removed in 16; the codemod is `npx @next/codemod@canary next-lint-to-eslint-cli .`.
-  - `@types/node` is `^20` in web while `engines` says Node 22; `@types/react` 19.0 in web vs 19.2 in the landing.
+    - Tiptap 3 clears the Tiptap moderates (`mergeAttributes`, GHSA-cp6q-959q-f8rh); every 2.x is affected. Since A2 the core and StarterKit extensions are 2.27.3 while `@tiptap/react`, `starter-kit`, `pm`, `extension-link` and `extension-placeholder` stay 2.11.7 (`npm audit fix` moved only the transitive ones).
+    - No firebase release clears the `@grpc/grpc-js` high: every `@firebase/firestore` up to firebase 13.0.0 pins `@grpc/grpc-js` `~1.9.0`, and the fix is 1.13.6 or 1.14.5. Why it doesn't apply to us is in the B2 log.
+  - Web Next 15 to 16, to match the landing. `next lint` is removed in 16; the codemod is `npx @next/codemod@canary next-lint-to-eslint-cli .`. It also clears the web `postcss` high (Next 15.5.27 pins `postcss` 8.4.31). Mind A33: 16.4.0 breaks Pages Router dev under Turbopack.
+  - The `uuid` moderate chain (firebase-admin → `@google-cloud/storage` 7 → `gaxios` 6 / `teeny-request` 9). npm calls it fixable, but `npm audit fix` leaves it; firebase-admin 14.5 (in range) moves its Google Cloud dependencies up a major (`@google-cloud/storage` 8, `@google-cloud/firestore` 9), so treat it as its own change.
+  - `@types/node` is `^20` in web while `engines` says Node 22. (`@types/react` and `@types/react-dom` are one shared 19.3.0 since A2.)
 
 - [ ] **A26 · Align tooling across the apps** · S · risk L
   - One root `.prettierrc` and one Prettier version (web `^3.9.5` vs a pinned `3.8.4` in the landing can format differently).
   - Typecheck the landing too (the root `typecheck` covers web only).
-  - Same env var name for the same Gmail credentials (`EMAIL_APP_PASSWORD` in web, `EMAIL_PASS` in the landing); update both Vercel projects together.
+  - Same env var name for the same Gmail credentials (`EMAIL_APP_PASSWORD` in web, `EMAIL_PASS` in the landing); update both Vercel projects together. Check the accounts first: in B2 the landing's local `.env.local` held a different Gmail account than web's, with an app password Gmail rejected (the founder replaced it).
   - `engines` in the landing `package.json`.
   - The code duplication (`cn`, Logo, favicons, amber tokens, logo filter, nodemailer setup, email regex) stays, per the root "no shared code" rule.
 
@@ -304,6 +309,7 @@ Until A29 lands, run the format check locally with `npx prettier --check --end-o
 
 - [ ] **A28 · CI audit step** · S · risk L
   - Add `npm audit --omit=dev --audit-level=high` to `.github/workflows/ci.yml` after A2 (it would fail today). The test step comes with A7.
+  - Still fails after A2 (exit 1): the 5 remaining highs have no in-range fix (B2 log). Needs web Next 16 (A25) and a firebase release that lifts `@grpc/grpc-js`, or a step that tolerates those two advisories by ID.
 
 - [ ] **A29 · Line endings: local format check fails on Windows** · S · risk L · do early (B6)
   - **Problem:** this machine has `core.autocrlf=true`, so the checkout has CRLF line endings, and `npm run format:check` reports "Code style issues" in 159 files of `apps/web` alone; the verification loop can't pass locally. The only difference is line endings: `npx prettier --check --end-of-line auto .` passes. CI (Linux, LF) is unaffected.
@@ -318,12 +324,22 @@ Until A29 lands, run the format check locally with `npx prettier --check --end-o
   - **Fix (pick with D7):** send the welcome email only once `email_verified` is true (needs a verification step; pairs with A17), or keep sending but leave the name out of the subject (and maybe the greeting), or accept the risk.
   - **Recommended (2026-10-10):** use the name only when the token says `email_verified` (Google sign-ups); otherwise send the fixed "Welcome to Asetta" with "Hi there". Text an attacker chooses then never reaches an unverified inbox, at the cost of the name for password sign-ups (usually just their email prefix). A few lines in the route; ship it with A31, which rewrites the same subject and greeting. Gating on verification is heavier and belongs with A17. If abuse ever shows up, add a global daily cap on welcome emails so they can't eat the Gmail limit reminders need.
 
+- [ ] **A33 · Landing back to the current Next 16 once the dev bug is fixed** · S · risk L · found during B2
+  - **Where:** `apps/landing/package.json` (`next`, `eslint-config-next`, `@next/third-parties` are `~16.3.8`).
+  - **Problem:** Next 16.4.0 breaks Pages Router dev under Turbopack: modules a page shares with `_app` never get chunked, so the page server-renders and then dies on hydration with "module factory is not available" (vercel/next.js#99789; reproduced in B2 on `/` and `/contact` from a clean `.next` in a clean browser). `next build` is fine. 16.3.8 is the first release outside every `next` advisory, so the landing is pinned to `~16.3.8` until a fixed release ships.
+  - **Fix:** when a 16.4.x or later release lists #99789 as fixed, move the three back to `^` that version and run `npm run dev:landing` on `/` and `/contact` in a fresh browser profile.
+  - **Done when:** the landing is on the latest 16.x and dev renders every page without the overlay.
+
+- [ ] **A34 · `next dev` writes `apps/landing/AGENTS.md`** · S · risk L · needs D8 · found during B2
+  - **Problem:** on Next 16.3.8 and 16.4.0 (the two B2 ran; 16.2.9 unchecked), `next dev` generates an `AGENTS.md` with a "read the Next.js docs in node_modules" block for AI agents ("Generated AGENTS.md for AI agents. Set `agentRules: false` in next.config to disable."), and re-creates it on every run, so the landing shows an untracked file after each dev session. Web will do the same after its Next 16 move (A25). B2 deleted the generated copy instead of committing it.
+  - **Fix (pick with D8):** set `agentRules: false` in `apps/landing/next.config.ts` (recommended: the CLAUDE.md files are the agents' source of truth, and Claude Code doesn't read `AGENTS.md`), or gitignore `AGENTS.md`, or commit it.
+
 ## Baseline (2026-10-10)
 
 Numbers to compare against when items land.
 
-- `npm audit --omit=dev`: 46 vulnerabilities (1 critical, 12 high, 33 moderate).
-- `apps/web` build: 229 kB First Load JS shared by all pages (`_app` chunk 114 kB); every dashboard route 320 kB; `/login` and `/register` 242 kB; `/onboarding` and `/settings` 285 kB.
+- `npm audit --omit=dev`: 38 vulnerabilities (0 critical, 5 high, 33 moderate) after A2 (2026-10-10; was 46: 1 critical, 12 high, 33 moderate). Including dev dependencies: 43 (10 high).
+- `apps/web` build (Next 15.5.27, after A2): 229 kB First Load JS shared by all pages (`_app` chunk 114 kB); every dashboard route 319 kB (was 320); `/login` and `/register` 242 kB; `/onboarding` 285 kB; `/settings` 284 kB (was 285).
 - Live Firestore rules identical to `firestore.rules`; no Storage rules (Storage unused).
 - Vercel: projects `asetta` (apps/web) and `asetta-landing` (apps/landing), Hobby plan: runtime logs kept 1 hour; cron jobs run at most once a day and fire anywhere within the scheduled hour.
 - Tests: none.
@@ -392,3 +408,65 @@ Newest last. One entry per session: date, branch, items, what changed, what's le
   - Resizing the built-in browser pane clears an emulated viewport; the Chrome DevTools browser gives exact sizes and color schemes.
   - The emulator setup from B1 still works (project `asetta-me`, jar cached in `node_modules/.cache/a1-test/emulators`). The Auth emulator's `projects/{id}/accounts:update` with `Authorization: Bearer owner` sets `emailVerified`.
   - Stopped the dev server and emulators with `taskkill /T` by PID.
+
+### 2026-10-10 · B2 (`fix/dependency-security`, PR #7)
+
+- **A2 done.** After a final sweep the founder asked for a PR; the agent committed, pushed and opened it for this batch only (the founder merges). Three commits: Next pins plus `npm audit fix`; nodemailer 10 on its own; this tracker update.
+- **Part 1:**
+  - Web `next` and `eslint-config-next` 15.5.20 to 15.5.27, still exact pins.
+  - Landing `next`, `eslint-config-next` and `@next/third-parties` `^16.2.9` to `~16.3.8`, not the 16.4.0 A2 expected: 16.4.0 breaks Pages Router dev under Turbopack (A33). 16.3.8 is outside every `next` advisory, and its `postcss` 8.5.23 is patched.
+  - `npm audit fix`:
+    - `prosemirror-view` 1.42.6 (the notes-editor paste XSS), `@fastify/busboy` 3.2.3, `source-map-js`, `nanoid`, `brace-expansion`, `markdown-it`, `js-yaml`, firebase-admin's own `@grpc/grpc-js` 1.14.6 and `@google-cloud/storage` 7.22.0.
+    - It also moved Tiptap's core and StarterKit extensions 2.11.7 to 2.27.3. That doesn't clear the Tiptap moderate (A25), and the direct Tiptap packages stay 2.11.7.
+  - Hoisting side effects: `sharp` 0.35.5 and a root `postcss` 8.5.23 (both security fixes), typescript-eslint 8.71.1 (lint only), and `@types/react`/`@types/react-dom` 19.0 to one shared 19.3.0. The landing typecheck failed with two copies once its `next` sat at the root.
+- **Part 2:**
+  - nodemailer 10.1.0 in both apps (web was on 9.0.3, the landing on 8.0.11).
+  - `@types/nodemailer` removed from both: 10 ships its own declarations, and tsc resolves `nodemailer/dist/esm/nodemailer.d.ts`.
+  - The breaking changes don't touch our code: 9.0 validates TLS on remote attachment, OAuth and proxy fetches (unused); 10.0 needs Node 20+ (we run 22).
+- **Audit:** `npm audit --omit=dev` 46 to 38: 0 critical, 5 high, 33 moderate.
+- **Remaining highs, with reasons:**
+  1. `@grpc/grpc-js` through the firebase client SDK (four entries: `firebase`, `@firebase/firestore`, `@firebase/firestore-compat`, `@grpc/grpc-js`).
+     - Every `@firebase/firestore`, up to firebase 13.0.0, pins `@grpc/grpc-js` `~1.9.0`, so no upgrade, major or not, clears it (noted in A25).
+     - The advisory (GHSA-m9gg-hp2v-232j) is about a gRPC *server* trusting unauthorized client certificates in `getAuthContext`, which we don't run. The client SDK talks to Firestore over WebChannel in the browser, not grpc-js.
+     - npm's only suggestion is a "fix" that downgrades to firebase 9.14.0.
+  2. `postcss` 8.4.31 inside web's `next` 15.5.27, an exact pin by Next.
+     - The advisories are file reads through an attacker-controlled `sourceMappingURL` in CSS compiled at build time. Next compiles only our own CSS.
+     - Clears with web Next 16 (A25).
+  - Dev-only highs (5 more): `braces` → `micromatch` → `fast-glob` under `@next/eslint-plugin-next`, at lint time only. npm's only fix downgrades `eslint-config-next` to 14.
+  - Moderates left: Tiptap (needs Tiptap 3), the `uuid` chain under firebase-admin (A25), and web `next` through that `postcss`.
+- **Smoke tests:**
+  - Previews checked in light and dark with the plain-text parts and shown to the founder before anything was sent.
+  - Three emails sent with the founder's approval, all to the founder's own address:
+    - **Welcome:** through the real `/api/welcome-email` route on the dev server (:3005) against the Auth and Firestore emulators. A verified test user got "Welcome to Asetta, B2 smoke test"; a second call returned `sent: false`; the marker landed in the emulator.
+    - **Reminder:** a scratchpad script sent the preview's subject, HTML and text through nodemailer 10 with `lib/email.ts`'s transport settings (verify, then send), with links and the logo pointed at `https://asetta.me`; Gmail answered 250 OK. The cron route wasn't called (it reads production data).
+    - **Contact form:** submitted on the landing dev server (:3006), `POST /api/contact` 200. The first try failed with `EAUTH 535`: the landing's local `.env.local` held a different Gmail account than web's, with an app password Gmail rejected. The founder replaced it, and the retry sent. The Vercel values may need the same check (A26).
+  - These ran while the landing was briefly on 16.4.0; the web tree they used is identical in the final lockfile (checked entry by entry).
+- **B16 follow-up:** the email logo is live in production (checked 2026-10-10): `https://asetta.me/images/email-logo.png` returns 200 `image/png`, 2,488 bytes.
+- **Verification loop:**
+  - lint, typecheck and build green: web on Next 15.5.27, the landing on 16.3.8 (Turbopack). The landing's `tsc --noEmit` is clean too, and `npm ls --all` shows no invalid or missing packages.
+  - `format:check` fails on line endings only (A29: 161 web and 38 landing files); `prettier --check --end-of-line auto .` passes in both apps.
+  - Web build sizes: dashboard routes 319 kB (was 320), `/settings` 284 kB (was 285), the rest unchanged (Baseline updated).
+- **Final sweep before the PR:**
+  - Fresh audit against the original: the `next` critical is gone in both apps (web `next` is moderate only through its pinned `postcss`). Fixed highs: `nodemailer`, `prosemirror-view`, `sharp`, `@fastify/busboy`, `brace-expansion`, `nanoid`, `source-map-js`, and the landing's `postcss`. Left: the firebase/`@grpc/grpc-js` chain and web's Next-pinned `postcss` (reasons above).
+  - Lockfile: `npm install --package-lock-only` changes nothing; all 827 entries resolve from registry.npmjs.org with integrity hashes; the Linux binaries CI and Vercel need are recorded (`@next/swc-linux-x64-gnu` for 15.5.27 and 16.3.8, sharp, lightningcss, Tailwind oxide).
+  - The sends ran on dev servers (Turbopack), so the production builds were checked too, without sending:
+    - Web is built with webpack. Served with `next start`, `POST /api/welcome-email` and `GET /api/cron/notifications` with no auth both return 401, so `lib/email.ts` (which calls `createTransport` at module load) loads under nodemailer 10. `/api/dev/email-preview` returns 404.
+    - The landing's production bundle loads nodemailer through Turbopack's external alias, which points at 10.1.0; its ESM entry exposes `createTransport` on the default export the contact route imports.
+- **Left for the founder:**
+  - On the Vercel preview:
+    - Open a notes editor and paste some formatted text: Tiptap now mixes 2.27.3 core and extensions with 2.11.7 `react`, `starter-kit`, `link` and `placeholder`, and the editor needs a signed-in account, so it wasn't checked locally.
+    - Click through the landing.
+    - Submit one contact form to confirm the landing's Vercel email credentials.
+  - Delete the three B2 test emails, then merge. `/code-review` was not run: the diff is package manifests, the lockfile and this tracker, with no source changes.
+- **New:** A33 (landing back to the current Next 16 once vercel/next.js#99789 ships), A34 and D8 (`next dev` writes `apps/landing/AGENTS.md`; B2 deleted the generated copy, not committed). A25, A26 and A28 got B2 notes.
+- **Gotchas:**
+  - npm 10.9.8 workspaces misbehave:
+    - `npm update -w apps/landing` updated *every* workspace: web got firebase 11.10, Tiptap 2.27 and firebase-admin's Google Cloud majors. Reverted.
+    - `npm update <names> -w apps/landing` updated the root (web) copies of those names and left the landing's alone.
+    - `npm install next@^16.4.0 -w apps/landing` saved the new spec but left 16.2.9 in the lockfile (an invalid tree that `npm install` would not repair).
+    - What works: name the version in `npm install <pkg>@<range> -w <app>`, then check `npm ls --all`. If the lockfile is stuck, delete that package's entries from `package-lock.json` and its folder, then `npm install`.
+  - Plain `npm ls` only checks top-level dependencies and called an invalid nested `postcss` valid; use `npm ls --all`.
+  - Deleting a nested `next` folder by hand leaves a stale `apps/landing/node_modules/.bin/next` shim (`Cannot find module ...apps\landing\node_modules\next\dist\bin\next`); delete the shim. A fresh `npm ci` never has it.
+  - The landing's `next` and `postcss` now sit at the repo root and web's `next` is nested in `apps/web/node_modules`, the reverse of before.
+  - C: has about 20 MB free, so npm hit ENOSPC. Set `npm_config_cache` and `TEMP`/`TMP` to folders under `node_modules/.cache/` on E:.
+  - Next 16 keeps a versioned Turbopack dev cache in `apps/landing/.next/dev`; deleting it is safe.
