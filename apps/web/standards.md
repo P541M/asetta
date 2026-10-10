@@ -521,6 +521,35 @@ never duplicated into component state (the source of the 2026-07-16 flicker fix)
 - Content-listing overlays (e.g. `DayDetailModal`) may widen to `max-w-md`; `max-w-sm` is the
   confirmation-dialog size.
 
+### Email (locked 2026-10-10)
+
+- **One layout, one builder per email.** `lib/emailTemplates.ts` holds the shared layout and a
+  builder per email (`reminderEmail`, `welcomeEmail`) that returns `{ subject, html, text }`;
+  `lib/email.ts` only delivers. A new email is a new builder on the same layout, never a second
+  layout. Every email has a matching plain-text part and a hidden preheader.
+- **The surface language carries over**: the `--card` surface, one tonal panel for the key detail
+  (`--secondary/50`, the assessment-row tone), one flat amber button at the platform's `sm` size,
+  amber only on that button and the logo mark. No header bands, borders, shadows or emoji.
+  Sentence case, quiet voice, no em dashes. Course color dots stay out of email (see Course
+  colors).
+- **Mail clients are not browsers**: table layout, light theme as inline styles (some clients
+  strip `<style>`); the `<style>` block only adds the dark theme via `prefers-color-scheme`
+  (Apple Mail) and the Apple data-detector reset. Colors are the theme tokens: light inline, dark
+  in the media query. Light/dark follows the reader's mail app, never the Asetta theme setting
+  (the Gmail apps invert on their own; Gmail web is always light).
+- **Type**: Manrope (loaded from Google Fonts, Outlook guarded) first in a system stack; Apple
+  Mail and iOS Mail show it, Gmail and Outlook never load web fonts and fall back. Sizes follow
+  the type ramp: 20px heading, 16px item title, 14px body, 12px footer.
+- **Logo**: `public/images/email-logo.png`, the mark in `--primary` amber on transparent, 84px
+  shown at 28px beside the live-text wordmark (Gmail doesn't render SVG). Regenerate it from
+  `Asetta_Logo.svg` if the mark changes.
+- **Escape every user value** with `utils/escapeHtml.ts` in HTML; collapse whitespace in
+  subjects. The welcome email carries the account name only for a verified address (D7 in
+  `docs/AUDIT.md`).
+- **Preview before sending**: `npm run dev:web`, then open `/api/dev/email-preview` (404 outside
+  development; `format=text` shows the subject and plain text). Test sends go to the founder's
+  own address only.
+
 ### Handoff notes for new sessions
 
 This file + `CLAUDE.md` (which mandates reading it) are the complete context — prior chat history

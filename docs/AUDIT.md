@@ -39,7 +39,7 @@ branch. Tick the items off and add a session log entry when done. Don't commit.
 | D4 | When do reminders go out, and in which timezone? | A8 | **At 9:30 in each user's own timezone**, taken from their browser. (2026-10-10) |
 | D5 | What is the per-user upload limit? | A18 | **20 files per user per day.** (2026-10-10) |
 | D6 | What runs the reminder job often enough to hit 9:30 local time? Vercel Hobby cron runs once a day and fires anywhere within its hour. | A8 | **GitHub Actions, every 30 minutes**, calling the endpoint with the cron secret. The repo is public, so Actions minutes are free. The Vercel daily cron stays as a backstop. Details and gotchas in A8. (2026-10-10) |
-| D7 | Welcome email for unverified password sign-ups: wait for a verified address, drop the user-chosen name from the subject, or accept the risk? | A30 | **Pending.** Recommended: use the name only when the token says `email_verified` (Google sign-ups); everyone else gets a fixed "Welcome to Asetta" and "Hi there". Small, no sign-up friction, and attacker-chosen text never reaches an unverified inbox. Ship with A31. Details in A30. (recommended 2026-10-10) |
+| D7 | Welcome email for unverified password sign-ups: wait for a verified address, drop the user-chosen name from the subject, or accept the risk? | A30 | **Use the name only when the token says `email_verified` (Google sign-ups); everyone else gets a fixed "Welcome to Asetta" and "Hi there".** Small, no sign-up friction, and attacker-chosen text never reaches an unverified inbox. Shipped with A31. (2026-10-10, done the same day) |
 
 ## Batches (suggested order)
 
@@ -54,7 +54,7 @@ branch. Tick the items off and add a session log entry when done. Don't commit.
 | B6 | A5, A29 | Repo hygiene leftovers, line endings | A29 unblocks the local format check |
 | B7 | A10, A14 | Grade math + ICS export, test-first | D1 decided |
 | B8 | A9 | Extraction normalization, test-first | |
-| B9 | A8 | Reminders at 9:30 local time, test-first | D4 and D6 decided |
+| B9 | A8, A32 | Reminders at 9:30 local time, test-first | D4 and D6 decided; A32 is the Settings copy for the new time |
 | B10 | A11, A12 | Data layer: live assessments, user doc | |
 | B11 | A13 | Course names containing "/" | Reproduce first |
 | B12 | A16, A17 | Rules + verified notification email | Founder deploys rules |
@@ -144,7 +144,8 @@ Until A29 lands, run the format check locally with `npx prettier --check --end-o
     - The git rule is repeated in the root `CLAUDE.md`, web `CLAUDE.md` and standards.md (twice).
   - **Done when:** no doc uses `asetta/` as a working directory, an absolute machine path, `npx tsc --noEmit`, or names deleted files; the git and em dash rules live only in the root `CLAUDE.md`; every path in the CLAUDE files resolves.
 
-- [ ] **A31 · Redesign the welcome and reminder emails** · M · risk L · founder priority (2026-10-10: "it is hideous")
+- [x] **A31 · Redesign the welcome and reminder emails** · M · risk L · founder priority (2026-10-10: "it is hideous") (done 2026-10-10, PR #6)
+  - **Shipped:** one shared layout and a builder per email in `lib/emailTemplates.ts`, a hosted amber logo PNG, Manrope with a system fallback, the platform's `sm` button, matching plain-text parts, and the dev preview at `/api/dev/email-preview`. The founder signed off on the test sends. The rules are in standards.md ("Email").
   - **Where:** `apps/web/src/lib/emailTemplates.ts`, `apps/web/src/lib/email.ts` (subjects, plain-text parts).
   - **Problem:** Both emails ignore the platform's surface language (standards.md): emoji everywhere (🎉 👋 ✨ 💪 🚀 and one per feature line), a solid amber header band, bordered boxes and a left accent bar, drop shadows, Title Case headings ("Assessment Reminder") and cutesy copy ("Hey there! 👋 Just a friendly heads up", "You've got this! 💪", "Welcome to the Asetta family! 🚀"). No logo; the font is named Manrope, which mail clients won't load. The reminder shows the course name twice and never shows the actual due date or time, only "N days". Styling sits in a `<style>` block with classes, which some clients strip. Nothing links to turning reminders off.
   - **Fix:** One shared layout for both emails: table-based, inline styles, a ~560px column, system font stack, stone neutrals, amber only on the single button and the logo. The logo as a hosted PNG (Gmail doesn't render SVG; `public/images/` has only `Asetta_Logo.svg` and the favicons today). Copy in the app's quiet voice: sentence case, no emoji, no em dashes. Reminder: the assessment as the emphasized line, the course as supporting text, the due date and time, one "Open Asetta" button, and a footer link to manage reminders in Settings. Welcome: a few lines and one button. Matching plain-text parts. A local preview (render to HTML files or a dev-only page) so changes can be reviewed without sending.
@@ -259,6 +260,11 @@ Until A29 lands, run the format check locally with `npx prettier --check --end-o
   - **Problem:** Validation and escaping are good, but nothing stops bots or repeat submissions, and it all lands in your inbox.
   - **Fix:** A hidden honeypot field plus a simple per-IP limit.
 
+- [ ] **A32 · Settings states the wrong reminder time** · S · risk L · ship with A8 · found during B16
+  - **Where:** the custom-days hint "Notifications will be sent daily at 9:00 PM." in `apps/web/src/components/settings/NotificationsSection.tsx` and `apps/web/src/components/onboarding/steps/NotificationsStep.tsx`.
+  - **Problem:** the cron runs at 21:00 UTC (`vercel.json`), which is 5 PM in Toronto during daylight time and 4 PM in winter, not 9 PM. After A8 it becomes 9:30 in the user's own time zone, so the copy is wrong either way.
+  - **Fix:** in the A8 PR, change both to "around 9:30 in the morning, your time" (or whatever A8 ships).
+
 ## Later
 
 - [ ] **A21 · Merge the two upload forms' logic** · M · risk M
@@ -304,7 +310,9 @@ Until A29 lands, run the format check locally with `npx prettier --check --end-o
   - **Fix:** a root `.gitattributes` with `* text=auto eol=lf` (mark binaries such as images and fonts `binary`), then the founder renormalizes once: `git add --renormalize .` in its own commit. No Prettier config change needed.
   - **Done when:** `npm run format:check` passes on a fresh Windows checkout.
 
-- [ ] **A30 · Welcome email to unverified sign-up addresses** · S-M · risk L · needs D7 · found during A1
+- [x] **A30 · Welcome email to unverified sign-up addresses** · S-M · risk L · D7 decided · found during A1 (done 2026-10-10, PR #6)
+  - **Shipped:** the route reads `email_verified` from the verified ID token; only then does the name (body `displayName`, else the token's `name`) reach `welcomeEmail()`, which otherwise sends "Welcome to Asetta" and "Hi there". The unused `institution` body field is gone (the client never sent it, and it was one more piece of attacker-chosen text). A verified account with no name now also gets "Hi there" instead of its email prefix.
+  - **Done when** (added at ship time; the item had none): a verified token puts the name in the subject and greeting; an unverified token gets the fixed subject and "Hi there" even when the body sends a name; the once-per-user rule from A1 still holds. All three checked against the emulators (session log).
   - **Where:** `apps/web/src/pages/api/welcome-email.ts`, `apps/web/src/lib/email.ts` (`sendWelcomeEmail` subject), `apps/web/src/pages/register.tsx`.
   - **Problem:** Password sign-ups never verify their email, so anyone can register with someone else's address and a display name of their choosing (up to 100 characters, escaped, but plain text such as a URL still shows). Asetta's Gmail then sends that address one welcome email with the name in the subject and greeting. A1 limits this to one email per new account, but accounts are free to create, and each send counts toward the Gmail daily cap (D3).
   - **Fix (pick with D7):** send the welcome email only once `email_verified` is true (needs a verification step; pairs with A17), or keep sending but leave the name out of the subject (and maybe the greeting), or accept the risk.
@@ -359,3 +367,28 @@ Newest last. One entry per session: date, branch, items, what changed, what's le
 - **Gotchas:** the C: drive is full (17.5 MB free), so the Firestore emulator download failed with ENOSPC. Set `FIREBASE_EMULATORS_PATH`, `TEMP`/`TMP` and `JAVA_TOOL_OPTIONS=-Djava.io.tmpdir=<dir>` to folders under `node_modules/.cache/` on E:. The jar (v1.22.0, 131 MB) stays cached in `node_modules/.cache/a1-test/emulators` for A16 (`npm ci` deletes it). Emulator ID tokens are unsigned and only pass when the server has `FIREBASE_AUTH_EMULATOR_HOST` set; set `FIRESTORE_EMULATOR_HOST` with it so no write reaches production. Stopping a background dev server or emulator leaves its node/java children running on Windows; kill them by PID.
 - **New:** A30 and D7 (welcome email to unverified sign-up addresses; recommendation in A30). A31: redesign both emails, founder priority, queued as B16 right after B1.
 - The founder allowed the agent to commit, push and open the PR for this batch only; the founder merges.
+
+### 2026-10-10 · B16 (`feat/email-redesign`, PR #6)
+
+- **D7 decided** as recommended (name only for a verified address). **A30 and A31 done**; the founder signed off on the test sends, then asked for a PR (the agent committed, pushed and opened it for this batch only).
+- **A31.** `lib/emailTemplates.ts` is rewritten as one shared layout plus `reminderEmail()` and `welcomeEmail()`, each returning `{ subject, html, text }`; `lib/email.ts` is one `deliver()` plus `sendReminderEmail` and `sendWelcomeEmail` (the old `sendEmail` and the subject line in `notifications.ts` are gone). The layout is tables, inline light styles, a `prefers-color-scheme` dark block for Apple Mail, a 560px column, the theme tokens, Manrope from Google Fonts with an Outlook guard and a system fallback, the platform's `sm` primary button, and a hidden preheader. New `public/images/email-logo.png` (the mark in amber, 84px, rendered from `Asetta_Logo.svg` with sharp). The reminder shows the assessment, the course and the real due date and time ("Tuesday, October 13 at 11:59 PM"), with a footer link to Settings. The due time is formatted on the server's clock, the same clock `notifications.ts` parses it on; A8 replaces both. The new "Email" section in standards.md records the rules.
+- **Founder feedback on the first preview**, now fixed: the font didn't match the platform (it now loads Manrope; Gmail and Outlook still can't), and the button was too big (it was 44px; it is now the platform's 36px `sm` button). Light/dark stays with the mail app's setting, the standard; the Asetta theme lives in the browser and the server never sees it.
+- **Preview:** dev-only `GET /api/dev/email-preview` (404 unless `NODE_ENV` is development) lists the variants; `format=text` shows the subject and plain text. It renders with the dev server's origin, so the logo loads locally.
+- **A30.** `/api/welcome-email` passes the name only when the token has `email_verified`, and the `institution` body field is gone.
+- **Verified:**
+  - Previews checked in light and dark, at 680px and 390px, and with Manrope stripped (the Gmail fallback); HTML in a name renders as text.
+  - Templates contain no emoji, borders, shadows or old copy; amber only on the button and the logo.
+  - Four emails sent with the founder's approval, all to the founder's own inbox, all landed in Primary. Two design tests went from a scratchpad script that sent the preview HTML with the logo as an inline attachment (the hosted PNG isn't deployed yet). Two went through the real route on the dev server (:3005) against the Auth and Firestore emulators:
+    - Verified test user: "Welcome to Asetta, B16 Verified" / "Hi B16 Verified,".
+    - Unverified test user, whose body sent "Visit evil.example now": "Welcome to Asetta" / "Hi there,", and that text appears nowhere in the HTML or the plain text.
+    - A second call for each returned `sent: false`.
+- **Verification loop:** lint, typecheck and build green; build sizes match the Baseline. `format:check` fails on line endings only (A29: 158 web files); `prettier --check --end-of-line auto .` passes in both apps.
+- **`/code-review` (high) before the PR:** fixed the reminder's "due in" wording, which came from the cron's `floor(ms / day)` count and could contradict the date now shown (due tomorrow 10:00 with the 21:00 UTC run read "due today"; 47 hours out read "due tomorrow"). The email now counts calendar days to `dueAt` on the same clock via the new `calendarDaysUntil` in `utils/dateUtils.ts`, which `getDaysUntil` now wraps. The send decision and the dedupe IDs still use the old count until A8. Also fixed: an empty course name no longer leaves "for  is due" in the subject. Skipped: reminder send failures are still dev-logged only (A3).
+- **Left for the founder:** after deploy, the logo loads from `https://asetta.me/images/email-logo.png`; until then, emails sent by the real routes show no logo (the two A30 test emails are like that), so check one real email after the merge. Check the Vercel preview, then merge.
+- **New:** A32 (Settings and onboarding say reminders go out at 9:00 PM; ships with A8, added to B9).
+- **Gotchas:**
+  - Manrope is installed on this machine, so a local preview shows it even when the web font doesn't load; strip it from the inline styles to see the Gmail fallback.
+  - Gmail builds the inbox snippet from the plain-text part when the email has an attachment, so the design tests' previews skip the preheader; real sends have no attachment and show it.
+  - Resizing the built-in browser pane clears an emulated viewport; the Chrome DevTools browser gives exact sizes and color schemes.
+  - The emulator setup from B1 still works (project `asetta-me`, jar cached in `node_modules/.cache/a1-test/emulators`). The Auth emulator's `projects/{id}/accounts:update` with `Authorization: Bearer owner` sets `emailVerified`.
+  - Stopped the dev server and emulators with `taskkill /T` by PID.

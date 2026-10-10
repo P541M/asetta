@@ -31,9 +31,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const adminApp = await getAdmin();
   let uid: string;
   let email: string | undefined;
+  let emailVerified: boolean | undefined;
   let tokenName: unknown;
   try {
-    ({ uid, email, name: tokenName } = await getAuth(adminApp).verifyIdToken(authHeader.slice(7)));
+    ({
+      uid,
+      email,
+      email_verified: emailVerified,
+      name: tokenName,
+    } = await getAuth(adminApp).verifyIdToken(authHeader.slice(7)));
   } catch {
     return res.status(401).json({ error: "Invalid authentication token" });
   }
@@ -43,9 +49,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(400).json({ error: "No email address on this account" });
   }
 
-  const body = (req.body ?? {}) as { displayName?: unknown; institution?: unknown };
-  const displayName = cleanText(body.displayName) || cleanText(tokenName) || email.split("@")[0];
-  const institution = cleanText(body.institution) || undefined;
+  // D7: password sign-ups never verify their address, so anyone can register someone else's.
+  // Only a verified address (Google sign-ups) gets the name; that keeps text the account holder
+  // chose out of other people's inboxes.
+  const body = (req.body ?? {}) as { displayName?: unknown };
+  const name = emailVerified ? cleanText(body.displayName) || cleanText(tokenName) : "";
 
   // Claim the send before sending. create() is atomic, so concurrent requests for the same user
   // send one email. Clients have no rule for this collection, so only the server can reset it.
@@ -61,7 +69,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   try {
-    await sendWelcomeEmail(displayName, email, institution);
+    await sendWelcomeEmail(email, name || undefined);
   } catch (error) {
     // Release the claim so a later request can retry.
     await sentMarker.delete().catch((deleteError: unknown) => {

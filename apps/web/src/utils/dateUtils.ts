@@ -57,17 +57,19 @@ const startOfDay = (date: Date): Date =>
   new Date(date.getFullYear(), date.getMonth(), date.getDate());
 
 /**
- * Calendar days from `now` to the due date in the viewer's timezone: due
- * tomorrow is 1 whatever the hour. Negative once the due moment has passed,
- * including earlier the same day.
+ * Calendar days from `now` to `dueDate` on the local clock: due tomorrow is 1
+ * whatever the hour. Negative once the due moment has passed, including earlier
+ * the same day.
  */
-export const getDaysUntil = (
-  dateStr: string,
-  timeStr: string = "23:59",
-  now: Date = new Date(),
-): number => {
-  const dueDate = parseLocalDateTime(dateStr, timeStr);
+export const calendarDaysUntil = (dueDate: Date, now: Date = new Date()): number => {
   // Round, not floor: days either side of a DST change are 23 or 25 hours long
   const days = Math.round((startOfDay(dueDate).getTime() - startOfDay(now).getTime()) / MS_PER_DAY);
   return dueDate.getTime() < now.getTime() ? Math.min(days, -1) : days;
 };
+
+/** Calendar days from `now` to a stored due date, in the viewer's timezone. */
+export const getDaysUntil = (
+  dateStr: string,
+  timeStr: string = "23:59",
+  now: Date = new Date(),
+): number => calendarDaysUntil(parseLocalDateTime(dateStr, timeStr), now);

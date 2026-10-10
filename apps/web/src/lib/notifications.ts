@@ -1,6 +1,6 @@
 import { getAdmin } from "./firebase-admin";
 import { getFirestore } from "firebase-admin/firestore";
-import { sendEmail } from "./email";
+import { sendReminderEmail } from "./email";
 import { isValidEmail } from "../utils/validation";
 import { devLog, devError } from "../utils/devLog";
 import type { AssessmentStatus } from "../types/assessment";
@@ -227,20 +227,16 @@ export async function checkAndSendNotifications() {
               continue;
             }
 
-            const subject = `Assessment Reminder: ${assessment.courseName} - ${assessment.assignmentName}`;
-
             devLog(
               `📧 Sending notification for "${assessment.assignmentName}" (${daysUntilDue} days until due)`,
             );
 
             try {
-              await sendEmail(
-                preferences.email,
-                subject,
-                assessment.assignmentName,
-                daysUntilDue,
-                assessment.courseName,
-              );
+              await sendReminderEmail(preferences.email, {
+                assessmentTitle: assessment.assignmentName,
+                courseName: assessment.courseName,
+                dueAt: dueDate,
+              });
 
               // Record the notification to prevent duplicates
               await notificationRef.set({
