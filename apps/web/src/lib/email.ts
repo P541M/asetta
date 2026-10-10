@@ -34,7 +34,7 @@ export async function sendWelcomeEmail(displayName: string, email: string, insti
       devLog("✅ Email transporter connection verified");
     }
 
-    const html = generateWelcomeEmailHTML(displayName, email, institution);
+    const html = generateWelcomeEmailHTML(displayName, institution);
 
     const mailOptions = {
       from: `"Asetta" <${process.env.EMAIL_USER}>`,

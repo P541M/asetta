@@ -1,7 +1,19 @@
 import { NextApiRequest, NextApiResponse } from "next";
+import { getAuth } from "firebase-admin/auth";
+import { FieldValue, getFirestore } from "firebase-admin/firestore";
+import { getAdmin } from "../../lib/firebase-admin";
 import { sendWelcomeEmail } from "../../lib/email";
-import { isValidEmail } from "../../utils/validation";
-import { devLog, devError } from "../../utils/devLog";
+
+const MAX_NAME_LENGTH = 100;
+
+// gRPC status ALREADY_EXISTS, which DocumentReference.create() throws when the doc is there.
+const ALREADY_EXISTS = 6;
+
+/** Collapses whitespace (so a name can't break the subject line) and caps the length. */
+function cleanText(value: unknown): string {
+  if (typeof value !== "string") return "";
+  return value.replace(/\s+/g, " ").trim().slice(0, MAX_NAME_LENGTH);
+}
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "POST") {
@@ -11,63 +23,60 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     });
   }
 
-  const { displayName, email, institution } = req.body;
-
-  // Validate required fields
-  if (!displayName || !email) {
-    return res.status(400).json({
-      error: "Missing required fields",
-      message: "displayName and email are required",
-    });
+  const authHeader = req.headers.authorization;
+  if (!authHeader?.startsWith("Bearer ")) {
+    return res.status(401).json({ error: "Authentication required" });
   }
 
-  // Basic email validation
-  if (!isValidEmail(email)) {
-    return res.status(400).json({
-      error: "Invalid email format",
-      message: "Please provide a valid email address",
-    });
+  const adminApp = await getAdmin();
+  let uid: string;
+  let email: string | undefined;
+  let tokenName: unknown;
+  try {
+    ({ uid, email, name: tokenName } = await getAuth(adminApp).verifyIdToken(authHeader.slice(7)));
+  } catch {
+    return res.status(401).json({ error: "Invalid authentication token" });
+  }
+
+  // The recipient is always the signed-in account's own address; any email in the body is ignored.
+  if (!email) {
+    return res.status(400).json({ error: "No email address on this account" });
+  }
+
+  const body = (req.body ?? {}) as { displayName?: unknown; institution?: unknown };
+  const displayName = cleanText(body.displayName) || cleanText(tokenName) || email.split("@")[0];
+  const institution = cleanText(body.institution) || undefined;
+
+  // Claim the send before sending. create() is atomic, so concurrent requests for the same user
+  // send one email. Clients have no rule for this collection, so only the server can reset it.
+  const sentMarker = getFirestore(adminApp).doc(`welcomeEmails/${uid}`);
+  try {
+    await sentMarker.create({ sentAt: FieldValue.serverTimestamp() });
+  } catch (error) {
+    if ((error as { code?: unknown }).code === ALREADY_EXISTS) {
+      return res.status(200).json({ success: true, sent: false, message: "Already sent" });
+    }
+    console.error("Welcome email: could not record the send", { uid, error });
+    return res.status(500).json({ error: "Email sending failed" });
   }
 
   try {
-    if (process.env.NODE_ENV === "development") {
-      devLog("📧 Welcome email API called");
-    }
-
     await sendWelcomeEmail(displayName, email, institution);
-
-    return res.status(200).json({
-      success: true,
-      message: "Welcome email sent successfully",
-    });
   } catch (error) {
-    devError("❌ Welcome email API error");
+    // Release the claim so a later request can retry.
+    await sentMarker.delete().catch((deleteError: unknown) => {
+      console.error("Welcome email: could not release the send claim", { uid, deleteError });
+    });
 
-    // Check if it's an email service error
-    const emailError = error as {
-      message?: string;
-      code?: string;
-      responseCode?: number;
-    };
+    // Log the codes only: nodemailer's messages can contain the recipient address.
+    const { code, responseCode } = error as { code?: string; responseCode?: number };
+    console.error("Welcome email: send failed", { uid, code, responseCode });
 
-    let errorMessage = "Failed to send welcome email";
-    let statusCode = 500;
-
-    if (emailError.code === "EAUTH") {
-      errorMessage = "Email authentication failed";
-      statusCode = 500;
-    } else if (emailError.code === "ECONNECTION") {
-      errorMessage = "Email service connection failed";
-      statusCode = 503;
-    } else if (emailError.responseCode === 550) {
-      errorMessage = "Invalid email address";
-      statusCode = 400;
-    }
-
-    return res.status(statusCode).json({
+    return res.status(code === "ECONNECTION" ? 503 : 500).json({
       error: "Email sending failed",
-      message: errorMessage,
-      details: process.env.NODE_ENV === "development" ? emailError.message : undefined,
+      message: "Failed to send welcome email",
     });
   }
+
+  return res.status(200).json({ success: true, sent: true, message: "Welcome email sent" });
 }

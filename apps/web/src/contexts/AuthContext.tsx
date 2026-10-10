@@ -5,7 +5,24 @@ import { auth, db } from "../lib/firebase";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { AuthContextType } from "../types/context";
 import { useOnboardingStatus } from "../hooks/useOnboardingStatus";
-import { devLog, devError } from "../utils/devLog";
+import { devError } from "../utils/devLog";
+
+/** Asks the server for the welcome email. It goes to the account's own address, at most once. */
+async function requestWelcomeEmail(usr: User, displayName: string) {
+  try {
+    const token = await usr.getIdToken();
+    const response = await fetch("/api/welcome-email", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ displayName }),
+    });
+    if (!response.ok) {
+      devError("Welcome email request failed");
+    }
+  } catch {
+    devError("Welcome email request error");
+  }
+}
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
@@ -48,24 +65,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           };
           await setDoc(userRef, defaultSettings);
 
-          // Send welcome email for new Google OAuth users (non-blocking)
-          try {
-            const response = await fetch("/api/welcome-email", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                displayName: defaultSettings.displayName,
-                email: defaultSettings.email,
-              }),
-            });
-            if (response.ok) {
-              devLog("Welcome email sent for new Google user");
-            } else {
-              devError("Welcome email failed for new Google user");
-            }
-          } catch {
-            devError("Welcome email error for new Google user");
-          }
+          // Every new user doc (email and Google sign-ups alike) requests the welcome email.
+          // Not awaited: sign-in shouldn't wait on the mail server.
+          void requestWelcomeEmail(usr, defaultSettings.displayName);
         } else {
           // Update lastLogin if document already exists
           await setDoc(userRef, { lastLogin: new Date() }, { merge: true });

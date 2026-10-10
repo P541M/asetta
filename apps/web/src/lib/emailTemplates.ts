@@ -1,13 +1,18 @@
 /**
  * HTML templates for outgoing email (deadline reminders + welcome email).
- * Markup moved verbatim from lib/email.ts.
+ * Markup moved verbatim from lib/email.ts. Every user-supplied value is escaped before it is
+ * interpolated.
  */
+
+import { escapeHtml } from "../utils/escapeHtml";
 
 export function generateEmailHTML(
   assessmentTitle: string,
   daysUntilDue: number,
   courseName: string,
 ): string {
+  const title = escapeHtml(assessmentTitle);
+  const course = escapeHtml(courseName);
   return `
     <!DOCTYPE html>
     <html>
@@ -110,8 +115,8 @@ export function generateEmailHTML(
             <h1 style="margin: 0; font-size: 24px; font-weight: 600;">Assessment Reminder</h1>
           </div>
           <div class="content">
-            <div class="assessment-title">${courseName} - ${assessmentTitle}</div>
-            <p style="margin: 0 0 16px 0; color: #6B7280; font-size: 16px; font-weight: 500;">${courseName}</p>
+            <div class="assessment-title">${course} - ${title}</div>
+            <p style="margin: 0 0 16px 0; color: #6B7280; font-size: 16px; font-weight: 500;">${course}</p>
             <p class="message">Hey there! 👋 Just a friendly heads up about your upcoming assessment. We want to make sure you have everything you need to succeed!</p>
             <div class="due-date">
               <p style="margin: 0; color: #374151;">Time remaining:</p>
@@ -132,11 +137,8 @@ export function generateEmailHTML(
   `;
 }
 
-export function generateWelcomeEmailHTML(
-  displayName: string,
-  email: string,
-  institution?: string,
-): string {
+export function generateWelcomeEmailHTML(displayName: string, institution?: string): string {
+  const name = escapeHtml(displayName);
   return `
     <!DOCTYPE html>
     <html>
@@ -244,7 +246,7 @@ export function generateWelcomeEmailHTML(
             <h1 style="margin: 0; font-size: 28px; font-weight: 600;">Welcome to Asetta! 🎉</h1>
           </div>
           <div class="content">
-            <div class="welcome-title">Hi ${displayName}!</div>
+            <div class="welcome-title">Hi ${name}!</div>
             <p class="message">Thank you for joining Asetta! We're excited to help you manage your academic assessments and stay on top of your studies.</p>
             
             ${
@@ -252,7 +254,7 @@ export function generateWelcomeEmailHTML(
                 ? `
             <div class="user-info">
               <p style="margin: 0; color: #374151; font-weight: 500;">Your Profile:</p>
-              <p style="margin: 8px 0 0 0; color: #6B7280;">📚 ${institution}</p>
+              <p style="margin: 8px 0 0 0; color: #6B7280;">📚 ${escapeHtml(institution)}</p>
             </div>
             `
                 : ""
