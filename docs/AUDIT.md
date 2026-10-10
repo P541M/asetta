@@ -39,7 +39,7 @@ branch. Tick the items off and add a session log entry when done. Don't commit.
 | D4 | When do reminders go out, and in which timezone? | A8 | **At 9:30 in each user's own timezone**, taken from their browser. (2026-10-10) |
 | D5 | What is the per-user upload limit? | A18 | **20 files per user per day.** (2026-10-10) |
 | D6 | What runs the reminder job often enough to hit 9:30 local time? Vercel Hobby cron runs once a day and fires anywhere within its hour. | A8 | **GitHub Actions, every 30 minutes**, calling the endpoint with the cron secret. The repo is public, so Actions minutes are free. The Vercel daily cron stays as a backstop. Details and gotchas in A8. (2026-10-10) |
-| D7 | Welcome email for unverified password sign-ups: wait for a verified address, drop the user-chosen name from the subject, or accept the risk? | A30 | |
+| D7 | Welcome email for unverified password sign-ups: wait for a verified address, drop the user-chosen name from the subject, or accept the risk? | A30 | **Pending.** Recommended: use the name only when the token says `email_verified` (Google sign-ups); everyone else gets a fixed "Welcome to Asetta" and "Hi there". Small, no sign-up friction, and attacker-chosen text never reaches an unverified inbox. Ship with A31. Details in A30. (recommended 2026-10-10) |
 
 ## Batches (suggested order)
 
