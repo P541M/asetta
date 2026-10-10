@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+Guidance for Claude Code in `apps/landing`, the marketing site at www.asetta.me. Global rules (git, copy, commands) are in the root `CLAUDE.md`.
 
 ## Project Overview
 
@@ -8,24 +8,25 @@ Asetta is a landing page for an AI-powered academic management platform. The lan
 
 ## Tech Stack & Architecture
 
-- **Framework**: Next.js 16 (Pages Router, Turbopack) with React 19
+- **Framework**: Next.js 16 (Pages Router, Turbopack) with React 19. `next`, `eslint-config-next` and `@next/third-parties` stay on `~16.3.8` until A33 (16.4.0 breaks dev; see `docs/ops.md`)
 - **Language**: TypeScript (strict mode)
 - **Styling**: Tailwind CSS v4 — CSS-first config via `@theme` in `src/styles/globals.css` (there is **no** `tailwind.config.ts`)
 - **Animations**: Motion (`motion/react`, the renamed framer-motion) — scroll-triggered reveals via the `Reveal` component
 - **Email**: Nodemailer for the contact form
 - **Fonts**: Inter via `next/font` (variable font, CSS variable `--font-inter`)
 - **Analytics**: Google Analytics 4 via `@next/third-parties`
-- **Deployment**: Vercel/Netlify-style static hosting (plus one API route)
+- **Deployment**: Vercel project `asetta-landing` (www.asetta.me); pages are prerendered, plus one API route. See `docs/ops.md`
 
 ## Common Development Commands
 
+Run from the repo root:
+
 ```bash
-npm install      # Install dependencies
-npm run dev      # Start development server (Turbopack)
-npm run build    # Build for production
-npm start        # Start production server
-npm run lint     # Run ESLint (flat config; `next lint` was removed in Next 16)
-npm run format   # Prettier write (printWidth 100; .md files and public/ are ignored)
+npm run dev:landing                   # Dev server (Turbopack; port 3001 if web is already on 3000)
+npm run lint -w apps/landing          # ESLint (flat config; `next lint` was removed in Next 16)
+npm run format -w apps/landing        # Prettier write (printWidth 100; .md files and public/ are ignored)
+npm run format:check -w apps/landing  # Prettier check
+npm run build -w apps/landing         # Production build (`npm run build` builds both apps)
 ```
 
 ## Project Structure
@@ -87,25 +88,23 @@ npm run format   # Prettier write (printWidth 100; .md files and public/ are ign
 
 ## Environment Variables
 
-- `EMAIL_USER`: Gmail account for sending contact form emails
+- `EMAIL_USER`: Gmail account for sending contact form emails (the form needs both email variables)
 - `EMAIL_PASS`: App password for the Gmail account
 - `NEXT_PUBLIC_GA_MEASUREMENT_ID` (optional): GA4 measurement ID
 
+The full matrix for both apps is in `docs/ops.md`.
+
 ## Conventions
 
-- **No em dashes (—) anywhere in copy.** Use commas, periods, or semicolons instead. This is a hard rule from the founder.
+- The root `CLAUDE.md` copy rule applies to every string on the site.
 - Content/copy lives in `src/lib/` data files or page JSX; components stay copy-free where practical
 - All internal/external CTAs route through `ButtonLink`; URLs come from `src/lib/site.ts`
 - Entrance animations use `Reveal`; do not add bespoke CSS keyframe utilities
 - Shared SVG icons live in `src/components/icons.tsx`; native buttons use `Button` from `Button.tsx`
-- Formatting is enforced by Prettier; run `npm run lint`, `npm run format:check`, and `npm run build` before committing
+- Formatting is enforced by Prettier. Before calling work done, run `npm run lint && npm run format:check && npm run build` from the repo root (on Windows, see `docs/ops.md` for the local `format:check` line-ending workaround)
 
 ## Content Strategy
 
 The landing page positions Asetta as a free, AI-powered academic assistant with six core features: AI Extraction, Grade Calculator, Calendar & Deadlines, Semester Organization, Assessment Tracking, and Notes & Documentation. The product is simply free — there is intentionally **no pricing page** (`/pricing` redirects home); free-for-students is stated plainly in the hero and CTAs rather than shouted in badges. Copy is concise and sentence-case; all CTAs direct users to the main application for registration and login.
 
 Legal pages reflect that Asetta is operated from Ontario, Canada: PIPEDA compliance, breach notification, cross-border (US) data storage disclosure, age eligibility (13+), termination, and Ontario governing law/venue. Have a lawyer review before relying on them.
-
-## Known Issues/Limitations
-
-- Contact form requires Gmail SMTP setup (`EMAIL_USER`/`EMAIL_PASS`) for production use

@@ -2,36 +2,14 @@
 
 **This file is the single source of truth for code norms and UI styling/theming on the main
 platform.** Read it before writing or reviewing any code. If a change conflicts with this file,
-either the change is wrong or this file must be updated in the same commit — never let them drift.
-
-Last updated: 2026-09-24 (v4.3.1 — due dates are local calendar days read from a live clock
-(`getDaysUntil` + `hooks/useNow`); blur-scoped editors are focusable containers so macOS
-button clicks don't close them.
-v4.3 2026-07-22: course colors: user-chosen hex per course via a custom
-picker (`ui/CourseColorPicker` on the new `ui/popover` primitive, react-colorful canvas),
-rendered inline-style as the sanctioned user-data exception; the course-dot recipe;
-name-hash preset defaults via `constants/courseColors.ts`; grade-calculator tiles and
-breakdown aligned to the stat-label and shared-grid-template recipes.
-v4.2 2026-07-22: dashboard chrome codified: one-bar anatomy with an
-item-title-tier greeting, underline tabs on desktop, fixed bottom nav on mobile, Add as the
-chrome's primary CTA (actions never pose as navigation), chrome spacing rule; assessments-table
-shared grid template recipe; course-card recipe; shared urgency helpers in `utils/urgency.ts`;
-same-day polish: menu items separated by `space-y-1`, breadcrumb titles for filtered views,
-the `hover:bg-accent/50` list-row hover recipe, micro-motion capped at ~150ms, mounted-tab
-memoization + lazy-loaded notes editor.
-v4.1 2026-07-16: 2026-07 housekeeping recipes codified: icon rules, panel-header
-+ empty-state recipes, settings stacked-sections layout with instant preferences, URL-derived
-context-switcher state. v4.0 2026-07-15: **migration complete** — every section is on the
-shadcn/Tailwind-v4 system and the legacy token families and utilities are deleted from
-`globals.css` (grep-proofed); this file describes the steady state. Surface language unchanged
-since the 2026-07-14 v3 lock: borderless tonal surfaces, filled inputs, flat buttons, View
-Transitions theme crossfade).
+either the change is wrong or this file must be updated in the same change; never let them drift.
+It holds current rules only; history lives in the `docs/AUDIT.md` session log and in git.
 
 ---
 
-## Part 1 — Code Standards
+## Part 1: Code standards
 
-These were established during the 2026-07 codebase overhaul. All new code must follow them.
+All new code follows these.
 
 ### Architecture & file layout
 
@@ -53,7 +31,8 @@ These were established during the 2026-07 codebase overhaul. All new code must f
 
 - TypeScript strict; no `any` in new code (parsed JSON at API boundaries is the one exception,
   validated immediately).
-- Prettier (printWidth 100) is enforced — run `npm run format`; ESLint must stay at zero warnings.
+- Prettier (printWidth 100) is enforced: `npm run format -w apps/web` writes fixes. ESLint must
+  stay at zero warnings.
 - `console.error`/`console.warn` for real failures only; dev-only logging via `utils/devLog.ts`;
   no informational `console.log`.
 - No dead code: unused exports, unreachable branches, and "just in case" props get deleted, not
@@ -61,26 +40,47 @@ These were established during the 2026-07 codebase overhaul. All new code must f
 - Comments explain constraints the code can't express (see the adjust-state-during-render note in
   `UnifiedDashboardPage.tsx`), never narrate what the next line does.
 
+### API routes and server code
+
+- **Authenticate before reading the body.** Verify the `Authorization: Bearer <ID token>` with
+  firebase-admin first, so an unauthenticated request never gets parsed or written to disk.
+  Act only on the identity in the token (its uid and email), never on a uid or email address
+  from the body.
+- **Validate every input** at the boundary: method, types, lengths, and path-segment safety for
+  anything used in a Firestore path (no `/`). Reject with a 4xx and a short message.
+- **Server-only state is written with the admin SDK** into collections no client rule matches
+  (e.g. `welcomeEmails/{uid}`). Client-writable fields on the user doc are never trusted as a
+  server guard.
+- **Log real failures with `console.error`** (no email addresses or other personal data in
+  logs; uids and error codes are fine). `devLog`/`devError` print in development only, so they
+  never carry a production failure.
+- **Escape every user value in email HTML** with `utils/escapeHtml.ts` (see "Email" in Part 2).
+- Secrets come from env vars only (the matrix is in `docs/ops.md`); a route whose secret is unset
+  fails closed.
+- Known gaps, don't copy them: the cron route accepts an unset secret and dev-logs its failures
+  (A3), and the upload route parses the body before checking the token (A4).
+
 ### Verification loop (every task, no exceptions)
 
+From the repo root:
+
 ```
-npm run lint && npm run format:check && npx tsc --noEmit && npm run build
+npm run lint && npm run format:check && npm run typecheck && npm run build
 ```
 
-All four green before work is called done. CI (`.github/workflows/ci.yml`) enforces the same on
-GitHub. Agents never run `git commit`/`git push` — the founder owns all git operations.
+All four green before work is called done. CI (`.github/workflows/ci.yml`) runs the same steps on
+GitHub. On Windows, stop any dev server first, and see `docs/ops.md` for the local line-ending
+workaround for `format:check` (A29).
 
-Note (2026-07-16): `next lint` prints a deprecation warning on Next 15.5 (removal in Next 16).
-The loop is unchanged for now; the migration to the ESLint CLI is tracked as A25 in
-`docs/AUDIT.md`.
+`next lint` prints a deprecation warning on Next 15.5 (it is removed in Next 16); the move to the
+ESLint CLI is A25 in `docs/AUDIT.md`.
 
 ---
 
-## Part 2 — UI System (shadcn/ui on Tailwind v4)
+## Part 2: UI system (shadcn/ui on Tailwind v4)
 
-Asetta is migrating to **shadcn/ui** on **Tailwind CSS v4**, **incrementally, section by section**
-(auth flow migrated first). Until a section is migrated it keeps the legacy styling; once migrated
-it must contain **zero** legacy styling.
+Every screen is built on **shadcn/ui** primitives on **Tailwind CSS v4**, styled only with the
+semantic tokens below. There is no legacy styling left to preserve.
 
 ### Tailwind v4 conventions
 
@@ -91,10 +91,9 @@ it must contain **zero** legacy styling.
 - Standalone CSS files that use `@apply` must start with `@reference "./globals.css";`
   (see `rich-text-editor.css`).
 - v4 renamed some utilities (`shadow-sm`→`shadow-xs` era names, `rounded`→`rounded-sm`,
-  `outline-none`→`outline-hidden`); the upgrade tool already converted the codebase — write the
-  new names.
-- The `border-color: gray-200` compatibility block in `globals.css` exists for legacy pages;
-  new code always states its border color explicitly.
+  `outline-none`→`outline-hidden`); write the v4 names.
+- v4 borders default to `currentColor`: always state the border color explicitly
+  (`border-border`).
 - **Clickable always shows the pointer cursor** (2026-07-22). v4's preflight stopped setting
   `cursor: pointer` on buttons; `globals.css` restores it for `button:not(:disabled)` and
   `[role="button"]:not(:disabled)`, and `DropdownMenuItem` is `cursor-pointer`. Don't add
@@ -124,7 +123,7 @@ are what make Asetta look like Asetta and not a default shadcn app:
 - **Headings are solid `foreground`** — no colored/highlighted words. Amber appears only on
   primary buttons, the logo, links, and focus rings.
 - **Shadows**: `shadow-soft` for elevated cards/panels; nothing heavier without a reason.
-- **Copy**: sentence case, quiet voice, no em dashes (founder rule shared with the landing).
+- **Copy**: sentence case, quiet voice; the root `CLAUDE.md` copy rule applies.
 
 ### Forms & auth patterns (locked 2026-07-14)
 
@@ -209,7 +208,7 @@ tracking-tight` in **sentence case** ("Welcome back", not "Welcome Back").
 
 ### Type ramp (locked 2026-07-15)
 
-Five tiers; every piece of text in migrated code states its tier explicitly. If text doesn't fit
+Five tiers; every piece of text in app code states its tier explicitly. If text doesn't fit
 a tier, the ramp is wrong — update it here, don't invent a sixth size at the call site.
 
 | Tier | Classes | Used for |
@@ -229,17 +228,16 @@ a tier, the ramp is wrong — update it here, don't invent a sixth size at the c
   assignment) is the emphasized text, its grouping labels (course) are supporting.
 - The `h1`–`h6` base styles in `globals.css` are retained as a semantic baseline (they use
   `text-foreground` + the tier sizes) so bare headings — e.g. rich-text notes content — render
-  sensibly; migrated components still set their tier classes explicitly rather than relying on it.
+  sensibly; components still set their tier classes explicitly rather than relying on it.
 - Deliberate exception: the auth brand panel hero (`text-5xl/6xl`) is marketing-scale on purpose
   (shared with the landing); nothing inside the app uses it.
 
 ### Component rules
 
 - **shadcn primitives live in `src/components/ui/` with lowercase filenames** (`button.tsx`,
-  `input.tsx`, `card.tsx`, …) — the shadcn CLI convention. Existing PascalCase files in the same
-  folder (`CustomSelect.tsx`, `EmptyState.tsx`, …) are legacy app components; the casing makes
-  the distinction visible at a glance. Legacy ones are replaced or rebuilt on primitives as their
-  sections are migrated.
+  `input.tsx`, `dropdown-menu.tsx`, ...), the shadcn CLI convention. PascalCase files in the same
+  folder (`EmptyState.tsx`, `PanelHeader.tsx`, ...) are shared app components built on those
+  primitives; the casing makes the distinction visible at a glance.
 - **Customize centrally, never at call sites.** Asetta's look is achieved by editing the variant
   definitions inside the primitive files (cva variants) and the theme tokens — *not* by piling
   override classes onto `<Button className="…">` at usage sites. If a call site needs more than
@@ -283,15 +281,13 @@ a tier, the ramp is wrong — update it here, don't invent a sixth size at the c
 - **Semantic tokens are CSS variables** defined once in `globals.css` for `:root` (light) and
   `.dark` (dark). Because tokens flip with the theme, new components need **no `dark:` variants**
   except for genuinely asymmetric cases (e.g. shadows that only exist in light mode).
-- **Exact token values ("Theme Tokens" table): locked during the auth-flow redesign** and recorded
-  here. Brand anchor: Asetta amber (`#D97706` light / `#F59E0B` dark) as `--primary`, preserved
-  from the current design.
-- **Legacy tokens are gone.** The `light-*`/`dark-*` families and the `.btn-*`/`.input`/`.form-*`/
-  `.card*`/`.badge*`/`.modal-*` utilities were removed from `globals.css` once the migration
-  completed (2026-07-15, each grep-proofed). Do not reintroduce them — reach for a semantic token
-  or a `ui/` primitive. What remains in `globals.css` is intentional: semantic tokens, the radius/
-  shadow/font/animation `@theme` scales, safe-area utilities, scrollbar styling, the `h1`–`h6`
-  baseline, and the SVG logo filters.
+- **Exact token values are locked** in the "Theme tokens" table. Brand anchor: Asetta amber
+  (`#D97706` light / `#F59E0B` dark) as `--primary`.
+- **No legacy styling.** The old `light-*`/`dark-*` token families and the `.btn-*`/`.input`/
+  `.form-*`/`.card*`/`.badge*`/`.modal-*` utilities no longer exist; reintroducing any of them is
+  a regression. Reach for a semantic token or a `ui/` primitive. What `globals.css` holds is
+  intentional: semantic tokens, the radius/shadow/font/animation `@theme` scales, safe-area
+  utilities, scrollbar styling, the `h1` to `h6` baseline, and the SVG logo filters.
 
 ### Dark/light mode rules
 
@@ -312,7 +308,7 @@ a tier, the ramp is wrong — update it here, don't invent a sixth size at the c
 - Components must render correctly in both themes *by construction* (semantic tokens). Any
   `dark:` override in new code needs a comment justifying it.
 
-### Quality bar for every migrated screen
+### Quality bar for every screen
 
 - Keyboard: visible `focus-visible` rings on all interactive elements; logical tab order.
 - Existing `aria-label`s and form semantics are preserved or improved, never dropped.
@@ -320,33 +316,17 @@ a tier, the ramp is wrong — update it here, don't invent a sixth size at the c
 - Motion is subtle and respects `prefers-reduced-motion`.
 - Manually verified in **both themes** and at mobile width before the task is called done.
 
-### Migration state
-
-| Section | Status |
-| --- | --- |
-| Theme engine (next-themes) + tokens + primitives (`button`, `input`, `label`, `card`, `alert`, `dropdown-menu`, `password-input`, `checkbox`, `switch`, `popover`) | ✅ migrated 2026-07-14 (checkbox 07-15, switch 07-15, popover added 07-22) |
-| Auth flow (login/register/reset) | ✅ migrated 2026-07-14 |
-| Dashboard shell (header, user menu, tabs, semester bar, stats, page frame, body base styles) | ✅ migrated 2026-07-14 |
-| Modals pass (`ConfirmationModal`, semester manage/delete modals, notes modal incl. rich-text editor toolbar/content + link modal, extraction success, API limit, `DayDetailModal`) | ✅ migrated 2026-07-15 — all overlays are on the recipe; the `.modal-*` classes are deleted |
-| Onboarding (wizard shell + 6 steps + `OnboardingUploadForm`; new `switch` primitive; `Avatar`/`AvatarPicker`/`IconPicker` rebuilt on tokens) | ✅ migrated 2026-07-15 |
-| Assessments table (incl. course-filtered view; `StatusSelect` rebuilt on primitives as a tinted status chip, new `checkbox` primitive) | ✅ migrated 2026-07-15 |
-| Courses tab (`CoursesOverviewTable`: tonal keyboard-accessible course cards) | ✅ migrated 2026-07-15 |
-| Grades / Calendar / Add (grade calculator + tonal stat tiles, calendar grid + `DayDetailModal`, upload/quick-add forms; `EmptyState`/`LoadingSpinner`/`RateLimitNotice` rebuilt on tokens; `CustomSelect`, `ErrorMessage`, `utils/statusUtils.ts` deleted — status tints all come from `statusTintClasses`) | ✅ migrated 2026-07-15 |
-| Settings (profile, preferences incl. Light/Dark/System theme selector, notifications; nav on the tab-bar recipe; `Switch` for all toggles) + last pages (`404`, `index`) | ✅ migrated 2026-07-15 |
-
-**Migration complete (v4.0).** Every section is on the shadcn/Tailwind-v4 system; the legacy
-`light-*`/`dark-*` tokens and `.btn-*`/`.input`/`.form-*`/`.card*`/`.badge*` utilities are gone
-from `globals.css`. Any reintroduction of a `light-*`/`dark-*` class or a legacy utility is a
-regression.
+### Theme control and context switchers
 
 **Placement rule for the theme control** (founder decision, 2026-07-14): the light/dark
-`ThemeToggle` is on auth pages only; inside the app theme lives ONLY in Settings → Preferences
-(the Light/Dark/System selector) — not in the header or user menu. Theme is a set-and-forget
+`ThemeToggle` is on auth pages only; inside the app, theme lives ONLY in Settings → Preferences
+(the Light/Dark/System selector), not in the header or user menu. Theme is a set-and-forget
 preference, not a daily control.
 
 **Selector pattern** (founder decision, 2026-07-14): context switchers (semester, and future
-course/term pickers) are a single dropdown control — current value + check-marked options +
-related actions (add/manage) in one menu. No pill rows with satellite icon buttons.
+course/term pickers) are a single dropdown control: current value + options, the selected one
+tinted per "Icons" (no checkmark), + related actions (add/manage) in one menu. No pill rows with
+satellite icon buttons.
 Context-switcher state derives from the URL: the active semester is the `[semester]` route
 segment (first semester when absent), switching is just a `router.push`, and selection state is
 never duplicated into component state (the source of the 2026-07-16 flicker fix).
@@ -530,8 +510,7 @@ never duplicated into component state (the source of the 2026-07-16 flicker fix)
 - **The surface language carries over**: the `--card` surface, one tonal panel for the key detail
   (`--secondary/50`, the assessment-row tone), one flat amber button at the platform's `sm` size,
   amber only on that button and the logo mark. No header bands, borders, shadows or emoji.
-  Sentence case, quiet voice, no em dashes. Course color dots stay out of email (see Course
-  colors).
+  Copy follows "Surface language". Course color dots stay out of email (see Course colors).
 - **Mail clients are not browsers**: table layout, light theme as inline styles (some clients
   strip `<style>`); the `<style>` block only adds the dark theme via `prefers-color-scheme`
   (Apple Mail) and the Apple data-detector reset. Colors are the theme tokens: light inline, dark
@@ -552,10 +531,7 @@ never duplicated into component state (the source of the 2026-07-16 flicker fix)
 
 ### Handoff notes for new sessions
 
-This file + `CLAUDE.md` (which mandates reading it) are the complete context — prior chat history
-is NOT required. **The section-by-section migration is complete (v4.0):** every section is on the
-shadcn/Tailwind-v4 system and the legacy CSS is gone. This file now describes the steady state,
-not a migration in progress. New work is ordinary feature/fix work under these rules — semantic
-tokens and `ui/` primitives only, no `light-*`/`dark-*` classes, customize primitives centrally
-(never at call sites), run the Part 1 verification loop after every task, and the founder owns all
-git operations (never the agent).
+This file, the root `CLAUDE.md` and `apps/web/CLAUDE.md` are the complete context; prior chat
+history is not required. In short: semantic tokens and `ui/` primitives only, customize
+primitives centrally (never at call sites), and run the Part 1 verification loop after every
+task. Open work and its decisions are in `docs/AUDIT.md`.
