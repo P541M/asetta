@@ -18,8 +18,9 @@ branch. Tick the items off and add a session log entry when done. Don't commit.
 1. Run the verification loop from the repo root: `npm run lint && npm run format:check && npm run typecheck && npm run build` (add `npm test` once A7 lands).
 2. Tick finished items and note the date and PR: `- [x] **A1 · ...** (done 2026-10-12, PR #4)`. If an item is only partly done, leave it unticked and say what's left in the log.
 3. Add a session log entry at the bottom: branch, items, what changed, what's left, gotchas.
-4. Anything new you found becomes a new item with the next free ID. Don't fold it into the current batch.
-5. Run `/code-review` and check the Vercel preview. The founder commits, pushes and merges.
+4. Update the docs the change touches: rules in the CLAUDE files or `apps/web/standards.md`; deploy, cron, env, rules and npm facts in `docs/ops.md`.
+5. Anything new you found becomes a new item with the next free ID. Don't fold it into the current batch.
+6. Run `/code-review` and check the Vercel preview. The founder commits, pushes and merges.
 
 **Rules:**
 
@@ -62,7 +63,7 @@ branch. Tick the items off and add a session log entry when done. Don't commit.
 | B13 | A15 | Bundle size | |
 | B14 | A18, A20 | Rate limits (upload quota, contact form) | D5 decided |
 | B15 | A19 | Cron throughput | After A8 |
-| any | A21 to A28, A33, A34 | Later items | As time allows; A34 needs D8 |
+| any | A21 to A28, A33 to A35 | Later items | As time allows; A34 needs D8 |
 
 Until A29 lands, run the format check locally with `npx prettier --check --end-of-line auto .` inside each app.
 
@@ -97,14 +98,15 @@ Until A29 lands, run the format check locally with `npx prettier --check --end-o
 
 - [ ] **A5 · Repo hygiene leftovers from the merge** · S · risk L
   - `.claude/settings.local.json` is committed but personal. Done 2026-10-10: the 4 entries pointing at the old project folder are removed, the file is in the root `.gitignore`, and git no longer tracks it. Optionally prune its broad allows (`Bash(rm:*)`, `Bash(curl:*)`, `Bash(env)`).
-  - `apps/web/.env.example` exists but `.env*` in `apps/web/.gitignore` hides it, and the README points to it. Add `!.env.example`; check it holds placeholders only.
+  - ~~Commit `apps/web/.env.example` (hidden by `.env*` in `apps/web/.gitignore`).~~ Dropped 2026-10-10: the founder deleted the file as not needed (git never tracked it). The env lists live in the root `README.md` and `docs/ops.md`.
   - `.refactor-baseline/` lines in `apps/landing/.gitignore` and `apps/landing/.prettierignore`: remove.
   - `apps/web/next.config.ts`: `images.remotePatterns` is dead (no remote images; Storage is unused and has no rules). Remove it. Check whether `dangerouslyAllowSVG` is still needed for the logo (the landing renders the same SVG without it).
   - Em dashes in user-facing copy: `apps/web/src/lib/upload/constants.ts:46,53` and `apps/web/src/lib/uploadClient.ts:56,65`.
   - Root `.gitignore`: carry the secret patterns repo-wide (`serviceAccountKey*.json`, `firebase-adminsdk*.json`, `*.pem`); today only `apps/web/.gitignore` has them.
   - **Done when:** verification loop green; the logo renders on `/login` in both themes.
 
-- [ ] **A6 · Docs cleanup** · S-M · risk L
+- [x] **A6 · Docs cleanup** · S-M · risk L (done 2026-10-10, branch `docs/a6-cleanup`, PR not opened yet)
+  - **Shipped (B3):** a root `README.md` (moved from `apps/web/README.md` and rewritten for the monorepo); `apps/web/README.md` and `apps/landing/README.md` deleted; new `docs/ops.md`; the root `CLAUDE.md` has the read order, a doc map, and the only copy of the git and em dash rules; `apps/web/CLAUDE.md` rewritten to 24 lines; `standards.md` cleaned up per the table below, plus a new "API routes and server code" section; small fixes to `apps/landing/CLAUDE.md`. Still open elsewhere: the standards.md Testing section ships with A7. The `apps/web/.env.example` line of the target structure is dropped (see A5). Details in the B3 session log.
   - **Done 2026-10-10 (D2):** all 12 plans and 3 specs under `docs/superpowers/` deleted (in git history). Their three spec-only decisions now live in `apps/web/standards.md` (notes editor extensions, initials-only avatar, course color scope). The `next lint` note in standards.md points at A25 instead of the deleted plan. The root `CLAUDE.md` says `docs/superpowers/` holds in-flight work only.
   - **Target structure:**
     ```
@@ -115,7 +117,7 @@ Until A29 lands, run the format check locally with `npx prettier --check --end-o
     docs/superpowers/       in-flight plans/specs only; deleted in the PR that ships them
     apps/web/CLAUDE.md      about 20 lines: app commands, where things live, tests; points to standards.md
     apps/web/standards.md   current rules only, plus Testing and API/server sections
-    apps/web/.env.example   committed (A5)
+    apps/web/.env.example   dropped (A5): the env lists are in README.md and docs/ops.md
     apps/landing/CLAUDE.md  same role, small fixes
     ```
   - **Read order for Claude:** root `CLAUDE.md`, then the app's `CLAUDE.md`, then `apps/web/standards.md` (web only), then `docs/AUDIT.md` when picking work, then `docs/ops.md` for deploy, cron and env.
@@ -157,7 +159,7 @@ Until A29 lands, run the format check locally with `npx prettier --check --end-o
 ## Next
 
 - [ ] **A7 · Vitest setup + first suites (grade, date, parsing)** · M · risk L
-  - **Where:** `apps/web` (new `vitest.config.ts`, a `test` script), root `package.json` (`npm test`), `.github/workflows/ci.yml`, `apps/web/standards.md` (Testing section).
+  - **Where:** `apps/web` (new `vitest.config.ts`, a `test` script), root `package.json` (`npm test`), `.github/workflows/ci.yml`, `apps/web/standards.md` (Testing section, and `npm test` in the verification loop), `apps/web/CLAUDE.md` ("Verifying" says there are no unit tests yet), the root `README.md` checks list.
   - **Setup:** Vitest in `apps/web` only, node environment, the `@/` alias from tsconfig. Pin the timezone (e.g. `process.env.TZ = "America/Toronto"` at the top of `vitest.config.ts`) and prove it with a test on `getTimezoneOffset()`. Run the date suites under a second zone too (e.g. `Asia/Kolkata` or `Pacific/Auckland`). Use `vi.setSystemTime` for "now" and cover the DST weekends (Mar 8 and Nov 1, 2026).
   - **Testable today (pure):** `utils/gradeCalculations.ts`, `utils/dateUtils.ts`, `utils/urgency.ts`, `utils/icsGenerator.ts`, `lib/upload/textExtraction.ts` (`formatDate`, `extractAssessmentsBasic`, `extractCourseName`; `extractTime` is private, so test it through `extractAssessmentsBasic` or export it), `lib/upload/constants.ts` (`validateUploadSelection`), `lib/uploadClient.ts` (`parseUploadResponse`; Node 22 has `Response`), `constants/courseColors.ts`, `utils/authErrors.ts`.
   - **Needs extracting first (in later items):** the Gemini response cleanup in `lib/upload/gemini.ts` (A9); the date math, `validateNotificationPreferences` and the send decision in `lib/notifications.ts` (A8); `processCourseStats`/`computeStats` in `hooks/useSemesterAssessments.ts`; the "a mark sets status to Submitted" rule in `GradeCalculator.tsx` (A10).
@@ -315,6 +317,7 @@ Until A29 lands, run the format check locally with `npx prettier --check --end-o
   - **Problem:** this machine has `core.autocrlf=true`, so the checkout has CRLF line endings, and `npm run format:check` reports "Code style issues" in 159 files of `apps/web` alone; the verification loop can't pass locally. The only difference is line endings: `npx prettier --check --end-of-line auto .` passes. CI (Linux, LF) is unaffected.
   - **Fix:** a root `.gitattributes` with `* text=auto eol=lf` (mark binaries such as images and fonts `binary`), then the founder renormalizes once: `git add --renormalize .` in its own commit. No Prettier config change needed.
   - **Done when:** `npm run format:check` passes on a fresh Windows checkout.
+  - Then delete the workaround from `docs/ops.md` ("The Windows dev machine"), the verification loop in `apps/web/standards.md`, the Conventions in `apps/landing/CLAUDE.md`, and the note under Batches in this file.
 
 - [x] **A30 · Welcome email to unverified sign-up addresses** · S-M · risk L · D7 decided · found during A1 (done 2026-10-10, PR #6)
   - **Shipped:** the route reads `email_verified` from the verified ID token; only then does the name (body `displayName`, else the token's `name`) reach `welcomeEmail()`, which otherwise sends "Welcome to Asetta" and "Hi there". The unused `institution` body field is gone (the client never sent it, and it was one more piece of attacker-chosen text). A verified account with no name now also gets "Hi there" instead of its email prefix.
@@ -328,11 +331,17 @@ Until A29 lands, run the format check locally with `npx prettier --check --end-o
   - **Where:** `apps/landing/package.json` (`next`, `eslint-config-next`, `@next/third-parties` are `~16.3.8`).
   - **Problem:** Next 16.4.0 breaks Pages Router dev under Turbopack: modules a page shares with `_app` never get chunked, so the page server-renders and then dies on hydration with "module factory is not available" (vercel/next.js#99789; reproduced in B2 on `/` and `/contact` from a clean `.next` in a clean browser). `next build` is fine. 16.3.8 is the first release outside every `next` advisory, so the landing is pinned to `~16.3.8` until a fixed release ships.
   - **Fix:** when a 16.4.x or later release lists #99789 as fixed, move the three back to `^` that version and run `npm run dev:landing` on `/` and `/contact` in a fresh browser profile.
-  - **Done when:** the landing is on the latest 16.x and dev renders every page without the overlay.
+  - **Done when:** the landing is on the latest 16.x and dev renders every page without the overlay; the pin notes in `docs/ops.md` ("Pins to know") and `apps/landing/CLAUDE.md` (Framework) are gone.
 
 - [ ] **A34 · `next dev` writes `apps/landing/AGENTS.md`** · S · risk L · needs D8 · found during B2
   - **Problem:** on Next 16.3.8 and 16.4.0 (the two B2 ran; 16.2.9 unchecked), `next dev` generates an `AGENTS.md` with a "read the Next.js docs in node_modules" block for AI agents ("Generated AGENTS.md for AI agents. Set `agentRules: false` in next.config to disable."), and re-creates it on every run, so the landing shows an untracked file after each dev session. Web will do the same after its Next 16 move (A25). B2 deleted the generated copy instead of committing it.
-  - **Fix (pick with D8):** set `agentRules: false` in `apps/landing/next.config.ts` (recommended: the CLAUDE.md files are the agents' source of truth, and Claude Code doesn't read `AGENTS.md`), or gitignore `AGENTS.md`, or commit it.
+  - **Fix (pick with D8):** set `agentRules: false` in `apps/landing/next.config.ts` (recommended: the CLAUDE.md files are the agents' source of truth, and Claude Code doesn't read `AGENTS.md`), or gitignore `AGENTS.md`, or commit it. Then update the `AGENTS.md` line in `docs/ops.md` ("Pins to know").
+
+- [ ] **A35 · Em dashes left in the rules docs** · S · risk L · found during B3
+  - **Where:** `apps/web/standards.md` (57 left) and `apps/landing/CLAUDE.md` (13 left). B3 kept em dashes out of everything it wrote or rewrote, but left untouched lines alone.
+  - **Problem:** the root rule covers copy, not docs, but the founder asked for none in anything B3 wrote, and agents lift wording from these docs into code, comments and copy.
+  - **Fix:** replace each by hand with a comma, colon, semicolon or period (some are asides or ranges that need rewording, not a mechanical swap). Decide with the founder whether the root rule should say "copy and docs".
+  - **Done when:** a search for the em dash character (U+2014) finds nothing in the CLAUDE files, `standards.md` or `docs/`.
 
 ## Baseline (2026-10-10)
 
@@ -470,3 +479,43 @@ Newest last. One entry per session: date, branch, items, what changed, what's le
   - The landing's `next` and `postcss` now sit at the repo root and web's `next` is nested in `apps/web/node_modules`, the reverse of before.
   - C: has about 20 MB free, so npm hit ENOSPC. Set `npm_config_cache` and `TEMP`/`TMP` to folders under `node_modules/.cache/` on E:.
   - Next 16 keeps a versioned Turbopack dev cache in `apps/landing/.next/dev`; deleting it is safe.
+
+### 2026-10-10 · B3 (`docs/a6-cleanup`, no PR yet)
+
+- **A6 done.** Docs only: no app code, config or dependency changes. Not committed (the founder commits).
+- **Files:**
+  - New root `README.md`, moved from `apps/web/README.md`: a monorepo layout table, root commands (the old `npm run dev` doesn't exist at the root), `.env.local` blocks for both apps, both Vercel projects, and the CI job as it is (`verify`: install, lint, format check, typecheck, build). It has no pointer to `.env.example`; after the session the founder deleted that file as not needed.
+  - Deleted `apps/web/README.md` and `apps/landing/README.md` (the landing one described the pre-rewrite site).
+  - New `docs/ops.md`: Vercel projects, the reminder cron, an env matrix per app (every env var either app reads, apart from `NODE_ENV`), Firestore rules deploy, local API testing against the emulators, the `npm audit` policy, npm workspace notes and pins, and Windows machine notes. Sources: A6's ops notes, every B2 gotcha, and the B1/B16 emulator notes.
+  - Root `CLAUDE.md`: the read order, a doc map, the full git rule, and a rule to stop dev servers before `npm install` or a build on Windows. It also points to ops.md before any dependency update.
+  - `apps/web/CLAUDE.md`: rewritten to 24 lines (stack, the standards.md mandate, root commands, where things live, how to verify, the cron-route warning).
+  - `apps/web/standards.md`:
+    - Removed: the changelog preamble, the migration-state table, the `card.tsx`/`CustomSelect` examples, the `gray-200` block bullet (the block is gone from `globals.css`), and both git-rule copies.
+    - Changed: the em dash mentions point to the root rule; "migrating"/"migrated" wording now describes the steady state; the loop runs `npm run typecheck` from the root; `npm run format` is now `npm run format -w apps/web`.
+    - New: an "API routes and server code" section, which names the cron (A3) and upload (A4) routes as known gaps.
+    - Rewrote only the passages it touched. The theme-control and selector rules moved under their own heading.
+  - `apps/landing/CLAUDE.md`: root commands, the Vercel deploy line, a pointer for the `~16.3.8` pin (A33), the env pointer to ops.md, the em dash bullet replaced by a pointer, "before committing" replaced by the loop, and the redundant "Known issues" section dropped.
+- **Contradictions resolved:**
+  - Landing README vs landing `CLAUDE.md`: the README is deleted; the CLAUDE.md matches the code (Inter, Motion, Tailwind v4 CSS config, no pricing page, Next 16, Vercel).
+  - Verification steps: one loop in standards.md (lint, format check, typecheck, build, from the root). Web `CLAUDE.md` points to it, and the landing runs the same loop without typecheck (the landing has no typecheck script; A26).
+  - Where commands run: every doc runs them from the root, with `-w <app>` for an app's own scripts.
+  - Selector vs icon rule: the Icons rule wins (selected option tinted, no checkmark).
+  - The git rule now lives only in the root `CLAUDE.md`.
+- **Done-when checks:**
+  - Grepped the README, the CLAUDE files, standards.md and ops.md:
+    - Nothing uses `npx tsc`, an absolute machine path, or `asetta/` as a working directory.
+    - Nothing names a deleted file. `tailwind.config.ts` appears only as "there is no `tailwind.config.ts`".
+  - The em dash and git rules appear only in the root `CLAUDE.md`. Other mentions of commits are about Firestore writes, secrets, or how to split a change, not about who commits.
+  - Every backticked path in the three CLAUDE files resolves except `docs/superpowers/`, which exists only while work is in flight (the doc map says so). The component paths in standards.md resolve too.
+  - This tracker still quotes old patterns where items describe them.
+- **Checked while writing:**
+  - Vercel, read-only through the Vercel MCP: `asetta` serves asetta.me and `asetta-landing` serves www.asetta.me, both on Node 22.x. Vercel Authentication is on for previews and the generated `*.vercel.app` URLs. The API returns neither the Root Directory nor the plan, so ops.md doesn't state the Root Directory and takes the Hobby plan from the Baseline.
+  - The old web `CLAUDE.md` said preferences live in localStorage. Only the table's sort and filter do; display preferences are in Firestore. The new file doesn't make the claim.
+- **Verification loop:**
+  - Lint, typecheck and build green; build sizes match the Baseline.
+  - `format:check` fails on line endings only (A29: 161 web files); `prettier --check --end-of-line auto .` passes in both apps.
+  - Markdown is Prettier-ignored in both apps and nothing checks root-level docs, so the loop can't catch doc problems; the greps above stand in for that.
+- **Tracker updates:** "Ending a session" gained a step to update the docs a change touches. A5's `.env.example` bullet is dropped (the founder deleted the file after B3). A7, A29, A33 and A34 name the doc lines they must update when they land.
+- **New:** A35 (em dashes left in standards.md and the landing `CLAUDE.md`, and whether the root rule should cover docs).
+- **Left for the founder:** review the diff, commit, push and open the PR. `/code-review` was not run: the diff is Markdown only. The Vercel preview only needs a green build (no app changes).
+- **Gotchas:** the Write tool saves LF, so git warns "LF will be replaced by CRLF" on the new and rewritten files; harmless (git stores LF either way, and the diff is content only).
