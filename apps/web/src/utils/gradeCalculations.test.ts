@@ -1,11 +1,15 @@
 import { describe, expect, it } from "vitest";
 import { makeAssessment } from "@/test/assessments";
 import {
+  applyMarkInput,
   calculateRequiredGrade,
   computeCurrentGrade,
   computeTotalWeight,
+  currentGradeView,
   getGradeInfo,
   getProgressBarColor,
+  requiredGradeView,
+  resolveTargetGrade,
 } from "./gradeCalculations";
 
 const submitted = (mark: number | null, weight: number) =>
@@ -46,12 +50,16 @@ describe("computeCurrentGrade", () => {
     expect(computeCurrentGrade([missed(0, 10), submitted(100, 10)])).toBeCloseTo(50);
   });
 
-  it.fails("A10 (D1): counts a Missed assessment with no mark as 0", () => {
+  it("A10 (D1): counts a Missed assessment with no mark as 0", () => {
     expect(computeCurrentGrade([submitted(90, 50), missed(null, 50)])).toBeCloseTo(45);
   });
 
-  it.fails("A36: is null when every marked assessment weighs 0", () => {
+  it("A36: is null when every marked assessment weighs 0", () => {
     expect(computeCurrentGrade([submitted(95, 0)])).toBeNull();
+  });
+
+  it("leaves a weighted grade unchanged by a mark that weighs 0", () => {
+    expect(computeCurrentGrade([submitted(95, 0), submitted(80, 20)])).toBeCloseTo(80);
   });
 });
 
@@ -88,20 +96,112 @@ describe("calculateRequiredGrade", () => {
     );
   });
 
-  it.fails("A10: is null when the remaining assessments carry no weight", () => {
+  it("A10: is null when the remaining assessments carry no weight", () => {
     expect(calculateRequiredGrade([submitted(80, 100), notStarted(0)], 85, 100)).toBeNull();
   });
 
-  it.fails("A10 (D1): treats a Missed assessment with no mark as completed with 0", () => {
+  it("A10 (D1): treats a Missed assessment with no mark as completed with 0", () => {
     // 45 earned, 0 from the missed one, 25 weight left: 25 / 25
     expect(
       calculateRequiredGrade([submitted(90, 50), missed(null, 25), notStarted(25)], 70, 100),
     ).toBeCloseTo(100);
   });
+});
 
-  it.todo(
-    "A10: a target already secured (required below 0) doesn't render as a negative percentage",
-  );
+describe("requiredGradeView", () => {
+  it("states the average needed, one decimal", () => {
+    expect(requiredGradeView(88.333)).toEqual({ kind: "needed", text: "88.3", reachable: true });
+  });
+
+  it("flags an average above 100 as out of reach", () => {
+    expect(requiredGradeView(112.5)).toEqual({ kind: "needed", text: "112.5", reachable: false });
+  });
+
+  it("reads reach from the shown value (100.04 shows 100.0, which is reachable)", () => {
+    expect(requiredGradeView(100.04)).toEqual({ kind: "needed", text: "100.0", reachable: true });
+  });
+
+  it("A10: a target already secured (required below 0) doesn't render as a negative percentage", () => {
+    expect(requiredGradeView(-12.5)).toEqual({ kind: "secured" });
+  });
+
+  it.each([0, 0.04, -0.04])("treats %f (shown as 0.0) as secured", (required) => {
+    expect(requiredGradeView(required)).toEqual({ kind: "secured" });
+  });
+});
+
+describe("applyMarkInput", () => {
+  const course = [
+    makeAssessment({ id: "a1", status: "Not started" }),
+    makeAssessment({ id: "a2", status: "In progress", mark: null }),
+  ];
+
+  it("sets the mark and makes the assessment Submitted", () => {
+    expect(applyMarkInput(course, "a1", "87.5")[0]).toMatchObject({
+      mark: 87.5,
+      status: "Submitted",
+    });
+  });
+
+  it("clears the mark for an empty field", () => {
+    const marked = applyMarkInput(course, "a1", "87.5");
+    expect(applyMarkInput(marked, "a1", "")[0].mark).toBeNull();
+  });
+
+  it.each([
+    ["-5", 0],
+    ["abc", 0],
+    ["12.", 12],
+  ])("parses %s as %f", (raw, mark) => {
+    expect(applyMarkInput(course, "a1", raw)[0].mark).toBe(mark);
+  });
+
+  it("leaves the other assessments alone", () => {
+    expect(applyMarkInput(course, "a1", "90")[1]).toBe(course[1]);
+  });
+
+  it("A10: clearing the only mark clears the current grade", () => {
+    const marked = applyMarkInput([notStarted(20)], "a1", "90");
+    expect(computeCurrentGrade(marked)).toBeCloseTo(90);
+    expect(computeCurrentGrade(applyMarkInput(marked, "a1", ""))).toBeNull();
+  });
+});
+
+describe("resolveTargetGrade", () => {
+  it("uses the saved target", () => {
+    expect(resolveTargetGrade({ targetGrade: 70 })).toBe(70);
+  });
+
+  it("falls back to 85 without preferences", () => {
+    expect(resolveTargetGrade(null)).toBe(85);
+  });
+
+  it("A10: a target grade of 0 stays 0 (GradeCalculator's `|| 85`)", () => {
+    expect(resolveTargetGrade({ targetGrade: 0 })).toBe(0);
+  });
+});
+
+describe("currentGradeView", () => {
+  it("shows the grade with one decimal, its band and its meter color", () => {
+    expect(currentGradeView(86.04)).toEqual({
+      value: 86,
+      text: "86.0",
+      info: getGradeInfo(86),
+      barColor: "bg-success",
+    });
+  });
+
+  it("A10: GradeOverviewCards picks the letter from the shown value (89.96 shows 90.0% and A+)", () => {
+    const view = currentGradeView(89.96);
+    expect(view.text).toBe("90.0");
+    expect(view.info).toMatchObject({ letter: "A+", gpa: 4.0 });
+  });
+
+  it("A10: picks the meter color from the shown value too (84.96 shows 85.0%)", () => {
+    const view = currentGradeView(84.96);
+    expect(view.text).toBe("85.0");
+    expect(view.barColor).toBe("bg-success");
+  });
 });
 
 describe("getGradeInfo", () => {
@@ -136,14 +236,6 @@ describe("getGradeInfo", () => {
   ])("tints %f with %s", (percentage, tintClass) => {
     expect(getGradeInfo(percentage).tintClass).toBe(tintClass);
   });
-
-  it.todo(
-    "A10: GradeOverviewCards picks the letter from the shown value (89.96 shows 90.0% and A+)",
-  );
-  it.todo("A10: a target grade of 0 stays 0 (GradeCalculator's `|| 85`)");
-  it.todo(
-    "A10: clearing the only mark clears the current grade (GradeCalculator's recalculateGrade)",
-  );
 });
 
 describe("getProgressBarColor", () => {

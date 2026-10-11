@@ -6,10 +6,11 @@ import { useCoursePreferences } from "../../hooks/useCoursePreferences";
 import { Assessment } from "../../types/assessment";
 import { parseLocalDateTime } from "../../utils/dateUtils";
 import {
+  applyMarkInput,
   computeCurrentGrade,
   computeTotalWeight,
   calculateRequiredGrade,
-  getGradeInfo,
+  resolveTargetGrade,
 } from "../../utils/gradeCalculations";
 import { ChartColumn, CircleAlert } from "lucide-react";
 import { Alert, AlertDescription } from "../ui/alert";
@@ -30,8 +31,6 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
   onAutoSaveStatusChange,
 }) => {
   const { user } = useAuth();
-  const [currentGrade, setCurrentGrade] = useState<number | null>(null);
-  const [totalWeight, setTotalWeight] = useState<number>(0);
 
   // Course preferences hook for target grade
   const {
@@ -68,32 +67,19 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
     });
 
     setAssessments(sortedAssessments);
-    setTotalWeight(computeTotalWeight(sortedAssessments));
-    setCurrentGrade(computeCurrentGrade(sortedAssessments));
   }, [fetchedAssessments]);
 
-  // Recompute the grade after an edit; keeps the previous value when nothing is completed
-  const recalculateGrade = (updatedAssessments: Assessment[]) => {
-    const grade = computeCurrentGrade(updatedAssessments);
-    if (grade !== null) {
-      setCurrentGrade(grade);
-    }
-  };
-
   const handleMarkChange = (assessmentId: string, value: string) => {
-    const mark = value === "" ? null : Math.max(0, parseFloat(value) || 0);
-
-    const updatedAssessments = assessments.map((assessment) =>
-      assessment.id === assessmentId
-        ? { ...assessment, mark, status: "Submitted" as const }
-        : assessment,
-    );
+    const updatedAssessments = applyMarkInput(assessments, assessmentId, value);
     setAssessments(updatedAssessments);
-    recalculateGrade(updatedAssessments);
 
     const edited = updatedAssessments.find((assessment) => assessment.id === assessmentId);
     if (edited?.id) {
-      queueSave(edited.id, { mark, weight: edited.weight, status: edited.status });
+      queueSave(edited.id, {
+        mark: edited.mark ?? null,
+        weight: edited.weight,
+        status: edited.status,
+      });
     }
   };
 
@@ -104,8 +90,6 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
       assessment.id === assessmentId ? { ...assessment, weight: newWeight } : assessment,
     );
     setAssessments(updatedAssessments);
-    setTotalWeight(computeTotalWeight(updatedAssessments));
-    recalculateGrade(updatedAssessments);
 
     const edited = updatedAssessments.find((assessment) => assessment.id === assessmentId);
     if (edited?.id) {
@@ -157,9 +141,12 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
     );
   }
 
-  const currentGradeInfo = currentGrade !== null ? getGradeInfo(currentGrade) : null;
+  // Derived on every render, never kept in state, so an edit can't leave a stale value on screen
+  const currentGrade = computeCurrentGrade(assessments);
+  const totalWeight = computeTotalWeight(assessments);
+  const targetGrade = resolveTargetGrade(coursePreferences);
   const requiredGrade = coursePreferences
-    ? calculateRequiredGrade(assessments, coursePreferences.targetGrade, totalWeight)
+    ? calculateRequiredGrade(assessments, targetGrade, totalWeight)
     : null;
 
   return (
@@ -174,9 +161,8 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
       {/* Grade Overview Cards */}
       <GradeOverviewCards
         currentGrade={currentGrade}
-        currentGradeInfo={currentGradeInfo}
         totalWeight={totalWeight}
-        targetGrade={coursePreferences?.targetGrade || 85}
+        targetGrade={targetGrade}
         onTargetGradeChange={handleTargetGradeChange}
         preferencesLoading={preferencesLoading}
         requiredGrade={requiredGrade}
