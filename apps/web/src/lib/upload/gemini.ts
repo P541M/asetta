@@ -1,7 +1,25 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
-import { ExtractedAssessment, extractCourseName, formatDate } from "./textExtraction";
+import { GoogleGenerativeAI, ResponseSchema, SchemaType } from "@google/generative-ai";
+import { parseAiAssessments } from "./aiResponse";
+import type { ExtractedAssessment } from "./normalize";
 
-async function extractAssessmentsAI(text: string): Promise<string> {
+// Gemini answers in this shape (structured output), so the reply is a bare JSON array.
+// `normalizeExtractedAssessment` still checks every value.
+const ASSESSMENTS_SCHEMA: ResponseSchema = {
+  type: SchemaType.ARRAY,
+  items: {
+    type: SchemaType.OBJECT,
+    properties: {
+      courseName: { type: SchemaType.STRING, description: "Course code and name" },
+      assignmentName: { type: SchemaType.STRING, description: "Assessment name and type" },
+      dueDate: { type: SchemaType.STRING, description: "Due date as YYYY-MM-DD" },
+      dueTime: { type: SchemaType.STRING, description: "Due time as 24-hour HH:MM" },
+      weight: { type: SchemaType.NUMBER, description: "Percentage of the final grade, 0 to 100" },
+    },
+    required: ["courseName", "assignmentName", "dueDate", "dueTime", "weight"],
+  },
+};
+
+async function extractAssessmentsAI(text: string, localDate: string): Promise<string> {
   const geminiApiKey = process.env.GEMINI_API_KEY;
 
   if (!geminiApiKey) {
@@ -9,10 +27,13 @@ async function extractAssessmentsAI(text: string): Promise<string> {
   }
 
   const genAI = new GoogleGenerativeAI(geminiApiKey);
-  const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+  const model = genAI.getGenerativeModel({
+    model: "gemini-2.5-flash",
+    generationConfig: { responseMimeType: "application/json", responseSchema: ASSESSMENTS_SCHEMA },
+  });
 
-  // Get current year for date defaulting
-  const currentYear = new Date().getFullYear();
+  // The uploader's year, for dates written without one
+  const currentYear = Number(localDate.slice(0, 4));
 
   const prompt = `
     You are an AI assistant that extracts assessment information from course outlines.
@@ -22,8 +43,7 @@ async function extractAssessmentsAI(text: string): Promise<string> {
       "assignmentName": "Assessment name and type",
       "dueDate": "YYYY-MM-DD format",
       "dueTime": "HH:MM format (24-hour), use '23:59' if not specified",
-      "weight": "Numeric percentage weight",
-      "status": "Not started"
+      "weight": "Numeric percentage weight"
     }
 
     Only include assessments that have clear due dates or deadline information. Extract as many assessments as you can find. If no time is specified, use '23:59' as the default.
@@ -38,6 +58,7 @@ async function extractAssessmentsAI(text: string): Promise<string> {
       * "Assignment due September 20" → "${currentYear}-09-20" (using current year)
     - For dates that seem to be in the past within the current year, consider if they should be the following year
     - Always convert to YYYY-MM-DD format using the defaulted or specified year
+    - A numeric date such as "03/04/${currentYear}" can be day/month or month/day. Use the order the rest of the document shows (a date like "15/03" is day first, "03/15" is month first). If nothing in the document settles it, set dueDate to "" instead of guessing.
 
     WEIGHT EXTRACTION - Look for these patterns:
     - "25%" → weight: 25
@@ -138,67 +159,13 @@ async function extractAssessmentsAI(text: string): Promise<string> {
  */
 export async function extractAssessmentsWithAI(
   extractedText: string,
+  localDate: string,
 ): Promise<ExtractedAssessment[]> {
   if (!process.env.GEMINI_API_KEY) {
     throw new Error("Gemini API not configured");
   }
 
-  const aiContent = await extractAssessmentsAI(extractedText);
+  const aiContent = await extractAssessmentsAI(extractedText, localDate);
 
-  // Clean up the AI response to extract JSON
-  let jsonString = aiContent.trim();
-
-  // Remove markdown code blocks if present
-  jsonString = jsonString.replace(/```json\n?/g, "").replace(/```\n?/g, "");
-
-  // Try to extract JSON array from response
-  const jsonMatch = jsonString.match(/\[[\s\S]*\]/);
-  if (jsonMatch) {
-    jsonString = jsonMatch[0];
-  }
-
-  let parsedAssessments;
-  try {
-    parsedAssessments = JSON.parse(jsonString);
-  } catch {
-    throw new Error(`Failed to parse AI response as JSON`);
-  }
-
-  // Validate and clean the parsed assessments
-  if (!Array.isArray(parsedAssessments)) {
-    throw new Error("AI response is not an array");
-  }
-
-  return parsedAssessments
-    .map((assessment, index) => {
-      // Validate required fields
-      if (!assessment || typeof assessment !== "object") {
-        return null;
-      }
-
-      const courseName =
-        assessment.courseName || extractCourseName(extractedText) || "Unknown Course";
-      const assignmentName = assessment.assignmentName || `Assessment ${index + 1}`;
-      const dueDate = formatDate(assessment.dueDate) || new Date().toISOString().split("T")[0];
-      const dueTime = assessment.dueTime || "23:59";
-      const weight =
-        typeof assessment.weight === "number"
-          ? assessment.weight
-          : parseFloat(assessment.weight) || 0;
-
-      // Basic validation
-      if (!courseName || !assignmentName || !dueDate) {
-        return null;
-      }
-
-      return {
-        courseName,
-        assignmentName,
-        dueDate,
-        dueTime,
-        weight,
-        status: "Not started",
-      } as ExtractedAssessment;
-    })
-    .filter((assessment): assessment is ExtractedAssessment => assessment !== null);
+  return parseAiAssessments(aiContent, extractedText, localDate);
 }

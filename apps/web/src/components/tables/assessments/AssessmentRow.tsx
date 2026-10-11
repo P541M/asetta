@@ -1,7 +1,12 @@
 import { Assessment, AssessmentStatus } from "@/types/assessment";
 import { cn } from "@/lib/utils";
 import { formatLocalDateTime } from "../../../utils/dateUtils";
-import { daysUntilLabel, urgencyChipClass, urgencyTextClass } from "../../../utils/urgency";
+import {
+  NEEDS_REVIEW_LABEL,
+  daysUntilLabel,
+  urgencyChipClass,
+  urgencyTextClass,
+} from "../../../utils/urgency";
 import { Button } from "../../ui/button";
 import { Checkbox } from "../../ui/checkbox";
 import CourseColorDot from "../../ui/CourseColorDot";
@@ -76,15 +81,22 @@ const AssessmentRow = ({
         <p className="text-sm text-muted-foreground">
           Due {formatLocalDateTime(assessment.dueDate, assessment.dueTime)}
         </p>
-        {showDaysTillDue && daysTillDue !== null && (
-          <span
-            className={cn(
-              "inline-block rounded-full px-2 py-1 text-xs font-medium",
-              urgencyChipClass(daysTillDue),
-            )}
-          >
-            {daysUntilLabel(daysTillDue)}
+        {assessment.needsReview ? (
+          <span className="inline-block rounded-full bg-primary/10 px-2 py-1 text-xs font-medium text-primary">
+            {NEEDS_REVIEW_LABEL}
           </span>
+        ) : (
+          showDaysTillDue &&
+          daysTillDue !== null && (
+            <span
+              className={cn(
+                "inline-block rounded-full px-2 py-1 text-xs font-medium",
+                urgencyChipClass(daysTillDue),
+              )}
+            >
+              {daysUntilLabel(daysTillDue)}
+            </span>
+          )
         )}
       </div>
 
@@ -146,10 +158,15 @@ const AssessmentRow = ({
         <span className="whitespace-nowrap text-sm text-foreground">
           {formatLocalDateTime(assessment.dueDate, assessment.dueTime)}
         </span>
-        {showDaysTillDue && daysTillDue !== null && (
-          <span className={cn("text-xs font-medium", urgencyTextClass(daysTillDue))}>
-            {daysUntilLabel(daysTillDue)}
-          </span>
+        {assessment.needsReview ? (
+          <span className="text-xs font-medium text-primary">{NEEDS_REVIEW_LABEL}</span>
+        ) : (
+          showDaysTillDue &&
+          daysTillDue !== null && (
+            <span className={cn("text-xs font-medium", urgencyTextClass(daysTillDue))}>
+              {daysUntilLabel(daysTillDue)}
+            </span>
+          )
         )}
       </div>
       {showWeight && (

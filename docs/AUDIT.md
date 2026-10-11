@@ -43,6 +43,7 @@ branch. Tick the items off and add a session log entry when done. Don't commit.
 | D7 | Welcome email for unverified password sign-ups: wait for a verified address, drop the user-chosen name from the subject, or accept the risk? | A30 | **Use the name only when the token says `email_verified` (Google sign-ups); everyone else gets a fixed "Welcome to Asetta" and "Hi there".** Small, no sign-up friction, and attacker-chosen text never reaches an unverified inbox. Shipped with A31. (2026-10-10, done the same day) |
 | D8 | `next dev` (16.3.8 and 16.4.0) keeps writing `apps/landing/AGENTS.md`: disable it with `agentRules: false`, gitignore it, or commit it? | A34 | Open. Recommended: `agentRules: false` (details in A34). |
 | D9 | Move the ICS export's UID domain from `asetta.app` to `asetta.me`? | A14's `it.todo` | **Keep `asetta.app`.** (2026-10-11) Calendar apps match a re-imported event by its UID, so a new domain makes every assessment a new event: anyone who imported before gets each one twice. Keeping `asetta.app` costs nothing in practice: a UID is an opaque ID, nothing resolves it, and Firestore IDs make a clash implausible. Revisit only with a subscribed feed (webcal), where a one-time switch could be announced. A14's `it.todo` is now a test that pins the domain. |
+| D10 | How should upload extraction read a numeric date whose day and month could swap ("03/04/2026"), when nothing in the outline settles the order? | Nothing (B8 shipped the safe default) | Open. **Today (B8):** if another numeric date in the same outline can only be one order ("15/04/2026" is day first, "04/15/2026" month first), every date in it is read that way. Otherwise the assessment is kept, dated the upload day and flagged "Check the due date" (`needsReview`), and Gemini is told to leave such a date empty. **Options:** (a) keep flagging (no wrong dates; costs a manual fix only for outlines where every numeric date has a day of 12 or less, which is rare in a full outline); (b) assume month first, the old silent behavior (US style, wrong for day-first outlines, common in Canada); (c) assume day first (the reverse). **Recommended: (a).** A wrong date that looks right is worse than a flagged one: reminders and the "Due in N days" label trust it. A cheap improvement either way: put the outline's raw date text in the flagged assessment's notes so the fix takes one look. |
 
 ## Batches (suggested order)
 
@@ -64,7 +65,7 @@ branch. Tick the items off and add a session log entry when done. Don't commit.
 | B13 | A15 | Bundle size | |
 | B14 | A18, A20 | Rate limits (upload quota, contact form) | D5 decided |
 | B15 | A19 | Cron throughput | After A8 |
-| any | A21 to A28, A33 to A35, A39, A40, A42, A43 | Later items | As time allows; A34 needs D8 |
+| any | A21 to A28, A33 to A35, A39, A40, A42 to A46 | Later items | As time allows; A34 needs D8 |
 
 ## Fix now
 
@@ -189,7 +190,8 @@ branch. Tick the items off and add a session log entry when done. Don't commit.
   - **Tests:** none yet; the date math sits in `lib/notifications.ts` next to Firestore calls, so extract it into a pure helper first. Every suite already runs under Toronto and Kolkata (`apps/web/vitest.config.ts`); a helper that takes the zone as a parameter can cover any other zone (Auckland, UTC) on top of that.
   - **Done when:** tests cover Toronto, a UTC+ zone, a half-hour zone (e.g. `Asia/Kolkata`), both 2026 DST switches, unpadded times and a late run; reminders arrive shortly after 9:30 local (within one scheduler interval).
 
-- [ ] **A9 · Normalize AI and regex extraction output** · M · risk L-M · test-first
+- [x] **A9 · Normalize AI and regex extraction output** · M · risk L-M · test-first (done 2026-10-11, PR #13; D10 open, B8 ships its safe default)
+  - **Shipped (B8):** `lib/upload/normalize.ts` (`normalizeExtractedAssessment` and its parsers), used by `lib/upload/aiResponse.ts` (the Gemini cleanup, now pure and tested), `lib/upload/textExtraction.ts` and the route's "nothing found" placeholder. No usable date means `needsReview: true` on the upload day the client sends (`localDate`), never the server's UTC day. Gemini gets a `responseSchema` (structured JSON) on the installed `@google/generative-ai` 0.24.1, no dependency change; A25 is not needed for it. Details in the B8 session log.
   - **Where:** `apps/web/src/lib/upload/textExtraction.ts:124-176` (`formatDate`), `apps/web/src/lib/upload/gemini.ts:146-203`, `apps/web/src/pages/api/upload.ts:182-191`.
   - **Problem:** `formatDate` only knows full month names, so "Sept 30, 2026" and "Mar 15, 2026" are stored as raw text. DD/MM (common in Canada) is read as MM/DD: "15/03/2026" becomes "2026-15-03" (verified). No range checks. `dueTime`, `weight` and the names aren't type- or range-checked, so "11:59 PM" reaches the UI as an Invalid Date, and nothing guards against NaN (likely shows "NaN days left"). Fallback dates use the UTC day (`toISOString().split("T")[0]` at upload.ts:186, gemini.ts:182, textExtraction.ts:49). JSON is scraped out of free text with a regex.
   - **Fix:** One `normalizeExtractedAssessment()` used by both paths: a valid `YYYY-MM-DD` or the item is flagged for review (no guessing today's date in UTC), padded `HH:MM` (accept 12-hour input), weight clamped 0-100, strings trimmed and length-capped. Ask Gemini for structured JSON output (easier on `@google/genai`, see A25).
@@ -282,7 +284,8 @@ branch. Tick the items off and add a session log entry when done. Don't commit.
   - **Fix:** return null ("no grade yet") when the completed weight is 0, the same answer A10 gives `calculateRequiredGrade` when nothing weighted is left.
   - **Done when:** the `it.fails("A36: ...")` in `utils/gradeCalculations.test.ts` is a passing `it`.
 
-- [ ] **A37 · Course-name fallback reads a term as the course code** · S · risk L · with A9 (B8) · found during B4
+- [x] **A37 · Course-name fallback reads a term as the course code** · S · risk L · with A9 (B8) · found during B4 (done 2026-10-11, PR #13)
+  - **Shipped (B8):** codes are 2 to 4 capitals at a word boundary, then an optional space, `*` or `-`, then 3 or 4 digits ("CIS 3760", "CIS*3760", "COMP-1405", "MATH1010A"); a capitalized term before a year ("FALL 2026") is skipped. A lowercase "cis 3760" is no longer read as a code.
   - **Where:** `apps/web/src/lib/upload/textExtraction.ts` (`extractCourseName`). Callers: the regex fallback, the "Manual Review Required" placeholder in `pages/api/upload.ts`, and `lib/upload/gemini.ts` whenever Gemini returns no course name.
   - **Problem:** the code pattern `/([A-Z]{2,4})\s*(\d{3,4}[A-Z]*)/i` is case-insensitive, matches inside words, and takes the first hit in the whole text. A term before the course code wins: "Fall 2026 syllabus" then "CIS 3760" gives `Fall2026`; "Course outline, Winter 2027" gives `nter2027`; "Summer 2026" gives `mmer2026` (all checked in B4).
   - **Fix:** match capitals at a word boundary only (no `i` on the letters) and skip a term word (Fall, Winter, Spring, Summer) followed by a year.
@@ -394,15 +397,30 @@ branch. Tick the items off and add a session log entry when done. Don't commit.
   - **Problem:** every keystroke saves, so deleting the target to retype it writes 0 to Firestore, and leaving the field empty keeps 0. Before B7 the `|| 85` showed 85 while 0 was saved; now the 0 shows, with "Target already secured" while the field is empty.
   - **Fix:** don't save an empty or unparseable value (the field snaps back to the saved target on blur); consider clamping to 0 to 100.
 
+- [ ] **A44 · Small PDFs fail to parse in the upload route** · S · risk L · found during B8
+  - **Where:** `apps/web/src/pages/api/upload.ts` (`pdfParse(fs.readFileSync(filePath))`); pdf-parse 1.1.1 with its bundled pdf.js.
+  - **Problem:** a valid PDF under about 4 KB fails with "bad XRef entry" and the file is reported as unreadable. Node hands a small file back as a slice of its shared buffer pool (nonzero `byteOffset`), and pdf.js then reads every object 8 bytes off (B8 logged it: at xref offset 9 it saw "PDF-1.4"). Passing `new Uint8Array(buffer)` parsed the same file; files over about 4 KB parse either way, so real outlines are rarely hit. B5's hand-written PDF failed the same way.
+  - **Fix:** pass a fresh `Uint8Array` copy to `pdfParse`, with a test PDF under 4 KB. Check whether a pdf-parse upgrade (A25) also fixes it.
+
+- [ ] **A45 · Regex fallback takes a weight from the next line or the whole outline** · S · risk L · found during B8
+  - **Where:** `apps/web/src/lib/upload/textExtraction.ts` (`extractWeight`).
+  - **Problem:** an assessment's weight is the first percentage in the 200 characters from its match, so a line without one takes the next line's ("Lab 2 due 20/10/2026" before "Project ... (30%)" gets 30). With none in that window it falls back to the first percentage in the whole outline. B8's tests give every line its own weight to stay clear of it.
+  - **Fix:** look for the weight on the assessment's own line (or up to the next match) only, and store 0 when there is none.
+
+- [ ] **A46 · Regex fallback reads a number before a month as the day** · S · risk L · found during B8 (`/code-review`)
+  - **Where:** `apps/web/src/lib/upload/normalize.ts` (`DAY_FIRST` in `parseDueDate`) and the day-first alternative of `DATE_TEXT` in `textExtraction.ts`.
+  - **Problem:** "Lab 3 Dec 2026" or "Week 10 May 2026" reads 3 or 10 as the day, a valid but wrong date with no review flag. "3 Dec 2026" alone is a real day-first date, so the text can't tell them apart; before B8 the same reading happened through `\w+\s+\d{1,2},?\s*\d{4}`.
+  - **Fix (decide while building):** accept a day-first date only when the number isn't right after an assessment word (Lab, Quiz, Week, Assignment), or flag it for review.
+
 ## Baseline (2026-10-10)
 
 Numbers to compare against when items land.
 
 - `npm audit --omit=dev`: 38 vulnerabilities (0 critical, 5 high, 33 moderate) after A2 (2026-10-10; was 46: 1 critical, 12 high, 33 moderate). Including dev dependencies: 43 (10 high).
-- `apps/web` build (Next 15.5.27, after A2): 229 kB First Load JS shared by all pages (`_app` chunk 114 kB); `/dashboard/*` 319 kB (was 320) and `/dashboard/[semester]/*` 320 kB after B7 (+767 bytes, 345 gzipped, in the shared dashboard chunk: the grade view helpers and ICS folding); `/login` and `/register` 242 kB; `/onboarding` 285 kB; `/settings` 284 kB (was 285).
+- `apps/web` build (Next 15.5.27, after A2): 229 kB First Load JS shared by all pages (`_app` chunk 114 kB); `/dashboard/*` 320 kB (B8 measured main at 320; the 319 recorded after A2 was stale by then) and `/dashboard/[semester]/*` 320 kB after B7 (+767 bytes, 345 gzipped, in the shared dashboard chunk: the grade view helpers and ICS folding); `/login` and `/register` 242 kB; `/onboarding` 285 kB; `/settings` 284 kB (was 285).
 - Live Firestore rules identical to `firestore.rules`; no Storage rules (Storage unused).
 - Vercel: projects `asetta` (apps/web) and `asetta-landing` (apps/landing), Hobby plan: runtime logs kept 1 hour; cron jobs run at most once a day and fire anywhere within the scheduled hour; functions on Fluid compute get a 300-second default and maximum duration (docs checked 2026-10-11). In `apps/web/vercel.json` the cron route has `maxDuration` 300 since A3 (was 10) and the upload route 60.
-- Tests (after B7, 2026-10-11; 9 suites after A7, none before): 11 suites in `apps/web`, each run in two zones. Per zone, 252 tests: 246 pass, 4 expected failures (`it.fails`: A9 3, A37 1), 2 todo (A9 2). `npm test` takes about 2 seconds.
+- Tests (after B8, 2026-10-11; 11 suites after B7, 9 after A7, none before): 13 suites in `apps/web`, each run in two zones. Per zone, 382 tests, all passing: no expected failures (`it.fails`) and no todo left. `npm test` takes about 2 seconds.
 
 ## Session log
 
@@ -727,3 +745,38 @@ Newest last. One entry per session: date, branch, items, what changed, what's le
   - A `next build` hung right after "Environments: .env.local" while the agent's shell had its working directory inside `apps/web/.next/static/chunks` (Windows keeps a directory busy while a process sits in it, and Next deletes `.next` first). Killing the tree and rebuilding from the repo root fixed it.
   - Signing in as a user with no user doc makes `AuthContext` call `/api/welcome-email`; seed the user doc first (and keep `EMAIL_APP_PASSWORD` empty) so a test sign-in can't send mail.
   - In the built-in browser, the first screenshot after a navigation or scroll often times out; the second one works. With a small pane, set a 1280x800 viewport or the login form doesn't render.
+
+### 2026-10-11 · B8 (`fix/b8-extraction`, PR #13)
+
+- **A9 and A37 done.** Pulled main after PR #12 (already up to date), branched, no dev servers were running, no `package.json` changed, so no install. C: had 33 GB free, so npm ran normally (ops.md's ENOSPC note is now a fallback).
+- **Test-first:**
+  - The four waiting `it.fails` (A9 3, A37 1) ran once as plain `it`s and failed on their assertions in both zones: "Sept 30, 2026" and "Mar 15, 2026" came back unchanged, "15/03/2026" became "2026-15-03", "Winter 2027" gave `nter2027`.
+  - The Gemini cleanup moved out of `gemini.ts` into the pure `parseAiAssessments` (`lib/upload/aiResponse.ts`) unchanged, and 15 tests pinned today's behavior first (fences, prose around the array, empty array, bad JSON, non-array, dropped non-objects, the course and name fallbacks, text weights, forced status, the 23:59 default). Six new `it.fails` then failed on their assertions against it: a bracket in the prose before the array threw "Failed to parse"; a missing or impossible date got no flag; "11:59 PM" was stored as is; weights 150 and -5 were kept; a numeric course name and a multi-line name went through raw. All six pass after the fix.
+  - A9's two `it.todo` are real tests: the range checks (Feb 30, Feb 29 in 2026, April 31, month 15, month 0, "6055-78-01", year 1999, words, no year) and the shared normalizer over a realistic outline.
+  - `normalize.test.ts` holds table tests over syllabus strings: abbreviated months with and without a period, ordinals, a weekday in front, day-first names, DD/MM and DD.MM.YYYY, two-digit years, 12-hour times ("11:59 PM", "11:59pm", "11.59 p.m.", "9 AM", "12:00 AM"), out-of-range times, weights as numbers and text, over 100, negative, NaN and Infinity, over-long names (cut by code point), and a grid of junk dates and times that must still store a valid pair.
+  - The two `/code-review` date fixes below also started as failing tests.
+- **A9:**
+  - `normalizeExtractedAssessment` is the only way an extracted assessment is stored (rule added to `apps/web/standards.md`). Dates: a real calendar day from 2000 to 2099, or null. Times: padded 24-hour HH:MM, else 23:59. Weights: 0 to 100, at most two decimals, else 0. Names: whitespace collapsed, the course capped at 100 characters, the assessment at 200.
+  - Ambiguous dates (D10, open): the outline's other numeric dates settle the order when one can only be day first or month first (`detectDateOrder`, which counts real dates only); otherwise the date is not guessed. Gemini's prompt now says to leave such a date empty.
+  - "Flagged for review": the old "Manual Review Required" placeholder was a normal assessment dated the server's UTC day, and nothing in the UI marked it. The founder chose a `needsReview` field plus a label (asked during planning). An assessment without a usable date is now stored with `needsReview: true`, dated the uploader's local today. `postUploadForm` sends that date as `localDate`, and the route refuses an upload without a valid one (within a day of the UTC date) with "Please refresh the page and upload again.", so no path falls back to the UTC day. The "nothing found" placeholder goes through the same normalizer and is flagged too.
+  - UI: a flagged row shows "Check the due date" (amber, `NEEDS_REVIEW_LABEL` in `utils/urgency.ts`) in place of the urgency label, on the table's mobile card and desktop row and in the calendar's day modal. Saving the edit row clears the flag (`deleteField`); a status change doesn't. A flagged assessment is never a course's next deadline or counted as due this week, and the reminder cron skips it.
+  - Gemini: `responseMimeType: "application/json"` with a `responseSchema` (an array of objects with the five fields), on the installed `@google/generative-ai` 0.24.1; no dependency change. The year for dates written without one comes from `localDate`, not the server clock. The real Gemini API was not called: the parser is covered by unit tests and the route ran on the regex fallback.
+  - The regex fallback also reads abbreviated months, ordinals, day-first names, ISO dates and decimal weights ("12.5%").
+- **A37:** see the item; 11 new cases cover the terms and the code formats.
+- **End to end on the emulators** (Auth and Firestore emulators, dev server on :3005, `GEMINI_API_KEY` and `EMAIL_APP_PASSWORD` empty, `CRON_SECRET` a placeholder; scripts in `node_modules/.cache/b8/`):
+  - `e2e.mjs` signed up a generated test user (credentials in `node_modules/.cache/b8/e2e-user.json`, emulator only), seeded the user doc and a semester, and posted to the real route: the five pdf-parse sample PDFs (`node_modules/pdf-parse/test/data`), plus two outlines built by `make-pdf.cjs` (a CIS*3760 one with "Sept. 30", DD/MM dates, "Dec. 1st", a 130% weight and an impossible "13/13/2026"; a MATH 1200 one whose only dates could swap).
+  - Without `localDate`, and with one three days off: 400, nothing stored. `03-invalid.pdf`: "Failed to parse PDF", as before.
+  - 13 assessments stored, each checked by an independent parser: a real date, a padded time, a weight from 0 to 100, single-line names within the caps, status Not started. Flagged and dated the local day: the `01-valid.pdf` item that main stores as "6055-78-01" (main's extraction was run on the same file first), the "13/13/2026" exam, both MATH 1200 quizzes (D10) and the `05` placeholder. The `05` file sent with the next day's date (a user ahead of UTC) got that day, not the server's. "CIS*3760" read as `CIS3760`, "Sept. 30, 2026 at 11:59 PM" as 2026-09-30 23:59, the 130% as 100. The research-paper samples still give junk names (they aren't outlines), now with valid dates or a flag.
+  - The UI in the built-in browser (the `__FIREBASE_DEFAULTS__` cookie; the console showed the Auth Emulator warning before any credentials were typed; no request went to an `https://` host): the label on every flagged row at 1280px, and at 375px in dark with no horizontal scroll; no console errors. Editing MATH 1200 Quiz 2 to 2027-06-05 and saving removed `needsReview` in the emulator, and Quiz 1 kept it. The Oct 11 calendar modal listed its four flagged items with the label.
+  - The reminder cron (preferences set to one day before): a control assessment due the next day got a send attempt (failed: no email password); the flagged placeholder due the same day was skipped.
+  - Afterwards the cookie, the emulator sign-in and the viewport were cleared, and the dev server and emulators were stopped (ports closed). No formidable temp file was left.
+- **Old data:** no migration. Production assessments uploaded before this PR can still hold a raw date ("Sept 30, 2026"), a month over 12 ("2026-15-03"), an impossible date ("6055-78-01"), a 12-hour or unpadded time ("11:59 PM"), weights above 100 or below 0, names with line breaks or of any length, a course code read from a term (`nter2027`), and "Manual Review Required" placeholders dated the UTC day with no `needsReview` flag. A9's guarantee covers new uploads only.
+- **Verification loop:** lint, `format:check`, typecheck, `npm test` (26 files, 764 passed; the same with the host zone set to UTC) and build all green. Build sizes equal main's (main built with the changes stashed: every page within a few bytes, `/dashboard/*` 320 kB on both; the Baseline's 319 corrected).
+- **`/code-review` (high):** seven findings. Fixed: the section fallback read "2026-10-15" as "26-10-15" (2015-10-26), so ISO now comes first and a numeric date can't start inside a longer number; `detectDateOrder` counted impossible dates as evidence; a flagged placeholder showed as a course's next deadline; the label was duplicated (now in `utils/urgency.ts`); a regex was rebuilt per section. New item: A46. No change: refusing an upload without `localDate` (a tab left open across the deploy is told to refresh) is the cost of never using the UTC day.
+- **Docs:** `apps/web/standards.md` (the extraction rule and the flag's behavior); `docs/ops.md` (ENOSPC as a fallback, `taskkill` from Git Bash, `hasCompletedOnboarding` for a test user, the `localDate` field and the 4 KB floor for test PDFs).
+- **New:** D10 (ambiguous day and month), A44 (small PDFs fail in pdf-parse), A45 (the regex fallback's weight window), A46 (a number before a month read as the day).
+- **Left for the founder:** D10; check the Vercel preview; merge. Gemini's structured output only meets real replies in production (or a preview with the key set), so one real outline upload there is the last check of `responseSchema`.
+- **Gotchas:**
+  - In this shell, heredocs passed to `python` or `cat` turned `\\n` into a real newline and `\\` into `\`, which broke test strings twice; edit files that hold escapes with the editor tool.
+  - pdf-parse rejects a valid PDF under about 4 KB (A44); pad generated test PDFs.
+  - A seeded test user needs `hasCompletedOnboarding: true`, or every page redirects to `/onboarding`.

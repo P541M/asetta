@@ -7,11 +7,13 @@ import { getAdmin } from "../../lib/firebase-admin";
 import { getAuth } from "firebase-admin/auth";
 import { getFirestore } from "firebase-admin/firestore";
 import { extractAssessmentsWithAI } from "../../lib/upload/gemini";
+import { extractAssessmentsBasic, extractCourseName } from "../../lib/upload/textExtraction";
 import {
   ExtractedAssessment,
-  extractAssessmentsBasic,
-  extractCourseName,
-} from "../../lib/upload/textExtraction";
+  UNKNOWN_COURSE,
+  normalizeExtractedAssessment,
+  parseLocalDate,
+} from "../../lib/upload/normalize";
 import {
   ACCEPTED_MIME_TYPE,
   MAX_FILES_PER_UPLOAD,
@@ -145,6 +147,20 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(400).json({ success: false, error: "Invalid semester ID" });
     }
 
+    // The uploader's local today dates any assessment flagged for review. The server's own clock
+    // only knows the UTC day, which is the wrong day for much of the world.
+    const localDateField = fields.localDate;
+    const localDate = parseLocalDate(
+      Array.isArray(localDateField) ? localDateField[0] : localDateField,
+      new Date(),
+    );
+    if (!localDate) {
+      return res.status(400).json({
+        success: false,
+        error: "Please refresh the page and upload again.",
+      });
+    }
+
     const adminDb = getFirestore(adminApp);
     // Verify the semester exists by checking if we can access it
     const semesterRef = adminDb.doc(`users/${userId}/semesters/${semesterId}`);
@@ -194,7 +210,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
         let assessments: ExtractedAssessment[] = [];
         try {
-          assessments = await extractAssessmentsWithAI(extractedText);
+          assessments = await extractAssessmentsWithAI(extractedText, localDate);
         } catch (error: unknown) {
           const errorMessage = error instanceof Error ? error.message : "";
           if (errorMessage === "DAILY_QUOTA_EXCEEDED") {
@@ -207,18 +223,21 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             continue;
           }
           // Fall back to basic extraction
-          assessments = extractAssessmentsBasic(extractedText);
+          assessments = extractAssessmentsBasic(extractedText, localDate);
         }
 
+        // Nothing found: one placeholder, flagged for review, so the upload isn't silently empty.
         if (assessments.length === 0) {
-          assessments.push({
-            courseName: extractCourseName(extractedText) || "Unknown Course",
-            assignmentName: "Manual Review Required",
-            dueDate: new Date().toISOString().split("T")[0],
-            dueTime: "23:59",
-            weight: 0,
-            status: "Not started",
-          });
+          assessments.push(
+            normalizeExtractedAssessment(
+              {},
+              {
+                fallbackCourseName: extractCourseName(extractedText) ?? UNKNOWN_COURSE,
+                fallbackAssignmentName: "Manual Review Required",
+                localDate,
+              },
+            ),
+          );
         }
 
         const assessmentsRef = adminDb.collection(

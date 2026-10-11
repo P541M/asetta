@@ -4,6 +4,7 @@ import { Day } from "../../types/calendar";
 import { cn } from "@/lib/utils";
 import { Button } from "../ui/button";
 import { statusTintClasses } from "../tables/assessments/StatusSelect";
+import { NEEDS_REVIEW_LABEL } from "../../utils/urgency";
 
 interface DayDetailModalProps {
   day: Day;
@@ -82,6 +83,9 @@ const DayDetailModal = ({ day, onClose, formatDateTime }: DayDetailModalProps) =
                 </div>
                 <div className="mt-2 text-sm text-muted-foreground">
                   <p>Due: {formatDateTime(day.date, assessment.dueTime)}</p>
+                  {assessment.needsReview && (
+                    <p className="font-medium text-primary">{NEEDS_REVIEW_LABEL}</p>
+                  )}
                   {assessment.weight > 0 && <p>Weight: {assessment.weight}%</p>}
                 </div>
               </div>

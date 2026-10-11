@@ -414,6 +414,14 @@ never duplicated into component state (the source of the 2026-07-16 flicker fix)
   it does its date math in UTC, where no DST gap can shift it. Anything
   that renders time-relative text reads the clock from `hooks/useNow` (ticks each minute and on
   tab wake), so labels on a page left open overnight stay true.
+- **Extracted assessments are stored only through `normalizeExtractedAssessment`**
+  (`lib/upload/normalize.ts`), for Gemini and the regex fallback alike: a real calendar
+  `dueDate`, a padded 24-hour `dueTime`, a weight from 0 to 100, trimmed and capped names. An
+  assessment without a usable date (unreadable, impossible, or a day and month that could swap,
+  D10) is kept with `needsReview: true`, dated the uploader's local today (the upload form sends
+  it; the server never uses its own UTC day). A flagged row shows "Check the due date"
+  (`NEEDS_REVIEW_LABEL` in `utils/urgency.ts`) in place of the urgency label, is never a course's
+  next deadline and gets no reminder; saving the row's edit clears the flag.
 
 ### Course cards (locked 2026-07-22)
 

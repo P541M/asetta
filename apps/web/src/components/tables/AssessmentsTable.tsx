@@ -1,6 +1,6 @@
 import React from "react";
 import { useState, useEffect, useMemo } from "react";
-import { updateDoc, deleteDoc, serverTimestamp } from "firebase/firestore";
+import { updateDoc, deleteDoc, deleteField, serverTimestamp } from "firebase/firestore";
 import { ChevronsUpDown, FileText, ListFilter } from "lucide-react";
 import { getAssessmentDocRef } from "../../lib/firebaseUtils";
 import { useAuth } from "../../contexts/AuthContext";
@@ -203,8 +203,10 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
     if (!user) return;
     try {
       const assessmentRef = getAssessmentDocRef(user.uid, semesterId, assessmentId);
+      // Saving the edit row is the student's check of the date, so it clears the review flag.
       await updateDoc(assessmentRef, {
         ...editFormData,
+        needsReview: deleteField(),
         updatedAt: new Date(),
       });
       setEditingId(null);
