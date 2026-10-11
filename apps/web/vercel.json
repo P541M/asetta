@@ -1,5 +1,4 @@
 {
-  "version": 2,
   "crons": [
     {
       "path": "/api/cron/notifications",
@@ -8,11 +7,9 @@
   ],
   "functions": {
     "src/pages/api/cron/notifications.ts": {
-      "memory": 1024,
-      "maxDuration": 10
+      "maxDuration": 300
     },
     "src/pages/api/upload.ts": {
-      "memory": 1024,
       "maxDuration": 60
     }
   }

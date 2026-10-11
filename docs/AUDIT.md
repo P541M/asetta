@@ -56,14 +56,14 @@ branch. Tick the items off and add a session log entry when done. Don't commit.
 | B6 | A5, A29 | Repo hygiene leftovers, line endings | A29 unblocks the local format check |
 | B7 | A10, A14, A36 | Grade math + ICS export, test-first | D1 decided; A36 is the same grade function |
 | B8 | A9, A37 | Extraction normalization, test-first | A37 is the same extraction code |
-| B9 | A8, A32 | Reminders at 9:30 local time, test-first | D4 and D6 decided; A32 is the Settings copy for the new time |
+| B9 | A8, A32, A38 | Reminders at 9:30 local time, test-first | D4 and D6 decided; A32 is the Settings copy for the new time; A38 is the retry the new schedule makes possible |
 | B10 | A11, A12 | Data layer: live assessments, user doc | |
 | B11 | A13 | Course names containing "/" | Reproduce first |
 | B12 | A16, A17 | Rules + verified notification email | Founder deploys rules |
 | B13 | A15 | Bundle size | |
 | B14 | A18, A20 | Rate limits (upload quota, contact form) | D5 decided |
 | B15 | A19 | Cron throughput | After A8 |
-| any | A21 to A28, A33 to A35 | Later items | As time allows; A34 needs D8 |
+| any | A21 to A28, A33 to A35, A39, A40 | Later items | As time allows; A34 needs D8 |
 
 Until A29 lands, run the format check locally with `npx prettier --check --end-of-line auto .` inside each app.
 
@@ -83,13 +83,15 @@ Until A29 lands, run the format check locally with `npx prettier --check --end-o
   - **Fix:** Web `next` and `eslint-config-next` to 15.5.27. `npm update` in the landing (`next` 16.4.0 is in range). `npm audit fix` (never `--force`). Then nodemailer 10 (a major, both apps) as its own commit; smoke-test the reminder, welcome and contact emails. If the firebase/grpc high needs a major, move it to A25 and log it.
   - **Done when:** 0 critical; every remaining high is listed in the session log with a reason; Baseline numbers updated.
 
-- [ ] **A3 · Cron: fail closed, log failures, retry failed sends** · S · risk L
+- [x] **A3 · Cron: fail closed, log failures, retry failed sends** · S · risk L (done 2026-10-11, PR #10)
+  - **Shipped:** pure rules in `lib/reminderCron.ts` (`isCronAuthorized`, `isAlreadySent`, `cronRunId`), tested first in `lib/reminderCron.test.ts`. The route refuses every request while `CRON_SECRET` is unset or empty and logs that it is unset. `lib/notifications.ts` treats only `status: "sent"` as sent, so a failed send is retried; send failures (uid, assessment ID, SMTP codes, no addresses), per-user errors and a failed summary write go to `console.error`. Each run writes the server-only `cronRuns/{UTC date}` (the day's `runs`, `sent` and `failed`, plus `lastRun`), and the route returns the same summary. `vercel.json`: the cron's `maxDuration` is 300, the Hobby maximum on Fluid compute (Vercel docs, checked 2026-10-11); `memory` and `version` are gone. Retries only happen within the same day count, so under the daily cron a failure still waits for A8 (A38).
   - **Where:** `apps/web/src/pages/api/cron/notifications.ts:8`; `apps/web/src/lib/notifications.ts` (dedupe check :219-228, failed record :262-280); `apps/web/src/utils/devLog.ts`; `apps/web/vercel.json`.
   - **Problem:** If `CRON_SECRET` is unset, the header `Bearer undefined` is accepted. Per-user errors and email failures go through `devError`, which does nothing in production, and Vercel Hobby keeps logs for 1 hour, so failures are invisible. A failed send still writes the dedupe doc (status "failed"), so it is never retried. `maxDuration: 10` caps a sequential scan of every user. `memory` and `version: 2` in `vercel.json` are ignored leftovers.
   - **Fix:** Reject when the secret is unset. `console.error` real failures (no email addresses in logs). Persist a per-run summary (e.g. a `cronRuns/{date}` doc with users, sent, failed, duration). Treat only `status: "sent"` as already sent. Raise `maxDuration` within the plan's limit; drop `memory` and `version`.
   - **Done when:** with no secret configured, every request gets 401; a forced SMTP failure is retried on the next run; the last run's result is still readable after an hour.
 
-- [ ] **A4 · Upload route: auth first, clean temp files, log errors** · S · risk L
+- [x] **A4 · Upload route: auth first, clean temp files, log errors** · S · risk L (done 2026-10-11, PR #10)
+  - **Shipped:** the token is verified from the headers before `parseForm`. Every temp file formidable opens, partial ones included (collected on `fileBegin`), is deleted in a `finally`. Each catch logs with `console.error` and the uid, as does the form-parse 400 (the 413s are the client's limits and stay quiet). `semesterId` must pass `isValidDocId` (`utils/validation.ts`, tested first: no `/`, not `.` or `..`, not `__x__`, at most 1,500 bytes).
   - **Where:** `apps/web/src/pages/api/upload.ts` (parse :74, auth :104, bare catches :158, :226, :276).
   - **Problem:** The multipart body (up to 4 MB, written to /tmp) is parsed before the token is checked. formidable's temp files are never deleted. Three `catch {}` blocks swallow errors with no log. `semesterId` isn't checked to be a single path segment.
   - **Fix:** Verify the Bearer token before `parseForm` (headers arrive before the body). Unlink every temp file in a `finally`. `console.error` in each catch. Reject a `semesterId` containing `/`.
@@ -244,7 +246,7 @@ Until A29 lands, run the format check locally with `npx prettier --check --end-o
 - [ ] **A16 · Firestore rules: validate fields** · M · risk M
   - **Where:** `firestore.rules` (the live rules matched this file on 2026-10-10).
   - **Problem:** Owners can write any key, type or size on every doc, including the `email` that reminders go to (see A17). The `documents` and `courses` rules match collections nothing uses.
-  - **Fix:** Allow-list keys and types per collection (user doc, semesters, assessments, coursePreferences); cap string lengths; delete the dead matches. Leave `welcomeEmails` without a client rule (server-only, A1). Test in the Firestore emulator before deploying. Agents can't deploy rules (`.claude/settings.json` denies it); the founder deploys.
+  - **Fix:** Allow-list keys and types per collection (user doc, semesters, assessments, coursePreferences); cap string lengths; delete the dead matches. Leave `welcomeEmails`, `cronRuns` and `notifications` without a client rule (server-only: A1, and A3's run summary and reminder records). Test in the Firestore emulator before deploying. Agents can't deploy rules (`.claude/settings.json` denies it); the founder deploys.
   - **Done when:** emulator tests pass for every write the app makes and fail for out-of-schema writes.
 
 - [ ] **A17 · Verify the notification email before sending** · M · risk M · moved from `docs/backlog.md`
@@ -261,7 +263,7 @@ Until A29 lands, run the format check locally with `npx prettier --check --end-o
 - [ ] **A19 · Cron throughput** · M · risk M · after A8
   - **Where:** `apps/web/src/lib/notifications.ts:36-130`; `apps/web/src/lib/email.ts:32,99`.
   - **Problem:** Every run reads every user, then every semester, then every assessment, one at a time. `transporter.verify()` runs before every email. Gmail caps sending at roughly 500 a day (D3: staying on Gmail for now). It will time out as users grow.
-  - **Fix:** A8's `nextReminderAt` query removes the full user scan. What's left: read only the due user's assessments in the reminder window, bounded concurrency, verify the transporter once per run, and track daily send counts in the A3 run summary. Revisit D3 if sends approach the Gmail cap.
+  - **Fix:** A8's `nextReminderAt` query removes the full user scan. What's left: read only the due user's assessments in the reminder window, bounded concurrency, and verify the transporter once per run. The A3 run summary (`cronRuns/{date}`) already keeps each day's `sent` and `failed` totals and each run's `durationMs`. Revisit D3 if sends approach the Gmail cap.
   - **Done when:** run time stays flat as users grow (measure with the A3 run summary).
 
 - [ ] **A20 · Landing contact form: throttle and bot check** · S · risk L
@@ -285,6 +287,12 @@ Until A29 lands, run the format check locally with `npx prettier --check --end-o
   - **Problem:** the code pattern `/([A-Z]{2,4})\s*(\d{3,4}[A-Z]*)/i` is case-insensitive, matches inside words, and takes the first hit in the whole text. A term before the course code wins: "Fall 2026 syllabus" then "CIS 3760" gives `Fall2026`; "Course outline, Winter 2027" gives `nter2027`; "Summer 2026" gives `mmer2026` (all checked in B4).
   - **Fix:** match capitals at a word boundary only (no `i` on the letters) and skip a term word (Fall, Winter, Spring, Summer) followed by a year.
   - **Done when:** the `it.fails("A37: ...")` in `lib/upload/textExtraction.test.ts` is a passing `it`, plus cases for the code formats the fix accepts.
+
+- [ ] **A38 · A failed reminder is retried only on the same day count** · S · risk L · with A8 (B9) · found during B5
+  - **Where:** `apps/web/src/lib/notifications.ts`: the record ID `${uid}_${assessmentId}_${daysUntilDue}` and the `daysUntilDue === notificationDaysBefore` check.
+  - **Problem:** since A3, a failed send no longer blocks the next attempt, but the record ID and the send check both use the day count. The daily cron's next run is a day later, when the count has moved on, so that reminder is never sent and its failed record just stays. Only a rerun on the same day retries it. (Read from the code; B5's emulator runs checked the same-day retry only.)
+  - **Fix (in A8's rewrite):** key the record by the assessment and the reminder's target day, not the count, and let a run send any reminder whose day has come and that has no "sent" record (or don't advance `nextReminderAt` past a failed send). With D6's 30-minute schedule, a failure is then retried within half an hour. Two things the B5 review raised come with that: overlapping runs can both read a failed record and both send (claim the send first, as `welcomeEmails` does with `create()`), and a permanent failure (a rejected address) is retried on every run, so cap the attempts.
+  - **Done when:** a test of A8's pure helper shows a reminder that failed in one run going out in the next, after the day count has changed.
 
 ## Later
 
@@ -360,6 +368,16 @@ Until A29 lands, run the format check locally with `npx prettier --check --end-o
   - **Fix:** replace each by hand with a comma, colon, semicolon or period (some are asides or ranges that need rewording, not a mechanical swap). Decide with the founder whether the root rule should say "copy and docs".
   - **Done when:** a search for the em dash character (U+2014) finds nothing in the CLAUDE files, `standards.md` or `docs/`.
 
+- [ ] **A39 · Token checks that fail for server reasons are silent** · S · risk L · found during B5
+  - **Where:** the `catch` around `verifyIdToken` in `apps/web/src/pages/api/upload.ts` and `apps/web/src/pages/api/welcome-email.ts`.
+  - **Problem:** every error becomes a 401 "Invalid authentication token" with no log. That is right for an expired or junk token, but the same catch also takes server-side failures (for example the admin SDK failing to fetch Google's signing keys, or bad admin credentials). The student then sees "Your session expired" while nothing reaches the logs.
+  - **Fix:** `console.error` (with the error code, no token) when the code isn't a client token problem (`auth/id-token-expired`, `auth/id-token-revoked`, `auth/argument-error` and similar), and consider a 503 for those.
+
+- [ ] **A40 · Upload route capped at 60 seconds** · S · risk L · found during B5
+  - **Where:** `apps/web/vercel.json` (`src/pages/api/upload.ts`: `maxDuration: 60`).
+  - **Problem:** one upload of up to 10 PDFs calls Gemini once per file, one after another. Hobby on Fluid compute allows 300 seconds (B5 checked the docs), but this route stops at 60, and a slow batch shows the student the timeout message.
+  - **Fix:** time a 10-file upload; if it gets near 60 seconds, raise the limit (up to 300) or process the files with bounded concurrency.
+
 ## Baseline (2026-10-10)
 
 Numbers to compare against when items land.
@@ -367,8 +385,8 @@ Numbers to compare against when items land.
 - `npm audit --omit=dev`: 38 vulnerabilities (0 critical, 5 high, 33 moderate) after A2 (2026-10-10; was 46: 1 critical, 12 high, 33 moderate). Including dev dependencies: 43 (10 high).
 - `apps/web` build (Next 15.5.27, after A2): 229 kB First Load JS shared by all pages (`_app` chunk 114 kB); every dashboard route 319 kB (was 320); `/login` and `/register` 242 kB; `/onboarding` 285 kB; `/settings` 284 kB (was 285).
 - Live Firestore rules identical to `firestore.rules`; no Storage rules (Storage unused).
-- Vercel: projects `asetta` (apps/web) and `asetta-landing` (apps/landing), Hobby plan: runtime logs kept 1 hour; cron jobs run at most once a day and fire anywhere within the scheduled hour.
-- Tests (after A7, 2026-10-11; was none): 9 suites in `apps/web`, each run in two zones. Per zone, 179 tests: 160 pass, 12 expected failures (`it.fails`: A9 3, A10 3, A14 4, A36 1, A37 1), 7 todo (A9 2, A10 4, A14 1). `npm test` takes about 2 seconds.
+- Vercel: projects `asetta` (apps/web) and `asetta-landing` (apps/landing), Hobby plan: runtime logs kept 1 hour; cron jobs run at most once a day and fire anywhere within the scheduled hour; functions on Fluid compute get a 300-second default and maximum duration (docs checked 2026-10-11). In `apps/web/vercel.json` the cron route has `maxDuration` 300 since A3 (was 10) and the upload route 60.
+- Tests (after B5, 2026-10-11; 9 suites after A7, none before): 11 suites in `apps/web`, each run in two zones. Per zone, 217 tests: 198 pass, 12 expected failures (`it.fails`: A9 3, A10 3, A14 4, A36 1, A37 1), 7 todo (A9 2, A10 4, A14 1). `npm test` takes about 2 seconds.
 
 ## Session log
 
@@ -587,3 +605,38 @@ Newest last. One entry per session: date, branch, items, what changed, what's le
   - `npm install --dry-run` reproduces the arborist crash without touching anything; the debug log's `placeDep` and `fetch manifest` lines show which package pulled the loop in.
   - Git Bash doesn't pass `TZ` to Node (`TZ=Asia/Kolkata node ...` still ran in Toronto); PowerShell does.
   - An `it.fails` also passes when the test throws for an unrelated reason, so run a new one once as a plain `it` and read the failure.
+
+### 2026-10-11 · B5 (`fix/b5-server-hardening`, PR #10)
+
+- **A3 and A4 done.** Pulled main first (already up to date with PR #9), no dev servers running, `npm install` clean. After a final sweep the founder asked for a PR; the agent committed, pushed and opened it for this batch only (the founder merges).
+- **Test-first:** `lib/reminderCron.test.ts` (20 cases: the secret check, the already-sent rule, the run ID) and `utils/validation.test.ts` (18 cases for `isValidDocId`). They were first run against stubs that copied today's inline logic, and 21 of 38 failed on their assertions: the unset and empty secret accepting `Bearer undefined` and `Bearer `, a failed record counting as sent, slashes and `..` passing. Then the real functions made them pass in both zones.
+- **A3:** see the item. The run summary is `cronRuns/{UTC date}` with daily counters plus `lastRun`, not one doc per run, so A8's 48 runs a day still give daily totals (A19). The day key is UTC on purpose (`cronRunId` tests it at 23:30 UTC, when Kolkata is already on the next day).
+- **A4:** see the item. The route now checks the token before anything reads the body.
+- **`maxDuration`:** Vercel's duration and limits pages (updated 2026-08-24) give Hobby on Fluid compute 300 seconds as both the default and the maximum, and the vercel.json page says `memory` can't be set there with Fluid compute and `version` should not be used. Fluid has been the default since April 23, 2025; `asetta` was created May 8, 2025, but the Vercel MCP doesn't show the setting, so the preview deploy is the real check.
+- **Route checks** (dev server on :3005 against the Auth and Firestore emulators run from a scratch folder; placeholder `CRON_SECRET`; `EMAIL_APP_PASSWORD` and `GEMINI_API_KEY` set empty so nothing could reach Gmail or Gemini; `TEMP` on an empty folder). Old code first, then new:
+  - Unauthenticated 4 MB upload: old 401 after a 4,128,768-byte temp file was written and left; new 401 with zero file events in the temp folder (`fs.watch`), same for a junk token.
+  - Authenticated upload: old left its temp file; new leaves none after a 200, a 413 (a 4.06 MB file), a 400 for `sem1/assessments/x` and `..`, two unparseable PDFs, or a body with no multipart boundary.
+  - Logs: `Upload: could not parse a PDF` (both PDFs) and `could not parse the form` now appear with the uid; the old code said nothing.
+  - Cron, forced send failure: old run 1 failed and run 2 skipped it as "already sent". New runs 1 and 2 both attempted it and logged `Reminder cron: send failed` (uid, assessment ID, no address); `cronRuns/2026-10-11` read `runs: 2, failed: 2`. After marking the record `sent`, run 3 skipped it (`sent: 0, failed: 0`), so the change can't cause repeat sends.
+  - Secret: with `CRON_SECRET` empty, no header, `Bearer `, `Bearer undefined` and `Bearer null` all got 401 and each logged that the secret is unset. A wrong secret gets 401 with the placeholder set.
+  - The forced failure is `deliver()` throwing before it contacts Gmail; a real SMTP error goes through the same catch. No real email was sent this session.
+- **Finding:** the old code with an *empty* secret also refused `Bearer `, because Node trims trailing spaces from header values, so only the *unset* secret (`Bearer undefined`) was open. That case can't be reproduced here, since `.env.local` defines `CRON_SECRET`; the unit tests cover it.
+- **Done-when checks:**
+  - A3: no secret means 401 for every request (route with an empty secret, unit tests for unset and empty); a forced send failure is retried by the next run (see A38 for the daily schedule); the run's result sits in a Firestore doc that doesn't expire.
+  - A4: an unauthenticated 4 MB POST gets 401 without a file event in the temp folder; no upload file remains after any request; failures are logged.
+- **`/code-review` (high):** six findings. Fixed: a null thrown value would have broken the send-failure log. Moved into A38: overlapping runs could both retry a failed send, and a permanent failure is retried every run with no cap. No change: cleanup in `finally` finishes before the handler resolves; the separate "Semester ID is required" check stays for its message; the unset-secret log is meant to be loud.
+- **Verification loop:** lint, typecheck, `npm test` and build green. `npm test`: 22 files (11 suites in 2 zones), 396 passed, 24 expected failures, 14 todo. Build sizes match the Baseline. `format:check` fails on line endings only (A29: 170 web files; the 10 more than B4 are B4's own test files, which came down CRLF with the PR #9 merge). `prettier --check --end-of-line auto .` passes in both apps, and the new files pass the strict check.
+- **Docs:** `apps/web/standards.md` (the "Known gaps" bullet is replaced by rules on temp-file cleanup and run records; `cronRuns` joins the server-only example); `docs/ops.md` (the function-limits note, the Reminder cron section, the server-only collections, env overrides for local route tests, the C: note).
+- **New:** A38 (a failed reminder is retried only on the same day count; added to B9 with A8), A39 (token checks that fail for server reasons are silent), A40 (the upload route is capped at 60 seconds).
+- **Final sweep:** re-read every changed line. Fixed two overstatements in the docs (what a missing `cronRuns` day doc means; A38's day-change case was read from the code, not run) and one wrong file size in this entry, then ran the full loop again: same results as above.
+- **Vercel preview** (commit `a8cbb62`): built and READY, so Vercel accepted the cron's `maxDuration: 300` (Fluid compute is on). Through the Vercel MCP's authenticated fetch, `GET /api/upload` returned the route's own JSON 405. `GET /api/cron/notifications` returned 401, but the tool hid the body, so it couldn't show whether that was the route or Vercel Authentication; the local checks cover the route.
+- **Left for the founder:**
+  - Merge.
+  - After the merge, after the first 21:00 UTC run, open `cronRuns/<that date>` in the Firestore console and expect `runs: 1` with `lastRun.error` null.
+  - Optional: one real reminder sent to your own address to see a retried send go through end to end (not done; it needs your approval).
+- **Gotchas:**
+  - C: had 0 bytes free. Every `npm run` and `npx` failed with ENOSPC until `npm_config_cache`, `TEMP` and `TMP` pointed under `node_modules/.cache/b5/`, and agent shell output of more than a few lines failed with "write error", so outputs went to files there.
+  - Git Bash's `curl` is a native binary, so `-F "files=@/e/..."` fails (error 26); use `E:/...` paths inside `-F`.
+  - An empty env var survives into a child process on Windows, and Next keeps it, so `VAR=` in the dev server's environment overrides `.env.local`.
+  - A hand-written minimal PDF gave pdf-parse 1.1.1 "bad XRef entry"; the sample PDFs in `node_modules/pdf-parse/test/data` parse.
+  - Scripts, fixtures and logs for these checks are in `node_modules/.cache/b5/` (untracked; `npm ci` deletes them).

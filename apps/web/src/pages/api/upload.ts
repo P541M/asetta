@@ -19,6 +19,7 @@ import {
   MAX_TOTAL_UPLOAD_BYTES,
   formatBytes,
 } from "../../lib/upload/constants";
+import { isValidDocId } from "../../utils/validation";
 
 export const config = {
   api: {
@@ -40,7 +41,15 @@ const isTooManyFilesError = (error: unknown): boolean =>
 const isPayloadTooLargeError = (error: unknown): boolean =>
   (error as { httpCode?: unknown })?.httpCode === 413;
 
-const parseForm = (req: NextApiRequest): Promise<{ fields: Fields; files: Files }> => {
+/**
+ * Parses the multipart body. formidable writes each file to the OS temp dir as it arrives; every
+ * path it opens, including a partial file from a failed parse, is pushed onto `tempFiles` so the
+ * handler can delete them all.
+ */
+const parseForm = (
+  req: NextApiRequest,
+  tempFiles: string[],
+): Promise<{ fields: Fields; files: Files }> => {
   return new Promise((resolve, reject) => {
     const form = new IncomingForm({
       multiples: true,
@@ -52,6 +61,9 @@ const parseForm = (req: NextApiRequest): Promise<{ fields: Fields; files: Files 
       maxFiles: MAX_FILES_PER_UPLOAD,
       filter: ({ mimetype }) => mimetype === ACCEPTED_MIME_TYPE,
     });
+    form.on("fileBegin", (_name, file) => {
+      tempFiles.push(file.filepath);
+    });
     form.parse(req, (err, fields, files) => {
       if (err) {
         reject(err);
@@ -62,16 +74,42 @@ const parseForm = (req: NextApiRequest): Promise<{ fields: Fields; files: Files 
   });
 };
 
+/** Deletes formidable's temp files. A file that is already gone is fine; anything else is logged. */
+const removeTempFiles = async (paths: string[]) => {
+  const results = await Promise.allSettled(paths.map((p) => fs.promises.rm(p, { force: true })));
+  for (const result of results) {
+    if (result.status === "rejected") {
+      console.error("Upload: could not delete a temp file", result.reason);
+    }
+  }
+};
+
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "POST") {
     return res.status(405).json({ success: false, error: "Method not allowed" });
   }
 
+  // Authenticate from the headers before reading the body, so an unauthenticated upload is never
+  // parsed or written to disk.
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return res.status(401).json({ success: false, error: "Authentication required" });
+  }
+
+  let userId: string | undefined;
+  const tempFiles: string[] = [];
   try {
+    const adminApp = await getAdmin();
+    try {
+      userId = (await getAuth(adminApp).verifyIdToken(authHeader.slice(7))).uid;
+    } catch {
+      return res.status(401).json({ success: false, error: "Invalid authentication token" });
+    }
+
     let fields: Fields;
     let files: Files;
     try {
-      ({ fields, files } = await parseForm(req));
+      ({ fields, files } = await parseForm(req, tempFiles));
     } catch (error: unknown) {
       if (isTooManyFilesError(error)) {
         return res.status(413).json({
@@ -89,6 +127,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           )} per upload.`,
         });
       }
+      // The size and count limits above are the client's mistakes; anything else is worth a log.
+      console.error("Upload: could not parse the form", { uid: userId, error });
       return res.status(400).json({
         success: false,
         error: "We couldn't read that upload. Please make sure you're sending PDF files.",
@@ -100,19 +140,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (!semesterId) {
       return res.status(400).json({ success: false, error: "Semester ID is required" });
     }
-
-    const authHeader = req.headers.authorization;
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      return res.status(401).json({ success: false, error: "Authentication required" });
-    }
-    const token = authHeader.split(" ")[1];
-    const adminApp = await getAdmin();
-    let userId;
-    try {
-      const decodedToken = await getAuth(adminApp).verifyIdToken(token);
-      userId = decodedToken.uid;
-    } catch {
-      return res.status(401).json({ success: false, error: "Invalid authentication token" });
+    // It goes into a Firestore path, so it must be exactly one segment.
+    if (!isValidDocId(semesterId)) {
+      return res.status(400).json({ success: false, error: "Invalid semester ID" });
     }
 
     const adminDb = getFirestore(adminApp);
@@ -155,7 +185,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         try {
           const data = await pdfParse(pdfBuffer);
           extractedText = data.text;
-        } catch {
+        } catch (error) {
+          console.error("Upload: could not parse a PDF", { uid: userId, error });
           failedFiles++;
           errors.push(`Failed to parse PDF: ${fileName}`);
           continue;
@@ -223,7 +254,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             }
           });
         }
-      } catch {
+      } catch (error) {
+        console.error("Upload: could not process a file", { uid: userId, error });
         failedFiles++;
         errors.push(`Failed to process file: ${fileData.originalFilename}`);
       }
@@ -273,10 +305,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       errors: errors.length > 0 ? errors : undefined,
       hasRateLimitErrors,
     });
-  } catch {
+  } catch (error) {
+    console.error("Upload: request failed", { uid: userId, error });
     return res.status(500).json({
       success: false,
       error: "Processing error occurred",
     });
+  } finally {
+    await removeTempFiles(tempFiles);
   }
 }

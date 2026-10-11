@@ -49,16 +49,19 @@ All new code follows these.
 - **Validate every input** at the boundary: method, types, lengths, and path-segment safety for
   anything used in a Firestore path (no `/`). Reject with a 4xx and a short message.
 - **Server-only state is written with the admin SDK** into collections no client rule matches
-  (e.g. `welcomeEmails/{uid}`). Client-writable fields on the user doc are never trusted as a
-  server guard.
+  (e.g. `welcomeEmails/{uid}`, `cronRuns/{date}`). Client-writable fields on the user doc are
+  never trusted as a server guard.
 - **Log real failures with `console.error`** (no email addresses or other personal data in
   logs; uids and error codes are fine). `devLog`/`devError` print in development only, so they
   never carry a production failure.
 - **Escape every user value in email HTML** with `utils/escapeHtml.ts` (see "Email" in Part 2).
 - Secrets come from env vars only (the matrix is in `docs/ops.md`); a route whose secret is unset
-  fails closed.
-- Known gaps, don't copy them: the cron route accepts an unset secret and dev-logs its failures
-  (A3), and the upload route parses the body before checking the token (A4).
+  fails closed and logs that it is unset (see `pages/api/cron/notifications.ts`).
+- **Delete what the request wrote to disk** in a `finally`, on success and failure alike
+  (formidable's temp files in `pages/api/upload.ts`).
+- **A scheduled job records each run** in Firestore (the reminder cron's `cronRuns/{date}`),
+  because Vercel Hobby keeps logs for 1 hour. A failed side effect is recorded as failed and
+  retried, never marked done.
 
 ### Testing
 
