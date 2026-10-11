@@ -1,15 +1,18 @@
 import { User } from "firebase/auth";
 import { ExtractionResult } from "../types/upload";
 import { formatBytes, MAX_TOTAL_UPLOAD_BYTES } from "./upload/constants";
+import { getTodayDateString } from "../utils/dateUtils";
 
 /**
- * POSTs syllabus files to /api/upload with the user's Firebase ID token.
+ * POSTs syllabus files to /api/upload with the user's Firebase ID token and local date (the
+ * server dates any assessment flagged for review with it; its own clock only knows the UTC day).
  * Callers own response parsing/error handling (the two upload forms have
  * intentionally different success and error flows), but should parse via
  * `parseUploadResponse` so platform-level HTML errors stay readable.
  */
 export async function postUploadForm(user: User, formData: FormData): Promise<Response> {
   const token = await user.getIdToken();
+  formData.set("localDate", getTodayDateString());
   return fetch("/api/upload", {
     method: "POST",
     headers: {

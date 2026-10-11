@@ -13,6 +13,8 @@ export interface Assessment {
   status: AssessmentStatus;
   notes?: string;
   mark?: number | null;
+  /** Set by the upload when no usable due date was found; the date is a placeholder. */
+  needsReview?: boolean;
   createdAt?: Date | Timestamp;
   updatedAt?: Date | Timestamp;
 }

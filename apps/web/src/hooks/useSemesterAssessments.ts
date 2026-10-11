@@ -34,7 +34,8 @@ function processCourseStats(assessmentsList: Assessment[], now: Date): CourseSta
   courseMap.forEach((assessments, courseName) => {
     const completed = assessments.filter((a) => isCompletedStatus(a.status));
     const upcomingAssessments = assessments
-      .filter((a) => !isCompletedStatus(a.status) && dueAt(a) >= now.getTime())
+      // A flagged assessment's date is a placeholder, so it can't be the next deadline.
+      .filter((a) => !isCompletedStatus(a.status) && !a.needsReview && dueAt(a) >= now.getTime())
       .sort((a, b) => dueAt(a) - dueAt(b));
 
     const nextUpcoming = upcomingAssessments[0];
@@ -63,6 +64,7 @@ function computeStats(assessmentsList: Assessment[], now: Date): DashboardStats 
   const inProgressCount = assessmentsList.filter((a) => a.status === "In progress").length;
   const completedCount = assessmentsList.filter((a) => isCompletedStatus(a.status)).length;
   const upcomingCount = assessmentsList.filter((a) => {
+    if (a.needsReview) return false;
     const due = dueAt(a);
     return due > now.getTime() && due <= oneWeek.getTime() && !isCompletedStatus(a.status);
   }).length;
@@ -136,6 +138,7 @@ export function useSemesterAssessments(user: User | null, selectedSemesterId: st
               assignmentName: data.assignmentName || "Unknown Assessment",
               dueTime: data.dueTime || "23:59",
               weight: data.weight || 0,
+              needsReview: data.needsReview === true,
             };
           });
           hasDataRef.current = assessmentsList.length > 0;

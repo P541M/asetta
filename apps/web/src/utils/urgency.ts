@@ -12,6 +12,9 @@ export const daysUntilLabel = (days: number): string =>
         ? "Due tomorrow"
         : `${days} days left`;
 
+/** Shown instead of the urgency label while an uploaded assessment's date is a placeholder. */
+export const NEEDS_REVIEW_LABEL = "Check the due date";
+
 export const urgencyTextClass = (days: number): string =>
   days <= 3 ? "text-destructive" : days <= 7 ? "text-primary" : "text-muted-foreground";
 

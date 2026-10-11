@@ -22,6 +22,8 @@ interface Assessment {
   assignmentName: string;
   dueTime: string;
   status: AssessmentStatus;
+  /** The due date is the upload day's placeholder until the student checks it. */
+  needsReview?: boolean;
 }
 
 /** One run's result: returned by the cron route and saved as `lastRun` in `cronRuns/{UTC date}`. */
@@ -225,6 +227,10 @@ export async function checkAndSendNotifications(): Promise<CronRunSummary> {
         devLog(`🔮 Future assessments: ${futureAssessments.length}`);
 
         for (const assessment of futureAssessments) {
+          if (assessment.needsReview) {
+            devLog(`⏭️ Skipping "${assessment.assignmentName}": its due date needs review`);
+            continue;
+          }
           if (assessment.status === "Submitted" && !preferences.notifySubmittedAssessments) {
             devLog(`⏭️ Skipping submitted assessment "${assessment.assignmentName}"`);
             continue;

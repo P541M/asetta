@@ -134,7 +134,12 @@ project. Never commit real values.
   `getAuth()` and `getFirestore()` in `lib/firebase.ts` then connect to the emulators. Check the
   console shows "You are using the Auth Emulator" before typing any credentials, create the test
   user through the Auth emulator's REST API, and seed its user doc first: a user without one makes
-  `AuthContext` request the welcome email. Delete the cookie afterwards.
+  `AuthContext` request the welcome email. Give it `hasCompletedOnboarding: true` too, or the
+  sign-in lands on `/onboarding`. Delete the cookie afterwards.
+- Uploads need a `localDate` form field (YYYY-MM-DD within a day of the UTC date) or the route
+  answers 400; the app's `postUploadForm` adds it. A test PDF must be at least about 4 KB:
+  smaller ones fail in pdf-parse with "bad XRef entry" (A44). B8's generator
+  (`node_modules/.cache/b8/make-pdf.cjs`) pads its outlines past that.
 - Preview emails at `/api/dev/email-preview` on `npm run dev:web` (404 outside development).
   Real test sends go to the founder's own address only, with the founder's approval.
 
@@ -207,10 +212,13 @@ project. Never commit real values.
   editor's and MCP servers' node processes by its command line.
 - Stopping a background dev server or emulator can leave its node or java children running; kill
   them by PID (`taskkill /PID <pid> /T /F`).
-- The C: drive is nearly full, so npm and the emulators can fail with ENOSPC. Point
+- If C: fills up again, npm and the emulators fail with ENOSPC. The fallback: point
   `npm_config_cache`, `TEMP` and `TMP` (and `JAVA_TOOL_OPTIONS=-Djava.io.tmpdir=<dir>` for the
   emulators) at folders under `node_modules/.cache/` in the repo. When C: is completely full,
-  every `npm run` and `npx` command needs this, not only installs.
+  every `npm run` and `npx` command needs this, not only installs. C: had 33 GB free on
+  2026-10-11, so npm runs normally today.
+- `taskkill /PID <pid> /T /F` from Git Bash fails with "not found" (the shell rewrites the `/`
+  flags); run it through `powershell -NoProfile -Command "taskkill /PID <pid> /T /F"`.
 - Line endings: the root `.gitattributes` (`* text=auto eol=lf`) checks every text file out with
   LF even though this machine has `core.autocrlf=true`, so `npm run format:check` passes locally
   as it does on CI. It also lists the binary types (images, fonts, video, PDF); give any new
