@@ -13,6 +13,3 @@ public/
 
 # Prose stays hand-formatted
 *.md
-
-# Refactor verification snapshots (temporary)
-.refactor-baseline/

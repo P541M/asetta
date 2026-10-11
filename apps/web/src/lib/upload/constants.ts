@@ -43,14 +43,14 @@ export const validateUploadSelection = (
   if (oversized) {
     return `"${oversized.name}" is ${formatBytes(oversized.size)}. The maximum is ${formatBytes(
       MAX_FILE_BYTES,
-    )} per file — try compressing it or splitting out the pages you need.`;
+    )} per file. Try compressing it or splitting out the pages you need.`;
   }
 
   const totalBytes = files.reduce((sum, file) => sum + file.size, 0);
   if (totalBytes > MAX_TOTAL_UPLOAD_BYTES) {
     return `Those ${files.length} files total ${formatBytes(totalBytes)}. The maximum is ${formatBytes(
       MAX_TOTAL_UPLOAD_BYTES,
-    )} per upload — please upload them in smaller batches.`;
+    )} per upload. Please upload them in smaller batches.`;
   }
 
   return null;
