@@ -1,6 +1,7 @@
 import { getAdmin } from "./firebase-admin";
-import { getFirestore } from "firebase-admin/firestore";
+import { FieldValue, getFirestore, type Firestore } from "firebase-admin/firestore";
 import { sendReminderEmail } from "./email";
+import { cronRunId, isAlreadySent } from "./reminderCron";
 import { isValidEmail } from "../utils/validation";
 import { devLog, devError } from "../utils/devLog";
 import type { AssessmentStatus } from "../types/assessment";
@@ -23,23 +24,57 @@ interface Assessment {
   status: AssessmentStatus;
 }
 
-export async function checkAndSendNotifications() {
+/** One run's result: returned by the cron route and saved as `lastRun` in `cronRuns/{UTC date}`. */
+export interface CronRunSummary {
+  startedAt: Date;
+  finishedAt: Date;
+  durationMs: number;
+  users: number;
+  sent: number;
+  failed: number;
+  userErrors: number;
+  /** The message of the error that stopped the run, or null when it ran to the end. */
+  error: string | null;
+}
+
+export async function checkAndSendNotifications(): Promise<CronRunSummary> {
   const startTime = new Date();
   devLog("=== NOTIFICATION CHECK STARTED ===", startTime.toISOString());
 
+  let db: Firestore | undefined;
+  let totalNotificationsSent = 0;
+  let totalUsersProcessed = 0;
+  let totalSendFailures = 0;
+  let totalUserErrors = 0;
+
+  const summarize = (runError: unknown): CronRunSummary => {
+    const finishedAt = new Date();
+    return {
+      startedAt: startTime,
+      finishedAt,
+      durationMs: finishedAt.getTime() - startTime.getTime(),
+      users: totalUsersProcessed,
+      sent: totalNotificationsSent,
+      failed: totalSendFailures,
+      userErrors: totalUserErrors,
+      error:
+        runError === undefined
+          ? null
+          : runError instanceof Error
+            ? runError.message
+            : String(runError),
+    };
+  };
+
   try {
     const adminApp = await getAdmin();
-    const db = getFirestore(adminApp);
+    db = getFirestore(adminApp);
     devLog("✅ Firebase Admin initialized successfully");
 
     // Get all users with notification preferences
     const usersRef = db.collection("users");
     const usersSnapshot = await usersRef.get();
     devLog(`📊 Found ${usersSnapshot.docs.length} users to check`);
-
-    let totalNotificationsSent = 0;
-    let totalUsersProcessed = 0;
-    let totalErrors = 0;
 
     for (const userDoc of usersSnapshot.docs) {
       totalUsersProcessed++;
@@ -220,7 +255,7 @@ export async function checkAndSendNotifications() {
             const notificationRef = db.collection("notifications").doc(notificationId);
             const existingNotification = await notificationRef.get();
 
-            if (existingNotification.exists) {
+            if (isAlreadySent(existingNotification.data())) {
               devLog(
                 `⏭️ Notification already sent for "${assessment.assignmentName}" (${daysUntilDue} days)`,
               );
@@ -256,9 +291,20 @@ export async function checkAndSendNotifications() {
                 `✅ Email sent successfully to ${preferences.email} and notification recorded`,
               );
             } catch (emailError) {
-              devError(`❌ Failed to send email:`, emailError);
+              // Log the codes only: nodemailer's messages can contain the recipient address.
+              // The full message goes into the failed record below (a server-only collection).
+              const { code, responseCode } = (emailError ?? {}) as {
+                code?: string;
+                responseCode?: number;
+              };
+              console.error("Reminder cron: send failed", {
+                uid: userDoc.id,
+                assessmentId: assessment.id,
+                code,
+                responseCode,
+              });
 
-              // Record the failed notification attempt
+              // Record the failed attempt. Only status "sent" blocks a send, so the next run retries.
               await notificationRef.set({
                 userId: userDoc.id,
                 assessmentId: assessment.id,
@@ -272,7 +318,7 @@ export async function checkAndSendNotifications() {
                 error: emailError instanceof Error ? emailError.message : String(emailError),
               });
 
-              totalErrors++;
+              totalSendFailures++;
             }
           } else {
             devLog(
@@ -281,24 +327,53 @@ export async function checkAndSendNotifications() {
           }
         }
       } catch (userError) {
-        devError(`❌ Error processing user ${userDoc.id}:`, userError);
-        totalErrors++;
+        console.error("Reminder cron: could not process a user", {
+          uid: userDoc.id,
+          error: userError,
+        });
+        totalUserErrors++;
       }
     }
 
-    const endTime = new Date();
-    const duration = endTime.getTime() - startTime.getTime();
+    const summary = summarize(undefined);
 
     devLog("\n=== NOTIFICATION CHECK COMPLETED ===");
-    devLog(`⏱️ Duration: ${duration}ms`);
-    devLog(`👥 Users processed: ${totalUsersProcessed}`);
-    devLog(`📧 Notifications sent: ${totalNotificationsSent}`);
-    devLog(`❌ Errors encountered: ${totalErrors}`);
+    devLog(`⏱️ Duration: ${summary.durationMs}ms`);
+    devLog(`👥 Users processed: ${summary.users}`);
+    devLog(`📧 Notifications sent: ${summary.sent}`);
+    devLog(`❌ Send failures: ${summary.failed}, user errors: ${summary.userErrors}`);
     devLog("=== END SUMMARY ===");
+
+    await recordRun(db, summary);
+    return summary;
   } catch (error) {
-    devError("💥 CRITICAL ERROR in notification system:", error);
-    devError("Stack trace:", error instanceof Error ? error.stack : String(error));
+    // The route logs the error itself; record that the run stopped, if Firestore is reachable.
+    if (db) await recordRun(db, summarize(error));
     throw error;
+  }
+}
+
+/**
+ * Keeps the day's totals and the latest run in `cronRuns/{UTC date}`, readable long after
+ * Vercel's 1-hour log window. No client rule matches `cronRuns`, so it is server-only.
+ */
+async function recordRun(db: Firestore, summary: CronRunSummary) {
+  try {
+    await db
+      .collection("cronRuns")
+      .doc(cronRunId(summary.startedAt))
+      .set(
+        {
+          runs: FieldValue.increment(1),
+          sent: FieldValue.increment(summary.sent),
+          failed: FieldValue.increment(summary.failed),
+          // Every key is written each time, so the merge replaces the previous run's values.
+          lastRun: summary,
+        },
+        { merge: true },
+      );
+  } catch (error) {
+    console.error("Reminder cron: could not save the run summary", error);
   }
 }
 
