@@ -65,8 +65,6 @@ branch. Tick the items off and add a session log entry when done. Don't commit.
 | B15 | A19 | Cron throughput | After A8 |
 | any | A21 to A28, A33 to A35, A39, A40 | Later items | As time allows; A34 needs D8 |
 
-Until A29 lands, run the format check locally with `npx prettier --check --end-of-line auto .` inside each app.
-
 ## Fix now
 
 - [x] **A1 · Lock down `/api/welcome-email`** · S · risk L (done 2026-10-10, PR #5)
@@ -98,7 +96,8 @@ Until A29 lands, run the format check locally with `npx prettier --check --end-o
   - **Done when:** an unauthenticated 4 MB POST returns 401 without touching /tmp; no upload files remain in /tmp after a request; failures show up in logs.
   - The per-user quota is A18.
 
-- [ ] **A5 · Repo hygiene leftovers from the merge** · S · risk L
+- [x] **A5 · Repo hygiene leftovers from the merge** · S · risk L (done 2026-10-11)
+  - **Shipped (B6):** the `.refactor-baseline/` lines are gone from the landing `.gitignore` and `.prettierignore` (the folder no longer exists). `apps/web/next.config.ts` has no `images` block. `remotePatterns` was dead. `dangerouslyAllowSVG` only sent the logo's SVG through the image optimizer (`/_next/image`); without it, Next 15.5 serves any `.svg` given to `next/image` as is, which is how the landing already renders the same file. `contentDispositionType` and `contentSecurityPolicy` only hardened those optimizer responses, and nothing uses the optimizer now; Next's defaults are the same `attachment` and a `script-src 'none'` sandbox policy anyway. The four upload messages use a period, a semicolon or a comma instead of the em dash. The root `.gitignore` carries `*serviceAccountKey*.json` (web's pattern, which covers `serviceAccountKey*.json`), `firebase-adminsdk*.json` and `*.pem`. `.claude/settings.local.json` is no longer on disk; the prune list went to the founder (B6 log).
   - `.claude/settings.local.json` is committed but personal. Done 2026-10-10: the 4 entries pointing at the old project folder are removed, the file is in the root `.gitignore`, and git no longer tracks it. Optionally prune its broad allows (`Bash(rm:*)`, `Bash(curl:*)`, `Bash(env)`).
   - ~~Commit `apps/web/.env.example` (hidden by `.env*` in `apps/web/.gitignore`).~~ Dropped 2026-10-10: the founder deleted the file as not needed (git never tracked it). The env lists live in the root `README.md` and `docs/ops.md`.
   - `.refactor-baseline/` lines in `apps/landing/.gitignore` and `apps/landing/.prettierignore`: remove.
@@ -338,7 +337,8 @@ Until A29 lands, run the format check locally with `npx prettier --check --end-o
   - Add `npm audit --omit=dev --audit-level=high` to `.github/workflows/ci.yml` after A2 (it would fail today). The test step shipped with A7.
   - Still fails after A2 (exit 1): the 5 remaining highs have no in-range fix (B2 log). Needs web Next 16 (A25) and a firebase release that lifts `@grpc/grpc-js`, or a step that tolerates those two advisories by ID.
 
-- [ ] **A29 · Line endings: local format check fails on Windows** · S · risk L · do early (B6)
+- [x] **A29 · Line endings: local format check fails on Windows** · S · risk L · do early (B6) (done 2026-10-11)
+  - **Shipped (B6):** a root `.gitattributes` with `* text=auto eol=lf`, plus `binary` for images (png, jpg, jpeg, gif, ico, webp, avif, bmp), fonts (woff, woff2, ttf, otf, eot), mp4, webm (A27) and pdf. Only `apps/web/.gitignore` and `apps/landing/.gitignore` were stored with CRLF; every other text file was already LF in the index, so the renormalize commit touches those two files only. A fresh clone with `core.autocrlf=true` checks out every text file with LF and passes the whole loop, `format:check` included (B6 log). The workaround is gone from `docs/ops.md`, `apps/web/standards.md`, `apps/landing/CLAUDE.md` and the Batches section here.
   - **Problem:** this machine has `core.autocrlf=true`, so the checkout has CRLF line endings, and `npm run format:check` reports "Code style issues" in 159 files of `apps/web` alone; the verification loop can't pass locally. The only difference is line endings: `npx prettier --check --end-of-line auto .` passes. CI (Linux, LF) is unaffected.
   - **Fix:** a root `.gitattributes` with `* text=auto eol=lf` (mark binaries such as images and fonts `binary`), then the founder renormalizes once: `git add --renormalize .` in its own commit. No Prettier config change needed.
   - **Done when:** `npm run format:check` passes on a fresh Windows checkout.
@@ -362,11 +362,11 @@ Until A29 lands, run the format check locally with `npx prettier --check --end-o
   - **Problem:** on Next 16.3.8 and 16.4.0 (the two B2 ran; 16.2.9 unchecked), `next dev` generates an `AGENTS.md` with a "read the Next.js docs in node_modules" block for AI agents ("Generated AGENTS.md for AI agents. Set `agentRules: false` in next.config to disable."), and re-creates it on every run, so the landing shows an untracked file after each dev session. Web will do the same after its Next 16 move (A25). B2 deleted the generated copy instead of committing it.
   - **Fix (pick with D8):** set `agentRules: false` in `apps/landing/next.config.ts` (recommended: the CLAUDE.md files are the agents' source of truth, and Claude Code doesn't read `AGENTS.md`), or gitignore `AGENTS.md`, or commit it. Then update the `AGENTS.md` line in `docs/ops.md` ("Pins to know").
 
-- [ ] **A35 · Em dashes left in the rules docs** · S · risk L · found during B3
-  - **Where:** `apps/web/standards.md` (57 left) and `apps/landing/CLAUDE.md` (13 left). B3 kept em dashes out of everything it wrote or rewrote, but left untouched lines alone.
-  - **Problem:** the root rule covers copy, not docs, but the founder asked for none in anything B3 wrote, and agents lift wording from these docs into code, comments and copy.
-  - **Fix:** replace each by hand with a comma, colon, semicolon or period (some are asides or ranges that need rewording, not a mechanical swap). Decide with the founder whether the root rule should say "copy and docs".
-  - **Done when:** a search for the em dash character (U+2014) finds nothing in the CLAUDE files, `standards.md` or `docs/`.
+- [ ] **A35 · Em dashes left in the rules docs and code comments** · S · risk L · found during B3 (code comments added in B6)
+  - **Where:** `apps/web/standards.md` (57 left) and `apps/landing/CLAUDE.md` (13 left). B3 kept em dashes out of everything it wrote or rewrote, but left untouched lines alone. Added in B6 at the founder's request: 32 in code comments across 24 files in `apps/web/src` (TS, TSX and CSS comments, for example `components/ui/button.tsx`, `styles/globals.css`, `lib/uploadClient.ts`). B6 removed the last ones from web copy; the landing's `src` has none.
+  - **Problem:** the root rule covers copy, not docs or comments, but the founder asked for none in anything B3 wrote, and agents lift wording from these docs and comments into code and copy.
+  - **Fix:** replace each by hand with a comma, colon, semicolon or period (some are asides or ranges that need rewording, not a mechanical swap). Decide with the founder whether the root rule should say "copy, docs and code comments".
+  - **Done when:** a search for the em dash character (U+2014) finds nothing in the CLAUDE files, `standards.md`, `docs/` or `apps/web/src`.
 
 - [ ] **A39 · Token checks that fail for server reasons are silent** · S · risk L · found during B5
   - **Where:** the `catch` around `verifyIdToken` in `apps/web/src/pages/api/upload.ts` and `apps/web/src/pages/api/welcome-email.ts`.
@@ -640,3 +640,32 @@ Newest last. One entry per session: date, branch, items, what changed, what's le
   - An empty env var survives into a child process on Windows, and Next keeps it, so `VAR=` in the dev server's environment overrides `.env.local`.
   - A hand-written minimal PDF gave pdf-parse 1.1.1 "bad XRef entry"; the sample PDFs in `node_modules/pdf-parse/test/data` parse.
   - Scripts, fixtures and logs for these checks are in `node_modules/.cache/b5/` (untracked; `npm ci` deletes them).
+
+### 2026-10-11 · B6 (`chore/b6-repo-hygiene`, not committed yet)
+
+- **A5 and A29 done.** Pulled main first (already up to date with PR #10). No dev servers were running, and no `package.json` changed, so no install. Nothing is committed; the commit order the founder needs is below.
+- **A5:**
+  - Logo: `components/ui/Logo.tsx` renders `/images/Asetta_Logo.svg` through `next/image` without `unoptimized`. Before the change, both `/login` logos loaded through the optimizer (`/_next/image?url=%2Fimages%2FAsetta_Logo.svg&w=256&q=75`, seen in the built-in browser). Without `dangerouslyAllowSVG`, Next 15.5.27 marks any `.svg` source unoptimized (`get-img-props.js`), so the logo now loads from `/images/Asetta_Logo.svg`, and `/_next/image` answers 400 for that SVG. The whole `images` block went (see the item).
+  - Checked in the built-in browser on the dev server (light and dark, at 1280px and 375px) and on the production build with `next start` (light and dark): the logo loads (1080px natural, 28px rendered, amber filter), nothing requests `/_next/image`, and the production console is clean.
+  - Copy, now: "... per file. Try compressing it or splitting out the pages you need."; "... per upload. Please upload them in smaller batches."; "Try uploading fewer files at once; one or two syllabi per upload works best."; "Please try again, and if it keeps happening, contact support." The loose assertions in `lib/upload/constants.test.ts` and `lib/uploadClient.test.ts` pass unchanged. Web `src` still has 32 em dashes, all in code comments (CSS included), which the copy rule doesn't cover; the landing's `src` has none.
+  - `.claude/settings.local.json` is no longer on disk anywhere in the repo, so there was nothing to prune. From its last tracked version (before commit 31ab08b), the broad allows suggested for pruning if it comes back: `Bash(rm:*)`, `Bash(curl:*)`, `Bash(env)`, `Bash(node:*)`, `Bash(npm install:*)`, `Bash(find:*)`, `Bash(sed:*)`, `Bash(mv:*)`, `Bash(dos2unix:*)` and the one-off PowerShell installs and `npm audit fix`. The founder decides.
+  - `git ls-files -ci --exclude-standard` is empty: the new root patterns ignore no tracked file.
+- **A29:**
+  - Before: `git ls-files --eol` gave 232 `i/lf w/crlf`, 2 `i/crlf w/crlf` (the two `.gitignore` files) and 21 binaries git detected itself (png, gif, ico). `format:check` failed on 175 web and 38 landing files. A fresh clone of `main` listed the same, so the CRLF comes from `core.autocrlf=true` (Git for Windows' system config) at checkout.
+  - Rehearsed the commits in a scratch clone on E: (scratch commits, never pushed): A5; `.gitattributes` and docs; the tracker; then `git add --renormalize .`, which staged exactly the two `.gitignore` files, line endings only.
+  - After: a fresh clone of that branch into a new folder on E: (`core.autocrlf=true`) lists 235 `i/lf w/lf`, the 21 binaries as `attr/-text`, no CRLF, and a clean status. After `npm ci` there, the whole loop passed: lint, `format:check` ("All matched files use Prettier code style!" in both apps), typecheck, `npm test` (the counts below) and build, with CI's placeholder Firebase env (`/login` is 241 kB there and 242 kB here, because the placeholders are shorter than the real values).
+  - `docs/ops.md`'s workaround bullet is replaced by a line on what `.gitattributes` does and that a new binary type needs a line there.
+- **Verification loop (this checkout):** lint, typecheck, `npm test` and build green. `npm test`: 22 files, 396 passed, 24 expected failures, 14 todo (unchanged). Build sizes match the Baseline. `format:check` still fails here on the CRLF working tree until this checkout is refreshed after the commits; the fresh clone is the proof.
+- **Commit order:**
+  1. A5: root `.gitignore`, landing `.gitignore` and `.prettierignore`, `apps/web/next.config.ts`, `lib/upload/constants.ts`, `lib/uploadClient.ts`. Git keeps the landing `.gitignore` CRLF here (it doesn't convert a file whose index copy has CRLF), so its diff is one line.
+  2. A29: `.gitattributes`, `docs/ops.md`, `apps/web/standards.md`, `apps/landing/CLAUDE.md`.
+  3. The tracker: `docs/AUDIT.md`.
+  4. Last, on a clean tree, alone: `git add --renormalize .`. It re-adds every tracked file, so anything uncommitted would ride along. It should stage only the two `.gitignore` files.
+  5. Then refresh an existing checkout once: `git rm -r --cached -q .`, then `git reset --hard`. That rewrites tracked files only; `.env.local`, `node_modules` and other ignored files stay. `git checkout-index --force --all` doesn't do it (it skips files git considers up to date). Rehearsed in the scratch clone: 235 `w/lf` and a clean status.
+- **After the report:** the founder approved the step 5 refresh of this checkout once the commits are in (the agent then reruns `format:check` here), had the scratch clones on E: deleted (done), and had the code-comment em dashes added to A35.
+- **Left for the founder:** decide on the settings prune; commit in the order above; check the Vercel preview. `/code-review` was not run: the code diff is a config block removal and four strings, each checked above.
+- **Gotchas:**
+  - C: had 424 KB free. Every npm and npx command ran with `npm_config_cache` (B2's warm cache in `node_modules/.cache/b2/npm`), `TEMP` and `TMP` under `node_modules/.cache/`. For the fresh clone's `npm ci`, they pointed into this checkout's `node_modules/.cache/b6/`, because `npm ci` deletes the clone's own `node_modules` first.
+  - With the built-in browser pane hidden, the page doesn't draw: `/login` stays on "Loading..." until a screenshot is taken.
+  - `next dev` (Turbopack) logs `[HMR] Invalid message` for `isrManifest` and a TypeError in `handleStaticIndicator` on every load, before and after this change. Dev only.
+  - Stop a background server by killing the tree from the shell that launched it (`taskkill /PID <pid> /T /F`); look the tree up with `wmic process where "name='node.exe'" get ProcessId,ParentProcessId,CommandLine /format:list`.
