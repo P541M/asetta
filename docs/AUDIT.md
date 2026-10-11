@@ -276,7 +276,7 @@ branch. Tick the items off and add a session log entry when done. Don't commit.
   - **Problem:** the cron runs at 21:00 UTC (`vercel.json`), which is 5 PM in Toronto during daylight time and 4 PM in winter, not 9 PM. After A8 it becomes 9:30 in the user's own time zone, so the copy is wrong either way.
   - **Fix:** in the A8 PR, change both to "around 9:30 in the morning, your time" (or whatever A8 ships).
 
-- [x] **A36 · Current grade reads 0% when every marked assessment weighs 0** · S · risk L · with A10 (B7) · found during B4 (done 2026-10-11, PR pending)
+- [x] **A36 · Current grade reads 0% when every marked assessment weighs 0** · S · risk L · with A10 (B7) · found during B4 (done 2026-10-11, PR #12)
   - **Where:** `apps/web/src/utils/gradeCalculations.ts` (`computeCurrentGrade`).
   - **Problem:** when the completed, marked assessments weigh 0 in total, the function returns `0` (`completedWeight > 0 ? ... : 0`), so the grades tab shows 0.0% and an F. Weight 0 is common: the regex fallback stores 0 when it finds no weight, and entering a mark in the grade calculator sets the status to Submitted.
   - **Fix:** return null ("no grade yet") when the completed weight is 0, the same answer A10 gives `calculateRequiredGrade` when nothing weighted is left.
