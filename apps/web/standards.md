@@ -60,15 +60,41 @@ All new code follows these.
 - Known gaps, don't copy them: the cron route accepts an unset secret and dev-logs its failures
   (A3), and the upload route parses the body before checking the token (A4).
 
+### Testing
+
+- **Vitest, in `apps/web` only**, in the node environment (`apps/web/vitest.config.ts`). `npm test`
+  from the root runs every suite; it is part of the verification loop and of CI.
+- **What gets tests:** pure logic in `utils/`, `constants/` and the pure parts of `lib/`. Logic
+  that lives in a component or next to Firestore calls is extracted into a pure function first,
+  then tested. There are no component, Firestore or network tests yet.
+- **Files:** `<module>.test.ts` next to the module (`utils/dateUtils.test.ts`), never under
+  `src/pages/` (every file there becomes a route). Shared fixtures live in `src/test/` and are
+  imported through the alias (`@/test/assessments`).
+- **Every suite runs in two time zones**, `America/Toronto` and `Asia/Kolkata` (the config's
+  `projects` set `TZ`), so a test must pass in both. Build dates with the local constructor
+  (`new Date(2026, 2, 8, 9, 30)`), never UTC strings, and leave zone-specific offsets to the zone
+  checks at the top of `utils/dateUtils.test.ts`.
+- **"Now" is never the real clock**: use `vi.useFakeTimers()` with `vi.setSystemTime()`, or the
+  function's `now` parameter. Day counts get cases on both 2026 DST weekends (Mar 8 and Nov 1).
+- **Known bugs are `it.fails`**: assert the correct result and name the `docs/AUDIT.md` item
+  (`it.fails("A10: ...")`). The fix turns it into a plain `it`; Vitest fails an `it.fails` that
+  starts passing, so it can't be left behind. An `it.fails` also passes when the test throws for an
+  unrelated reason, so run a new one once as a plain `it` and check it fails on its assertion. Use
+  `it.todo("A10: ...")` when the fix lives outside the function under test or isn't designed yet.
+  Never assert a known bug as correct behavior.
+- **A logic fix starts with a failing test** (the items marked test-first in `docs/AUDIT.md`).
+- **Assert user-facing copy loosely** (`toContain` on its key words), so a copy edit doesn't break
+  a logic test; assert values, dates and thresholds exactly.
+
 ### Verification loop (every task, no exceptions)
 
 From the repo root:
 
 ```
-npm run lint && npm run format:check && npm run typecheck && npm run build
+npm run lint && npm run format:check && npm run typecheck && npm test && npm run build
 ```
 
-All four green before work is called done. CI (`.github/workflows/ci.yml`) runs the same steps on
+All five green before work is called done. CI (`.github/workflows/ci.yml`) runs the same steps on
 GitHub. On Windows, stop any dev server first, and see `docs/ops.md` for the local line-ending
 workaround for `format:check` (A29).
 

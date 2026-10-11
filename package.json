@@ -13,9 +13,11 @@
     "build": "npm run build -w apps/web && npm run build -w apps/landing",
     "lint": "npm run lint -w apps/web && npm run lint -w apps/landing",
     "format:check": "npm run format:check -w apps/web && npm run format:check -w apps/landing",
-    "typecheck": "tsc --noEmit -p apps/web"
+    "typecheck": "tsc --noEmit -p apps/web",
+    "test": "npm run test -w apps/web"
   },
   "overrides": {
-    "jose": "^5.9.6"
+    "jose": "^5.9.6",
+    "vite": "^6.4.4"
   }
 }

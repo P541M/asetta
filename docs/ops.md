@@ -126,6 +126,10 @@ project. Never commit real values.
     `package-lock.json` and its folder under `node_modules`, then `npm install`.
 - Check the tree with `npm ls --all`. Plain `npm ls` checks top-level dependencies only and
   reports an invalid nested package as valid.
+- npm 10.9 crashes with `Cannot read properties of null (reading 'edgesOut')` when peer
+  dependencies form a loop (Vite 8 and `vitest`, see "Pins to know"). `npm install --dry-run`
+  reproduces it without touching anything, and the debug log's `placeDep` lines show which
+  package pulled the loop in.
 - Deleting a nested package folder by hand can leave a stale shim in `node_modules/.bin`
   (for example `apps/landing/node_modules/.bin/next` failing with "Cannot find module"). Delete
   the shim too. A fresh `npm ci` never has it.
@@ -142,6 +146,13 @@ project. Never commit real values.
   fine). Don't move them to 16.4 until a release fixes it (A33).
 - The root `package.json` overrides `jose` to `^5`: the upload route crashed at module load with
   jose 6 under `jwks-rsa`. Revisit when firebase-admin bumps `jwks-rsa`.
+- The root `package.json` overrides `vite` to `^6.4.4`. Only Vitest uses Vite; neither app does.
+  Vitest 4.1 accepts Vite 6 to 8, but npm 10.9 crashes resolving Vite 8: its optional
+  `@vitejs/devtools` peer brings in `@vitejs/devtools-vitest`, which peers back on `vitest`. Vite 7
+  and 8 also want `@types/node` `^20.19`, and npm then hoists a `@types/node` 26 to the root
+  above web's 20.17. Revisit with web's `@types/node` move (A25).
+- Web's `vitest` is `^4.1.11`, not 5: Vitest 5 declares `@types/node` `^22 || >=24` as a peer and
+  web is on `^20` (A25).
 - `next lint` is deprecated in Next 15.5 and removed in 16; the codemod to the ESLint CLI is part
   of web's Next 16 move (A25). The landing already lints with `eslint .`.
 - Next 16's `next dev` writes `apps/landing/AGENTS.md` on every run. Delete it rather than adding it to the repo
@@ -161,3 +172,6 @@ project. Never commit real values.
   out with CRLF; CI on Linux is fine). Until A29 lands, check formatting with
   `npx prettier --check --end-of-line auto .` inside each app.
 - Next 16 keeps a versioned Turbopack dev cache in `apps/landing/.next/dev`; deleting it is safe.
+- Git Bash doesn't pass `TZ` through to Node (`TZ=UTC node ...` still runs in the host zone). Set
+  it from PowerShell (`$env:TZ = "UTC"`) to run something under another zone. The Vitest config
+  doesn't depend on this: Node applies `process.env.TZ` when it is assigned at runtime.

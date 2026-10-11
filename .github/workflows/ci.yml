@@ -41,5 +41,8 @@ jobs:
       - name: Typecheck (web)
         run: npm run typecheck
 
+      - name: Test (web)
+        run: npm test
+
       - name: Build (web + landing)
         run: npm run build
