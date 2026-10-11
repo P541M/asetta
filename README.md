@@ -110,13 +110,14 @@ npm run dev:landing    # the marketing site (3001 if the platform is already run
 npm run lint           # ESLint, both apps
 npm run format:check   # Prettier, both apps
 npm run typecheck      # TypeScript, apps/web
+npm test               # Vitest unit tests, apps/web
 npm run build          # production build, both apps
 ```
 
 ## Deployment and CI
 
 - **Deploys**: two Vercel projects, `asetta` (`apps/web`) and `asetta-landing` (`apps/landing`), both connected to this repository. A push to `main` deploys both to production; other branches get preview deployments with their own URLs. Details in `docs/ops.md`.
-- **CI**: GitHub Actions (`.github/workflows/ci.yml`) runs one job, `verify`, on every push to `main` and every pull request: install, lint (web and landing), format check (web and landing), typecheck (web) and build (web and landing). The build uses harmless placeholder Firebase values; real credentials stay in Vercel.
+- **CI**: GitHub Actions (`.github/workflows/ci.yml`) runs one job, `verify`, on every push to `main` and every pull request: install, lint (web and landing), format check (web and landing), typecheck (web), unit tests (web) and build (web and landing). The build uses harmless placeholder Firebase values; real credentials stay in Vercel.
 - **Recommended**: protect `main` (GitHub, Settings, Branches) by requiring the "CI / verify" check, so nothing broken can be merged and auto-deployed.
 
 ## Let's connect

@@ -43,6 +43,7 @@ npm run build          # build both apps
 npm run lint           # lint both apps
 npm run format:check   # Prettier check, both apps
 npm run typecheck      # tsc for apps/web
+npm test               # Vitest unit tests for apps/web
 ```
 
 Add a dependency to one app with `npm install <pkg> -w apps/web` (or `-w apps/landing`); run an app's own script with `npm run <script> -w apps/web`. Each app pins its own `next` and `eslint-config-next`. Both apps must share one `react`/`react-dom` version, because hoisted packages resolve React from the root. npm's workspace flags have traps; read `docs/ops.md` before updating dependencies.

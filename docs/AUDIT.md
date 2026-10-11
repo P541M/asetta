@@ -15,7 +15,7 @@ branch. Tick the items off and add a session log entry when done. Don't commit.
 
 **Ending a session:**
 
-1. Run the verification loop from the repo root: `npm run lint && npm run format:check && npm run typecheck && npm run build` (add `npm test` once A7 lands).
+1. Run the verification loop from the repo root: `npm run lint && npm run format:check && npm run typecheck && npm test && npm run build`.
 2. Tick finished items and note the date and PR: `- [x] **A1 · ...** (done 2026-10-12, PR #4)`. If an item is only partly done, leave it unticked and say what's left in the log.
 3. Add a session log entry at the bottom: branch, items, what changed, what's left, gotchas.
 4. Update the docs the change touches: rules in the CLAUDE files or `apps/web/standards.md`; deploy, cron, env, rules and npm facts in `docs/ops.md`.
@@ -54,8 +54,8 @@ branch. Tick the items off and add a session log entry when done. Don't commit.
 | B4 | A7 | Vitest setup + first suites | The next stated goal |
 | B5 | A3, A4 | Server hardening quick wins (cron, upload) | |
 | B6 | A5, A29 | Repo hygiene leftovers, line endings | A29 unblocks the local format check |
-| B7 | A10, A14 | Grade math + ICS export, test-first | D1 decided |
-| B8 | A9 | Extraction normalization, test-first | |
+| B7 | A10, A14, A36 | Grade math + ICS export, test-first | D1 decided; A36 is the same grade function |
+| B8 | A9, A37 | Extraction normalization, test-first | A37 is the same extraction code |
 | B9 | A8, A32 | Reminders at 9:30 local time, test-first | D4 and D6 decided; A32 is the Settings copy for the new time |
 | B10 | A11, A12 | Data layer: live assessments, user doc | |
 | B11 | A13 | Course names containing "/" | Reproduce first |
@@ -106,7 +106,7 @@ Until A29 lands, run the format check locally with `npx prettier --check --end-o
   - **Done when:** verification loop green; the logo renders on `/login` in both themes.
 
 - [x] **A6 · Docs cleanup** · S-M · risk L (done 2026-10-10, PR #8)
-  - **Shipped (B3):** a root `README.md` (moved from `apps/web/README.md` and rewritten for the monorepo); `apps/web/README.md` and `apps/landing/README.md` deleted; new `docs/ops.md`; the root `CLAUDE.md` has the read order, a doc map, and the only copy of the git and em dash rules; `apps/web/CLAUDE.md` rewritten to 24 lines; `standards.md` cleaned up per the table below, plus a new "API routes and server code" section; small fixes to `apps/landing/CLAUDE.md`. Still open elsewhere: the standards.md Testing section ships with A7. The `apps/web/.env.example` line of the target structure is dropped (see A5). Details in the B3 session log.
+  - **Shipped (B3):** a root `README.md` (moved from `apps/web/README.md` and rewritten for the monorepo); `apps/web/README.md` and `apps/landing/README.md` deleted; new `docs/ops.md`; the root `CLAUDE.md` has the read order, a doc map, and the only copy of the git and em dash rules; `apps/web/CLAUDE.md` rewritten to 24 lines; `standards.md` cleaned up per the table below, plus a new "API routes and server code" section; small fixes to `apps/landing/CLAUDE.md`. The standards.md Testing section shipped later, with A7 (B4). The `apps/web/.env.example` line of the target structure is dropped (see A5). Details in the B3 session log.
   - **Done 2026-10-10 (D2):** all 12 plans and 3 specs under `docs/superpowers/` deleted (in git history). Their three spec-only decisions now live in `apps/web/standards.md` (notes editor extensions, initials-only avatar, course color scope). The `next lint` note in standards.md points at A25 instead of the deleted plan. The root `CLAUDE.md` says `docs/superpowers/` holds in-flight work only.
   - **Target structure:**
     ```
@@ -158,7 +158,8 @@ Until A29 lands, run the format check locally with `npx prettier --check --end-o
 
 ## Next
 
-- [ ] **A7 · Vitest setup + first suites (grade, date, parsing)** · M · risk L
+- [x] **A7 · Vitest setup + first suites (grade, date, parsing)** · M · risk L (done 2026-10-11, PR #9)
+  - **Shipped (B4):** Vitest 4.1.11 in `apps/web` (`vitest.config.ts`: node environment, the `@/` alias, `src/**/*.test.ts`), `npm test` at the root and in CI, and nine suites, one per module on the "Testable today" list. Every suite runs twice, as the `toronto` and `kolkata` projects (each sets `TZ`), and zone checks at the top of `utils/dateUtils.test.ts` prove the pin. Known bugs are 12 `it.fails` and 7 `it.todo` naming A9, A10, A14 and the new A36 and A37. No app source changed. The root `package.json` overrides `vite` to `^6.4.4`, because npm 10.9 crashes on Vite 8 (`docs/ops.md`, "Pins to know"). Details in the B4 session log.
   - **Where:** `apps/web` (new `vitest.config.ts`, a `test` script), root `package.json` (`npm test`), `.github/workflows/ci.yml`, `apps/web/standards.md` (Testing section, and `npm test` in the verification loop), `apps/web/CLAUDE.md` ("Verifying" says there are no unit tests yet), the root `README.md` checks list.
   - **Setup:** Vitest in `apps/web` only, node environment, the `@/` alias from tsconfig. Pin the timezone (e.g. `process.env.TZ = "America/Toronto"` at the top of `vitest.config.ts`) and prove it with a test on `getTimezoneOffset()`. Run the date suites under a second zone too (e.g. `Asia/Kolkata` or `Pacific/Auckland`). Use `vi.setSystemTime` for "now" and cover the DST weekends (Mar 8 and Nov 1, 2026).
   - **Testable today (pure):** `utils/gradeCalculations.ts`, `utils/dateUtils.ts`, `utils/urgency.ts`, `utils/icsGenerator.ts`, `lib/upload/textExtraction.ts` (`formatDate`, `extractAssessmentsBasic`, `extractCourseName`; `extractTime` is private, so test it through `extractAssessmentsBasic` or export it), `lib/upload/constants.ts` (`validateUploadSelection`), `lib/uploadClient.ts` (`parseUploadResponse`; Node 22 has `Response`), `constants/courseColors.ts`, `utils/authErrors.ts`.
@@ -183,12 +184,14 @@ Until A29 lands, run the format check locally with `npx prettier --check --end-o
     - **GitHub Actions gotchas:** scheduled workflows run only from the default branch; GitHub can delay runs or drop some under heavy load; and it disables scheduled workflows in a public repo after 60 days with no repo activity (it emails a warning first; re-enable from the Actions tab). The Vercel backstop still sends, just late, during any gap.
     - **Ship the workflow in the same PR as the new send logic, not before.** Under today's logic, 48 runs a day would each scan every user (48x the Firestore reads) and send reminders at whatever time an assessment enters the 12-36h window.
     - Optional, decide while building: one digest email per user per day instead of one per assessment (fewer Gmail sends, see D3).
+  - **Tests:** none yet; the date math sits in `lib/notifications.ts` next to Firestore calls, so extract it into a pure helper first. Every suite already runs under Toronto and Kolkata (`apps/web/vitest.config.ts`); a helper that takes the zone as a parameter can cover any other zone (Auckland, UTC) on top of that.
   - **Done when:** tests cover Toronto, a UTC+ zone, a half-hour zone (e.g. `Asia/Kolkata`), both 2026 DST switches, unpadded times and a late run; reminders arrive shortly after 9:30 local (within one scheduler interval).
 
 - [ ] **A9 · Normalize AI and regex extraction output** · M · risk L-M · test-first
   - **Where:** `apps/web/src/lib/upload/textExtraction.ts:124-176` (`formatDate`), `apps/web/src/lib/upload/gemini.ts:146-203`, `apps/web/src/pages/api/upload.ts:182-191`.
   - **Problem:** `formatDate` only knows full month names, so "Sept 30, 2026" and "Mar 15, 2026" are stored as raw text. DD/MM (common in Canada) is read as MM/DD: "15/03/2026" becomes "2026-15-03" (verified). No range checks. `dueTime`, `weight` and the names aren't type- or range-checked, so "11:59 PM" reaches the UI as an Invalid Date, and nothing guards against NaN (likely shows "NaN days left"). Fallback dates use the UTC day (`toISOString().split("T")[0]` at upload.ts:186, gemini.ts:182, textExtraction.ts:49). JSON is scraped out of free text with a regex.
   - **Fix:** One `normalizeExtractedAssessment()` used by both paths: a valid `YYYY-MM-DD` or the item is flagged for review (no guessing today's date in UTC), padded `HH:MM` (accept 12-hour input), weight clamped 0-100, strings trimmed and length-capped. Ask Gemini for structured JSON output (easier on `@google/genai`, see A25).
+  - **Tests:** `lib/upload/textExtraction.test.ts` holds the A9 `it.fails` (abbreviated months, "15/03/2026") and `it.todo` (range checks, the shared normalizer); the fix turns them into passing `it`s. The Gemini cleanup in `lib/upload/gemini.ts` has no tests yet (extract it first). A37 sits in the same test file.
   - **Done when:** table tests over realistic syllabus strings pass; no stored assessment can have an unparseable date or time.
 
 - [ ] **A10 · Grade math bugs** · S-M · risk M · D1 decided · test-first
@@ -200,6 +203,7 @@ Until A29 lands, run the format check locally with `npx prettier --check --end-o
     - Rounding vs letter: 89.96 shows "90.0%" with the letter "A" (GradeOverviewCards.tsx:54 vs `getGradeInfo`). Pick the letter from the displayed value.
     - A target of 0 becomes 85 (`|| 85`, GradeCalculator.tsx:179); use `??`.
     - A required grade below 0 (target already secured) renders as a negative percentage.
+  - **Tests:** `utils/gradeCalculations.test.ts` holds the A10 `it.fails` (no remaining weight; D1 in both functions) and four `it.todo` for the component cases, which need their logic pulled out of `GradeCalculator.tsx` and `GradeOverviewCards.tsx` into `gradeCalculations.ts` first. A36 sits in the same file.
   - **Done when:** each case has a test; the grades tab shows correct values after clearing marks.
 
 - [ ] **A11 · One live source of assessments** · M · risk M
@@ -228,6 +232,7 @@ Until A29 lands, run the format check locally with `npx prettier --check --end-o
   - **Where:** `apps/web/src/utils/icsGenerator.ts`.
   - **Problem:** The default 23:59 due time makes DTEND 00:59 on the same day, before DTSTART (verified; `incrementHour` at :54-58 wraps without rolling the date). `DTSTAMP`, required by RFC 5545, is missing. SUMMARY and DESCRIPTION aren't escaped for `,` `;` `\`. No 75-octet line folding. The UID uses `@asetta.app` (the domain is asetta.me).
   - **Fix:** Compute the end from a Date (or make due-time events zero-length). Add DTSTAMP, escaping and folding. Changing the UID domain would duplicate events for anyone who already imported, so decide whether it's worth it.
+  - **Tests:** `utils/icsGenerator.test.ts` holds the A14 `it.fails` (the 23:59 end, DTSTAMP, SUMMARY escaping, 75-octet folding) and an `it.todo` for the UID domain decision.
   - **Done when:** tests cover 23:59 and names with commas and semicolons; the file imports cleanly into Google Calendar.
 
 - [ ] **A15 · Bundle size** · M · risk L-M
@@ -269,6 +274,18 @@ Until A29 lands, run the format check locally with `npx prettier --check --end-o
   - **Problem:** the cron runs at 21:00 UTC (`vercel.json`), which is 5 PM in Toronto during daylight time and 4 PM in winter, not 9 PM. After A8 it becomes 9:30 in the user's own time zone, so the copy is wrong either way.
   - **Fix:** in the A8 PR, change both to "around 9:30 in the morning, your time" (or whatever A8 ships).
 
+- [ ] **A36 · Current grade reads 0% when every marked assessment weighs 0** · S · risk L · with A10 (B7) · found during B4
+  - **Where:** `apps/web/src/utils/gradeCalculations.ts` (`computeCurrentGrade`).
+  - **Problem:** when the completed, marked assessments weigh 0 in total, the function returns `0` (`completedWeight > 0 ? ... : 0`), so the grades tab shows 0.0% and an F. Weight 0 is common: the regex fallback stores 0 when it finds no weight, and entering a mark in the grade calculator sets the status to Submitted.
+  - **Fix:** return null ("no grade yet") when the completed weight is 0, the same answer A10 gives `calculateRequiredGrade` when nothing weighted is left.
+  - **Done when:** the `it.fails("A36: ...")` in `utils/gradeCalculations.test.ts` is a passing `it`.
+
+- [ ] **A37 · Course-name fallback reads a term as the course code** · S · risk L · with A9 (B8) · found during B4
+  - **Where:** `apps/web/src/lib/upload/textExtraction.ts` (`extractCourseName`). Callers: the regex fallback, the "Manual Review Required" placeholder in `pages/api/upload.ts`, and `lib/upload/gemini.ts` whenever Gemini returns no course name.
+  - **Problem:** the code pattern `/([A-Z]{2,4})\s*(\d{3,4}[A-Z]*)/i` is case-insensitive, matches inside words, and takes the first hit in the whole text. A term before the course code wins: "Fall 2026 syllabus" then "CIS 3760" gives `Fall2026`; "Course outline, Winter 2027" gives `nter2027`; "Summer 2026" gives `mmer2026` (all checked in B4).
+  - **Fix:** match capitals at a word boundary only (no `i` on the letters) and skip a term word (Fall, Winter, Spring, Summer) followed by a year.
+  - **Done when:** the `it.fails("A37: ...")` in `lib/upload/textExtraction.test.ts` is a passing `it`, plus cases for the code formats the fix accepts.
+
 ## Later
 
 - [ ] **A21 · Merge the two upload forms' logic** · M · risk M
@@ -297,7 +314,7 @@ Until A29 lands, run the format check locally with `npx prettier --check --end-o
     - No firebase release clears the `@grpc/grpc-js` high: every `@firebase/firestore` up to firebase 13.0.0 pins `@grpc/grpc-js` `~1.9.0`, and the fix is 1.13.6 or 1.14.5. Why it doesn't apply to us is in the B2 log.
   - Web Next 15 to 16, to match the landing. `next lint` is removed in 16; the codemod is `npx @next/codemod@canary next-lint-to-eslint-cli .`. It also clears the web `postcss` high (Next 15.5.27 pins `postcss` 8.4.31). Mind A33: 16.4.0 breaks Pages Router dev under Turbopack.
   - The `uuid` moderate chain (firebase-admin → `@google-cloud/storage` 7 → `gaxios` 6 / `teeny-request` 9). npm calls it fixable, but `npm audit fix` leaves it; firebase-admin 14.5 (in range) moves its Google Cloud dependencies up a major (`@google-cloud/storage` 8, `@google-cloud/firestore` 9), so treat it as its own change.
-  - `@types/node` is `^20` in web while `engines` says Node 22. (`@types/react` and `@types/react-dom` are one shared 19.3.0 since A2.)
+  - `@types/node` is `^20` in web while `engines` says Node 22. (`@types/react` and `@types/react-dom` are one shared 19.3.0 since A2.) Moving it to `^22` also unblocks Vitest 5, which declares `@types/node` `^22 || >=24` as a peer, and the removal of the root `vite` override (B4 log; `docs/ops.md`, "Pins to know").
 
 - [ ] **A26 · Align tooling across the apps** · S · risk L
   - One root `.prettierrc` and one Prettier version (web `^3.9.5` vs a pinned `3.8.4` in the landing can format differently).
@@ -310,7 +327,7 @@ Until A29 lands, run the format check locally with `npx prettier --check --end-o
   - About 9.3 MB of GIFs in `apps/landing/public/images/features`. Convert to MP4/WebM (autoplay, muted, loop, playsinline).
 
 - [ ] **A28 · CI audit step** · S · risk L
-  - Add `npm audit --omit=dev --audit-level=high` to `.github/workflows/ci.yml` after A2 (it would fail today). The test step comes with A7.
+  - Add `npm audit --omit=dev --audit-level=high` to `.github/workflows/ci.yml` after A2 (it would fail today). The test step shipped with A7.
   - Still fails after A2 (exit 1): the 5 remaining highs have no in-range fix (B2 log). Needs web Next 16 (A25) and a firebase release that lifts `@grpc/grpc-js`, or a step that tolerates those two advisories by ID.
 
 - [ ] **A29 · Line endings: local format check fails on Windows** · S · risk L · do early (B6)
@@ -351,7 +368,7 @@ Numbers to compare against when items land.
 - `apps/web` build (Next 15.5.27, after A2): 229 kB First Load JS shared by all pages (`_app` chunk 114 kB); every dashboard route 319 kB (was 320); `/login` and `/register` 242 kB; `/onboarding` 285 kB; `/settings` 284 kB (was 285).
 - Live Firestore rules identical to `firestore.rules`; no Storage rules (Storage unused).
 - Vercel: projects `asetta` (apps/web) and `asetta-landing` (apps/landing), Hobby plan: runtime logs kept 1 hour; cron jobs run at most once a day and fire anywhere within the scheduled hour.
-- Tests: none.
+- Tests (after A7, 2026-10-11; was none): 9 suites in `apps/web`, each run in two zones. Per zone, 179 tests: 160 pass, 12 expected failures (`it.fails`: A9 3, A10 3, A14 4, A36 1, A37 1), 7 todo (A9 2, A10 4, A14 1). `npm test` takes about 2 seconds.
 
 ## Session log
 
@@ -519,3 +536,54 @@ Newest last. One entry per session: date, branch, items, what changed, what's le
 - **New:** A35 (em dashes left in standards.md and the landing `CLAUDE.md`, and whether the root rule should cover docs).
 - **Left for the founder:** review and merge. `/code-review` was not run: the diff is Markdown only. The Vercel preview only needs a green build (no app changes).
 - **Gotchas:** the Write tool saves LF, so git warns "LF will be replaced by CRLF" on the new and rewritten files; harmless (git stores LF either way, and the diff is content only).
+
+### 2026-10-11 · B4 (`test/a7-vitest`, PR #9)
+
+- **A7 done.** Tests, test config, CI and docs, plus the dependencies below; no app source changed. After a last look-through the founder asked for a PR; the agent committed, pushed and opened it for this batch only (the founder merges).
+- **Install:**
+  - `npm install -D vitest@^4.1.11 -w apps/web` (resolves 4.1.11). Scripts: `test: vitest run` in web, `test: npm run test -w apps/web` at the root.
+  - Not Vitest 5 (5.0.3 is current): it declares `@types/node` `^22 || >=24` as a peer and web is on `^20` (A25).
+  - The first try crashed: npm 10.9.8, `Cannot read properties of null (reading 'edgesOut')`. Vitest takes Vite `^6 || ^7 || ^8`; npm picked Vite 8.3.4, whose optional `@vitejs/devtools` peer pulls in `@vitejs/devtools-vitest`, which peers on `vitest`, and arborist dies on the loop.
+  - Vite 7 avoided the crash but wants `@types/node` `^20.19`. npm would then have hoisted `@types/node` 26.6.5 to the root over web's 20.17.19, where root-level packages web compiles against (firebase-admin, `@types/formidable`) resolve it. A direct `vite` devDependency didn't help either: npm nests it under `apps/web` and hoists `vitest` to the root, out of its reach.
+  - Settled on a root override, `"vite": "^6.4.4"` (patched Oct 6; its peer range takes `@types/node` `^20`). Every step was a `--dry-run` first. Recorded in `docs/ops.md` ("Pins to know", and the loop crash under the workspace notes).
+  - Lockfile: 81 new entries (Vitest, Vite 6.4.4, esbuild 0.25.12, rollup 4.64.5 and their platform binaries). One existing version changed: `@types/estree` 1.0.6 to 1.0.9, which rollup pins. Every entry resolves from registry.npmjs.org with an integrity hash, and the Linux binaries CI needs are recorded (`@rollup/rollup-linux-x64-gnu`, `@esbuild/linux-x64`, and rollup's own optional `@napi-rs/lzma-linux-x64-gnu`).
+  - `npm ls --all`: no invalid or missing packages. Its two "extraneous" lines (`@emnapi/runtime`, `@img/sharp-wasm32`) are lockfile entries main already had, unchanged.
+  - `npm install --package-lock-only` changes nothing. `npm audit` is unchanged (38 production, 43 with dev dependencies), with no advisory against Vitest, Vite, esbuild or rollup.
+- **Config** (`apps/web/vitest.config.ts`): node environment, `@` aliased to `src` (mirrors tsconfig `paths`), `src/**/*.test.ts`, and two projects, `toronto` and `kolkata`, that set `TZ` through `env`.
+  - Every suite runs in both zones, not just a list of date suites that would need keeping in sync; the full run takes about 2 seconds.
+  - Before relying on it, checked on this machine that Node applies `process.env.TZ` assigned at runtime, which is how `env` reaches each worker.
+  - The zone checks at the top of `utils/dateUtils.test.ts` assert `getTimezoneOffset()` in January and July, and the length of Mar 8 and Nov 1, 2026 (23 and 25 hours in Toronto, 24 in Kolkata). A pin that silently failed would show there.
+- **Suites**, each next to its module, with a shared `makeAssessment()` in `src/test/assessments.ts` imported through `@/` so the alias is exercised:
+  - `utils/gradeCalculations`, `utils/urgency`, `utils/icsGenerator`, `utils/authErrors`.
+  - `utils/dateUtils`: local parsing, `getTodayDateString` either side of midnight, `calendarDaysUntil` and `getDaysUntil` with `vi.setSystemTime`, both 2026 DST weekends.
+  - `lib/upload/textExtraction`: `formatDate`, `extractCourseName`, `extractAssessmentsBasic`; `extractTime` stays private and is covered through `extractAssessmentsBasic`.
+  - `lib/upload/constants` (`validateUploadSelection`, `formatBytes`), `lib/uploadClient` (`parseUploadResponse`, with Node's `Response`).
+  - `constants/courseColors`: also pins the preset order and three hash defaults, since reordering would change every unset course's color.
+  - Copy is asserted with `toContain` on its key words, so A5's em dash fix in the upload messages won't break these.
+- **Known bugs as tests:**
+  - `it.fails` (12): A9 abbreviated months ("Sept 30, 2026", "Mar 15, 2026") and "15/03/2026" read as month 15; A10 `calculateRequiredGrade` returning 0 when nothing weighted is left, and D1 (a Missed assessment without a mark counts as 0) in both grade functions; A14 the 23:59 DTEND, DTSTAMP, SUMMARY escaping and 75-octet folding; A36; A37.
+  - Each was run once as a plain `it` to confirm it fails on its assertion and not on a mistake in the test. The messages show today's behavior, for example DTEND `20261015T005900` before DTSTART `20261015T235900`.
+  - `it.todo` (7): the A10 component cases (the letter from the rounded value, a target of 0, clearing the only mark, a negative required grade), A9's range checks and shared normalizer, and the A14 UID domain decision.
+- **Done-when checks:**
+  - `npm test` runs from the root, and CI has a "Test (web)" step after typecheck. It runs on GitHub for the first time on this PR.
+  - The first suites cover grades, dates and urgency, `formatDate` and ICS.
+  - standards.md has a Testing section.
+- **Docs:** standards.md has a Testing section (where tests live, both zones, the clock, `it.fails` and `it.todo` with item IDs, test-first fixes, loose copy assertions) and `npm test` in the loop ("All five green"). Also updated: `apps/web/CLAUDE.md` (commands, where tests live, Verifying), the root README (checks list and CI line), the root `CLAUDE.md` command list, `docs/ops.md` (the `vite` override, the Vitest 4 choice, the npm loop crash, Git Bash and `TZ`), and here: the loop under "Ending a session", and a **Tests** line on the test-first items A8, A9, A10 and A14 saying where their waiting `it.fails` and `it.todo` live.
+- **Verification loop:**
+  - lint, typecheck, `npm test` and build green. `npm test`: 18 files (9 suites in 2 zones), 320 passed, 24 expected failures, 14 todo.
+  - `npm test` also passes with the host zone set to UTC (`$env:TZ = "UTC"` in PowerShell), as on CI's Linux runner.
+  - `format:check` fails on line endings only (A29: 160 web files, one fewer than before because Prettier rewrote `apps/web/package.json` with LF; 38 landing). `prettier --check --end-of-line auto .` passes in both apps, and the new files pass the strict check too.
+  - Build sizes match the Baseline, so no test code reaches the bundles.
+- **New:**
+  - A36: the current grade reads 0% when every marked assessment weighs 0. Added to B7.
+  - A37: the course-name fallback reads "Winter 2027" as `nter2027`. Added to B8.
+  - A25 now notes Vitest 5 and the `vite` override.
+- **Left for the founder:**
+  - Check that the CI "Test (web)" step passes on Linux (its first run), then merge.
+  - The Vercel preview only needs a green build: Vercel installs devDependencies too, but nothing from Vitest reaches the build.
+  - `/code-review` was not run: the diff is tests, test config, CI and docs, with no app source changes.
+- **Gotchas:**
+  - C: had 224 MB free, so the install ran from the start with `npm_config_cache`, `TEMP` and `TMP` under `node_modules/.cache/a7/`. No ENOSPC.
+  - `npm install --dry-run` reproduces the arborist crash without touching anything; the debug log's `placeDep` and `fetch manifest` lines show which package pulled the loop in.
+  - Git Bash doesn't pass `TZ` to Node (`TZ=Asia/Kolkata node ...` still ran in Toronto); PowerShell does.
+  - An `it.fails` also passes when the test throws for an unrelated reason, so run a new one once as a plain `it` and read the failure.
