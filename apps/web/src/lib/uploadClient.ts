@@ -53,7 +53,7 @@ const describeNonJsonResponse = (status: number): string => {
     )} and try again.`;
   }
   if (status === 504 || status === 408) {
-    return "Processing took too long and timed out. Try uploading fewer files at once — one or two syllabi per upload works best.";
+    return "Processing took too long and timed out. Try uploading fewer files at once; one or two syllabi per upload works best.";
   }
   if (status === 502 || status === 503) {
     return "The upload service is temporarily unavailable. Please wait a moment and try again.";
@@ -62,7 +62,7 @@ const describeNonJsonResponse = (status: number): string => {
     return "Your session expired. Please sign in again and retry the upload.";
   }
   if (status >= 500) {
-    return "Something went wrong while processing your files. Please try again — if it keeps happening, contact support.";
+    return "Something went wrong while processing your files. Please try again, and if it keeps happening, contact support.";
   }
   return "The upload failed and the server returned an unexpected response. Please try again.";
 };

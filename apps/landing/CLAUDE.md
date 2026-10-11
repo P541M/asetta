@@ -101,7 +101,7 @@ The full matrix for both apps is in `docs/ops.md`.
 - All internal/external CTAs route through `ButtonLink`; URLs come from `src/lib/site.ts`
 - Entrance animations use `Reveal`; do not add bespoke CSS keyframe utilities
 - Shared SVG icons live in `src/components/icons.tsx`; native buttons use `Button` from `Button.tsx`
-- Formatting is enforced by Prettier. Before calling work done, run `npm run lint && npm run format:check && npm run build` from the repo root (on Windows, see `docs/ops.md` for the local `format:check` line-ending workaround)
+- Formatting is enforced by Prettier. Before calling work done, run `npm run lint && npm run format:check && npm run build` from the repo root
 
 ## Content Strategy
 
