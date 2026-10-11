@@ -42,6 +42,7 @@ branch. Tick the items off and add a session log entry when done. Don't commit.
 | D6 | What runs the reminder job often enough to hit 9:30 local time? Vercel Hobby cron runs once a day and fires anywhere within its hour. | A8 | **GitHub Actions, every 30 minutes**, calling the endpoint with the cron secret. The repo is public, so Actions minutes are free. The Vercel daily cron stays as a backstop. Details and gotchas in A8. (2026-10-10) |
 | D7 | Welcome email for unverified password sign-ups: wait for a verified address, drop the user-chosen name from the subject, or accept the risk? | A30 | **Use the name only when the token says `email_verified` (Google sign-ups); everyone else gets a fixed "Welcome to Asetta" and "Hi there".** Small, no sign-up friction, and attacker-chosen text never reaches an unverified inbox. Shipped with A31. (2026-10-10, done the same day) |
 | D8 | `next dev` (16.3.8 and 16.4.0) keeps writing `apps/landing/AGENTS.md`: disable it with `agentRules: false`, gitignore it, or commit it? | A34 | Open. Recommended: `agentRules: false` (details in A34). |
+| D9 | Move the ICS export's UID domain from `asetta.app` to `asetta.me`? | A14's `it.todo` | Open. Calendar apps match a re-imported event by its UID, so a new domain makes every assessment a new event: anyone who imported before gets each one twice. Keeping `asetta.app` costs nothing in practice: a UID is an opaque ID, nothing resolves it, and Firestore IDs make a clash implausible. **Recommended: keep `asetta.app`**; revisit only with a subscribed feed (webcal), where a one-time switch could be announced. |
 
 ## Batches (suggested order)
 
@@ -63,7 +64,7 @@ branch. Tick the items off and add a session log entry when done. Don't commit.
 | B13 | A15 | Bundle size | |
 | B14 | A18, A20 | Rate limits (upload quota, contact form) | D5 decided |
 | B15 | A19 | Cron throughput | After A8 |
-| any | A21 to A28, A33 to A35, A39, A40 | Later items | As time allows; A34 needs D8 |
+| any | A21 to A28, A33 to A35, A39 to A43 | Later items | As time allows; A34 needs D8; A41 needs a founder call |
 
 ## Fix now
 
@@ -195,7 +196,7 @@ branch. Tick the items off and add a session log entry when done. Don't commit.
   - **Tests:** `lib/upload/textExtraction.test.ts` holds the A9 `it.fails` (abbreviated months, "15/03/2026") and `it.todo` (range checks, the shared normalizer); the fix turns them into passing `it`s. The Gemini cleanup in `lib/upload/gemini.ts` has no tests yet (extract it first). A37 sits in the same test file.
   - **Done when:** table tests over realistic syllabus strings pass; no stored assessment can have an unparseable date or time.
 
-- [ ] **A10 · Grade math bugs** · S-M · risk M · D1 decided · test-first
+- [x] **A10 · Grade math bugs** · S-M · risk M · D1 decided · test-first (done 2026-10-11, PR #PRNUM)
   - **Where:** `apps/web/src/utils/gradeCalculations.ts`, `apps/web/src/components/assessment/GradeCalculator.tsx`, `apps/web/src/components/assessment/grade-calculator/GradeOverviewCards.tsx`.
   - **Problems:**
     - `calculateRequiredGrade` returns `0` when the remaining weight is 0 (:65); it should be null ("nothing left to grade").
@@ -229,7 +230,7 @@ branch. Tick the items off and add a session log entry when done. Don't commit.
   - **Fix:** Encode the ID (e.g. `encodeURIComponent`) with a fallback read of the raw ID for existing docs, or store the name in a field with a slug ID.
   - **Done when:** reproduced first; then a course with "/" can set its color and target grade and be renamed.
 
-- [ ] **A14 · ICS export correctness** · S · risk L · test-first
+- [ ] **A14 · ICS export correctness** · S · risk L · test-first (code done 2026-10-11 in PR #PRNUM; left: the Google Calendar import of the B7 sample, see the B7 log; the UID domain waits on D9)
   - **Where:** `apps/web/src/utils/icsGenerator.ts`.
   - **Problem:** The default 23:59 due time makes DTEND 00:59 on the same day, before DTSTART (verified; `incrementHour` at :54-58 wraps without rolling the date). `DTSTAMP`, required by RFC 5545, is missing. SUMMARY and DESCRIPTION aren't escaped for `,` `;` `\`. No 75-octet line folding. The UID uses `@asetta.app` (the domain is asetta.me).
   - **Fix:** Compute the end from a Date (or make due-time events zero-length). Add DTSTAMP, escaping and folding. Changing the UID domain would duplicate events for anyone who already imported, so decide whether it's worth it.
@@ -275,7 +276,7 @@ branch. Tick the items off and add a session log entry when done. Don't commit.
   - **Problem:** the cron runs at 21:00 UTC (`vercel.json`), which is 5 PM in Toronto during daylight time and 4 PM in winter, not 9 PM. After A8 it becomes 9:30 in the user's own time zone, so the copy is wrong either way.
   - **Fix:** in the A8 PR, change both to "around 9:30 in the morning, your time" (or whatever A8 ships).
 
-- [ ] **A36 · Current grade reads 0% when every marked assessment weighs 0** · S · risk L · with A10 (B7) · found during B4
+- [x] **A36 · Current grade reads 0% when every marked assessment weighs 0** · S · risk L · with A10 (B7) · found during B4 (done 2026-10-11, PR pending)
   - **Where:** `apps/web/src/utils/gradeCalculations.ts` (`computeCurrentGrade`).
   - **Problem:** when the completed, marked assessments weigh 0 in total, the function returns `0` (`completedWeight > 0 ? ... : 0`), so the grades tab shows 0.0% and an F. Weight 0 is common: the regex fallback stores 0 when it finds no weight, and entering a mark in the grade calculator sets the status to Submitted.
   - **Fix:** return null ("no grade yet") when the completed weight is 0, the same answer A10 gives `calculateRequiredGrade` when nothing weighted is left.
@@ -378,15 +379,30 @@ branch. Tick the items off and add a session log entry when done. Don't commit.
   - **Problem:** one upload of up to 10 PDFs calls Gemini once per file, one after another. Hobby on Fluid compute allows 300 seconds (B5 checked the docs), but this route stops at 60, and a slow batch shows the student the timeout message.
   - **Fix:** time a 10-file upload; if it gets near 60 seconds, raise the limit (up to 300) or process the files with bounded concurrency.
 
+- [ ] **A41 · A mark edit always sets the status to Submitted** · S · risk L · found during B7
+  - **Where:** `applyMarkInput` in `apps/web/src/utils/gradeCalculations.ts` (used by `GradeCalculator.tsx`).
+  - **Problem:** entering or clearing a mark in the grade calculator saves the assessment as Submitted. Clearing a stray mark on a Missed assessment leaves it Submitted with no mark, so it stops counting as 0 (D1) and its weight goes back to "remaining". Entering a mark on a Missed assessment also relabels it Submitted.
+  - **Fix (founder call):** leave the status alone when the mark is cleared, and decide whether a mark on a Missed assessment keeps it Missed. Then update the `applyMarkInput` tests.
+
+- [ ] **A42 · ICS file ends without a CRLF** · S · risk L · found during B7
+  - **Where:** `generateICSFile` in `apps/web/src/utils/icsGenerator.ts`.
+  - **Problem:** RFC 5545 ends every content line with CRLF, including `END:VCALENDAR`; the file joins with CRLF but has none after the last line. Google Calendar accepts it; a strict parser may not.
+  - **Fix:** append `\r\n` after the join and update the "wraps the events" test.
+
+- [ ] **A43 · Clearing the target-grade field saves 0** · S · risk L · found during B7
+  - **Where:** the target `NumberField` in `apps/web/src/components/assessment/grade-calculator/GradeOverviewCards.tsx` (`parseFloat(raw) || 0`).
+  - **Problem:** every keystroke saves, so deleting the target to retype it writes 0 to Firestore, and leaving the field empty keeps 0. Before B7 the `|| 85` showed 85 while 0 was saved; now the 0 shows, with "Target already secured" while the field is empty.
+  - **Fix:** don't save an empty or unparseable value (the field snaps back to the saved target on blur); consider clamping to 0 to 100.
+
 ## Baseline (2026-10-10)
 
 Numbers to compare against when items land.
 
 - `npm audit --omit=dev`: 38 vulnerabilities (0 critical, 5 high, 33 moderate) after A2 (2026-10-10; was 46: 1 critical, 12 high, 33 moderate). Including dev dependencies: 43 (10 high).
-- `apps/web` build (Next 15.5.27, after A2): 229 kB First Load JS shared by all pages (`_app` chunk 114 kB); every dashboard route 319 kB (was 320); `/login` and `/register` 242 kB; `/onboarding` 285 kB; `/settings` 284 kB (was 285).
+- `apps/web` build (Next 15.5.27, after A2): 229 kB First Load JS shared by all pages (`_app` chunk 114 kB); `/dashboard/*` 319 kB (was 320) and `/dashboard/[semester]/*` 320 kB after B7 (+767 bytes, 345 gzipped, in the shared dashboard chunk: the grade view helpers and ICS folding); `/login` and `/register` 242 kB; `/onboarding` 285 kB; `/settings` 284 kB (was 285).
 - Live Firestore rules identical to `firestore.rules`; no Storage rules (Storage unused).
 - Vercel: projects `asetta` (apps/web) and `asetta-landing` (apps/landing), Hobby plan: runtime logs kept 1 hour; cron jobs run at most once a day and fire anywhere within the scheduled hour; functions on Fluid compute get a 300-second default and maximum duration (docs checked 2026-10-11). In `apps/web/vercel.json` the cron route has `maxDuration` 300 since A3 (was 10) and the upload route 60.
-- Tests (after B5, 2026-10-11; 9 suites after A7, none before): 11 suites in `apps/web`, each run in two zones. Per zone, 217 tests: 198 pass, 12 expected failures (`it.fails`: A9 3, A10 3, A14 4, A36 1, A37 1), 7 todo (A9 2, A10 4, A14 1). `npm test` takes about 2 seconds.
+- Tests (after B7, 2026-10-11; 9 suites after A7, none before): 11 suites in `apps/web`, each run in two zones. Per zone, 244 tests: 237 pass, 4 expected failures (`it.fails`: A9 3, A37 1), 3 todo (A9 2, A14 1 for D9). `npm test` takes about 2 seconds.
 
 ## Session log
 
@@ -672,3 +688,37 @@ Newest last. One entry per session: date, branch, items, what changed, what's le
   - With the built-in browser pane hidden, the page doesn't draw: `/login` stays on "Loading..." until a screenshot is taken.
   - `next dev` (Turbopack) logs `[HMR] Invalid message` for `isrManifest` and a TypeError in `handleStaticIndicator` on every load, before and after this change. Dev only.
   - Stop a background server by killing the tree from the shell that launched it (`taskkill /PID <pid> /T /F`); look the tree up with `wmic process where "name='node.exe'" get ProcessId,ParentProcessId,CommandLine /format:list`.
+
+### 2026-10-11 · B7 (`fix/b7-grades-ics`, PR #PRNUM)
+
+- **A10 and A36 done; A14's code done, its Google Calendar import still open** (below). Pulled main first (already up to date with PR #11); no dev servers were running and no `package.json` changed, so no install. After the report the founder asked the agent to run every check itself, then commit, push and open the PR for this batch (the founder merges).
+- **Test-first:**
+  - The 8 waiting `it.fails` (A10 3, A36 1, A14 4) ran once as plain `it`s and failed on their assertions in both zones: a Missed assessment with no mark gave 90, not 45; DTEND `20261015T005900` came before DTSTART; SUMMARY was unescaped; a line was 138 octets.
+  - The four A10 `it.todo` cases: the logic moved into `utils/gradeCalculations.ts` with today's behavior first (`applyMarkInput`, `resolveTargetGrade`, `currentGradeView`, `requiredGradeView`, plus a temporary `gradeAfterEdit` copying `recalculateGrade`). Their tests failed (85 for a target of 0, "A" for 89.96, 90 kept after clearing the mark, "-12.5" and "-0.0" shown as needed), then passed after the fix. `gradeAfterEdit` then reduced to `computeCurrentGrade` and was deleted: the component derives the grade instead.
+  - The new ICS tests also ran against the old generator: 11 failed on their assertions (unpadded `T90500`, DTEND `20261231T003000`, a raw newline in SUMMARY, a 146-octet line). The two DST cases and the unfold case pass on both and stay as guards.
+- **A10/A36:**
+  - One counted-mark rule for both functions: a completed assessment counts with its mark; a Missed one without a mark counts as 0 (D1). `computeCurrentGrade` is null ("no grade yet") until graded assessments carry weight; `calculateRequiredGrade` is null when no weight is left to grade.
+  - `GradeCalculator` no longer keeps the grade or total weight in state; both are derived each render, so clearing a mark can't leave a stale grade. The target uses `??` through `resolveTargetGrade`, for the field and the projection alike.
+  - `GradeOverviewCards` takes the letter, GPA and meter color from the shown one-decimal value (the meter color had the same rounding issue at 85: 84.96 showed 85.0% on an amber bar).
+  - Null states, checked at every caller (`GradeCalculator` is the only one): the grade tile shows "No weighted marks yet" (was "No completed assessments yet", wrong once a Submitted assessment has no mark or the marked ones weigh 0); the "Need" line is hidden when nothing weighted is left, as it already was when everything was graded; a needed average of 0 or below (shown value) reads "Target already secured" in the success color. No state shows "0%", "NaN" or a negative percentage for a grade.
+- **A14:** the end comes from date math in UTC (floating time has no zone, so a DST gap can't move it): 23:59 ends 00:59 the next day and Dec 31 rolls into the next year. DTSTAMP is UTC, from a new `now` parameter (default: the real clock). SUMMARY, DESCRIPTION and PRODID are escaped as TEXT. Lines fold at 75 octets, counted in UTF-8 and never splitting a character. Unpadded times ("9:05") now come out padded, since start and end share one parse. The UID stays `@asetta.app`: D9 added with the trade-off and a recommendation, and its `it.todo` stays.
+- **Grades tab, end to end** (the A10 "after clearing marks" check), on this branch's dev server (:3005) against the Auth and Firestore emulators, with a seeded test user (credentials generated into `node_modules/.cache/b7/e2e-user.json`, emulator only) and three courses:
+  - The browser was pointed at the emulators with the `__FIREBASE_DEFAULTS__` cookie (no code change; see `docs/ops.md`). Before typing the test credentials, the console showed the SDK's "You are using the Auth Emulator" warning; afterwards no request went to any `https://` host and Firestore traffic went to `127.0.0.1:8080`.
+  - CIS 3760 (A 90 at 20%, a Missed quiz with no mark at 10%): 60.0%, C-, GPA 1.7 and "Need 95.7%" (D1; before: 90.0%).
+  - ENGG 4450 (89.96 at 50%): 90.0%, A+, GPA 4 and "Need 80.0%". Clearing that only mark showed "No weighted marks yet" and "Need 85.0%" at once; typing it back restored 90.0%, and the emulator held `mark: 89.96`. Target 0: "Target already secured", the field stayed 0 after blur and after a reload (before: 85, and "Need -90.0%").
+  - MATH 1200 (a 95 at weight 0, plus a weight-0 quiz): "No weighted marks yet" and no "Need" line (before: 0.0%, F and "Need 0.0%"). Weight 10 gave 95.0% and A+; back to 0 gave "No weighted marks yet" again.
+  - Calendar tab: the real Export button (its blob captured in the page instead of a download) gave `text/calendar`, 8 events, 23:59 due times ending 00:59 the next day, "Final project\, demo\; report" escaped, a UTC DTSTAMP, CRLF only.
+  - Phone width (375px) in dark: no horizontal scroll, tiles legible. No console errors. Afterwards the cookie and the emulator session were cleared from the built-in browser, and the dev server and emulators were stopped (ports closed).
+- **Static render:** the real `GradeOverviewCards` in eight states with the built CSS (`tiles.tsx`, `make-tiles.mjs`, `serve.mjs` in `node_modules/.cache/b7/`), light and dark at desktop width and light at 375px, all as intended.
+- **ICS, checked by an independent parser:** `validate-ics.mjs` round-trips the generator's output through ical.js 2.2.1 (Mozilla's RFC 5545 parser, installed only in `node_modules/.cache/b7/icaltest/`): every SUMMARY, DESCRIPTION, PRODID, DTSTART (floating), DTEND, DTSTAMP and UID decodes to the source value, including folded, accented, emoji, backslash and newline titles, both 2026 DST nights and the year rollover; the B7 sample parses too. Against the old generator ical.js rejects the whole file at a name with a line break ("invalid line ... Part B"), so before A14 one such assessment could break every import.
+- **Google Calendar import: not done.** The built-in browser isn't signed in to Google, and Claude in Chrome (chosen by the founder for this) reported the extension not connected twice. The sample is `node_modules/.cache/b7/asetta-b7-sample.ics` (seven events, Oct 26 to Dec 31, 2026, built by `make-sample.mjs` with the real generator); import it into a new throwaway calendar, then tick A14.
+- **Verification loop:** lint, `format:check` (no workaround), typecheck, `npm test` (22 files, 474 passed, 8 expected failures, 6 todo; the same with the host zone set to UTC) and build all green. Build: shared 229 kB and `_app` 114 kB unchanged; `/dashboard/[semester]/*` went from 319 to 320 kB (main rebuilt with the changes stashed for the comparison: +767 bytes, 345 gzipped, in the shared dashboard chunk). Baseline updated.
+- **`/code-review` (high):** six findings. Fixed: `standards.md` now lists the ICS export as the one exception to "parse stored dates only via `parseLocalDateTime`"; the ICS tests pass the test clock everywhere. New items: A41, A42, A43. No change: an unparseable stored date gives NaN in DTSTART, as it gave garbage before; A9's "no unparseable stored dates" covers it.
+- **Docs:** `apps/web/standards.md` (the ICS exception above); `docs/ops.md` (driving the signed-in UI against the emulators).
+- **New:** A41 (a mark edit always sets Submitted, so clearing a stray mark on a Missed assessment drops D1's 0), A42 (no CRLF after `END:VCALENDAR`), A43 (clearing the target field saves 0), D9 (the UID domain).
+- **Left for the founder:** the Google Calendar import (above), or connect Claude in Chrome and ask the agent to run it; answer D9; decide A41's status rule; check the Vercel preview builds; merge.
+- **Gotchas:**
+  - C: had 272 KB free. Every npm and npx command ran with `npm_config_cache` on `node_modules/.cache/b2/npm` and `TEMP`/`TMP` on `node_modules/.cache/b7/tmp`; command output went to files there, because the shell fails to print more than a few lines.
+  - A `next build` hung right after "Environments: .env.local" while the agent's shell had its working directory inside `apps/web/.next/static/chunks` (Windows keeps a directory busy while a process sits in it, and Next deletes `.next` first). Killing the tree and rebuilding from the repo root fixed it.
+  - Signing in as a user with no user doc makes `AuthContext` call `/api/welcome-email`; seed the user doc first (and keep `EMAIL_APP_PASSWORD` empty) so a test sign-in can't send mail.
+  - In the built-in browser, the first screenshot after a navigation or scroll often times out; the second one works. With a small pane, set a 1280x800 viewport or the login form doesn't render.
