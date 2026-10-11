@@ -98,8 +98,7 @@ npm run lint && npm run format:check && npm run typecheck && npm test && npm run
 ```
 
 All five green before work is called done. CI (`.github/workflows/ci.yml`) runs the same steps on
-GitHub. On Windows, stop any dev server first, and see `docs/ops.md` for the local line-ending
-workaround for `format:check` (A29).
+GitHub. On Windows, stop any dev server first (`docs/ops.md`).
 
 `next lint` prints a deprecation warning on Next 15.5 (it is removed in Next 16); the move to the
 ESLint CLI is A25 in `docs/AUDIT.md`.

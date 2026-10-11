@@ -1,0 +1,25 @@
+# Check every text file out with LF, whatever core.autocrlf says, so Prettier's "lf" check
+# passes on Windows too. Git detects text itself; the types below are binary, never converted.
+* text=auto eol=lf
+
+# Images
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.webp binary
+*.avif binary
+*.bmp binary
+
+# Fonts
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.otf binary
+*.eot binary
+
+# Video and documents
+*.mp4 binary
+*.webm binary
+*.pdf binary

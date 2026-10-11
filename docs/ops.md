@@ -204,9 +204,10 @@ project. Never commit real values.
   `npm_config_cache`, `TEMP` and `TMP` (and `JAVA_TOOL_OPTIONS=-Djava.io.tmpdir=<dir>` for the
   emulators) at folders under `node_modules/.cache/` in the repo. When C: is completely full,
   every `npm run` and `npx` command needs this, not only installs.
-- `npm run format:check` fails locally on line endings only (`core.autocrlf=true` checks files
-  out with CRLF; CI on Linux is fine). Until A29 lands, check formatting with
-  `npx prettier --check --end-of-line auto .` inside each app.
+- Line endings: the root `.gitattributes` (`* text=auto eol=lf`) checks every text file out with
+  LF even though this machine has `core.autocrlf=true`, so `npm run format:check` passes locally
+  as it does on CI. It also lists the binary types (images, fonts, video, PDF); give any new
+  binary type a `binary` line there.
 - Next 16 keeps a versioned Turbopack dev cache in `apps/landing/.next/dev`; deleting it is safe.
 - Git Bash doesn't pass `TZ` through to Node (`TZ=UTC node ...` still runs in the host zone). Set
   it from PowerShell (`$env:TZ = "UTC"`) to run something under another zone. The Vitest config
