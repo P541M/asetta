@@ -42,7 +42,7 @@ branch. Tick the items off and add a session log entry when done. Don't commit.
 | D6 | What runs the reminder job often enough to hit 9:30 local time? Vercel Hobby cron runs once a day and fires anywhere within its hour. | A8 | **GitHub Actions, every 30 minutes**, calling the endpoint with the cron secret. The repo is public, so Actions minutes are free. The Vercel daily cron stays as a backstop. Details and gotchas in A8. (2026-10-10) |
 | D7 | Welcome email for unverified password sign-ups: wait for a verified address, drop the user-chosen name from the subject, or accept the risk? | A30 | **Use the name only when the token says `email_verified` (Google sign-ups); everyone else gets a fixed "Welcome to Asetta" and "Hi there".** Small, no sign-up friction, and attacker-chosen text never reaches an unverified inbox. Shipped with A31. (2026-10-10, done the same day) |
 | D8 | `next dev` (16.3.8 and 16.4.0) keeps writing `apps/landing/AGENTS.md`: disable it with `agentRules: false`, gitignore it, or commit it? | A34 | Open. Recommended: `agentRules: false` (details in A34). |
-| D9 | Move the ICS export's UID domain from `asetta.app` to `asetta.me`? | A14's `it.todo` | Open. Calendar apps match a re-imported event by its UID, so a new domain makes every assessment a new event: anyone who imported before gets each one twice. Keeping `asetta.app` costs nothing in practice: a UID is an opaque ID, nothing resolves it, and Firestore IDs make a clash implausible. **Recommended: keep `asetta.app`**; revisit only with a subscribed feed (webcal), where a one-time switch could be announced. |
+| D9 | Move the ICS export's UID domain from `asetta.app` to `asetta.me`? | A14's `it.todo` | **Keep `asetta.app`.** (2026-10-11) Calendar apps match a re-imported event by its UID, so a new domain makes every assessment a new event: anyone who imported before gets each one twice. Keeping `asetta.app` costs nothing in practice: a UID is an opaque ID, nothing resolves it, and Firestore IDs make a clash implausible. Revisit only with a subscribed feed (webcal), where a one-time switch could be announced. A14's `it.todo` is now a test that pins the domain. |
 
 ## Batches (suggested order)
 
@@ -230,7 +230,7 @@ branch. Tick the items off and add a session log entry when done. Don't commit.
   - **Fix:** Encode the ID (e.g. `encodeURIComponent`) with a fallback read of the raw ID for existing docs, or store the name in a field with a slug ID.
   - **Done when:** reproduced first; then a course with "/" can set its color and target grade and be renamed.
 
-- [ ] **A14 · ICS export correctness** · S · risk L · test-first (code done 2026-10-11 in PR #12; left: the Google Calendar import of the B7 sample, see the B7 log; the UID domain waits on D9)
+- [ ] **A14 · ICS export correctness** · S · risk L · test-first (code done 2026-10-11 in PR #12; left: the Google Calendar import of the B7 sample, see the B7 log; the UID stays on `asetta.app` (D9))
   - **Where:** `apps/web/src/utils/icsGenerator.ts`.
   - **Problem:** The default 23:59 due time makes DTEND 00:59 on the same day, before DTSTART (verified; `incrementHour` at :54-58 wraps without rolling the date). `DTSTAMP`, required by RFC 5545, is missing. SUMMARY and DESCRIPTION aren't escaped for `,` `;` `\`. No 75-octet line folding. The UID uses `@asetta.app` (the domain is asetta.me).
   - **Fix:** Compute the end from a Date (or make due-time events zero-length). Add DTSTAMP, escaping and folding. Changing the UID domain would duplicate events for anyone who already imported, so decide whether it's worth it.
@@ -402,7 +402,7 @@ Numbers to compare against when items land.
 - `apps/web` build (Next 15.5.27, after A2): 229 kB First Load JS shared by all pages (`_app` chunk 114 kB); `/dashboard/*` 319 kB (was 320) and `/dashboard/[semester]/*` 320 kB after B7 (+767 bytes, 345 gzipped, in the shared dashboard chunk: the grade view helpers and ICS folding); `/login` and `/register` 242 kB; `/onboarding` 285 kB; `/settings` 284 kB (was 285).
 - Live Firestore rules identical to `firestore.rules`; no Storage rules (Storage unused).
 - Vercel: projects `asetta` (apps/web) and `asetta-landing` (apps/landing), Hobby plan: runtime logs kept 1 hour; cron jobs run at most once a day and fire anywhere within the scheduled hour; functions on Fluid compute get a 300-second default and maximum duration (docs checked 2026-10-11). In `apps/web/vercel.json` the cron route has `maxDuration` 300 since A3 (was 10) and the upload route 60.
-- Tests (after B7, 2026-10-11; 9 suites after A7, none before): 11 suites in `apps/web`, each run in two zones. Per zone, 244 tests: 237 pass, 4 expected failures (`it.fails`: A9 3, A37 1), 3 todo (A9 2, A14 1 for D9). `npm test` takes about 2 seconds.
+- Tests (after B7, 2026-10-11; 9 suites after A7, none before): 11 suites in `apps/web`, each run in two zones. Per zone, 244 tests: 238 pass, 4 expected failures (`it.fails`: A9 3, A37 1), 2 todo (A9 2). `npm test` takes about 2 seconds.
 
 ## Session log
 
@@ -716,7 +716,8 @@ Newest last. One entry per session: date, branch, items, what changed, what's le
 - **`/code-review` (high):** six findings. Fixed: `standards.md` now lists the ICS export as the one exception to "parse stored dates only via `parseLocalDateTime`"; the ICS tests pass the test clock everywhere. New items: A41, A42, A43. No change: an unparseable stored date gives NaN in DTSTART, as it gave garbage before; A9's "no unparseable stored dates" covers it.
 - **Docs:** `apps/web/standards.md` (the ICS exception above); `docs/ops.md` (driving the signed-in UI against the emulators).
 - **New:** A41 (a mark edit always sets Submitted, so clearing a stray mark on a Missed assessment drops D1's 0), A42 (no CRLF after `END:VCALENDAR`), A43 (clearing the target field saves 0), D9 (the UID domain).
-- **Left for the founder:** the Google Calendar import (above), or connect Claude in Chrome and ask the agent to run it; answer D9; decide A41's status rule; check the Vercel preview builds; merge.
+- **After the PR:** the founder answered D9 (keep `asetta.app`); A14's UID `it.todo` became a test pinning it (per zone: 238 pass, 2 todo).
+- **Left for the founder:** the Google Calendar import (above), or connect Claude in Chrome and ask the agent to run it; decide A41's status rule; check the Vercel preview builds; merge.
 - **Gotchas:**
   - C: had 272 KB free. Every npm and npx command ran with `npm_config_cache` on `node_modules/.cache/b2/npm` and `TEMP`/`TMP` on `node_modules/.cache/b7/tmp`; command output went to files there, because the shell fails to print more than a few lines.
   - A `next build` hung right after "Environments: .env.local" while the agent's shell had its working directory inside `apps/web/.next/static/chunks` (Windows keeps a directory busy while a process sits in it, and Next deletes `.next` first). Killing the tree and rebuilding from the repo root fixed it.

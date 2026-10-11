@@ -168,5 +168,7 @@ describe("generateICSFile", () => {
     expect(field(eventLines(unfold(ics))[0], "SUMMARY")).toBe(`CIS 3760: ${name}`);
   });
 
-  it.todo("A14: decide whether to move the UID domain from asetta.app to asetta.me");
+  it("A14 (D9): keeps the UID on asetta.app, so a re-import updates events instead of duplicating them", () => {
+    expect(field(onlyEvent({ id: "abc123" }), "UID")).toBe("abc123@asetta.app");
+  });
 });
