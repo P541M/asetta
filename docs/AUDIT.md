@@ -196,7 +196,7 @@ branch. Tick the items off and add a session log entry when done. Don't commit.
   - **Tests:** `lib/upload/textExtraction.test.ts` holds the A9 `it.fails` (abbreviated months, "15/03/2026") and `it.todo` (range checks, the shared normalizer); the fix turns them into passing `it`s. The Gemini cleanup in `lib/upload/gemini.ts` has no tests yet (extract it first). A37 sits in the same test file.
   - **Done when:** table tests over realistic syllabus strings pass; no stored assessment can have an unparseable date or time.
 
-- [x] **A10 · Grade math bugs** · S-M · risk M · D1 decided · test-first (done 2026-10-11, PR #PRNUM)
+- [x] **A10 · Grade math bugs** · S-M · risk M · D1 decided · test-first (done 2026-10-11, PR #12)
   - **Where:** `apps/web/src/utils/gradeCalculations.ts`, `apps/web/src/components/assessment/GradeCalculator.tsx`, `apps/web/src/components/assessment/grade-calculator/GradeOverviewCards.tsx`.
   - **Problems:**
     - `calculateRequiredGrade` returns `0` when the remaining weight is 0 (:65); it should be null ("nothing left to grade").
@@ -230,7 +230,7 @@ branch. Tick the items off and add a session log entry when done. Don't commit.
   - **Fix:** Encode the ID (e.g. `encodeURIComponent`) with a fallback read of the raw ID for existing docs, or store the name in a field with a slug ID.
   - **Done when:** reproduced first; then a course with "/" can set its color and target grade and be renamed.
 
-- [ ] **A14 · ICS export correctness** · S · risk L · test-first (code done 2026-10-11 in PR #PRNUM; left: the Google Calendar import of the B7 sample, see the B7 log; the UID domain waits on D9)
+- [ ] **A14 · ICS export correctness** · S · risk L · test-first (code done 2026-10-11 in PR #12; left: the Google Calendar import of the B7 sample, see the B7 log; the UID domain waits on D9)
   - **Where:** `apps/web/src/utils/icsGenerator.ts`.
   - **Problem:** The default 23:59 due time makes DTEND 00:59 on the same day, before DTSTART (verified; `incrementHour` at :54-58 wraps without rolling the date). `DTSTAMP`, required by RFC 5545, is missing. SUMMARY and DESCRIPTION aren't escaped for `,` `;` `\`. No 75-octet line folding. The UID uses `@asetta.app` (the domain is asetta.me).
   - **Fix:** Compute the end from a Date (or make due-time events zero-length). Add DTSTAMP, escaping and folding. Changing the UID domain would duplicate events for anyone who already imported, so decide whether it's worth it.
@@ -689,7 +689,7 @@ Newest last. One entry per session: date, branch, items, what changed, what's le
   - `next dev` (Turbopack) logs `[HMR] Invalid message` for `isrManifest` and a TypeError in `handleStaticIndicator` on every load, before and after this change. Dev only.
   - Stop a background server by killing the tree from the shell that launched it (`taskkill /PID <pid> /T /F`); look the tree up with `wmic process where "name='node.exe'" get ProcessId,ParentProcessId,CommandLine /format:list`.
 
-### 2026-10-11 · B7 (`fix/b7-grades-ics`, PR #PRNUM)
+### 2026-10-11 · B7 (`fix/b7-grades-ics`, PR #12)
 
 - **A10 and A36 done; A14's code done, its Google Calendar import still open** (below). Pulled main first (already up to date with PR #11); no dev servers were running and no `package.json` changed, so no install. After the report the founder asked the agent to run every check itself, then commit, push and open the PR for this batch (the founder merges).
 - **Test-first:**
