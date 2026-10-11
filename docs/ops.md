@@ -17,8 +17,16 @@ machine. Planned changes live in `docs/AUDIT.md`; this file describes what is tr
   preview needs a Vercel login. The custom domains are public.
 - Hobby limits that shape the code: runtime logs are kept for 1 hour, and a cron job runs at most
   once a day and fires anywhere within its scheduled hour.
-- Function limits in `apps/web/vercel.json`: the cron route has `maxDuration: 10`, the upload
-  route `maxDuration: 60`. The `memory` and `version` keys there are ignored leftovers (A3).
+- Function limits in `apps/web/vercel.json`: the cron route has `maxDuration: 300`, the upload
+  route `maxDuration: 60`.
+  - Vercel's docs (checked 2026-10-11) give Hobby functions on Fluid compute a 300-second default
+    and maximum. Fluid compute is the default for projects created after April 23, 2025, and
+    `asetta` was created on May 8, 2025. The Vercel MCP's project read doesn't show the setting;
+    it is under Settings, Functions, Fluid Compute in the dashboard.
+  - A `maxDuration` in `vercel.json` overrides the default in both directions: the cron's old
+    `10` held it to 10 seconds.
+  - `vercel.json` has no `memory` or `version` (both removed in A3). With Fluid compute, memory
+    can't be set there (Hobby is fixed at 2 GB and 1 vCPU), and `version` is a retired property.
 - The cron route has no `regions` config on purpose: it was never a valid key for Pages Router
   API routes, so the function runs in the project's default region. Pin a region in the Vercel
   project settings if that is ever needed.
@@ -28,11 +36,27 @@ machine. Planned changes live in `docs/AUDIT.md`; this file describes what is tr
 - `apps/web/vercel.json` schedules `GET /api/cron/notifications` at `0 21 * * *` (21:00 UTC,
   so 5 PM in Toronto in summer and 4 PM in winter, give or take the Hobby hour).
 - The route accepts only `Authorization: Bearer <CRON_SECRET>`. Vercel sends that header itself
-  when the project has `CRON_SECRET` set.
+  when the project has `CRON_SECRET` set. With the secret unset or empty, every request gets 401
+  and logs `Reminder cron: CRON_SECRET is not set`, so a missing secret stops reminders loudly.
+- **Run summary:** every run writes `cronRuns/{YYYY-MM-DD}`, keyed by the UTC day the run
+  started. `runs`, `sent` and `failed` are that day's totals; `lastRun` is the latest run
+  (`startedAt`, `finishedAt`, `durationMs`, `users` checked, `sent`, `failed`, `userErrors`, and
+  `error`, the message that stopped the run, or null). Read it in the Firestore console; it
+  outlives the 1-hour log window. No doc for a day means no run got past the secret check and
+  reached Firestore that day: look in the logs for a 401 or a startup error (within the hour).
+  The route also returns the summary as JSON.
+- **Failures** go to `console.error` without email addresses: `Reminder cron: send failed` (uid,
+  assessment ID, SMTP `code` and `responseCode`), `could not process a user` (uid, error),
+  `could not save the run summary`, and `run failed`. The full send error is kept on the failed
+  record in `notifications/{uid}_{assessmentId}_{days}`.
+- **Retries:** only a `notifications` record with `status: "sent"` blocks a reminder. A failed
+  send is retried by the next run that computes the same day count, so under the daily schedule
+  only a rerun on the same day retries it (A38).
 - **Never call the route locally with the real secret.** It reads production Firestore and sends
-  real emails. QA it through the scheduled run's logs (within the 1-hour log window).
-- Planned: fail closed and log failures (A3), 9:30 in each user's timezone through a GitHub
-  Actions schedule (A8, D6), and throughput (A19).
+  real emails. QA production through the run summary (and the logs, within the hour); test
+  locally against the emulators with a placeholder secret ("Testing API routes locally").
+- Planned: 9:30 in each user's timezone through a GitHub Actions schedule (A8, D6), and
+  throughput (A19).
 
 ## Environment variables
 
@@ -79,8 +103,9 @@ project. Never commit real values.
   MCP tools.
 - The live rules matched `firestore.rules` on 2026-10-10. After any deploy, check the console
   matches the file.
-- `welcomeEmails/{uid}` is server-only: no rule matches it, so clients are denied. Keep it that
-  way when rules gain field validation (A16).
+- `welcomeEmails/{uid}`, `cronRuns/{date}` and `notifications/{id}` (the reminder records) are
+  server-only: no rule matches them, so clients are denied. Keep it that way when rules gain
+  field validation (A16).
 - Storage is unused and has no rules.
 
 ## Testing API routes locally
@@ -93,6 +118,16 @@ project. Never commit real values.
   `FIREBASE_EMULATORS_PATH` there). `npm ci` deletes it.
 - The Auth emulator's `projects/{id}/accounts:update` with `Authorization: Bearer owner` sets
   `emailVerified` on a test user.
+- Override `.env.local` values in the dev server's own environment: Next never replaces a
+  variable that is already set, even to an empty string.
+  - `CRON_SECRET=<a placeholder>` lets you call the cron route without the real secret.
+  - `EMAIL_APP_PASSWORD=` (empty) makes every send fail before it contacts Gmail: the safe way to
+    force a send failure.
+  - `GEMINI_API_KEY=` (empty) makes uploads skip Gemini and use the regex fallback.
+- Point `TEMP` and `TMP` at an empty folder to watch formidable's upload files; none should be
+  left after a request, and an unauthenticated upload should never create one.
+- The emulators can run from a scratch folder with its own `firebase.json` (auth on 9099,
+  firestore on 8080, UI off) and `--project asetta-me`, which keeps their logs out of the repo.
 - Preview emails at `/api/dev/email-preview` on `npm run dev:web` (404 outside development).
   Real test sends go to the founder's own address only, with the founder's approval.
 
@@ -167,7 +202,8 @@ project. Never commit real values.
   them by PID (`taskkill /PID <pid> /T /F`).
 - The C: drive is nearly full, so npm and the emulators can fail with ENOSPC. Point
   `npm_config_cache`, `TEMP` and `TMP` (and `JAVA_TOOL_OPTIONS=-Djava.io.tmpdir=<dir>` for the
-  emulators) at folders under `node_modules/.cache/` in the repo.
+  emulators) at folders under `node_modules/.cache/` in the repo. When C: is completely full,
+  every `npm run` and `npx` command needs this, not only installs.
 - `npm run format:check` fails locally on line endings only (`core.autocrlf=true` checks files
   out with CRLF; CI on Linux is fine). Until A29 lands, check formatting with
   `npx prettier --check --end-of-line auto .` inside each app.
