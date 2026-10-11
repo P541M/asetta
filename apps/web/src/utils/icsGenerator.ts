@@ -1,38 +1,39 @@
 import { Assessment } from "../types/assessment";
 
-export function generateICSFile(assessments: Assessment[], semesterName: string): string {
+export function generateICSFile(
+  assessments: Assessment[],
+  semesterName: string,
+  now: Date = new Date(),
+): string {
+  // DTSTAMP is when the file was made, the same for every event
+  const stamp = formatUTCStamp(now);
+
   // ICS file header
   const icsContent = [
     "BEGIN:VCALENDAR",
     "VERSION:2.0",
-    `PRODID:-//Asetta//${semesterName} Calendar//EN`,
+    `PRODID:-//Asetta//${escapeText(semesterName)} Calendar//EN`,
     "CALSCALE:GREGORIAN",
   ];
 
-  // Helper function to format date and time to ICS format (UTC)
-  const formatICSDateTime = (dateStr: string, timeStr: string): string => {
-    const [year, month, day] = dateStr.split("-");
-    const [hours, minutes] = timeStr.split(":");
-    // Assuming local time, convert to UTC-like format without timezone (clients will interpret as local)
-    return `${year}${month}${day}T${hours}${minutes}00`;
-  };
-
   // Add each assessment as a VEVENT
   assessments.forEach((assessment) => {
-    const startDateTime = formatICSDateTime(assessment.dueDate, assessment.dueTime);
-    // For simplicity, set the event duration to 1 hour (arbitrary)
-    const endDateTime = formatICSDateTime(assessment.dueDate, incrementHour(assessment.dueTime));
-    const uid = `${assessment.id}@asetta.app`; // Unique identifier
+    const startDateTime = formatFloatingDateTime(assessment.dueDate, assessment.dueTime);
+    // One hour long; a late due time ends on the next day
+    const endDateTime = formatFloatingDateTime(assessment.dueDate, assessment.dueTime, 1);
+    // Calendars match re-imported events by UID: changing the domain duplicates them (D9)
+    const uid = `${assessment.id}@asetta.app`;
     const summary = `${assessment.courseName}: ${assessment.assignmentName}`;
     const description = `Weight: ${assessment.weight}%\nStatus: ${assessment.status}`;
 
     icsContent.push(
       "BEGIN:VEVENT",
       `UID:${uid}`,
+      `DTSTAMP:${stamp}`,
       `DTSTART:${startDateTime}`,
       `DTEND:${endDateTime}`,
-      `SUMMARY:${summary}`,
-      `DESCRIPTION:${description.replace(/\n/g, "\\n")}`, // Escape newlines
+      `SUMMARY:${escapeText(summary)}`,
+      `DESCRIPTION:${escapeText(description)}`,
       "STATUS:CONFIRMED",
       "BEGIN:VALARM",
       "TRIGGER:-PT1H", // Reminder 1 hour before
@@ -47,12 +48,64 @@ export function generateICSFile(assessments: Assessment[], semesterName: string)
   icsContent.push("END:VCALENDAR");
 
   // Join with CRLF (required by ICS spec)
-  return icsContent.join("\r\n");
+  return icsContent.map(foldLine).join("\r\n");
 }
 
-// Helper function to increment time by 1 hour
-function incrementHour(timeStr: string): string {
+const pad = (value: number, width = 2) => String(value).padStart(width, "0");
+
+/**
+ * A stored due date and time, plus `addHours`, as floating local time ("20261015T235900"),
+ * which calendar apps read in the viewer's own zone. The math runs in UTC because floating
+ * time has no zone: going through the local zone (parseLocalDateTime) would let a DST gap
+ * move it.
+ */
+function formatFloatingDateTime(dateStr: string, timeStr: string, addHours = 0): string {
+  const [year, month, day] = dateStr.split("-").map(Number);
   const [hours, minutes] = timeStr.split(":").map(Number);
-  const newHours = (hours + 1) % 24;
-  return `${newHours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}`;
+  const moment = new Date(Date.UTC(year, month - 1, day, hours + addHours, minutes));
+  return (
+    `${pad(moment.getUTCFullYear(), 4)}${pad(moment.getUTCMonth() + 1)}${pad(moment.getUTCDate())}` +
+    `T${pad(moment.getUTCHours())}${pad(moment.getUTCMinutes())}00`
+  );
+}
+
+/** A moment as a UTC stamp ("20261011T160509Z"), the form DTSTAMP requires. */
+const formatUTCStamp = (date: Date) =>
+  date
+    .toISOString()
+    .replace(/\.\d{3}/, "")
+    .replace(/[-:]/g, "");
+
+/** Escapes a TEXT value (RFC 5545, 3.3.11): backslash, semicolon, comma and newlines. */
+const escapeText = (value: string) =>
+  value.replace(/[\\;,]/g, (char) => `\\${char}`).replace(/\r\n|\r|\n/g, "\\n");
+
+const encoder = new TextEncoder();
+const MAX_LINE_OCTETS = 75;
+
+/**
+ * Folds a content line longer than 75 octets (RFC 5545, 3.1): each continuation line
+ * starts with a space, and a multi-byte character is never split.
+ */
+function foldLine(line: string): string {
+  if (encoder.encode(line).length <= MAX_LINE_OCTETS) return line;
+
+  const parts: string[] = [];
+  let part = "";
+  let partOctets = 0;
+  // The first line holds 75 octets; continuations hold 74 after their leading space
+  let limit = MAX_LINE_OCTETS;
+  for (const char of line) {
+    const octets = encoder.encode(char).length;
+    if (partOctets + octets > limit) {
+      parts.push(part);
+      part = "";
+      partOctets = 0;
+      limit = MAX_LINE_OCTETS - 1;
+    }
+    part += char;
+    partOctets += octets;
+  }
+  parts.push(part);
+  return parts.join("\r\n ");
 }

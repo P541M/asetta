@@ -409,7 +409,9 @@ never duplicated into component state (the source of the 2026-07-16 flicker fix)
   "Due tomorrow" at any hour) and goes negative once the due moment passes. Stored
   `dueDate`/`dueTime` pairs are parsed only via `parseLocalDateTime`, never
   `new Date("YYYY-MM-DD")` (UTC midnight, the wrong local day for most users) or
-  `` new Date(`${date}T${time}`) `` (Safari's strict parser rejects unpadded times). Anything
+  `` new Date(`${date}T${time}`) `` (Safari's strict parser rejects unpadded times). The one
+  exception is the ICS export (`utils/icsGenerator.ts`): it writes floating wall-clock time, so
+  it does its date math in UTC, where no DST gap can shift it. Anything
   that renders time-relative text reads the clock from `hooks/useNow` (ticks each minute and on
   tab wake), so labels on a page left open overnight stay true.
 

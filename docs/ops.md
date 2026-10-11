@@ -128,6 +128,13 @@ project. Never commit real values.
   left after a request, and an unauthenticated upload should never create one.
 - The emulators can run from a scratch folder with its own `firebase.json` (auth on 9099,
   firestore on 8080, UI off) and `--project asetta-me`, which keeps their logs out of the repo.
+- To drive the signed-in UI against the emulators without a code change, set a
+  `__FIREBASE_DEFAULTS__` cookie on the dev server's origin before the app loads: web-safe
+  base64 (no padding) of `{"emulatorHosts":{"auth":"127.0.0.1:9099","firestore":"127.0.0.1:8080"}}`.
+  `getAuth()` and `getFirestore()` in `lib/firebase.ts` then connect to the emulators. Check the
+  console shows "You are using the Auth Emulator" before typing any credentials, create the test
+  user through the Auth emulator's REST API, and seed its user doc first: a user without one makes
+  `AuthContext` request the welcome email. Delete the cookie afterwards.
 - Preview emails at `/api/dev/email-preview` on `npm run dev:web` (404 outside development).
   Real test sends go to the founder's own address only, with the founder's approval.
 

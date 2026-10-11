@@ -1,4 +1,5 @@
 import { Assessment } from "../types/assessment";
+import { CoursePreferences, DEFAULT_COURSE_PREFERENCES } from "../types/coursePreferences";
 import { isCompletedStatus } from "../constants/assessment";
 
 export interface GradeInfo {
@@ -8,28 +9,31 @@ export interface GradeInfo {
   tintClass: string;
 }
 
-/** An assessment counts toward the grade once completed AND given a mark. */
-const hasCountableMark = (a: Assessment) =>
-  isCompletedStatus(a.status) && a.mark !== null && a.mark !== undefined;
+/**
+ * The mark an assessment counts toward the grade with, or null while it is still to be
+ * graded. A completed assessment counts with its mark; a Missed one without a mark counts
+ * as 0 (D1 in docs/AUDIT.md).
+ */
+const countedMark = (a: Assessment): number | null => {
+  if (!isCompletedStatus(a.status)) return null;
+  if (a.mark !== null && a.mark !== undefined) return a.mark;
+  return a.status === "Missed" ? 0 : null;
+};
 
 /**
- * Weighted average over completed-and-marked assessments, as a percentage.
- * Returns null when nothing is completed yet.
+ * Weighted average over the graded assessments, as a percentage.
+ * Returns null ("no grade yet") until graded assessments carry some weight.
  */
 export function computeCurrentGrade(assessments: Assessment[]): number | null {
-  const completedAssessments = assessments.filter(hasCountableMark);
-
-  if (completedAssessments.length === 0) return null;
-
-  const weightedSum = completedAssessments.reduce((sum, assessment) => {
-    if (assessment.mark === null || assessment.mark === undefined) return sum;
-    return sum + (assessment.mark * assessment.weight) / 100;
-  }, 0);
-  const completedWeight = completedAssessments.reduce((sum, assessment) => {
-    if (assessment.mark === null || assessment.mark === undefined) return sum;
-    return sum + assessment.weight;
-  }, 0);
-  return completedWeight > 0 ? (weightedSum / completedWeight) * 100 : 0;
+  let weightedSum = 0;
+  let gradedWeight = 0;
+  for (const assessment of assessments) {
+    const mark = countedMark(assessment);
+    if (mark === null) continue;
+    weightedSum += (mark * assessment.weight) / 100;
+    gradedWeight += assessment.weight;
+  }
+  return gradedWeight > 0 ? (weightedSum / gradedWeight) * 100 : null;
 }
 
 export function computeTotalWeight(assessments: Assessment[]): number {
@@ -38,31 +42,90 @@ export function computeTotalWeight(assessments: Assessment[]): number {
 
 /**
  * Average mark needed on the remaining assessments to reach `targetGrade`.
- * Returns null when there is nothing left to grade.
+ * Returns null when nothing weighted is left to grade.
  */
 export function calculateRequiredGrade(
   assessments: Assessment[],
   targetGrade: number,
   totalWeight: number,
 ): number | null {
-  const completedAssessments = assessments.filter(hasCountableMark);
-  const remainingAssessments = assessments.filter((a) => !hasCountableMark(a));
+  let earnedWeightedSum = 0;
+  let remainingWeight = 0;
+  for (const assessment of assessments) {
+    const mark = countedMark(assessment);
+    if (mark === null) remainingWeight += assessment.weight;
+    else earnedWeightedSum += (mark * assessment.weight) / 100;
+  }
 
-  if (remainingAssessments.length === 0) return null;
+  if (remainingWeight <= 0) return null;
 
-  const currentWeightedSum = completedAssessments.reduce((sum, assessment) => {
-    if (assessment.mark === null || assessment.mark === undefined) return sum;
-    return sum + (assessment.mark * assessment.weight) / 100;
-  }, 0);
-
-  const remainingWeight = remainingAssessments.reduce(
-    (sum, assessment) => sum + assessment.weight,
-    0,
-  );
   const targetWeightedSum = (targetGrade * totalWeight) / 100;
-  const requiredWeightedSum = targetWeightedSum - currentWeightedSum;
+  return ((targetWeightedSum - earnedWeightedSum) / remainingWeight) * 100;
+}
 
-  return remainingWeight > 0 ? (requiredWeightedSum / remainingWeight) * 100 : 0;
+/**
+ * The grades tab's mark edit: an empty field clears the mark, anything else is parsed and
+ * floored at 0. Entering a mark makes a Not started or In progress assessment Submitted;
+ * Submitted and Missed keep their status, and clearing a mark never changes it (A41), so a
+ * stray keystroke can't turn a Missed assessment into a Submitted one.
+ */
+export function applyMarkInput(
+  assessments: Assessment[],
+  assessmentId: string,
+  raw: string,
+): Assessment[] {
+  const mark = raw === "" ? null : Math.max(0, parseFloat(raw) || 0);
+  return assessments.map((assessment) => {
+    if (assessment.id !== assessmentId) return assessment;
+    const status =
+      mark !== null && !isCompletedStatus(assessment.status)
+        ? ("Submitted" as const)
+        : assessment.status;
+    return { ...assessment, mark, status };
+  });
+}
+
+/** The target grade the tile shows and the projection uses; a saved 0 stays 0. */
+export const resolveTargetGrade = (preferences: CoursePreferences | null): number =>
+  preferences?.targetGrade ?? DEFAULT_COURSE_PREFERENCES.targetGrade;
+
+/** A percentage rounded the way the tiles print it, so labels and colors match the number. */
+const shown = (percentage: number): number => Number(percentage.toFixed(1));
+
+export interface CurrentGradeView {
+  /** The grade the meter is drawn at. */
+  value: number;
+  /** The number as shown, one decimal, without the % sign. */
+  text: string;
+  info: GradeInfo;
+  barColor: string;
+}
+
+/**
+ * How the current-grade tile shows a grade. The letter, GPA and meter color come from the
+ * shown one-decimal value, so 89.96 reads "90.0%" with an A+.
+ */
+export function currentGradeView(grade: number): CurrentGradeView {
+  const value = shown(grade);
+  return {
+    value,
+    text: value.toFixed(1),
+    info: getGradeInfo(value),
+    barColor: getProgressBarColor(value),
+  };
+}
+
+export type RequiredGradeView =
+  { kind: "secured" } | { kind: "needed"; text: string; reachable: boolean };
+
+/**
+ * How the target tile states the average needed on the remaining assessments. At 0 or
+ * below (shown value) the target holds even with no more marks, so it is "secured".
+ */
+export function requiredGradeView(required: number): RequiredGradeView {
+  const value = shown(required);
+  if (value <= 0) return { kind: "secured" };
+  return { kind: "needed", text: value.toFixed(1), reachable: value <= 100 };
 }
 
 // Three semantic tints instead of five raw-palette bands: A reads as success,
