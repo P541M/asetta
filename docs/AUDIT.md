@@ -158,7 +158,7 @@ Until A29 lands, run the format check locally with `npx prettier --check --end-o
 
 ## Next
 
-- [x] **A7 · Vitest setup + first suites (grade, date, parsing)** · M · risk L (done 2026-10-11, PR pending)
+- [x] **A7 · Vitest setup + first suites (grade, date, parsing)** · M · risk L (done 2026-10-11, PR #9)
   - **Shipped (B4):** Vitest 4.1.11 in `apps/web` (`vitest.config.ts`: node environment, the `@/` alias, `src/**/*.test.ts`), `npm test` at the root and in CI, and nine suites, one per module on the "Testable today" list. Every suite runs twice, as the `toronto` and `kolkata` projects (each sets `TZ`), and zone checks at the top of `utils/dateUtils.test.ts` prove the pin. Known bugs are 12 `it.fails` and 7 `it.todo` naming A9, A10, A14 and the new A36 and A37. No app source changed. The root `package.json` overrides `vite` to `^6.4.4`, because npm 10.9 crashes on Vite 8 (`docs/ops.md`, "Pins to know"). Details in the B4 session log.
   - **Where:** `apps/web` (new `vitest.config.ts`, a `test` script), root `package.json` (`npm test`), `.github/workflows/ci.yml`, `apps/web/standards.md` (Testing section, and `npm test` in the verification loop), `apps/web/CLAUDE.md` ("Verifying" says there are no unit tests yet), the root `README.md` checks list.
   - **Setup:** Vitest in `apps/web` only, node environment, the `@/` alias from tsconfig. Pin the timezone (e.g. `process.env.TZ = "America/Toronto"` at the top of `vitest.config.ts`) and prove it with a test on `getTimezoneOffset()`. Run the date suites under a second zone too (e.g. `Asia/Kolkata` or `Pacific/Auckland`). Use `vi.setSystemTime` for "now" and cover the DST weekends (Mar 8 and Nov 1, 2026).
@@ -537,7 +537,7 @@ Newest last. One entry per session: date, branch, items, what changed, what's le
 - **Left for the founder:** review and merge. `/code-review` was not run: the diff is Markdown only. The Vercel preview only needs a green build (no app changes).
 - **Gotchas:** the Write tool saves LF, so git warns "LF will be replaced by CRLF" on the new and rewritten files; harmless (git stores LF either way, and the diff is content only).
 
-### 2026-10-11 · B4 (`test/a7-vitest`, no PR yet)
+### 2026-10-11 · B4 (`test/a7-vitest`, PR #9)
 
 - **A7 done.** Tests, test config, CI and docs, plus the dependencies below; no app source changed. After a last look-through the founder asked for a PR; the agent committed, pushed and opened it for this batch only (the founder merges).
 - **Install:**
