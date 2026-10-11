@@ -136,11 +136,38 @@ describe("applyMarkInput", () => {
     makeAssessment({ id: "a2", status: "In progress", mark: null }),
   ];
 
-  it("sets the mark and makes the assessment Submitted", () => {
-    expect(applyMarkInput(course, "a1", "87.5")[0]).toMatchObject({
-      mark: 87.5,
-      status: "Submitted",
-    });
+  it.each(["Not started", "In progress"] as const)(
+    "sets the mark and makes the assessment Submitted (was %s)",
+    (status) => {
+      const [edited] = applyMarkInput([makeAssessment({ id: "a1", status })], "a1", "87.5");
+      expect(edited).toMatchObject({ mark: 87.5, status: "Submitted" });
+    },
+  );
+
+  it.each(["Submitted", "Missed"] as const)(
+    "A41: keeps the status (%s) when a mark is entered",
+    (status) => {
+      const [edited] = applyMarkInput([makeAssessment({ id: "a1", status })], "a1", "40");
+      expect(edited).toMatchObject({ mark: 40, status });
+    },
+  );
+
+  it.each(["Not started", "In progress", "Submitted", "Missed"] as const)(
+    "A41: never changes the status (%s) when the mark is cleared",
+    (status) => {
+      const [edited] = applyMarkInput([makeAssessment({ id: "a1", status, mark: 70 })], "a1", "");
+      expect(edited).toMatchObject({ mark: null, status });
+    },
+  );
+
+  it("A41: a stray mark typed and deleted on a Missed assessment leaves it counting as 0", () => {
+    const course = [
+      makeAssessment({ id: "a1", status: "Submitted", mark: 90, weight: 50 }),
+      makeAssessment({ id: "a2", status: "Missed", mark: null, weight: 50 }),
+    ];
+    const afterTypo = applyMarkInput(applyMarkInput(course, "a2", "5"), "a2", "");
+    expect(afterTypo[1]).toMatchObject({ status: "Missed", mark: null });
+    expect(computeCurrentGrade(afterTypo)).toBeCloseTo(45);
   });
 
   it("clears the mark for an empty field", () => {

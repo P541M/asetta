@@ -64,7 +64,7 @@ branch. Tick the items off and add a session log entry when done. Don't commit.
 | B13 | A15 | Bundle size | |
 | B14 | A18, A20 | Rate limits (upload quota, contact form) | D5 decided |
 | B15 | A19 | Cron throughput | After A8 |
-| any | A21 to A28, A33 to A35, A39 to A43 | Later items | As time allows; A34 needs D8; A41 needs a founder call |
+| any | A21 to A28, A33 to A35, A39, A40, A42, A43 | Later items | As time allows; A34 needs D8 |
 
 ## Fix now
 
@@ -379,10 +379,10 @@ branch. Tick the items off and add a session log entry when done. Don't commit.
   - **Problem:** one upload of up to 10 PDFs calls Gemini once per file, one after another. Hobby on Fluid compute allows 300 seconds (B5 checked the docs), but this route stops at 60, and a slow batch shows the student the timeout message.
   - **Fix:** time a 10-file upload; if it gets near 60 seconds, raise the limit (up to 300) or process the files with bounded concurrency.
 
-- [ ] **A41 · A mark edit always sets the status to Submitted** · S · risk L · found during B7
+- [x] **A41 · A mark edit always sets the status to Submitted** · S · risk L · found during B7 (done 2026-10-11, PR #12)
   - **Where:** `applyMarkInput` in `apps/web/src/utils/gradeCalculations.ts` (used by `GradeCalculator.tsx`).
   - **Problem:** entering or clearing a mark in the grade calculator saves the assessment as Submitted. Clearing a stray mark on a Missed assessment leaves it Submitted with no mark, so it stops counting as 0 (D1) and its weight goes back to "remaining". Entering a mark on a Missed assessment also relabels it Submitted.
-  - **Fix (founder call):** leave the status alone when the mark is cleared, and decide whether a mark on a Missed assessment keeps it Missed. Then update the `applyMarkInput` tests.
+  - **Fix (founder call, 2026-10-11):** entering a mark makes a Not started or In progress assessment Submitted; Submitted and Missed keep their status; clearing a mark never changes the status. A Missed assessment with a typed mark counts that mark, and counts 0 again once the mark is cleared (D1).
 
 - [ ] **A42 · ICS file ends without a CRLF** · S · risk L · found during B7
   - **Where:** `generateICSFile` in `apps/web/src/utils/icsGenerator.ts`.
@@ -402,7 +402,7 @@ Numbers to compare against when items land.
 - `apps/web` build (Next 15.5.27, after A2): 229 kB First Load JS shared by all pages (`_app` chunk 114 kB); `/dashboard/*` 319 kB (was 320) and `/dashboard/[semester]/*` 320 kB after B7 (+767 bytes, 345 gzipped, in the shared dashboard chunk: the grade view helpers and ICS folding); `/login` and `/register` 242 kB; `/onboarding` 285 kB; `/settings` 284 kB (was 285).
 - Live Firestore rules identical to `firestore.rules`; no Storage rules (Storage unused).
 - Vercel: projects `asetta` (apps/web) and `asetta-landing` (apps/landing), Hobby plan: runtime logs kept 1 hour; cron jobs run at most once a day and fire anywhere within the scheduled hour; functions on Fluid compute get a 300-second default and maximum duration (docs checked 2026-10-11). In `apps/web/vercel.json` the cron route has `maxDuration` 300 since A3 (was 10) and the upload route 60.
-- Tests (after B7, 2026-10-11; 9 suites after A7, none before): 11 suites in `apps/web`, each run in two zones. Per zone, 244 tests: 238 pass, 4 expected failures (`it.fails`: A9 3, A37 1), 2 todo (A9 2). `npm test` takes about 2 seconds.
+- Tests (after B7, 2026-10-11; 9 suites after A7, none before): 11 suites in `apps/web`, each run in two zones. Per zone, 252 tests: 246 pass, 4 expected failures (`it.fails`: A9 3, A37 1), 2 todo (A9 2). `npm test` takes about 2 seconds.
 
 ## Session log
 
@@ -716,8 +716,12 @@ Newest last. One entry per session: date, branch, items, what changed, what's le
 - **`/code-review` (high):** six findings. Fixed: `standards.md` now lists the ICS export as the one exception to "parse stored dates only via `parseLocalDateTime`"; the ICS tests pass the test clock everywhere. New items: A41, A42, A43. No change: an unparseable stored date gives NaN in DTSTART, as it gave garbage before; A9's "no unparseable stored dates" covers it.
 - **Docs:** `apps/web/standards.md` (the ICS exception above); `docs/ops.md` (driving the signed-in UI against the emulators).
 - **New:** A41 (a mark edit always sets Submitted, so clearing a stray mark on a Missed assessment drops D1's 0), A42 (no CRLF after `END:VCALENDAR`), A43 (clearing the target field saves 0), D9 (the UID domain).
-- **After the PR:** the founder answered D9 (keep `asetta.app`); A14's UID `it.todo` became a test pinning it (per zone: 238 pass, 2 todo).
-- **Left for the founder:** the Google Calendar import (above), or connect Claude in Chrome and ask the agent to run it; decide A41's status rule; check the Vercel preview builds; merge.
+- **After the PR:**
+  - D9: the founder kept `asetta.app`; A14's UID `it.todo` became a test pinning it.
+  - A41, added to this PR at the founder's request: entering a mark makes a Not started or In progress assessment Submitted; Submitted and Missed keep their status; clearing a mark never changes it. Test-first: 9 cases in `applyMarkInput`'s tests, 5 of which failed on their assertions against the old rule (Missed turned Submitted, and every cleared status became Submitted).
+  - A41 end to end on the emulators (same setup as above): typing 5 on the Missed quiz took CIS 3760 to 61.7%, deleting it brought back 60.0% and "Need 95.7%", and the emulator held the quiz as Missed with no mark (before: Submitted with no mark and 90.0%). The Not started midterm became Submitted at 70 and stayed Submitted when its mark was cleared.
+  - Loop green again: `npm test` 22 files, 492 passed, 8 expected failures, 4 todo (per zone 246 pass, 2 todo; Baseline updated); build sizes unchanged.
+- **Left for the founder:** the Google Calendar import (above), or connect Claude in Chrome and ask the agent to run it; check the Vercel preview builds; merge.
 - **Gotchas:**
   - C: had 272 KB free. Every npm and npx command ran with `npm_config_cache` on `node_modules/.cache/b2/npm` and `TEMP`/`TMP` on `node_modules/.cache/b7/tmp`; command output went to files there, because the shell fails to print more than a few lines.
   - A `next build` hung right after "Environments: .env.local" while the agent's shell had its working directory inside `apps/web/.next/static/chunks` (Windows keeps a directory busy while a process sits in it, and Next deletes `.next` first). Killing the tree and rebuilding from the repo root fixed it.

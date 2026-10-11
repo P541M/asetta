@@ -65,7 +65,9 @@ export function calculateRequiredGrade(
 
 /**
  * The grades tab's mark edit: an empty field clears the mark, anything else is parsed and
- * floored at 0, and the edited assessment becomes Submitted either way.
+ * floored at 0. Entering a mark makes a Not started or In progress assessment Submitted;
+ * Submitted and Missed keep their status, and clearing a mark never changes it (A41), so a
+ * stray keystroke can't turn a Missed assessment into a Submitted one.
  */
 export function applyMarkInput(
   assessments: Assessment[],
@@ -73,11 +75,14 @@ export function applyMarkInput(
   raw: string,
 ): Assessment[] {
   const mark = raw === "" ? null : Math.max(0, parseFloat(raw) || 0);
-  return assessments.map((assessment) =>
-    assessment.id === assessmentId
-      ? { ...assessment, mark, status: "Submitted" as const }
-      : assessment,
-  );
+  return assessments.map((assessment) => {
+    if (assessment.id !== assessmentId) return assessment;
+    const status =
+      mark !== null && !isCompletedStatus(assessment.status)
+        ? ("Submitted" as const)
+        : assessment.status;
+    return { ...assessment, mark, status };
+  });
 }
 
 /** The target grade the tile shows and the projection uses; a saved 0 stays 0. */
