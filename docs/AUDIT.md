@@ -83,14 +83,14 @@ Until A29 lands, run the format check locally with `npx prettier --check --end-o
   - **Fix:** Web `next` and `eslint-config-next` to 15.5.27. `npm update` in the landing (`next` 16.4.0 is in range). `npm audit fix` (never `--force`). Then nodemailer 10 (a major, both apps) as its own commit; smoke-test the reminder, welcome and contact emails. If the firebase/grpc high needs a major, move it to A25 and log it.
   - **Done when:** 0 critical; every remaining high is listed in the session log with a reason; Baseline numbers updated.
 
-- [x] **A3 · Cron: fail closed, log failures, retry failed sends** · S · risk L (done 2026-10-11, B5; PR not opened yet)
+- [x] **A3 · Cron: fail closed, log failures, retry failed sends** · S · risk L (done 2026-10-11, PR #10)
   - **Shipped:** pure rules in `lib/reminderCron.ts` (`isCronAuthorized`, `isAlreadySent`, `cronRunId`), tested first in `lib/reminderCron.test.ts`. The route refuses every request while `CRON_SECRET` is unset or empty and logs that it is unset. `lib/notifications.ts` treats only `status: "sent"` as sent, so a failed send is retried; send failures (uid, assessment ID, SMTP codes, no addresses), per-user errors and a failed summary write go to `console.error`. Each run writes the server-only `cronRuns/{UTC date}` (the day's `runs`, `sent` and `failed`, plus `lastRun`), and the route returns the same summary. `vercel.json`: the cron's `maxDuration` is 300, the Hobby maximum on Fluid compute (Vercel docs, checked 2026-10-11); `memory` and `version` are gone. Retries only happen within the same day count, so under the daily cron a failure still waits for A8 (A38).
   - **Where:** `apps/web/src/pages/api/cron/notifications.ts:8`; `apps/web/src/lib/notifications.ts` (dedupe check :219-228, failed record :262-280); `apps/web/src/utils/devLog.ts`; `apps/web/vercel.json`.
   - **Problem:** If `CRON_SECRET` is unset, the header `Bearer undefined` is accepted. Per-user errors and email failures go through `devError`, which does nothing in production, and Vercel Hobby keeps logs for 1 hour, so failures are invisible. A failed send still writes the dedupe doc (status "failed"), so it is never retried. `maxDuration: 10` caps a sequential scan of every user. `memory` and `version: 2` in `vercel.json` are ignored leftovers.
   - **Fix:** Reject when the secret is unset. `console.error` real failures (no email addresses in logs). Persist a per-run summary (e.g. a `cronRuns/{date}` doc with users, sent, failed, duration). Treat only `status: "sent"` as already sent. Raise `maxDuration` within the plan's limit; drop `memory` and `version`.
   - **Done when:** with no secret configured, every request gets 401; a forced SMTP failure is retried on the next run; the last run's result is still readable after an hour.
 
-- [x] **A4 · Upload route: auth first, clean temp files, log errors** · S · risk L (done 2026-10-11, B5; PR not opened yet)
+- [x] **A4 · Upload route: auth first, clean temp files, log errors** · S · risk L (done 2026-10-11, PR #10)
   - **Shipped:** the token is verified from the headers before `parseForm`. Every temp file formidable opens, partial ones included (collected on `fileBegin`), is deleted in a `finally`. Each catch logs with `console.error` and the uid, as does the form-parse 400 (the 413s are the client's limits and stay quiet). `semesterId` must pass `isValidDocId` (`utils/validation.ts`, tested first: no `/`, not `.` or `..`, not `__x__`, at most 1,500 bytes).
   - **Where:** `apps/web/src/pages/api/upload.ts` (parse :74, auth :104, bare catches :158, :226, :276).
   - **Problem:** The multipart body (up to 4 MB, written to /tmp) is parsed before the token is checked. formidable's temp files are never deleted. Three `catch {}` blocks swallow errors with no log. `semesterId` isn't checked to be a single path segment.
@@ -606,7 +606,7 @@ Newest last. One entry per session: date, branch, items, what changed, what's le
   - Git Bash doesn't pass `TZ` to Node (`TZ=Asia/Kolkata node ...` still ran in Toronto); PowerShell does.
   - An `it.fails` also passes when the test throws for an unrelated reason, so run a new one once as a plain `it` and read the failure.
 
-### 2026-10-11 · B5 (`fix/b5-server-hardening`)
+### 2026-10-11 · B5 (`fix/b5-server-hardening`, PR #10)
 
 - **A3 and A4 done.** Pulled main first (already up to date with PR #9), no dev servers running, `npm install` clean. After a final sweep the founder asked for a PR; the agent committed, pushed and opened it for this batch only (the founder merges).
 - **Test-first:** `lib/reminderCron.test.ts` (20 cases: the secret check, the already-sent rule, the run ID) and `utils/validation.test.ts` (18 cases for `isValidDocId`). They were first run against stubs that copied today's inline logic, and 21 of 38 failed on their assertions: the unset and empty secret accepting `Bearer undefined` and `Bearer `, a failed record counting as sent, slashes and `..` passing. Then the real functions made them pass in both zones.
@@ -629,6 +629,7 @@ Newest last. One entry per session: date, branch, items, what changed, what's le
 - **Docs:** `apps/web/standards.md` (the "Known gaps" bullet is replaced by rules on temp-file cleanup and run records; `cronRuns` joins the server-only example); `docs/ops.md` (the function-limits note, the Reminder cron section, the server-only collections, env overrides for local route tests, the C: note).
 - **New:** A38 (a failed reminder is retried only on the same day count; added to B9 with A8), A39 (token checks that fail for server reasons are silent), A40 (the upload route is capped at 60 seconds).
 - **Final sweep:** re-read every changed line. Fixed two overstatements in the docs (what a missing `cronRuns` day doc means; A38's day-change case was read from the code, not run) and one wrong file size in this entry, then ran the full loop again: same results as above.
+- **Vercel preview** (commit `a8cbb62`): built and READY, so Vercel accepted the cron's `maxDuration: 300` (Fluid compute is on). Through the Vercel MCP's authenticated fetch, `GET /api/upload` returned the route's own JSON 405. `GET /api/cron/notifications` returned 401, but the tool hid the body, so it couldn't show whether that was the route or Vercel Authentication; the local checks cover the route.
 - **Left for the founder:**
   - Merge.
   - After the merge, after the first 21:00 UTC run, open `cronRuns/<that date>` in the Firestore console and expect `runs: 1` with `lastRun.error` null.
