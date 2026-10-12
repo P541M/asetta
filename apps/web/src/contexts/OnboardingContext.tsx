@@ -2,7 +2,7 @@ import React, { createContext, useContext, useReducer, useCallback, useEffect } 
 import { useRouter } from "next/router";
 import { useAuth } from "./AuthContext";
 import { db } from "../lib/firebase";
-import { doc, updateDoc } from "firebase/firestore";
+import { doc, serverTimestamp, updateDoc } from "firebase/firestore";
 import { loadUserDataForOnboarding } from "../utils/onboardingUtils";
 import {
   OnboardingState,
@@ -264,6 +264,8 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
         emailNotifications: state.userData.emailNotifications || true,
         notificationDaysBefore: state.userData.notificationDaysBefore || 1,
         email: state.userData.email || "",
+        // The reminder cron looks at this user at its next run, with the settings chosen here
+        nextReminderAt: serverTimestamp(),
       });
 
       // Refresh the onboarding status in AuthContext

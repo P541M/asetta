@@ -1,7 +1,7 @@
 import { useState, useEffect, FormEvent } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import { updateProfile } from "firebase/auth";
-import { doc, updateDoc, getDoc } from "firebase/firestore";
+import { doc, updateDoc, getDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "../../lib/firebase";
 import ProfileSection from "./ProfileSection";
 import PreferencesSection from "./PreferencesSection";
@@ -142,6 +142,8 @@ const UserSettings = () => {
         ...notifForm,
         // Consent mirrors the notifications toggle (one decision, stored in both fields)
         hasConsentedToNotifications: notifForm.emailNotifications,
+        // The reminder cron looks at this user at its next run, so a change after 9:30 applies today
+        nextReminderAt: serverTimestamp(),
         updatedAt: new Date(),
       });
       setSavedNotif(notifForm);
