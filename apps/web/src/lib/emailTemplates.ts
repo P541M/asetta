@@ -8,7 +8,6 @@
  * Every user value is escaped before it reaches the HTML.
  */
 
-import { calendarDaysUntil } from "../utils/dateUtils";
 import { escapeHtml } from "../utils/escapeHtml";
 
 export interface EmailContent {
@@ -20,13 +19,14 @@ export interface EmailContent {
 export interface ReminderDetails {
   assessmentTitle: string;
   courseName: string;
+  /** The stored due date (YYYY-MM-DD) and padded time (HH:MM), shown as the student entered them. */
+  dueDate: string;
+  dueTime: string;
   /**
-   * Parsed on the server's clock (lib/notifications.ts) and formatted on the same clock, so the
-   * due time the student entered comes back unchanged. The "due in" wording counts calendar days
-   * to it on that clock too, so it always agrees with the date shown. Per-user time zones arrive
-   * with A8.
+   * Calendar days from the student's local today to the due date, counted by the cron in their
+   * time zone (lib/reminderSchedule.ts), so the wording agrees with the date shown.
    */
-  dueAt: Date;
+  daysUntilDue: number;
 }
 
 const DEFAULT_APP_URL = process.env.NEXT_PUBLIC_APP_URL || "https://asetta.me";
@@ -73,16 +73,23 @@ function dueInWords(days: number): string {
   return `in ${days} days`;
 }
 
-/** "Thursday, October 15 at 11:59 PM", on the server's clock (see ReminderDetails.dueAt). */
-function formatDue(dueAt: Date): string {
-  const date = dueAt.toLocaleDateString("en-US", {
+/**
+ * "Thursday, October 15 at 11:59 PM": the stored date and time, built and formatted in UTC so no
+ * zone (the server's included) can shift them.
+ */
+function formatDue(dueDate: string, dueTime: string): string {
+  const [year, month, day] = dueDate.split("-").map(Number);
+  const [hours, minutes] = dueTime.split(":").map(Number);
+  const wallClock = new Date(Date.UTC(year, month - 1, day, hours, minutes));
+  const date = wallClock.toLocaleDateString("en-US", {
+    timeZone: "UTC",
     weekday: "long",
     month: "long",
     day: "numeric",
   });
   // ICU puts a narrow no-break space before AM/PM, which some mail clients render as a box.
-  const time = dueAt
-    .toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })
+  const time = wallClock
+    .toLocaleTimeString("en-US", { timeZone: "UTC", hour: "numeric", minute: "2-digit" })
     .replace(/ /g, " ");
   return `${date} at ${time}`;
 }
@@ -167,8 +174,8 @@ ${content}
 export function reminderEmail(details: ReminderDetails, appUrl = DEFAULT_APP_URL): EmailContent {
   const title = oneLine(details.assessmentTitle);
   const course = oneLine(details.courseName);
-  const dueIn = dueInWords(calendarDaysUntil(details.dueAt));
-  const due = formatDue(details.dueAt);
+  const dueIn = dueInWords(details.daysUntilDue);
+  const due = formatDue(details.dueDate, details.dueTime);
   const heading = `Due ${dueIn}`;
   const subject = course ? `${title} for ${course} is due ${dueIn}` : `${title} is due ${dueIn}`;
   const dashboardUrl = `${appUrl}/dashboard`;

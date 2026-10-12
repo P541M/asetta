@@ -2,10 +2,11 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import { User, onAuthStateChanged, signOut } from "firebase/auth";
 import { auth, db } from "../lib/firebase";
-import { doc, getDoc, setDoc } from "firebase/firestore";
+import { doc, getDoc, serverTimestamp, setDoc } from "firebase/firestore";
 import { AuthContextType } from "../types/context";
 import { useOnboardingStatus } from "../hooks/useOnboardingStatus";
 import { devError } from "../utils/devLog";
+import { browserTimeZone } from "../utils/timeZone";
 
 /** Asks the server for the welcome email. It goes to the account's own address, at most once. */
 async function requestWelcomeEmail(usr: User, displayName: string) {
@@ -53,6 +54,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         // Check if user document exists in Firestore
         const userRef = doc(db, "users", usr.uid);
         const userDoc = await getDoc(userRef);
+        // Reminders go out at 9:30 in this zone (A8). nextReminderAt set to the server's now asks
+        // the reminder cron to look at this user at its next run, which then schedules the next 9:30.
+        const timeZone = browserTimeZone();
 
         if (!userDoc.exists()) {
           // Create a new document if it doesn't exist
@@ -62,6 +66,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             institution: "",
             createdAt: new Date(),
             lastLogin: new Date(),
+            ...(timeZone ? { timeZone } : {}),
+            nextReminderAt: serverTimestamp(),
           };
           await setDoc(userRef, defaultSettings);
 
@@ -69,8 +75,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           // Not awaited: sign-in shouldn't wait on the mail server.
           void requestWelcomeEmail(usr, defaultSettings.displayName);
         } else {
-          // Update lastLogin if document already exists
-          await setDoc(userRef, { lastLogin: new Date() }, { merge: true });
+          // Update lastLogin if document already exists, and the zone when it's new or has changed
+          const zoneUpdate =
+            timeZone && timeZone !== userDoc.data().timeZone
+              ? { timeZone, nextReminderAt: serverTimestamp() }
+              : {};
+          await setDoc(userRef, { lastLogin: new Date(), ...zoneUpdate }, { merge: true });
         }
       }
       setLoading(false);

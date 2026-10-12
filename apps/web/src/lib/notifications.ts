@@ -1,10 +1,31 @@
 import { getAdmin } from "./firebase-admin";
-import { FieldValue, getFirestore, type Firestore } from "firebase-admin/firestore";
+import {
+  FieldValue,
+  Timestamp,
+  getFirestore,
+  type DocumentSnapshot,
+  type Firestore,
+  type QueryDocumentSnapshot,
+} from "firebase-admin/firestore";
 import { sendReminderEmail } from "./email";
-import { cronRunId, isAlreadySent } from "./reminderCron";
+import {
+  MAX_SEND_ATTEMPTS,
+  claimDecision,
+  cronRunId,
+  isRecentLegacySend,
+  legacyRecordIds,
+  type ClaimDecision,
+} from "./reminderCron";
+import {
+  dueReminders,
+  nextReminderRun,
+  reminderRecordId,
+  resolveTimeZone,
+  type DueReminder,
+  type ReminderAssessment,
+} from "./reminderSchedule";
 import { isValidEmail } from "../utils/validation";
-import { devLog, devError } from "../utils/devLog";
-import type { AssessmentStatus } from "../types/assessment";
+import { devLog } from "../utils/devLog";
 
 interface NotificationPreferences {
   emailNotifications: boolean;
@@ -14,23 +35,14 @@ interface NotificationPreferences {
   notifySubmittedAssessments: boolean;
 }
 
-interface Assessment {
-  id: string;
-  dueDate: Date | string | { toDate: () => Date }; // Can be Date, string, or Firestore Timestamp
-  userId: string;
-  courseName: string;
-  assignmentName: string;
-  dueTime: string;
-  status: AssessmentStatus;
-  /** The due date is the upload day's placeholder until the student checks it. */
-  needsReview?: boolean;
-}
-
 /** One run's result: returned by the cron route and saved as `lastRun` in `cronRuns/{UTC date}`. */
 export interface CronRunSummary {
   startedAt: Date;
   finishedAt: Date;
   durationMs: number;
+  /** Users the day's sweep gave a first `nextReminderAt`; null when the sweep had already run. */
+  scheduled: number | null;
+  /** Users whose `nextReminderAt` had come. */
   users: number;
   sent: number;
   failed: number;
@@ -39,26 +51,30 @@ export interface CronRunSummary {
   error: string | null;
 }
 
-export async function checkAndSendNotifications(): Promise<CronRunSummary> {
-  const startTime = new Date();
-  devLog("=== NOTIFICATION CHECK STARTED ===", startTime.toISOString());
-
+/**
+ * One reminder run as of `now` (the route passes a simulated moment in development only). Only
+ * users whose `nextReminderAt` has come are read, so calling it twice in a row sends nothing new.
+ */
+export async function checkAndSendNotifications(now: Date = new Date()): Promise<CronRunSummary> {
+  const clockStart = Date.now();
   let db: Firestore | undefined;
-  let totalNotificationsSent = 0;
-  let totalUsersProcessed = 0;
-  let totalSendFailures = 0;
-  let totalUserErrors = 0;
+  let scheduled: number | null = null;
+  let users = 0;
+  let sent = 0;
+  let failed = 0;
+  let userErrors = 0;
 
   const summarize = (runError: unknown): CronRunSummary => {
-    const finishedAt = new Date();
+    const durationMs = Date.now() - clockStart;
     return {
-      startedAt: startTime,
-      finishedAt,
-      durationMs: finishedAt.getTime() - startTime.getTime(),
-      users: totalUsersProcessed,
-      sent: totalNotificationsSent,
-      failed: totalSendFailures,
-      userErrors: totalUserErrors,
+      startedAt: now,
+      finishedAt: new Date(now.getTime() + durationMs),
+      durationMs,
+      scheduled,
+      users,
+      sent,
+      failed,
+      userErrors,
       error:
         runError === undefined
           ? null
@@ -69,287 +85,35 @@ export async function checkAndSendNotifications(): Promise<CronRunSummary> {
   };
 
   try {
-    const adminApp = await getAdmin();
-    db = getFirestore(adminApp);
-    devLog("✅ Firebase Admin initialized successfully");
+    db = getFirestore(await getAdmin());
+    try {
+      scheduled = await scheduleUnscheduledUsers(db, now);
+    } catch (sweepError) {
+      // Users who already have a nextReminderAt still get their reminders; the next run retries.
+      console.error("Reminder cron: could not schedule new users", sweepError);
+    }
 
-    // Get all users with notification preferences
-    const usersRef = db.collection("users");
-    const usersSnapshot = await usersRef.get();
-    devLog(`📊 Found ${usersSnapshot.docs.length} users to check`);
+    const dueUsers = await db.collection("users").where("nextReminderAt", "<=", now).get();
+    devLog(`Reminder cron: ${dueUsers.size} users due at ${now.toISOString()}`);
 
-    for (const userDoc of usersSnapshot.docs) {
-      totalUsersProcessed++;
-      devLog(
-        `\n--- Processing User ${userDoc.id} (${totalUsersProcessed}/${usersSnapshot.docs.length}) ---`,
-      );
-
+    for (const userDoc of dueUsers.docs) {
+      users++;
       try {
-        const userData = userDoc.data();
-        devLog("📋 Raw user data:", {
-          hasEmailNotifications: "emailNotifications" in userData,
-          hasNotificationDaysBefore: "notificationDaysBefore" in userData,
-          hasEmail: "email" in userData,
-          hasConsent: "hasConsentedToNotifications" in userData,
-        });
-
-        // Validate user preferences
-        const preferencesValidation = validateNotificationPreferences(userData);
-
-        if (!preferencesValidation.isValid) {
-          devLog(`⚠️ Invalid user preferences for ${userDoc.id}:`, preferencesValidation.errors);
-          continue;
-        }
-
-        const preferences = preferencesValidation.sanitized!;
-
-        devLog("⚙️ User preferences:", {
-          userId: userDoc.id,
-          emailNotifications: preferences.emailNotifications,
-          notificationDaysBefore: preferences.notificationDaysBefore,
-          hasConsentedToNotifications: preferences.hasConsentedToNotifications,
-          notifySubmittedAssessments: preferences.notifySubmittedAssessments,
-          email: preferences.email ? `${preferences.email.substring(0, 3)}***` : "not set",
-        });
-
-        if (!preferences.hasConsentedToNotifications) {
-          devLog("⏭️ User has not consented to notifications, skipping");
-          continue;
-        }
-
-        if (!preferences.emailNotifications) {
-          devLog("⏭️ Email notifications disabled for user, skipping");
-          continue;
-        }
-
-        if (!preferences.email) {
-          devLog("⚠️ No email address set for user, skipping");
-          continue;
-        }
-
-        // Get all semesters for this user
-        const semestersRef = userDoc.ref.collection("semesters");
-        const semestersSnapshot = await semestersRef.get();
-        devLog(`📚 Found ${semestersSnapshot.docs.length} semesters for user`);
-
-        // Get all assessments across all semesters
-        const now = new Date();
-        devLog("🕐 Current time:", now.toISOString());
-
-        let allAssessments: Assessment[] = [];
-
-        for (const semesterDoc of semestersSnapshot.docs) {
-          const assessmentsRef = semesterDoc.ref.collection("assessments");
-          const assessmentsSnapshot = await assessmentsRef.get();
-          devLog(
-            `📝 Found ${assessmentsSnapshot.docs.length} assessments in semester ${semesterDoc.id}`,
-          );
-
-          const semesterAssessments = assessmentsSnapshot.docs.map((doc) => {
-            const data = doc.data();
-            devLog(`📄 Assessment data for ${doc.id}:`, {
-              assignmentName: data.assignmentName,
-              dueDate: data.dueDate,
-              dueTime: data.dueTime,
-              courseName: data.courseName,
-              dueDateType: typeof data.dueDate,
-              dueTimeType: typeof data.dueTime,
-            });
-
-            return {
-              id: doc.id,
-              userId: userDoc.id,
-              ...data,
-            };
-          }) as Assessment[];
-
-          allAssessments = [...allAssessments, ...semesterAssessments];
-        }
-
-        devLog(`📊 Total assessments found: ${allAssessments.length}`);
-
-        // Filter assessments that are due in the future and process dates
-        const futureAssessments = [];
-        const dateParsingErrors = [];
-
-        for (const assessment of allAssessments) {
-          try {
-            let dueDate: Date;
-
-            // Handle different date formats from Firestore
-            if (
-              assessment.dueDate &&
-              typeof assessment.dueDate === "object" &&
-              "toDate" in assessment.dueDate
-            ) {
-              // Firestore Timestamp
-              dueDate = (assessment.dueDate as { toDate: () => Date }).toDate();
-              if (assessment.dueTime) {
-                const [hours, minutes] = assessment.dueTime.split(":");
-                dueDate.setHours(parseInt(hours), parseInt(minutes), 0, 0);
-              }
-            } else if (typeof assessment.dueDate === "string") {
-              // String date
-              const dateTimeString = assessment.dueTime
-                ? `${assessment.dueDate}T${assessment.dueTime}`
-                : assessment.dueDate;
-              dueDate = new Date(dateTimeString);
-            } else {
-              throw new Error(`Invalid date format: ${typeof assessment.dueDate}`);
-            }
-
-            if (isNaN(dueDate.getTime())) {
-              throw new Error(`Invalid date value: ${assessment.dueDate}`);
-            }
-
-            if (dueDate > now) {
-              futureAssessments.push({
-                ...assessment,
-                parsedDueDate: dueDate,
-              });
-            }
-
-            devLog(`✅ Parsed date for "${assessment.assignmentName}": ${dueDate.toISOString()}`);
-          } catch (error) {
-            devError(`❌ Date parsing error for assessment "${assessment.assignmentName}":`, error);
-            dateParsingErrors.push({
-              assessmentId: assessment.id,
-              title: assessment.assignmentName,
-              error: error instanceof Error ? error.message : String(error),
-            });
-          }
-        }
-
-        if (dateParsingErrors.length > 0) {
-          devLog(`⚠️ Date parsing errors (${dateParsingErrors.length}):`, dateParsingErrors);
-        }
-
-        devLog(`🔮 Future assessments: ${futureAssessments.length}`);
-
-        for (const assessment of futureAssessments) {
-          if (assessment.needsReview) {
-            devLog(`⏭️ Skipping "${assessment.assignmentName}": its due date needs review`);
-            continue;
-          }
-          if (assessment.status === "Submitted" && !preferences.notifySubmittedAssessments) {
-            devLog(`⏭️ Skipping submitted assessment "${assessment.assignmentName}"`);
-            continue;
-          }
-
-          const dueDate = assessment.parsedDueDate;
-          const timeDiffMs = dueDate.getTime() - now.getTime();
-          const daysUntilDue = Math.floor(timeDiffMs / (1000 * 60 * 60 * 24));
-          const hoursUntilDue = Math.floor(timeDiffMs / (1000 * 60 * 60));
-
-          devLog(`📋 Assessment details:`, {
-            title: assessment.assignmentName,
-            courseName: assessment.courseName,
-            dueDate: dueDate.toISOString(),
-            daysUntilDue,
-            hoursUntilDue,
-            notificationDaysBefore: preferences.notificationDaysBefore,
-            shouldNotify: daysUntilDue === preferences.notificationDaysBefore,
-          });
-
-          // Check if we should send a notification (with some tolerance for timing)
-          if (
-            daysUntilDue === preferences.notificationDaysBefore ||
-            (preferences.notificationDaysBefore === 1 && hoursUntilDue <= 36 && hoursUntilDue >= 12)
-          ) {
-            // Check if we've already sent a notification for this assessment
-            const notificationId = `${userDoc.id}_${assessment.id}_${daysUntilDue}`;
-            const notificationRef = db.collection("notifications").doc(notificationId);
-            const existingNotification = await notificationRef.get();
-
-            if (isAlreadySent(existingNotification.data())) {
-              devLog(
-                `⏭️ Notification already sent for "${assessment.assignmentName}" (${daysUntilDue} days)`,
-              );
-              continue;
-            }
-
-            devLog(
-              `📧 Sending notification for "${assessment.assignmentName}" (${daysUntilDue} days until due)`,
-            );
-
-            try {
-              await sendReminderEmail(preferences.email, {
-                assessmentTitle: assessment.assignmentName,
-                courseName: assessment.courseName,
-                dueAt: dueDate,
-              });
-
-              // Record the notification to prevent duplicates
-              await notificationRef.set({
-                userId: userDoc.id,
-                assessmentId: assessment.id,
-                assessmentTitle: assessment.assignmentName,
-                courseName: assessment.courseName,
-                daysUntilDue,
-                email: preferences.email,
-                sentAt: new Date(),
-                notificationType: "email",
-                status: "sent",
-              });
-
-              totalNotificationsSent++;
-              devLog(
-                `✅ Email sent successfully to ${preferences.email} and notification recorded`,
-              );
-            } catch (emailError) {
-              // Log the codes only: nodemailer's messages can contain the recipient address.
-              // The full message goes into the failed record below (a server-only collection).
-              const { code, responseCode } = (emailError ?? {}) as {
-                code?: string;
-                responseCode?: number;
-              };
-              console.error("Reminder cron: send failed", {
-                uid: userDoc.id,
-                assessmentId: assessment.id,
-                code,
-                responseCode,
-              });
-
-              // Record the failed attempt. Only status "sent" blocks a send, so the next run retries.
-              await notificationRef.set({
-                userId: userDoc.id,
-                assessmentId: assessment.id,
-                assessmentTitle: assessment.assignmentName,
-                courseName: assessment.courseName,
-                daysUntilDue,
-                email: preferences.email,
-                sentAt: new Date(),
-                notificationType: "email",
-                status: "failed",
-                error: emailError instanceof Error ? emailError.message : String(emailError),
-              });
-
-              totalSendFailures++;
-            }
-          } else {
-            devLog(
-              `⏭️ Not sending notification - timing doesn't match (${daysUntilDue} days vs ${preferences.notificationDaysBefore} required)`,
-            );
-          }
-        }
+        const result = await processUser(db, userDoc, now);
+        sent += result.sent;
+        failed += result.failed;
       } catch (userError) {
+        // nextReminderAt wasn't advanced, so the next run tries this user again.
         console.error("Reminder cron: could not process a user", {
           uid: userDoc.id,
           error: userError,
         });
-        totalUserErrors++;
+        userErrors++;
       }
     }
 
     const summary = summarize(undefined);
-
-    devLog("\n=== NOTIFICATION CHECK COMPLETED ===");
-    devLog(`⏱️ Duration: ${summary.durationMs}ms`);
-    devLog(`👥 Users processed: ${summary.users}`);
-    devLog(`📧 Notifications sent: ${summary.sent}`);
-    devLog(`❌ Send failures: ${summary.failed}, user errors: ${summary.userErrors}`);
-    devLog("=== END SUMMARY ===");
-
+    devLog("Reminder cron: run finished", summary);
     await recordRun(db, summary);
     return summary;
   } catch (error) {
@@ -357,6 +121,248 @@ export async function checkAndSendNotifications(): Promise<CronRunSummary> {
     if (db) await recordRun(db, summarize(error));
     throw error;
   }
+}
+
+/**
+ * Once per UTC day, sets `nextReminderAt` to now for every user without one, so this run reads
+ * them: every user on the first run after A8, then anyone whose sign-in didn't set it. A user is
+ * only ever read through the `nextReminderAt` query, and Firestore can't query a missing field.
+ */
+async function scheduleUnscheduledUsers(db: Firestore, now: Date): Promise<number | null> {
+  const runRef = db.collection("cronRuns").doc(cronRunId(now));
+  if ((await runRef.get()).get("sweptAt")) return null;
+
+  const allUsers = await db.collection("users").select("nextReminderAt").get();
+  const unscheduled = allUsers.docs.filter(
+    (doc) => !(doc.get("nextReminderAt") instanceof Timestamp),
+  );
+  for (let start = 0; start < unscheduled.length; start += 500) {
+    const batch = db.batch();
+    for (const doc of unscheduled.slice(start, start + 500)) {
+      batch.update(doc.ref, { nextReminderAt: now });
+    }
+    await batch.commit();
+  }
+
+  await runRef.set({ sweptAt: now }, { merge: true });
+  return unscheduled.length;
+}
+
+/** Sends one user's due reminders, then moves their `nextReminderAt` on. */
+async function processUser(
+  db: Firestore,
+  userDoc: QueryDocumentSnapshot,
+  now: Date,
+): Promise<{ sent: number; failed: number }> {
+  const userData = userDoc.data();
+  const timeZone = resolveTimeZone(userData.timeZone);
+  const result = { sent: 0, failed: 0 };
+  let retryPending = false;
+
+  const preferences = activePreferences(userDoc.id, userData);
+  if (preferences) {
+    const { assessments, names } = await readAssessments(userDoc);
+    const reminders = dueReminders({
+      assessments,
+      settings: {
+        daysBefore: preferences.notificationDaysBefore,
+        notifySubmitted: preferences.notifySubmittedAssessments,
+      },
+      timeZone,
+      now,
+    });
+
+    for (const reminder of reminders) {
+      const outcome = await sendReminder(db, {
+        uid: userDoc.id,
+        preferences,
+        reminder,
+        names: names.get(reminder.assessmentId)!,
+        now,
+      });
+      if (outcome.status === "sent") result.sent++;
+      if (outcome.status === "failed") result.failed++;
+      if (outcome.retry) retryPending = true;
+    }
+  }
+
+  // A user with reminders off is still moved on, so they aren't read again until tomorrow.
+  await userDoc.ref.update({ nextReminderAt: nextReminderRun(timeZone, now, retryPending) });
+  return result;
+}
+
+/** The user's reminder settings, or null when they get no reminders. */
+function activePreferences(uid: string, userData: unknown): NotificationPreferences | null {
+  const validation = validateNotificationPreferences(userData);
+  if (!validation.isValid) {
+    devLog(`Reminder cron: invalid preferences for ${uid}`, validation.errors);
+    return null;
+  }
+  const preferences = validation.sanitized!;
+  if (
+    !preferences.hasConsentedToNotifications ||
+    !preferences.emailNotifications ||
+    !preferences.email
+  ) {
+    return null;
+  }
+  return preferences;
+}
+
+interface AssessmentNames {
+  assessmentTitle: string;
+  courseName: string;
+}
+
+/** Every assessment in every semester of the user (A19 narrows this). */
+async function readAssessments(userDoc: QueryDocumentSnapshot) {
+  const assessments: ReminderAssessment[] = [];
+  const names = new Map<string, AssessmentNames>();
+  const semesters = await userDoc.ref.collection("semesters").get();
+  for (const semester of semesters.docs) {
+    const snapshot = await semester.ref.collection("assessments").get();
+    for (const doc of snapshot.docs) {
+      const data = doc.data();
+      assessments.push({
+        id: doc.id,
+        dueDate: data.dueDate,
+        dueTime: data.dueTime,
+        status: data.status,
+        needsReview: data.needsReview,
+      });
+      names.set(doc.id, {
+        assessmentTitle: String(data.assignmentName ?? ""),
+        courseName: String(data.courseName ?? ""),
+      });
+    }
+  }
+  return { assessments, names };
+}
+
+const toDate = (value: unknown): Date | null =>
+  value instanceof Timestamp ? value.toDate() : value instanceof Date ? value : null;
+
+/**
+ * Claims, sends and records one reminder. `retry` says whether this user needs another look
+ * before tomorrow: a failed send with attempts left, or one another run is busy with.
+ */
+async function sendReminder(
+  db: Firestore,
+  {
+    uid,
+    preferences,
+    reminder,
+    names,
+    now,
+  }: {
+    uid: string;
+    preferences: NotificationPreferences;
+    reminder: DueReminder;
+    names: AssessmentNames;
+    now: Date;
+  },
+): Promise<{ status: "sent" | "failed" | "skipped"; retry: boolean }> {
+  const notifications = db.collection("notifications");
+  const { assessmentId } = reminder;
+  const recordRef = notifications.doc(reminderRecordId(uid, reminder));
+  const toRecord = (snapshot: DocumentSnapshot) =>
+    snapshot.exists
+      ? {
+          status: snapshot.get("status"),
+          attempts: snapshot.get("attempts"),
+          lastAttemptAt: toDate(snapshot.get("lastAttemptAt")),
+        }
+      : undefined;
+  const skipped = (decision: ClaimDecision) => ({
+    status: "skipped" as const,
+    retry: !decision.claim && (decision.reason === "waiting" || decision.reason === "sending"),
+  });
+
+  // A sent reminder stays due for the catch-up days; settle it with one read, no transaction.
+  const existing = await recordRef.get();
+  const precheck = claimDecision(toRecord(existing), now);
+  if (!precheck.claim) return skipped(precheck);
+
+  if (!existing.exists) {
+    const legacy = await db.getAll(
+      ...legacyRecordIds(uid, assessmentId, preferences.notificationDaysBefore).map((id) =>
+        notifications.doc(id),
+      ),
+    );
+    if (
+      legacy.some((snapshot) =>
+        isRecentLegacySend(
+          { status: snapshot.get("status"), sentAt: toDate(snapshot.get("sentAt")) },
+          now,
+        ),
+      )
+    ) {
+      devLog(`Reminder cron: ${uid}_${assessmentId} went out before A8, skipping`);
+      return { status: "skipped", retry: false };
+    }
+  }
+
+  // Claim the send before sending: the transaction lets only one run move the record to
+  // "sending", so overlapping runs (GitHub Actions and the Vercel backstop) can't both send it.
+  const decision: ClaimDecision = await db.runTransaction(async (transaction) => {
+    const claim = claimDecision(toRecord(await transaction.get(recordRef)), now);
+    if (claim.claim) {
+      transaction.set(
+        recordRef,
+        {
+          userId: uid,
+          assessmentId,
+          assessmentTitle: names.assessmentTitle,
+          courseName: names.courseName,
+          targetDay: reminder.targetDay,
+          daysUntilDue: reminder.daysUntilDue,
+          status: "sending",
+          attempts: claim.attempt,
+          lastAttemptAt: now,
+        },
+        { merge: true },
+      );
+    }
+    return claim;
+  });
+  if (!decision.claim) return skipped(decision);
+
+  try {
+    await sendReminderEmail(preferences.email, {
+      ...names,
+      dueDate: reminder.dueDate,
+      dueTime: reminder.dueTime,
+      daysUntilDue: reminder.daysUntilDue,
+    });
+  } catch (emailError) {
+    // Log the codes only: nodemailer's messages can contain the recipient address.
+    // The full message goes into the record (a server-only collection).
+    const { code, responseCode } = (emailError ?? {}) as { code?: string; responseCode?: number };
+    console.error("Reminder cron: send failed", {
+      uid,
+      assessmentId,
+      attempt: decision.attempt,
+      code,
+      responseCode,
+    });
+    await recordRef.update({
+      status: "failed",
+      error: emailError instanceof Error ? emailError.message : String(emailError),
+    });
+    return { status: "failed", retry: decision.attempt < MAX_SEND_ATTEMPTS };
+  }
+
+  try {
+    await recordRef.update({ status: "sent", sentAt: now, error: FieldValue.delete() });
+  } catch (recordError) {
+    // The email went out; the claim stays "sending", and is only retried once its lease is up.
+    console.error("Reminder cron: sent, but could not record it", {
+      uid,
+      assessmentId,
+      error: recordError,
+    });
+  }
+  return { status: "sent", retry: false };
 }
 
 /**
@@ -383,9 +389,6 @@ async function recordRun(db: Firestore, summary: CronRunSummary) {
   }
 }
 
-// Function to validate email format
-
-// Function to validate user notification preferences
 function validateNotificationPreferences(preferences: unknown): {
   isValid: boolean;
   errors: string[];

@@ -62,6 +62,11 @@ All new code follows these.
 - **A scheduled job records each run** in Firestore (the reminder cron's `cronRuns/{date}`),
   because Vercel Hobby keeps logs for 1 hour. A failed side effect is recorded as failed and
   retried, never marked done.
+- **A job is safe to run twice and to overlap with itself**: claim each side effect atomically
+  before doing it (a transaction, or `create()` as in `welcomeEmails`), record the outcome, and
+  cap the retries. The reminder cron's guard is its server-only `notifications/{id}` records
+  (`lib/reminderCron.ts`); `nextReminderAt` and `timeZone` on the user doc are client-writable
+  scheduling hints, never a guard.
 
 ### Testing
 
@@ -76,7 +81,9 @@ All new code follows these.
 - **Every suite runs in two time zones**, `America/Toronto` and `Asia/Kolkata` (the config's
   `projects` set `TZ`), so a test must pass in both. Build dates with the local constructor
   (`new Date(2026, 2, 8, 9, 30)`), never UTC strings, and leave zone-specific offsets to the zone
-  checks at the top of `utils/dateUtils.test.ts`.
+  checks at the top of `utils/dateUtils.test.ts`. A function that takes the zone as a parameter
+  (`lib/reminderSchedule.ts`) is the exception: it is tested with absolute instants
+  (`Date.UTC(...)`), the same moment in both runs, across zones of its own (Auckland, UTC).
 - **"Now" is never the real clock**: use `vi.useFakeTimers()` with `vi.setSystemTime()`, or the
   function's `now` parameter. Day counts get cases on both 2026 DST weekends (Mar 8 and Nov 1).
 - **Known bugs are `it.fails`**: assert the correct result and name the `docs/AUDIT.md` item
@@ -411,7 +418,10 @@ never duplicated into component state (the source of the 2026-07-16 flicker fix)
   `new Date("YYYY-MM-DD")` (UTC midnight, the wrong local day for most users) or
   `` new Date(`${date}T${time}`) `` (Safari's strict parser rejects unpadded times). The one
   exception is the ICS export (`utils/icsGenerator.ts`): it writes floating wall-clock time, so
-  it does its date math in UTC, where no DST gap can shift it. Anything
+  it does its date math in UTC, where no DST gap can shift it. On the server, which has no
+  viewer, a stored date and time become an instant only in `lib/reminderSchedule.ts`, in the
+  user's stored `timeZone`; it is the only module that imports the time zone library
+  (`@date-fns/tz`). Anything
   that renders time-relative text reads the clock from `hooks/useNow` (ticks each minute and on
   tab wake), so labels on a page left open overnight stay true.
 - **Extracted assessments are stored only through `normalizeExtractedAssessment`**

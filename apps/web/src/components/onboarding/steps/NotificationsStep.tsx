@@ -210,7 +210,7 @@ export function NotificationsStep() {
                   placeholder="Enter number of days (1-30)"
                 />
                 <p className="pt-1 text-sm text-muted-foreground">
-                  Choose between 1 and 30 days. Notifications will be sent daily at 9:00 PM.
+                  Choose between 1 and 30 days. Reminders go out at about 9:30 AM in your time zone.
                 </p>
               </div>
             )}

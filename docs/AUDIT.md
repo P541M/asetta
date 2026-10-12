@@ -65,7 +65,7 @@ branch. Tick the items off and add a session log entry when done. Don't commit.
 | B13 | A15 | Bundle size | |
 | B14 | A18, A20 | Rate limits (upload quota, contact form) | D5 decided |
 | B15 | A19 | Cron throughput | After A8 |
-| any | A21 to A28, A33 to A35, A39, A40, A42 to A46 | Later items | As time allows; A34 needs D8 |
+| any | A21 to A28, A33 to A35, A39, A40, A42 to A50 | Later items | As time allows; A34 needs D8; A47 once 5 days have passed since A8's first production run |
 
 ## Fix now
 
@@ -170,7 +170,8 @@ branch. Tick the items off and add a session log entry when done. Don't commit.
   - **Scope rule:** A7 doesn't fix logic. Known bugs (A9, A10, A14) go in as `it.todo` or `it.fails` naming their ID; those items turn them green.
   - **Done when:** `npm test` runs from the root and in CI; first suites cover grades, dates/urgency, `formatDate` and ICS; standards.md has a Testing section.
 
-- [ ] **A8 · Reminders at 9:30 in each user's timezone** · M-L · risk M · D4 decided, needs D6 · test-first
+- [x] **A8 · Reminders at 9:30 in each user's timezone** · M-L · risk M · D4 and D6 decided · test-first (done 2026-10-11, PR #14)
+  - **Shipped (B9):** the date math is the pure `lib/reminderSchedule.ts`, the only module that imports the time zone library (`@date-fns/tz` 1.5.0). A reminder belongs to a target day, N calendar days before the due date; from 9:30 that day in the user's `timeZone` (else `America/Toronto`), every run sends it until it has gone out, up to 2 days late. The user doc has `timeZone` (the browser's zone, written at sign-in when missing or changed) and `nextReminderAt`; each run reads only the users whose `nextReminderAt` has come and moves it to their next 9:30, and the first run of each UTC day schedules users without one. `.github/workflows/reminders.yml` calls the route at :05 and :35 UTC; the daily Vercel cron stays as the backstop. Unpadded and 12-hour times are read, Missed is skipped, "due in N days" counts calendar days in the user's zone, and the email shows the stored date and time. The digest is not built (A49). Details in the B9 session log and `docs/ops.md` ("Reminder cron").
   - **Where:** `apps/web/src/lib/notifications.ts:138-216`; `apps/web/src/pages/api/cron/notifications.ts`; `apps/web/vercel.json` (cron `0 21 * * *`); new `.github/workflows/reminders.yml` (D6); the user doc (new fields); wherever the timezone gets saved (sign-in in `AuthContext.tsx`, or onboarding/Settings).
   - **Today:** one run a day at 21:00 UTC (5 PM in Toronto), and the server reads every due date as UTC: ``new Date(`${dueDate}T${dueTime}`)`` (:156-159), the pattern standards.md bans. Reminders are off by each user's UTC offset. Unpadded times (`"9:00"`) give an Invalid Date and are skipped silently (verified in Node). Days are `floor(ms/day)` (:200) while the UI counts calendar days (`getDaysUntil`), so the email and the UI can disagree; the 12-36h window (:216) can send "due in 0 days". Future assessments marked "Missed" still get reminders (only "Submitted" is skipped). No timezone is stored per user.
   - **Target (D4):** each user gets their reminders at 9:30 in their own timezone.
@@ -246,6 +247,7 @@ branch. Tick the items off and add a session log entry when done. Don't commit.
   - **Done when:** `npm run build` shows smaller numbers than the Baseline; no visible jank on tab switch.
 
 - [ ] **A16 · Firestore rules: validate fields** · M · risk M
+  - Since A8 (B9) the client writes `timeZone` on the user doc and sets `nextReminderAt` to `serverTimestamp()`. Allow `timeZone` as a short string and `nextReminderAt` only as `request.time`, so a client can ask for the next run but not schedule itself into every run. `notifications` and `cronRuns` stay server-only.
   - **Where:** `firestore.rules` (the live rules matched this file on 2026-10-10).
   - **Problem:** Owners can write any key, type or size on every doc, including the `email` that reminders go to (see A17). The `documents` and `courses` rules match collections nothing uses.
   - **Fix:** Allow-list keys and types per collection (user doc, semesters, assessments, coursePreferences); cap string lengths; delete the dead matches. Leave `welcomeEmails`, `cronRuns` and `notifications` without a client rule (server-only: A1, and A3's run summary and reminder records). Test in the Firestore emulator before deploying. Agents can't deploy rules (`.claude/settings.json` denies it); the founder deploys.
@@ -263,6 +265,7 @@ branch. Tick the items off and add a session log entry when done. Don't commit.
   - **Done when:** going over the limit returns 429 with a clear message and the existing limit modal shows.
 
 - [ ] **A19 · Cron throughput** · M · risk M · after A8
+  - After A8 (B9): a run reads only the users whose `nextReminderAt` has come (about once a day each, plus retries), but the first run of each UTC day still reads every user doc once (the `nextReminderAt` field only, to schedule users without one), and a due user's semesters and assessments are all read, one at a time. `transporter.verify()` still runs before every email.
   - **Where:** `apps/web/src/lib/notifications.ts:36-130`; `apps/web/src/lib/email.ts:32,99`.
   - **Problem:** Every run reads every user, then every semester, then every assessment, one at a time. `transporter.verify()` runs before every email. Gmail caps sending at roughly 500 a day (D3: staying on Gmail for now). It will time out as users grow.
   - **Fix:** A8's `nextReminderAt` query removes the full user scan. What's left: read only the due user's assessments in the reminder window, bounded concurrency, and verify the transporter once per run. The A3 run summary (`cronRuns/{date}`) already keeps each day's `sent` and `failed` totals and each run's `durationMs`. Revisit D3 if sends approach the Gmail cap.
@@ -273,7 +276,8 @@ branch. Tick the items off and add a session log entry when done. Don't commit.
   - **Problem:** Validation and escaping are good, but nothing stops bots or repeat submissions, and it all lands in your inbox.
   - **Fix:** A hidden honeypot field plus a simple per-IP limit.
 
-- [ ] **A32 · Settings states the wrong reminder time** · S · risk L · ship with A8 · found during B16
+- [x] **A32 · Settings states the wrong reminder time** · S · risk L · ship with A8 · found during B16 (done 2026-10-11, PR #14)
+  - **Shipped (B9):** both hints read "Choose between 1 and 30 days. Reminders go out at about 9:30 AM in your time zone." They still show only under Custom timing (A50).
   - **Where:** the custom-days hint "Notifications will be sent daily at 9:00 PM." in `apps/web/src/components/settings/NotificationsSection.tsx` and `apps/web/src/components/onboarding/steps/NotificationsStep.tsx`.
   - **Problem:** the cron runs at 21:00 UTC (`vercel.json`), which is 5 PM in Toronto during daylight time and 4 PM in winter, not 9 PM. After A8 it becomes 9:30 in the user's own time zone, so the copy is wrong either way.
   - **Fix:** in the A8 PR, change both to "around 9:30 in the morning, your time" (or whatever A8 ships).
@@ -291,7 +295,8 @@ branch. Tick the items off and add a session log entry when done. Don't commit.
   - **Fix:** match capitals at a word boundary only (no `i` on the letters) and skip a term word (Fall, Winter, Spring, Summer) followed by a year.
   - **Done when:** the `it.fails("A37: ...")` in `lib/upload/textExtraction.test.ts` is a passing `it`, plus cases for the code formats the fix accepts.
 
-- [ ] **A38 · A failed reminder is retried only on the same day count** · S · risk L · with A8 (B9) · found during B5
+- [x] **A38 · A failed reminder is retried only on the same day count** · S · risk L · with A8 (B9) · found during B5 (done 2026-10-11, PR #14)
+  - **Shipped (B9):** records are `notifications/{uid}_{assessmentId}_{targetDay}`, so a failed send keeps its ID after the day count changes, and any run up to 2 days after the target day retries it. Each send is claimed in a transaction first (status `sending`; `claimDecision` in `lib/reminderCron.ts`), retried at least 20 minutes apart, at most 3 attempts; a claim whose run died is taken over after 10 minutes. The test is "A38: goes out in the next run after the day count has changed" in `lib/reminderSchedule.test.ts`.
   - **Where:** `apps/web/src/lib/notifications.ts`: the record ID `${uid}_${assessmentId}_${daysUntilDue}` and the `daysUntilDue === notificationDaysBefore` check.
   - **Problem:** since A3, a failed send no longer blocks the next attempt, but the record ID and the send check both use the day count. The daily cron's next run is a day later, when the count has moved on, so that reminder is never sent and its failed record just stays. Only a rerun on the same day retries it. (Read from the code; B5's emulator runs checked the same-day retry only.)
   - **Fix (in A8's rewrite):** key the record by the assessment and the reminder's target day, not the count, and let a run send any reminder whose day has come and that has no "sent" record (or don't advance `nextReminderAt` past a failed send). With D6's 30-minute schedule, a failure is then retried within half an hour. Two things the B5 review raised come with that: overlapping runs can both read a failed record and both send (claim the send first, as `welcomeEmails` does with `create()`), and a permanent failure (a rejected address) is retried on every run, so cap the attempts.
@@ -412,15 +417,33 @@ branch. Tick the items off and add a session log entry when done. Don't commit.
   - **Problem:** "Lab 3 Dec 2026" or "Week 10 May 2026" reads 3 or 10 as the day, a valid but wrong date with no review flag. "3 Dec 2026" alone is a real day-first date, so the text can't tell them apart; before B8 the same reading happened through `\w+\s+\d{1,2},?\s*\d{4}`.
   - **Fix (decide while building):** accept a day-first date only when the number isn't right after an assessment word (Lab, Quiz, Week, Assignment), or flag it for review.
 
+- [ ] **A47 · Remove the reminder cron's check for records from before A8** · S · risk L · found during B9
+  - **Where:** `legacyRecordIds` and `isRecentLegacySend` in `apps/web/src/lib/reminderCron.ts`, their use in `sendReminder` (`lib/notifications.ts`), their tests, and the "Records from before A8" bullet in `docs/ops.md`.
+  - **Problem:** the check only matters for the first 4 days after A8's first production run: it stops the switch from resending what the old cron had just sent. After that it is one or two wasted reads for each new reminder.
+  - **Fix:** delete it once 5 days have passed since the first production run (the first `cronRuns/{date}` doc with `sweptAt` dates it).
+
+- [ ] **A48 · Onboarding saves email notifications as on even when switched off** · S · risk L · found during B9
+  - **Where:** `completeOnboarding` in `apps/web/src/contexts/OnboardingContext.tsx`: `emailNotifications: state.userData.emailNotifications || true`.
+  - **Problem:** `false || true` is true, so a student who turns email notifications off in onboarding is saved with `emailNotifications: true` and `hasConsentedToNotifications: false`. No reminder goes out (the cron needs consent), but Settings then shows the switch on, and the next save of the Notifications card sets consent to match it, turning reminders on without the student choosing it.
+  - **Fix:** `?? false` (check what `loadUserDataForOnboarding` defaults it to), with a test once the save's mapping is pulled out.
+
+- [ ] **A49 · Daily digest email (optional, from A8)** · M · risk M · found during B9
+  - A8 left the digest to "decide while building"; B9 didn't build it. Since A8 a user's due reminders all go out in the same run, one email each. A digest would be one email per user per run listing them: fewer Gmail sends (D3) and less inbox noise. It needs one claim covering several records and a new builder in `lib/emailTemplates.ts`. Revisit with A19, or when sends approach the Gmail cap.
+
+- [ ] **A50 · The reminder time shows only under Custom timing** · S · risk L · found during B9
+  - **Where:** `apps/web/src/components/settings/NotificationsSection.tsx` and `apps/web/src/components/onboarding/steps/NotificationsStep.tsx`.
+  - **Problem:** the hint that says when reminders go out (A32) sits inside the custom-days panel, so a student who picks 1, 2, 3 or 7 days never sees it.
+  - **Fix:** show the time under the timing field for every choice.
+
 ## Baseline (2026-10-10)
 
 Numbers to compare against when items land.
 
-- `npm audit --omit=dev`: 38 vulnerabilities (0 critical, 5 high, 33 moderate) after A2 (2026-10-10; was 46: 1 critical, 12 high, 33 moderate). Including dev dependencies: 43 (10 high).
-- `apps/web` build (Next 15.5.27, after A2): 229 kB First Load JS shared by all pages (`_app` chunk 114 kB); `/dashboard/*` 320 kB (B8 measured main at 320; the 319 recorded after A2 was stale by then) and `/dashboard/[semester]/*` 320 kB after B7 (+767 bytes, 345 gzipped, in the shared dashboard chunk: the grade view helpers and ICS folding); `/login` and `/register` 242 kB; `/onboarding` 285 kB; `/settings` 284 kB (was 285).
+- `npm audit --omit=dev`: 38 vulnerabilities (0 critical, 5 high, 33 moderate) after A2 (2026-10-10; was 46: 1 critical, 12 high, 33 moderate). Including dev dependencies: 43 (10 high). Unchanged after B9 (`@date-fns/tz` has no dependencies and no advisories).
+- `apps/web` build (Next 15.5.27, after A2): 229 kB First Load JS shared by all pages (`_app` chunk 114 kB); `/dashboard/*` 320 kB (B8 measured main at 320; the 319 recorded after A2 was stale by then) and `/dashboard/[semester]/*` 320 kB after B7 (+767 bytes, 345 gzipped, in the shared dashboard chunk: the grade view helpers and ICS folding); `/login` and `/register` 242 kB; `/onboarding` 285 kB; `/settings` 285 kB after B9 (was 284: about 20 bytes for `serverTimestamp` in the Settings save took the page from 5.38 to 5.4 kB, measured against main).
 - Live Firestore rules identical to `firestore.rules`; no Storage rules (Storage unused).
 - Vercel: projects `asetta` (apps/web) and `asetta-landing` (apps/landing), Hobby plan: runtime logs kept 1 hour; cron jobs run at most once a day and fire anywhere within the scheduled hour; functions on Fluid compute get a 300-second default and maximum duration (docs checked 2026-10-11). In `apps/web/vercel.json` the cron route has `maxDuration` 300 since A3 (was 10) and the upload route 60.
-- Tests (after B8, 2026-10-11; 11 suites after B7, 9 after A7, none before): 13 suites in `apps/web`, each run in two zones. Per zone, 382 tests, all passing: no expected failures (`it.fails`) and no todo left. `npm test` takes about 2 seconds.
+- Tests (after B9, 2026-10-11; 13 suites after B8, 11 after B7, 9 after A7, none before): 16 suites in `apps/web`, each run in two zones. Per zone, 466 tests, all passing: no expected failures (`it.fails`) and no todo left. `npm test` takes about 3 seconds.
 
 ## Session log
 
@@ -781,3 +804,50 @@ Newest last. One entry per session: date, branch, items, what changed, what's le
   - In this shell, heredocs passed to `python` or `cat` turned `\\n` into a real newline and `\\` into `\`, which broke test strings twice; edit files that hold escapes with the editor tool.
   - pdf-parse rejects a valid PDF under about 4 KB (A44); pad generated test PDFs.
   - A seeded test user needs `hasCompletedOnboarding: true`, or every page redirects to `/onboarding`.
+
+### 2026-10-11 · B9 (`feat/b9-reminders-local-time`, PR #14)
+
+- **A8, A32 and A38 done.** Pulled main after PR #13 (already up to date), branched, no dev servers were running. The founder asked for every check to be run by the agent, then a commit, push and PR (the founder merges).
+- **Test-first:**
+  - Today's date math moved unchanged into the pure `lib/reminderSchedule.ts` (`dueReminders`, taking the zone and "now" as parameters and ignoring the zone, as the old code did). 20 cases asserting the fixed behavior (A8 19, A38 1) ran once as plain `it`s and failed on their assertions in both zones, showing today's behavior: the record key was the day count (`targetDay: "3"`); an assessment due tomorrow at 05:00 came back with `daysUntilDue: 0` through the 12-36 hour window; "9:00", "11:59 PM" and a missing time gave nothing (Invalid Date, or UTC midnight for the date alone); Auckland, Kolkata and UTC users were read on the server's clock; a Missed assessment got a reminder; nothing waited for 9:30; and on the next day the failed reminder wasn't due at all. One case first passed in the Toronto run (the old floor count landed on exactly 4 days), so its due time moved to 20:00 to fail in both zones. Marked `it.fails`, they passed against the old code; after the fix they became plain `it`s.
+  - New functions started from failing tests: `resolveTimeZone`, `nextReminderRun`, `isValidTimeZone`, `browserTimeZone`, `claimDecision` (replaces `isAlreadySent`, whose cases moved into it), `legacyRecordIds`, `isRecentLegacySend`, and the reminder email's wall-clock date (`lib/emailTemplates.test.ts`, new).
+  - Zones covered: Toronto, Auckland (UTC+13 in October), Kolkata (half hour), UTC, both 2026 Toronto DST switches and both Auckland ones, unpadded and 12-hour times, a late run the same day and the next morning, the 2-day catch-up limit, a run called twice (every 15 minutes across both DST weekends, `nextReminderRun` is always after now), and A38's retry after the day count changed.
+- **Design** (the item and `docs/ops.md`, "Reminder cron", have the rest): reminders belong to a target day, due from 9:30 local; `nextReminderAt` decides when a run reads a user; records are keyed by the target day and claimed in a transaction before sending; at most 3 attempts, 20 minutes apart; up to 2 days of catch-up. The route takes `?now=` in development only, for the emulator checks.
+- **Dependency:** `npm install @date-fns/tz@^1.5.0 -w apps/web` (1.5.0, published 2026-05-21, MIT, no dependencies). The lockfile gains one entry, from registry.npmjs.org with an integrity hash; `npm ls --all` is clean; `npm install --package-lock-only` changes nothing; `npm audit` unchanged. The dry run listed 103 "add" lines, but all except `@date-fns/tz` are platform binaries the lockfile already records, which a no-op dry run lists too.
+- **Client:** sign-in writes `timeZone` (from `Intl`) with `nextReminderAt: serverTimestamp()` when the zone is missing or has changed; new user docs get both. Saving the Notifications card and finishing onboarding also set `nextReminderAt: serverTimestamp()`, so a change after 9:30 applies at the next run instead of the next day.
+- **A32:** the hint reads "Choose between 1 and 30 days. Reminders go out at about 9:30 AM in your time zone." in Settings and onboarding.
+- **End to end on the emulators** (Auth and Firestore emulators from `node_modules/.cache/b9/emu`, dev server on :3005 with `CRON_SECRET` a placeholder and `EMAIL_APP_PASSWORD` and `GEMINI_API_KEY` empty, so every send fails before reaching Gmail; scripts in `node_modules/.cache/b9/`). `e2e.mjs` seeded users in Toronto (N=3), Auckland (N=1), Kolkata (N=2) and UTC (N=1), a user from before A8 (no `timeZone`, no `nextReminderAt`, one assessment with an old-format `sent` record from the day before) and one with reminders off, then called the real route at simulated times:
+  - Oct 11 20:05 UTC, the day's first run: the sweep scheduled the one unscheduled user; 6 users read; the pre-A8 user (Toronto fallback, 16:05 there) skipped the reminder the old cron had sent and attempted the other one due that day (1 failed); everyone else moved to their next 9:30 (Auckland 20:30 UTC = 09:30 NZDT, Kolkata 04:00 UTC, UTC 09:30, Toronto 13:30 UTC).
+  - The same moment again: 0 users read, nothing new.
+  - 20:35: Auckland's 09:30 had passed; its reminder was attempted ("due in 1 day"); the pre-A8 user's retry was attempt 2.
+  - Oct 12 04:05: Kolkata's reminder (attempt 1, "due in 2 days"); the pre-A8 user's third attempt came after Toronto's midnight, so it went out on the new day as "due in 2 days" and then stopped (capped); its `nextReminderAt` went to 09:30 Toronto, not a retry.
+  - 09:35: UTC's reminder; Auckland's third attempt, capped.
+  - 13:35, Toronto's 09:30: 5 users; both Toronto reminders attempted, the unpadded "9:00" one stored as 09:00; the Missed, needs-review, later and opted-out Submitted assessments got no record; the user with reminders off was moved to tomorrow. The same moment again: 0 users.
+  - With one Toronto record set to `sent` by hand (no real send can happen here) and a Settings-style write of `nextReminderAt`, 14:05 skipped the sent one and retried the other.
+  - Oct 13 06:05 UTC (02:05 in Toronto) after no runs for the rest of Oct 12: the failed Toronto reminder went out on the new day under the same record ID, `daysUntilDue` 2 (A38 end to end).
+  - 19 send failures in all, each logged with uid, assessment ID and attempt, no address anywhere in the log. `cronRuns` had one doc per UTC day with `sweptAt`, the day's totals and `lastRun` (with `scheduled`).
+  - `overlap.mjs`: two simultaneous calls for a user with one due reminder; both read the user, one attempted the send (`attempts: 1`), the other saw the claim and set a re-check for 20 minutes later.
+  - No secret: 401. A bad `?now`: 400.
+  - After the `/code-review` fixes below, both scripts ran again with output identical to the first run.
+- **UI, in the built-in browser** against the emulators (the `__FIREBASE_DEFAULTS__` cookie; the Auth Emulator warning showed before any credentials were typed; test users generated into `node_modules/.cache/b9/e2e-user.json`, emulator only):
+  - Signing in a user stored as `Pacific/Auckland` from this Toronto browser rewrote `timeZone` to `America/Toronto` and set `nextReminderAt` to the server's now; a later page load with the same zone wrote `lastLogin` only. A user with no zone got one at sign-in.
+  - Settings with custom days: the new hint in light and dark at 1280px and at 375px (no horizontal scroll); saving the card set `nextReminderAt`. Onboarding's notifications step under Custom timing: the hint in both themes at both widths; finishing onboarding set `nextReminderAt`. A cron call afterwards moved both users to 09:30 Toronto. No console errors.
+  - Afterwards the cookie, the emulator sign-in, the stored theme and the viewport were cleared, and the dev server and emulators were stopped (ports closed).
+- **The first production run** (existing users and records): no user has `timeZone` or `nextReminderAt` today.
+  - The first run after the deploy (GitHub's next :05 or :35 once the secret is set, else the 21:00 UTC Vercel run) sweeps every existing user, sets `nextReminderAt` to now and reads them all in that run, in Toronto time, as the old daily run did. `cronRuns/<that date>` shows `sweptAt` and `lastRun.scheduled` equal to the number of users.
+  - In that run, a reminder whose target day is today (once it is past 9:30 in Toronto) or one of the two days before goes out unless the old cron sent it in the last 4 days (its `{uid}_{assessmentId}_{days}` record). So the old cron's last sends are not repeated, and the ones it never made (unpadded or 12-hour times, an assessment added after its reminder day) go out late, saying "due in N days" from today. Today's reminders that the old 21:00 UTC run would have sent go out at the first run instead, and from the next morning everyone gets 09:30 Toronto.
+  - Each user moves to their own zone at their next sign-in (`timeZone` plus `nextReminderAt` set to now, so the next run reschedules them).
+  - Old records stay as they are; new records are `{uid}_{assessmentId}_{YYYY-MM-DD}` with `status`, `attempts` and `lastAttemptAt` and no email address. The old-record check goes away with A47.
+  - If the workflow runs before the secret exists, each run fails at its first step and GitHub emails a failure; reminders still go out from the Vercel backstop.
+- **Done-when checks:** A8: the tests above cover Toronto, a UTC+ zone, a half-hour zone, both 2026 DST switches, unpadded times and a late run; on the emulators each zone's reminder was attempted at the first :05 or :35 run after its 9:30 (5 minutes later; the production timing is the founder's first-run check). A32: both hints match what shipped, checked in both themes at phone width. A38: "A38: goes out in the next run after the day count has changed" passes, and the same happened end to end.
+- **Verification loop:** lint, `format:check`, typecheck, `npm test` (32 files, 932 passed: 466 per zone) and build all green. Build: every page equal to main except `/settings`, 5.38 to 5.4 kB (285 kB first load, was 284), from `serverTimestamp` in the Settings save (main built with the changes stashed). `.github/workflows/reminders.yml` parses as YAML and its script passes `bash -n`; the production endpoint answers 401 to a request without the secret (no redirect, nothing ran).
+- **`/code-review` (high):** seven findings. Fixed: a failure in the daily sweep stopped the whole run (it is now logged and the run goes on); curl's retries could outlast the job's 10-minute limit, and a curl failure skipped the error line (now `--retry-max-time 900`, a 20-minute job, and the curl exit code in the message); a sent reminder was re-checked with the old-record read and a transaction on each of its catch-up days (now one read settles it, and the old-record check runs only for a reminder with no new record); `storedDate` duplicated the normalizer's date check (it now calls `parseDueDate`). Skipped: two devices that name a zone differently (`Asia/Calcutta`, `Asia/Kolkata`) rewrite it on each sign-in (an extra read, never an extra send); the three `nextReminderAt: serverTimestamp()` writes stay inline; the dev preview's date formatting.
+- **Docs:** `docs/ops.md` (the Reminder cron section rewritten for both triggers, the run, records, the summary and failures; the env table; `?now=` in "Testing API routes locally"); `apps/web/standards.md` (server dates only through `lib/reminderSchedule.ts`; jobs safe to run twice and to overlap; zone-parameter tests use `Date.UTC`); the root and web `CLAUDE.md` and the README (the new workflow).
+- **New:** A47 (remove the old-record check after the switch), A48 (onboarding saves `emailNotifications` as true when switched off), A49 (the optional digest, not built), A50 (the reminder time shows only under Custom timing). A16 and A19 got notes for the new fields and what is left of the scan.
+- **Left for the founder:** add the `CRON_SECRET` Actions secret before merging (steps in the PR), check the Vercel preview, merge, then check the first runs (in the PR).
+- **Gotchas:**
+  - Node's ICU reports Kolkata as `Asia/Calcutta`; both names are valid and convert the same, so compare zones through `Intl`, not as strings.
+  - A collection read skips a parent doc that doesn't exist: an e2e seed that wrote assessments under a semester without writing the semester doc made every run find nothing.
+  - Python's text mode on Windows writes CRLF; open files with `newline=''` (git normalizes on commit either way, through `.gitattributes`).
+  - The built-in browser keeps the app's theme per origin, so after one test user picks a theme, the next one starts in it; the color-scheme emulation only applies to System.
+  - Killing a background `dev.sh` or `emu.sh` leaves the dev server and the emulator tree running; kill each tree by PID.

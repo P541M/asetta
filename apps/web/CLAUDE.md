@@ -17,7 +17,7 @@ Students upload course outlines, Gemini extracts the assessments, and they track
 - `hooks/`: client Firestore reads and writes; `lib/`: Firebase setup, server logic (email, notifications, upload)
 - `utils/`: pure functions; `constants/`, `contexts/`, `types/`; `styles/globals.css`: theme tokens and Tailwind config
 - Tests: `*.test.ts` next to the module they cover; shared fixtures in `test/`
-- Outside `src/`: `vercel.json` (cron, function limits); `vitest.config.ts`; `firestore.rules` at the repo root
+- Outside `src/`: `vercel.json` (the daily backstop cron, function limits); `vitest.config.ts`; `firestore.rules` and `.github/workflows/reminders.yml` (the 30-minute reminder schedule) at the repo root
 
 ## Verifying
 

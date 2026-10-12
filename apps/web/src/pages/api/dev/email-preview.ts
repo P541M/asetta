@@ -16,11 +16,21 @@ function render(req: NextApiRequest, appUrl: string): EmailContent | null {
   }
   if (email === "reminder") {
     const daysUntilDue = Math.max(0, Math.min(30, Number(days ?? 3) || 0));
-    const dueAt = new Date();
-    dueAt.setDate(dueAt.getDate() + daysUntilDue);
-    dueAt.setHours(23, 59, 0, 0);
+    const due = new Date();
+    due.setDate(due.getDate() + daysUntilDue);
+    const dueDate = [
+      due.getFullYear(),
+      String(due.getMonth() + 1).padStart(2, "0"),
+      String(due.getDate()).padStart(2, "0"),
+    ].join("-");
     return reminderEmail(
-      { assessmentTitle: "Lab report 2", courseName: "CHEM 1010", dueAt },
+      {
+        assessmentTitle: "Lab report 2",
+        courseName: "CHEM 1010",
+        dueDate,
+        dueTime: "23:59",
+        daysUntilDue,
+      },
       appUrl,
     );
   }

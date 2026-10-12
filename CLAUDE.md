@@ -30,6 +30,7 @@ Asetta monorepo (npm workspaces). Two independent Next.js apps, each deployed as
 | `docs/ops.md`            | Vercel projects, the reminder cron, the env matrix, Firestore rules deploy, the `npm audit` policy, npm workspace and Windows gotchas. |
 | `docs/superpowers/`      | In-flight plans and specs only; the folder exists only while something is in flight. Delete them in the PR that ships the work; git history keeps them, and the rules they produce go into the app's rules files. |
 | `.github/workflows/ci.yml` | One CI job covering both apps.                                                            |
+| `.github/workflows/reminders.yml` | Calls the reminder endpoint every 30 minutes (needs the `CRON_SECRET` Actions secret; `docs/ops.md`). |
 
 Rules belong in the CLAUDE files and `apps/web/standards.md`; history belongs in the `docs/AUDIT.md` session log and git.
 
