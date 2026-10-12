@@ -1,0 +1,50 @@
+name: Reminders
+
+# Calls the reminder endpoint every 30 minutes, so each user's reminders go out shortly after
+# 9:30 in their own time zone (D4, D6 in docs/AUDIT.md). The daily Vercel cron in
+# apps/web/vercel.json stays as the backstop. The endpoint is safe to call twice.
+#
+# Needs the CRON_SECRET Actions secret, with the same value as CRON_SECRET in the Vercel project
+# `asetta` (docs/ops.md, "Reminder cron"). GitHub runs schedules from the default branch only,
+# can delay or drop runs under load, and turns schedules off in a public repo after 60 days
+# without activity (re-enable them from the Actions tab).
+
+on:
+  schedule:
+    # :05 and :35 UTC, off the top of the hour, when GitHub delays scheduled runs most.
+    - cron: "5,35 * * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: reminders
+  cancel-in-progress: false
+
+permissions: {}
+
+jobs:
+  send:
+    if: github.repository == 'P541M/asetta'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Call the reminder endpoint
+        env:
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        # The run's counts stay out of the log on purpose: Actions logs are public in this repo.
+        # Read them in Firestore (cronRuns/<UTC date>) instead.
+        run: |
+          if [ -z "$CRON_SECRET" ]; then
+            echo "::error::The CRON_SECRET Actions secret is not set (Settings > Secrets and variables > Actions)."
+            exit 1
+          fi
+          # A run takes at most 300 seconds. A timeout or a 5xx is retried (the endpoint is safe to
+          # call twice), all within --retry-max-time, which stays under the job's timeout.
+          status=$(curl --silent --show-error --output /dev/null --write-out "%{http_code}" \
+            --max-time 330 --retry 2 --retry-delay 30 --retry-max-time 900 \
+            --header "Authorization: Bearer $CRON_SECRET" \
+            https://asetta.me/api/cron/notifications) || status="none (curl exit $?)"
+          echo "Reminder endpoint answered HTTP $status"
+          if [ "$status" != "200" ]; then
+            echo "::error::The reminder endpoint answered HTTP $status (cronRuns/<UTC date> in Firestore has the run)."
+            exit 1
+          fi
