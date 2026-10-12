@@ -23,6 +23,15 @@ export const DEFAULT_DISPLAY_PREFERENCES: DisplayPreferences = {
   showStatsBar: false,
 };
 
+/** Why the signed-in user's doc couldn't be loaded: no connection, or anything else. */
+export type UserDocError = "offline" | "failed";
+
+/** Sorts a Firestore error: `unavailable` is the client being offline. */
+export function userDocErrorKind(error: unknown): UserDocError {
+  const code = typeof error === "object" && error !== null && "code" in error ? error.code : null;
+  return code === "unavailable" ? "offline" : "failed";
+}
+
 /** Onboarding status from the user doc's data; `undefined` is a doc that doesn't exist yet. */
 export function onboardingStatusFromUserDoc(data: DocumentData | undefined): OnboardingStatus {
   if (!data) {

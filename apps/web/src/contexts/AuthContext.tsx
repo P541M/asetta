@@ -7,7 +7,12 @@ import { AuthContextType } from "../types/context";
 import { useOnboardingStatus } from "../hooks/useOnboardingStatus";
 import { devError } from "../utils/devLog";
 import { browserTimeZone } from "../utils/timeZone";
-import { lastLoginToWrite, timeZoneToWrite } from "../utils/userDoc";
+import {
+  lastLoginToWrite,
+  timeZoneToWrite,
+  UserDocError,
+  userDocErrorKind,
+} from "../utils/userDoc";
 
 /** Asks the server for the welcome email. It goes to the account's own address, at most once. */
 async function requestWelcomeEmail(usr: User, displayName: string) {
@@ -29,6 +34,7 @@ async function requestWelcomeEmail(usr: User, displayName: string) {
 const AuthContext = createContext<AuthContextType>({
   user: null,
   loading: true,
+  userDocError: null,
   onboardingStatus: null,
   onboardingLoading: true,
   refreshOnboardingStatus: async () => {},
@@ -40,6 +46,7 @@ export const useAuth = () => useContext(AuthContext);
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [userDocError, setUserDocError] = useState<UserDocError | null>(null);
 
   // Use the onboarding status hook
   const {
@@ -51,47 +58,56 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (usr) => {
       setUser(usr);
-      if (usr) {
-        // Check if user document exists in Firestore
-        const userRef = doc(db, "users", usr.uid);
-        const userDoc = await getDoc(userRef);
-        // Reminders go out at 9:30 in this zone (A8). nextReminderAt set to the server's now asks
-        // the reminder cron to look at this user at its next run, which then schedules the next 9:30.
-        const timeZone = browserTimeZone();
+      setUserDocError(null);
+      // A failed read or write (offline, a rules denial) must still end the loading state;
+      // the app then shows LoadErrorScreen instead of a spinner that never stops (A12).
+      try {
+        if (usr) {
+          // Check if user document exists in Firestore
+          const userRef = doc(db, "users", usr.uid);
+          const userDoc = await getDoc(userRef);
+          // Reminders go out at 9:30 in this zone (A8). nextReminderAt set to the server's now asks
+          // the reminder cron to look at this user at its next run, which then schedules the next 9:30.
+          const timeZone = browserTimeZone();
 
-        if (!userDoc.exists()) {
-          // Create a new document if it doesn't exist
-          const defaultSettings = {
-            displayName: usr.displayName || usr.email?.split("@")[0] || "User",
-            email: usr.email || "",
-            institution: "",
-            createdAt: new Date(),
-            lastLogin: new Date(),
-            ...(timeZone ? { timeZone } : {}),
-            nextReminderAt: serverTimestamp(),
-          };
-          await setDoc(userRef, defaultSettings);
+          if (!userDoc.exists()) {
+            // Create a new document if it doesn't exist
+            const defaultSettings = {
+              displayName: usr.displayName || usr.email?.split("@")[0] || "User",
+              email: usr.email || "",
+              institution: "",
+              createdAt: new Date(),
+              lastLogin: new Date(),
+              ...(timeZone ? { timeZone } : {}),
+              nextReminderAt: serverTimestamp(),
+            };
+            await setDoc(userRef, defaultSettings);
 
-          // Every new user doc (email and Google sign-ups alike) requests the welcome email.
-          // Not awaited: sign-in shouldn't wait on the mail server.
-          void requestWelcomeEmail(usr, defaultSettings.displayName);
-        } else {
-          const stored = userDoc.data();
-          const lastLogin = lastLoginToWrite(stored.lastLogin, new Date());
-          const zone = timeZoneToWrite(stored.timeZone, timeZone);
-          if (lastLogin || zone) {
-            await setDoc(
-              userRef,
-              {
-                ...(lastLogin ? { lastLogin } : {}),
-                ...(zone ? { timeZone: zone, nextReminderAt: serverTimestamp() } : {}),
-              },
-              { merge: true },
-            );
+            // Every new user doc (email and Google sign-ups alike) requests the welcome email.
+            // Not awaited: sign-in shouldn't wait on the mail server.
+            void requestWelcomeEmail(usr, defaultSettings.displayName);
+          } else {
+            const stored = userDoc.data();
+            const lastLogin = lastLoginToWrite(stored.lastLogin, new Date());
+            const zone = timeZoneToWrite(stored.timeZone, timeZone);
+            if (lastLogin || zone) {
+              await setDoc(
+                userRef,
+                {
+                  ...(lastLogin ? { lastLogin } : {}),
+                  ...(zone ? { timeZone: zone, nextReminderAt: serverTimestamp() } : {}),
+                },
+                { merge: true },
+              );
+            }
           }
         }
+      } catch (error) {
+        console.error("Could not load the user doc:", error);
+        setUserDocError(userDocErrorKind(error));
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     });
 
     return () => unsubscribe();
@@ -106,6 +122,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       value={{
         user,
         loading,
+        userDocError,
         onboardingStatus,
         onboardingLoading,
         refreshOnboardingStatus,

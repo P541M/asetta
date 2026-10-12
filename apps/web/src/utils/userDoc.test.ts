@@ -6,6 +6,7 @@ import {
   onboardingStatusFromUserDoc,
   shouldRedirectToOnboarding,
   timeZoneToWrite,
+  userDocErrorKind,
 } from "./userDoc";
 
 /** What a Firestore Timestamp field reads back as: an object with toDate(). */
@@ -125,6 +126,19 @@ describe("lastLoginToWrite", () => {
     const last = timestamp(new Date(2026, 10, 1, 0, 30));
     expect(lastLoginToWrite(last, new Date(2026, 10, 1, 23, 30))).toBeNull();
   });
+});
+
+describe("userDocErrorKind", () => {
+  it("reads Firestore's unavailable code as offline", () => {
+    expect(userDocErrorKind({ code: "unavailable", message: "client is offline" })).toBe("offline");
+  });
+
+  it.each([[{ code: "permission-denied" }], [new Error("boom")], ["text"], [null]])(
+    "reads anything else as a failure (%j)",
+    (error) => {
+      expect(userDocErrorKind(error)).toBe("failed");
+    },
+  );
 });
 
 describe("timeZoneToWrite", () => {
