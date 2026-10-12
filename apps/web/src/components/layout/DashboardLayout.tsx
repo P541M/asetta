@@ -11,7 +11,6 @@ import LoadingSpinner from "../ui/LoadingSpinner";
 import { useSemesters } from "../../hooks/useSemesters";
 import { useSemesterAssessments } from "../../hooks/useSemesterAssessments";
 import { useCourseColors } from "../../hooks/useCourseColors";
-import { useDisplayPreferences } from "../../hooks/useDisplayPreferences";
 
 interface DashboardLayoutProps {
   children: (props: DashboardData) => React.ReactNode;
@@ -26,10 +25,10 @@ const DashboardLayout = ({
   description = "Manage your semesters, track assessments, and stay organized with Asetta.",
   forceSemesterId,
 }: DashboardLayoutProps) => {
-  const { user, loading, logout } = useAuth();
+  const { user, loading, logout, displayPreferences } = useAuth();
   const router = useRouter();
   const { setActiveTab } = useTab();
-  const { showStatsBar } = useDisplayPreferences(user);
+  const { showStatsBar } = displayPreferences;
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   const {

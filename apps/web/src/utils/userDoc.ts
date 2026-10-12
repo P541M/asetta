@@ -76,9 +76,36 @@ export function displayPreferencesFromUserDoc(data: DocumentData | undefined): D
   };
 }
 
-/** The `lastLogin` a sign-in writes to an existing user doc, or null when it writes none. */
+/** What the app shows of the account: the name in the greeting and the avatar. */
+export interface UserProfile {
+  displayName: string;
+}
+
+export function profileFromUserDoc(data: DocumentData | undefined): UserProfile {
+  return { displayName: data?.displayName || "" };
+}
+
+/** A stored Firestore Timestamp (or Date) as a Date; null for anything else. */
+function storedDate(value: unknown): Date | null {
+  if (value instanceof Date) return value;
+  if (typeof value === "object" && value !== null && "toDate" in value) {
+    const date: unknown = typeof value.toDate === "function" ? value.toDate() : null;
+    if (date instanceof Date) return date;
+  }
+  return null;
+}
+
+const localDay = (date: Date) => `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
+
+/**
+ * The `lastLogin` a sign-in writes to an existing user doc, or null when it writes none: at most
+ * once per local calendar day (A12), so most page loads write nothing.
+ */
 export function lastLoginToWrite(stored: unknown, now: Date): Date | null {
-  return now;
+  const last = storedDate(stored);
+  const sameDay =
+    last !== null && !Number.isNaN(last.getTime()) && localDay(last) === localDay(now);
+  return sameDay ? null : now;
 }
 
 /**

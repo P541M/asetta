@@ -139,7 +139,7 @@ const OnboardingContext = createContext<OnboardingContextType | undefined>(undef
 // Provider component
 export function OnboardingProvider({ children }: { children: React.ReactNode }) {
   const [state, dispatch] = useReducer(onboardingReducer, initialState);
-  const { user, refreshOnboardingStatus } = useAuth();
+  const { user } = useAuth();
   const router = useRouter();
 
   // Load existing user data when user is available
@@ -234,9 +234,6 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
         onboardingSkipped: true, // Flag to indicate it was skipped
       });
 
-      // Refresh the onboarding status in AuthContext
-      await refreshOnboardingStatus();
-
       // Hide modal and navigate to dashboard
       dispatch({ type: "HIDE_EXIT_MODAL" });
       router.push("/dashboard");
@@ -246,7 +243,7 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
     } finally {
       setLoading(false);
     }
-  }, [user, router, setLoading, setError, refreshOnboardingStatus]);
+  }, [user, router, setLoading, setError]);
 
   const completeOnboarding = useCallback(async () => {
     if (!user) return;
@@ -268,9 +265,6 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
         nextReminderAt: serverTimestamp(),
       });
 
-      // Refresh the onboarding status in AuthContext
-      await refreshOnboardingStatus();
-
       // Navigate to dashboard
       router.push("/dashboard");
     } catch (error) {
@@ -279,7 +273,7 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
     } finally {
       setLoading(false);
     }
-  }, [user, state.userData, router, setLoading, setError, refreshOnboardingStatus]);
+  }, [user, state.userData, router, setLoading, setError]);
 
   const value: OnboardingContextType = {
     state,

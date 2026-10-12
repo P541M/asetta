@@ -5,7 +5,6 @@ import { ChevronsUpDown, FileText, ListFilter } from "lucide-react";
 import { getAssessmentDocRef } from "../../lib/firebaseUtils";
 import { useAuth } from "../../contexts/AuthContext";
 import { useTab } from "../../contexts/TabContext";
-import { useDisplayPreferences } from "../../hooks/useDisplayPreferences";
 import { useNow } from "../../hooks/useNow";
 import { getDaysUntil, parseLocalDateTime } from "../../utils/dateUtils";
 import { Assessment, AssessmentStatus, AssessmentsTableProps } from "../../types/assessment";
@@ -41,7 +40,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
   title = "Assessments",
   courseColors,
 }) => {
-  const { user } = useAuth();
+  const { user, displayPreferences } = useAuth();
   const { setActiveTab } = useTab();
   const [localAssessments, setLocalAssessments] = useState<Assessment[]>(assessments);
 
@@ -52,7 +51,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
   const { sortKey, sortOrder, filter, setFilter } = useTableSettings();
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const { showDaysTillDue, showWeight, showNotes } = useDisplayPreferences(user);
+  const { showDaysTillDue, showWeight, showNotes } = displayPreferences;
   const now = useNow();
   const [editFormData, setEditFormData] = useState<Assessment>({
     id: "",

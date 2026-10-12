@@ -1,13 +1,15 @@
 import { User } from "firebase/auth";
-import { OnboardingStatus, UserDocError } from "@/utils/userDoc";
+import { DisplayPreferences, OnboardingStatus, UserDocError, UserProfile } from "@/utils/userDoc";
 
 export interface AuthContextType {
   user: User | null;
+  /** True until the session is restored and, when signed in, the user doc has loaded. */
   loading: boolean;
   /** Why the signed-in user's doc couldn't be loaded; `_app` shows LoadErrorScreen for it. */
   userDocError: UserDocError | null;
+  /** Null while signed out, loading, or when the user doc couldn't be loaded. */
   onboardingStatus: OnboardingStatus | null;
-  onboardingLoading: boolean;
-  refreshOnboardingStatus: () => Promise<void>;
+  profile: UserProfile;
+  displayPreferences: DisplayPreferences;
   logout: () => Promise<void>;
 }

@@ -4,6 +4,7 @@ import {
   displayPreferencesFromUserDoc,
   lastLoginToWrite,
   onboardingStatusFromUserDoc,
+  profileFromUserDoc,
   shouldRedirectToOnboarding,
   timeZoneToWrite,
   userDocErrorKind,
@@ -84,6 +85,17 @@ describe("displayPreferencesFromUserDoc", () => {
   });
 });
 
+describe("profileFromUserDoc", () => {
+  it("reads the display name", () => {
+    expect(profileFromUserDoc({ displayName: "Sam" })).toEqual({ displayName: "Sam" });
+  });
+
+  it("is empty without a doc or a name", () => {
+    expect(profileFromUserDoc(undefined)).toEqual({ displayName: "" });
+    expect(profileFromUserDoc({ displayName: null })).toEqual({ displayName: "" });
+  });
+});
+
 describe("lastLoginToWrite", () => {
   const now = new Date(2026, 9, 11, 20, 30);
 
@@ -109,20 +121,20 @@ describe("lastLoginToWrite", () => {
     },
   );
 
-  it.fails("A12: writes nothing for a second sign-in the same local day", () => {
+  it("A12: writes nothing for a second sign-in the same local day", () => {
     expect(lastLoginToWrite(timestamp(new Date(2026, 9, 11, 0, 5)), now)).toBeNull();
   });
 
-  it.fails("A12: reads a stored Date as well as a Timestamp", () => {
+  it("A12: reads a stored Date as well as a Timestamp", () => {
     expect(lastLoginToWrite(new Date(2026, 9, 11, 8, 0), now)).toBeNull();
   });
 
-  it.fails("A12: counts the March DST day as one day", () => {
+  it("A12: counts the March DST day as one day", () => {
     const last = timestamp(new Date(2026, 2, 8, 0, 30));
     expect(lastLoginToWrite(last, new Date(2026, 2, 8, 23, 30))).toBeNull();
   });
 
-  it.fails("A12: counts the November DST day as one day", () => {
+  it("A12: counts the November DST day as one day", () => {
     const last = timestamp(new Date(2026, 10, 1, 0, 30));
     expect(lastLoginToWrite(last, new Date(2026, 10, 1, 23, 30))).toBeNull();
   });
