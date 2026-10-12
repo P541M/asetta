@@ -1,4 +1,4 @@
-import type { DisplayPreferences } from "../hooks/useDisplayPreferences";
+import type { DisplayPreferences } from "../utils/userDoc";
 
 export interface PreferencesSectionProps {
   prefs: DisplayPreferences;

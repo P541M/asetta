@@ -20,7 +20,6 @@ const CoursesOverviewTable = ({
   courses,
   onSelectCourse,
   semesterId,
-  onCourseRenamed,
   courseColors,
   setCourseColor,
 }: CoursesOverviewTableProps) => {
@@ -33,7 +32,6 @@ const CoursesOverviewTable = ({
   const { renameCourse, isRenaming } = useCourseRename(semesterId, {
     onSuccess: (oldName, newName) => {
       setEditingCourse(null);
-      onCourseRenamed?.();
 
       // Update navigation if user is currently viewing the renamed course
       if (router.query.course === oldName) {

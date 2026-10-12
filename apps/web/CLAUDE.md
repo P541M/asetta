@@ -16,6 +16,7 @@ Students upload course outlines, Gemini extracts the assessments, and they track
 - `components/`: markup, by feature; `components/ui/`: shadcn primitives (lowercase) and shared app components
 - `hooks/`: client Firestore reads and writes; `lib/`: Firebase setup, server logic (email, notifications, upload)
 - `utils/`: pure functions; `constants/`, `contexts/`, `types/`; `styles/globals.css`: theme tokens and Tailwind config
+- `contexts/AuthContext.tsx`: the signed-in user and the live user doc (`hooks/useUserDoc.ts`); the dashboard's assessments are one live listener (`hooks/useSemesterAssessments.ts`)
 - Tests: `*.test.ts` next to the module they cover; shared fixtures in `test/`
 - Outside `src/`: `vercel.json` (the daily backstop cron, function limits); `vitest.config.ts`; `firestore.rules` and `.github/workflows/reminders.yml` (the 30-minute reminder schedule) at the repo root
 

@@ -176,6 +176,19 @@ project. Never commit real values.
   user through the Auth emulator's REST API, and seed its user doc first: a user without one makes
   `AuthContext` request the welcome email. Give it `hasCompletedOnboarding: true` too, or the
   sign-in lands on `/onboarding`. Delete the cookie afterwards.
+- **Counting Firestore reads:** use a production build (`npm run build -w apps/web`, then
+  `npm run start -w apps/web -- -p 3005` with the same env), because development's StrictMode
+  runs effects twice. The Firestore emulator's rule-coverage report
+  (`GET http://127.0.0.1:8080/emulator/v1/projects/asetta-me:ruleCoverage`) counts how often
+  each rule line ran; with a scratch copy of the rules where the doc's `get` has its own line,
+  the change across one page load is that load's reads of the doc. A change pushed to an open
+  listener makes the emulator re-check rules several times, so measure loads where nothing
+  changes. B10's `count-reads.mjs` and split rules are in `node_modules/.cache/b10/`.
+- **Forcing a read error:** edit the scratch rules file (for example `allow get: if false;`);
+  the emulator reloads it. A copy can land mid-read and leave the old rules loaded, so check the
+  report's `rules.files[0].content` and `touch` the file if needed. Stopping the Firestore
+  emulator's java process stops the whole `emulators:start`, Auth included: export first
+  (`firebase emulators:export <dir> --project asetta-me`) and restart with `--import <dir>`.
 - Uploads need a `localDate` form field (YYYY-MM-DD within a day of the UTC date) or the route
   answers 400; the app's `postUploadForm` adds it. A test PDF must be at least about 4 KB:
   smaller ones fail in pdf-parse with "bad XRef entry" (A44). B8's generator

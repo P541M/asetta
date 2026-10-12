@@ -1,110 +1,63 @@
 // src/contexts/AuthContext.tsx
-import { createContext, useContext, useEffect, useState, ReactNode } from "react";
+import { createContext, useContext, useEffect, useMemo, useState, ReactNode } from "react";
 import { User, onAuthStateChanged, signOut } from "firebase/auth";
-import { auth, db } from "../lib/firebase";
-import { doc, getDoc, serverTimestamp, setDoc } from "firebase/firestore";
+import { auth } from "../lib/firebase";
 import { AuthContextType } from "../types/context";
-import { useOnboardingStatus } from "../hooks/useOnboardingStatus";
-import { devError } from "../utils/devLog";
-import { browserTimeZone } from "../utils/timeZone";
+import { useUserDoc } from "../hooks/useUserDoc";
+import {
+  DEFAULT_DISPLAY_PREFERENCES,
+  displayPreferencesFromUserDoc,
+  onboardingStatusFromUserDoc,
+  profileFromUserDoc,
+} from "../utils/userDoc";
 
-/** Asks the server for the welcome email. It goes to the account's own address, at most once. */
-async function requestWelcomeEmail(usr: User, displayName: string) {
-  try {
-    const token = await usr.getIdToken();
-    const response = await fetch("/api/welcome-email", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-      body: JSON.stringify({ displayName }),
-    });
-    if (!response.ok) {
-      devError("Welcome email request failed");
-    }
-  } catch {
-    devError("Welcome email request error");
-  }
-}
+const logout = async () => {
+  await signOut(auth);
+};
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
   loading: true,
+  userDocError: null,
   onboardingStatus: null,
-  onboardingLoading: true,
-  refreshOnboardingStatus: async () => {},
-  logout: async () => {},
+  profile: { displayName: "" },
+  displayPreferences: DEFAULT_DISPLAY_PREFERENCES,
+  logout,
 });
 
 export const useAuth = () => useContext(AuthContext);
 
+/**
+ * The signed-in user and their user doc. The doc is read once, live (useUserDoc), and everything
+ * the app shows from it (profile, display preferences, onboarding status) derives from that one
+ * read (A12).
+ */
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [authLoading, setAuthLoading] = useState(true);
+  const userDoc = useUserDoc(user);
 
-  // Use the onboarding status hook
-  const {
-    onboardingStatus,
-    loading: onboardingLoading,
-    refreshStatus: refreshOnboardingStatus,
-  } = useOnboardingStatus(user);
-
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (usr) => {
-      setUser(usr);
-      if (usr) {
-        // Check if user document exists in Firestore
-        const userRef = doc(db, "users", usr.uid);
-        const userDoc = await getDoc(userRef);
-        // Reminders go out at 9:30 in this zone (A8). nextReminderAt set to the server's now asks
-        // the reminder cron to look at this user at its next run, which then schedules the next 9:30.
-        const timeZone = browserTimeZone();
-
-        if (!userDoc.exists()) {
-          // Create a new document if it doesn't exist
-          const defaultSettings = {
-            displayName: usr.displayName || usr.email?.split("@")[0] || "User",
-            email: usr.email || "",
-            institution: "",
-            createdAt: new Date(),
-            lastLogin: new Date(),
-            ...(timeZone ? { timeZone } : {}),
-            nextReminderAt: serverTimestamp(),
-          };
-          await setDoc(userRef, defaultSettings);
-
-          // Every new user doc (email and Google sign-ups alike) requests the welcome email.
-          // Not awaited: sign-in shouldn't wait on the mail server.
-          void requestWelcomeEmail(usr, defaultSettings.displayName);
-        } else {
-          // Update lastLogin if document already exists, and the zone when it's new or has changed
-          const zoneUpdate =
-            timeZone && timeZone !== userDoc.data().timeZone
-              ? { timeZone, nextReminderAt: serverTimestamp() }
-              : {};
-          await setDoc(userRef, { lastLogin: new Date(), ...zoneUpdate }, { merge: true });
-        }
-      }
-      setLoading(false);
-    });
-
-    return () => unsubscribe();
-  }, []);
-
-  const logout = async () => {
-    await signOut(auth);
-  };
-
-  return (
-    <AuthContext.Provider
-      value={{
-        user,
-        loading,
-        onboardingStatus,
-        onboardingLoading,
-        refreshOnboardingStatus,
-        logout,
-      }}
-    >
-      {children}
-    </AuthContext.Provider>
+  useEffect(
+    () =>
+      onAuthStateChanged(auth, (usr) => {
+        setUser(usr);
+        setAuthLoading(false);
+      }),
+    [],
   );
+
+  const value = useMemo<AuthContextType>(() => {
+    const docReady = user !== null && !userDoc.loading && userDoc.error === null;
+    return {
+      user,
+      loading: authLoading || userDoc.loading,
+      userDocError: userDoc.error,
+      onboardingStatus: docReady ? onboardingStatusFromUserDoc(userDoc.data) : null,
+      profile: profileFromUserDoc(userDoc.data),
+      displayPreferences: displayPreferencesFromUserDoc(userDoc.data),
+      logout,
+    };
+  }, [user, authLoading, userDoc]);
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

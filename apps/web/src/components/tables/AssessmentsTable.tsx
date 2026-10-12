@@ -5,7 +5,6 @@ import { ChevronsUpDown, FileText, ListFilter } from "lucide-react";
 import { getAssessmentDocRef } from "../../lib/firebaseUtils";
 import { useAuth } from "../../contexts/AuthContext";
 import { useTab } from "../../contexts/TabContext";
-import { useDisplayPreferences } from "../../hooks/useDisplayPreferences";
 import { useNow } from "../../hooks/useNow";
 import { getDaysUntil, parseLocalDateTime } from "../../utils/dateUtils";
 import { Assessment, AssessmentStatus, AssessmentsTableProps } from "../../types/assessment";
@@ -37,11 +36,10 @@ const filterOptions = [
 const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
   assessments,
   semesterId,
-  onStatusChange,
   title = "Assessments",
   courseColors,
 }) => {
-  const { user } = useAuth();
+  const { user, displayPreferences } = useAuth();
   const { setActiveTab } = useTab();
   const [localAssessments, setLocalAssessments] = useState<Assessment[]>(assessments);
 
@@ -52,7 +50,7 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
   const { sortKey, sortOrder, filter, setFilter } = useTableSettings();
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const { showDaysTillDue, showWeight, showNotes } = useDisplayPreferences(user);
+  const { showDaysTillDue, showWeight, showNotes } = displayPreferences;
   const now = useNow();
   const [editFormData, setEditFormData] = useState<Assessment>({
     id: "",
@@ -120,9 +118,6 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
         status: newStatus,
         updatedAt: serverTimestamp(),
       });
-      if (onStatusChange) {
-        onStatusChange(assessmentId, newStatus);
-      }
     } catch (error) {
       console.error("Error updating assessment status:", error);
       // Revert optimistic update on error
@@ -210,7 +205,6 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
         updatedAt: new Date(),
       });
       setEditingId(null);
-      onStatusChange?.(assessmentId, editFormData.status);
     } catch (error) {
       console.error("Error updating assessment:", error);
     }
@@ -233,7 +227,6 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
           : { notes, updatedAt: new Date() };
 
       await updateDoc(assessmentRef, updateData);
-      onStatusChange?.(selectedAssessment.id, selectedAssessment.status);
       setSelectedAssessment(null);
     } catch (error) {
       console.error("Error saving notes:", error);

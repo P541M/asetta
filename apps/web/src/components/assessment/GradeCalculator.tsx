@@ -1,6 +1,5 @@
-import { memo, useState, useEffect } from "react";
+import { memo, useEffect, useMemo, useState } from "react";
 import { useAuth } from "../../contexts/AuthContext";
-import { useAssessments } from "../../hooks/useAssessments";
 import { useAssessmentAutoSave } from "../../hooks/useAssessmentAutoSave";
 import { useCoursePreferences } from "../../hooks/useCoursePreferences";
 import { Assessment } from "../../types/assessment";
@@ -10,7 +9,10 @@ import {
   computeCurrentGrade,
   computeTotalWeight,
   calculateRequiredGrade,
+  GradeEdit,
+  pendingEdits,
   resolveTargetGrade,
+  withEdits,
 } from "../../utils/gradeCalculations";
 import { ChartColumn, CircleAlert } from "lucide-react";
 import { Alert, AlertDescription } from "../ui/alert";
@@ -22,12 +24,15 @@ import AssessmentBreakdown from "./grade-calculator/AssessmentBreakdown";
 interface GradeCalculatorProps {
   semesterId: string;
   selectedCourse: string | null;
+  /** The semester's assessments, live from the dashboard's listener (A11). */
+  assessments: Assessment[];
   onAutoSaveStatusChange?: (status: "idle" | "saving" | "saved" | "error", error?: string) => void;
 }
 
 const GradeCalculator: React.FC<GradeCalculatorProps> = ({
   semesterId,
   selectedCourse,
+  assessments: semesterAssessments,
   onAutoSaveStatusChange,
 }) => {
   const { user } = useAuth();
@@ -40,13 +45,8 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
     updateTargetGrade,
   } = useCoursePreferences(semesterId, selectedCourse);
 
-  const {
-    assessments: fetchedAssessments,
-    loading: isLoading,
-    error,
-  } = useAssessments(semesterId, selectedCourse ? { courseName: selectedCourse } : {});
-
-  const [assessments, setAssessments] = useState<Assessment[]>([]);
+  // Typed edits the live data doesn't show yet (saves are debounced), by assessment ID
+  const [edits, setEdits] = useState<Record<string, GradeEdit>>({});
 
   const {
     queueSave,
@@ -59,23 +59,38 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
     onAutoSaveStatusChange?.(saveStatus, saveError || undefined);
   }, [saveStatus, saveError, onAutoSaveStatusChange]);
 
+  // Saved edits drop out once the live data shows them
   useEffect(() => {
-    const sortedAssessments = [...fetchedAssessments].sort((a, b) => {
-      const dateA = parseLocalDateTime(a.dueDate, a.dueTime);
-      const dateB = parseLocalDateTime(b.dueDate, b.dueTime);
-      return dateA.getTime() - dateB.getTime();
-    });
+    setEdits((current) => pendingEdits(current, semesterAssessments));
+  }, [semesterAssessments]);
 
-    setAssessments(sortedAssessments);
-  }, [fetchedAssessments]);
+  const courseAssessments = useMemo(
+    () =>
+      semesterAssessments
+        .filter((assessment) => assessment.courseName === selectedCourse)
+        .sort(
+          (a, b) =>
+            parseLocalDateTime(a.dueDate, a.dueTime).getTime() -
+            parseLocalDateTime(b.dueDate, b.dueTime).getTime(),
+        ),
+    [semesterAssessments, selectedCourse],
+  );
+  const assessments = useMemo(
+    () => withEdits(courseAssessments, edits),
+    [courseAssessments, edits],
+  );
+
+  const saveEdit = (assessmentId: string, edit: GradeEdit) => {
+    setEdits((current) => ({ ...current, [assessmentId]: edit }));
+    queueSave(assessmentId, edit);
+  };
 
   const handleMarkChange = (assessmentId: string, value: string) => {
-    const updatedAssessments = applyMarkInput(assessments, assessmentId, value);
-    setAssessments(updatedAssessments);
-
-    const edited = updatedAssessments.find((assessment) => assessment.id === assessmentId);
+    const edited = applyMarkInput(assessments, assessmentId, value).find(
+      (assessment) => assessment.id === assessmentId,
+    );
     if (edited?.id) {
-      queueSave(edited.id, {
+      saveEdit(edited.id, {
         mark: edited.mark ?? null,
         weight: edited.weight,
         status: edited.status,
@@ -85,15 +100,9 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
 
   const handleWeightChange = (assessmentId: string, value: string) => {
     const newWeight = value === "" ? 0 : Math.min(100, Math.max(0, parseFloat(value) || 0));
-
-    const updatedAssessments = assessments.map((assessment) =>
-      assessment.id === assessmentId ? { ...assessment, weight: newWeight } : assessment,
-    );
-    setAssessments(updatedAssessments);
-
-    const edited = updatedAssessments.find((assessment) => assessment.id === assessmentId);
+    const edited = assessments.find((assessment) => assessment.id === assessmentId);
     if (edited?.id) {
-      queueSave(edited.id, { mark: edited.mark ?? null, weight: newWeight, status: edited.status });
+      saveEdit(edited.id, { mark: edited.mark ?? null, weight: newWeight, status: edited.status });
     }
   };
 
@@ -115,20 +124,11 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
     );
   }
 
-  if (isLoading || preferencesLoading) {
+  if (preferencesLoading) {
     return (
       <div className="flex justify-center py-8">
         <LoadingSpinner />
       </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <Alert variant="destructive">
-        <CircleAlert aria-hidden />
-        <AlertDescription>{error}</AlertDescription>
-      </Alert>
     );
   }
 

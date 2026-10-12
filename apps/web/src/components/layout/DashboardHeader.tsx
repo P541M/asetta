@@ -1,7 +1,6 @@
 import { useRouter } from "next/router";
 import { ChevronDown, LogOut, Plus, Settings } from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
-import { useUserProfile } from "../../hooks/useUserProfile";
 import { SemesterTabsProps } from "@/types/course";
 import Avatar from "../ui/Avatar";
 import SemesterTabs from "../assessment/SemesterTabs";
@@ -48,13 +47,12 @@ const getTodayLabel = () =>
 
 /** The app bar: wordmark, semester context switcher, primary action, user menu. */
 const DashboardHeader = ({ onLogout, semesterProps, onAddAssessment }: DashboardHeaderProps) => {
-  const { user } = useAuth();
-  const { profile } = useUserProfile();
+  const { user, profile } = useAuth();
   const router = useRouter();
 
   if (!user) return null;
 
-  const displayName = profile?.displayName || user.displayName || user.email?.split("@")[0] || "";
+  const displayName = profile.displayName || user.displayName || user.email?.split("@")[0] || "";
 
   return (
     // mt-safe clears a device notch in standalone mode; it is 0 in browsers
@@ -99,7 +97,7 @@ const DashboardHeader = ({ onLogout, semesterProps, onAddAssessment }: Dashboard
           >
             <Avatar
               size="sm"
-              name={profile?.displayName || user.displayName || user.email || undefined}
+              name={profile.displayName || user.displayName || user.email || undefined}
             />
             <ChevronDown
               className="size-4 text-muted-foreground transition-transform duration-150 [[data-state=open]>&]:rotate-180"

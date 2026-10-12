@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { getDoc, setDoc, updateDoc } from "firebase/firestore";
+import { getDoc, setDoc } from "firebase/firestore";
 import { useAuth } from "../contexts/AuthContext";
 import { getCoursePreferencesDocRef } from "../lib/firebaseUtils";
 import {
@@ -33,20 +33,12 @@ export const useCoursePreferences = (
         const preferencesRef = getCoursePreferencesDocRef(user.uid, semesterId, courseName);
         const preferencesDoc = await getDoc(preferencesRef);
 
-        if (preferencesDoc.exists()) {
-          // Merge over defaults: a doc created color-first has no targetGrade yet
-          const data = {
-            ...DEFAULT_COURSE_PREFERENCES,
-            ...(preferencesDoc.data() as Partial<CoursePreferences>),
-          };
-          setPreferences(data);
-        } else {
-          // Create default preferences for new course (merge: never clobber a
-          // concurrent color write)
-          const defaultPrefs = { ...DEFAULT_COURSE_PREFERENCES };
-          await setDoc(preferencesRef, defaultPrefs, { merge: true });
-          setPreferences(defaultPrefs);
-        }
+        // Merge over defaults: a doc created color-first has no targetGrade yet. A course without
+        // a doc just shows the defaults; viewing it writes nothing (A12).
+        setPreferences({
+          ...DEFAULT_COURSE_PREFERENCES,
+          ...(preferencesDoc.exists() ? (preferencesDoc.data() as Partial<CoursePreferences>) : {}),
+        });
       } catch (err) {
         console.error("Error loading course preferences:", err);
         setError("Failed to load course preferences");
@@ -67,23 +59,12 @@ export const useCoursePreferences = (
       }
 
       try {
-        const preferencesRef = getCoursePreferencesDocRef(user.uid, semesterId, courseName);
-
-        // Check if document exists
-        const preferencesDoc = await getDoc(preferencesRef);
-
-        if (preferencesDoc.exists()) {
-          // Update existing document
-          await updateDoc(preferencesRef, { targetGrade });
-        } else {
-          // Create new document with target grade (merge: never clobber a
-          // concurrent color write)
-          await setDoc(
-            preferencesRef,
-            { ...DEFAULT_COURSE_PREFERENCES, targetGrade },
-            { merge: true },
-          );
-        }
+        // One merged write creates or updates the doc (merge: never clobber a concurrent color write)
+        await setDoc(
+          getCoursePreferencesDocRef(user.uid, semesterId, courseName),
+          { targetGrade },
+          { merge: true },
+        );
 
         // Update local state
         setPreferences((prev) =>

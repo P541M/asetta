@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import { useRouter } from "next/router";
 import Head from "next/head";
@@ -6,12 +6,12 @@ import { useTab } from "../../contexts/TabContext";
 import DashboardHeader from "./DashboardHeader";
 import TabNavigationBar from "./TabNavigationBar";
 import { DashboardData } from "../../types/dashboard";
+import LoadErrorScreen from "../ui/LoadErrorScreen";
 import LoadingScreen from "../ui/LoadingScreen";
 import LoadingSpinner from "../ui/LoadingSpinner";
 import { useSemesters } from "../../hooks/useSemesters";
 import { useSemesterAssessments } from "../../hooks/useSemesterAssessments";
 import { useCourseColors } from "../../hooks/useCourseColors";
-import { useDisplayPreferences } from "../../hooks/useDisplayPreferences";
 
 interface DashboardLayoutProps {
   children: (props: DashboardData) => React.ReactNode;
@@ -26,11 +26,10 @@ const DashboardLayout = ({
   description = "Manage your semesters, track assessments, and stay organized with Asetta.",
   forceSemesterId,
 }: DashboardLayoutProps) => {
-  const { user, loading, logout } = useAuth();
+  const { user, loading, userDocError, logout, displayPreferences } = useAuth();
   const router = useRouter();
   const { setActiveTab } = useTab();
-  const { showStatsBar } = useDisplayPreferences(user);
-  const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const { showStatsBar } = displayPreferences;
 
   const {
     semesters,
@@ -55,10 +54,6 @@ const DashboardLayout = ({
     router.push("/login");
   };
 
-  const refreshAssessments = useCallback(() => {
-    setRefreshTrigger((prev) => prev + 1);
-  }, []);
-
   /* Stable identity so the memoized tab components skip re-rendering when an
      unrelated part of the layout (e.g. the active tab) changes */
   const childData = useMemo(
@@ -70,8 +65,6 @@ const DashboardLayout = ({
       availableCourses,
       error,
       stats,
-      refreshAssessments,
-      refreshTrigger,
       courseColors,
       setCourseColor,
     }),
@@ -83,8 +76,6 @@ const DashboardLayout = ({
       availableCourses,
       error,
       stats,
-      refreshAssessments,
-      refreshTrigger,
       courseColors,
       setCourseColor,
     ],
@@ -92,6 +83,9 @@ const DashboardLayout = ({
 
   if (loading) {
     return <LoadingScreen />;
+  }
+  if (userDocError) {
+    return <LoadErrorScreen error={userDocError} />;
   }
 
   const statCards = [

@@ -1,4 +1,4 @@
-import { Assessment } from "../types/assessment";
+import { Assessment, AssessmentStatus } from "../types/assessment";
 import { CoursePreferences, DEFAULT_COURSE_PREFERENCES } from "../types/coursePreferences";
 import { isCompletedStatus } from "../constants/assessment";
 
@@ -83,6 +83,49 @@ export function applyMarkInput(
         : assessment.status;
     return { ...assessment, mark, status };
   });
+}
+
+/** A grade calculator edit: the fields its auto-save writes. */
+export interface GradeEdit {
+  mark: number | null;
+  weight: number;
+  status: AssessmentStatus;
+}
+
+/**
+ * The live assessments with the grade calculator's unsaved edits over them. Its saves are
+ * debounced, so for a moment an edit exists only here; the live data catches up once it saves.
+ */
+export function withEdits(
+  assessments: Assessment[],
+  edits: Record<string, GradeEdit>,
+): Assessment[] {
+  return assessments.map((assessment) => {
+    const edit = assessment.id ? edits[assessment.id] : undefined;
+    return edit ? { ...assessment, ...edit } : assessment;
+  });
+}
+
+/**
+ * The edits the live data doesn't show yet. One it shows has been saved and drops out, so a
+ * later change from elsewhere isn't hidden behind it; so does one whose assessment is gone.
+ * Returns `edits` itself when nothing drops.
+ */
+export function pendingEdits(
+  edits: Record<string, GradeEdit>,
+  assessments: Assessment[],
+): Record<string, GradeEdit> {
+  const live = new Map(assessments.map((assessment) => [assessment.id, assessment]));
+  const pending = Object.entries(edits).filter(([id, edit]) => {
+    const assessment = live.get(id);
+    return (
+      assessment !== undefined &&
+      ((assessment.mark ?? null) !== edit.mark ||
+        assessment.weight !== edit.weight ||
+        assessment.status !== edit.status)
+    );
+  });
+  return pending.length === Object.keys(edits).length ? edits : Object.fromEntries(pending);
 }
 
 /** The target grade the tile shows and the projection uses; a saved 0 stays 0. */

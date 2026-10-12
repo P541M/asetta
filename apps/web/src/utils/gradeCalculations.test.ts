@@ -8,8 +8,10 @@ import {
   currentGradeView,
   getGradeInfo,
   getProgressBarColor,
+  pendingEdits,
   requiredGradeView,
   resolveTargetGrade,
+  withEdits,
 } from "./gradeCalculations";
 
 const submitted = (mark: number | null, weight: number) =>
@@ -191,6 +193,56 @@ describe("applyMarkInput", () => {
     const marked = applyMarkInput([notStarted(20)], "a1", "90");
     expect(computeCurrentGrade(marked)).toBeCloseTo(90);
     expect(computeCurrentGrade(applyMarkInput(marked, "a1", ""))).toBeNull();
+  });
+});
+
+describe("withEdits", () => {
+  const live = [
+    makeAssessment({ id: "a1", mark: null, weight: 20 }),
+    makeAssessment({ id: "a2", mark: 70, weight: 30, status: "Submitted" }),
+  ];
+
+  it("shows each unsaved edit over the live assessment", () => {
+    const shown = withEdits(live, { a1: { mark: 85, weight: 25, status: "Submitted" } });
+    expect(shown[0]).toMatchObject({ id: "a1", mark: 85, weight: 25, status: "Submitted" });
+    expect(shown[1]).toBe(live[1]);
+  });
+
+  it("is the live list when nothing is unsaved", () => {
+    expect(withEdits(live, {})).toEqual(live);
+  });
+});
+
+describe("pendingEdits", () => {
+  const edit = { mark: 85, weight: 20, status: "Submitted" as const };
+
+  it("keeps an edit the live data doesn't show yet (its save is still debounced)", () => {
+    const edits = { a1: edit };
+    expect(pendingEdits(edits, [makeAssessment({ id: "a1", mark: null, weight: 20 })])).toBe(edits);
+  });
+
+  it("drops an edit once the live data shows it (saved)", () => {
+    const live = [makeAssessment({ id: "a1", mark: 85, weight: 20, status: "Submitted" })];
+    expect(pendingEdits({ a1: edit }, live)).toEqual({});
+  });
+
+  it("matches a cleared mark to a doc without one", () => {
+    const cleared = { mark: null, weight: 20, status: "Missed" as const };
+    const live = [makeAssessment({ id: "a1", mark: undefined, weight: 20, status: "Missed" })];
+    expect(pendingEdits({ a1: cleared }, live)).toEqual({});
+  });
+
+  it("drops an edit whose assessment is gone (deleted or moved to another course)", () => {
+    expect(pendingEdits({ a1: edit }, [])).toEqual({});
+  });
+
+  it("keeps the other edits when one is saved", () => {
+    const live = [
+      makeAssessment({ id: "a1", mark: 85, weight: 20, status: "Submitted" }),
+      makeAssessment({ id: "a2", mark: null, weight: 10 }),
+    ];
+    const other = { mark: 60, weight: 10, status: "Submitted" as const };
+    expect(pendingEdits({ a1: edit, a2: other }, live)).toEqual({ a2: other });
   });
 });
 

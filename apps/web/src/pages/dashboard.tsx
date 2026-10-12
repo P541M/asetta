@@ -3,18 +3,18 @@ import { useAuth } from "../contexts/AuthContext";
 import { useRouter } from "next/router";
 import { db } from "../lib/firebase";
 import { collection, getDocs, query, orderBy, limit } from "firebase/firestore";
-import { shouldRedirectToOnboarding } from "../utils/onboardingUtils";
+import { shouldRedirectToOnboarding } from "../utils/userDoc";
 import LoadingScreen from "../components/ui/LoadingScreen";
 
 const Dashboard = () => {
-  const { user, loading, onboardingStatus, onboardingLoading } = useAuth();
+  const { user, loading, onboardingStatus } = useAuth();
   const router = useRouter();
   const [redirecting, setRedirecting] = useState(false);
 
   useEffect(() => {
     const redirectToFirstSemester = async () => {
-      // Wait for both auth and onboarding status to load
-      if (loading || onboardingLoading) {
+      // Wait for auth and the user doc (onboarding status) to load
+      if (loading) {
         return;
       }
 
@@ -53,9 +53,9 @@ const Dashboard = () => {
     };
 
     redirectToFirstSemester();
-  }, [user, loading, onboardingStatus, onboardingLoading, router, redirecting]);
+  }, [user, loading, onboardingStatus, router, redirecting]);
 
-  if (loading || onboardingLoading) {
+  if (loading) {
     return <LoadingScreen />;
   }
 

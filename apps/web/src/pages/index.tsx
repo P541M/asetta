@@ -2,16 +2,16 @@
 import { useEffect } from "react";
 import { useRouter } from "next/router";
 import { useAuth } from "../contexts/AuthContext";
-import { shouldRedirectToOnboarding } from "../utils/onboardingUtils";
+import { shouldRedirectToOnboarding } from "../utils/userDoc";
 import LoadingScreen from "../components/ui/LoadingScreen";
 
 export default function Index() {
   const router = useRouter();
-  const { user, loading, onboardingStatus, onboardingLoading } = useAuth();
+  const { user, loading, onboardingStatus } = useAuth();
 
   useEffect(() => {
-    // Wait for both auth and onboarding status to load
-    if (!loading && !onboardingLoading) {
+    // Wait for auth and the user doc (onboarding status) to load
+    if (!loading) {
       if (!user) {
         // Not authenticated - redirect to login
         router.push("/login");
@@ -23,7 +23,7 @@ export default function Index() {
         router.push("/dashboard");
       }
     }
-  }, [user, loading, onboardingStatus, onboardingLoading, router]);
+  }, [user, loading, onboardingStatus, router]);
 
   // Show loading state while checking auth and onboarding status
   return <LoadingScreen />;

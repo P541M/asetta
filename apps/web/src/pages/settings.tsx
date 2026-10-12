@@ -5,12 +5,13 @@ import UserSettings from "../components/settings/UserSettings";
 import { useEffect } from "react";
 import Head from "next/head";
 import DashboardHeader from "../components/layout/DashboardHeader";
+import LoadErrorScreen from "../components/ui/LoadErrorScreen";
 import LoadingScreen from "../components/ui/LoadingScreen";
 import { Button } from "../components/ui/button";
 
 const SettingsPage = () => {
   const router = useRouter();
-  const { user, loading, logout } = useAuth();
+  const { user, loading, userDocError, logout } = useAuth();
 
   // Redirect to login if not authenticated
   useEffect(() => {
@@ -30,6 +31,10 @@ const SettingsPage = () => {
 
   if (!user) {
     return null;
+  }
+
+  if (userDocError) {
+    return <LoadErrorScreen error={userDocError} />;
   }
 
   return (

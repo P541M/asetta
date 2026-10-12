@@ -1,28 +1,26 @@
+import { useMemo } from "react";
 import { CircleAlert, FileText } from "lucide-react";
-import { useAssessments } from "../../hooks/useAssessments";
 import AssessmentsTable from "../tables/AssessmentsTable";
 import { CourseFilteredAssessmentsProps } from "../../types/course";
 import { resolveCourseColor } from "../../constants/courseColors";
 import { Alert, AlertDescription } from "../ui/alert";
 import CourseColorDot from "../ui/CourseColorDot";
 import EmptyState from "../ui/EmptyState";
-import LoadingSpinner from "../ui/LoadingSpinner";
 import PanelHeader from "../ui/PanelHeader";
 
 const CourseFilteredAssessments = ({
+  assessments: semesterAssessments,
+  error,
   semesterId,
   selectedCourse,
   onBack,
   courseColors,
 }: CourseFilteredAssessmentsProps) => {
-  const {
-    assessments,
-    loading: isLoading,
-    error,
-    refetch,
-  } = useAssessments(semesterId, {
-    courseName: selectedCourse,
-  });
+  // Memoized so the table's local copy only resyncs when the live data changes
+  const assessments = useMemo(
+    () => semesterAssessments.filter((assessment) => assessment.courseName === selectedCourse),
+    [semesterAssessments, selectedCourse],
+  );
 
   const courseColor = resolveCourseColor(courseColors[selectedCourse], selectedCourse);
 
@@ -48,15 +46,11 @@ const CourseFilteredAssessments = ({
     </span>
   );
 
-  if (isLoading || error || assessments.length === 0) {
+  if (error || assessments.length === 0) {
     return (
       <div className="p-6">
         <PanelHeader title={breadcrumb} />
-        {isLoading ? (
-          <div className="flex justify-center py-12">
-            <LoadingSpinner />
-          </div>
-        ) : error ? (
+        {error ? (
           <Alert variant="destructive">
             <CircleAlert aria-hidden />
             <AlertDescription>{error}</AlertDescription>
@@ -77,7 +71,6 @@ const CourseFilteredAssessments = ({
       title={breadcrumb}
       assessments={assessments}
       semesterId={semesterId}
-      onStatusChange={refetch}
       courseColors={courseColors}
     />
   );

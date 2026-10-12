@@ -11,7 +11,11 @@ import SettingsMessage from "./SettingsMessage";
 import { ProfileForm } from "../../types/profile";
 import { NotificationsForm } from "../../types/preferences";
 import { isValidEmail } from "../../utils/validation";
-import { DisplayPreferences, DEFAULT_DISPLAY_PREFERENCES } from "../../hooks/useDisplayPreferences";
+import {
+  DisplayPreferences,
+  DEFAULT_DISPLAY_PREFERENCES,
+  displayPreferencesFromUserDoc,
+} from "../../utils/userDoc";
 
 type Message = { text: string; type: "success" | "error" } | null;
 
@@ -74,12 +78,7 @@ const UserSettings = () => {
         setSavedProfile(profile);
         setNotifForm(notifications);
         setSavedNotif(notifications);
-        setPrefs({
-          showDaysTillDue: userData.showDaysTillDue ?? true,
-          showWeight: userData.showWeight ?? true,
-          showNotes: userData.showNotes ?? true,
-          showStatsBar: userData.showStatsBar ?? false,
-        });
+        setPrefs(displayPreferencesFromUserDoc(userData));
       } catch (error) {
         console.error("Error fetching user data:", error);
       }

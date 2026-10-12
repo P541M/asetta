@@ -21,13 +21,11 @@ export interface Assessment {
 
 export interface AddAssessmentFormProps {
   semesterId: string;
-  onSuccess: () => void;
 }
 
 export interface AssessmentsTableProps {
   assessments: Assessment[];
   semesterId: string;
-  onStatusChange?: (assessmentId: string, newStatus: AssessmentStatus) => void;
   /** Panel title; the course-filtered view passes its breadcrumb here. */
   title?: ReactNode;
   courseColors: Record<string, string>;

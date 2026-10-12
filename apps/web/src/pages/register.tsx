@@ -105,7 +105,8 @@ const Register = () => {
     }
   };
 
-  if (loading || (user && !isSubmitting)) {
+  // During a submit the form stays up (its button shows progress) while the user doc loads
+  if (!isSubmitting && (loading || user)) {
     return <LoadingScreen />;
   }
 

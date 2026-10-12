@@ -1,117 +1,52 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { User } from "firebase/auth";
 import { collection, onSnapshot, orderBy, query } from "firebase/firestore";
 import { db } from "../lib/firebase";
 import { Assessment } from "../types/assessment";
-import { CourseStats } from "../types/course";
-import { isCompletedStatus } from "../constants/assessment";
-import { getTodayDateString, parseLocalDateTime } from "../utils/dateUtils";
+import {
+  assessmentFromDoc,
+  computeStats,
+  courseNames,
+  processCourseStats,
+} from "../utils/semesterAssessments";
 import { useNow } from "./useNow";
 
-export interface DashboardStats {
-  total: number;
-  notStarted: number;
-  inProgress: number;
-  submitted: number;
-  upcomingDeadlines: number;
-  completionRate: number;
+interface SemesterSnapshot {
+  uid: string;
+  semesterId: string;
+  assessments: Assessment[];
+  error: string | null;
 }
 
-const dueAt = (assessment: Assessment): number =>
-  parseLocalDateTime(assessment.dueDate, assessment.dueTime).getTime();
-
-// Helper function to process course statistics from assessments
-function processCourseStats(assessmentsList: Assessment[], now: Date): CourseStats[] {
-  const courseMap = new Map<string, Assessment[]>();
-  assessmentsList.forEach((assessment) => {
-    if (!courseMap.has(assessment.courseName)) {
-      courseMap.set(assessment.courseName, []);
-    }
-    courseMap.get(assessment.courseName)?.push(assessment);
-  });
-
-  const courseStatsList: CourseStats[] = [];
-  courseMap.forEach((assessments, courseName) => {
-    const completed = assessments.filter((a) => isCompletedStatus(a.status));
-    const upcomingAssessments = assessments
-      // A flagged assessment's date is a placeholder, so it can't be the next deadline.
-      .filter((a) => !isCompletedStatus(a.status) && !a.needsReview && dueAt(a) >= now.getTime())
-      .sort((a, b) => dueAt(a) - dueAt(b));
-
-    const nextUpcoming = upcomingAssessments[0];
-    const progress =
-      assessments.length > 0 ? Math.round((completed.length / assessments.length) * 100) : 0;
-
-    courseStatsList.push({
-      courseName,
-      totalAssessments: assessments.length,
-      pendingAssessments: assessments.length - completed.length,
-      completedAssessments: completed.length,
-      nextDueDate: nextUpcoming ? nextUpcoming.dueDate : null,
-      nextAssignment: nextUpcoming ? nextUpcoming.assignmentName : null,
-      progress,
-    });
-  });
-
-  return courseStatsList.sort((a, b) => a.courseName.localeCompare(b.courseName));
-}
-
-function computeStats(assessmentsList: Assessment[], now: Date): DashboardStats {
-  const oneWeek = new Date(now);
-  oneWeek.setDate(now.getDate() + 7);
-  const totalCount = assessmentsList.length;
-  const notStartedCount = assessmentsList.filter((a) => a.status === "Not started").length;
-  const inProgressCount = assessmentsList.filter((a) => a.status === "In progress").length;
-  const completedCount = assessmentsList.filter((a) => isCompletedStatus(a.status)).length;
-  const upcomingCount = assessmentsList.filter((a) => {
-    if (a.needsReview) return false;
-    const due = dueAt(a);
-    return due > now.getTime() && due <= oneWeek.getTime() && !isCompletedStatus(a.status);
-  }).length;
-  const completionRate = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
-  return {
-    total: totalCount,
-    notStarted: notStartedCount,
-    inProgress: inProgressCount,
-    submitted: completedCount,
-    upcomingDeadlines: upcomingCount,
-    completionRate: completionRate,
-  };
-}
+const NO_ASSESSMENTS: Assessment[] = [];
 
 /**
  * Live assessments for the selected semester (Firestore onSnapshot), plus the
- * derived course list and dashboard stats.
+ * derived course list and dashboard stats. Every dashboard tab reads this one
+ * listener (A11).
  *
- * The subscription is keyed on user + semester only. Whether the loading spinner
- * shows is tracked via a ref so that data arriving/changing does not tear down
- * and recreate the listener (previously this effect also depended on
- * `assessments.length`, causing a needless re-subscribe on every add/delete).
+ * The subscription is keyed on user + semester only. Each snapshot is stored with
+ * the user and semester it belongs to, so after a switch no tab shows (or edits) the last
+ * semester's assessments: it loads until the new semester's first snapshot.
  */
 export function useSemesterAssessments(user: User | null, selectedSemesterId: string) {
-  const [assessments, setAssessments] = useState<Assessment[]>([]);
-  const [availableCourses, setAvailableCourses] = useState<string[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const hasDataRef = useRef(false);
+  const [loaded, setLoaded] = useState<SemesterSnapshot | null>(null);
   const now = useNow();
 
+  const current =
+    user && loaded?.uid === user.uid && loaded.semesterId === selectedSemesterId ? loaded : null;
+  const assessments = current?.assessments ?? NO_ASSESSMENTS;
+  const error = current?.error ?? null;
+  const isLoading = Boolean(user && selectedSemesterId) && current === null;
+
+  const availableCourses = useMemo(() => courseNames(assessments), [assessments]);
   // Derived at render, not in the snapshot callback, so they follow the clock
   const courses = useMemo(() => processCourseStats(assessments, now), [assessments, now]);
   const stats = useMemo(() => computeStats(assessments, now), [assessments, now]);
 
   useEffect(() => {
-    if (!user || !selectedSemesterId) {
-      setAssessments([]);
-      hasDataRef.current = false;
-      return;
-    }
+    if (!user || !selectedSemesterId) return;
 
-    // Only show loading spinner on initial load or when there's no previous data
-    if (!hasDataRef.current) {
-      setIsLoading(true);
-    }
-    setError(null);
     const assessmentsRef = collection(
       db,
       "users",
@@ -121,53 +56,27 @@ export function useSemesterAssessments(user: User | null, selectedSemesterId: st
       "assessments",
     );
     const q = query(assessmentsRef, orderBy("dueDate", "asc"));
-    let unsubscribe: (() => void) | undefined;
 
-    try {
-      unsubscribe = onSnapshot(
-        q,
-        (snapshot) => {
-          const assessmentsList: Assessment[] = snapshot.docs.map((doc) => {
-            const data = doc.data();
-            return {
-              id: doc.id,
-              dueDate: data.dueDate || getTodayDateString(),
-              status: data.status || "Not started",
-              notes: data.notes || "",
-              courseName: data.courseName || "Unknown Course",
-              assignmentName: data.assignmentName || "Unknown Assessment",
-              dueTime: data.dueTime || "23:59",
-              weight: data.weight || 0,
-              needsReview: data.needsReview === true,
-            };
-          });
-          hasDataRef.current = assessmentsList.length > 0;
-          setAssessments(assessmentsList);
-
-          // Extract available courses (sorted alphabetically)
-          const uniqueCourses = Array.from(
-            new Set(assessmentsList.map((a) => a.courseName)),
-          ).sort();
-          setAvailableCourses(uniqueCourses);
-          setIsLoading(false);
-        },
-        (err) => {
-          console.error("Error fetching assessments:", err);
-          setError("Failed to load assessments. Please try again.");
-          setIsLoading(false);
-        },
-      );
-    } catch (error) {
-      console.error("Error setting up assessments listener:", error);
-      setError("Failed to set up assessments listener. Please try again.");
-      setIsLoading(false);
-    }
-
-    return () => {
-      if (unsubscribe) {
-        unsubscribe();
-      }
-    };
+    return onSnapshot(
+      q,
+      (snapshot) => {
+        setLoaded({
+          uid: user.uid,
+          semesterId: selectedSemesterId,
+          assessments: snapshot.docs.map((doc) => assessmentFromDoc(doc.id, doc.data())),
+          error: null,
+        });
+      },
+      (err) => {
+        console.error("Error fetching assessments:", err);
+        setLoaded({
+          uid: user.uid,
+          semesterId: selectedSemesterId,
+          assessments: NO_ASSESSMENTS,
+          error: "Failed to load assessments. Please try again.",
+        });
+      },
+    );
   }, [selectedSemesterId, user]);
 
   return { assessments, courses, availableCourses, isLoading, error, stats };

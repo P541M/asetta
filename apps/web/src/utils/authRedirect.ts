@@ -1,6 +1,7 @@
 import { NextRouter } from "next/router";
 import { User } from "firebase/auth";
-import { getUserOnboardingStatus, shouldRedirectToOnboarding } from "./onboardingUtils";
+import { getUserOnboardingStatus } from "./onboardingUtils";
+import { shouldRedirectToOnboarding } from "./userDoc";
 
 /** After sign-in/sign-up: send new users to onboarding, everyone else to the dashboard. */
 export async function redirectAfterAuth(user: User, router: NextRouter): Promise<void> {
