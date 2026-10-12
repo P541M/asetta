@@ -1,7 +1,11 @@
 import { Dispatch, SetStateAction } from "react";
+import { Assessment } from "./assessment";
 import { Semester } from "./semester";
 
 export interface CourseFilteredAssessmentsProps {
+  /** The semester's assessments, live from the dashboard's listener (A11). */
+  assessments: Assessment[];
+  error: string | null;
   semesterId: string;
   selectedCourse: string;
   onBack: () => void;
@@ -29,7 +33,6 @@ export interface CoursesOverviewTableProps {
   courses: CourseStats[];
   onSelectCourse: (courseName: string) => void;
   semesterId: string;
-  onCourseRenamed?: () => void;
   courseColors: Record<string, string>;
   setCourseColor: (courseName: string, color: string) => Promise<void>;
 }

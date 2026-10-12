@@ -1,7 +1,5 @@
 export interface UploadFormProps {
   semesterId: string;
-  semesterName: string;
-  onUploadSuccess: (semester: string) => void;
 }
 
 export type UploadStatus =

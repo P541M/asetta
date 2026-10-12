@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef, KeyboardEvent, useCallback } from "react";
 import { ChevronLeft, ChevronRight, ChevronsUpDown, Download } from "lucide-react";
-import { useAssessments } from "../../hooks/useAssessments";
 import { generateICSFile } from "../../utils/icsGenerator";
 import { Assessment } from "../../types/assessment";
 import { Day, CalendarViewProps } from "../../types/calendar";
@@ -59,26 +58,13 @@ const formatDateTime = (date: Date, time: string): string => {
   });
 };
 
-const CalendarView = ({ selectedSemester, semesterId, refreshTrigger }: CalendarViewProps) => {
+const CalendarView = ({ selectedSemester, assessments }: CalendarViewProps) => {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [calendarDays, setCalendarDays] = useState<Day[]>([]);
   const [selectedDay, setSelectedDay] = useState<Day | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const calendarRef = useRef<HTMLDivElement>(null);
-
-  const { assessments, refetch } = useAssessments(semesterId);
-
-  // The hook fetches on mount and on semester change; this covers external
-  // refreshes (e.g. a new assessment added from another tab).
-  const lastTriggerRef = useRef(refreshTrigger);
-  useEffect(() => {
-    if (refreshTrigger !== lastTriggerRef.current) {
-      lastTriggerRef.current = refreshTrigger;
-      refetch();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [refreshTrigger]);
 
   // Filter assessments based on search and status
   const getAssessmentsForDate = useCallback(

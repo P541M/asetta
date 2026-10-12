@@ -16,7 +16,10 @@ export interface DashboardStats {
 const dueAt = (assessment: Assessment): number =>
   parseLocalDateTime(assessment.dueDate, assessment.dueTime).getTime();
 
-/** One doc from the semester's live assessments listener, with defaults for missing fields. */
+/**
+ * One doc from the semester's live assessments listener, with defaults for missing fields. Every
+ * dashboard view reads this, so it keeps the mark and the timestamps as stored (A11).
+ */
 export function assessmentFromDoc(id: string, data: DocumentData): Assessment {
   return {
     id,
@@ -28,6 +31,9 @@ export function assessmentFromDoc(id: string, data: DocumentData): Assessment {
     dueTime: data.dueTime || "23:59",
     weight: data.weight || 0,
     needsReview: data.needsReview === true,
+    ...(typeof data.mark === "number" || data.mark === null ? { mark: data.mark } : {}),
+    ...(data.createdAt ? { createdAt: data.createdAt } : {}),
+    ...(data.updatedAt ? { updatedAt: data.updatedAt } : {}),
   };
 }
 

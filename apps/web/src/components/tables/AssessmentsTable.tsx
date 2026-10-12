@@ -36,7 +36,6 @@ const filterOptions = [
 const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
   assessments,
   semesterId,
-  onStatusChange,
   title = "Assessments",
   courseColors,
 }) => {
@@ -119,9 +118,6 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
         status: newStatus,
         updatedAt: serverTimestamp(),
       });
-      if (onStatusChange) {
-        onStatusChange(assessmentId, newStatus);
-      }
     } catch (error) {
       console.error("Error updating assessment status:", error);
       // Revert optimistic update on error
@@ -209,7 +205,6 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
         updatedAt: new Date(),
       });
       setEditingId(null);
-      onStatusChange?.(assessmentId, editFormData.status);
     } catch (error) {
       console.error("Error updating assessment:", error);
     }
@@ -232,7 +227,6 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
           : { notes, updatedAt: new Date() };
 
       await updateDoc(assessmentRef, updateData);
-      onStatusChange?.(selectedAssessment.id, selectedAssessment.status);
       setSelectedAssessment(null);
     } catch (error) {
       console.error("Error saving notes:", error);

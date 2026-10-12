@@ -12,7 +12,7 @@ import CopyrightAgreement from "./CopyrightAgreement";
 import { postUploadForm, parseUploadResponse } from "../../lib/uploadClient";
 import { MAX_FILE_BYTES, formatBytes, validateUploadSelection } from "../../lib/upload/constants";
 
-const UploadForm = ({ semesterId, semesterName, onUploadSuccess }: UploadFormProps) => {
+const UploadForm = ({ semesterId }: UploadFormProps) => {
   const { user } = useAuth();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [files, setFiles] = useState<FileProgress[]>([]);
@@ -145,8 +145,6 @@ const UploadForm = ({ semesterId, semesterName, onUploadSuccess }: UploadFormPro
           setExtractionResult(payload.data);
           setShowSuccessModal(true);
         }
-
-        onUploadSuccess(semesterName);
       } else {
         // Check for different types of errors
         if (status === 429) {

@@ -11,7 +11,7 @@ import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import StatusSelect from "../tables/assessments/StatusSelect";
 
-const AddAssessmentForm = ({ semesterId, onSuccess }: AddAssessmentFormProps) => {
+const AddAssessmentForm = ({ semesterId }: AddAssessmentFormProps) => {
   const { user } = useAuth();
 
   const [formData, setFormData] = useState({
@@ -65,7 +65,6 @@ const AddAssessmentForm = ({ semesterId, onSuccess }: AddAssessmentFormProps) =>
         status: "Not started",
       });
       setMessage({ text: "Assessment added", type: "success" });
-      onSuccess?.();
     } catch (error) {
       console.error("Error adding assessment:", error);
       setMessage({

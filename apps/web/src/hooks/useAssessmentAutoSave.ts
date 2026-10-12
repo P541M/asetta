@@ -2,21 +2,15 @@ import { useCallback, useRef, useState } from "react";
 import { User } from "firebase/auth";
 import { updateDoc } from "firebase/firestore";
 import { getAssessmentDocRef } from "../lib/firebaseUtils";
-import { AssessmentStatus } from "../types/assessment";
+import { GradeEdit } from "../utils/gradeCalculations";
 
 export type AutoSaveStatus = "idle" | "saving" | "saved" | "error";
-
-interface AssessmentSaveFields {
-  mark: number | null;
-  weight: number;
-  status: AssessmentStatus;
-}
 
 /**
  * Debounced per-assessment saves for the grade calculator.
  *
- * Saves are queued from user edits only — data arriving from a fetch is not an
- * edit and must never trigger a write. Each queued save captures its document
+ * Saves are queued from user edits only: data arriving from the live listener is
+ * not an edit and must never trigger a write. Each queued save captures its document
  * ref at edit time, so switching semesters mid-debounce cannot retarget a
  * pending write to a path where the assessment does not exist.
  */
@@ -27,7 +21,7 @@ export function useAssessmentAutoSave(user: User | null, semesterId: string, del
   const idleTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const queueSave = useCallback(
-    (assessmentId: string, fields: AssessmentSaveFields) => {
+    (assessmentId: string, fields: GradeEdit) => {
       if (!user || !semesterId) return;
 
       const key = `${semesterId}/${assessmentId}`;

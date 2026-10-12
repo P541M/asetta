@@ -9,6 +9,6 @@ export interface Day {
 
 export interface CalendarViewProps {
   selectedSemester: string;
-  semesterId: string;
-  refreshTrigger?: number;
+  /** The semester's assessments, live from the dashboard's listener (A11). */
+  assessments: Assessment[];
 }

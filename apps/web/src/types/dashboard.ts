@@ -16,8 +16,6 @@ export interface DashboardData {
     upcomingDeadlines: number;
     completionRate: number;
   };
-  refreshAssessments: () => void;
-  refreshTrigger: number;
   /** Explicitly stored "#RRGGBB" colors only; resolve with resolveCourseColor(map[name], name). */
   courseColors: Record<string, string>;
   setCourseColor: (courseName: string, color: string) => Promise<void>;

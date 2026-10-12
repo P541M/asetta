@@ -63,11 +63,11 @@ describe("assessmentFromDoc", () => {
     expect(assessmentFromDoc("x", { ...stored, needsReview: "true" }).needsReview).toBe(false);
   });
 
-  it.fails("A11: keeps the mark", () => {
+  it("A11: keeps the mark", () => {
     expect(assessmentFromDoc("x", { ...stored, mark: 85 }).mark).toBe(85);
   });
 
-  it.fails("A11: keeps a cleared mark as null", () => {
+  it("A11: keeps a cleared mark as null", () => {
     expect(assessmentFromDoc("x", { ...stored, mark: null })).toHaveProperty("mark", null);
   });
 
@@ -75,7 +75,7 @@ describe("assessmentFromDoc", () => {
     expect(assessmentFromDoc("x", stored)).not.toHaveProperty("mark");
   });
 
-  it.fails("A11: keeps createdAt and updatedAt", () => {
+  it("A11: keeps createdAt and updatedAt", () => {
     const createdAt = new Date(2026, 8, 1);
     const updatedAt = new Date(2026, 9, 10);
     const assessment = assessmentFromDoc("x", { ...stored, createdAt, updatedAt });

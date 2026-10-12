@@ -45,8 +45,7 @@ interface UnifiedDashboardPageProps {
 
 // Courses Tab Component
 const CoursesTab = memo(function CoursesTab({ data, onSelectCourse }: CoursesTabProps) {
-  const { error, courses, selectedSemesterId, refreshAssessments, courseColors, setCourseColor } =
-    data;
+  const { error, courses, selectedSemesterId, courseColors, setCourseColor } = data;
 
   return (
     <>
@@ -57,7 +56,6 @@ const CoursesTab = memo(function CoursesTab({ data, onSelectCourse }: CoursesTab
           courses={courses}
           onSelectCourse={onSelectCourse}
           semesterId={selectedSemesterId}
-          onCourseRenamed={refreshAssessments}
           courseColors={courseColors}
           setCourseColor={setCourseColor}
         />
@@ -71,7 +69,7 @@ const AssessmentsTab = memo(function AssessmentsTab({ data }: { data: DashboardD
   const router = useRouter();
   const { setActiveTab } = useTab();
   const [selectedCourse, setSelectedCourse] = useState<string | null>(null);
-  const { selectedSemesterId, assessments, error, refreshAssessments, courseColors } = data;
+  const { selectedSemesterId, assessments, error, courseColors } = data;
 
   useEffect(() => {
     if (router.query.course && typeof router.query.course === "string") {
@@ -97,6 +95,8 @@ const AssessmentsTab = memo(function AssessmentsTab({ data }: { data: DashboardD
     <div>
       {selectedCourse ? (
         <CourseFilteredAssessments
+          assessments={assessments}
+          error={error}
           semesterId={selectedSemesterId}
           selectedCourse={selectedCourse}
           onBack={handleClearCourseSelection}
@@ -110,7 +110,6 @@ const AssessmentsTab = memo(function AssessmentsTab({ data }: { data: DashboardD
             <AssessmentsTable
               assessments={assessments}
               semesterId={selectedSemesterId}
-              onStatusChange={refreshAssessments}
               courseColors={courseColors}
             />
           )}
@@ -128,7 +127,7 @@ const GradesTab = memo(function GradesTab({ data, urlSemesterId }: TabComponentP
     "idle",
   );
   const [autoSaveError, setAutoSaveError] = useState<string | undefined>();
-  const { selectedSemesterId, availableCourses, courseColors } = data;
+  const { selectedSemesterId, assessments, availableCourses, error, courseColors } = data;
 
   useEffect(() => {
     if (router.query.course && typeof router.query.course === "string") {
@@ -233,7 +232,12 @@ const GradesTab = memo(function GradesTab({ data, urlSemesterId }: TabComponentP
         }
       />
 
-      {availableCourses.length === 0 ? (
+      {error ? (
+        <Alert variant="destructive">
+          <CircleAlert aria-hidden />
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      ) : availableCourses.length === 0 ? (
         <EmptyState
           icon={BookOpen}
           title="No courses yet"
@@ -246,8 +250,11 @@ const GradesTab = memo(function GradesTab({ data, urlSemesterId }: TabComponentP
         />
       ) : (
         <GradeCalculator
+          // A new semester starts without the last one's unsaved edits
+          key={selectedSemesterId}
           semesterId={selectedSemesterId}
           selectedCourse={selectedCourse}
+          assessments={assessments}
           onAutoSaveStatusChange={handleAutoSaveStatusChange}
         />
       )}
@@ -257,20 +264,18 @@ const GradesTab = memo(function GradesTab({ data, urlSemesterId }: TabComponentP
 
 // Calendar Tab Component
 const CalendarTab = memo(function CalendarTab({ data }: { data: DashboardData }) {
-  const { selectedSemester, selectedSemesterId, refreshTrigger } = data;
+  const { selectedSemester, assessments, error } = data;
 
-  return (
-    <CalendarView
-      selectedSemester={selectedSemester}
-      semesterId={selectedSemesterId}
-      refreshTrigger={refreshTrigger}
-    />
+  return error ? (
+    <TabError message={error} />
+  ) : (
+    <CalendarView selectedSemester={selectedSemester} assessments={assessments} />
   );
 });
 
 // Add Assessment Tab Component
 const AddTab = memo(function AddTab({ data, urlSemesterId }: TabComponentProps) {
-  const { selectedSemester, selectedSemesterId, refreshAssessments } = data;
+  const { selectedSemesterId } = data;
 
   return (
     <div>
@@ -278,11 +283,7 @@ const AddTab = memo(function AddTab({ data, urlSemesterId }: TabComponentProps) 
         <div className="p-6">
           <PanelHeader title="Add assessments" />
 
-          <UploadForm
-            semesterId={selectedSemesterId}
-            semesterName={selectedSemester}
-            onUploadSuccess={refreshAssessments}
-          />
+          <UploadForm semesterId={selectedSemesterId} />
 
           {/* Typographic rule between the two paths */}
           <div className="my-8 flex items-center gap-3">
@@ -291,7 +292,7 @@ const AddTab = memo(function AddTab({ data, urlSemesterId }: TabComponentProps) 
             <div className="h-px flex-1 bg-border" />
           </div>
 
-          <AddAssessmentForm semesterId={selectedSemesterId} onSuccess={refreshAssessments} />
+          <AddAssessmentForm semesterId={selectedSemesterId} />
         </div>
       ) : (
         <EmptyState

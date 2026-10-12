@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import { useRouter } from "next/router";
 import Head from "next/head";
@@ -29,7 +29,6 @@ const DashboardLayout = ({
   const router = useRouter();
   const { setActiveTab } = useTab();
   const { showStatsBar } = displayPreferences;
-  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   const {
     semesters,
@@ -54,10 +53,6 @@ const DashboardLayout = ({
     router.push("/login");
   };
 
-  const refreshAssessments = useCallback(() => {
-    setRefreshTrigger((prev) => prev + 1);
-  }, []);
-
   /* Stable identity so the memoized tab components skip re-rendering when an
      unrelated part of the layout (e.g. the active tab) changes */
   const childData = useMemo(
@@ -69,8 +64,6 @@ const DashboardLayout = ({
       availableCourses,
       error,
       stats,
-      refreshAssessments,
-      refreshTrigger,
       courseColors,
       setCourseColor,
     }),
@@ -82,8 +75,6 @@ const DashboardLayout = ({
       availableCourses,
       error,
       stats,
-      refreshAssessments,
-      refreshTrigger,
       courseColors,
       setCourseColor,
     ],
