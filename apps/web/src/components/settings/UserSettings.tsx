@@ -11,7 +11,7 @@ import SettingsMessage from "./SettingsMessage";
 import { ProfileForm } from "../../types/profile";
 import { NotificationsForm } from "../../types/preferences";
 import { isValidEmail } from "../../utils/validation";
-import { DisplayPreferences, DEFAULT_DISPLAY_PREFERENCES } from "../../hooks/useDisplayPreferences";
+import { DisplayPreferences, DEFAULT_DISPLAY_PREFERENCES } from "../../utils/userDoc";
 
 type Message = { text: string; type: "success" | "error" } | null;
 

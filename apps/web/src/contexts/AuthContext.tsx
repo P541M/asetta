@@ -7,6 +7,7 @@ import { AuthContextType } from "../types/context";
 import { useOnboardingStatus } from "../hooks/useOnboardingStatus";
 import { devError } from "../utils/devLog";
 import { browserTimeZone } from "../utils/timeZone";
+import { lastLoginToWrite, timeZoneToWrite } from "../utils/userDoc";
 
 /** Asks the server for the welcome email. It goes to the account's own address, at most once. */
 async function requestWelcomeEmail(usr: User, displayName: string) {
@@ -75,12 +76,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           // Not awaited: sign-in shouldn't wait on the mail server.
           void requestWelcomeEmail(usr, defaultSettings.displayName);
         } else {
-          // Update lastLogin if document already exists, and the zone when it's new or has changed
-          const zoneUpdate =
-            timeZone && timeZone !== userDoc.data().timeZone
-              ? { timeZone, nextReminderAt: serverTimestamp() }
-              : {};
-          await setDoc(userRef, { lastLogin: new Date(), ...zoneUpdate }, { merge: true });
+          const stored = userDoc.data();
+          const lastLogin = lastLoginToWrite(stored.lastLogin, new Date());
+          const zone = timeZoneToWrite(stored.timeZone, timeZone);
+          if (lastLogin || zone) {
+            await setDoc(
+              userRef,
+              {
+                ...(lastLogin ? { lastLogin } : {}),
+                ...(zone ? { timeZone: zone, nextReminderAt: serverTimestamp() } : {}),
+              },
+              { merge: true },
+            );
+          }
         }
       }
       setLoading(false);

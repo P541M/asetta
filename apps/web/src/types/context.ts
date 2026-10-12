@@ -1,5 +1,5 @@
 import { User } from "firebase/auth";
-import { OnboardingStatus } from "@/utils/onboardingUtils";
+import { OnboardingStatus } from "@/utils/userDoc";
 
 export interface AuthContextType {
   user: User | null;

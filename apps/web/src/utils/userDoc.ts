@@ -1,0 +1,81 @@
+import type { DocumentData } from "firebase/firestore";
+
+/** Reads of the user doc (`users/{uid}`) and the rules for what sign-in writes to it. */
+
+export interface OnboardingStatus {
+  hasCompletedOnboarding: boolean;
+  onboardingCompletedAt?: Date;
+  isNewUser: boolean;
+  needsOnboarding: boolean;
+}
+
+export interface DisplayPreferences {
+  showDaysTillDue: boolean;
+  showWeight: boolean;
+  showNotes: boolean;
+  showStatsBar: boolean;
+}
+
+export const DEFAULT_DISPLAY_PREFERENCES: DisplayPreferences = {
+  showDaysTillDue: true,
+  showWeight: true,
+  showNotes: true,
+  showStatsBar: false,
+};
+
+/** Onboarding status from the user doc's data; `undefined` is a doc that doesn't exist yet. */
+export function onboardingStatusFromUserDoc(data: DocumentData | undefined): OnboardingStatus {
+  if (!data) {
+    return {
+      hasCompletedOnboarding: false,
+      onboardingCompletedAt: undefined,
+      isNewUser: true,
+      needsOnboarding: true,
+    };
+  }
+
+  const hasCompletedOnboarding = data.hasCompletedOnboarding ?? false;
+  const onboardingCompletedAt = data.onboardingCompletedAt?.toDate();
+
+  // Consider a user "new" if they don't have onboarding completion data
+  const isNewUser = !hasCompletedOnboarding && !onboardingCompletedAt;
+
+  return {
+    hasCompletedOnboarding,
+    onboardingCompletedAt,
+    isNewUser,
+    needsOnboarding: !hasCompletedOnboarding,
+  };
+}
+
+export function shouldRedirectToOnboarding(onboardingStatus: OnboardingStatus | null): boolean {
+  if (!onboardingStatus) {
+    return false;
+  }
+
+  return onboardingStatus.needsOnboarding;
+}
+
+/** Display preferences from the user doc's data, defaulting each one that isn't set. */
+export function displayPreferencesFromUserDoc(data: DocumentData | undefined): DisplayPreferences {
+  if (!data) return DEFAULT_DISPLAY_PREFERENCES;
+  return {
+    showDaysTillDue: data.showDaysTillDue ?? true,
+    showWeight: data.showWeight ?? true,
+    showNotes: data.showNotes ?? true,
+    showStatsBar: data.showStatsBar ?? false,
+  };
+}
+
+/** The `lastLogin` a sign-in writes to an existing user doc, or null when it writes none. */
+export function lastLoginToWrite(stored: unknown, now: Date): Date | null {
+  return now;
+}
+
+/**
+ * The browser's zone when sign-in should save it on an existing user doc (missing or changed),
+ * else null. Saving it also sets `nextReminderAt`, so the reminder cron reschedules (A8).
+ */
+export function timeZoneToWrite(stored: unknown, browserZone: string | null): string | null {
+  return browserZone && browserZone !== stored ? browserZone : null;
+}

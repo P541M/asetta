@@ -2,7 +2,7 @@
 import { useEffect } from "react";
 import { useRouter } from "next/router";
 import { useAuth } from "../contexts/AuthContext";
-import { shouldRedirectToOnboarding } from "../utils/onboardingUtils";
+import { shouldRedirectToOnboarding } from "../utils/userDoc";
 import LoadingScreen from "../components/ui/LoadingScreen";
 
 export default function Index() {

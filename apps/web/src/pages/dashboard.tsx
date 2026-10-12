@@ -3,7 +3,7 @@ import { useAuth } from "../contexts/AuthContext";
 import { useRouter } from "next/router";
 import { db } from "../lib/firebase";
 import { collection, getDocs, query, orderBy, limit } from "firebase/firestore";
-import { shouldRedirectToOnboarding } from "../utils/onboardingUtils";
+import { shouldRedirectToOnboarding } from "../utils/userDoc";
 import LoadingScreen from "../components/ui/LoadingScreen";
 
 const Dashboard = () => {

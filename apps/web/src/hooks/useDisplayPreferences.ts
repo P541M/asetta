@@ -2,20 +2,11 @@ import { useEffect, useState } from "react";
 import { User } from "firebase/auth";
 import { getDoc } from "firebase/firestore";
 import { getUserDocRef } from "../lib/firebaseUtils";
-
-export interface DisplayPreferences {
-  showDaysTillDue: boolean;
-  showWeight: boolean;
-  showNotes: boolean;
-  showStatsBar: boolean;
-}
-
-export const DEFAULT_DISPLAY_PREFERENCES: DisplayPreferences = {
-  showDaysTillDue: true,
-  showWeight: true,
-  showNotes: true,
-  showStatsBar: false,
-};
+import {
+  DEFAULT_DISPLAY_PREFERENCES,
+  DisplayPreferences,
+  displayPreferencesFromUserDoc,
+} from "../utils/userDoc";
 
 /**
  * Reads the user's display preferences from their Firestore user document.
@@ -31,13 +22,7 @@ export function useDisplayPreferences(user: User | null): DisplayPreferences {
       try {
         const userSnapshot = await getDoc(getUserDocRef(user.uid));
         if (userSnapshot.exists()) {
-          const userData = userSnapshot.data();
-          setPreferences({
-            showDaysTillDue: userData.showDaysTillDue ?? true,
-            showWeight: userData.showWeight ?? true,
-            showNotes: userData.showNotes ?? true,
-            showStatsBar: userData.showStatsBar ?? false,
-          });
+          setPreferences(displayPreferencesFromUserDoc(userSnapshot.data()));
         }
       } catch (error) {
         console.error("Error fetching user preferences:", error);

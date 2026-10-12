@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { User } from "firebase/auth";
-import { getUserOnboardingStatus, OnboardingStatus } from "@/utils/onboardingUtils";
+import { getUserOnboardingStatus } from "@/utils/onboardingUtils";
+import { OnboardingStatus } from "@/utils/userDoc";
 
 interface UseOnboardingStatusReturn {
   onboardingStatus: OnboardingStatus | null;
