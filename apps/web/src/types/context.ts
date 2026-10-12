@@ -5,7 +5,7 @@ export interface AuthContextType {
   user: User | null;
   /** True until the session is restored and, when signed in, the user doc has loaded. */
   loading: boolean;
-  /** Why the signed-in user's doc couldn't be loaded; `_app` shows LoadErrorScreen for it. */
+  /** Why the signed-in user's doc couldn't be loaded; the pages that need it show LoadErrorScreen. */
   userDocError: UserDocError | null;
   /** Null while signed out, loading, or when the user doc couldn't be loaded. */
   onboardingStatus: OnboardingStatus | null;

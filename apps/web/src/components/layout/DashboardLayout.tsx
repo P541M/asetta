@@ -6,6 +6,7 @@ import { useTab } from "../../contexts/TabContext";
 import DashboardHeader from "./DashboardHeader";
 import TabNavigationBar from "./TabNavigationBar";
 import { DashboardData } from "../../types/dashboard";
+import LoadErrorScreen from "../ui/LoadErrorScreen";
 import LoadingScreen from "../ui/LoadingScreen";
 import LoadingSpinner from "../ui/LoadingSpinner";
 import { useSemesters } from "../../hooks/useSemesters";
@@ -25,7 +26,7 @@ const DashboardLayout = ({
   description = "Manage your semesters, track assessments, and stay organized with Asetta.",
   forceSemesterId,
 }: DashboardLayoutProps) => {
-  const { user, loading, logout, displayPreferences } = useAuth();
+  const { user, loading, userDocError, logout, displayPreferences } = useAuth();
   const router = useRouter();
   const { setActiveTab } = useTab();
   const { showStatsBar } = displayPreferences;
@@ -82,6 +83,9 @@ const DashboardLayout = ({
 
   if (loading) {
     return <LoadingScreen />;
+  }
+  if (userDocError) {
+    return <LoadErrorScreen error={userDocError} />;
   }
 
   const statCards = [

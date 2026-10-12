@@ -136,11 +136,15 @@ const GradesTab = memo(function GradesTab({ data, urlSemesterId }: TabComponentP
     }
   }, [router.query.course]);
 
-  // Auto-select first course if none selected and courses are available.
+  // Select the first course when none is selected, or when the selected one is gone (renamed
+  // in another tab, or left over from another semester).
   // Deliberate "adjust state during render" (see react.dev: You Might Not Need an Effect):
   // the guard prevents loops, and unlike a useEffect this re-renders before paint,
   // so the tab never flashes an unselected state once courses load.
-  if (!selectedCourse && availableCourses.length > 0) {
+  if (
+    availableCourses.length > 0 &&
+    (!selectedCourse || !availableCourses.includes(selectedCourse))
+  ) {
     setSelectedCourse(availableCourses[0]);
   }
 

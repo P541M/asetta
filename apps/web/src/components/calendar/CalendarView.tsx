@@ -61,7 +61,8 @@ const formatDateTime = (date: Date, time: string): string => {
 const CalendarView = ({ selectedSemester, assessments }: CalendarViewProps) => {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [calendarDays, setCalendarDays] = useState<Day[]>([]);
-  const [selectedDay, setSelectedDay] = useState<Day | null>(null);
+  // The open day is kept as its date, so its modal follows the live data
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const calendarRef = useRef<HTMLDivElement>(null);
@@ -137,15 +138,19 @@ const CalendarView = ({ selectedSemester, assessments }: CalendarViewProps) => {
     generateCalendarDays();
   }, [currentMonth, getAssessmentsForDate]);
 
+  const selectedDay = selectedDate
+    ? (calendarDays.find((day) => day.date.getTime() === selectedDate.getTime()) ?? null)
+    : null;
+
   // Navigation handlers
   const previousMonth = () => {
     setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1));
-    setSelectedDay(null);
+    setSelectedDate(null);
   };
 
   const nextMonth = () => {
     setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1));
-    setSelectedDay(null);
+    setSelectedDate(null);
   };
 
   const goToToday = () => {
@@ -153,7 +158,7 @@ const CalendarView = ({ selectedSemester, assessments }: CalendarViewProps) => {
     setCurrentMonth(new Date(today.getFullYear(), today.getMonth(), 1));
     const todayDay = calendarDays.find((day) => day.date.getTime() === today.getTime());
     if (todayDay) {
-      setSelectedDay(todayDay);
+      setSelectedDate(todayDay.date);
     }
   };
 
@@ -281,14 +286,17 @@ const CalendarView = ({ selectedSemester, assessments }: CalendarViewProps) => {
         aria-label="Calendar. Use the arrow keys to change month"
         className="rounded-xl outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
       >
-        <CalendarGrid calendarDays={calendarDays} onSelectDay={setSelectedDay} />
+        <CalendarGrid
+          calendarDays={calendarDays}
+          onSelectDay={(day) => setSelectedDate(day.date)}
+        />
       </div>
 
       {/* Day detail modal */}
       {selectedDay && (
         <DayDetailModal
           day={selectedDay}
-          onClose={() => setSelectedDay(null)}
+          onClose={() => setSelectedDate(null)}
           formatDateTime={formatDateTime}
         />
       )}

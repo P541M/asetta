@@ -5,15 +5,7 @@ import { ThemeProvider } from "next-themes";
 import "../styles/globals.css";
 import "../styles/rich-text-editor.css";
 import "../styles/color-picker.css";
-import { AuthProvider, useAuth } from "../contexts/AuthContext";
-import LoadErrorScreen from "../components/ui/LoadErrorScreen";
-
-/** A signed-in user whose doc can't be loaded gets the error screen, not a page left loading. */
-function Page({ Component, pageProps }: Pick<AppProps, "Component" | "pageProps">) {
-  const { user, userDocError } = useAuth();
-  if (user && userDocError) return <LoadErrorScreen error={userDocError} />;
-  return <Component {...pageProps} />;
-}
+import { AuthProvider } from "../contexts/AuthContext";
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (
@@ -47,7 +39,7 @@ function MyApp({ Component, pageProps }: AppProps) {
           <meta name="theme-color" content="#ffffff" />
         </Head>
         <main>
-          <Page Component={Component} pageProps={pageProps} />
+          <Component {...pageProps} />
         </main>
       </ThemeProvider>
     </AuthProvider>
