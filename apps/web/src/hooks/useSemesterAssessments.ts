@@ -12,6 +12,7 @@ import {
 import { useNow } from "./useNow";
 
 interface SemesterSnapshot {
+  uid: string;
   semesterId: string;
   assessments: Assessment[];
   error: string | null;
@@ -25,14 +26,15 @@ const NO_ASSESSMENTS: Assessment[] = [];
  * listener (A11).
  *
  * The subscription is keyed on user + semester only. Each snapshot is stored with
- * the semester it belongs to, so after a switch no tab shows (or edits) the last
+ * the user and semester it belongs to, so after a switch no tab shows (or edits) the last
  * semester's assessments: it loads until the new semester's first snapshot.
  */
 export function useSemesterAssessments(user: User | null, selectedSemesterId: string) {
   const [loaded, setLoaded] = useState<SemesterSnapshot | null>(null);
   const now = useNow();
 
-  const current = user && loaded?.semesterId === selectedSemesterId ? loaded : null;
+  const current =
+    user && loaded?.uid === user.uid && loaded.semesterId === selectedSemesterId ? loaded : null;
   const assessments = current?.assessments ?? NO_ASSESSMENTS;
   const error = current?.error ?? null;
   const isLoading = Boolean(user && selectedSemesterId) && current === null;
@@ -59,6 +61,7 @@ export function useSemesterAssessments(user: User | null, selectedSemesterId: st
       q,
       (snapshot) => {
         setLoaded({
+          uid: user.uid,
           semesterId: selectedSemesterId,
           assessments: snapshot.docs.map((doc) => assessmentFromDoc(doc.id, doc.data())),
           error: null,
@@ -67,6 +70,7 @@ export function useSemesterAssessments(user: User | null, selectedSemesterId: st
       (err) => {
         console.error("Error fetching assessments:", err);
         setLoaded({
+          uid: user.uid,
           semesterId: selectedSemesterId,
           assessments: NO_ASSESSMENTS,
           error: "Failed to load assessments. Please try again.",

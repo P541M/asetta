@@ -937,6 +937,7 @@ Newest last. One entry per session: date, branch, items, what changed, what's le
 - **Verification loop:** lint, `format:check`, typecheck, `npm test` (36 files, 1052 passed, 2 expected failures, A51 in both zones) and build all green.
 - **Docs:** `apps/web/standards.md` (the user doc read once through `useAuth()`, one live assessments listener, no writes on read, the load error screen); `docs/ops.md` (counting reads with rule coverage, forcing a read error, stopping Firestore with an export); `apps/web/CLAUDE.md` (where the user doc lives).
 - **New:** A51 to A56. A15, A24 and A35 got notes.
+- **Final check (founder's request, same day):** re-read the whole diff against A11's and A12's Fix and Done when; a second `/code-review` (high) found two minor points. Fixed: the assessments snapshot is now keyed by user as well as semester, so a different account can never see the last one's snapshot. No change: `/dashboard` with a user-doc error goes to the first semester, which then shows the error screen (one extra semesters read). The loop passed again (same counts and sizes), and a smoke test on the production build against the emulators (sign-in, then a semester switch each way) showed a spinner and then the right semester.
 - **Left for the founder:** check the Vercel preview, then merge.
 - **Gotchas:**
   - The Firestore emulator hot-reloads the rules file, but a copy can land mid-read: "Rules updated" while the rule-coverage report still shows the old rules. Check the report's `rules.files[0].content`, and `touch` the file to reload again.
