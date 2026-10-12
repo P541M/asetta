@@ -33,30 +33,66 @@ machine. Planned changes live in `docs/AUDIT.md`; this file describes what is tr
 
 ## Reminder cron
 
-- `apps/web/vercel.json` schedules `GET /api/cron/notifications` at `0 21 * * *` (21:00 UTC,
-  so 5 PM in Toronto in summer and 4 PM in winter, give or take the Hobby hour).
-- The route accepts only `Authorization: Bearer <CRON_SECRET>`. Vercel sends that header itself
-  when the project has `CRON_SECRET` set. With the secret unset or empty, every request gets 401
+- Reminders go out at 9:30 in each user's own time zone (D4). Two triggers call
+  `GET /api/cron/notifications` with `Authorization: Bearer <CRON_SECRET>`:
+  - **GitHub Actions** (`.github/workflows/reminders.yml`) at :05 and :35 past every hour (UTC),
+    so a user's reminders go out within about 5 minutes of their 9:30 (35 for a zone on a
+    quarter hour, such as Nepal). It needs the repo Actions secret `CRON_SECRET`, with the same
+    value as in Vercel, and fails loudly without it. It prints only the HTTP status, because
+    Actions logs are public in this repo. Run it by hand from the Actions tab (Reminders, Run
+    workflow).
+  - **Vercel cron** (`apps/web/vercel.json`) at `0 21 * * *`: once a day, the backstop. Vercel
+    sends the header itself when the project has `CRON_SECRET` set.
+- GitHub runs schedules from the default branch only, can delay or drop runs under load, and
+  turns schedules off in a public repo after 60 days without repo activity (it emails a warning
+  first; re-enable from the Actions tab). While it is off, the Vercel backstop still sends, up to
+  a day late.
+- The route accepts only that header. With the secret unset or empty, every request gets 401
   and logs `Reminder cron: CRON_SECRET is not set`, so a missing secret stops reminders loudly.
-- **Run summary:** every run writes `cronRuns/{YYYY-MM-DD}`, keyed by the UTC day the run
-  started. `runs`, `sent` and `failed` are that day's totals; `lastRun` is the latest run
-  (`startedAt`, `finishedAt`, `durationMs`, `users` checked, `sent`, `failed`, `userErrors`, and
-  `error`, the message that stopped the run, or null). Read it in the Firestore console; it
-  outlives the 1-hour log window. No doc for a day means no run got past the secret check and
-  reached Firestore that day: look in the logs for a 401 or a startup error (within the hour).
-  The route also returns the summary as JSON.
+- **How a run works** (`lib/notifications.ts`; the date math is in `lib/reminderSchedule.ts`):
+  - Each user doc has `timeZone`, the browser's IANA zone, and `nextReminderAt`, when the cron
+    should look at the user next. Users without a valid `timeZone` get `America/Toronto`.
+  - The client writes `timeZone` at sign-in when it is missing or has changed, and sets
+    `nextReminderAt` to the server's now with it, and again when it saves notification settings
+    or finishes onboarding, so the change applies at the next run.
+  - The first run of each UTC day sets `nextReminderAt` to now on every user without one (on the
+    first run after A8, every user), because Firestore can't query a missing field.
+  - Every run reads only the users whose `nextReminderAt` has come, sends their due reminders,
+    and moves `nextReminderAt` to their next 9:30, or about 20 minutes on while a failed send
+    waits to retry. A user with reminders off is moved on too. Calling the route twice in a row
+    sends nothing new.
+  - A reminder belongs to a target day, N calendar days before the due date. From 9:30 that day
+    in the user's zone, runs send it until it has gone out, up to 2 days late, so a missed run
+    catches up. Never for an assessment that is already due, needs review, is Missed, or is
+    Submitted when the user opted out. "Due in N days" counts calendar days in the user's zone.
+- **Records:** `notifications/{uid}_{assessmentId}_{targetDay}`. A run claims a reminder in a
+  transaction (status `sending`, with `attempts` and `lastAttemptAt`) before sending, then marks
+  it `sent` or `failed` (with the error message). Only `sent` blocks it for good, so overlapping
+  runs can't both send one. A failed send is retried by a later run at least 20 minutes on, up to
+  3 attempts; a claim whose run died is taken over after 10 minutes.
+- **Records from before A8** are `notifications/{uid}_{assessmentId}_{days}`. For the first days
+  after A8, a run skips a reminder whose old-format record says `sent` within the last 4 days, so
+  the switch doesn't resend what the old cron had just sent (A47 removes that check). Nothing
+  else reads or deletes the old records.
+- **Run summary:** every run writes `cronRuns/{YYYY-MM-DD}`, keyed by the UTC day of the run.
+  `runs`, `sent` and `failed` are that day's totals; `sweptAt` is when that day's first run
+  scheduled the users without a `nextReminderAt`; `lastRun` is the latest run (`startedAt`,
+  `finishedAt`, `durationMs`, `scheduled` (users the day's sweep scheduled, or null after it),
+  `users` (users whose `nextReminderAt` had come), `sent`, `failed`, `userErrors`, and `error`,
+  the message that stopped the run, or null). Read it in the Firestore console; it outlives the
+  1-hour log window. No doc for a day means no run got past the secret check and reached
+  Firestore that day: look in the logs for a 401 or a startup error (within the hour). The route
+  also returns the summary as JSON.
 - **Failures** go to `console.error` without email addresses: `Reminder cron: send failed` (uid,
-  assessment ID, SMTP `code` and `responseCode`), `could not process a user` (uid, error),
-  `could not save the run summary`, and `run failed`. The full send error is kept on the failed
-  record in `notifications/{uid}_{assessmentId}_{days}`.
-- **Retries:** only a `notifications` record with `status: "sent"` blocks a reminder. A failed
-  send is retried by the next run that computes the same day count, so under the daily schedule
-  only a rerun on the same day retries it (A38).
+  assessment ID, attempt, SMTP `code` and `responseCode`), `could not process a user` (uid,
+  error; that user's `nextReminderAt` isn't moved, so the next run tries again), `could not
+  schedule new users` (the day's sweep; the run goes on for users who already have a
+  `nextReminderAt`, and the next run sweeps again), `sent, but could not record it`, `could not
+  save the run summary`, and `run failed`.
 - **Never call the route locally with the real secret.** It reads production Firestore and sends
   real emails. QA production through the run summary (and the logs, within the hour); test
   locally against the emulators with a placeholder secret ("Testing API routes locally").
-- Planned: 9:30 in each user's timezone through a GitHub Actions schedule (A8, D6), and
-  throughput (A19).
+- Planned: throughput (A19).
 
 ## Environment variables
 
@@ -77,7 +113,7 @@ project. Never commit real values.
 | `GEMINI_API_KEY`                           | `lib/upload/gemini.ts`                      | Syllabus extraction.                                                                        |
 | `EMAIL_USER`                               | `lib/email.ts`                              | The Gmail account that sends reminders and welcome emails.                                  |
 | `EMAIL_APP_PASSWORD`                       | `lib/email.ts`                              | A Gmail app password, not the account password.                                             |
-| `CRON_SECRET`                              | `pages/api/cron/notifications.ts`           | See "Reminder cron".                                                                        |
+| `CRON_SECRET`                              | `pages/api/cron/notifications.ts`           | See "Reminder cron". The repo's Actions secret `CRON_SECRET` holds the same value.          |
 | `NEXT_PUBLIC_APP_URL`                      | `lib/emailTemplates.ts`                     | Links and the logo in emails. Defaults to `https://asetta.me`.                              |
 
 **`apps/landing`** (Vercel project `asetta-landing`):
@@ -120,7 +156,11 @@ project. Never commit real values.
   `emailVerified` on a test user.
 - Override `.env.local` values in the dev server's own environment: Next never replaces a
   variable that is already set, even to an empty string.
-  - `CRON_SECRET=<a placeholder>` lets you call the cron route without the real secret.
+  - `CRON_SECRET=<a placeholder>` lets you call the cron route without the real secret. In
+    development the route also takes `?now=<ISO instant>` and runs as of that moment (ignored
+    everywhere else), so a script can walk through each zone's 9:30. B9's are in
+    `node_modules/.cache/b9/` (`e2e.mjs`, `overlap.mjs`). Seed each test user's semester doc, not
+    just its assessments: a collection read skips a parent doc that doesn't exist.
   - `EMAIL_APP_PASSWORD=` (empty) makes every send fail before it contacts Gmail: the safe way to
     force a send failure.
   - `GEMINI_API_KEY=` (empty) makes uploads skip Gemini and use the regex fallback.

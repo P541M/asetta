@@ -33,6 +33,7 @@ Other files at the root:
 - `docs/ops.md`: deploys, the reminder cron, environment variables, Firestore rules, dependency notes.
 - `firestore.rules`, `firebase.json`, `.firebaserc`: Firestore security rules and the Firebase CLI config.
 - `.github/workflows/ci.yml`: the CI job for both apps.
+- `.github/workflows/reminders.yml`: calls the reminder endpoint every 30 minutes.
 - `CLAUDE.md` and each app's `CLAUDE.md`: rules for AI coding agents (`apps/web/standards.md` holds the platform's code and design standards).
 
 ## Getting started
@@ -118,6 +119,7 @@ npm run build          # production build, both apps
 
 - **Deploys**: two Vercel projects, `asetta` (`apps/web`) and `asetta-landing` (`apps/landing`), both connected to this repository. A push to `main` deploys both to production; other branches get preview deployments with their own URLs. Details in `docs/ops.md`.
 - **CI**: GitHub Actions (`.github/workflows/ci.yml`) runs one job, `verify`, on every push to `main` and every pull request: install, lint (web and landing), format check (web and landing), typecheck (web), unit tests (web) and build (web and landing). The build uses harmless placeholder Firebase values; real credentials stay in Vercel.
+- **Reminders**: GitHub Actions (`.github/workflows/reminders.yml`) calls `/api/cron/notifications` every 30 minutes with the `CRON_SECRET` repository secret, so reminders go out at 9:30 in each user's time zone; the daily Vercel cron in `apps/web/vercel.json` is the backstop. Details in `docs/ops.md`.
 - **Recommended**: protect `main` (GitHub, Settings, Branches) by requiring the "CI / verify" check, so nothing broken can be merged and auto-deployed.
 
 ## Let's connect
