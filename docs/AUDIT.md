@@ -65,7 +65,7 @@ branch. Tick the items off and add a session log entry when done. Don't commit.
 | B13 | A15 | Bundle size | |
 | B14 | A18, A20 | Rate limits (upload quota, contact form) | D5 decided |
 | B15 | A19 | Cron throughput | After A8 |
-| any | A21 to A28, A33 to A35, A39, A40, A42 to A50 | Later items | As time allows; A34 needs D8; A47 once 5 days have passed since A8's first production run |
+| any | A21 to A28, A33 to A35, A39, A40, A42 to A56 | Later items | As time allows; A34 needs D8; A47 once 5 days have passed since A8's first production run |
 
 ## Fix now
 
@@ -211,13 +211,15 @@ branch. Tick the items off and add a session log entry when done. Don't commit.
   - **Tests:** `utils/gradeCalculations.test.ts` holds the A10 `it.fails` (no remaining weight; D1 in both functions) and four `it.todo` for the component cases, which need their logic pulled out of `GradeCalculator.tsx` and `GradeOverviewCards.tsx` into `gradeCalculations.ts` first. A36 sits in the same file.
   - **Done when:** each case has a test; the grades tab shows correct values after clearing marks.
 
-- [ ] **A11 · One live source of assessments** · M · risk M
+- [x] **A11 · One live source of assessments** · M · risk M (done 2026-10-12, PR #15)
+  - **Shipped (B10):** the listener's mapping is the pure `assessmentFromDoc` in `utils/semesterAssessments.ts` (with `processCourseStats`, `computeStats` and `courseNames`, all tested) and keeps `mark`, `createdAt` and `updatedAt`. Grades, Calendar and the course-filtered view derive from `DashboardData`; `useAssessments`, `refreshTrigger`/`refreshAssessments` and the props that only fed them (`onStatusChange`, `onCourseRenamed`, `onUploadSuccess`, `onSuccess`, `semesterName`) are gone. The grade calculator shows typed edits over the live data until their debounced save lands (`withEdits`, `pendingEdits`). Each snapshot is stored with its semester, so after a switch no tab shows the last semester's assessments; Grades falls back to the first course when the selected one is gone; an open calendar day follows the live data. The two `getDocs` left on assessments list docs to write them: course rename (`useCourseRename`) and semester delete (`SemesterTabs`, which can target a semester the listener doesn't cover). The listener keeps `orderBy("dueDate")` (A52).
   - **Where:** `apps/web/src/hooks/useAssessments.ts` (used by `GradeCalculator.tsx:48`, `CalendarView.tsx:70`, `CourseFilteredAssessments.tsx:23`); `apps/web/src/hooks/useSemesterAssessments.ts:128-139`; tabs mounted in `UnifiedDashboardPage.tsx:340-358`.
   - **Problem:** All five tabs stay mounted, but grades, calendar and the course-filtered view read once with `getDocs`. Mark something Submitted in Assessments and Grades/Calendar stay stale until a remount. The live listener drops `mark`, `createdAt` and `updatedAt`, so it can't be reused yet. Each of those views is an extra full read on top of the listener.
   - **Fix:** Keep `mark` in the live mapping. Derive the grades, calendar and filtered views from `DashboardData`. Delete `useAssessments` and the `refreshTrigger` plumbing if nothing else needs them.
   - **Done when:** an edit in any tab shows in every other tab without a reload; no `getDocs` on assessments outside the listener.
 
-- [ ] **A12 · Auth reliability and user-doc reads** · S, then M · risk L/M
+- [x] **A12 · Auth reliability and user-doc reads** · S, then M · risk L/M (done 2026-10-12, PR #15)
+  - **Shipped (B10):** S first: the `onAuthStateChanged` callback got a try/catch/finally and a `userDocError`, so a failed read ends in `LoadErrorScreen`, not a spinner. Then M: `hooks/useUserDoc.ts` keeps one `onSnapshot` on the user doc for the session, and `useAuth()` derives `profile`, `displayPreferences` and `onboardingStatus` from it (`utils/userDoc.ts`, tested); `useUserProfile`, `useDisplayPreferences`, `useOnboardingStatus` and `refreshOnboardingStatus` are gone. The server's first answer runs the sign-in writes: a missing doc is created (and requests the welcome email), `lastLogin` is written at most once per local day (`lastLoginToWrite`), and the zone when missing or changed (`timeZoneToWrite`, B9's rule unchanged). Only a server snapshot can say the doc is missing; offline with nothing cached shows "Can't reach Asetta" and the page recovers once the server answers. The dashboard layout, Settings and onboarding show the error screen (not `_app`, which would put its UI in every page's bundle). `useCoursePreferences` writes nothing on view and saves the target with one merged `setDoc`. Measured on the emulators: 1 user-doc read per dashboard load (was 2 reads, 5 `getDoc` calls, plus a `lastLogin` write every load). Left: `useSemesters` still re-runs the `order` backfill read on every mount (not in the Fix; A24 deletes it).
   - **Where:** `apps/web/src/contexts/AuthContext.tsx:33-75`; `hooks/useOnboardingStatus.ts`; `hooks/useUserProfile.ts` (in DashboardHeader); `hooks/useDisplayPreferences.ts` (DashboardLayout.tsx:32 and AssessmentsTable.tsx:55); `hooks/useSemesters.ts:46-70`; `hooks/useCoursePreferences.ts:43-48`.
   - **Problems:**
     - The `onAuthStateChanged` callback has no try/finally. One failed `getDoc`/`setDoc` (offline, network) leaves `loading` true forever: an endless spinner.
@@ -241,6 +243,7 @@ branch. Tick the items off and add a session log entry when done. Don't commit.
   - **Done when:** tests cover 23:59 and names with commas and semicolons; the file imports cleanly into Google Calendar.
 
 - [ ] **A15 · Bundle size** · M · risk L-M
+  - B10: `_app` is 115 kB (+1 kB for the user-doc listener). `LoadErrorScreen` stays out of `_app` on purpose: there it put Button, EmptyState and `tailwind-merge` into every page's shared chunk (+11 kB, measured).
   - **Where:** `apps/web/src/contexts/AuthContext.tsx` (pulls Firestore into `_app`); `apps/web/src/components/pages/UnifiedDashboardPage.tsx:10-16` (every tab imported eagerly).
   - **Problem:** 229 kB of JS is shared by every page (the `_app` chunk is 114 kB: Firebase Auth + Firestore). Every dashboard route is 320 kB because Calendar, Grades, Upload, dnd-kit and react-colorful all load up front.
   - **Fix:** `next/dynamic` for every tab except the one being opened. Move the user-doc bootstrap out of `AuthContext` (or lazy-import Firestore there) so the auth pages don't ship Firestore.
@@ -320,7 +323,7 @@ branch. Tick the items off and add a session log entry when done. Don't commit.
 - [ ] **A24 · Dead code** · S · risk L
   - `CheckSolidIcon` and `CloseSolidIcon` are unused (`components/ui/icons.tsx:56`, `:72`).
   - The legacy `darkMode` theme seed in `pages/_document.tsx`.
-  - The `order` backfill in `hooks/useSemesters.ts:46-70`, once every semester doc has `order` (check with an admin script the founder runs).
+  - The `order` backfill in `hooks/useSemesters.ts:46-70`, once every semester doc has `order` (check with an admin script the founder runs). Until then it re-reads every semester doc on each dashboard mount (A12 listed it; B10 left it here).
 
 - [ ] **A25 · Outdated dependencies (not security)** · M each · risk M · one major per PR
   - `@google/generative-ai` is Google's deprecated legacy SDK; move to `@google/genai` (also unlocks structured output for A9).
@@ -372,7 +375,7 @@ branch. Tick the items off and add a session log entry when done. Don't commit.
   - **Fix (pick with D8):** set `agentRules: false` in `apps/landing/next.config.ts` (recommended: the CLAUDE.md files are the agents' source of truth, and Claude Code doesn't read `AGENTS.md`), or gitignore `AGENTS.md`, or commit it. Then update the `AGENTS.md` line in `docs/ops.md` ("Pins to know").
 
 - [ ] **A35 · Em dashes left in the rules docs and code comments** · S · risk L · found during B3 (code comments added in B6)
-  - **Where:** `apps/web/standards.md` (57 left) and `apps/landing/CLAUDE.md` (13 left). B3 kept em dashes out of everything it wrote or rewrote, but left untouched lines alone. Added in B6 at the founder's request: 32 in code comments across 24 files in `apps/web/src` (TS, TSX and CSS comments, for example `components/ui/button.tsx`, `styles/globals.css`, `lib/uploadClient.ts`). B6 removed the last ones from web copy; the landing's `src` has none.
+  - **Where:** `apps/web/standards.md` (57 left) and `apps/landing/CLAUDE.md` (13 left). B3 kept em dashes out of everything it wrote or rewrote, but left untouched lines alone. Added in B6 at the founder's request: 32 in code comments across 24 files in `apps/web/src` (TS, TSX and CSS comments, for example `components/ui/button.tsx`, `styles/globals.css`, `lib/uploadClient.ts`). B6 removed the last ones from web copy; the landing's `src` has none. B10 rewrote one in `hooks/useAssessmentAutoSave.ts`, leaving 31.
   - **Problem:** the root rule covers copy, not docs or comments, but the founder asked for none in anything B3 wrote, and agents lift wording from these docs and comments into code and copy.
   - **Fix:** replace each by hand with a comma, colon, semicolon or period (some are asides or ranges that need rewording, not a mechanical swap). Decide with the founder whether the root rule should say "copy, docs and code comments".
   - **Done when:** a search for the em dash character (U+2014) finds nothing in the CLAUDE files, `standards.md`, `docs/` or `apps/web/src`.
@@ -435,15 +438,47 @@ branch. Tick the items off and add a session log entry when done. Don't commit.
   - **Problem:** the hint that says when reminders go out (A32) sits inside the custom-days panel, so a student who picks 1, 2, 3 or 7 days never sees it.
   - **Fix:** show the time under the timing field for every choice.
 
+- [ ] **A51 · The stats bar's "Submitted" counts Missed assessments** · S · risk L · found during B10
+  - **Where:** `computeStats` in `apps/web/src/utils/semesterAssessments.ts` (`submitted: completedCount`), shown by the "Submitted" card in `DashboardLayout.tsx`.
+  - **Problem:** `isCompletedStatus` counts Submitted and Missed, so a student with one Submitted and one Missed assessment sees "Submitted 2". The completion rate counting Missed as done is deliberate; the label is not.
+  - **Fix:** count `status === "Submitted"` only, and keep the completion rate as it is.
+  - **Done when:** the `it.fails("A51: ...")` in `utils/semesterAssessments.test.ts` is a passing `it`.
+
+- [ ] **A52 · An assessment without a due date is hidden everywhere** · S · risk L · found during B10
+  - **Where:** the `orderBy("dueDate")` query in `apps/web/src/hooks/useSemesterAssessments.ts`; the `dueDate` default in `assessmentFromDoc` (`utils/semesterAssessments.ts`).
+  - **Problem:** Firestore's `orderBy` leaves out docs without the field, so such an assessment never appears in any tab, and its weight and mark never reach the grade. The mapping's "today" default only applies to an empty or null `dueDate`. Before B10 it was worse: the grades tab read such docs with `getDocs` and its sort crashed the whole dashboard (`parseLocalDateTime(undefined)`, reproduced on main with a seeded doc). The upload (B8's normalizer) and the Add form always write a date, so only old or hand-edited docs can be affected.
+  - **Fix:** drop the `orderBy` and sort on the client (every consumer sorts anyway), and give such a doc `needsReview` with the viewer's today rather than a silent default (D10's rule). Or first check with an admin script whether any production doc lacks a `dueDate`.
+
+- [ ] **A53 · The grade breakdown labels a Missed assessment "Pending" or "Overdue"** · S · risk L · found during B10
+  - **Where:** `getAssessmentStatus` in `apps/web/src/components/assessment/grade-calculator/AssessmentBreakdown.tsx`.
+  - **Problem:** the label looks at Submitted and the due date only. A Missed assessment due later reads "Pending" and a past one "Overdue", while the grade counts it as 0 (D1).
+  - **Fix:** a "Missed" label with the Missed tint (`statusTintClasses.Missed`).
+
+- [ ] **A54 · Sign-in reads the onboarding status on its own, and a read error sends an onboarded user to onboarding** · S · risk L · found during B10
+  - **Where:** `getUserOnboardingStatus` in `apps/web/src/utils/onboardingUtils.ts` (used by `redirectAfterAuth` on login and register) and `loadUserDataForOnboarding` (`OnboardingContext`).
+  - **Problem:** two `getDoc` readers of the user doc remain beside the live one in `AuthContext`. `getUserOnboardingStatus` turns any read error into "needs onboarding", so a failed read at sign-in sends an onboarded user to `/onboarding`. Since B10 that page shows the error screen instead of the flow, so nothing gets overwritten; checked with the user-doc read denied, `/login` lands on `/onboarding` with "Couldn't load your account". With the live listener active the extra `getDoc` shares its target, so it costs no extra read.
+  - **Fix:** route login and register through `useAuth()` (wait for `loading`, then read `onboardingStatus`) and seed the onboarding form from `useAuth()` too; delete both readers.
+
+- [ ] **A55 · Metadata-only user-doc snapshots re-render every `useAuth` consumer** · S · risk L · found during B10 (`/code-review`, skipped)
+  - **Where:** `useUserDoc` in `apps/web/src/hooks/useUserDoc.ts` (`includeMetadataChanges: true`, so the server confirming a cached doc counts as its first answer).
+  - **Problem:** each write ack and each connectivity change sets new state, so the whole dashboard re-renders two or three times per user-doc write (a settings toggle, the daily `lastLogin`).
+  - **Fix:** after the first server answer, skip the state update when only the metadata changed.
+
+- [ ] **A56 · The calendar's Today button never opens today** · S · risk L · found during B10
+  - **Where:** `goToToday` in `apps/web/src/components/calendar/CalendarView.tsx` (also the Home key).
+  - **Problem:** it compares each day's midnight with `new Date()` (the current time), which never matches, so the month moves but today's day never opens.
+  - **Fix:** compare with the start of today.
+
 ## Baseline (2026-10-10)
 
 Numbers to compare against when items land.
 
 - `npm audit --omit=dev`: 38 vulnerabilities (0 critical, 5 high, 33 moderate) after A2 (2026-10-10; was 46: 1 critical, 12 high, 33 moderate). Including dev dependencies: 43 (10 high). Unchanged after B9 (`@date-fns/tz` has no dependencies and no advisories).
-- `apps/web` build (Next 15.5.27, after A2): 229 kB First Load JS shared by all pages (`_app` chunk 114 kB); `/dashboard/*` 320 kB (B8 measured main at 320; the 319 recorded after A2 was stale by then) and `/dashboard/[semester]/*` 320 kB after B7 (+767 bytes, 345 gzipped, in the shared dashboard chunk: the grade view helpers and ICS folding); `/login` and `/register` 242 kB; `/onboarding` 285 kB; `/settings` 285 kB after B9 (was 284: about 20 bytes for `serverTimestamp` in the Settings save took the page from 5.38 to 5.4 kB, measured against main).
+- `apps/web` build (Next 15.5.27, after A2): 229 kB First Load JS shared by all pages (`_app` chunk 114 kB); `/dashboard/*` 320 kB (B8 measured main at 320; the 319 recorded after A2 was stale by then) and `/dashboard/[semester]/*` 320 kB after B7 (+767 bytes, 345 gzipped, in the shared dashboard chunk: the grade view helpers and ICS folding); `/login` and `/register` 242 kB; `/onboarding` 285 kB; `/settings` 285 kB after B9 (was 284: about 20 bytes for `serverTimestamp` in the Settings save took the page from 5.38 to 5.4 kB, measured against main). After B10 (main built first, same machine): shared 229 kB with `_app` 115 kB (was 114, the user-doc listener); `/dashboard/*`, `/login` and `/settings` unchanged; `/onboarding` 286 (was 285), `/register` 243 (was 242), `/reset-password` 241 (was 240).
 - Live Firestore rules identical to `firestore.rules`; no Storage rules (Storage unused).
 - Vercel: projects `asetta` (apps/web) and `asetta-landing` (apps/landing), Hobby plan: runtime logs kept 1 hour; cron jobs run at most once a day and fire anywhere within the scheduled hour; functions on Fluid compute get a 300-second default and maximum duration (docs checked 2026-10-11). In `apps/web/vercel.json` the cron route has `maxDuration` 300 since A3 (was 10) and the upload route 60.
-- Tests (after B9, 2026-10-11; 13 suites after B8, 11 after B7, 9 after A7, none before): 16 suites in `apps/web`, each run in two zones. Per zone, 466 tests, all passing: no expected failures (`it.fails`) and no todo left. `npm test` takes about 3 seconds.
+- Tests (after B10, 2026-10-12; 16 suites after B9, 13 after B8, 11 after B7, 9 after A7, none before): 18 suites in `apps/web`, each run in two zones. Per zone, 527 tests: 526 passing and 1 expected failure (`it.fails`, A51); no todo. `npm test` takes about 4 seconds.
+- Firestore reads (B10, emulator rule coverage): a dashboard load reads the user doc once and writes nothing (before B10: 2 reads from 5 `getDoc` calls, plus a `lastLogin` write every load); the first load of a day also writes `lastLogin` once.
 
 ## Session log
 
@@ -851,3 +886,60 @@ Newest last. One entry per session: date, branch, items, what changed, what's le
   - Python's text mode on Windows writes CRLF; open files with `newline=''` (git normalizes on commit either way, through `.gitattributes`).
   - The built-in browser keeps the app's theme per origin, so after one test user picks a theme, the next one starts in it; the color-scheme emulation only applies to System.
   - Killing a background `dev.sh` or `emu.sh` leaves the dev server and the emulator tree running; kill each tree by PID.
+
+### 2026-10-12 · B10 (`fix/b10-data-layer`, PR #15)
+
+- **A11 and A12 done.** Pulled main after PR #14 (already up to date), no dev servers were running, `npm install` clean (nothing changed), then branched. The founder asked for every check to be run by the agent, then a commit, push and PR (the founder merges).
+- **Baseline first, on the unchanged branch** (production build with `next start` on :3005, so React's StrictMode doesn't double the reads; Auth and Firestore emulators; seeded users and a semester in `node_modules/.cache/b10/seed.mjs`):
+  - A dashboard reload read the user doc 2 times (the 5 `getDoc` calls share targets when they overlap) and wrote `lastLogin` every time.
+  - A rules denial on the user doc left "Loading..." on screen indefinitely (`Uncaught (in promise) FirebaseError`).
+  - A status change in Assessments left Grades stale (Midterm set to Missed still read 90.0%, should be 36.0%).
+  - Found while seeding: an assessment without a `dueDate` crashed the whole dashboard (A52), and the stats bar's "Submitted" counted the Missed quiz (A51).
+- **How reads were counted:** the emulator's rule-coverage report (`GET /emulator/v1/projects/asetta-me:ruleCoverage`), with a scratch copy of the rules where the user doc's `get`, `list` and `write` sit on their own lines (same access), diffed before and after one reload. A listen or `getDoc` evaluates `get` once. A change pushed to an open listener makes the emulator re-check the rule several times (+5 to +7 here), which production doesn't bill beyond one read per changed doc, so the per-load count comes from loads where the doc doesn't change. `count-reads.mjs` in `node_modules/.cache/b10/` reads it.
+- **Test-first:**
+  - Pure logic pulled out of the hooks unchanged first (`utils/semesterAssessments.ts`: `assessmentFromDoc`, `courseNames`, `processCourseStats`, `computeStats`; `utils/userDoc.ts`: the onboarding status, display preferences and profile mappings, `lastLoginToWrite`, `timeZoneToWrite`, `userDocErrorKind`), with tests pinning today's behavior.
+  - Known bugs went in as `it.fails` and were each run once as a plain `it`, failing on their assertions in both zones: A11 (the mapping drops `mark`, a cleared `mark: null`, `createdAt` and `updatedAt`: "expected undefined to be 85"), A12 (`lastLoginToWrite` wrote on a second sign-in the same day, for a Timestamp or a Date, and on both 2026 DST days) and A51 ("expected 2 to be 1"). The A11 and A12 fixes turned them into plain `it`s; A51 stays.
+  - New helpers started from failing tests: `userDocErrorKind`, `profileFromUserDoc`, and the grade calculator's `withEdits` and `pendingEdits`.
+- **A12, in order:** S (try/catch/finally, `userDocError`, `LoadErrorScreen`), then M (see the item). In M the offline case needed care: Firestore raises a "doc missing" snapshot from the cache when it can't reach the server, and treating that as missing would create a new user doc over the real one, so only a server snapshot counts.
+- **A11:** see the item.
+- **`/code-review` (high):** six findings. Fixed:
+  - Grades kept a renamed or other-semester course selected and showed an empty calculator.
+  - On a semester switch the tabs got the previous semester's assessments until the new snapshot, so a grade typed in that moment would save to a nonexistent path.
+  - UserSettings duplicated the preferences mapping.
+  - An open calendar day didn't follow the live data.
+
+  Skipped: metadata-only snapshots re-render `useAuth` consumers (A55); the second onboarding-status read path (A54).
+- **Bundle:** with the error screen in `_app` (the S design) the shared chunk grew 229 to 240 kB; a build without it showed the screen's UI imports were 11 of the 12 kB. It moved into the three pages that need the user doc (dashboard layout, Settings, onboarding), which already load those modules. Final sizes are in the Baseline.
+- **End to end on the emulators** (the production build; the `__FIREBASE_DEFAULTS__` cookie, with the Auth Emulator warning in the console before any credentials were typed; test credentials generated into `node_modules/.cache/b10/e2e-user.json`, emulator only):
+  - A12 reads: each dashboard reload read the user doc once and wrote nothing; switching through all five tabs added nothing. With `lastLogin` set to the day before, the next load wrote it once, and the load after that read once and wrote nothing.
+  - A12 errors:
+    - **Rules denial:** "Couldn't load your account" within about 0.1 s on the dashboard, Settings and onboarding. `/login` for the signed-in user went to `/onboarding` with the same screen (A54).
+    - **Firestore stopped** (stopping it took the whole emulator process, Auth included): "Can't reach Asetta" in about 4 s. After a restart from an export, the open page loaded on its own 9 s later with no reload, and the user doc was unchanged.
+    - Checked in light and dark at 1280px and 375px, with no horizontal scroll.
+  - A11, each edit then every other tab read back without a reload:
+    - **Status in Assessments:** Lab 1 to Submitted showed in Courses (1 of 1), Grades and the stats bar.
+    - **Grades:** a weight showed in Assessments; marks typed into two rows inside the 750 ms debounce showed at once (79.0%) and saved (70 and 80 in the emulator, Midterm's status Submitted).
+    - **Add and rename:** an assessment added in Add showed in Courses, Calendar and the Grades course list. Renaming that course while Grades had it selected updated Courses, Assessments and Calendar, and Grades fell back to the first course.
+    - **Due date and delete:** a due date edited in Assessments moved in Calendar and Courses; a delete removed the assessment from every tab.
+    - **Another browser tab:** a status change there showed in the first tab's course-filtered view.
+    - **Semester switch:** on the same page it shows a spinner, then the new semester; no tab showed the old one.
+    - **Missing `dueDate`:** the doc is hidden, with no crash (A52).
+    - **Course preferences:** viewing a course without a preferences doc wrote nothing; setting its target created the doc with only `targetGrade`.
+  - B9 kept:
+    - A user stored as Pacific/Auckland signing in from this Toronto browser got `America/Toronto` and `nextReminderAt` at the server's time; a user with no zone got both.
+    - A user without a doc (sign-in, and a sign-up through the form) got a doc with both fields and exactly one welcome-email request, counted with a `fetch` wrapper in the page. The send failed by design (empty `EMAIL_APP_PASSWORD`) and the route released its marker.
+    - Saving the Notifications card and finishing onboarding set `nextReminderAt`.
+  - Redirects as before:
+    - Sign-in for an onboarded user lands on the first semester's Assessments; for a user who isn't onboarded, on `/onboarding`.
+    - Sign-up lands on `/onboarding`. `/dashboard` for a user who isn't onboarded goes to `/onboarding`, and `/login` while signed in goes to the dashboard.
+    - Finishing onboarding goes to the new semester's dashboard, and skipping goes to `/dashboard/assessments`, neither bouncing back. (`/` goes to www.asetta.me in a production build, by design.)
+  - Afterwards the emulator sign-in, the cookie, the stored theme and the viewport were cleared, and the server and emulators were stopped (ports closed).
+- **Verification loop:** lint, `format:check`, typecheck, `npm test` (36 files, 1052 passed, 2 expected failures, A51 in both zones) and build all green.
+- **Docs:** `apps/web/standards.md` (the user doc read once through `useAuth()`, one live assessments listener, no writes on read, the load error screen); `docs/ops.md` (counting reads with rule coverage, forcing a read error, stopping Firestore with an export); `apps/web/CLAUDE.md` (where the user doc lives).
+- **New:** A51 to A56. A15, A24 and A35 got notes.
+- **Left for the founder:** check the Vercel preview, then merge.
+- **Gotchas:**
+  - The Firestore emulator hot-reloads the rules file, but a copy can land mid-read: "Rules updated" while the rule-coverage report still shows the old rules. Check the report's `rules.files[0].content`, and `touch` the file to reload again.
+  - Killing the Firestore emulator's java process stops the whole `emulators:start` (Auth too). Export first (`firebase emulators:export <dir>`) and restart with `--import <dir>`.
+  - The built-in browser's hidden pane doesn't paint, so React effects can lag: the register form's password check ran after Enter, and the first submit said the requirements weren't met. Submitting again worked.
+  - The browser's network list drops requests under Firestore's long-polling; count a request with a `fetch` wrapper installed in the page instead.

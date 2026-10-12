@@ -21,6 +21,22 @@ All new code follows these.
   it, split into a folder: `ComponentName.tsx` stays the public coordinator, subparts live in a
   same-named folder (see `tables/assessments/`, `assessment/semester-tabs/`,
   `assessment/grade-calculator/`, `components/auth/`).
+- **The user doc is read once, live.** `hooks/useUserDoc.ts` keeps one `onSnapshot` on
+  `users/{uid}` for the session, and `AuthContext` derives the profile, display preferences and
+  onboarding status from it: read them from `useAuth()`, never with a `getDoc` of your own. The
+  sign-in writes run on the server's first answer: the doc is created only when the server says
+  it is missing (an offline cache can't, or the app would write a new doc over the real one),
+  `lastLogin` at most once per local day, and the zone when it is missing or has changed.
+- **The dashboard's assessments come from one live listener** (`useSemesterAssessments`,
+  passed down as `DashboardData`). Tabs derive their views from it; no tab reads assessments
+  with `getDocs` or refreshes another tab by hand. Listing docs in order to write them (course
+  rename, semester delete) is the only exception.
+- **No writes on read.** Viewing something never creates or updates a doc; a missing value falls
+  back to its default when read (course preferences, course colors).
+- **A failed load shows an error state, never a spinner that waits forever.** A page that needs
+  the user doc returns `ui/LoadErrorScreen` on `userDocError` (the dashboard layout, Settings,
+  onboarding). It stays out of `_app`, where its UI imports would land in every page's shared
+  bundle.
 - **Pure logic goes in `src/utils/`** as typed, testable functions (see `gradeCalculations.ts`).
   Shared constants go in `src/constants/` (see `isCompletedStatus` — never re-inline
   `["Submitted", "Missed"]`).
