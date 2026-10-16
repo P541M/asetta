@@ -1,34 +1,144 @@
 rules_version = '2';
-  service cloud.firestore {
-    match /databases/{database}/documents {
-      match /users/{userId} {
-        // Allow users to read/write their own user document
-        allow read, write: if request.auth != null && request.auth.uid == userId;
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Clients reach only their own user doc and what sits under it. Each collection lists the
+    // keys a client may write and the type of each (A16). A create checks every key; an update
+    // checks only the keys it adds or changes, so a key an older app version left in a doc never
+    // blocks an edit. Removing a key is always allowed: the app reads a missing one as its
+    // default. Caps sit far above anything typed; the app's own limits do the validation.
+    //
+    // No rule matches welcomeEmails, cronRuns, notifications or emailVerifications, so clients
+    // can't touch them: they hold server state (the welcome-email claim, the reminder cron's run
+    // summaries and send records, and the confirm links for a notification address).
+    // `verifiedEmail` on the user doc is server state too, so it isn't in the user doc's list.
+    // `npm run test:rules` checks every write the app makes against this file.
 
-        // Allow access to semesters collection
-        match /semesters/{semesterId} {
-          allow read, write: if request.auth != null && request.auth.uid == userId;
+    function signedInAs(userId) {
+      return request.auth != null && request.auth.uid == userId;
+    }
 
-          // Allow access to assessments within semesters
-          match /assessments/{assessmentId} {
-            allow read, write: if request.auth != null && request.auth.uid == userId;
-          }
+    function createdKeys() {
+      return request.resource.data.keys().toSet();
+    }
 
-          // Allow access to course preferences within semesters
-          match /coursePreferences/{courseName} {
-            allow read, write: if request.auth != null && request.auth.uid == userId;
-          }
+    function updatedKeys() {
+      let diff = request.resource.data.diff(resource.data);
+      return diff.addedKeys().union(diff.changedKeys());
+    }
+
+    function text(data, keys, key, max) {
+      return !(key in keys) || (data[key] is string && data[key].size() <= max);
+    }
+
+    function flag(data, keys, key) {
+      return !(key in keys) || data[key] is bool;
+    }
+
+    function number(data, keys, key) {
+      return !(key in keys) || data[key] is number;
+    }
+
+    function time(data, keys, key) {
+      return !(key in keys) || data[key] is timestamp;
+    }
+
+    function validUser(data, keys) {
+      return keys.hasOnly([
+          'displayName', 'email', 'institution', 'timeZone', 'nextReminderAt',
+          'createdAt', 'lastLogin', 'updatedAt',
+          'hasCompletedOnboarding', 'onboardingCompletedAt', 'onboardingSkipped',
+          'emailNotifications', 'hasConsentedToNotifications', 'notificationDaysBefore',
+          'notifySubmittedAssessments',
+          'showDaysTillDue', 'showWeight', 'showNotes', 'showStatsBar'
+        ])
+        && text(data, keys, 'displayName', 200)
+        && text(data, keys, 'email', 254)
+        && text(data, keys, 'institution', 200)
+        && text(data, keys, 'timeZone', 64)
+        // The client can ask the reminder cron to look at it at the next run (serverTimestamp()),
+        // never schedule itself into every run
+        && (!('nextReminderAt' in keys) || data.nextReminderAt == request.time)
+        && time(data, keys, 'createdAt')
+        && time(data, keys, 'lastLogin')
+        && time(data, keys, 'updatedAt')
+        && time(data, keys, 'onboardingCompletedAt')
+        && flag(data, keys, 'hasCompletedOnboarding')
+        && flag(data, keys, 'onboardingSkipped')
+        && flag(data, keys, 'emailNotifications')
+        && flag(data, keys, 'hasConsentedToNotifications')
+        && flag(data, keys, 'notifySubmittedAssessments')
+        && flag(data, keys, 'showDaysTillDue')
+        && flag(data, keys, 'showWeight')
+        && flag(data, keys, 'showNotes')
+        && flag(data, keys, 'showStatsBar')
+        && (!('notificationDaysBefore' in keys) || data.notificationDaysBefore is int);
+    }
+
+    function validSemester(data, keys) {
+      return keys.hasOnly(['name', 'order', 'createdAt', 'updatedAt', 'startDate', 'endDate'])
+        && text(data, keys, 'name', 200)
+        && number(data, keys, 'order')
+        && time(data, keys, 'createdAt')
+        && time(data, keys, 'updatedAt')
+        && text(data, keys, 'startDate', 32)
+        && text(data, keys, 'endDate', 32);
+    }
+
+    // `needsReview` is only ever set by the upload (the admin SDK); a client only removes it
+    function validAssessment(data, keys) {
+      return keys.hasOnly([
+          'courseName', 'assignmentName', 'dueDate', 'dueTime', 'weight', 'status',
+          'notes', 'mark', 'createdAt', 'updatedAt'
+        ])
+        && text(data, keys, 'courseName', 500)
+        && text(data, keys, 'assignmentName', 500)
+        && text(data, keys, 'dueDate', 32)
+        && text(data, keys, 'dueTime', 32)
+        && number(data, keys, 'weight')
+        && (!('status' in keys)
+          || data.status in ['Not started', 'In progress', 'Submitted', 'Missed'])
+        && (!('notes' in keys)
+          || data.notes == null || (data.notes is string && data.notes.size() <= 100000))
+        && (!('mark' in keys) || data.mark == null || data.mark is number)
+        && time(data, keys, 'createdAt')
+        && time(data, keys, 'updatedAt');
+    }
+
+    function validCoursePreferences(data, keys) {
+      return keys.hasOnly(['color', 'targetGrade'])
+        && (!('color' in keys) || (data.color is string && data.color.matches('#[0-9A-Fa-f]{6}')))
+        && number(data, keys, 'targetGrade');
+    }
+
+    match /users/{userId} {
+      allow read: if signedInAs(userId);
+      allow create: if signedInAs(userId) && validUser(request.resource.data, createdKeys());
+      allow update: if signedInAs(userId) && validUser(request.resource.data, updatedKeys());
+
+      match /semesters/{semesterId} {
+        allow read, delete: if signedInAs(userId);
+        allow create: if signedInAs(userId)
+          && validSemester(request.resource.data, createdKeys());
+        allow update: if signedInAs(userId)
+          && validSemester(request.resource.data, updatedKeys());
+
+        match /assessments/{assessmentId} {
+          allow read, delete: if signedInAs(userId);
+          allow create: if signedInAs(userId)
+            && validAssessment(request.resource.data, createdKeys());
+          allow update: if signedInAs(userId)
+            && validAssessment(request.resource.data, updatedKeys());
         }
 
-        // Allow access to documents collection (for course outlines)
-        match /documents/{documentId} {
-          allow read, write: if request.auth != null && request.auth.uid == userId;
-        }
-
-        // Allow access to courses collection
-        match /courses/{courseId} {
-          allow read, write: if request.auth != null && request.auth.uid == userId;
+        // The ID is coursePreferencesDocId(courseName) (utils/courseName.ts), not always the name
+        match /coursePreferences/{prefsId} {
+          allow read, delete: if signedInAs(userId);
+          allow create: if signedInAs(userId)
+            && validCoursePreferences(request.resource.data, createdKeys());
+          allow update: if signedInAs(userId)
+            && validCoursePreferences(request.resource.data, updatedKeys());
         }
       }
     }
   }
+}

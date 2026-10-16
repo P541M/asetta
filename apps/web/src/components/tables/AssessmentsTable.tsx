@@ -198,9 +198,16 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
     if (!user) return;
     try {
       const assessmentRef = getAssessmentDocRef(user.uid, semesterId, assessmentId);
+      const { courseName, assignmentName, dueDate, dueTime, weight, status } = editFormData;
+      // Only the fields the row edits: the rules refuse the rest of the row's data (its `id`).
       // Saving the edit row is the student's check of the date, so it clears the review flag.
       await updateDoc(assessmentRef, {
-        ...editFormData,
+        courseName,
+        assignmentName,
+        dueDate,
+        dueTime,
+        weight,
+        status,
         needsReview: deleteField(),
         updatedAt: new Date(),
       });

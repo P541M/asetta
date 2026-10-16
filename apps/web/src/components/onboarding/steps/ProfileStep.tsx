@@ -51,6 +51,7 @@ export function ProfileStep() {
             id="institution"
             type="text"
             value={formData.institution}
+            maxLength={200}
             onChange={(e) => handleInputChange("institution", e.target.value)}
             placeholder="e.g., University of Toronto"
             required

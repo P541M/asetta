@@ -12,7 +12,8 @@
     "lint": "next lint",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "test": "vitest run"
+    "test": "vitest run",
+    "test:rules": "npx -y firebase-tools@13.35.1 emulators:exec --only firestore --project demo-asetta-rules \"vitest run --config vitest.rules.config.ts\""
   },
   "dependencies": {
     "@date-fns/tz": "^1.5.0",
