@@ -9,6 +9,7 @@ import {
   displayPreferencesFromUserDoc,
   onboardingStatusFromUserDoc,
   profileFromUserDoc,
+  verifiedEmailFromUserDoc,
 } from "../utils/userDoc";
 
 const logout = async () => {
@@ -22,6 +23,7 @@ const AuthContext = createContext<AuthContextType>({
   onboardingStatus: null,
   profile: { displayName: "" },
   displayPreferences: DEFAULT_DISPLAY_PREFERENCES,
+  verifiedEmail: null,
   logout,
 });
 
@@ -29,8 +31,8 @@ export const useAuth = () => useContext(AuthContext);
 
 /**
  * The signed-in user and their user doc. The doc is read once, live (useUserDoc), and everything
- * the app shows from it (profile, display preferences, onboarding status) derives from that one
- * read (A12).
+ * the app shows from it (profile, display preferences, onboarding status, the confirmed
+ * notification address) derives from that one read (A12).
  */
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
@@ -55,6 +57,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       onboardingStatus: docReady ? onboardingStatusFromUserDoc(userDoc.data) : null,
       profile: profileFromUserDoc(userDoc.data),
       displayPreferences: displayPreferencesFromUserDoc(userDoc.data),
+      verifiedEmail: verifiedEmailFromUserDoc(userDoc.data),
       logout,
     };
   }, [user, authLoading, userDoc]);

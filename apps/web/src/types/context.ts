@@ -11,5 +11,7 @@ export interface AuthContextType {
   onboardingStatus: OnboardingStatus | null;
   profile: UserProfile;
   displayPreferences: DisplayPreferences;
+  /** The notification address confirmed through its link (A17), or null. */
+  verifiedEmail: string | null;
   logout: () => Promise<void>;
 }

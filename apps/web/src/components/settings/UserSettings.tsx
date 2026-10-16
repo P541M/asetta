@@ -6,11 +6,14 @@ import { db } from "../../lib/firebase";
 import ProfileSection from "./ProfileSection";
 import PreferencesSection from "./PreferencesSection";
 import NotificationsSection from "./NotificationsSection";
+import EmailConfirmationStatus from "./EmailConfirmationStatus";
 import SettingsActions from "./SettingsActions";
 import SettingsMessage from "./SettingsMessage";
 import { ProfileForm } from "../../types/profile";
 import { NotificationsForm } from "../../types/preferences";
 import { isValidEmail } from "../../utils/validation";
+import { notificationEmailStatus } from "../../utils/notificationEmail";
+import { requestConfirmLink, type ConfirmLinkRequest } from "../../lib/notificationEmailClient";
 import {
   DisplayPreferences,
   DEFAULT_DISPLAY_PREFERENCES,
@@ -23,7 +26,7 @@ const isDirty = <T extends object>(form: T, saved: T | null) =>
   saved !== null && (Object.keys(form) as (keyof T)[]).some((key) => form[key] !== saved[key]);
 
 const UserSettings = () => {
-  const { user } = useAuth();
+  const { user, verifiedEmail } = useAuth();
 
   const [profileForm, setProfileForm] = useState<ProfileForm>({
     displayName: user?.displayName || "",
@@ -45,6 +48,17 @@ const UserSettings = () => {
   const [savedNotif, setSavedNotif] = useState<NotificationsForm | null>(null);
   const [notifSaving, setNotifSaving] = useState(false);
   const [notifMessage, setNotifMessage] = useState<Message>(null);
+  const [linkState, setLinkState] = useState<ConfirmLinkRequest | null>(null);
+  const [linkSending, setLinkSending] = useState(false);
+
+  // A chosen address gets reminders once confirmed (A17); verifiedEmail is live from the user doc
+  const accountEmail = user?.email ?? null;
+  const emailStatus = notificationEmailStatus({
+    email: notifForm.email,
+    verifiedEmail,
+    accountEmail,
+  });
+  const emailIsSaved = notifForm.email.trim() === (savedNotif?.email ?? "").trim();
 
   const setProfileField = <K extends keyof ProfileForm>(field: K, value: ProfileForm[K]) =>
     setProfileForm((form) => ({ ...form, [field]: value }));
@@ -124,6 +138,13 @@ const UserSettings = () => {
     }
   };
 
+  const sendConfirmLink = async () => {
+    if (!user) return;
+    setLinkSending(true);
+    setLinkState(await requestConfirmLink(user));
+    setLinkSending(false);
+  };
+
   const handleNotifSave = async (e: FormEvent) => {
     e.preventDefault();
     if (!user) return;
@@ -145,8 +166,13 @@ const UserSettings = () => {
         nextReminderAt: serverTimestamp(),
         updatedAt: new Date(),
       });
+      // A new address that isn't confirmed gets its link as soon as it is saved
+      const needsLink =
+        notifForm.emailNotifications && emailStatus === "unconfirmed" && !emailIsSaved;
       setSavedNotif(notifForm);
       setNotifMessage({ text: "Notification settings updated", type: "success" });
+      setLinkState(null);
+      if (needsLink) void sendConfirmLink();
     } catch (error) {
       console.error("Error updating notification settings:", error);
       setNotifMessage({
@@ -178,7 +204,20 @@ const UserSettings = () => {
 
       <section className="rounded-xl bg-card p-6 shadow-soft md:p-8">
         <form onSubmit={handleNotifSave}>
-          <NotificationsSection form={notifForm} onChange={setNotifField} />
+          <NotificationsSection
+            form={notifForm}
+            onChange={setNotifField}
+            emailStatus={
+              <EmailConfirmationStatus
+                status={emailStatus}
+                accountEmail={accountEmail}
+                saved={emailIsSaved}
+                linkState={linkState}
+                sending={linkSending}
+                onSendLink={sendConfirmLink}
+              />
+            }
+          />
           <SettingsMessage text={notifMessage?.text ?? ""} type={notifMessage?.type ?? "success"} />
           <SettingsActions dirty={isDirty(notifForm, savedNotif)} saving={notifSaving} />
         </form>

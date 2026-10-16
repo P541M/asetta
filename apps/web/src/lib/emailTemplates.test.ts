@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { reminderEmail, type ReminderDetails } from "./emailTemplates";
+import { confirmAddressEmail, reminderEmail, type ReminderDetails } from "./emailTemplates";
 
 const details = (overrides: Partial<ReminderDetails> = {}): ReminderDetails => ({
   assessmentTitle: "Lab report 2",
@@ -40,5 +40,23 @@ describe("reminderEmail", () => {
     const { html } = reminderEmail(details({ assessmentTitle: "<b>Quiz</b>" }));
     expect(html).toContain("&lt;b&gt;Quiz&lt;/b&gt;");
     expect(html).not.toContain("<b>Quiz</b>");
+  });
+});
+
+describe("confirmAddressEmail (A17)", () => {
+  const link = "https://asetta.me/confirm-email?uid=abc123&token=tok_EN-1";
+
+  it("links to the confirm page, escaped in the HTML and as is in the text", () => {
+    const { html, text } = confirmAddressEmail(link);
+    expect(html).toContain('href="https://asetta.me/confirm-email?uid=abc123&amp;token=tok_EN-1"');
+    expect(text).toContain(link);
+  });
+
+  it("has a fixed subject and says what to do if it wasn't you", () => {
+    const { subject, text } = confirmAddressEmail(link);
+    expect(subject).toContain("Confirm");
+    expect(subject).toContain("reminders");
+    expect(text).toContain("24 hours");
+    expect(text).toContain("ignore");
   });
 });

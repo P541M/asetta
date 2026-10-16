@@ -22,7 +22,7 @@ const timingOptions = [
   { value: "7", label: "1 week before due date" },
 ];
 
-const NotificationsSection = ({ form, onChange }: NotificationsSectionProps) => {
+const NotificationsSection = ({ form, onChange, emailStatus }: NotificationsSectionProps) => {
   const [isCustomDays, setIsCustomDays] = useState(false);
   const [customDays, setCustomDays] = useState(form.notificationDaysBefore);
 
@@ -121,6 +121,8 @@ const NotificationsSection = ({ form, onChange }: NotificationsSectionProps) => 
                 Reminder: Notifications might end up in your spam folder
               </p>
             )}
+
+            {form.email && isValidEmail(form.email) && emailStatus}
           </div>
 
           {/* Timing */}
