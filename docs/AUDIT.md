@@ -229,7 +229,7 @@ branch. Tick the items off and add a session log entry when done. Don't commit.
   - **Fix:** try/finally first (S). Then one live user-doc context (`onSnapshot`) that feeds the profile, display preferences and onboarding status (M). Write `lastLogin` at most once a day. No writes on read.
   - **Done when:** a forced Firestore error shows an error state, not a spinner; 1 user-doc read per dashboard load.
 
-- [x] **A13 · Course names containing "/"** · S-M · risk M · reproduce first (done 2026-10-16, PR not opened yet)
+- [x] **A13 · Course names containing "/"** · S-M · risk M · reproduce first (done 2026-10-16, PR #16)
   - **Shipped (B11):** reproduced first, then fixed. The doc ID comes from the pure `coursePreferencesDocId` in `utils/courseName.ts`, used by `getCoursePreferencesDocRef`. A name Firestore takes as one ID, and that doesn't start with `%`, keeps itself as the ID, so every existing doc keeps its ID: no migration, no fallback read. Any other name (a `/`, `.`, `..`, `__x__`, or a leading `%`) becomes `%` plus the name with `%` written as `%25` and `/` as `%2F`. `useCourseColors` turns listed IDs back into names with `courseNameFromPreferencesDocId`, which returns null for an ID the scheme never makes, so it skips such a doc. Rename now allows any character: the `/ \ # ? [ ]` blocklist only existed for the doc ID, and the empty and 100-character checks stay (`validateCourseName`, moved to the same module). The rules are unchanged. The one loss: a preferences doc saved before A13 for a name starting with `%` is no longer read (its course shows the defaults).
   - **Where:** `apps/web/src/lib/firebaseUtils.ts:27-33` (`getCoursePreferencesDocRef`); callers `hooks/useCoursePreferences.ts`, `hooks/useCourseColors.ts:61`, `hooks/useCourseRename.ts`.
   - **Problem (inferred from Firestore's path rules, not yet reproduced):** the raw course name is the document ID. A cross-listed name like "MATH/STAT 2050" adds path segments, so `doc()` throws: target grade, color and rename would fail for that course.
@@ -964,7 +964,7 @@ Newest last. One entry per session: date, branch, items, what changed, what's le
   - The built-in browser's hidden pane doesn't paint, so React effects can lag: the register form's password check ran after Enter, and the first submit said the requirements weren't met. Submitting again worked.
   - The browser's network list drops requests under Firestore's long-polling; count a request with a `fetch` wrapper installed in the page instead.
 
-### 2026-10-16 · B11 (`fix/b11-course-name-slash`, PR not opened yet)
+### 2026-10-16 · B11 (`fix/b11-course-name-slash`, PR #16)
 
 - **A13 done.** Branched from main after PR #15 (up to date with origin). Nothing committed; the founder commits.
 - **Setup:** this machine had no `node_modules` and now runs Node 24.22 and npm 11.19 (no Node 22 installed). `npm ci` installed from the lockfile without changing it; the audit counts matched the Baseline (43 with dev dependencies, 10 high). No dev servers were running (the node processes were MCP proxies). The emulators needed `firebase-tools@13.35.1`, because 14 and later need Java 21 and the machine has Java 20 (`docs/ops.md`).
@@ -993,7 +993,7 @@ Newest last. One entry per session: date, branch, items, what changed, what's le
 - **Second `/code-review` (high, founder's request):** five findings. Fixed: the rename cap duplicated `MAX_COURSE_NAME_LENGTH` from `lib/upload/normalize.ts`, so `utils/courseName.ts` now owns it and the normalizer imports it; three doc slips (the failing-test count above, the Baseline's route sizes, the script list in `docs/ops.md`). Skipped: the ref and listener wiring has no automated test (there are no Firestore tests yet, per standards.md; the emulator run covered it).
 - **Docs:** `apps/web/standards.md` (a Part 1 rule: user text never goes into a Firestore path as is, with the ID scheme; the Course colors storage line); `docs/ops.md` (firebase-tools 13 for Java 20, the firebase-admin 14 modular imports, the machine's Node and npm, the hidden browser pane needing a screenshot to render); the `constants/courseColors.ts` comment. A15 and A16 got notes.
 - **New:** A57, A58, A59.
-- **Left for the founder:** commit and open the PR (fill the PR number into A13 and this entry), check the Vercel preview, merge. Rules are unchanged, so no deploy is needed.
+- **Left for the founder:** check the Vercel preview, then merge. (The founder asked for a second review and the PR after the first pass; the agent committed, pushed and opened it.) Rules are unchanged, so no deploy is needed.
 - **Gotchas:**
   - A shell whose working directory sits inside `apps/web/.next` keeps Next from deleting it, and `next build` then hangs after "Environments: .env.local" with no CPU use. Never `cd` into `.next`; read files there by path.
   - Fast Refresh applies each saved file at once: adding a call before its import (two edits) briefly threw "is not defined" in the open page. A full reload clears it.
