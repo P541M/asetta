@@ -4,6 +4,7 @@ import { collection, onSnapshot, setDoc } from "firebase/firestore";
 import { db } from "../lib/firebase";
 import { getCoursePreferencesDocRef } from "../lib/firebaseUtils";
 import { isValidCourseColor } from "../constants/courseColors";
+import { courseNameFromPreferencesDocId } from "../utils/courseName";
 
 /**
  * Stored course colors for a semester (courseName -> "#RRGGBB"), live via
@@ -35,9 +36,10 @@ export function useCourseColors(user: User | null, semesterId: string) {
         const colors: Record<string, string> = {};
         snapshot.forEach((docSnap) => {
           const color = docSnap.data().color;
+          const courseName = courseNameFromPreferencesDocId(docSnap.id);
           // Malformed values are dropped: resolveCourseColor falls back to the default
-          if (isValidCourseColor(color)) {
-            colors[docSnap.id] = color.toUpperCase();
+          if (courseName !== null && isValidCourseColor(color)) {
+            colors[courseName] = color.toUpperCase();
           }
         });
         setCourseColors(colors);

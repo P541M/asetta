@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
+import { MAX_COURSE_NAME_LENGTH } from "@/utils/courseName";
 import {
   MAX_ASSESSMENT_NAME_LENGTH,
-  MAX_COURSE_NAME_LENGTH,
   cleanText,
   detectDateOrder,
   normalizeExtractedAssessment,

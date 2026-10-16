@@ -150,8 +150,15 @@ project. Never commit real values.
   `FIREBASE_AUTH_EMULATOR_HOST` and `FIRESTORE_EMULATOR_HOST` together on the dev server:
   emulator ID tokens are unsigned and only pass with the Auth one set, and the Firestore one
   keeps every write off production.
-- The emulator jar is cached in `node_modules/.cache/a1-test/emulators` (point
-  `FIREBASE_EMULATORS_PATH` there). `npm ci` deletes it.
+- firebase-tools isn't a dependency; run it with `npx -y firebase-tools@<version>`. Version 14
+  and later need Java 21 for the emulators, and this machine has Java 20 (2026-10-16), so use
+  `firebase-tools@13.35.1`, the last 13.x. Point `FIREBASE_EMULATORS_PATH` at a folder under
+  `node_modules/.cache/` to keep the downloaded jar there; `npm ci` deletes it. B11's scripts
+  (`emu.sh`, `dev.sh`, `seed.cjs`, `dump.cjs`, and `repro-docref.cjs`, which shows the A13 failure
+  with the SDK alone) are in `node_modules/.cache/b11/`.
+- firebase-admin 14 has no namespaced API (`admin.auth()` is not a function): seed scripts import
+  `initializeApp`, `getAuth` and `getFirestore` from `firebase-admin/app`, `/auth` and
+  `/firestore`.
 - The Auth emulator's `projects/{id}/accounts:update` with `Authorization: Bearer owner` sets
   `emailVerified` on a test user.
 - Override `.env.local` values in the dev server's own environment: Next never replaces a
@@ -277,6 +284,14 @@ project. Never commit real values.
   as it does on CI. It also lists the binary types (images, fonts, video, PDF); give any new
   binary type a `binary` line there.
 - Next 16 keeps a versioned Turbopack dev cache in `apps/landing/.next/dev`; deleting it is safe.
+- Node and npm (2026-10-16): the machine runs Node 24.22 and npm 11.19 through nvm4w (20.14 is
+  the only other install), while `engines` says 22.x. Install with `npm ci`, which takes the
+  lockfile as is; npm 11 skips the install scripts it hasn't been told to allow (esbuild,
+  `@firebase/util`, `protobufjs`), and the whole verification loop still passes without them.
+  The npm 10.9 notes under "Dependencies" describe the version CI and earlier sessions used.
+- The built-in browser's pane, while hidden, doesn't render the page until something asks for
+  pixels: a page can sit on "Loading..." for a minute after a navigation. Taking a screenshot
+  makes it render; read the page with `read_page` or JavaScript afterwards.
 - Git Bash doesn't pass `TZ` through to Node (`TZ=UTC node ...` still runs in the host zone). Set
   it from PowerShell (`$env:TZ = "UTC"`) to run something under another zone. The Vitest config
   doesn't depend on this: Node applies `process.env.TZ` when it is assigned at runtime.
