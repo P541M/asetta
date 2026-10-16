@@ -65,7 +65,7 @@ branch. Tick the items off and add a session log entry when done. Don't commit.
 | B13 | A15 | Bundle size | |
 | B14 | A18, A20 | Rate limits (upload quota, contact form) | D5 decided |
 | B15 | A19 | Cron throughput | After A8 |
-| any | A21 to A28, A33 to A35, A39, A40, A42 to A56 | Later items | As time allows; A34 needs D8; A47 once 5 days have passed since A8's first production run |
+| any | A21 to A28, A33 to A35, A39, A40, A42 to A59 | Later items | As time allows; A34 needs D8; A47 once 5 days have passed since A8's first production run |
 
 ## Fix now
 
@@ -229,7 +229,8 @@ branch. Tick the items off and add a session log entry when done. Don't commit.
   - **Fix:** try/finally first (S). Then one live user-doc context (`onSnapshot`) that feeds the profile, display preferences and onboarding status (M). Write `lastLogin` at most once a day. No writes on read.
   - **Done when:** a forced Firestore error shows an error state, not a spinner; 1 user-doc read per dashboard load.
 
-- [ ] **A13 · Course names containing "/"** · S-M · risk M · reproduce first
+- [x] **A13 · Course names containing "/"** · S-M · risk M · reproduce first (done 2026-10-16, PR not opened yet)
+  - **Shipped (B11):** reproduced first, then fixed. The doc ID comes from the pure `coursePreferencesDocId` in `utils/courseName.ts`, used by `getCoursePreferencesDocRef`. A name Firestore takes as one ID, and that doesn't start with `%`, keeps itself as the ID, so every existing doc keeps its ID: no migration, no fallback read. Any other name (a `/`, `.`, `..`, `__x__`, or a leading `%`) becomes `%` plus the name with `%` written as `%25` and `/` as `%2F`. `useCourseColors` turns listed IDs back into names with `courseNameFromPreferencesDocId`, which returns null for an ID the scheme never makes, so it skips such a doc. Rename now allows any character: the `/ \ # ? [ ]` blocklist only existed for the doc ID, and the empty and 100-character checks stay (`validateCourseName`, moved to the same module). The rules are unchanged. The one loss: a preferences doc saved before A13 for a name starting with `%` is no longer read (its course shows the defaults).
   - **Where:** `apps/web/src/lib/firebaseUtils.ts:27-33` (`getCoursePreferencesDocRef`); callers `hooks/useCoursePreferences.ts`, `hooks/useCourseColors.ts:61`, `hooks/useCourseRename.ts`.
   - **Problem (inferred from Firestore's path rules, not yet reproduced):** the raw course name is the document ID. A cross-listed name like "MATH/STAT 2050" adds path segments, so `doc()` throws: target grade, color and rename would fail for that course.
   - **Fix:** Encode the ID (e.g. `encodeURIComponent`) with a fallback read of the raw ID for existing docs, or store the name in a field with a slug ID.
@@ -243,6 +244,7 @@ branch. Tick the items off and add a session log entry when done. Don't commit.
   - **Done when:** tests cover 23:59 and names with commas and semicolons; the file imports cleanly into Google Calendar.
 
 - [ ] **A15 · Bundle size** · M · risk L-M
+  - B11: `lib/firebaseUtils.ts` ships whole in `_app` (through `useUserDoc`), so its new `utils/courseName.ts` import added 686 bytes (304 gzipped) to every page. Moving `getCoursePreferencesDocRef` into a module outside `_app`'s graph would take it back out.
   - B10: `_app` is 115 kB (+1 kB for the user-doc listener). `LoadErrorScreen` stays out of `_app` on purpose: there it put Button, EmptyState and `tailwind-merge` into every page's shared chunk (+11 kB, measured).
   - **Where:** `apps/web/src/contexts/AuthContext.tsx` (pulls Firestore into `_app`); `apps/web/src/components/pages/UnifiedDashboardPage.tsx:10-16` (every tab imported eagerly).
   - **Problem:** 229 kB of JS is shared by every page (the `_app` chunk is 114 kB: Firebase Auth + Firestore). Every dashboard route is 320 kB because Calendar, Grades, Upload, dnd-kit and react-colorful all load up front.
@@ -250,6 +252,7 @@ branch. Tick the items off and add a session log entry when done. Don't commit.
   - **Done when:** `npm run build` shows smaller numbers than the Baseline; no visible jank on tab switch.
 
 - [ ] **A16 · Firestore rules: validate fields** · M · risk M
+  - Since A13 (B11), a `coursePreferences` doc ID is `coursePreferencesDocId(name)` (`utils/courseName.ts`), not always the raw name, so the rule's `{courseName}` wildcard is really an ID; rename it with the rule change.
   - Since A8 (B9) the client writes `timeZone` on the user doc and sets `nextReminderAt` to `serverTimestamp()`. Allow `timeZone` as a short string and `nextReminderAt` only as `request.time`, so a client can ask for the next run but not schedule itself into every run. `notifications` and `cronRuns` stay server-only.
   - **Where:** `firestore.rules` (the live rules matched this file on 2026-10-10).
   - **Problem:** Owners can write any key, type or size on every doc, including the `email` that reminders go to (see A17). The `documents` and `courses` rules match collections nothing uses.
@@ -375,7 +378,7 @@ branch. Tick the items off and add a session log entry when done. Don't commit.
   - **Fix (pick with D8):** set `agentRules: false` in `apps/landing/next.config.ts` (recommended: the CLAUDE.md files are the agents' source of truth, and Claude Code doesn't read `AGENTS.md`), or gitignore `AGENTS.md`, or commit it. Then update the `AGENTS.md` line in `docs/ops.md` ("Pins to know").
 
 - [ ] **A35 · Em dashes left in the rules docs and code comments** · S · risk L · found during B3 (code comments added in B6)
-  - **Where:** `apps/web/standards.md` (57 left) and `apps/landing/CLAUDE.md` (13 left). B3 kept em dashes out of everything it wrote or rewrote, but left untouched lines alone. Added in B6 at the founder's request: 32 in code comments across 24 files in `apps/web/src` (TS, TSX and CSS comments, for example `components/ui/button.tsx`, `styles/globals.css`, `lib/uploadClient.ts`). B6 removed the last ones from web copy; the landing's `src` has none. B10 rewrote one in `hooks/useAssessmentAutoSave.ts`, leaving 31.
+  - **Where:** `apps/web/standards.md` (57 left; 56 after B11 reworded one) and `apps/landing/CLAUDE.md` (13 left). B3 kept em dashes out of everything it wrote or rewrote, but left untouched lines alone. Added in B6 at the founder's request: 32 in code comments across 24 files in `apps/web/src` (TS, TSX and CSS comments, for example `components/ui/button.tsx`, `styles/globals.css`, `lib/uploadClient.ts`). B6 removed the last ones from web copy; the landing's `src` has none. B10 rewrote one in `hooks/useAssessmentAutoSave.ts`, leaving 31.
   - **Problem:** the root rule covers copy, not docs or comments, but the founder asked for none in anything B3 wrote, and agents lift wording from these docs and comments into code and copy.
   - **Fix:** replace each by hand with a comma, colon, semicolon or period (some are asides or ranges that need rewording, not a mechanical swap). Decide with the founder whether the root rule should say "copy, docs and code comments".
   - **Done when:** a search for the em dash character (U+2014) finds nothing in the CLAUDE files, `standards.md`, `docs/` or `apps/web/src`.
@@ -469,14 +472,30 @@ branch. Tick the items off and add a session log entry when done. Don't commit.
   - **Problem:** it compares each day's midnight with `new Date()` (the current time), which never matches, so the month moves but today's day never opens.
   - **Fix:** compare with the start of today.
 
+- [ ] **A57 · A course rename fails silently, and each Enter runs it twice** · S · risk L · found during B11
+  - **Where:** `CoursesOverviewTable.tsx` (`useCourseRename`'s `onError`, and the editor's `onBlur`); `hooks/useCourseRename.ts`.
+  - **Problem:** `onError` only logs and closes the editor, so a validation message (empty, over 100 characters) or a Firestore failure never reaches the student, who just sees the old name. One Enter calls `renameCourse` twice: Enter submits, `isRenaming` disables the input, the input loses focus, and `onBlur` submits again. The B11 baseline logged two "Course rename failed" errors for one Enter. A successful second run repeats the same writes, so it does no harm today. The rename also swallows a failed read of the old preferences doc (`console.warn`) and commits without moving it, so the renamed course shows the default color and target.
+  - **Fix:** show the error inline, as the color picker's `colorError` already does. Ignore a submit while a rename is running. Fail the rename when the preferences read fails.
+
+- [ ] **A58 · Course names aren't trimmed or capped in the Add form** · S · risk L · found during B11 (`/code-review`)
+  - **Where:** `components/forms/AddAssessmentForm.tsx` (`addDoc` with `...formData` as typed). Check the assessment edit row's save too.
+  - **Problem:** "CIS 3760 " and "CIS 3760" become two courses (two cards, two preferences docs). Rename trims the old name, so on the spaced one it finds none of its assessments and not its preferences doc. There's no length cap either, while rename and upload cap at 100. A name over 1,500 bytes can't be a doc ID even escaped (A13), so its color and target can't save.
+  - **Fix:** trim and cap at 100 wherever a course name is saved (reuse `validateCourseName` from `utils/courseName.ts`).
+
+- [ ] **A59 · Renaming a course onto another course's name replaces that course's preferences** · S · risk L · found during B11 (`/code-review`)
+  - **Where:** `hooks/useCourseRename.ts` (`batch.set(newPrefsRef, prefsData)`).
+  - **Problem:** renaming "MATH 2050" to an existing "MATH/STAT 2050" merges the two courses' assessments. When the renamed course has a preferences doc, it overwrites the other course's color and target grade. Read from the code, not reproduced. A13 made cross-listed names reachable here; the behavior itself is older.
+  - **Fix:** keep the existing course's values (`set` with `merge`, written so the existing fields win), or ask which to keep.
+
 ## Baseline (2026-10-10)
 
 Numbers to compare against when items land.
 
 - `npm audit --omit=dev`: 38 vulnerabilities (0 critical, 5 high, 33 moderate) after A2 (2026-10-10; was 46: 1 critical, 12 high, 33 moderate). Including dev dependencies: 43 (10 high). Unchanged after B9 (`@date-fns/tz` has no dependencies and no advisories).
-- `apps/web` build (Next 15.5.27, after A2): 229 kB First Load JS shared by all pages (`_app` chunk 114 kB); `/dashboard/*` 320 kB (B8 measured main at 320; the 319 recorded after A2 was stale by then) and `/dashboard/[semester]/*` 320 kB after B7 (+767 bytes, 345 gzipped, in the shared dashboard chunk: the grade view helpers and ICS folding); `/login` and `/register` 242 kB; `/onboarding` 285 kB; `/settings` 285 kB after B9 (was 284: about 20 bytes for `serverTimestamp` in the Settings save took the page from 5.38 to 5.4 kB, measured against main). After B10 (main built first, same machine): shared 229 kB with `_app` 115 kB (was 114, the user-doc listener); `/dashboard/*`, `/login` and `/settings` unchanged; `/onboarding` 286 (was 285), `/register` 243 (was 242), `/reset-password` 241 (was 240).
+- `apps/web` build (Next 15.5.27, after A2): 229 kB First Load JS shared by all pages (`_app` chunk 114 kB); `/dashboard/*` 320 kB (B8 measured main at 320; the 319 recorded after A2 was stale by then) and `/dashboard/[semester]/*` 320 kB after B7 (+767 bytes, 345 gzipped, in the shared dashboard chunk: the grade view helpers and ICS folding); `/login` and `/register` 242 kB; `/onboarding` 285 kB; `/settings` 285 kB after B9 (was 284: about 20 bytes for `serverTimestamp` in the Settings save took the page from 5.38 to 5.4 kB, measured against main). After B10 (main built first, same machine): shared 229 kB with `_app` 115 kB (was 114, the user-doc listener); `/dashboard/*`, `/login` and `/settings` unchanged; `/onboarding` 286 (was 285), `/register` 243 (was 242), `/reset-password` 241 (was 240). After B11 (main built first on the same machine, Node 24.22): shared 230 kB (was 229) with `_app` 115 kB (+686 bytes, 304 gzipped: `utils/courseName.ts` through `lib/firebaseUtils.ts`); `/login` 243 (was 242) and `/dashboard` 222 (was 221) from the shared chunk; every other first-load size unchanged (page sizes moved by chunk splitting only: `/onboarding` 12.1 to 12 kB, `/settings` 5.37 to 5.34 kB).
 - Live Firestore rules identical to `firestore.rules`; no Storage rules (Storage unused).
 - Vercel: projects `asetta` (apps/web) and `asetta-landing` (apps/landing), Hobby plan: runtime logs kept 1 hour; cron jobs run at most once a day and fire anywhere within the scheduled hour; functions on Fluid compute get a 300-second default and maximum duration (docs checked 2026-10-11). In `apps/web/vercel.json` the cron route has `maxDuration` 300 since A3 (was 10) and the upload route 60.
+- Tests (after B11, 2026-10-16): 19 suites, per zone 610 tests: 609 passing and 1 expected failure (A51).
 - Tests (after B10, 2026-10-12; 16 suites after B9, 13 after B8, 11 after B7, 9 after A7, none before): 18 suites in `apps/web`, each run in two zones. Per zone, 527 tests: 526 passing and 1 expected failure (`it.fails`, A51); no todo. `npm test` takes about 4 seconds.
 - Firestore reads (B10, emulator rule coverage): a dashboard load reads the user doc once and writes nothing (before B10: 2 reads from 5 `getDoc` calls, plus a `lastLogin` write every load); the first load of a day also writes `lastLogin` once.
 
@@ -944,3 +963,39 @@ Newest last. One entry per session: date, branch, items, what changed, what's le
   - Killing the Firestore emulator's java process stops the whole `emulators:start` (Auth too). Export first (`firebase emulators:export <dir>`) and restart with `--import <dir>`.
   - The built-in browser's hidden pane doesn't paint, so React effects can lag: the register form's password check ran after Enter, and the first submit said the requirements weren't met. Submitting again worked.
   - The browser's network list drops requests under Firestore's long-polling; count a request with a `fetch` wrapper installed in the page instead.
+
+### 2026-10-16 · B11 (`fix/b11-course-name-slash`, PR not opened yet)
+
+- **A13 done.** Branched from main after PR #15 (up to date with origin). Nothing committed; the founder commits.
+- **Setup:** this machine had no `node_modules` and now runs Node 24.22 and npm 11.19 (no Node 22 installed). `npm ci` installed from the lockfile without changing it; the audit counts matched the Baseline (43 with dev dependencies, 10 high). No dev servers were running (the node processes were MCP proxies). The emulators needed `firebase-tools@13.35.1`, because 14 and later need Java 21 and the machine has Java 20 (`docs/ops.md`).
+- **Reproduced first** (the item was inferred, not reproduced):
+  - With the SDK alone (`repro-docref.cjs`, no network): "MATH/STAT 2050" makes `doc()` throw ("must have an even number of segments ... has 7"). "ENG 1001/ENG 1002/ENG 1003" builds a ref to a nested doc (`coursePreferences/ENG 1001/ENG 1002`, ID "ENG 1003"). The SDK accepts ".", ".." and "__init__" (Firestore rejects them).
+  - In the app, on main's code, against the emulators with the real rules (a user with "CIS 3760", "MATH/STAT 2050" and "ENG 1001/ENG 1002/ENG 1003", plus a pre-A13 preferences doc for "CIS 3760"):
+    - **Color:** "MATH/STAT 2050" showed "Failed to save course color" (the segments error); the two-slash course got `PERMISSION_DENIED` (no rule matches the nested path).
+    - **Grades:** both slash courses showed only "Course preferences error: Failed to load course preferences" in place of the whole calculator, worse than the item guessed. "CIS 3760" read its target of 70.
+    - **Rename:** renaming "MATH/STAT 2050" to "MATH 2050" closed the editor with nothing changed, the error only in the console, logged twice for one Enter (A57). Renaming "CIS 3760" to "CIS/STAT 3760" was refused by the old character rule, also silently.
+    - **Course view:** opening a slash course's filtered view through `?course=` works (the name is encoded twice in the URL, but it reads back right), so routing was not part of A13.
+    - Nothing was written for the slash courses.
+- **Test-first:** today's rules moved unchanged into `utils/courseName.ts` (the ID was the name; the rename rule with its blocklist). The new `utils/courseName.test.ts` cases ran as plain `it`s, and 14 A13 cases plus the `%` escape case failed on their assertions in both zones (15 per zone). The cases pinning that existing IDs don't change passed, as they should. After the fix all pass. The `/code-review` fix below started from a failing test too.
+- **Design choices:** keeping the raw name as the ID whenever Firestore takes it means no migration and no extra read, unlike the item's `encodeURIComponent` idea, which would have moved every existing doc. A leading `%` marks an escaped ID, and a name starting with `%` is escaped too, so a raw ID can never equal an escaped one. Escaping only `%` and `/` keeps IDs readable in the console and short (no `encodeURIComponent` blowup towards the 1,500-byte limit). Dropping the rename blocklist: every one of those characters is fine in a Firestore ID, and the URL already encodes the name.
+- **End to end after the fix** (same data; dev server on :3005 with sends and Gemini off; `dump.cjs` lists every preferences doc, nested ones included):
+  - **Old doc:** "CIS 3760" still showed its stored blue, and its target of 70.
+  - **Color:** picks for "MATH/STAT 2050" and the two-slash course saved as `%MATH%2FSTAT 2050` and `%ENG 1001%2FENG 1002%2FENG 1003`, and the cards repainted from the listener.
+  - **Grades:** the calculator showed for both slash courses. Targets of 80 and 90 merged into those docs and read back after a reload.
+  - **Renames:** "MATH/STAT 2050" to "MATH 2050" renamed its assessments and moved the doc to the raw ID with its color and target; back to "MATH/STAT 2050" moved it to the escaped ID again. "CIS 3760" to "CIS/STAT 3760" moved the old raw-ID doc to `%CIS%2FSTAT 3760` with its blue and 70. No console errors after the fix.
+  - No UI changed, so there was no theme or mobile check. The onboarding color picker uses the same `setCourseColor` and wasn't driven separately.
+  - Afterwards the emulator cookie and IndexedDB were cleared, the viewport reset, the tab closed, and the dev server and emulators stopped (ports closed).
+- **Verification loop:** lint, `format:check`, typecheck, `npm test` (38 files, 1218 passed, 2 expected failures for A51) and build all green. Build: main built on this machine first. Shared 229 to 230 kB from 686 bytes (304 gzipped) in `_app` (A15 note); every other first-load size unchanged.
+- **`/code-review` (high):** six findings.
+  - Fixed: a pre-A13 doc for a name starting with `%` would have been read as another course's color ("%Stats" decoding to "Stats"). `courseNameFromPreferencesDocId` now returns null for an ID the scheme never makes, and the listener skips it.
+  - Logged: silent rename failures, the double submit and the swallowed preferences read (A57); untrimmed and uncapped names from the Add form (A58); a rename onto an existing course overwriting its preferences (A59).
+  - Skipped: the `_app` bytes (noted in A15).
+- **Second `/code-review` (high, founder's request):** five findings. Fixed: the rename cap duplicated `MAX_COURSE_NAME_LENGTH` from `lib/upload/normalize.ts`, so `utils/courseName.ts` now owns it and the normalizer imports it; three doc slips (the failing-test count above, the Baseline's route sizes, the script list in `docs/ops.md`). Skipped: the ref and listener wiring has no automated test (there are no Firestore tests yet, per standards.md; the emulator run covered it).
+- **Docs:** `apps/web/standards.md` (a Part 1 rule: user text never goes into a Firestore path as is, with the ID scheme; the Course colors storage line); `docs/ops.md` (firebase-tools 13 for Java 20, the firebase-admin 14 modular imports, the machine's Node and npm, the hidden browser pane needing a screenshot to render); the `constants/courseColors.ts` comment. A15 and A16 got notes.
+- **New:** A57, A58, A59.
+- **Left for the founder:** commit and open the PR (fill the PR number into A13 and this entry), check the Vercel preview, merge. Rules are unchanged, so no deploy is needed.
+- **Gotchas:**
+  - A shell whose working directory sits inside `apps/web/.next` keeps Next from deleting it, and `next build` then hangs after "Environments: .env.local" with no CPU use. Never `cd` into `.next`; read files there by path.
+  - Fast Refresh applies each saved file at once: adding a call before its import (two edits) briefly threw "is not defined" in the open page. A full reload clears it.
+  - The built-in browser's console log survives reloads, and `console.clear()` doesn't empty it. Log a marker line and read what comes after it.
+  - Escape in the course editor closes the color popover and then the editor; a second key action on the editor's refs fails as stale.

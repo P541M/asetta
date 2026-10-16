@@ -33,6 +33,13 @@ All new code follows these.
   rename, semester delete) is the only exception.
 - **No writes on read.** Viewing something never creates or updates a doc; a missing value falls
   back to its default when read (course preferences, course colors).
+- **User text never goes into a Firestore path as is.** A "/" adds path segments: one makes
+  `doc()` throw, two land on a nested path no rule matches. A course's `coursePreferences` doc is
+  reached only through `getCoursePreferencesDocRef`, whose ID is `coursePreferencesDocId`
+  (`utils/courseName.ts`): the name itself when Firestore takes it as one ID and it doesn't start
+  with `%` (every doc written before A13 keeps its ID), otherwise `%` plus the name with `%`
+  written as `%25` and `/` as `%2F`. Turn a listed doc's ID back into the name with
+  `courseNameFromPreferencesDocId`. Course names may hold any character.
 - **A failed load shows an error state, never a spinner that waits forever.** A page that needs
   the user doc returns `ui/LoadErrorScreen` on `userDocError` (the dashboard layout, Settings,
   onboarding). It stays out of `_app`, where its UI imports would land in every page's shared
@@ -471,7 +478,8 @@ never duplicated into component state (the source of the 2026-07-16 flicker fix)
 ### Course colors (locked 2026-07-22)
 
 - **A course's color is user data, not theme styling**: any `#RRGGBB` hex, chosen per course,
-  stored in `coursePreferences/{courseName}.color`, rendered via **inline style** — the one
+  stored as `color` in the course's `coursePreferences` doc (its ID: "User text never goes into
+  a Firestore path as is" in Part 1), rendered via **inline style**: the one
   sanctioned exception to the tokens-only rule (same class of exception as progress-bar
   widths). The same hex renders in both themes; how a custom pick reads on each theme is the
   user's call. Malformed stored values are dropped on read and the default takes over.
