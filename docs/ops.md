@@ -65,6 +65,13 @@ machine. Planned changes live in `docs/AUDIT.md`; this file describes what is tr
     in the user's zone, runs send it until it has gone out, up to 2 days late, so a missed run
     catches up. Never for an assessment that is already due, needs review, is Missed, or is
     Submitted when the user opted out. "Due in N days" counts calendar days in the user's zone.
+- **Where a reminder goes** (A17): to the user doc's `email` when it is the account's sign-in
+  email or equals `verifiedEmail`, the address the student confirmed through the emailed link;
+  otherwise to the sign-in email (looked up in Firebase Auth when a send is about to be claimed).
+  A user with neither gets nothing. The link: `POST /api/notification-email/verify` emails it for
+  the saved address (24 hours, at most one a minute and 5 a UTC day, the hash in
+  `emailVerifications/{uid}`); `/confirm-email` POSTs `/api/notification-email/confirm` from a
+  button. Links use `NEXT_PUBLIC_APP_URL`, so one sent from a preview points at production.
 - **Records:** `notifications/{uid}_{assessmentId}_{targetDay}`. A run claims a reminder in a
   transaction (status `sending`, with `attempts` and `lastAttemptAt`) before sending, then marks
   it `sent` or `failed` (with the error message). Only `sent` blocks it for good, so overlapping
@@ -114,7 +121,7 @@ project. Never commit real values.
 | `EMAIL_USER`                               | `lib/email.ts`                              | The Gmail account that sends reminders and welcome emails.                                  |
 | `EMAIL_APP_PASSWORD`                       | `lib/email.ts`                              | A Gmail app password, not the account password.                                             |
 | `CRON_SECRET`                              | `pages/api/cron/notifications.ts`           | See "Reminder cron". The repo's Actions secret `CRON_SECRET` holds the same value.          |
-| `NEXT_PUBLIC_APP_URL`                      | `lib/emailTemplates.ts`                     | Links and the logo in emails. Defaults to `https://asetta.me`.                              |
+| `NEXT_PUBLIC_APP_URL`                      | `lib/emailTemplates.ts`, `pages/api/notification-email/verify.ts` | Links and the logo in emails, the confirm link included. Defaults to `https://asetta.me`. |
 
 **`apps/landing`** (Vercel project `asetta-landing`):
 
@@ -137,11 +144,29 @@ project. Never commit real values.
 - **The founder deploys rules**, from the repo root: `firebase deploy --only firestore:rules`.
   Agents can't: `.claude/settings.json` denies every deploy command and the destructive Firebase
   MCP tools.
-- The live rules matched `firestore.rules` on 2026-10-10. After any deploy, check the console
-  matches the file.
-- `welcomeEmails/{uid}`, `cronRuns/{date}` and `notifications/{id}` (the reminder records) are
-  server-only: no rule matches them, so clients are denied. Keep it that way when rules gain
-  field validation (A16).
+- The live rules matched `firestore.rules` on 2026-10-10. B12 (A16) rewrote the file; the
+  founder deploys it after B12's merge. After any deploy, check the console matches the file.
+- **Deploy order when rules and app change together:** the app first, then the rules. Rules that
+  refuse a write the old app still makes break it until the deploy lands (B12's rules refuse the
+  old edit row, which wrote the doc's `id`); a tab still open on the old bundle keeps failing
+  until it reloads.
+- **What the rules allow:** each client collection (the user doc, semesters, assessments,
+  `coursePreferences`) lists the keys a client may write, with a type and a size cap for each. A
+  create checks every key; an update checks only the keys it adds or changes, so a key an older
+  app version left in a doc never blocks an edit; removing a key is always allowed. A new field
+  the client writes needs a rules change and a case in the rules suite.
+- `welcomeEmails/{uid}`, `cronRuns/{date}`, `notifications/{id}` (the reminder records) and
+  `emailVerifications/{uid}` (the confirm link for a notification address) are server-only: no
+  rule matches them, so clients are denied. So is `verifiedEmail` on the user doc: it isn't in the
+  user doc's list (a client may only remove it, which sends its reminders to the account email).
+- **The rules suite:** `npm run test:rules` (from the root) starts the Firestore emulator with
+  `npx -y firebase-tools@13.35.1 emulators:exec` and runs
+  `apps/web/src/rules/firestore.rules.test.ts`, which loads `firestore.rules` into the emulator and
+  replays every client write in the app plus writes the rules must refuse. Run it before every
+  rules deploy; `npm test` and CI leave it out (A60). Against an emulator that is already running,
+  set `FIRESTORE_EMULATOR_HOST` and run `npx vitest run --config vitest.rules.config.ts` in
+  `apps/web`. On Windows the emulator's java process outlives `emulators:exec`, and the next run
+  fails with "port taken": kill it by PID ("The Windows dev machine").
 - Storage is unused and has no rules.
 
 ## Testing API routes locally
@@ -155,7 +180,15 @@ project. Never commit real values.
   `firebase-tools@13.35.1`, the last 13.x. Point `FIREBASE_EMULATORS_PATH` at a folder under
   `node_modules/.cache/` to keep the downloaded jar there; `npm ci` deletes it. B11's scripts
   (`emu.sh`, `dev.sh`, `seed.cjs`, `dump.cjs`, and `repro-docref.cjs`, which shows the A13 failure
-  with the SDK alone) are in `node_modules/.cache/b11/`.
+  with the SDK alone) are in `node_modules/.cache/b11/`. B12's (`emu.sh`, `dev.sh`, `seed.cjs`
+  with a reminder user per address case, `api-check.cjs` for the confirm-link routes, and
+  `make-link.cjs`, which stores a known token and prints its link in place of the email) are in
+  `node_modules/.cache/b12/`.
+- The emulator refuses a rules file outside the folder it starts in, so a scratch emulator copies
+  the repo's `firestore.rules` in at start (B12's `emu.sh` does).
+- `.env.local`'s `FIREBASE_SERVICE_ACCOUNT` didn't parse on this machine (2026-10-16), which makes
+  every admin route answer 500. Against the emulators set it to empty on the dev server: they need
+  no credentials, and no real ones get loaded.
 - firebase-admin 14 has no namespaced API (`admin.auth()` is not a function): seed scripts import
   `initializeApp`, `getAuth` and `getFirestore` from `firebase-admin/app`, `/auth` and
   `/firestore`.

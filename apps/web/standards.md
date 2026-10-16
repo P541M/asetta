@@ -40,6 +40,12 @@ All new code follows these.
   with `%` (every doc written before A13 keeps its ID), otherwise `%` plus the name with `%`
   written as `%25` and `/` as `%2F`. Turn a listed doc's ID back into the name with
   `courseNameFromPreferencesDocId`. Course names may hold any character.
+- **Every client write passes the Firestore rules' allow-list** (`firestore.rules`): each
+  collection lists the keys a client may write, with a type and a size cap. A new field the
+  client writes needs a rules change and a case in `src/rules/firestore.rules.test.ts`
+  (`npm run test:rules`), and the rules deploy after the app (`docs/ops.md`). Write only the
+  fields you mean to change, never a whole object read back from Firestore (the old edit row
+  wrote the doc's own `id`).
 - **A failed load shows an error state, never a spinner that waits forever.** A page that needs
   the user doc returns `ui/LoadErrorScreen` on `userDocError` (the dashboard layout, Settings,
   onboarding). It stays out of `_app`, where its UI imports would land in every page's shared
@@ -72,8 +78,14 @@ All new code follows these.
 - **Validate every input** at the boundary: method, types, lengths, and path-segment safety for
   anything used in a Firestore path (no `/`). Reject with a 4xx and a short message.
 - **Server-only state is written with the admin SDK** into collections no client rule matches
-  (e.g. `welcomeEmails/{uid}`, `cronRuns/{date}`). Client-writable fields on the user doc are
-  never trusted as a server guard.
+  (e.g. `welcomeEmails/{uid}`, `cronRuns/{date}`, `emailVerifications/{uid}`), or into a user-doc
+  field the rules leave out of the client's list (`verifiedEmail`). Client-writable fields on the
+  user doc are never trusted as a server guard.
+- **Email goes only to an address its owner proved** (A17): reminders use the chosen `email` only
+  when it is the account's own or equals `verifiedEmail` (`utils/notificationEmail.ts`), else the
+  account email. A link in an email that changes state opens a page whose button POSTs; the GET
+  changes nothing, because mail scanners fetch links. Its token is random, stored only as a hash,
+  expires, works once, and its sends are capped (`lib/emailVerification.ts`).
 - **Log real failures with `console.error`** (no email addresses or other personal data in
   logs; uids and error codes are fine). `devLog`/`devError` print in development only, so they
   never carry a production failure.
@@ -97,7 +109,11 @@ All new code follows these.
   from the root runs every suite; it is part of the verification loop and of CI.
 - **What gets tests:** pure logic in `utils/`, `constants/` and the pure parts of `lib/`. Logic
   that lives in a component or next to Firestore calls is extracted into a pure function first,
-  then tested. There are no component, Firestore or network tests yet.
+  then tested. There are no component or network tests yet.
+- **The Firestore rules have an emulator suite**, `src/rules/firestore.rules.test.ts`, run by
+  `npm run test:rules` (its own `vitest.rules.config.ts`; `npm test` leaves it out because it
+  needs the emulator). Each case copies a write the app makes, with a comment naming where it
+  lives, so change both together; add a deny case for anything the rules must refuse.
 - **Files:** `<module>.test.ts` next to the module (`utils/dateUtils.test.ts`), never under
   `src/pages/` (every file there becomes a route). Shared fixtures live in `src/test/` and are
   imported through the alias (`@/test/assessments`).
@@ -576,7 +592,8 @@ never duplicated into component state (the source of the 2026-07-16 flicker fix)
 ### Email (locked 2026-10-10)
 
 - **One layout, one builder per email.** `lib/emailTemplates.ts` holds the shared layout and a
-  builder per email (`reminderEmail`, `welcomeEmail`) that returns `{ subject, html, text }`;
+  builder per email (`reminderEmail`, `welcomeEmail`, `confirmAddressEmail`) that returns
+  `{ subject, html, text }`;
   `lib/email.ts` only delivers. A new email is a new builder on the same layout, never a second
   layout. Every email has a matching plain-text part and a hidden preheader.
 - **The surface language carries over**: the `--card` surface, one tonal panel for the key detail

@@ -113,6 +113,7 @@ npm run format:check   # Prettier, both apps
 npm run typecheck      # TypeScript, apps/web
 npm test               # Vitest unit tests, apps/web
 npm run build          # production build, both apps
+npm run test:rules     # Firestore rules on the emulator (needs Java; before any rules deploy)
 ```
 
 ## Deployment and CI
