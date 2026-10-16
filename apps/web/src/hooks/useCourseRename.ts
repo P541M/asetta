@@ -4,6 +4,7 @@ import { db } from "../lib/firebase";
 import { useAuth } from "../contexts/AuthContext";
 import { getAssessmentsRef, getCoursePreferencesDocRef } from "../lib/firebaseUtils";
 import { CoursePreferences } from "../types/coursePreferences";
+import { validateCourseName } from "../utils/courseName";
 
 interface UseCourseRenameOptions {
   onSuccess?: (oldName: string, newName: string) => void;
@@ -24,21 +25,6 @@ export const useCourseRename = (
   const { onSuccess, onError } = options;
   const [isRenaming, setIsRenaming] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  const validateCourseName = (name: string): string | null => {
-    if (!name || name.trim().length === 0) {
-      return "Course name cannot be empty";
-    }
-    if (name.trim().length > 100) {
-      return "Course name must be 100 characters or less";
-    }
-    // Prevent problematic characters that could cause issues with Firebase document IDs
-    const invalidChars = /[\/\\#?[\]]/;
-    if (invalidChars.test(name)) {
-      return "Course name cannot contain: / \\ # ? [ ]";
-    }
-    return null;
-  };
 
   const renameCourse = useCallback(
     async (oldName: string, newName: string) => {

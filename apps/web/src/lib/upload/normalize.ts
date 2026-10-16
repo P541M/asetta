@@ -4,6 +4,8 @@
  * and trimmed, length-capped names. Nothing here reads the clock.
  */
 
+import { MAX_COURSE_NAME_LENGTH } from "../../utils/courseName";
+
 export interface ExtractedAssessment {
   courseName: string;
   assignmentName: string;
@@ -40,7 +42,6 @@ export interface NormalizeOptions {
 
 export const UNKNOWN_COURSE = "Unknown Course";
 export const DEFAULT_DUE_TIME = "23:59";
-export const MAX_COURSE_NAME_LENGTH = 100;
 export const MAX_ASSESSMENT_NAME_LENGTH = 200;
 
 // Years outside this range are misreads (page numbers, ISBNs), not due dates.
