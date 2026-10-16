@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { reminderEmail, welcomeEmail } from "../../../lib/emailTemplates";
+import { confirmAddressEmail, reminderEmail, welcomeEmail } from "../../../lib/emailTemplates";
 import type { EmailContent } from "../../../lib/emailTemplates";
 
 const VARIANTS = [
@@ -7,12 +7,16 @@ const VARIANTS = [
   ["Reminder, due tomorrow", "email=reminder&days=1"],
   ["Welcome, verified address (Google sign-up)", "email=welcome&name=Sam%20Lee"],
   ["Welcome, unverified address (password sign-up)", "email=welcome"],
+  ["Confirm a notification address", "email=confirm"],
 ];
 
 function render(req: NextApiRequest, appUrl: string): EmailContent | null {
   const { email, name, days } = req.query;
   if (email === "welcome") {
     return welcomeEmail(typeof name === "string" ? name : undefined, appUrl);
+  }
+  if (email === "confirm") {
+    return confirmAddressEmail(`${appUrl}/confirm-email?uid=preview&token=preview`, appUrl);
   }
   if (email === "reminder") {
     const daysUntilDue = Math.max(0, Math.min(30, Number(days ?? 3) || 0));

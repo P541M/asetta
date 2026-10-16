@@ -3,7 +3,7 @@ import { writeBatch, getDocs, query, where, getDoc } from "firebase/firestore";
 import { db } from "../lib/firebase";
 import { useAuth } from "../contexts/AuthContext";
 import { getAssessmentsRef, getCoursePreferencesDocRef } from "../lib/firebaseUtils";
-import { CoursePreferences } from "../types/coursePreferences";
+import { isValidCourseColor } from "../constants/courseColors";
 import { validateCourseName } from "../utils/courseName";
 
 interface UseCourseRenameOptions {
@@ -80,9 +80,12 @@ export const useCourseRename = (
         try {
           const oldPrefsDoc = await getDoc(oldPrefsRef);
           if (oldPrefsDoc.exists()) {
-            const prefsData = oldPrefsDoc.data() as CoursePreferences;
-            // Create new preferences document
-            batch.set(newPrefsRef, prefsData);
+            // Only the values the rules accept move: one bad stored value would fail the batch
+            const { color, targetGrade } = oldPrefsDoc.data();
+            batch.set(newPrefsRef, {
+              ...(isValidCourseColor(color) ? { color: color.toUpperCase() } : {}),
+              ...(typeof targetGrade === "number" ? { targetGrade } : {}),
+            });
             // Delete old preferences document
             batch.delete(oldPrefsRef);
           }

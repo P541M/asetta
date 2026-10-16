@@ -19,6 +19,7 @@ const ProfileSection = ({ form, onChange }: ProfileSectionProps) => {
             id="displayName"
             type="text"
             value={form.displayName}
+            maxLength={200}
             onChange={(e) => onChange("displayName", e.target.value)}
             placeholder="Your display name"
           />
@@ -30,6 +31,7 @@ const ProfileSection = ({ form, onChange }: ProfileSectionProps) => {
             id="institution"
             type="text"
             value={form.institution}
+            maxLength={200}
             onChange={(e) => onChange("institution", e.target.value)}
             placeholder="Your university or school"
           />

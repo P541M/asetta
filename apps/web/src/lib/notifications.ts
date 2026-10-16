@@ -1,4 +1,5 @@
 import { getAdmin } from "./firebase-admin";
+import { getAuth, type Auth } from "firebase-admin/auth";
 import {
   FieldValue,
   Timestamp,
@@ -25,6 +26,12 @@ import {
   type ReminderAssessment,
 } from "./reminderSchedule";
 import { isValidEmail } from "../utils/validation";
+import {
+  cleanEmail,
+  notificationEmailStatus,
+  reminderRecipient,
+  sameAddress,
+} from "../utils/notificationEmail";
 import { devLog } from "../utils/devLog";
 
 interface NotificationPreferences {
@@ -58,6 +65,7 @@ export interface CronRunSummary {
 export async function checkAndSendNotifications(now: Date = new Date()): Promise<CronRunSummary> {
   const clockStart = Date.now();
   let db: Firestore | undefined;
+  let auth: Auth | undefined;
   let scheduled: number | null = null;
   let users = 0;
   let sent = 0;
@@ -85,7 +93,9 @@ export async function checkAndSendNotifications(now: Date = new Date()): Promise
   };
 
   try {
-    db = getFirestore(await getAdmin());
+    const app = await getAdmin();
+    db = getFirestore(app);
+    auth = getAuth(app);
     try {
       scheduled = await scheduleUnscheduledUsers(db, now);
     } catch (sweepError) {
@@ -99,7 +109,7 @@ export async function checkAndSendNotifications(now: Date = new Date()): Promise
     for (const userDoc of dueUsers.docs) {
       users++;
       try {
-        const result = await processUser(db, userDoc, now);
+        const result = await processUser(db, auth, userDoc, now);
         sent += result.sent;
         failed += result.failed;
       } catch (userError) {
@@ -151,6 +161,7 @@ async function scheduleUnscheduledUsers(db: Firestore, now: Date): Promise<numbe
 /** Sends one user's due reminders, then moves their `nextReminderAt` on. */
 async function processUser(
   db: Firestore,
+  auth: Auth,
   userDoc: QueryDocumentSnapshot,
   now: Date,
 ): Promise<{ sent: number; failed: number }> {
@@ -172,10 +183,16 @@ async function processUser(
       now,
     });
 
+    // Looked up once, and only when a reminder is about to be claimed
+    let recipient: Promise<string | null> | undefined;
+    const getRecipient = () =>
+      (recipient ??= reminderAddress(auth, userDoc.id, preferences.email, userData.verifiedEmail));
+
     for (const reminder of reminders) {
       const outcome = await sendReminder(db, {
         uid: userDoc.id,
         preferences,
+        getRecipient,
         reminder,
         names: names.get(reminder.assessmentId)!,
         now,
@@ -207,6 +224,36 @@ function activePreferences(uid: string, userData: unknown): NotificationPreferen
     return null;
   }
   return preferences;
+}
+
+/**
+ * Where this user's reminders go (A17): the chosen address once it is the account's own or
+ * confirmed through the link, else the account's sign-in email. Null: nowhere to send.
+ */
+async function reminderAddress(
+  auth: Auth,
+  uid: string,
+  email: string,
+  verifiedEmail: unknown,
+): Promise<string | null> {
+  // A confirmed address needs no account email, so no Auth call stands between it and a send
+  if (sameAddress(email, verifiedEmail)) {
+    devLog(`Reminder cron: ${uid} chose the confirmed address`);
+    return cleanEmail(email);
+  }
+  let accountEmail: string | null = null;
+  try {
+    accountEmail = (await auth.getUser(uid)).email ?? null;
+  } catch (error) {
+    // A user doc whose account is gone has no account email; anything else is retried next run
+    if ((error as { code?: unknown }).code !== "auth/user-not-found") throw error;
+  }
+  const addresses = { email, verifiedEmail, accountEmail };
+  const status = notificationEmailStatus(addresses);
+  devLog(
+    `Reminder cron: ${uid} chose ${status === "unconfirmed" ? "an unconfirmed" : `the ${status}`} address`,
+  );
+  return reminderRecipient(addresses);
 }
 
 interface AssessmentNames {
@@ -251,12 +298,14 @@ async function sendReminder(
   {
     uid,
     preferences,
+    getRecipient,
     reminder,
     names,
     now,
   }: {
     uid: string;
     preferences: NotificationPreferences;
+    getRecipient: () => Promise<string | null>;
     reminder: DueReminder;
     names: AssessmentNames;
     now: Date;
@@ -302,6 +351,12 @@ async function sendReminder(
     }
   }
 
+  const recipient = await getRecipient();
+  if (!recipient) {
+    devLog(`Reminder cron: ${uid} has no address to send to, skipping`);
+    return { status: "skipped", retry: false };
+  }
+
   // Claim the send before sending: the transaction lets only one run move the record to
   // "sending", so overlapping runs (GitHub Actions and the Vercel backstop) can't both send it.
   const decision: ClaimDecision = await db.runTransaction(async (transaction) => {
@@ -328,7 +383,7 @@ async function sendReminder(
   if (!decision.claim) return skipped(decision);
 
   try {
-    await sendReminderEmail(preferences.email, {
+    await sendReminderEmail(recipient, {
       ...names,
       dueDate: reminder.dueDate,
       dueTime: reminder.dueTime,

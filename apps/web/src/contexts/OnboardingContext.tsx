@@ -4,6 +4,8 @@ import { useAuth } from "./AuthContext";
 import { db } from "../lib/firebase";
 import { doc, serverTimestamp, updateDoc } from "firebase/firestore";
 import { loadUserDataForOnboarding } from "../utils/onboardingUtils";
+import { notificationEmailStatus } from "../utils/notificationEmail";
+import { requestConfirmLink } from "../lib/notificationEmailClient";
 import {
   OnboardingState,
   OnboardingContextType,
@@ -139,7 +141,7 @@ const OnboardingContext = createContext<OnboardingContextType | undefined>(undef
 // Provider component
 export function OnboardingProvider({ children }: { children: React.ReactNode }) {
   const [state, dispatch] = useReducer(onboardingReducer, initialState);
-  const { user } = useAuth();
+  const { user, verifiedEmail } = useAuth();
   const router = useRouter();
 
   // Load existing user data when user is available
@@ -265,6 +267,16 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
         nextReminderAt: serverTimestamp(),
       });
 
+      // Another address gets reminders once confirmed through its link (A17). Not awaited:
+      // finishing shouldn't wait on the mail server, and Settings can send the link again.
+      const unconfirmed =
+        notificationEmailStatus({
+          email: state.userData.email,
+          verifiedEmail,
+          accountEmail: user.email,
+        }) === "unconfirmed";
+      if (state.userData.emailNotifications && unconfirmed) void requestConfirmLink(user);
+
       // Navigate to dashboard
       router.push("/dashboard");
     } catch (error) {
@@ -273,7 +285,7 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
     } finally {
       setLoading(false);
     }
-  }, [user, state.userData, router, setLoading, setError]);
+  }, [user, verifiedEmail, state.userData, router, setLoading, setError]);
 
   const value: OnboardingContextType = {
     state,

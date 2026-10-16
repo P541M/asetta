@@ -8,11 +8,12 @@ Students upload course outlines, Gemini extracts the assessments, and they track
 
 - `npm run dev:web` (localhost:3000; `/` redirects to `/login` in development)
 - `npm run lint`, `npm run format:check`, `npm run typecheck`, `npm test`, `npm run build` (the verification loop in `standards.md`)
+- `npm run test:rules`: the Firestore rules suite (`src/rules/`) on the emulator; run it after any change to `firestore.rules` or to a client write
 - `npm run format -w apps/web` to write Prettier fixes; `npm install <pkg> -w apps/web` to add a dependency
 
 ## Where things live (`src/`)
 
-- `pages/`: thin route files; `pages/api/`: server routes (`upload`, `welcome-email`, `cron/notifications`, `dev/email-preview`)
+- `pages/`: thin route files; `pages/api/`: server routes (`upload`, `welcome-email`, `notification-email/verify` and `confirm`, `cron/notifications`, `dev/email-preview`)
 - `components/`: markup, by feature; `components/ui/`: shadcn primitives (lowercase) and shared app components
 - `hooks/`: client Firestore reads and writes; `lib/`: Firebase setup, server logic (email, notifications, upload)
 - `utils/`: pure functions; `constants/`, `contexts/`, `types/`; `styles/globals.css`: theme tokens and Tailwind config

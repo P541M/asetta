@@ -8,6 +8,7 @@ import {
   shouldRedirectToOnboarding,
   timeZoneToWrite,
   userDocErrorKind,
+  verifiedEmailFromUserDoc,
 } from "./userDoc";
 
 /** What a Firestore Timestamp field reads back as: an object with toDate(). */
@@ -173,5 +174,19 @@ describe("timeZoneToWrite", () => {
 
   it("replaces a stored value that isn't a zone name", () => {
     expect(timeZoneToWrite(42, "Asia/Kolkata")).toBe("Asia/Kolkata");
+  });
+});
+
+describe("verifiedEmailFromUserDoc", () => {
+  it("reads the address the server confirmed (A17)", () => {
+    expect(verifiedEmailFromUserDoc({ verifiedEmail: "sam.lee@uni.example.test" })).toBe(
+      "sam.lee@uni.example.test",
+    );
+  });
+
+  it("is null without one, or for a doc that doesn't exist", () => {
+    expect(verifiedEmailFromUserDoc({ email: "sam@example.test" })).toBeNull();
+    expect(verifiedEmailFromUserDoc({ verifiedEmail: true })).toBeNull();
+    expect(verifiedEmailFromUserDoc(undefined)).toBeNull();
   });
 });

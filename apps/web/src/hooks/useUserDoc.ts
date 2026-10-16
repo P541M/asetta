@@ -46,7 +46,8 @@ async function bootstrapUserDoc(user: User, snapshot: DocumentSnapshot): Promise
   const timeZone = browserTimeZone();
 
   if (!snapshot.exists()) {
-    const displayName = user.displayName || user.email?.split("@")[0] || "User";
+    // firestore.rules caps displayName at 200 characters; a longer Auth name would fail the create
+    const displayName = (user.displayName || user.email?.split("@")[0] || "User").slice(0, 200);
     await setDoc(snapshot.ref, {
       displayName,
       email: user.email || "",

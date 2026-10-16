@@ -241,3 +241,36 @@ ${paragraphs.map((line) => `<p class="fg" style="margin:16px 0 0 0;${BODY}">${li
 
   return { subject, html, text };
 }
+
+/**
+ * The confirm link for a notification address (A17). It goes to an address the student typed,
+ * which may not be theirs, so it carries no text they chose: only the link.
+ */
+export function confirmAddressEmail(confirmUrl: string, appUrl = DEFAULT_APP_URL): EmailContent {
+  const heading = "Confirm your email";
+  const subject = "Confirm your email for Asetta reminders";
+  const request =
+    "Someone asked Asetta to send assessment reminders to this address. If that was you, confirm it below.";
+  const expiry = "The link works for 24 hours.";
+  const footer =
+    "If you didn't ask for this, you can ignore this email. Asetta won't send reminders here unless the address is confirmed.";
+
+  const content = `<tr><td style="padding-bottom:16px;"><h1 class="fg" style="${HEADING}">${heading}</h1></td></tr>
+<tr><td>
+<p class="fg" style="margin:0;${BODY}">${request}</p>
+<p class="fg" style="margin:16px 0 0 0;${BODY}">${expiry}</p>
+</td></tr>
+<tr><td style="padding-top:24px;">${button("Confirm email", confirmUrl)}</td></tr>`;
+
+  const html = renderLayout({
+    appUrl,
+    title: subject,
+    preheader: "Confirm this address to get your Asetta reminders here.",
+    content,
+    footer: escapeHtml(footer),
+  });
+
+  const text = [heading, request, expiry, `Confirm email: ${confirmUrl}`, footer].join("\n\n");
+
+  return { subject, html, text };
+}

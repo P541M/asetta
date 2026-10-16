@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Bell, ChevronsUpDown, Info, Lock } from "lucide-react";
 import { useOnboarding } from "../../../contexts/OnboardingContext";
+import { useAuth } from "../../../contexts/AuthContext";
+import { notificationEmailStatus } from "../../../utils/notificationEmail";
 import { isValidEmail } from "../../../utils/validation";
 import { StepNavigation } from "../ui/StepNavigation";
 import { Button } from "../../ui/button";
@@ -24,6 +26,7 @@ const timingOptions = [
 
 export function NotificationsStep() {
   const { state, updateUserData } = useOnboarding();
+  const { user, verifiedEmail } = useAuth();
   const [formData, setFormData] = useState({
     emailNotifications: state.userData.emailNotifications || false,
     notificationDaysBefore: state.userData.notificationDaysBefore || 1,
@@ -87,6 +90,12 @@ export function NotificationsStep() {
     setFormData(newFormData);
     updateUserData(newFormData);
   };
+
+  // Another address gets reminders once confirmed through its link (A17), sent when onboarding ends
+  const accountEmail = user?.email ?? null;
+  const unconfirmed =
+    notificationEmailStatus({ email: formData.email, verifiedEmail, accountEmail }) ===
+    "unconfirmed";
 
   const canContinue =
     !formData.emailNotifications || (formData.emailNotifications && isValidEmail(formData.email));
@@ -156,6 +165,14 @@ export function NotificationsStep() {
               <p className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
                 <Info className="size-3.5 shrink-0" aria-hidden />
                 Reminder: Notifications might end up in your spam folder
+              </p>
+            )}
+
+            {unconfirmed && (
+              <p className="flex items-start gap-2 text-xs font-medium text-muted-foreground">
+                <Info className="mt-px size-3.5 shrink-0" aria-hidden />
+                We&apos;ll email this address a link to confirm it. Until it&apos;s confirmed,{" "}
+                {accountEmail ? `reminders go to ${accountEmail}` : "no reminders go out"}.
               </p>
             )}
           </div>

@@ -14,7 +14,8 @@
     "lint": "npm run lint -w apps/web && npm run lint -w apps/landing",
     "format:check": "npm run format:check -w apps/web && npm run format:check -w apps/landing",
     "typecheck": "tsc --noEmit -p apps/web",
-    "test": "npm run test -w apps/web"
+    "test": "npm run test -w apps/web",
+    "test:rules": "npm run test:rules -w apps/web"
   },
   "overrides": {
     "jose": "^5.9.6",

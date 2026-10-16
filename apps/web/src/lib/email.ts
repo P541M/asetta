@@ -1,6 +1,6 @@
 import nodemailer from "nodemailer";
 import { devError } from "../utils/devLog";
-import { reminderEmail, welcomeEmail } from "./emailTemplates";
+import { confirmAddressEmail, reminderEmail, welcomeEmail } from "./emailTemplates";
 import type { EmailContent, ReminderDetails } from "./emailTemplates";
 
 // Create a transporter using Gmail
@@ -43,4 +43,9 @@ export async function sendWelcomeEmail(to: string, name?: string) {
 
 export async function sendReminderEmail(to: string, details: ReminderDetails) {
   await deliver(to, reminderEmail(details));
+}
+
+/** The confirm link for a notification address the student chose (A17). */
+export async function sendConfirmAddressEmail(to: string, confirmUrl: string) {
+  await deliver(to, confirmAddressEmail(confirmUrl));
 }

@@ -10,3 +10,6 @@ firebase-adminsdk*.json
 *.pem
 # Personal Claude Code permissions; the shared ones live in .claude/settings.json
 .claude/settings.local.json
+# Firebase emulator logs (`npm run test:rules` writes them where it runs)
+firebase-debug.log
+firestore-debug.log

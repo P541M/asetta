@@ -73,3 +73,13 @@ export const getDaysUntil = (
   timeStr: string = "23:59",
   now: Date = new Date(),
 ): number => calendarDaysUntil(parseLocalDateTime(dateStr, timeStr), now);
+
+/** A stored Firestore Timestamp (or Date) as a Date; null for anything else. */
+export function storedDate(value: unknown): Date | null {
+  if (value instanceof Date) return value;
+  if (typeof value === "object" && value !== null && "toDate" in value) {
+    const date: unknown = typeof value.toDate === "function" ? value.toDate() : null;
+    if (date instanceof Date) return date;
+  }
+  return null;
+}

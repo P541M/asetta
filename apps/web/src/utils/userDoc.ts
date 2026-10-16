@@ -1,4 +1,5 @@
 import type { DocumentData } from "firebase/firestore";
+import { storedDate } from "./dateUtils";
 
 /** Reads of the user doc (`users/{uid}`) and the rules for what sign-in writes to it. */
 
@@ -85,14 +86,12 @@ export function profileFromUserDoc(data: DocumentData | undefined): UserProfile 
   return { displayName: data?.displayName || "" };
 }
 
-/** A stored Firestore Timestamp (or Date) as a Date; null for anything else. */
-function storedDate(value: unknown): Date | null {
-  if (value instanceof Date) return value;
-  if (typeof value === "object" && value !== null && "toDate" in value) {
-    const date: unknown = typeof value.toDate === "function" ? value.toDate() : null;
-    if (date instanceof Date) return date;
-  }
-  return null;
+/**
+ * The notification address the student confirmed through its link (A17). Only the server writes
+ * it; reminders go to the chosen address once it matches this one (utils/notificationEmail.ts).
+ */
+export function verifiedEmailFromUserDoc(data: DocumentData | undefined): string | null {
+  return typeof data?.verifiedEmail === "string" ? data.verifiedEmail : null;
 }
 
 const localDay = (date: Date) => `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
