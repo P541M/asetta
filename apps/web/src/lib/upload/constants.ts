@@ -15,6 +15,8 @@
 export const MAX_FILE_BYTES = 4 * 1024 * 1024; // 4 MB per file
 export const MAX_TOTAL_UPLOAD_BYTES = 4 * 1024 * 1024; // 4 MB per request
 export const MAX_FILES_PER_UPLOAD = 10;
+/** Per account, per UTC day (D5): each file can cost a Gemini call from the shared quota. */
+export const MAX_FILES_PER_DAY = 20;
 
 export const ACCEPTED_MIME_TYPE = "application/pdf";
 

@@ -5,7 +5,7 @@ import fs from "fs";
 import pdfParse from "pdf-parse";
 import { getAdmin } from "../../lib/firebase-admin";
 import { getAuth } from "firebase-admin/auth";
-import { getFirestore } from "firebase-admin/firestore";
+import { FieldValue, getFirestore } from "firebase-admin/firestore";
 import { extractAssessmentsWithAI } from "../../lib/upload/gemini";
 import { extractAssessmentsBasic, extractCourseName } from "../../lib/upload/textExtraction";
 import {
@@ -21,6 +21,14 @@ import {
   MAX_TOTAL_UPLOAD_BYTES,
   formatBytes,
 } from "../../lib/upload/constants";
+import {
+  claimUploadFiles,
+  filesUsedFromData,
+  secondsUntilUtcMidnight,
+  uploadLimitMessage,
+  uploadUsageDay,
+  uploadUsagePath,
+} from "../../lib/upload/quota";
 import { isValidDocId } from "../../utils/validation";
 
 export const config = {
@@ -182,9 +190,42 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(400).json({ success: false, error: "No valid files were uploaded" });
     }
 
+    // The day's limit (A18), claimed in a transaction before any extraction so overlapping
+    // requests can't both pass it: all of this request's files, or none. Files extraction never
+    // runs on are refunded below.
+    const now = new Date();
+    const usageRef = adminDb.doc(uploadUsagePath(userId, now));
+    const claim = await adminDb.runTransaction(async (transaction) => {
+      const used = filesUsedFromData((await transaction.get(usageRef)).data());
+      const outcome = claimUploadFiles(used, uploadedFiles.length);
+      if (outcome.allowed) {
+        transaction.set(usageRef, {
+          uid: userId,
+          day: uploadUsageDay(now),
+          files: outcome.used,
+          updatedAt: new Date(),
+        });
+      }
+      return outcome;
+    });
+    if (!claim.allowed) {
+      const retryAfter = secondsUntilUtcMidnight(now);
+      res.setHeader("Retry-After", String(retryAfter));
+      return res.status(429).json({
+        success: false,
+        error: "DAILY_QUOTA_EXCEEDED",
+        message: uploadLimitMessage(claim.remaining),
+        quotaType: "user",
+        remaining: claim.remaining,
+        retryAfter,
+      });
+    }
+
     let totalAssessments = 0;
     let processedFiles = 0;
     let failedFiles = 0;
+    // Files extraction ran on (Gemini, or the regex fallback): the ones the day's count keeps
+    let countedFiles = 0;
     const errors: string[] = [];
     const courseBreakdown: Array<{
       courseName: string;
@@ -225,6 +266,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           // Fall back to basic extraction
           assessments = extractAssessmentsBasic(extractedText, localDate);
         }
+        countedFiles++;
 
         // Nothing found: one placeholder, flagged for review, so the upload isn't silently empty.
         if (assessments.length === 0) {
@@ -277,6 +319,20 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         console.error("Upload: could not process a file", { uid: userId, error });
         failedFiles++;
         errors.push(`Failed to process file: ${fileData.originalFilename}`);
+      }
+    }
+
+    // An unreadable PDF never reached Gemini, and a file Gemini refused for its own quota or rate
+    // limit got nothing (the rate-limit notice retries the same files): neither counts.
+    const unusedFiles = uploadedFiles.length - countedFiles;
+    if (unusedFiles > 0) {
+      try {
+        await usageRef.update({ files: FieldValue.increment(-unusedFiles), updatedAt: new Date() });
+      } catch (error) {
+        console.error("Upload: could not return unused files to the daily limit", {
+          uid: userId,
+          error,
+        });
       }
     }
 

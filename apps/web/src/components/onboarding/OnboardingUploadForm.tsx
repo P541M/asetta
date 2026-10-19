@@ -15,7 +15,12 @@ import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
 import { Button } from "../ui/button";
 import ApiLimitReachedModal from "../modals/ApiLimitReachedModal";
 import CopyrightAgreement from "../forms/CopyrightAgreement";
-import { postUploadForm, parseUploadResponse } from "../../lib/uploadClient";
+import {
+  postUploadForm,
+  parseUploadResponse,
+  uploadQuotaFromPayload,
+  type UploadQuota,
+} from "../../lib/uploadClient";
 import {
   ACCEPTED_MIME_TYPE,
   MAX_FILE_BYTES,
@@ -43,6 +48,7 @@ export function OnboardingUploadForm({
   const [isDragOver, setIsDragOver] = useState(false);
   const [copyrightAgreed, setCopyrightAgreed] = useState(false);
   const [showApiLimitModal, setShowApiLimitModal] = useState<boolean>(false);
+  const [uploadQuota, setUploadQuota] = useState<UploadQuota | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileSelect = useCallback((selectedFiles: FileList | null) => {
@@ -104,6 +110,10 @@ export function OnboardingUploadForm({
     [handleFileSelect],
   );
 
+  // A failed upload ends every file's "uploading" spinner
+  const markFilesFailed = () =>
+    setFiles((prev) => prev.map((f) => ({ ...f, status: "error" as UploadStatus })));
+
   const handleUpload = async () => {
     if (!user || !fileInputRef.current?.files?.length || !copyrightAgreed) return;
 
@@ -137,8 +147,11 @@ export function OnboardingUploadForm({
         // Handle daily quota exhaustion
         if (status === 429 && payload?.error === "DAILY_QUOTA_EXCEEDED") {
           setUploadStatus("daily_quota_exceeded");
+          setUploadQuota(uploadQuotaFromPayload(payload, new Date()));
           setShowApiLimitModal(true);
+          setMessage("");
           setError(payload.message || "Daily processing limit reached");
+          markFilesFailed();
           return;
         }
         throw new Error(errorMessage || "Upload failed");
@@ -179,6 +192,7 @@ export function OnboardingUploadForm({
       onUploadSuccess(extractionData);
     } catch (err) {
       console.error("Upload error:", err);
+      setMessage("");
 
       // Check for daily quota errors in catch block as well
       if (
@@ -188,6 +202,7 @@ export function OnboardingUploadForm({
           err.message.includes("quota exceeded"))
       ) {
         setUploadStatus("daily_quota_exceeded");
+        setUploadQuota(null);
         setShowApiLimitModal(true);
         setError("Daily processing limit reached");
       } else {
@@ -195,12 +210,7 @@ export function OnboardingUploadForm({
         setError(err instanceof Error ? err.message : "Upload failed");
       }
 
-      setFiles((prev) =>
-        prev.map((f) => ({
-          ...f,
-          status: "error" as UploadStatus,
-        })),
-      );
+      markFilesFailed();
     }
   };
 
@@ -397,7 +407,11 @@ export function OnboardingUploadForm({
       )}
 
       {/* API limit reached modal */}
-      <ApiLimitReachedModal isOpen={showApiLimitModal} onClose={handleCloseApiLimitModal} />
+      <ApiLimitReachedModal
+        isOpen={showApiLimitModal}
+        onClose={handleCloseApiLimitModal}
+        quota={uploadQuota}
+      />
     </div>
   );
 }

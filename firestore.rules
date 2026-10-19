@@ -7,9 +7,10 @@ service cloud.firestore {
     // blocks an edit. Removing a key is always allowed: the app reads a missing one as its
     // default. Caps sit far above anything typed; the app's own limits do the validation.
     //
-    // No rule matches welcomeEmails, cronRuns, notifications or emailVerifications, so clients
-    // can't touch them: they hold server state (the welcome-email claim, the reminder cron's run
-    // summaries and send records, and the confirm links for a notification address).
+    // No rule matches welcomeEmails, cronRuns, notifications, emailVerifications, migrations or
+    // uploadUsage, so clients can't touch them: they hold server state (the welcome-email claim,
+    // the reminder cron's run summaries and send records, the confirm links for a notification
+    // address, one-time steps, and each account's daily upload count).
     // `verifiedEmail` on the user doc is server state too, so it isn't in the user doc's list.
     // `npm run test:rules` checks every write the app makes against this file.
 

@@ -5,4 +5,6 @@ export interface ContactFormPayload {
   email: string;
   message: string;
   emailConsent: boolean;
+  /** The honeypot (A20): hidden from people, so only a bot fills it. Always empty from the page. */
+  website: string;
 }
