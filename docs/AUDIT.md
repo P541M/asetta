@@ -66,7 +66,7 @@ branch. Tick the items off and add a session log entry when done. Don't commit.
 | B13 | A15 | Bundle size | |
 | B14 | A18, A20 | Rate limits (upload quota, contact form) | D5 decided |
 | B15 | A19 | Cron throughput | After A8 |
-| any | A21 to A28, A33 to A35, A39, A40, A42 to A64 | Later items | As time allows; A34 needs D8; A47 once 5 days have passed since A8's first production run |
+| any | A21 to A28, A33 to A35, A39, A40, A42 to A64, A66 | Later items | As time allows; A34 needs D8; A47 once 5 days have passed since A8's first production run |
 
 ## Fix now
 
@@ -516,6 +516,21 @@ branch. Tick the items off and add a session log entry when done. Don't commit.
   - **Where:** `confirmExistingAddresses` in `apps/web/src/lib/notifications.ts` and its call in `checkAndSendNotifications`; `existingAddressToConfirm` in `utils/notificationEmail.ts` and its tests; the D11 bullet in `docs/ops.md` ("Reminder cron").
   - **Problem:** after the first production run the step only reads its marker on every run (one read each).
   - **Fix:** once `migrations/d11-existing-addresses` in production has a `finishedAt`, delete the code, tests and bullet; keep the marker doc as the record.
+
+- [x] **A65 · Scrollbars: one clean look on every OS, no sideways jumps** · S · risk L · found 2026-10-19 (done 2026-10-19, PR #20)
+  - **Where:** the scrollbar block in `apps/web/src/styles/globals.css`; `hooks/useScrollLock.ts`; the seven overlays (`ConfirmationModal`, `DayDetailModal`, `ExtractionSuccessModal`, `ApiLimitReachedModal`, `NotesModal`, `ManageSemestersModal`, the editor's `LinkModal`); `editor/RichTextEditor.tsx`; `styles/rich-text-editor.css`.
+  - **Problem:** `scrollbar-width` and `scrollbar-color` on `*` made Chrome and Edge ignore the whole `::-webkit-scrollbar` block, so Windows got thin native bars with arrow buttons and a thumb about the color of the background. `.dark *` never matches `<html>`, so the page scrollbar stayed light in dark mode. With no gutter, content moved sideways between short and long tabs. Four modals hid the page scrollbar by hand (a 10px jump), and a closed `ConfirmationModal` cleared any other modal's lock when it mounted; three overlays didn't lock at all. The notes modal had a scroller inside a scroller.
+  - **Shipped:** see the 2026-10-19 session log.
+
+- [ ] **A66 · Dark `--border` differs between `globals.css` and the token table** · S · risk L · found during A65
+  - **Where:** `.dark` in `apps/web/src/styles/globals.css` (`--border: #333333`); the "Theme tokens" table in `apps/web/standards.md` (`#2E2E2E`).
+  - **Problem:** the code ships `#333333`, the same value as `--accent`, so dark row dividers match the hover tone; the table says `#2E2E2E`. standards.md says the two never drift.
+  - **Fix:** the founder picks the intended value; make both files match and check the dark dividers.
+
+- [x] **A67 · Landing scrollbars have the same Chrome bug** · S · risk L · found during A65 (done 2026-10-19, PR #20)
+  - **Where:** "Slim scrollbar" in `apps/landing/src/styles/globals.css`.
+  - **Problem:** `* { scrollbar-width: thin; scrollbar-color: ... }` makes Chrome and Edge ignore the `::-webkit-scrollbar` rules above it, so www.asetta.me shows native bars with arrow buttons on Windows; the 8px thumb renders only in browsers without the standard properties (Safari before 26.2).
+  - **Fix:** the platform's recipe (A65): `::-webkit-scrollbar` under `pointer: fine`, the standard properties behind `@supports not selector(::-webkit-scrollbar)`, `scrollbar-gutter: stable` on `html`.
 
 ## Baseline (2026-10-10)
 
@@ -1105,3 +1120,16 @@ Newest last. One entry per session: date, branch, items, what changed, what's le
   - firebase-tools 13 printed nothing for about three minutes on its first start here before the emulators came up; the Firestore emulator also needs its own `websocketPort` when another emulator holds 9150.
   - The hidden browser pane throttles timers and paints late (a screenshot can show the frame before the last click), so timing came from resource timing and state from the DOM. Webpack's runtime can be reached from the page with `self.webpackChunk_N_E.push([[id], {}, (req) => ...])`, which makes a chunk failure reproducible without a network tool.
   - Junctions into the worktree's `node_modules` (used for main's scratch build) must be removed as links (`[System.IO.Directory]::Delete`), never with `rm -rf`, which would delete through them.
+
+### 2026-10-19 · A65 and A67 scrollbars, both apps (`fix/scrollbars`, PR #20)
+
+- **Off the batch list:** the founder paused the batches to fix "weird" scrollbars and asked that they look and behave the same on Windows, macOS, Linux and phones. Founder call: keep the browser's own scrolling (no scrollbar library), styled clean. The founder asked for the PR; the agent committed, pushed and opened it (the founder merges).
+- **What was wrong** (measured in the browser pane, Chrome 152 on Windows): the 8px `::-webkit-scrollbar` block never rendered, because `scrollbar-width` and `scrollbar-color` on `*` switch it off in Chrome 121+; scrollbars were Chrome's 10px "thin" bars with arrow buttons. The dark thumb never reached `<html>` (`.dark *`), so the page bar was light gray on dark. Thumbs were about 1.05:1 against their surfaces. Hiding the page scrollbar for a modal widened the page by 10px. The `position: absolute` and `opacity` rules never did anything. Git history: `db0845b` (2025-07-26) removed `scrollbar-gutter: stable` from `*` (which had reserved a blank strip in every `overflow-hidden` box) and added those rules.
+- **Shipped:** `globals.css` styles the bar with `::-webkit-scrollbar` only, under `pointer: fine` (Chromium and Safari: 10px, rounded 6px thumb in `--muted-foreground` at 35%, 60% on hover, clear track, no arrows); Firefox gets `scrollbar-width: thin` in the same color behind `@supports not selector(::-webkit-scrollbar)`; touch screens keep native overlay bars. `html` keeps a stable scrollbar strip. `useScrollLock` replaces the hand-written `body.style.overflow` in every overlay: one shared count, so stacked overlays keep the page locked; it trades the strip for the same body padding so the backdrop covers the whole window and nothing moves. The notes editor fills the modal and its text area is the only scroller (the toolbar stays put; the 500px cap is gone, so the canvas grows to the modal's 90vh). Dropped the dead `-webkit-overflow-scrolling: touch`. Rules in `standards.md` ("Scrollbars", and a bullet under "Overlays").
+- **Lock details:** the hook runs as a layout effect, so an overlay's first frame already has the full-width backdrop. It also sets `--scroll-lock-strip` on `html` while locked; a fixed full-width bar uses `right-[var(--scroll-lock-strip,0px)]` in place of `inset-x-0` so it keeps its width (the platform's mobile bottom nav, the landing header).
+- **Landing (A67), same session at the founder's request:** the same recipe in stone-500 in `apps/landing/src/styles/globals.css`, an identical copy of the hook in `apps/landing/src/hooks/useScrollLock.ts` (the apps share no code), used by `ImageModal` (which had hidden the body scrollbar by hand), and the header on the strip variable. Rules in `apps/landing/CLAUDE.md`.
+- **Checked in the browser pane** (login page, injected test boxes): no arrows, thumb visible on card, input and secondary fills in both themes; the page bar and inner bars get the same thumb color in each theme; the page keeps a 10px strip on a short page; with the hook's lock steps, a fixed backdrop goes from 1014px to the full 1024px, the content stays at the same x on short and scrolled pages, and an inner overlay closing leaves the page locked. Landing, with the real lightbox on `/` and `/features`: the standard properties are off in Chromium, the page bar and inner bars share the stone thumb, the backdrop covers the full 1024px, content and header edges don't move (1014px and 982px before, open and after), the scroll position holds, and closing clears every inline style. Not checked: the dashboard's own overlays and the notes modal (they need a signed-in account), Safari, Firefox, macOS.
+- **Gotchas:** while the browser pane is hidden, `requestAnimationFrame` never fires and a reloaded page may never hydrate (every box measures 0); use timers, and open a fresh tab with `preview_start`. `document.documentElement.clientWidth` reports the full width when the stable strip holds no scrollbar; measure `getBoundingClientRect().width` instead (the hook does). Turbopack on Windows missed the `globals.css` edit and kept serving the old CSS until the dev server restarted.
+- **Verification loop:** lint, `format:check`, typecheck, `npm test` (42 files, 1298 passed, 2 expected failures for A51) and build all green.
+- **New items:** A66 (dark `--border` drift), A67 (the landing site had the same Chrome bug; done in this session).
+- **Left for the founder:** sign in and check the overlays in both themes (open a modal on a long page: nothing behind it should move, and the backdrop should reach the right edge), the notes modal with long notes, the landing lightbox, and a Mac (Safari and Chrome) and a phone. The checklist is in PR #20.

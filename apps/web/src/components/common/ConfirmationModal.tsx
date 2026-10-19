@@ -1,6 +1,7 @@
-import React, { ReactNode, useEffect } from "react";
+import React, { ReactNode } from "react";
 import { X } from "lucide-react";
 import { Button } from "../ui/button";
+import { useScrollLock } from "../../hooks/useScrollLock";
 
 interface ConfirmationModalProps {
   isOpen: boolean;
@@ -24,17 +25,7 @@ const ConfirmationModal = ({
   cancelText = "Cancel",
   variant = "primary",
 }: ConfirmationModalProps) => {
-  // Prevent body scroll while open
-  useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "unset";
-    }
-    return () => {
-      document.body.style.overflow = "unset";
-    };
-  }, [isOpen]);
+  useScrollLock(isOpen);
 
   if (!isOpen) return null;
 

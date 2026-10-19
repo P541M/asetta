@@ -4,6 +4,7 @@ import { Semester } from "@/types/semester";
 import { Button } from "../../ui/button";
 import { Input } from "../../ui/input";
 import LoadingSpinner from "../../ui/LoadingSpinner";
+import { useScrollLock } from "../../../hooks/useScrollLock";
 
 /** The list's chunk (dnd-kit). SemesterTabs fetches it when the semester menu opens (A15). */
 export const loadSortableSemesterList = () => import("./SortableSemesterList");
@@ -62,6 +63,8 @@ const ManageSemestersModal = ({
   onAdd,
   isAdding,
 }: ManageSemestersModalProps) => {
+  useScrollLock();
+
   return (
     <div
       className="fixed inset-0 z-150 flex items-center justify-center bg-black/60 p-4"

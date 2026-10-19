@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import Image from "next/image";
+import { useScrollLock } from "@/hooks/useScrollLock";
 import { CloseIcon } from "./icons";
 
 interface ImageModalProps {
@@ -18,21 +19,16 @@ export default function ImageModal({
   imageAlt,
   title,
 }: ImageModalProps) {
-  // Close on Escape and lock body scroll while open.
+  useScrollLock(isOpen);
+
+  // Close on Escape.
   useEffect(() => {
+    if (!isOpen) return;
     const handleEsc = (event: KeyboardEvent) => {
       if (event.key === "Escape") onClose();
     };
-
-    if (isOpen) {
-      document.addEventListener("keydown", handleEsc);
-      document.body.style.overflow = "hidden";
-    }
-
-    return () => {
-      document.removeEventListener("keydown", handleEsc);
-      document.body.style.overflow = "";
-    };
+    document.addEventListener("keydown", handleEsc);
+    return () => document.removeEventListener("keydown", handleEsc);
   }, [isOpen, onClose]);
 
   if (!isOpen) return null;
