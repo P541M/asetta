@@ -103,7 +103,7 @@ All new code follows these.
   user doc are never trusted as a server guard.
 - **Email goes only to an address its owner proved** (A17): reminders use the chosen `email` only
   when it is the account's own or equals `verifiedEmail` (`utils/notificationEmail.ts`), else the
-  account email. A link in an email that changes state opens a page whose button POSTs; the GET
+  account email. Addresses saved before A17 count as confirmed (D11, set once by the cron). A link in an email that changes state opens a page whose button POSTs; the GET
   changes nothing, because mail scanners fetch links. Its token is random, stored only as a hash,
   expires, works once, and its sends are capped (`lib/emailVerification.ts`).
 - **Log real failures with `console.error`** (no email addresses or other personal data in

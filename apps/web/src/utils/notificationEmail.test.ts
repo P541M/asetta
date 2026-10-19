@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   cleanEmail,
+  existingAddressToConfirm,
   notificationEmailStatus,
   reminderRecipient,
   sameAddress,
@@ -139,5 +140,25 @@ describe("reminderRecipient (A17)", () => {
     expect(
       reminderRecipient({ email: "victim@example.test", verifiedEmail: null, accountEmail: "" }),
     ).toBeNull();
+  });
+});
+
+describe("existingAddressToConfirm (D11)", () => {
+  it("confirms the address a user saved before A17, as saved", () => {
+    expect(existingAddressToConfirm(" sam.lee@uni.example.test", undefined)).toBe(
+      "sam.lee@uni.example.test",
+    );
+    expect(existingAddressToConfirm("sam@example.test", "")).toBe("sam@example.test");
+  });
+
+  it("leaves a user who has confirmed an address through a link alone", () => {
+    expect(existingAddressToConfirm("new@example.test", "sam.lee@uni.example.test")).toBeNull();
+    expect(existingAddressToConfirm("sam@example.test", "sam@example.test")).toBeNull();
+  });
+
+  it("confirms nothing that isn't an address", () => {
+    expect(existingAddressToConfirm("", undefined)).toBeNull();
+    expect(existingAddressToConfirm("sam", undefined)).toBeNull();
+    expect(existingAddressToConfirm(undefined, undefined)).toBeNull();
   });
 });

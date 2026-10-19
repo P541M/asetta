@@ -54,3 +54,14 @@ export function reminderRecipient(addresses: Addresses): string | null {
     ? cleanEmail(addresses.email)
     : cleanEmail(addresses.accountEmail);
 }
+
+/**
+ * D11: the address a one-time step marks confirmed for a user from before A17, so the change
+ * doesn't move anyone's reminders: the saved address, unless it isn't one or the user has already
+ * confirmed an address through a link (then a different saved one was changed since, and waits
+ * for its own link).
+ */
+export function existingAddressToConfirm(email: unknown, verifiedEmail: unknown): string | null {
+  if (typeof verifiedEmail === "string" && verifiedEmail !== "") return null;
+  return cleanEmail(email);
+}
