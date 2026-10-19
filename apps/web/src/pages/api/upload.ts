@@ -2,11 +2,11 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import type { File as FormidableFile } from "formidable";
 import { IncomingForm, Fields, Files } from "formidable";
 import fs from "fs";
-import pdfParse from "pdf-parse";
 import { getAdmin } from "../../lib/firebase-admin";
 import { getAuth } from "firebase-admin/auth";
 import { FieldValue, getFirestore } from "firebase-admin/firestore";
 import { extractAssessmentsWithAI } from "../../lib/upload/gemini";
+import { pdfText } from "../../lib/upload/pdfText";
 import { extractAssessmentsBasic, extractCourseName } from "../../lib/upload/textExtraction";
 import {
   ExtractedAssessment,
@@ -237,11 +237,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       try {
         const filePath = fileData.filepath;
         const fileName = fileData.originalFilename || "unknown.pdf";
-        const pdfBuffer = fs.readFileSync(filePath);
         let extractedText: string;
         try {
-          const data = await pdfParse(pdfBuffer);
-          extractedText = data.text;
+          extractedText = await pdfText(fs.readFileSync(filePath));
         } catch (error) {
           console.error("Upload: could not parse a PDF", { uid: userId, error });
           failedFiles++;
