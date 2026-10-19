@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { User } from "firebase/auth";
 import { collection, onSnapshot, setDoc } from "firebase/firestore";
-import { db } from "../lib/firebase";
+import { db } from "../lib/firestore";
 import { getCoursePreferencesDocRef } from "../lib/firebaseUtils";
 import { isValidCourseColor } from "../constants/courseColors";
 import { courseNameFromPreferencesDocId } from "../utils/courseName";

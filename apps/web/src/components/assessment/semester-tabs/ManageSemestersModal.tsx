@@ -1,29 +1,46 @@
-import {
-  DndContext,
-  closestCenter,
-  KeyboardSensor,
-  PointerSensor,
-  useSensor,
-  useSensors,
-  DragEndEvent,
-} from "@dnd-kit/core";
-import {
-  SortableContext,
-  sortableKeyboardCoordinates,
-  verticalListSortingStrategy,
-} from "@dnd-kit/sortable";
+import dynamic, { type DynamicOptionsLoadingProps } from "next/dynamic";
 import { Loader2, Plus, X } from "lucide-react";
 import { Semester } from "@/types/semester";
 import { Button } from "../../ui/button";
 import { Input } from "../../ui/input";
+import LoadingSpinner from "../../ui/LoadingSpinner";
 import { useScrollLock } from "../../../hooks/useScrollLock";
-import SortableSemester from "./SortableSemester";
+
+/** The list's chunk (dnd-kit). SemesterTabs fetches it when the semester menu opens (A15). */
+export const loadSortableSemesterList = () => import("./SortableSemesterList");
+
+/** The list still loading: nothing for the first 200 ms, then a spinner. */
+const ListLoading = ({ error, pastDelay, retry }: DynamicOptionsLoadingProps) => {
+  if (error) {
+    return (
+      <div className="rounded-xl bg-secondary/50 px-3 py-6 text-center">
+        <p className="text-sm text-muted-foreground">
+          Couldn&apos;t load your semesters. Check your internet connection, then try again.
+        </p>
+        <Button type="button" variant="secondary" size="sm" className="mt-3" onClick={retry}>
+          Try again
+        </Button>
+      </div>
+    );
+  }
+  if (!pastDelay) return null;
+  return (
+    <div className="flex justify-center rounded-xl bg-secondary/50 py-6">
+      <LoadingSpinner size="sm" />
+    </div>
+  );
+};
+
+const SortableSemesterList = dynamic(loadSortableSemesterList, {
+  ssr: false,
+  loading: ListLoading,
+});
 
 interface ManageSemestersModalProps {
   semesters: Semester[];
   selectedSemester: string;
   onClose: () => void;
-  onDragEnd: (event: DragEndEvent) => void;
+  onReorder: (reordered: Semester[]) => void;
   onEdit: (id: string, name: string) => void;
   onDelete: (id: string) => void;
   /** Add flow lives inside this modal — one surface owns all semester management */
@@ -38,7 +55,7 @@ const ManageSemestersModal = ({
   semesters,
   selectedSemester,
   onClose,
-  onDragEnd,
+  onReorder,
   onEdit,
   onDelete,
   addValue,
@@ -46,12 +63,6 @@ const ManageSemestersModal = ({
   onAdd,
   isAdding,
 }: ManageSemestersModalProps) => {
-  const sensors = useSensors(
-    useSensor(PointerSensor),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    }),
-  );
   useScrollLock();
 
   return (
@@ -104,33 +115,13 @@ const ManageSemestersModal = ({
               </p>
             </div>
           ) : (
-            <>
-              <p className="mb-2 text-xs text-muted-foreground">
-                Drag to reorder. Rename or delete with the icons.
-              </p>
-              <div className="max-h-72 overflow-y-auto rounded-xl bg-secondary/50 p-1.5">
-                <DndContext
-                  sensors={sensors}
-                  collisionDetection={closestCenter}
-                  onDragEnd={onDragEnd}
-                >
-                  <SortableContext
-                    items={semesters.map((s) => s.id)}
-                    strategy={verticalListSortingStrategy}
-                  >
-                    {semesters.map((semester) => (
-                      <SortableSemester
-                        key={semester.id}
-                        semester={semester}
-                        isSelected={selectedSemester === semester.name}
-                        onEdit={onEdit}
-                        onDelete={onDelete}
-                      />
-                    ))}
-                  </SortableContext>
-                </DndContext>
-              </div>
-            </>
+            <SortableSemesterList
+              semesters={semesters}
+              selectedSemester={selectedSemester}
+              onReorder={onReorder}
+              onEdit={onEdit}
+              onDelete={onDelete}
+            />
           )}
         </div>
       </div>
