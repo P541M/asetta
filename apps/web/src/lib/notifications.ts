@@ -8,9 +8,10 @@ import {
   type Firestore,
   type QueryDocumentSnapshot,
 } from "firebase-admin/firestore";
-import { sendReminderEmail } from "./email";
+import { createReminderMailer, type ReminderMailer } from "./email";
 import {
   MAX_SEND_ATTEMPTS,
+  USERS_AT_ONCE,
   claimDecision,
   cronRunId,
   isRecentLegacySend,
@@ -20,11 +21,13 @@ import {
 import {
   dueReminders,
   nextReminderRun,
+  reminderDueDates,
   reminderRecordId,
   resolveTimeZone,
   type DueReminder,
   type ReminderAssessment,
 } from "./reminderSchedule";
+import { mapWithConcurrency } from "../utils/async";
 import { isValidEmail } from "../utils/validation";
 import {
   cleanEmail,
@@ -66,7 +69,6 @@ export interface CronRunSummary {
 export async function checkAndSendNotifications(now: Date = new Date()): Promise<CronRunSummary> {
   const clockStart = Date.now();
   let db: Firestore | undefined;
-  let auth: Auth | undefined;
   let scheduled: number | null = null;
   let users = 0;
   let sent = 0;
@@ -93,30 +95,33 @@ export async function checkAndSendNotifications(now: Date = new Date()): Promise
     };
   };
 
+  const mailer = createReminderMailer();
   try {
     const app = await getAdmin();
-    db = getFirestore(app);
-    auth = getAuth(app);
+    const firestore = getFirestore(app);
+    db = firestore; // for the catch below
+    const auth = getAuth(app);
     try {
-      await confirmExistingAddresses(db, now);
+      await confirmExistingAddresses(firestore, now);
     } catch (migrationError) {
       // The claim was released, so the next run tries again; reminders still go out meanwhile.
       console.error("Reminder cron: could not confirm existing addresses", migrationError);
     }
     try {
-      scheduled = await scheduleUnscheduledUsers(db, now);
+      scheduled = await scheduleUnscheduledUsers(firestore, now);
     } catch (sweepError) {
       // Users who already have a nextReminderAt still get their reminders; the next run retries.
       console.error("Reminder cron: could not schedule new users", sweepError);
     }
 
-    const dueUsers = await db.collection("users").where("nextReminderAt", "<=", now).get();
+    const dueUsers = await firestore.collection("users").where("nextReminderAt", "<=", now).get();
     devLog(`Reminder cron: ${dueUsers.size} users due at ${now.toISOString()}`);
 
-    for (const userDoc of dueUsers.docs) {
+    // A few users at a time (A19); each user's reminders still go out one after another.
+    await mapWithConcurrency(dueUsers.docs, USERS_AT_ONCE, async (userDoc) => {
       users++;
       try {
-        const result = await processUser(db, auth, userDoc, now);
+        const result = await processUser(firestore, auth, mailer, userDoc, now);
         sent += result.sent;
         failed += result.failed;
       } catch (userError) {
@@ -127,16 +132,18 @@ export async function checkAndSendNotifications(now: Date = new Date()): Promise
         });
         userErrors++;
       }
-    }
+    });
 
     const summary = summarize(undefined);
     devLog("Reminder cron: run finished", summary);
-    await recordRun(db, summary);
+    await recordRun(firestore, summary);
     return summary;
   } catch (error) {
     // The route logs the error itself; record that the run stopped, if Firestore is reachable.
     if (db) await recordRun(db, summarize(error));
     throw error;
+  } finally {
+    mailer.close();
   }
 }
 
@@ -181,35 +188,55 @@ async function confirmExistingAddresses(db: Firestore, now: Date): Promise<void>
   }
 }
 
+/** The earliest Firestore timestamp: a range from it matches every Timestamp and nothing else. */
+const EARLIEST_TIMESTAMP = new Timestamp(-62_135_596_800, 0);
+
 /**
  * Once per UTC day, sets `nextReminderAt` to now for every user without one, so this run reads
  * them: every user on the first run after A8, then anyone whose sign-in didn't set it. A user is
- * only ever read through the `nextReminderAt` query, and Firestore can't query a missing field.
+ * only ever read through the `nextReminderAt` query, and Firestore can't query a missing field,
+ * so two counts (one read per 1,000 users each) say first whether any user lacks a timestamp
+ * there, and only then is every user doc read (A19).
  */
 async function scheduleUnscheduledUsers(db: Firestore, now: Date): Promise<number | null> {
   const runRef = db.collection("cronRuns").doc(cronRunId(now));
   if ((await runRef.get()).get("sweptAt")) return null;
 
-  const allUsers = await db.collection("users").select("nextReminderAt").get();
-  const unscheduled = allUsers.docs.filter(
-    (doc) => !(doc.get("nextReminderAt") instanceof Timestamp),
+  const users = db.collection("users");
+  // One read-only transaction, so both counts see the same users
+  const [all, scheduled] = await db.runTransaction(
+    (transaction) =>
+      Promise.all([
+        transaction.get(users.count()),
+        transaction.get(users.where("nextReminderAt", ">=", EARLIEST_TIMESTAMP).count()),
+      ]),
+    { readOnly: true },
   );
-  for (let start = 0; start < unscheduled.length; start += 500) {
-    const batch = db.batch();
-    for (const doc of unscheduled.slice(start, start + 500)) {
-      batch.update(doc.ref, { nextReminderAt: now });
+  let unscheduledCount = 0;
+  if (all.data().count > scheduled.data().count) {
+    const allUsers = await users.select("nextReminderAt").get();
+    const unscheduled = allUsers.docs.filter(
+      (doc) => !(doc.get("nextReminderAt") instanceof Timestamp),
+    );
+    for (let start = 0; start < unscheduled.length; start += 500) {
+      const batch = db.batch();
+      for (const doc of unscheduled.slice(start, start + 500)) {
+        batch.update(doc.ref, { nextReminderAt: now });
+      }
+      await batch.commit();
     }
-    await batch.commit();
+    unscheduledCount = unscheduled.length;
   }
 
   await runRef.set({ sweptAt: now }, { merge: true });
-  return unscheduled.length;
+  return unscheduledCount;
 }
 
 /** Sends one user's due reminders, then moves their `nextReminderAt` on. */
 async function processUser(
   db: Firestore,
   auth: Auth,
+  mailer: ReminderMailer,
   userDoc: QueryDocumentSnapshot,
   now: Date,
 ): Promise<{ sent: number; failed: number }> {
@@ -220,7 +247,10 @@ async function processUser(
 
   const preferences = activePreferences(userDoc.id, userData);
   if (preferences) {
-    const { assessments, names } = await readAssessments(userDoc);
+    const { assessments, names } = await readAssessments(
+      userDoc,
+      reminderDueDates(timeZone, now, preferences.notificationDaysBefore),
+    );
     const reminders = dueReminders({
       assessments,
       settings: {
@@ -237,7 +267,7 @@ async function processUser(
       (recipient ??= reminderAddress(auth, userDoc.id, preferences.email, userData.verifiedEmail));
 
     for (const reminder of reminders) {
-      const outcome = await sendReminder(db, {
+      const outcome = await sendReminder(db, mailer, {
         uid: userDoc.id,
         preferences,
         getRecipient,
@@ -309,13 +339,30 @@ interface AssessmentNames {
   courseName: string;
 }
 
-/** Every assessment in every semester of the user (A19 narrows this). */
-async function readAssessments(userDoc: QueryDocumentSnapshot) {
+/**
+ * The user's assessments due in `dueDates`, the range a reminder can come from now
+ * (`reminderDueDates`), read from every semester at once with only the fields a reminder uses
+ * (A19). A stored date that isn't YYYY-MM-DD falls outside the range, and `dueReminders` would
+ * skip it anyway.
+ */
+async function readAssessments(
+  userDoc: QueryDocumentSnapshot,
+  dueDates: { from: string; to: string },
+) {
   const assessments: ReminderAssessment[] = [];
   const names = new Map<string, AssessmentNames>();
-  const semesters = await userDoc.ref.collection("semesters").get();
-  for (const semester of semesters.docs) {
-    const snapshot = await semester.ref.collection("assessments").get();
+  const semesters = await userDoc.ref.collection("semesters").select().get();
+  const snapshots = await Promise.all(
+    semesters.docs.map((semester) =>
+      semester.ref
+        .collection("assessments")
+        .where("dueDate", ">=", dueDates.from)
+        .where("dueDate", "<=", dueDates.to)
+        .select("dueDate", "dueTime", "status", "needsReview", "assignmentName", "courseName")
+        .get(),
+    ),
+  );
+  for (const snapshot of snapshots) {
     for (const doc of snapshot.docs) {
       const data = doc.data();
       assessments.push({
@@ -343,6 +390,7 @@ const toDate = (value: unknown): Date | null =>
  */
 async function sendReminder(
   db: Firestore,
+  mailer: ReminderMailer,
   {
     uid,
     preferences,
@@ -431,7 +479,7 @@ async function sendReminder(
   if (!decision.claim) return skipped(decision);
 
   try {
-    await sendReminderEmail(recipient, {
+    await mailer.send(recipient, {
       ...names,
       dueDate: reminder.dueDate,
       dueTime: reminder.dueTime,

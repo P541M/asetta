@@ -1,18 +1,26 @@
-import nodemailer from "nodemailer";
+import nodemailer, { type Transporter } from "nodemailer";
+import { onceUntilSuccess } from "../utils/async";
 import { devError } from "../utils/devLog";
 import { confirmAddressEmail, reminderEmail, welcomeEmail } from "./emailTemplates";
 import type { EmailContent, ReminderDetails } from "./emailTemplates";
 
-// Create a transporter using Gmail
-const transporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_APP_PASSWORD,
-  },
+/** The most Gmail connections one reminder cron run opens; each sends its emails in turn (A19). */
+const REMINDER_CONNECTIONS = 3;
+
+const gmailAuth = () => ({
+  user: process.env.EMAIL_USER,
+  pass: process.env.EMAIL_APP_PASSWORD,
 });
 
-async function deliver(to: string, { subject, html, text }: EmailContent) {
+// Create a transporter using Gmail, for the routes that send one email per request
+const transporter = nodemailer.createTransport({ service: "gmail", auth: gmailAuth() });
+
+async function deliver(
+  transport: Transporter,
+  verify: () => Promise<unknown>,
+  to: string,
+  { subject, html, text }: EmailContent,
+) {
   if (!process.env.EMAIL_USER) {
     throw new Error("EMAIL_USER environment variable is not set");
   }
@@ -21,8 +29,8 @@ async function deliver(to: string, { subject, html, text }: EmailContent) {
   }
 
   try {
-    await transporter.verify();
-    await transporter.sendMail({
+    await verify();
+    await transport.sendMail({
       from: `"Asetta" <${process.env.EMAIL_USER}>`,
       to,
       subject,
@@ -36,16 +44,40 @@ async function deliver(to: string, { subject, html, text }: EmailContent) {
   }
 }
 
+const deliverOne = (to: string, content: EmailContent) =>
+  deliver(transporter, () => transporter.verify(), to, content);
+
 /** `name` only for a verified address; see the welcome-email route (D7). */
 export async function sendWelcomeEmail(to: string, name?: string) {
-  await deliver(to, welcomeEmail(name));
-}
-
-export async function sendReminderEmail(to: string, details: ReminderDetails) {
-  await deliver(to, reminderEmail(details));
+  await deliverOne(to, welcomeEmail(name));
 }
 
 /** The confirm link for a notification address the student chose (A17). */
 export async function sendConfirmAddressEmail(to: string, confirmUrl: string) {
-  await deliver(to, confirmAddressEmail(confirmUrl));
+  await deliverOne(to, confirmAddressEmail(confirmUrl));
+}
+
+/** Sends one reminder cron run's emails. */
+export interface ReminderMailer {
+  send(to: string, details: ReminderDetails): Promise<void>;
+  /** Closes the Gmail connections once the run has nothing left to send. */
+  close(): void;
+}
+
+/**
+ * The mailer for one cron run (A19): its emails share a few pooled Gmail connections, and the
+ * login is verified once, before the first send (again only after a failed check).
+ */
+export function createReminderMailer(): ReminderMailer {
+  const pool = nodemailer.createTransport({
+    service: "gmail",
+    pool: true,
+    maxConnections: REMINDER_CONNECTIONS,
+    auth: gmailAuth(),
+  });
+  const verify = onceUntilSuccess(() => pool.verify());
+  return {
+    send: (to, details) => deliver(pool, verify, to, reminderEmail(details)),
+    close: () => pool.close(),
+  };
 }

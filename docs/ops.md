@@ -56,11 +56,23 @@ machine. Planned changes live in `docs/AUDIT.md`; this file describes what is tr
     `nextReminderAt` to the server's now with it, and again when it saves notification settings
     or finishes onboarding, so the change applies at the next run.
   - The first run of each UTC day sets `nextReminderAt` to now on every user without one (on the
-    first run after A8, every user), because Firestore can't query a missing field.
+    first run after A8, every user), because Firestore can't query a missing field. Two counts
+    in one read-only transaction (all users, and users whose `nextReminderAt` is a timestamp;
+    one read per 1,000 users each) decide first whether anyone lacks it; only then is every user
+    doc read (A19). Every user doc gets the field when it is created, so normally nobody does.
   - Every run reads only the users whose `nextReminderAt` has come, sends their due reminders,
     and moves `nextReminderAt` to their next 9:30, or about 20 minutes on while a failed send
     waits to retry. A user with reminders off is moved on too. Calling the route twice in a row
     sends nothing new.
+  - **Throughput (A19):** a run handles 10 due users at once (`USERS_AT_ONCE` in
+    `lib/reminderCron.ts`); one user's reminders still go out one after another. For each user
+    it lists the semesters, then reads, from every semester at once, only the assessments due in
+    the range a reminder can come from (`reminderDueDates`: the reminder day is today or one of
+    the 2 catch-up days) and only the fields a reminder uses. The run's emails share a pool of 3
+    Gmail connections (`createReminderMailer` in `lib/email.ts`), closed when the run ends, and
+    the Gmail login is verified once, before the first send (again only after a failed check).
+    A run's time grows with the users due in it, not with the user count; B15's measurements
+    are in the B15 session log of `docs/AUDIT.md`.
   - A reminder belongs to a target day, N calendar days before the due date. From 9:30 that day
     in the user's zone, runs send it until it has gone out, up to 2 days late, so a missed run
     catches up. Never for an assessment that is already due, needs review, is Missed, or is
@@ -104,7 +116,6 @@ machine. Planned changes live in `docs/AUDIT.md`; this file describes what is tr
 - **Never call the route locally with the real secret.** It reads production Firestore and sends
   real emails. QA production through the run summary (and the logs, within the hour); test
   locally against the emulators with a placeholder secret ("Testing API routes locally").
-- Planned: throughput (A19).
 
 ## Limits
 
@@ -245,6 +256,19 @@ project. Never commit real values.
   the change across one page load is that load's reads of the doc. A change pushed to an open
   listener makes the emulator re-check rules several times, so measure loads where nothing
   changes. B10's `count-reads.mjs` and split rules are in `node_modules/.cache/b10/`.
+- **Counting the server's reads** (the cron, any admin SDK code): rules never run for the admin
+  SDK, so rule coverage shows nothing. B15's `counter.cjs` is preloaded into the server
+  (`NODE_OPTIONS=--require`) and counts billed reads (a document fetched, at least one per
+  query, one per 1,000 entries for a `count()`), writes and RPCs by collection, saved to a JSON
+  file; `B15_RTT_MS` adds a delay before every Firestore call to stand in for the network. A
+  production build ignores `?now=`, so B15's seed (`seed-scale.cjs <users> <scenario>`) builds
+  its data relative to the real clock. Scripts in `node_modules/.cache/b15/`: `emu.sh`
+  (`demo-asetta-b15`, Auth 9199, Firestore 8180), `e2e-env.sh`, `start.sh` (:3015),
+  `start-main.sh` (a scratch build of main on :3016), `measure.cjs` (clears, seeds, calls each
+  server in turn, prints `durationMs`, reads and the outcome). The emulator's queries slow down
+  as its data grows, and it slowed further after a few thousand-user runs (its java process
+  reached 4 GB): compare builds interleaved on a freshly started emulator, and trust the read
+  counts over its times.
 - **Forcing a read error:** edit the scratch rules file (for example `allow get: if false;`);
   the emulator reloads it. A copy can land mid-read and leave the old rules loaded, so check the
   report's `rules.files[0].content` and `touch` the file if needed. Stopping the Firestore

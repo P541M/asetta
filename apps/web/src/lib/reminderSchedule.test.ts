@@ -6,6 +6,7 @@ import {
   DEFAULT_TIME_ZONE,
   dueReminders,
   nextReminderRun,
+  reminderDueDates,
   reminderRecordId,
   resolveTimeZone,
   type ReminderAssessment,
@@ -262,6 +263,87 @@ describe("dueReminders", () => {
     });
   });
 });
+
+describe("reminderDueDates", () => {
+  it.each([
+    // Oct 12, 09:35 EDT: reminder days Oct 10 to 12, so due Oct 13 to 15
+    ["Toronto", "America/Toronto", utc(10, 12, 13, 35), 3, "2026-10-13", "2026-10-15"],
+    // Oct 12, 09:35 NZDT, still Oct 11 in UTC
+    ["Auckland", "Pacific/Auckland", utc(10, 11, 20, 35), 3, "2026-10-13", "2026-10-15"],
+    // Oct 12, 00:05 IST, still Oct 11 in UTC
+    [
+      "Kolkata just after midnight",
+      "Asia/Kolkata",
+      utc(10, 11, 18, 35),
+      3,
+      "2026-10-13",
+      "2026-10-15",
+    ],
+    // Oct 11, 23:30 EDT, already Oct 12 in UTC
+    ["Toronto late evening", "America/Toronto", utc(10, 12, 3, 30), 3, "2026-10-12", "2026-10-14"],
+    ["one day before", "UTC", utc(10, 12, 9, 35), 1, "2026-10-11", "2026-10-13"],
+    [
+      "30 days before, across a month end",
+      "UTC",
+      utc(10, 12, 9, 35),
+      30,
+      "2026-11-09",
+      "2026-11-11",
+    ],
+    ["across a year end", "UTC", utc(12, 30, 9, 35), 7, "2027-01-04", "2027-01-06"],
+  ])("A19: %s", (_case, zone, now, daysBefore, from, to) => {
+    expect(reminderDueDates(zone, now, daysBefore)).toEqual({ from, to });
+  });
+
+  it("A19: holds every due date dueReminders can send, in any zone, across both DST weekends", () => {
+    let sent = 0;
+    for (const zone of ["America/Toronto", "Pacific/Auckland", "Asia/Kolkata", "UTC"]) {
+      for (const start of [utc(3, 6, 0), utc(10, 30, 0)]) {
+        // Every 3 hours for 4 days
+        for (let step = 0; step < 32; step++) {
+          const now = new Date(start.getTime() + step * 3 * 60 * 60 * 1000);
+          for (const daysBefore of [1, 2, 3, 7, 30]) {
+            // Due dates from 2 days before the range to 2 days after it, at three times of day
+            const assessments: ReminderAssessment[] = [];
+            let dueDate = shiftDay(now.toISOString().slice(0, 10), daysBefore - 5);
+            for (let day = 0; day < 9; day++, dueDate = shiftDay(dueDate, 1)) {
+              for (const dueTime of ["00:00", "09:00", "23:59"]) {
+                assessments.push(assessment({ id: `${dueDate}T${dueTime}`, dueDate, dueTime }));
+              }
+            }
+            const { from, to } = reminderDueDates(zone, now, daysBefore);
+            for (const reminder of run(zone, now, assessments, { daysBefore })) {
+              sent++;
+              expect(reminder.dueDate >= from && reminder.dueDate <= to, reminder.dueDate).toBe(
+                true,
+              );
+            }
+          }
+        }
+      }
+    }
+    expect(sent).toBeGreaterThan(1000); // the check above really ran
+  });
+
+  it("A19: holds nothing extra: after 9:30 every date in it has a reminder (2 days or more)", () => {
+    // Oct 12, 09:35 EDT
+    const now = utc(10, 12, 13, 35);
+    for (const daysBefore of [2, 3, 7, 30]) {
+      const { from, to } = reminderDueDates("America/Toronto", now, daysBefore);
+      const inRange: ReminderAssessment[] = [];
+      for (let day = from; day <= to; day = shiftDay(day, 1)) {
+        inRange.push(assessment({ id: day, dueDate: day }));
+      }
+      expect(inRange).toHaveLength(3);
+      expect(ids(run("America/Toronto", now, inRange, { daysBefore }))).toEqual(
+        inRange.map((a) => a.id),
+      );
+    }
+  });
+});
+
+const shiftDay = (day: string, days: number) =>
+  new Date(Date.parse(`${day}T00:00:00Z`) + days * 86_400_000).toISOString().slice(0, 10);
 
 describe("resolveTimeZone", () => {
   it.each([
