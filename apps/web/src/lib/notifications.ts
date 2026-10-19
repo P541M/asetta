@@ -28,6 +28,7 @@ import {
 import { isValidEmail } from "../utils/validation";
 import {
   cleanEmail,
+  existingAddressToConfirm,
   notificationEmailStatus,
   reminderRecipient,
   sameAddress,
@@ -97,6 +98,12 @@ export async function checkAndSendNotifications(now: Date = new Date()): Promise
     db = getFirestore(app);
     auth = getAuth(app);
     try {
+      await confirmExistingAddresses(db, now);
+    } catch (migrationError) {
+      // The claim was released, so the next run tries again; reminders still go out meanwhile.
+      console.error("Reminder cron: could not confirm existing addresses", migrationError);
+    }
+    try {
       scheduled = await scheduleUnscheduledUsers(db, now);
     } catch (sweepError) {
       // Users who already have a nextReminderAt still get their reminders; the next run retries.
@@ -129,6 +136,47 @@ export async function checkAndSendNotifications(now: Date = new Date()): Promise
   } catch (error) {
     // The route logs the error itself; record that the run stopped, if Firestore is reachable.
     if (db) await recordRun(db, summarize(error));
+    throw error;
+  }
+}
+
+// gRPC status ALREADY_EXISTS, which DocumentReference.create() throws when the doc is there.
+const ALREADY_EXISTS = 6;
+
+/**
+ * D11, once ever: marks the address every user saved before A17 as confirmed (`verifiedEmail`),
+ * so A17 moves no one's reminders; only an address saved from now on needs its link. The marker
+ * `migrations/d11-existing-addresses` (server-only) claims it, so overlapping runs do it once; a
+ * failure releases the claim for the next run, and users already confirmed are skipped.
+ */
+async function confirmExistingAddresses(db: Firestore, now: Date): Promise<void> {
+  const marker = db.collection("migrations").doc("d11-existing-addresses");
+  try {
+    await marker.create({ startedAt: now });
+  } catch (error) {
+    if ((error as { code?: unknown }).code === ALREADY_EXISTS) return;
+    throw error;
+  }
+
+  try {
+    const users = await db.collection("users").select("email", "verifiedEmail").get();
+    const toConfirm = users.docs.flatMap((doc) => {
+      const address = existingAddressToConfirm(doc.get("email"), doc.get("verifiedEmail"));
+      return address ? [{ ref: doc.ref, address }] : [];
+    });
+    for (let start = 0; start < toConfirm.length; start += 500) {
+      const batch = db.batch();
+      for (const { ref, address } of toConfirm.slice(start, start + 500)) {
+        batch.update(ref, { verifiedEmail: address });
+      }
+      await batch.commit();
+    }
+    await marker.update({ finishedAt: new Date(), users: users.size, confirmed: toConfirm.length });
+    devLog(`Reminder cron: confirmed ${toConfirm.length} existing addresses (D11)`);
+  } catch (error) {
+    await marker.delete().catch((deleteError: unknown) => {
+      console.error("Reminder cron: could not release the D11 claim", deleteError);
+    });
     throw error;
   }
 }
