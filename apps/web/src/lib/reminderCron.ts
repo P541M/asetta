@@ -9,6 +9,12 @@ export function isCronAuthorized(
   return authHeader === `Bearer ${secret}`;
 }
 
+/**
+ * How many due users a run handles at once (A19). One user's reads and sends still run one after
+ * another, and every email goes through the run's few Gmail connections (lib/email.ts).
+ */
+export const USERS_AT_ONCE = 10;
+
 /** A rejected address fails every time, so a reminder gets this many sends at most. */
 export const MAX_SEND_ATTEMPTS = 3;
 /** The least time between two attempts at one reminder (runs are 30 minutes apart). */
