@@ -566,12 +566,38 @@ never duplicated into component state (the source of the 2026-07-16 flicker fix)
   own in-page page-title-tier heading ("Settings"); the header `title` prop is gone (v4.2).
   Subpages never show the mobile bottom nav.
 
+### Scrollbars (locked 2026-10-19)
+
+- **The browser's own scrolling, one look on every desktop OS, no JS** (founder call
+  2026-10-19). `globals.css` is the only place scrollbars are styled: a 10px bar with a rounded
+  6px thumb (`--muted-foreground` at 35%, 60% on hover) on a clear track, no arrow buttons.
+  Chromium and Safari draw it from `::-webkit-scrollbar` (under `pointer: fine`); Firefox gets
+  `scrollbar-width: thin` in the same color. Touch screens keep their native overlay scrollbars.
+  No scrollbar libraries and no per-component scrollbar CSS. The landing site uses the same
+  recipe in its own palette (stone-500); keep the two in step.
+- **Never set `scrollbar-width` or `scrollbar-color` where `::-webkit-scrollbar` applies**:
+  Chrome ignores every `::-webkit-scrollbar` rule on an element that has either (the styling
+  before 2026-10-19 never rendered for this reason). The Firefox rule sits behind
+  `@supports not selector(::-webkit-scrollbar)`.
+- **The page keeps its scrollbar strip** (`scrollbar-gutter: stable` on `html`), so content never
+  shifts sideways between short and long pages. Never put `scrollbar-gutter` on `*`: it reserves
+  a blank strip inside every `overflow-hidden` box.
+- **One scroller per surface**: a scrolling area never sits inside another one. In the notes
+  modal the editor's text area is the scroller; the toolbar stays put.
+
 ### Overlays (the modal recipe)
 
 - Panel: `fixed inset-0 z-150 bg-black/60` backdrop (click closes; panel stops propagation),
   `max-w-sm rounded-2xl bg-card shadow-lg`; header row = title + ghost X;
   `role="dialog" aria-modal`. **No entrance animation** — overlays appear instantly (pop/scale
   effects read as tacky; founder decision 2026-07-14).
+- **Every overlay locks the page with `useScrollLock`** (`hooks/useScrollLock.ts`; pass `isOpen`
+  when the overlay stays mounted while closed). Overlays share the lock, so stacked ones keep the
+  page locked until the last closes. It swaps the page's scrollbar strip for body padding, so the
+  backdrop covers the whole window and nothing behind it moves; a fixed full-width bar keeps its
+  width with `right-[var(--scroll-lock-strip,0px)]` in place of `inset-x-0` (the mobile bottom
+  nav). Never set `overflow` on `body` or `html` by hand. The landing site has an identical copy
+  of the hook (the apps share no code); change both together.
 - **One surface owns one concept, one entry point opens it.** Creation and management of the
   same object live in the SAME overlay (the Semesters modal has the add input at top — never a
   separate floating input), and exactly ONE control leads there (a single "Manage semesters"

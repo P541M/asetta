@@ -1,7 +1,8 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { createPortal } from "react-dom";
 import { Clock, X } from "lucide-react";
 import { Button } from "../ui/button";
+import { useScrollLock } from "../../hooks/useScrollLock";
 
 interface ApiLimitReachedModalProps {
   isOpen: boolean;
@@ -9,17 +10,7 @@ interface ApiLimitReachedModalProps {
 }
 
 const ApiLimitReachedModal: React.FC<ApiLimitReachedModalProps> = ({ isOpen, onClose }) => {
-  // Prevent body scroll while open
-  useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "unset";
-    }
-    return () => {
-      document.body.style.overflow = "unset";
-    };
-  }, [isOpen]);
+  useScrollLock(isOpen);
 
   if (!isOpen) return null;
 

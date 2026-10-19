@@ -4,16 +4,18 @@
    container fill, focus ring) is styled in RichTextEditor.tsx / NotesModal.tsx;
    these rules cover the ProseMirror-generated content markup. */
 
+/* EditorContent's wrapper (RichTextEditor.tsx) scrolls, never this element: one scroller per
+   surface */
 .rich-text-editor .ProseMirror {
   /* text-base: editor content is input text (16px also prevents iOS zoom) */
-  @apply max-h-[500px] min-h-[200px] overflow-y-auto text-base text-foreground outline-hidden;
+  @apply min-h-[200px] text-base text-foreground outline-hidden;
 }
 
 .rich-text-editor .ProseMirror p {
   @apply mb-4;
 }
 
-/* pl-6 keeps outside-positioned markers inside the scroll container (pl-4 clipped them) */
+/* pl-6 keeps outside-positioned markers inside the text area (pl-4 clipped them) */
 .rich-text-editor .ProseMirror ul {
   @apply mb-4 list-disc pl-6;
 }

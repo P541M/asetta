@@ -178,8 +178,6 @@
 @layer base {
   * {
     @apply border-border;
-    /* Improve touch scrolling on iOS */
-    -webkit-overflow-scrolling: touch;
     /* Optimize touch interactions */
     touch-action: manipulation;
   }
@@ -234,68 +232,52 @@
   }
 }
 
-@layer utilities {
-  /* Overlay Scrollbar Styles */
-  * {
-    /* Remove gutter to enable true overlay scrollbars */
-  }
-
-  /* WebKit Scrollbars (Chrome, Safari, Edge) */
-  ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
-    /* Enable overlay scrollbars that don't take up layout space */
-    position: absolute;
-    z-index: 9999;
-  }
-
-  ::-webkit-scrollbar-track {
-    /* Remove track background entirely */
-    background: transparent;
-  }
-
-  ::-webkit-scrollbar-thumb {
-    /* Style only the thumb with rounded corners */
-    @apply bg-border;
-    border-radius: 4px;
-    /* Default opacity 50% */
-    opacity: 0.5;
-  }
-
-  ::-webkit-scrollbar-thumb:hover {
-    /* 100% opacity on hover */
-    opacity: 1;
-  }
-
-  ::-webkit-scrollbar-thumb:active {
-    /* 100% opacity when clicked/dragged */
-    opacity: 1;
-  }
-
-  /* Firefox Scrollbar */
-  * {
-    scrollbar-width: thin;
-    /* Use transparent track and colored thumb */
-    scrollbar-color: rgba(229, 229, 229, 0.5) transparent;
-  }
-
-  .dark * {
-    /* Dark mode scrollbar colors */
-    scrollbar-color: rgba(42, 42, 42, 0.5) transparent;
-  }
-
-  /* Firefox hover state - using CSS custom properties for dynamic opacity */
+/*
+  Scrollbars: the browser's own scrolling with one look on every desktop OS, no JS
+  (standards.md, "Scrollbars"). The page keeps its scrollbar strip even when nothing scrolls, so
+  content never shifts sideways between short and long pages; useScrollLock pads the body by the
+  same strip while an overlay is open.
+*/
+@layer base {
   html {
-    --scrollbar-thumb-light: rgba(229, 229, 229, 0.5);
-    --scrollbar-thumb-dark: rgba(42, 42, 42, 0.5);
+    scrollbar-gutter: stable;
   }
 
-  html:hover {
-    --scrollbar-thumb-light: rgba(229, 229, 229, 1);
-    --scrollbar-thumb-dark: rgba(42, 42, 42, 1);
+  /* Chromium and Safari: a thin rounded thumb on a clear track, no arrow buttons. Never set
+     scrollbar-width or scrollbar-color for these browsers: Chrome ignores every
+     ::-webkit-scrollbar rule on an element that has either. Touch screens keep their native
+     overlay scrollbars. */
+  @media (pointer: fine) {
+    ::-webkit-scrollbar {
+      width: 10px;
+      height: 10px;
+    }
+
+    ::-webkit-scrollbar-track,
+    ::-webkit-scrollbar-corner {
+      background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      border: 2px solid transparent;
+      border-radius: 9999px;
+      background-clip: padding-box;
+      background-color: color-mix(in oklab, var(--muted-foreground) 35%, transparent);
+    }
+
+    ::-webkit-scrollbar-thumb:hover,
+    ::-webkit-scrollbar-thumb:active {
+      background-color: color-mix(in oklab, var(--muted-foreground) 60%, transparent);
+    }
   }
 
-  /* Safe Area Utilities */
+  /* Firefox has only the standard properties */
+  @supports not selector(::-webkit-scrollbar) {
+    * {
+      scrollbar-width: thin;
+      scrollbar-color: color-mix(in oklab, var(--muted-foreground) 35%, transparent) transparent;
+    }
+  }
 }
 
 /* SVG Logo Color Filter for Main App */

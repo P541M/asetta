@@ -9,6 +9,7 @@ import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { RichTextEditorProps } from "../../types/editor";
+import { useScrollLock } from "../../hooks/useScrollLock";
 
 interface LinkModalProps {
   hasSelection: boolean;
@@ -19,6 +20,7 @@ interface LinkModalProps {
 const LinkModal = ({ hasSelection, onClose, onSubmit }: LinkModalProps) => {
   const [url, setUrl] = useState("");
   const [text, setText] = useState("");
+  useScrollLock();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -161,7 +163,8 @@ const RichTextEditor = ({
   };
 
   return (
-    <div className="rich-text-editor">
+    /* Fills its container: the toolbar stays put and only the text area scrolls */
+    <div className="rich-text-editor flex min-h-0 flex-1 flex-col">
       <div className="flex flex-wrap gap-1 border-b border-border p-2">
         <ToolbarButton
           onClick={() => editor.chain().focus().toggleBold().run()}
@@ -213,7 +216,7 @@ const RichTextEditor = ({
           <Redo2 className="size-4" aria-hidden />
         </ToolbarButton>
       </div>
-      <EditorContent editor={editor} className="p-4" />
+      <EditorContent editor={editor} className="min-h-0 flex-1 overflow-y-auto p-4" />
       {showLinkModal && (
         <LinkModal
           hasSelection={!editor.state.selection.empty}

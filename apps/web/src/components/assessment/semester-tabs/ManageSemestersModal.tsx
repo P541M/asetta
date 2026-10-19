@@ -16,6 +16,7 @@ import { Loader2, Plus, X } from "lucide-react";
 import { Semester } from "@/types/semester";
 import { Button } from "../../ui/button";
 import { Input } from "../../ui/input";
+import { useScrollLock } from "../../../hooks/useScrollLock";
 import SortableSemester from "./SortableSemester";
 
 interface ManageSemestersModalProps {
@@ -51,6 +52,7 @@ const ManageSemestersModal = ({
       coordinateGetter: sortableKeyboardCoordinates,
     }),
   );
+  useScrollLock();
 
   return (
     <div

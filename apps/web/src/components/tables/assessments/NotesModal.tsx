@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "../../ui/button";
 import { statusTintClasses } from "./StatusSelect";
 import { formatLocalDateTime } from "../../../utils/dateUtils";
+import { useScrollLock } from "../../../hooks/useScrollLock";
 
 /* Tiptap is heavy to initialize and bundle; loading it lazily lets the modal
    shell paint instantly and keeps the editor out of the dashboard's main chunk. */
@@ -23,6 +24,7 @@ interface NotesModalProps {
 /** Large overlay with the rich-text notes editor for one assessment. */
 const NotesModal = ({ assessment, onClose, onSave }: NotesModalProps) => {
   const [draft, setDraft] = useState(assessment.notes ?? "");
+  useScrollLock();
 
   const handleCopy = () => {
     const text = `Assignment: ${assessment.assignmentName}\nCourse: ${
@@ -85,9 +87,11 @@ const NotesModal = ({ assessment, onClose, onSave }: NotesModalProps) => {
             </Button>
           </div>
         </div>
-        <div className="min-h-0 flex-1 overflow-y-auto px-5">
+        {/* The canvas grows with the modal and its text area scrolls. This wrapper scrolls only
+            on screens too short for the canvas's minimum height. */}
+        <div className="flex min-h-0 flex-1 flex-col overflow-y-auto px-5">
           {/* Writing canvas, not a form field: tonal fill only, no focus ring (founder call 2026-07-16) */}
-          <div className="overflow-hidden rounded-xl bg-input">
+          <div className="flex min-h-72 flex-1 flex-col overflow-hidden rounded-xl bg-input">
             <RichTextEditor
               content={draft}
               onChange={setDraft}

@@ -1,8 +1,8 @@
-import { useEffect } from "react";
 import { X } from "lucide-react";
 import { Day } from "../../types/calendar";
 import { cn } from "@/lib/utils";
 import { Button } from "../ui/button";
+import { useScrollLock } from "../../hooks/useScrollLock";
 import { statusTintClasses } from "../tables/assessments/StatusSelect";
 import { NEEDS_REVIEW_LABEL } from "../../utils/urgency";
 
@@ -14,13 +14,7 @@ interface DayDetailModalProps {
 
 /** Modal listing all assessments due on the clicked day (standard overlay recipe). */
 const DayDetailModal = ({ day, onClose, formatDateTime }: DayDetailModalProps) => {
-  // Prevent body scroll while open
-  useEffect(() => {
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = "unset";
-    };
-  }, []);
+  useScrollLock();
 
   const dateLabel = day.date.toLocaleDateString(undefined, {
     weekday: "long",

@@ -44,7 +44,7 @@ const TabNavigationBar = () => {
 
       {/* Mobile: fixed bottom navigation (below the overlay recipe's z-150) */}
       <nav
-        className="pb-safe fixed inset-x-0 bottom-0 z-40 bg-card shadow-soft md:hidden"
+        className="pb-safe fixed right-[var(--scroll-lock-strip,0px)] bottom-0 left-0 z-40 bg-card shadow-soft md:hidden"
         role="tablist"
         aria-label="Primary"
       >

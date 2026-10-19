@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { createPortal } from "react-dom";
 import { useRouter } from "next/router";
 import { CalendarDays, Clock, Info, ListChecks, Plus, X } from "lucide-react";
@@ -7,6 +7,7 @@ import { resolveCourseColor } from "../../constants/courseColors";
 import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
 import { Button } from "../ui/button";
 import CourseColorDot from "../ui/CourseColorDot";
+import { useScrollLock } from "../../hooks/useScrollLock";
 
 interface ExtractionSuccessModalProps {
   isOpen: boolean;
@@ -25,17 +26,7 @@ const ExtractionSuccessModal: React.FC<ExtractionSuccessModalProps> = ({
 }) => {
   const router = useRouter();
 
-  // Prevent body scroll while open
-  useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "unset";
-    }
-    return () => {
-      document.body.style.overflow = "unset";
-    };
-  }, [isOpen]);
+  useScrollLock(isOpen);
 
   if (!isOpen) return null;
 
