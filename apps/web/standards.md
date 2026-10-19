@@ -22,15 +22,33 @@ All new code follows these.
   same-named folder (see `tables/assessments/`, `assessment/semester-tabs/`,
   `assessment/grade-calculator/`, `components/auth/`).
 - **The user doc is read once, live.** `hooks/useUserDoc.ts` keeps one `onSnapshot` on
-  `users/{uid}` for the session, and `AuthContext` derives the profile, display preferences and
+  `users/{uid}` for the session (`hooks/userDocListener.ts`, which it loads on sign-in; see the
+  next rule), and `AuthContext` derives the profile, display preferences and
   onboarding status from it: read them from `useAuth()`, never with a `getDoc` of your own. The
   sign-in writes run on the server's first answer: the doc is created only when the server says
   it is missing (an offline cache can't, or the app would write a new doc over the real one),
   `lastLogin` at most once per local day, and the zone when it is missing or has changed.
+- **`_app` ships Firebase Auth, never Firestore** (A15). `lib/firebase.ts` holds the app and
+  Auth; `db` lives in `lib/firestore.ts`, which nothing in `_app`'s import graph (`AuthContext`,
+  `useUserDoc`, what they import) may import statically. Firestore code those files need loads
+  with `import()` when it runs: the user-doc listener on sign-in, the sign-in redirect's
+  onboarding read. So does a page that reads Firestore only once the user doc is in
+  (`/dashboard`'s first-semester lookup, `hooks/firstSemester.ts`). Lazy-load a module of your
+  own with named imports, never `import("firebase/firestore")` itself: the namespace stops
+  webpack from tree-shaking Firestore, which added 30 kB to every page that uses it. After
+  changing what `_app` or a page imports, compare `npm run build`'s First Load JS with the
+  Baseline in `docs/AUDIT.md`.
 - **The dashboard's assessments come from one live listener** (`useSemesterAssessments`,
   passed down as `DashboardData`). Tabs derive their views from it; no tab reads assessments
   with `getDocs` or refreshes another tab by hand. Listing docs in order to write them (course
   rename, semester delete) is the only exception.
+- **Each dashboard tab is its own chunk** (`next/dynamic` in
+  `components/pages/UnifiedDashboardPage.tsx`, the tabs in `components/pages/dashboard-tabs/`),
+  so a dashboard page loads only the chrome up front. The open tab's chunk is fetched at mount,
+  while auth and the data load; the other tabs render hidden once the data is in, which fetches
+  theirs, and they stay mounted. A tab still loading shows nothing for 200 ms, then the spinner.
+  Heavy UI behind a click (the notes editor, Manage semesters' drag list, fetched when the
+  semester menu opens) is a `next/dynamic` part of its surface too.
 - **No writes on read.** Viewing something never creates or updates a doc; a missing value falls
   back to its default when read (course preferences, course colors).
 - **User text never goes into a Firestore path as is.** A "/" adds path segments: one makes
@@ -49,7 +67,9 @@ All new code follows these.
 - **A failed load shows an error state, never a spinner that waits forever.** A page that needs
   the user doc returns `ui/LoadErrorScreen` on `userDocError` (the dashboard layout, Settings,
   onboarding). It stays out of `_app`, where its UI imports would land in every page's shared
-  bundle.
+  bundle. Code that fails to load counts as a failed load: the user-doc listener's chunk ends in
+  the same screen (and loads again when the browser comes back online), and a dashboard tab or
+  the semester list shows an error with "Try again" (`next/dynamic`'s `retry`).
 - **Pure logic goes in `src/utils/`** as typed, testable functions (see `gradeCalculations.ts`).
   Shared constants go in `src/constants/` (see `isCompletedStatus` — never re-inline
   `["Submitted", "Missed"]`).
@@ -67,7 +87,7 @@ All new code follows these.
 - No dead code: unused exports, unreachable branches, and "just in case" props get deleted, not
   commented out. (Deliberate exception: `src/pages/index.tsx` is kept as a redirect safety net.)
 - Comments explain constraints the code can't express (see the adjust-state-during-render note in
-  `UnifiedDashboardPage.tsx`), never narrate what the next line does.
+  `components/pages/dashboard-tabs/GradesTab.tsx`), never narrate what the next line does.
 
 ### API routes and server code
 

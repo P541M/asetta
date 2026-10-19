@@ -15,9 +15,9 @@ Students upload course outlines, Gemini extracts the assessments, and they track
 
 - `pages/`: thin route files; `pages/api/`: server routes (`upload`, `welcome-email`, `notification-email/verify` and `confirm`, `cron/notifications`, `dev/email-preview`)
 - `components/`: markup, by feature; `components/ui/`: shadcn primitives (lowercase) and shared app components
-- `hooks/`: client Firestore reads and writes; `lib/`: Firebase setup, server logic (email, notifications, upload)
+- `hooks/`: client Firestore reads and writes; `lib/`: Firebase setup (`firebase.ts` for the app and Auth, `firestore.ts` for `db`, kept out of `_app`), server logic (email, notifications, upload)
 - `utils/`: pure functions; `constants/`, `contexts/`, `types/`; `styles/globals.css`: theme tokens and Tailwind config
-- `contexts/AuthContext.tsx`: the signed-in user and the live user doc (`hooks/useUserDoc.ts`); the dashboard's assessments are one live listener (`hooks/useSemesterAssessments.ts`)
+- `contexts/AuthContext.tsx`: the signed-in user and the live user doc (`hooks/useUserDoc.ts`, which loads `hooks/userDocListener.ts` on sign-in); the dashboard's assessments are one live listener (`hooks/useSemesterAssessments.ts`); its tabs are `next/dynamic` chunks (`components/pages/dashboard-tabs/`)
 - Tests: `*.test.ts` next to the module they cover; shared fixtures in `test/`
 - Outside `src/`: `vercel.json` (the daily backstop cron, function limits); `vitest.config.ts`; `firestore.rules` and `.github/workflows/reminders.yml` (the 30-minute reminder schedule) at the repo root
 
