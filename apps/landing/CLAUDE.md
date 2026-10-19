@@ -35,7 +35,8 @@ npm run build -w apps/landing         # Production build (`npm run build` builds
 
 - **`site.ts`**: Single source of truth for external URLs (`REGISTER_URL`, `LOGIN_URL`, `CONTACT_EMAIL`, `LINKEDIN_URL`), default meta strings (`SITE_TITLE`, `SITE_DESCRIPTION`), header nav links (`NAV_LINKS`), and footer link groups (`FOOTER_LINK_GROUPS`). Add/remove nav entries here, not in components. `next.config.ts` imports the auth URLs from here for its redirects.
 - **`features.ts`**: Feature and challenge copy (`FEATURES`, `HOME_FEATURES`, `CHALLENGES`). The home page shows the first three features; the features page shows all six.
-- **`contact.ts`**: `ContactFormPayload`, the contact form's POST contract shared by the contact page and the API route.
+- **`contact.ts`**: `ContactFormPayload`, the contact form's POST contract shared by the contact page and the API route (`website` is the honeypot, always empty from the page).
+- **`rateLimit.ts`**: the in-memory sliding-window limiter and `clientIp` behind the contact route's per-IP limit (A20). Memory is per function instance, so it slows abuse but is no hard cap; see "Limits" in `docs/ops.md`.
 - **`utils.ts`**: `cn()` helper (clsx + tailwind-merge).
 
 ### Components (`src/components/`)
@@ -65,9 +66,9 @@ npm run build -w apps/landing         # Production build (`npm run build` builds
 - **`index.tsx`**: Hero with the tagline headline and the dark/light dashboard slider (in a macOS-style window frame) cresting into the first viewport, challenges tile grid, feature highlights (`layout="featured"`), closing `CTAPanel` (all pages share the same closing CTA pattern)
 - **`features.tsx`**: All six features + CTA block
 - **`about.tsx`**: Single company page — mission, why we built Asetta, founder's note, promise CTA (the former `/story` and `/founders-note` pages were merged here and redirect to it)
-- **`contact.tsx`**: Split layout (intro + email alternative left, form right). Filled borderless inputs (`bg-stone-100`, white + ring on focus); CASL consent checkbox; posts to `/api/contact`
+- **`contact.tsx`**: Split layout (intro + email alternative left, form right). Filled borderless inputs (`bg-stone-100`, white + ring on focus); CASL consent checkbox; a honeypot `website` field hidden with CSS (`display: none`, `aria-hidden`, out of the tab order); posts to `/api/contact`
 - **`privacy.tsx`**, **`terms.tsx`**: Built from `LegalPage` primitives
-- **`api/contact.ts`**: Nodemailer handler; requires `EMAIL_USER` / `EMAIL_PASS`, sends to `CONTACT_EMAIL`
+- **`api/contact.ts`**: Nodemailer handler; requires `EMAIL_USER` / `EMAIL_PASS`, sends to `CONTACT_EMAIL`. A filled honeypot gets the usual 200 and nothing is sent; valid submissions are limited to 5 per IP per hour (429 with `Retry-After` and a message the page shows)
 
 ## Design System (premium minimal)
 

@@ -9,7 +9,12 @@ import RateLimitNotice from "../ui/RateLimitNotice";
 import ExtractionSuccessModal from "../modals/ExtractionSuccessModal";
 import ApiLimitReachedModal from "../modals/ApiLimitReachedModal";
 import CopyrightAgreement from "./CopyrightAgreement";
-import { postUploadForm, parseUploadResponse } from "../../lib/uploadClient";
+import {
+  postUploadForm,
+  parseUploadResponse,
+  uploadQuotaFromPayload,
+  type UploadQuota,
+} from "../../lib/uploadClient";
 import { MAX_FILE_BYTES, formatBytes, validateUploadSelection } from "../../lib/upload/constants";
 
 const UploadForm = ({ semesterId }: UploadFormProps) => {
@@ -22,6 +27,7 @@ const UploadForm = ({ semesterId }: UploadFormProps) => {
   const [retryAfter, setRetryAfter] = useState<number>(120);
   const [showSuccessModal, setShowSuccessModal] = useState<boolean>(false);
   const [showApiLimitModal, setShowApiLimitModal] = useState<boolean>(false);
+  const [uploadQuota, setUploadQuota] = useState<UploadQuota | null>(null);
   const [extractionResult, setExtractionResult] = useState<ExtractionResult | null>(null);
   const [isDragActive, setIsDragActive] = useState<boolean>(false);
   const [copyrightAgreed, setCopyrightAgreed] = useState<boolean>(false);
@@ -149,7 +155,10 @@ const UploadForm = ({ semesterId }: UploadFormProps) => {
         // Check for different types of errors
         if (status === 429) {
           if (payload?.error === "DAILY_QUOTA_EXCEEDED") {
-            setUploadStatus("daily_quota_exceeded");
+            const quota = uploadQuotaFromPayload(payload, new Date());
+            // With files left today, Extract stays enabled so the student can pick fewer
+            setUploadStatus(quota && quota.remaining > 0 ? "error" : "daily_quota_exceeded");
+            setUploadQuota(quota);
             setShowApiLimitModal(true);
             setError(payload.message || "Daily processing limit reached");
           } else if (payload?.error === "RATE_LIMITED") {
@@ -174,6 +183,7 @@ const UploadForm = ({ semesterId }: UploadFormProps) => {
       ) {
         if (err.message.includes("daily") || err.message.includes("quota exceeded")) {
           setUploadStatus("daily_quota_exceeded");
+          setUploadQuota(null);
           setShowApiLimitModal(true);
           setError("Daily processing limit reached");
         } else {
@@ -415,7 +425,11 @@ const UploadForm = ({ semesterId }: UploadFormProps) => {
       )}
 
       {/* API limit reached modal */}
-      <ApiLimitReachedModal isOpen={showApiLimitModal} onClose={handleCloseApiLimitModal} />
+      <ApiLimitReachedModal
+        isOpen={showApiLimitModal}
+        onClose={handleCloseApiLimitModal}
+        quota={uploadQuota}
+      />
     </div>
   );
 };

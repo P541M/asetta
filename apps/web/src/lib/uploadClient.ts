@@ -27,11 +27,52 @@ export interface UploadApiPayload {
   error?: string;
   message?: string;
   retryAfter?: number;
+  /** "daily": Gemini's shared quota; "temporary": its rate limit; "user": the account's (A18). */
   quotaType?: string;
+  /** With quotaType "user": the files the account can still upload today. */
+  remaining?: number;
   data?: ExtractionResult;
   errors?: string[];
   hasRateLimitErrors?: boolean;
 }
+
+/** The account's daily upload limit (A18), as the limit modal shows it. */
+export interface UploadQuota {
+  remaining: number;
+  /** When the count starts over, on the browser's clock; null when the server didn't say. */
+  resetsAt: Date | null;
+}
+
+/**
+ * The account's limit from a 429, or null when the 429 is about Gemini's own limits. The reset
+ * comes from the server's wait in seconds, so the browser's clock being off doesn't move it.
+ */
+export const uploadQuotaFromPayload = (
+  payload: UploadApiPayload | null,
+  now: Date,
+): UploadQuota | null => {
+  if (payload?.quotaType !== "user") return null;
+  const { remaining, retryAfter } = payload;
+  return {
+    remaining: typeof remaining === "number" && remaining > 0 ? Math.floor(remaining) : 0,
+    resetsAt:
+      typeof retryAfter === "number" && retryAfter > 0
+        ? new Date(now.getTime() + retryAfter * 1000)
+        : null,
+  };
+};
+
+/** "Resets at 8:00 PM", or "Resets tomorrow at 5:30 AM": midnight UTC in the student's own time. */
+export const uploadLimitResetText = (resetsAt: Date | null, now: Date): string => {
+  if (!resetsAt) return "Resets at midnight UTC";
+  // Some ICU versions put a narrow no-break space before AM/PM
+  const time = resetsAt
+    .toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })
+    .replace(/ /g, " ");
+  return resetsAt.toDateString() === now.toDateString()
+    ? `Resets at ${time}`
+    : `Resets tomorrow at ${time}`;
+};
 
 export interface ParsedUploadResponse {
   ok: boolean;

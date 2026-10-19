@@ -98,7 +98,8 @@ All new code follows these.
 - **Validate every input** at the boundary: method, types, lengths, and path-segment safety for
   anything used in a Firestore path (no `/`). Reject with a 4xx and a short message.
 - **Server-only state is written with the admin SDK** into collections no client rule matches
-  (e.g. `welcomeEmails/{uid}`, `cronRuns/{date}`, `emailVerifications/{uid}`), or into a user-doc
+  (e.g. `welcomeEmails/{uid}`, `cronRuns/{date}`, `emailVerifications/{uid}`,
+  `uploadUsage/{uid}_{day}`), or into a user-doc
   field the rules leave out of the client's list (`verifiedEmail`). Client-writable fields on the
   user doc are never trusted as a server guard.
 - **Email goes only to an address its owner proved** (A17): reminders use the chosen `email` only
@@ -106,12 +107,20 @@ All new code follows these.
   account email. Addresses saved before A17 count as confirmed (D11, set once by the cron). A link in an email that changes state opens a page whose button POSTs; the GET
   changes nothing, because mail scanners fetch links. Its token is random, stored only as a hash,
   expires, works once, and its sends are capped (`lib/emailVerification.ts`).
+- **A costly shared resource gets a per-account cap** (A18's 20 uploads a day, for the shared
+  Gemini quota): claim the request's whole share in a transaction before the costly call, so
+  overlapping requests can't both pass; refund what the call never ran on; answer 429 with
+  `quotaType: "user"` and a `retryAfter` (`lib/upload/quota.ts`).
 - **Log real failures with `console.error`** (no email addresses or other personal data in
   logs; uids and error codes are fine). `devLog`/`devError` print in development only, so they
   never carry a production failure.
 - **Escape every user value in email HTML** with `utils/escapeHtml.ts` (see "Email" in Part 2).
 - Secrets come from env vars only (the matrix is in `docs/ops.md`); a route whose secret is unset
   fails closed and logs that it is unset (see `pages/api/cron/notifications.ts`).
+- **Read an uploaded PDF's text only through `lib/upload/pdfText.ts`** (A44): it hands
+  pdf-parse a `Uint8Array` copy, because pdf-parse's pdf.js misreads a Node `Buffer` and reads a
+  pooled slice (what `fs.readFileSync` returns for a small file) from the start of the shared
+  memory, so a file could parse as another file's bytes.
 - **Delete what the request wrote to disk** in a `finally`, on success and failure alike
   (formidable's temp files in `pages/api/upload.ts`).
 - **A scheduled job records each run** in Firestore (the reminder cron's `cronRuns/{date}`),

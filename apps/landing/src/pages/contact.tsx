@@ -9,7 +9,13 @@ import type { ContactFormPayload } from "@/lib/contact";
 import { CONTACT_EMAIL } from "@/lib/site";
 import { trackContactFormSubmission } from "@/utils/analytics";
 
-const EMPTY_FORM: ContactFormPayload = { name: "", email: "", message: "", emailConsent: false };
+const EMPTY_FORM: ContactFormPayload = {
+  name: "",
+  email: "",
+  message: "",
+  emailConsent: false,
+  website: "",
+};
 
 type Status = { type: "idle" | "loading" } | { type: "success" | "error"; message: string };
 
@@ -88,6 +94,21 @@ function ContactForm() {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
+      {/* Honeypot (A20): hidden with CSS, so people and autofill never see it, while a bot that
+          reads the HTML fills it. The API drops anything that arrives with it filled. */}
+      <div className="hidden" aria-hidden="true">
+        <label htmlFor="website">Leave this field empty</label>
+        <input
+          id="website"
+          type="text"
+          name="website"
+          value={formData.website}
+          onChange={handleChange}
+          tabIndex={-1}
+          autoComplete="off"
+        />
+      </div>
+
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         <Field id="name" label="Name">
           <input

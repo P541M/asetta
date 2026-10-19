@@ -621,6 +621,7 @@ describe("server-only and unused paths", () => {
       doc(db, "notifications", `${uid}_a1_2026-10-16`),
       doc(db, "emailVerifications", uid),
       doc(db, "migrations", "d11-existing-addresses"),
+      doc(db, "uploadUsage", `${uid}_2026-10-19`),
     ];
     for (const ref of serverDocs) {
       await admin.doc(ref.path).set({ seeded: true });
