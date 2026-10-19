@@ -81,27 +81,49 @@
 }
 
 /* ---------------------------------------------------------------------------
- * Slim scrollbar
+ * Scrollbars: the browser's own scrolling with one look on every desktop OS,
+ * matching the platform. The page keeps its scrollbar strip even when nothing
+ * scrolls, so content never shifts sideways; useScrollLock pads the body by the
+ * same strip while an overlay is open.
  * ------------------------------------------------------------------------- */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
+@layer base {
+  html {
+    scrollbar-gutter: stable;
+  }
 
-::-webkit-scrollbar-track {
-  background: transparent;
-}
+  /* Chromium and Safari: a thin rounded thumb on a clear track, no arrow buttons. Never set
+     scrollbar-width or scrollbar-color for these browsers: Chrome ignores every
+     ::-webkit-scrollbar rule on an element that has either. Touch screens keep their native
+     overlay scrollbars. */
+  @media (pointer: fine) {
+    ::-webkit-scrollbar {
+      width: 10px;
+      height: 10px;
+    }
 
-::-webkit-scrollbar-thumb {
-  background-color: var(--color-stone-300);
-  border-radius: 4px;
-}
+    ::-webkit-scrollbar-track,
+    ::-webkit-scrollbar-corner {
+      background: transparent;
+    }
 
-::-webkit-scrollbar-thumb:hover {
-  background-color: var(--color-stone-400);
-}
+    ::-webkit-scrollbar-thumb {
+      border: 2px solid transparent;
+      border-radius: 9999px;
+      background-clip: padding-box;
+      background-color: color-mix(in oklab, var(--color-stone-500) 35%, transparent);
+    }
 
-* {
-  scrollbar-width: thin;
-  scrollbar-color: var(--color-stone-300) transparent;
+    ::-webkit-scrollbar-thumb:hover,
+    ::-webkit-scrollbar-thumb:active {
+      background-color: color-mix(in oklab, var(--color-stone-500) 60%, transparent);
+    }
+  }
+
+  /* Firefox has only the standard properties */
+  @supports not selector(::-webkit-scrollbar) {
+    * {
+      scrollbar-width: thin;
+      scrollbar-color: color-mix(in oklab, var(--color-stone-500) 35%, transparent) transparent;
+    }
+  }
 }

@@ -64,7 +64,7 @@ export default function Header() {
   return (
     <header
       className={cn(
-        "pt-safe-only fixed inset-x-0 top-0 z-50 bg-white/85 backdrop-blur-md transition-shadow duration-200",
+        "pt-safe-only fixed top-0 right-[var(--scroll-lock-strip,0px)] left-0 z-50 bg-white/85 backdrop-blur-md transition-shadow duration-200",
         scrolled && "shadow-[0_1px_12px_rgb(28_25_23/0.08)]",
       )}
     >

@@ -53,7 +53,11 @@ npm run build -w apps/landing         # Production build (`npm run build` builds
 - **`ContentSection.tsx`**: Plain prose section (heading + paragraphs) used on the About page.
 - **`CTAPanel.tsx`**: The standardized closing CTA on every page: a plain centered headline + lead + buttons in whitespace (no box, no band of its own); the stone footer beneath it closes the page. Self-contained (owns its vertical spacing); place it directly under page content, **outside** any narrower content container. No card children — the former `CTAPanelCard` highlights were removed as redundant and boxy.
 - **`LegalPage.tsx`**: Document-style shell for legal pages — left-aligned header with last-updated date up top, sticky "On this page" sidebar on desktop, plus primitives (`BulletList`, `Callout`, `QuickSummary`, `EmailContactCard`). All boxes are neutral stone (no color on legal pages). Pages define a `SECTIONS: LegalSectionData[]` array and pass it as the `sections` prop; the shell renders the sections and derives the TOC from their titles. `QuickSummary` takes a flat `entries` list and splits it into two columns itself.
-- **`ImageModal.tsx`**: Full-size image lightbox.
+- **`ImageModal.tsx`**: Full-size image lightbox. Locks the page with `useScrollLock`.
+
+### Hooks (`src/hooks/`)
+
+- **`useScrollLock.ts`**: Stops the page scrolling behind an overlay. An identical copy of the platform's hook (`apps/web/src/hooks/useScrollLock.ts`; the apps share no code), so change both together. Every overlay uses it; never set `overflow` on `body` or `html` by hand.
 - **`ui/image-comparison.tsx`**: Draggable before/after slider used for the dashboard preview on the home page.
 
 ### Pages (`src/pages/`)
@@ -79,6 +83,7 @@ npm run build -w apps/landing         # Production build (`npm run build` builds
 - **Buttons**: Always use `ButtonLink`; pair one `primary` CTA with a `ghost` text link rather than two boxed buttons. The primary CTA label is standardized to **"Get started"** everywhere (analytics `trackLabel`s stay page-specific). In-page closing CTAs use the shared `CTAPanel`.
 - **Motion**: subtle only — `Reveal` (small fade-up on scroll), arrow nudge on button hover; respects `prefers-reduced-motion`.
 - **Custom CSS utilities** (`globals.css`): `.pt-page` (fixed-header offset incl. notch), `.pt-safe-only`, `.filter-primary` (tints the SVG logo).
+- **Scrollbars**: the same recipe as the platform ("Scrollbars" in `apps/web/standards.md`), in stone-500: the browser's own scrolling, a 10px bar with a rounded thumb on a clear track and no arrow buttons, from `::-webkit-scrollbar` under `pointer: fine`, with the standard properties only for Firefox (Chrome ignores `::-webkit-scrollbar` on an element that has `scrollbar-width` or `scrollbar-color`). `html` keeps a stable scrollbar strip so pages never shift sideways. The fixed header uses `right-[var(--scroll-lock-strip,0px)]` instead of `inset-x-0` so it keeps its width while an overlay locks the page.
 
 ## External Integrations
 
