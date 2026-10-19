@@ -72,6 +72,11 @@ machine. Planned changes live in `docs/AUDIT.md`; this file describes what is tr
   the saved address (24 hours, at most one a minute and 5 a UTC day, the hash in
   `emailVerifications/{uid}`); `/confirm-email` POSTs `/api/notification-email/confirm` from a
   button. Links use `NEXT_PUBLIC_APP_URL`, so one sent from a preview points at production.
+- **Addresses saved before A17 count as confirmed** (D11): the first run after the D11 deploy sets
+  `verifiedEmail` to each user's saved address (valid, and no `verifiedEmail` yet), once. The
+  marker `migrations/d11-existing-addresses` records `startedAt`, `finishedAt`, `users` and
+  `confirmed`; a marker without `finishedAt` means a run died during the step: delete it and the
+  next run redoes it (users already confirmed are skipped). A64 removes the step.
 - **Records:** `notifications/{uid}_{assessmentId}_{targetDay}`. A run claims a reminder in a
   transaction (status `sending`, with `attempts` and `lastAttemptAt`) before sending, then marks
   it `sent` or `failed` (with the error message). Only `sent` blocks it for good, so overlapping
@@ -155,8 +160,9 @@ project. Never commit real values.
   create checks every key; an update checks only the keys it adds or changes, so a key an older
   app version left in a doc never blocks an edit; removing a key is always allowed. A new field
   the client writes needs a rules change and a case in the rules suite.
-- `welcomeEmails/{uid}`, `cronRuns/{date}`, `notifications/{id}` (the reminder records) and
-  `emailVerifications/{uid}` (the confirm link for a notification address) are server-only: no
+- `welcomeEmails/{uid}`, `cronRuns/{date}`, `notifications/{id}` (the reminder records),
+  `emailVerifications/{uid}` (the confirm link for a notification address) and `migrations/{id}`
+  (one-time steps, such as D11's) are server-only: no
   rule matches them, so clients are denied. So is `verifiedEmail` on the user doc: it isn't in the
   user doc's list (a client may only remove it, which sends its reminders to the account email).
 - **The rules suite:** `npm run test:rules` (from the root) starts the Firestore emulator with
