@@ -106,6 +106,21 @@ machine. Planned changes live in `docs/AUDIT.md`; this file describes what is tr
   locally against the emulators with a placeholder secret ("Testing API routes locally").
 - Planned: throughput (A19).
 
+## Limits
+
+- **Uploads (A18):** each account can upload 20 files per UTC day (D5). The count is
+  `uploadUsage/{uid}_{YYYY-MM-DD}` (`files`, server-only). The upload route claims a request's
+  files in a transaction, all or none, before any extraction, and refunds the files extraction
+  never ran on (an unreadable PDF, or Gemini refusing for its own quota or rate limit). Over the
+  limit it answers 429 with `quotaType: "user"`, and the app shows its limit dialog. To give a
+  student their uploads back today, lower `files` or delete the doc in the Firestore console.
+  Logged failure: `Upload: could not return unused files to the daily limit` (uid, error).
+- **Contact form (A20):** a hidden honeypot field, then 5 sends per IP per hour, held in the
+  function instance's memory (`apps/landing/src/lib/rateLimit.ts`). A cold start or another
+  instance starts from zero, so it slows one client in a loop; it is not a hard cap (A71). The IP
+  comes from `x-forwarded-for`, which Vercel sets to the client's address and doesn't let a
+  client supply; anywhere else that header can be spoofed.
+
 ## Environment variables
 
 Each app reads its own `.env.local` locally; production values live in the matching Vercel
@@ -161,9 +176,9 @@ project. Never commit real values.
   app version left in a doc never blocks an edit; removing a key is always allowed. A new field
   the client writes needs a rules change and a case in the rules suite.
 - `welcomeEmails/{uid}`, `cronRuns/{date}`, `notifications/{id}` (the reminder records),
-  `emailVerifications/{uid}` (the confirm link for a notification address) and `migrations/{id}`
-  (one-time steps, such as D11's) are server-only: no
-  rule matches them, so clients are denied. So is `verifiedEmail` on the user doc: it isn't in the
+  `emailVerifications/{uid}` (the confirm link for a notification address), `migrations/{id}`
+  (one-time steps, such as D11's) and `uploadUsage/{uid}_{day}` (the daily upload count, A18) are
+  server-only: no rule matches them, so clients are denied. So is `verifiedEmail` on the user doc: it isn't in the
   user doc's list (a client may only remove it, which sends its reminders to the account email).
 - **The rules suite:** `npm run test:rules` (from the root) starts the Firestore emulator with
   `npx -y firebase-tools@13.35.1 emulators:exec` and runs
@@ -236,9 +251,18 @@ project. Never commit real values.
   emulator's java process stops the whole `emulators:start`, Auth included: export first
   (`firebase emulators:export <dir> --project asetta-me`) and restart with `--import <dir>`.
 - Uploads need a `localDate` form field (YYYY-MM-DD within a day of the UTC date) or the route
-  answers 400; the app's `postUploadForm` adds it. A test PDF must be at least about 4 KB:
-  smaller ones fail in pdf-parse with "bad XRef entry" (A44). B8's generator
-  (`node_modules/.cache/b8/make-pdf.cjs`) pads its outlines past that.
+  answers 400; the app's `postUploadForm` adds it. Since A44, a test PDF of any size parses
+  (before it, a file under 4 KB on Node 20, or under 32 KB on Node 24, failed or parsed as another
+  file). B14's generator (`node_modules/.cache/b14/make-pdf.cjs <count> <dir> [padding]`) writes
+  40 KB outlines by default and about 800 bytes with padding 0.
+- B14's scripts (`node_modules/.cache/b14/`): `emu.sh` (demo project `demo-asetta-b14`, Auth
+  9199, Firestore 8180), `e2e-env.sh` and `start.sh` (production build on :3006),
+  `start-landing.sh` (:3008, no `EMAIL_PASS`), `seed.cjs`, `set-usage.cjs` (sets today's upload
+  count), `api-check.cjs` (the A18 cases, overlapping requests included), `landing-check.cjs`
+  (the A20 cases; locally the route trusts a test `x-forwarded-for`), `a44-check.cjs` (six small
+  outlines, each read as itself), `dump.cjs`, `sizes.cjs`.
+  The browser pane can't pick local files: build the PDF in the page and set the file input
+  through a `DataTransfer`, then dispatch `change`.
 - Preview emails at `/api/dev/email-preview` on `npm run dev:web` (404 outside development).
   Real test sends go to the founder's own address only, with the founder's approval.
 
