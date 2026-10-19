@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useRouter } from "next/router";
 import { useAuth } from "../../contexts/AuthContext";
 import { useTab } from "../../contexts/TabContext";
-import { db } from "../../lib/firebase";
+import { db } from "../../lib/firestore";
 import {
   collection,
   addDoc,
@@ -14,8 +14,6 @@ import {
   writeBatch,
   limit,
 } from "firebase/firestore";
-import { arrayMove } from "@dnd-kit/sortable";
-import { DragEndEvent } from "@dnd-kit/core";
 import { ChevronsUpDown, Settings2 } from "lucide-react";
 import { Semester } from "@/types/semester";
 import { SemesterTabsProps } from "@/types/course";
@@ -30,7 +28,9 @@ import {
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import SemesterTabsSkeleton from "./semester-tabs/SemesterTabsSkeleton";
-import ManageSemestersModal from "./semester-tabs/ManageSemestersModal";
+import ManageSemestersModal, {
+  loadSortableSemesterList,
+} from "./semester-tabs/ManageSemestersModal";
 
 const SemesterTabs = ({
   semesters,
@@ -148,13 +148,7 @@ const SemesterTabs = ({
   };
 
   // Optimistic reorder: without the local set, rows snap back until the batch commits
-  const handleDragEnd = async (event: DragEndEvent) => {
-    const { active, over } = event;
-    if (!over || active.id === over.id) return;
-
-    const oldIndex = semesters.findIndex((s) => s.id === active.id);
-    const newIndex = semesters.findIndex((s) => s.id === over.id);
-    const newSemesters = arrayMove(semesters, oldIndex, newIndex);
+  const handleReorder = async (newSemesters: Semester[]) => {
     setSemesters(newSemesters);
 
     if (user) {
@@ -177,7 +171,13 @@ const SemesterTabs = ({
   return (
     <div className="min-w-0">
       {/* One switcher instead of pill clutter: current semester + everything else in the menu */}
-      <DropdownMenu>
+      <DropdownMenu
+        onOpenChange={(open) => {
+          // Fetch Manage semesters' list now, so it is there by the time the item is picked.
+          // A failed fetch is retried, and shown, by the list's own load.
+          if (open) loadSortableSemesterList().catch(() => {});
+        }}
+      >
         <DropdownMenuTrigger asChild>
           <Button
             type="button"
@@ -221,7 +221,7 @@ const SemesterTabs = ({
             setShowManageModal(false);
             setNewSemester("");
           }}
-          onDragEnd={handleDragEnd}
+          onReorder={handleReorder}
           onEdit={handleEditSave}
           onDelete={handleDeleteSemester}
           addValue={newSemester}

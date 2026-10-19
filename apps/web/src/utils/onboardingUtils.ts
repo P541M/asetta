@@ -1,6 +1,6 @@
 import { User } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
-import { db } from "@/lib/firebase";
+import { db } from "@/lib/firestore";
 import { OnboardingUserData } from "../types/onboarding";
 import { OnboardingStatus, onboardingStatusFromUserDoc } from "./userDoc";
 

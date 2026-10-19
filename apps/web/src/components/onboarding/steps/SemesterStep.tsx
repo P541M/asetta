@@ -5,7 +5,7 @@ import { useOnboarding } from "../../../contexts/OnboardingContext";
 import { StepNavigation } from "../ui/StepNavigation";
 import { Input } from "../../ui/input";
 import { Label } from "../../ui/label";
-import { db } from "../../../lib/firebase";
+import { db } from "../../../lib/firestore";
 import { collection, addDoc, query, orderBy, limit, getDocs } from "firebase/firestore";
 
 export function SemesterStep() {

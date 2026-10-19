@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
 import { writeBatch, getDocs, query, where, getDoc } from "firebase/firestore";
-import { db } from "../lib/firebase";
+import { db } from "../lib/firestore";
 import { useAuth } from "../contexts/AuthContext";
 import { getAssessmentsRef, getCoursePreferencesDocRef } from "../lib/firebaseUtils";
 import { isValidCourseColor } from "../constants/courseColors";

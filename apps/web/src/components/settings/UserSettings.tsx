@@ -2,7 +2,7 @@ import { useState, useEffect, FormEvent } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import { updateProfile } from "firebase/auth";
 import { doc, updateDoc, getDoc, serverTimestamp } from "firebase/firestore";
-import { db } from "../../lib/firebase";
+import { db } from "../../lib/firestore";
 import ProfileSection from "./ProfileSection";
 import PreferencesSection from "./PreferencesSection";
 import NotificationsSection from "./NotificationsSection";

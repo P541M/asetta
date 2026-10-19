@@ -1,8 +1,6 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { useRouter } from "next/router";
-import { db } from "../lib/firebase";
-import { collection, getDocs, query, orderBy, limit } from "firebase/firestore";
 import { shouldRedirectToOnboarding } from "../utils/userDoc";
 import LoadingScreen from "../components/ui/LoadingScreen";
 
@@ -32,14 +30,13 @@ const Dashboard = () => {
       if (!redirecting) {
         setRedirecting(true);
         try {
-          // Get the user's first semester
-          const semestersRef = collection(db, "users", user.uid, "semesters");
-          const q = query(semestersRef, orderBy("order", "asc"), limit(1));
-          const querySnapshot = await getDocs(q);
+          // Loaded here, not with the page: the user doc's listener has loaded Firestore by now,
+          // and a signed-out visitor never needs it (A15)
+          const { firstSemesterId } = await import("../hooks/firstSemester");
+          const semesterId = await firstSemesterId(user.uid);
 
-          if (!querySnapshot.empty) {
-            const firstSemester = querySnapshot.docs[0];
-            router.push(`/dashboard/${firstSemester.id}/assessments`);
+          if (semesterId) {
+            router.push(`/dashboard/${semesterId}/assessments`);
           } else {
             // No semesters found, redirect to assessments page to create one
             router.push("/dashboard/assessments");

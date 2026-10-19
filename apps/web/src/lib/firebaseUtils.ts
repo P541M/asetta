@@ -1,4 +1,4 @@
-import { db } from "./firebase";
+import { db } from "./firestore";
 import { collection, doc, CollectionReference, DocumentReference } from "firebase/firestore";
 import { coursePreferencesDocId } from "../utils/courseName";
 

@@ -217,7 +217,7 @@ project. Never commit real values.
 - To drive the signed-in UI against the emulators without a code change, set a
   `__FIREBASE_DEFAULTS__` cookie on the dev server's origin before the app loads: web-safe
   base64 (no padding) of `{"emulatorHosts":{"auth":"127.0.0.1:9099","firestore":"127.0.0.1:8080"}}`.
-  `getAuth()` and `getFirestore()` in `lib/firebase.ts` then connect to the emulators. Check the
+  `getAuth()` in `lib/firebase.ts` and `getFirestore()` in `lib/firestore.ts` then connect to the emulators. Check the
   console shows "You are using the Auth Emulator" before typing any credentials, create the test
   user through the Auth emulator's REST API, and seed its user doc first: a user without one makes
   `AuthContext` request the welcome email. Give it `hasCompletedOnboarding: true` too, or the

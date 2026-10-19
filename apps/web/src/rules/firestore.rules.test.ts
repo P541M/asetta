@@ -143,7 +143,7 @@ async function seedAssessment(
 describe("users/{uid}", () => {
   const userRef = (db: Firestore, uid: string) => doc(db, "users", uid);
 
-  it("allows the sign-in create (useUserDoc bootstrapUserDoc)", async () => {
+  it("allows the sign-in create (userDocListener bootstrapUserDoc)", async () => {
     const { uid, db } = newUser();
     const now = new Date();
     await setDoc(userRef(db, uid), {
@@ -340,7 +340,7 @@ describe("users/{uid}/semesters/{semesterId}", () => {
     });
   });
 
-  it("allows a rename and a reorder (handleEditSave, handleDragEnd, the order backfill)", async () => {
+  it("allows a rename and a reorder (handleEditSave, handleReorder, the order backfill)", async () => {
     const { uid, db } = newUser();
     await seedSemester(uid, "fall");
     await seedSemester(uid, "winter");
