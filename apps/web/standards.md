@@ -131,6 +131,11 @@ All new code follows these.
   cap the retries. The reminder cron's guard is its server-only `notifications/{id}` records
   (`lib/reminderCron.ts`); `nextReminderAt` and `timeZone` on the user doc are client-writable
   scheduling hints, never a guard.
+- **A scheduled job's cost follows the work that is due, not the user count** (A19): query only
+  what is due (`nextReminderAt`, the `reminderDueDates` range) and only the fields the job uses
+  (`select`); put a full scan behind a `count()` that says it is needed; handle independent users
+  a few at a time (`mapWithConcurrency` in `utils/async.ts`), never all at once or one by one;
+  share connections and checks across the run (`createReminderMailer` in `lib/email.ts`).
 
 ### Testing
 
