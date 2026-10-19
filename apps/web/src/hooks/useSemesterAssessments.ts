@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { User } from "firebase/auth";
 import { collection, onSnapshot, orderBy, query } from "firebase/firestore";
-import { db } from "../lib/firebase";
+import { db } from "../lib/firestore";
 import { Assessment } from "../types/assessment";
 import {
   assessmentFromDoc,

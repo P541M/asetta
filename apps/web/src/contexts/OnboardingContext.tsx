@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useReducer, useCallback, useEffect } from "react";
 import { useRouter } from "next/router";
 import { useAuth } from "./AuthContext";
-import { db } from "../lib/firebase";
+import { db } from "../lib/firestore";
 import { doc, serverTimestamp, updateDoc } from "firebase/firestore";
 import { loadUserDataForOnboarding } from "../utils/onboardingUtils";
 import { notificationEmailStatus } from "../utils/notificationEmail";

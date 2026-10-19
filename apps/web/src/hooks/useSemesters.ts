@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { User } from "firebase/auth";
 import { collection, getDocs, onSnapshot, orderBy, query, writeBatch } from "firebase/firestore";
-import { db } from "../lib/firebase";
+import { db } from "../lib/firestore";
 import { Semester } from "@/types/semester";
 
 /**

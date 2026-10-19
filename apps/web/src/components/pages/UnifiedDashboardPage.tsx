@@ -1,322 +1,69 @@
-import { memo, useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect } from "react";
 import { useRouter } from "next/router";
-import { BookOpen, Check, ChevronsUpDown, CircleAlert, GraduationCap, Loader2 } from "lucide-react";
+import dynamic, { type DynamicOptionsLoadingProps } from "next/dynamic";
+import { CircleAlert } from "lucide-react";
 import { TabProvider, useTab, TabType } from "../../contexts/TabContext";
 import DashboardLayout from "../layout/DashboardLayout";
-import { DashboardData, TabComponentProps, CoursesTabProps } from "../../types/dashboard";
-import { resolveCourseColor } from "../../constants/courseColors";
-
-// Import existing tab content components
-import CoursesOverviewTable from "../tables/CoursesOverviewTable";
-import AssessmentsTable from "../tables/AssessmentsTable";
-import CourseFilteredAssessments from "../assessment/CourseFilteredAssessments";
-import GradeCalculator from "../assessment/GradeCalculator";
-import CalendarView from "../calendar/CalendarView";
-import AddAssessmentForm from "../forms/AddAssessmentForm";
-import UploadForm from "../forms/UploadForm";
-import { Alert, AlertDescription } from "../ui/alert";
 import { Button } from "../ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "../ui/dropdown-menu";
-import CourseColorDot from "../ui/CourseColorDot";
 import EmptyState from "../ui/EmptyState";
-import PanelHeader from "../ui/PanelHeader";
-
-/** Inline error banner for tab content (padded to sit inside the panel). */
-const TabError = ({ message }: { message: string }) => (
-  <div className="p-6">
-    <Alert variant="destructive">
-      <CircleAlert aria-hidden />
-      <AlertDescription>{message}</AlertDescription>
-    </Alert>
-  </div>
-);
+import LoadingSpinner from "../ui/LoadingSpinner";
 
 interface UnifiedDashboardPageProps {
   forceSemesterId?: string;
 }
 
-/* The five tab panels stay mounted (display-toggled) so their state survives
-   switching; memo keeps the hidden ones from re-rendering on every interaction. */
+/* Each tab is its own chunk, so a dashboard page loads only the chrome up front (A15). The open
+   tab's chunk is fetched at mount, while auth and the Firestore reads are still loading, so it is
+   normally there before the data is. */
+const TAB_LOADERS = {
+  courses: () => import("./dashboard-tabs/CoursesTab"),
+  assessments: () => import("./dashboard-tabs/AssessmentsTab"),
+  grades: () => import("./dashboard-tabs/GradesTab"),
+  calendar: () => import("./dashboard-tabs/CalendarTab"),
+  add: () => import("./dashboard-tabs/AddTab"),
+} satisfies Record<TabType, () => Promise<unknown>>;
 
-// Courses Tab Component
-const CoursesTab = memo(function CoursesTab({ data, onSelectCourse }: CoursesTabProps) {
-  const { error, courses, selectedSemesterId, courseColors, setCourseColor } = data;
-
-  return (
-    <>
-      {error ? (
-        <TabError message={error} />
-      ) : (
-        <CoursesOverviewTable
-          courses={courses}
-          onSelectCourse={onSelectCourse}
-          semesterId={selectedSemesterId}
-          courseColors={courseColors}
-          setCourseColor={setCourseColor}
-        />
-      )}
-    </>
-  );
-});
-
-// Assessments Tab Component
-const AssessmentsTab = memo(function AssessmentsTab({ data }: { data: DashboardData }) {
-  const router = useRouter();
-  const { setActiveTab } = useTab();
-  const [selectedCourse, setSelectedCourse] = useState<string | null>(null);
-  const { selectedSemesterId, assessments, error, courseColors } = data;
-
-  useEffect(() => {
-    if (router.query.course && typeof router.query.course === "string") {
-      setSelectedCourse(decodeURIComponent(router.query.course));
-    } else {
-      setSelectedCourse(null);
-    }
-  }, [router.query.course]);
-
-  const handleClearCourseSelection = () => {
-    setSelectedCourse(null);
-    const newQuery = { ...router.query };
-    delete newQuery.course;
-    // Switch back to courses tab when clearing course selection
-    newQuery.tab = "courses";
-    router.replace({ pathname: router.pathname, query: newQuery }, undefined, {
-      shallow: true,
-    });
-    setActiveTab("courses");
-  };
-
-  return (
-    <div>
-      {selectedCourse ? (
-        <CourseFilteredAssessments
-          assessments={assessments}
-          error={error}
-          semesterId={selectedSemesterId}
-          selectedCourse={selectedCourse}
-          onBack={handleClearCourseSelection}
-          courseColors={courseColors}
-        />
-      ) : (
-        <>
-          {error ? (
-            <TabError message={error} />
-          ) : (
-            <AssessmentsTable
-              assessments={assessments}
-              semesterId={selectedSemesterId}
-              courseColors={courseColors}
-            />
-          )}
-        </>
-      )}
-    </div>
-  );
-});
-
-// Grades Tab Component
-const GradesTab = memo(function GradesTab({ data, urlSemesterId }: TabComponentProps) {
-  const router = useRouter();
-  const [selectedCourse, setSelectedCourse] = useState<string | null>(null);
-  const [autoSaveStatus, setAutoSaveStatus] = useState<"idle" | "saving" | "saved" | "error">(
-    "idle",
-  );
-  const [autoSaveError, setAutoSaveError] = useState<string | undefined>();
-  const { selectedSemesterId, assessments, availableCourses, error, courseColors } = data;
-
-  useEffect(() => {
-    if (router.query.course && typeof router.query.course === "string") {
-      const courseFromUrl = decodeURIComponent(router.query.course);
-      setSelectedCourse(courseFromUrl);
-    }
-  }, [router.query.course]);
-
-  // Select the first course when none is selected, or when the selected one is gone (renamed
-  // in another tab, or left over from another semester).
-  // Deliberate "adjust state during render" (see react.dev: You Might Not Need an Effect):
-  // the guard prevents loops, and unlike a useEffect this re-renders before paint,
-  // so the tab never flashes an unselected state once courses load.
-  if (
-    availableCourses.length > 0 &&
-    (!selectedCourse || !availableCourses.includes(selectedCourse))
-  ) {
-    setSelectedCourse(availableCourses[0]);
-  }
-
-  const handleAddAssessment = () => {
-    const basePath = urlSemesterId ? `/dashboard/${urlSemesterId}` : "/dashboard";
-    router.push(`${basePath}?tab=add`);
-  };
-
-  const handleAutoSaveStatusChange = useCallback(
-    (status: "idle" | "saving" | "saved" | "error", error?: string) => {
-      setAutoSaveStatus(status);
-      setAutoSaveError(error);
-    },
-    [],
-  );
-
-  if (!selectedSemesterId) {
+/** A tab still loading: nothing for the first 200 ms (nearly every load), then the spinner. */
+const TabLoading = ({ error, pastDelay, retry }: DynamicOptionsLoadingProps) => {
+  if (error) {
     return (
       <EmptyState
-        icon={GraduationCap}
-        title="No semester selected"
-        description="Select a semester above to view grade calculations for your courses."
+        icon={CircleAlert}
+        title="Couldn't load this tab"
+        description="Check your internet connection, then try again."
+        action={
+          <Button type="button" onClick={retry}>
+            Try again
+          </Button>
+        }
       />
     );
   }
-
+  if (!pastDelay) return null;
   return (
-    <div className="p-6">
-      <PanelHeader
-        title="Grade calculator"
-        actions={
-          <>
-            {/* Feedback motion only: the indicator responds to a save the user triggered */}
-            <div className="flex min-h-5 items-center">
-              {autoSaveStatus === "saving" && (
-                <span className="flex items-center gap-2 text-sm text-muted-foreground motion-safe:animate-fade-in">
-                  <Loader2 className="size-4 motion-safe:animate-spin" aria-hidden />
-                  Saving...
-                </span>
-              )}
-              {autoSaveStatus === "saved" && (
-                <span className="flex items-center gap-2 text-sm text-success motion-safe:animate-fade-in">
-                  <Check className="size-4" aria-hidden />
-                  Saved
-                </span>
-              )}
-              {autoSaveStatus === "error" && autoSaveError && (
-                <span className="flex items-center gap-2 text-sm text-destructive motion-safe:animate-fade-in">
-                  <CircleAlert className="size-4" aria-hidden />
-                  Error saving
-                </span>
-              )}
-            </div>
-
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  type="button"
-                  variant="secondary"
-                  className="min-w-48 justify-between"
-                  disabled={availableCourses.length === 0}
-                  aria-label="Switch course"
-                >
-                  <span className="flex min-w-0 items-center gap-1.5">
-                    {selectedCourse && (
-                      <CourseColorDot
-                        color={resolveCourseColor(courseColors[selectedCourse], selectedCourse)}
-                      />
-                    )}
-                    <span className="min-w-0 truncate">{selectedCourse || "Select a course"}</span>
-                  </span>
-                  <ChevronsUpDown className="text-muted-foreground" aria-hidden />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="min-w-48">
-                {availableCourses.map((course: string) => (
-                  <DropdownMenuItem
-                    key={course}
-                    data-selected={selectedCourse === course}
-                    onSelect={() => setSelectedCourse(course)}
-                  >
-                    <CourseColorDot color={resolveCourseColor(courseColors[course], course)} />
-                    <span className="truncate">{course}</span>
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </>
-        }
-      />
-
-      {error ? (
-        <Alert variant="destructive">
-          <CircleAlert aria-hidden />
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      ) : availableCourses.length === 0 ? (
-        <EmptyState
-          icon={BookOpen}
-          title="No courses yet"
-          description="This semester doesn't have any assessments yet."
-          action={
-            <Button type="button" onClick={handleAddAssessment}>
-              Add assessment
-            </Button>
-          }
-        />
-      ) : (
-        <GradeCalculator
-          // A new semester starts without the last one's unsaved edits
-          key={selectedSemesterId}
-          semesterId={selectedSemesterId}
-          selectedCourse={selectedCourse}
-          assessments={assessments}
-          onAutoSaveStatusChange={handleAutoSaveStatusChange}
-        />
-      )}
+    <div className="flex justify-center py-16">
+      <LoadingSpinner />
     </div>
   );
-});
+};
 
-// Calendar Tab Component
-const CalendarTab = memo(function CalendarTab({ data }: { data: DashboardData }) {
-  const { selectedSemester, assessments, error } = data;
-
-  return error ? (
-    <TabError message={error} />
-  ) : (
-    <CalendarView selectedSemester={selectedSemester} assessments={assessments} />
-  );
-});
-
-// Add Assessment Tab Component
-const AddTab = memo(function AddTab({ data, urlSemesterId }: TabComponentProps) {
-  const { selectedSemesterId } = data;
-
-  return (
-    <div>
-      {selectedSemesterId ? (
-        <div className="p-6">
-          <PanelHeader title="Add assessments" />
-
-          <UploadForm semesterId={selectedSemesterId} />
-
-          {/* Typographic rule between the two paths */}
-          <div className="my-8 flex items-center gap-3">
-            <div className="h-px flex-1 bg-border" />
-            <span className="text-xs font-medium text-muted-foreground">or add one manually</span>
-            <div className="h-px flex-1 bg-border" />
-          </div>
-
-          <AddAssessmentForm semesterId={selectedSemesterId} />
-        </div>
-      ) : (
-        <EmptyState
-          icon={GraduationCap}
-          title={urlSemesterId ? "Semester not found" : "No semester selected"}
-          description={
-            urlSemesterId
-              ? "Check the URL or head back to your dashboard."
-              : "Select a semester above to add assessments."
-          }
-        />
-      )}
-    </div>
-  );
-});
+// The tabs render only after the client has the user's data, never on the server. (next/dynamic
+// needs its options as a literal in each call.)
+const CoursesTab = dynamic(TAB_LOADERS.courses, { ssr: false, loading: TabLoading });
+const AssessmentsTab = dynamic(TAB_LOADERS.assessments, { ssr: false, loading: TabLoading });
+const GradesTab = dynamic(TAB_LOADERS.grades, { ssr: false, loading: TabLoading });
+const CalendarTab = dynamic(TAB_LOADERS.calendar, { ssr: false, loading: TabLoading });
+const AddTab = dynamic(TAB_LOADERS.add, { ssr: false, loading: TabLoading });
 
 // Main Content Component (with tab context)
 const DashboardContent = ({ urlSemesterId }: { urlSemesterId?: string }) => {
   const router = useRouter();
   const { activeTab } = useTab();
+
+  useEffect(() => {
+    // A failed fetch is retried, and shown, by the tab's own load
+    TAB_LOADERS[activeTab]().catch(() => {});
+  }, [activeTab]);
 
   const handleSelectCourse = useCallback(
     (courseName: string) => {
@@ -340,8 +87,11 @@ const DashboardContent = ({ urlSemesterId }: { urlSemesterId?: string }) => {
       forceSemesterId={urlSemesterId}
     >
       {(data) => (
+        /* The five tab panels stay mounted (display-toggled) so their state survives switching
+           and a tab opens with its data already loaded; memo keeps the hidden ones from
+           re-rendering on every interaction. Rendering the hidden ones is what fetches their
+           chunks, once the data is in. */
         <div>
-          {/* Render tab content based on active tab */}
           <div style={{ display: activeTab === "courses" ? "block" : "none" }}>
             <CoursesTab data={data} onSelectCourse={handleSelectCourse} />
           </div>
