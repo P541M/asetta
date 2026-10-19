@@ -126,6 +126,20 @@ export function dueReminders({
   return reminders;
 }
 
+/**
+ * The due dates (YYYY-MM-DD, inclusive) whose reminder a run at `now` may send: the reminder day
+ * is today in the user's zone or one of the catch-up days before it. The cron reads only the
+ * assessments due in this range (A19); `dueReminders` then decides which go out.
+ */
+export function reminderDueDates(
+  timeZone: string,
+  now: Date,
+  daysBefore: number,
+): { from: string; to: string } {
+  const today = localDay(now, timeZone);
+  return { from: addDays(today, daysBefore - CATCH_UP_DAYS), to: addDays(today, daysBefore) };
+}
+
 /** The `notifications/{id}` record for one reminder. */
 export function reminderRecordId(uid: string, reminder: DueReminder): string {
   return `${uid}_${reminder.assessmentId}_${reminder.targetDay}`;
