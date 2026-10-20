@@ -5,6 +5,7 @@ import {
   formatLocalDateTime,
   getDaysUntil,
   getTodayDateString,
+  isSameLocalDay,
   parseLocalDateTime,
 } from "./dateUtils";
 
@@ -129,6 +130,49 @@ describe("clock-dependent helpers", () => {
       expect(getDaysUntil("2026-10-11")).toBe(0);
       vi.setSystemTime(new Date(2026, 9, 11, 23, 59, 30));
       expect(getDaysUntil("2026-10-11")).toBe(-1);
+    });
+  });
+
+  describe("isSameLocalDay", () => {
+    // A calendar day cell holds its local midnight; the Today button matches it to the clock.
+    const cell = (monthIndex: number, day: number) => new Date(2026, monthIndex, day);
+    const todayCellMatches = (now: Date, monthIndex: number, day: number) => {
+      vi.setSystemTime(now);
+      return isSameLocalDay(cell(monthIndex, day), new Date());
+    };
+
+    it("matches today's cell at midnight", () => {
+      expect(todayCellMatches(new Date(2026, 9, 19), 9, 19)).toBe(true);
+    });
+
+    it("A56: matches today's cell at any time of day", () => {
+      expect(todayCellMatches(new Date(2026, 9, 19, 0, 0, 1), 9, 19)).toBe(true);
+      expect(todayCellMatches(new Date(2026, 9, 19, 12, 0), 9, 19)).toBe(true);
+      expect(todayCellMatches(new Date(2026, 9, 19, 23, 59, 59), 9, 19)).toBe(true);
+    });
+
+    it("A56: matches today's cell through the 23-hour March 8", () => {
+      expect(todayCellMatches(new Date(2026, 2, 8, 0, 30), 2, 8)).toBe(true);
+      expect(todayCellMatches(new Date(2026, 2, 8, 3, 30), 2, 8)).toBe(true);
+      expect(todayCellMatches(new Date(2026, 2, 8, 23, 59), 2, 8)).toBe(true);
+    });
+
+    it("A56: matches today's cell through the 25-hour November 1", () => {
+      expect(todayCellMatches(new Date(2026, 10, 1, 0, 30), 10, 1)).toBe(true);
+      expect(todayCellMatches(new Date(2026, 10, 1, 1, 30), 10, 1)).toBe(true);
+      expect(todayCellMatches(new Date(2026, 10, 1, 23, 59), 10, 1)).toBe(true);
+    });
+
+    it("doesn't match the cells either side of a DST switch", () => {
+      expect(todayCellMatches(new Date(2026, 2, 8, 23, 59), 2, 7)).toBe(false);
+      expect(todayCellMatches(new Date(2026, 2, 8, 0, 0), 2, 9)).toBe(false);
+      expect(todayCellMatches(new Date(2026, 10, 1, 23, 59), 9, 31)).toBe(false);
+      expect(todayCellMatches(new Date(2026, 10, 1, 0, 0), 10, 2)).toBe(false);
+    });
+
+    it("doesn't match the same day of another month or year", () => {
+      expect(isSameLocalDay(new Date(2026, 2, 8), new Date(2026, 3, 8))).toBe(false);
+      expect(isSameLocalDay(new Date(2026, 2, 8), new Date(2027, 2, 8))).toBe(false);
     });
   });
 });
