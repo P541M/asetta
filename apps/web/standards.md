@@ -253,7 +253,10 @@ are what make Asetta look like Asetta and not a default shadcn app:
   (`assessment/grade-calculator/NumberField.tsx`): the parent owns parsed/clamped numbers,
   the field snaps to canonical on blur. Controlling an input with a value reformatted on
   every keystroke ("12." re-rendering as "12") resets the caret — the 2026-07-22
-  cursor-jump lesson.
+  cursor-jump lesson. A keystroke that leaves no number (an emptied field, "-", ".") saves
+  nothing, so deleting a value to retype it never writes 0; the field snaps back to the saved
+  value on blur (A43, `parseTargetGradeInput` in `utils/gradeCalculations.ts`; the weight field
+  still saves 0 until A78).
 
 ### Motion
 

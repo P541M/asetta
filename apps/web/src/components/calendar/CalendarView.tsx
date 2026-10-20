@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, KeyboardEvent, useCallback } from "react";
 import { ChevronLeft, ChevronRight, ChevronsUpDown, Download } from "lucide-react";
+import { isSameLocalDay } from "../../utils/dateUtils";
 import { generateICSFile } from "../../utils/icsGenerator";
 import { Assessment } from "../../types/assessment";
 import { Day, CalendarViewProps } from "../../types/calendar";
@@ -93,8 +94,7 @@ const CalendarView = ({ selectedSemester, assessments }: CalendarViewProps) => {
       const lastDayOfMonth = new Date(year, month + 1, 0);
       const daysFromPrevMonth = firstDayOfMonth.getDay();
       const daysFromNextMonth = 6 - lastDayOfMonth.getDay();
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
+      const now = new Date();
       const days: Day[] = [];
 
       // Previous month days
@@ -105,7 +105,7 @@ const CalendarView = ({ selectedSemester, assessments }: CalendarViewProps) => {
         days.push({
           date,
           isCurrentMonth: false,
-          isToday: date.getTime() === today.getTime(),
+          isToday: isSameLocalDay(date, now),
           assessments: getAssessmentsForDate(date),
         });
       }
@@ -116,7 +116,7 @@ const CalendarView = ({ selectedSemester, assessments }: CalendarViewProps) => {
         days.push({
           date,
           isCurrentMonth: true,
-          isToday: date.getTime() === today.getTime(),
+          isToday: isSameLocalDay(date, now),
           assessments: getAssessmentsForDate(date),
         });
       }
@@ -127,7 +127,7 @@ const CalendarView = ({ selectedSemester, assessments }: CalendarViewProps) => {
         days.push({
           date,
           isCurrentMonth: false,
-          isToday: date.getTime() === today.getTime(),
+          isToday: isSameLocalDay(date, now),
           assessments: getAssessmentsForDate(date),
         });
       }
@@ -139,7 +139,7 @@ const CalendarView = ({ selectedSemester, assessments }: CalendarViewProps) => {
   }, [currentMonth, getAssessmentsForDate]);
 
   const selectedDay = selectedDate
-    ? (calendarDays.find((day) => day.date.getTime() === selectedDate.getTime()) ?? null)
+    ? (calendarDays.find((day) => isSameLocalDay(day.date, selectedDate)) ?? null)
     : null;
 
   // Navigation handlers
@@ -156,10 +156,9 @@ const CalendarView = ({ selectedSemester, assessments }: CalendarViewProps) => {
   const goToToday = () => {
     const today = new Date();
     setCurrentMonth(new Date(today.getFullYear(), today.getMonth(), 1));
-    const todayDay = calendarDays.find((day) => day.date.getTime() === today.getTime());
-    if (todayDay) {
-      setSelectedDate(todayDay.date);
-    }
+    // Opened by date, not found in the grid on screen: from another month, today's cell only
+    // exists once this month's grid is built. As with a click, only a day with assessments opens.
+    setSelectedDate(getAssessmentsForDate(today).length > 0 ? today : null);
   };
 
   // Keyboard navigation

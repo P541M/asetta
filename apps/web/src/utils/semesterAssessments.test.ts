@@ -201,7 +201,7 @@ describe("computeStats", () => {
     expect(stats.completionRate).toBe(50);
   });
 
-  it.fails("A51: counts only Submitted assessments as submitted", () => {
+  it("A51: counts only Submitted assessments as submitted", () => {
     const stats = computeStats(
       [makeAssessment({ status: "Submitted" }), makeAssessment({ status: "Missed" })],
       now,

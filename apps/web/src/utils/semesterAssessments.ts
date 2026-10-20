@@ -85,7 +85,9 @@ export function computeStats(assessmentsList: Assessment[], now: Date): Dashboar
   const totalCount = assessmentsList.length;
   const notStartedCount = assessmentsList.filter((a) => a.status === "Not started").length;
   const inProgressCount = assessmentsList.filter((a) => a.status === "In progress").length;
+  // Missed counts as done for the completion rate, but it isn't Submitted (A51)
   const completedCount = assessmentsList.filter((a) => isCompletedStatus(a.status)).length;
+  const submittedCount = assessmentsList.filter((a) => a.status === "Submitted").length;
   const upcomingCount = assessmentsList.filter((a) => {
     if (a.needsReview) return false;
     const due = dueAt(a);
@@ -96,7 +98,7 @@ export function computeStats(assessmentsList: Assessment[], now: Date): Dashboar
     total: totalCount,
     notStarted: notStartedCount,
     inProgress: inProgressCount,
-    submitted: completedCount,
+    submitted: submittedCount,
     upcomingDeadlines: upcomingCount,
     completionRate: completionRate,
   };

@@ -57,6 +57,13 @@ const startOfDay = (date: Date): Date =>
   new Date(date.getFullYear(), date.getMonth(), date.getDate());
 
 /**
+ * Whether two moments fall on the same local calendar day: a calendar day cell (its midnight)
+ * and the clock, say. Comparing the instants matches only at midnight (A56).
+ */
+export const isSameLocalDay = (a: Date, b: Date): boolean =>
+  startOfDay(a).getTime() === startOfDay(b).getTime();
+
+/**
  * Calendar days from `now` to `dueDate` on the local clock: due tomorrow is 1
  * whatever the hour. Negative once the due moment has passed, including earlier
  * the same day.

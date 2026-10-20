@@ -66,7 +66,8 @@ branch. Tick the items off and add a session log entry when done. Don't commit.
 | B13 | A15 | Bundle size | |
 | B14 | A18, A20 | Rate limits (upload quota, contact form) | D5 decided |
 | B15 | A19 | Cron throughput | After A8 |
-| any | A21 to A28, A33 to A35, A39, A40, A42 to A64, A66, A68 to A73 | Later items | As time allows; A34 needs D8; A47 once 5 days have passed since A8's first production run |
+| B17 | A51, A53, A43, A56 | Dashboard bugs students see | Test-first |
+| any | A21 to A28, A33 to A35, A39, A40, A42, A45 to A50, A52, A54, A55, A57 to A64, A66, A68 to A78 | Later items | As time allows; A34 needs D8; A47 once 5 days have passed since A8's first production run |
 
 ## Fix now
 
@@ -411,7 +412,8 @@ branch. Tick the items off and add a session log entry when done. Don't commit.
   - **Problem:** RFC 5545 ends every content line with CRLF, including `END:VCALENDAR`; the file joins with CRLF but has none after the last line. Google Calendar accepts it; a strict parser may not.
   - **Fix:** append `\r\n` after the join and update the "wraps the events" test.
 
-- [ ] **A43 · Clearing the target-grade field saves 0** · S · risk L · found during B7
+- [x] **A43 · Clearing the target-grade field saves 0** · S · risk L · found during B7 (done 2026-10-19, PR #23)
+  - **Shipped (B17):** the field's text goes through `parseTargetGradeInput` (`utils/gradeCalculations.ts`, tested): no number (empty, spaces, "-", ".", letters) saves nothing, so the saved target stays and the field snaps back to it on blur; a number is clamped to 0 to 100, like a weight. Clamped rather than refused: the weight field already clamps, a target outside 0 to 100 means nothing for a course grade, and the field shows the saved value on blur, so the student sees the clamp. A typed 0 still saves 0. Left over: every keystroke still saves, so deleting "85" one digit at a time saves 8 on the way (A76).
   - **Where:** the target `NumberField` in `apps/web/src/components/assessment/grade-calculator/GradeOverviewCards.tsx` (`parseFloat(raw) || 0`).
   - **Problem:** every keystroke saves, so deleting the target to retype it writes 0 to Firestore, and leaving the field empty keeps 0. Before B7 the `|| 85` showed 85 while 0 was saved; now the 0 shows, with "Target already secured" while the field is empty.
   - **Fix:** don't save an empty or unparseable value (the field snaps back to the saved target on blur); consider clamping to 0 to 100.
@@ -451,7 +453,8 @@ branch. Tick the items off and add a session log entry when done. Don't commit.
   - **Problem:** the hint that says when reminders go out (A32) sits inside the custom-days panel, so a student who picks 1, 2, 3 or 7 days never sees it.
   - **Fix:** show the time under the timing field for every choice.
 
-- [ ] **A51 · The stats bar's "Submitted" counts Missed assessments** · S · risk L · found during B10
+- [x] **A51 · The stats bar's "Submitted" counts Missed assessments** · S · risk L · found during B10 (done 2026-10-19, PR #23)
+  - **Shipped (B17):** `computeStats` counts `status === "Submitted"` for `submitted`; the completion rate still counts Missed as done. The `it.fails` is a plain `it`. The table's filter has the same mismatch (A74).
   - **Where:** `computeStats` in `apps/web/src/utils/semesterAssessments.ts` (`submitted: completedCount`), shown by the "Submitted" card in `DashboardLayout.tsx`.
   - **Problem:** `isCompletedStatus` counts Submitted and Missed, so a student with one Submitted and one Missed assessment sees "Submitted 2". The completion rate counting Missed as done is deliberate; the label is not.
   - **Fix:** count `status === "Submitted"` only, and keep the completion rate as it is.
@@ -462,7 +465,8 @@ branch. Tick the items off and add a session log entry when done. Don't commit.
   - **Problem:** Firestore's `orderBy` leaves out docs without the field, so such an assessment never appears in any tab, and its weight and mark never reach the grade. The mapping's "today" default only applies to an empty or null `dueDate`. Before B10 it was worse: the grades tab read such docs with `getDocs` and its sort crashed the whole dashboard (`parseLocalDateTime(undefined)`, reproduced on main with a seeded doc). The upload (B8's normalizer) and the Add form always write a date, so only old or hand-edited docs can be affected.
   - **Fix:** drop the `orderBy` and sort on the client (every consumer sorts anyway), and give such a doc `needsReview` with the viewer's today rather than a silent default (D10's rule). Or first check with an admin script whether any production doc lacks a `dueDate`.
 
-- [ ] **A53 · The grade breakdown labels a Missed assessment "Pending" or "Overdue"** · S · risk L · found during B10
+- [x] **A53 · The grade breakdown labels a Missed assessment "Pending" or "Overdue"** · S · risk L · found during B10 (done 2026-10-19, PR #23)
+  - **Shipped (B17):** the row rule is `breakdownStatus(assessment, now)` in `utils/gradeCalculations.ts` (tested), returning `submitted`, `missed`, `overdue` or `pending`; a Missed assessment is `missed` whatever its date. The component maps each to its icon, tint and label: Missed has `CircleX` (the status menu's Missed icon) and `statusTintClasses.Missed`. The breakdown now reads its clock from `useNow`, so a row turns Overdue on a page left open. Flagged rows still go by their placeholder date (A75).
   - **Where:** `getAssessmentStatus` in `apps/web/src/components/assessment/grade-calculator/AssessmentBreakdown.tsx`.
   - **Problem:** the label looks at Submitted and the due date only. A Missed assessment due later reads "Pending" and a past one "Overdue", while the grade counts it as 0 (D1).
   - **Fix:** a "Missed" label with the Missed tint (`statusTintClasses.Missed`).
@@ -477,7 +481,8 @@ branch. Tick the items off and add a session log entry when done. Don't commit.
   - **Problem:** each write ack and each connectivity change sets new state, so the whole dashboard re-renders two or three times per user-doc write (a settings toggle, the daily `lastLogin`).
   - **Fix:** after the first server answer, skip the state update when only the metadata changed.
 
-- [ ] **A56 · The calendar's Today button never opens today** · S · risk L · found during B10
+- [x] **A56 · The calendar's Today button never opens today** · S · risk L · found during B10 (done 2026-10-19, PR #23)
+  - **Shipped (B17):** cells and the open day are matched with `isSameLocalDay` (`utils/dateUtils.ts`, tested with `vi.setSystemTime` through Mar 8 and Nov 1, 2026). A second fault hid behind the first: Today looked for today's cell in the grid on screen, which from another month doesn't hold it. Now Today (and Home) sets the open day by date and the new month's grid finds it; like a click, it opens only a day with assessments (with none, or a filter hiding them, it just moves to this month).
   - **Where:** `goToToday` in `apps/web/src/components/calendar/CalendarView.tsx` (also the Home key).
   - **Problem:** it compares each day's midnight with `new Date()` (the current time), which never matches, so the month moves but today's day never opens.
   - **Fix:** compare with the start of today.
@@ -567,6 +572,31 @@ branch. Tick the items off and add a session log entry when done. Don't commit.
   - **Problem:** each send is claimed (an attempt counted) before the login check, so with a revoked app password every due reminder fails its 3 attempts within about an hour and is never sent, even after the password is fixed the same day. Same before B15, when the check ran before every email.
   - **Fix (decide):** check the login once at the start of a run that has reminders to send; if it fails, log it, claim nothing, and give the due users a short retry (`nextReminderRun` with a retry) so the reminders go out once the login works.
 
+- [ ] **A74 · The assessments table's "Submitted" filter shows Missed assessments** · S · risk L · found during B17
+  - **Where:** `filterOptions` and the filter in `apps/web/src/components/tables/AssessmentsTable.tsx` (`isCompletedStatus`).
+  - **Problem:** the A51 mismatch in the table: "Submitted" lists Missed assessments too, and "Not submitted" hides them, though they were never submitted.
+  - **Fix (decide the copy):** filter by status (Submitted only, everything else under "Not submitted"), or keep the grouping and name it for what it is (for example "To do" and "Done").
+
+- [ ] **A75 · The grade breakdown marks a flagged assessment Overdue** · S · risk L · found during B17
+  - **Where:** `breakdownStatus` in `apps/web/src/utils/gradeCalculations.ts`.
+  - **Problem:** a `needsReview` assessment's date is a placeholder (the upload day, D10), so from the next day its breakdown row reads Overdue in the destructive tint, while the assessments table says "Check the due date" and gives it no urgency.
+  - **Fix:** a flagged open assessment is never `overdue`: `pending`, or a marker of its own with `NEEDS_REVIEW_LABEL` as its label.
+
+- [ ] **A76 · The target-grade field saves every keystroke** · S · risk L · found during B17
+  - **Where:** the target `NumberField` in `GradeOverviewCards.tsx` and `updateTargetGrade` in `apps/web/src/hooks/useCoursePreferences.ts` (one `setDoc` per keystroke, no debounce).
+  - **Problem:** typing "72.5" writes four times. Deleting "85" one digit at a time saves 8 on the way, so a field left empty snaps back to 8, not 85 (checked on the emulator in B17; A43 stopped the empty field itself from saving 0).
+  - **Fix:** debounce the save like the assessments' auto-save (`useAssessmentAutoSave`), or save on blur with the projection reading the typed value, and snap an emptied field back to the target from before the edit.
+
+- [ ] **A77 · The calendar's today highlight doesn't follow the clock** · S · risk L · found during B17
+  - **Where:** `generateCalendarDays` in `apps/web/src/components/calendar/CalendarView.tsx`.
+  - **Problem:** "today" is read only when the month, the data or a filter changes, so on a dashboard left open past midnight the highlight stays on yesterday. Time-relative UI reads `hooks/useNow` (standards.md).
+  - **Fix:** read `useNow` in the calendar and pass its time where the grid is built (it already marks today with `isSameLocalDay`).
+
+- [ ] **A78 · Clearing a weight in the grade breakdown saves 0** · S · risk L · found during B17 (`/code-review`)
+  - **Where:** `handleWeightChange` in `apps/web/src/components/assessment/GradeCalculator.tsx` (`value === "" ? 0`).
+  - **Problem:** A43's fault in the weight field: deleting a weight to retype it queues 0, which saves after the auto-save's debounce, and a field left empty shows 0, so the course weight and "remaining" change.
+  - **Fix:** parse it like the target (`parseTargetGradeInput`'s rule: no number saves nothing, a number is clamped to 0 to 100), with a test; check `applyMarkInput` keeps clearing a mark, which is meaningful there.
+
 ## Baseline (2026-10-10)
 
 Numbers to compare against when items land.
@@ -575,6 +605,7 @@ Numbers to compare against when items land.
 - `apps/web` build (Next 15.5.27, after A2): 229 kB First Load JS shared by all pages (`_app` chunk 114 kB); `/dashboard/*` 320 kB (B8 measured main at 320; the 319 recorded after A2 was stale by then) and `/dashboard/[semester]/*` 320 kB after B7 (+767 bytes, 345 gzipped, in the shared dashboard chunk: the grade view helpers and ICS folding); `/login` and `/register` 242 kB; `/onboarding` 285 kB; `/settings` 285 kB after B9 (was 284: about 20 bytes for `serverTimestamp` in the Settings save took the page from 5.38 to 5.4 kB, measured against main). After B10 (main built first, same machine): shared 229 kB with `_app` 115 kB (was 114, the user-doc listener); `/dashboard/*`, `/login` and `/settings` unchanged; `/onboarding` 286 (was 285), `/register` 243 (was 242), `/reset-password` 241 (was 240). After B11 (main built first on the same machine, Node 24.22): shared 230 kB (was 229) with `_app` 115 kB (+686 bytes, 304 gzipped: `utils/courseName.ts` through `lib/firebaseUtils.ts`); `/login` 243 (was 242) and `/dashboard` 222 (was 221) from the shared chunk; every other first-load size unchanged (page sizes moved by chunk splitting only: `/onboarding` 12.1 to 12 kB, `/settings` 5.37 to 5.34 kB). After B12 (against B11's final build on this machine, which is main's code): shared 230 kB and `_app` 115 kB unchanged; `/settings` 286 kB (was 285; the page 6.39 kB, was 5.34), `/onboarding` 287 (was 286), `/dashboard/[semester]/*` 321 (was 320); the new `/confirm-email` is 238 kB. After B13 (A15; both builds in the B13 worktree with CI's placeholder env, which puts `/register` at 244 and `/confirm-email` at 239 before the change): shared 153 kB (was 230) with `_app` 38.4 kB (was 115); `/login` 166 (was 243), `/register` 167 (was 244), `/reset-password` 165 (was 241), `/confirm-email` 162 (was 239), `/404` 157 (was 234), `/dashboard` 145 (was 222), `/dashboard/*` and `/dashboard/[semester]/*` 271 (were 320 and 321), `/settings` 273 (was 286), `/onboarding` 287 (+283 bytes gzipped). After first paint a dashboard fetches the other tabs (the tab chunks total about 37 kB) and, when the semester menu opens, the drag list (dnd-kit, about 17 kB). After B14 (against main after PR #20, built from a scratch copy; see the B14 log for the build-location noise): shared 154 kB (main 153), `/onboarding` 288 (main 287, about 420 bytes gzipped net: the upload dialog's quota copy and helpers), every other page unchanged.
 - Live Firestore rules identical to `firestore.rules` until B12, whose new rules the founder deploys after its merge (B12 log); no Storage rules (Storage unused).
 - Vercel: projects `asetta` (apps/web) and `asetta-landing` (apps/landing), Hobby plan: runtime logs kept 1 hour; cron jobs run at most once a day and fire anywhere within the scheduled hour; functions on Fluid compute get a 300-second default and maximum duration (docs checked 2026-10-11). In `apps/web/vercel.json` the cron route has `maxDuration` 300 since A3 (was 10) and the upload route 60.
+- Tests (after B17, 2026-10-19): 25 suites, per zone 726 tests, all passing; no expected failure left (A51 is fixed). The rules suite: 44 cases, unchanged.
 - Tests (after B15, 2026-10-19): 25 suites, per zone 700 tests: 699 passing and 1 expected failure (A51). The rules suite: 44 cases, unchanged.
 - Reminder cron (B15, emulators, a simulated 25 ms per Firestore call, sends failing before Gmail): the first run of a UTC day with nobody due reads 4 docs at 10, 100 or 500 users (6 at 2,000; was every user plus 2); a run with 300 of 500 users due takes 13.3 s and 3,514 reads (was 168 s and 11,738). Table in the B15 session log.
 - Tests (after B14 and A44, 2026-10-19): 23 suites, per zone 672 tests: 671 passing and 1 expected failure (A51). After B14 alone: 22 suites, 669 per zone. The rules suite: 44 cases (`uploadUsage` joined the server-only case).
@@ -1260,3 +1291,36 @@ Newest last. One entry per session: date, branch, items, what changed, what's le
   - `next start` ignores `?now=`: seed relative to the real clock, and expect record IDs to change when a seeded zone passes midnight between runs.
   - Long emulator sessions slow down (heap); restart it and interleave the builds being compared.
   - Junctions into the worktree's `node_modules` (main's scratch build) must be removed as links, never with `rm -rf` (B13's gotcha).
+
+### 2026-10-19 · B17 (`claude/b17-dashboard-bugs-9c0744`, PR #23)
+
+- **A51, A53, A43 and A56 done**, four dashboard bugs students see. Started from another session's brief. The worktree was cut from local main and brought up to origin/main (2a66255, the merge of PR #22) with the app's sync; `npm ci` (Node 24.22, npm 11.19) left the lockfile unchanged. After reviewing, the founder asked for one last `/code-review` and the PR, so the agent committed, pushed and opened it (the founder merges).
+- **What changed:**
+  - **A51:** `computeStats` counts Submitted only for `submitted`; the completion rate still counts Missed as done. The existing `it.fails` is a plain `it`.
+  - **A53:** the breakdown's label rule is `breakdownStatus(assessment, now)` in `utils/gradeCalculations.ts`, returning `submitted`, `missed`, `overdue` or `pending`; the component maps each to its icon, tint and label (Missed: `CircleX`, `statusTintClasses.Missed`). The breakdown reads its clock from `useNow` (standards.md, time-relative UI), which gives the component a body: most of its diff is re-indentation (view it with whitespace hidden).
+  - **A43:** the target field's text goes through `parseTargetGradeInput` (same file): no number saves nothing, a number is clamped to 0 to 100.
+  - **A56:** `isSameLocalDay` (`utils/dateUtils.ts`) matches a day cell to a moment; the calendar uses it for the open day and the today mark. Today (and Home) now set the open day by date instead of looking it up in the grid on screen, which from another month doesn't hold today; as with a click, only a day with assessments opens.
+- **Test-first:** each rule was first moved out of its component unchanged, then tested for the right behavior. A51's `it.fails` as a plain `it` failed on its assertion (2, not 1). The 10 new A43 and A53 cases failed on their assertions (`'pending'` and `'overdue'` for `'missed'`; `0` for nothing; 150 and -5 unclamped; run in the Toronto project only, as they don't depend on the zone), and the 3 new A56 cases failed on theirs in both zones (`false` for today's cell at any time but midnight), while the cases that hold on the old code (midnight, the cells either side) passed. Then all passed. The A56 cases run under `vi.setSystemTime` through the 23-hour Mar 8 and the 25-hour Nov 1, 2026 (Toronto) and in Kolkata.
+- **Decisions** (none needed the starting session: no grade math, rules or write-shape change; `targetGrade` is still one number, merged):
+  - **A43 clamps to 0 to 100 rather than refusing a value outside it.** The breakdown's weight field already clamps; a target outside 0 to 100 means nothing for a course grade; the field shows the saved value on blur, so the student sees the clamp. A typed 0 still saves 0 (A10). Text with a number in front ("85abc") saves the number, as the mark and weight fields do.
+  - **A53's helper returns a state key, not copy**, so the tests assert values exactly and the labels stay in the component.
+  - **A56's Today opens nothing when today has no assessments** (or a filter hides them): a click on such a day opens nothing either, and the modal would list nothing.
+- **UI check:** a production build against the emulators (`demo-asetta-b17`; Auth 9199, Firestore 8180, server on :3017), signed in through the `__FIREBASE_DEFAULTS__` cookie, seeded with one Submitted and two Missed assessments (one past due, one due Nov 20) and a problem set due today. Scripts in `node_modules/.cache/b17/` (`emu.sh`, `e2e-env.sh`, `build.sh`, `start.sh`, `seed.cjs`, `dump.cjs` for the saved target, `stats-on.cjs`, `ci-env.sh`).
+  - **A51:** the stats bar read Submitted 1 (main would show 3) and completion 50%.
+  - **A53:** both Missed quizzes read Missed with the circle-x in the destructive tint (were Overdue and Pending); Lab 1 stayed Overdue and the final Pending; the grade stayed 48.0% (D1). Light and dark, desktop and 375 px, no sideways scroll.
+  - **A43:** emptying the field left `targetGrade` 85 in the emulator and the projection at "Need 122.0%" (main saves 0 and says "Target already secured"); blur showed 85; "150" saved 100 and showed 100 on blur; "-" saved nothing.
+  - **A56:** Today from December and Home from August both landed on October with Monday, October 19 open; Today within October opened it too; with the filter on Submitted, Today moved to October and opened nothing. Only the 19th carries the today mark. Light and dark.
+- **Verification loop:** lint, `format:check`, typecheck, `npm test` (50 files, 1,452 passed, none expected to fail) and build all green with CI's placeholder env and every B17 server stopped; page sizes unchanged (shared 154 kB, dashboard pages 271 kB).
+- **`/code-review` (high):** five findings. Fixed: the grid's today mark kept its own midnight comparison beside `isSameLocalDay` (now one rule; rechecked in the UI). Filed: clearing a weight saves 0, A43's fault in the weight field (A78). Already filed: a flagged row reads Overdue (A75). No change: the target field takes the number in front of trailing text, like the mark and weight fields. Skipped: Today's month switch lives in the component, so only the comparison has a unit test; checked in the UI instead.
+- **Last `/code-review` (high, founder's request before the PR):** two findings, both fixed: this log said the A43 and A53 cases failed in both zones (that run was Toronto only), and the rule A43 sets for numeric fields wasn't in `apps/web/standards.md`.
+- **Docs:** `apps/web/standards.md` (a live-parsed numeric field saves nothing for a keystroke that leaves no number; the weight field breaks it until A78).
+- **New:** A74 (the table's Submitted filter shows Missed), A75 (a flagged row reads Overdue in the breakdown), A76 (the target field saves every keystroke, so deleting "85" digit by digit leaves 8), A77 (the calendar's today mark doesn't follow the clock past midnight), A78 (clearing a weight saves 0).
+- **Left for the founder:** the merge. No rules change, no deploy step besides the app. On the Vercel preview, with a course that has a Submitted and a Missed assessment:
+  - Stats bar (Settings, Preferences, if it's off): Submitted counts only Submitted ones; completion rate unchanged.
+  - Grades: a Missed row shows "Missed" (hover the icon) in red with a circle-x, whatever its due date.
+  - Grades: select the target and delete it, click away: the old target comes back, and the "Need ...%" line never says "Target already secured" while the field is empty. Type 150: it shows 100 after you click away.
+  - Calendar: go a month or two ahead, press Today: this month, with today's day open if something is due today.
+- **Gotchas:**
+  - The stats bar is off by default (`showStatsBar` on the user doc); turn it on to see A51.
+  - With the browser pane hidden, screenshots can show a stale frame; read values from the page instead.
+  - Next's "inferred your workspace root" warning in a worktree build comes from the main checkout's lockfile above it; harmless.
