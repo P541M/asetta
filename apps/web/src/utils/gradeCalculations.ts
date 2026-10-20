@@ -1,6 +1,7 @@
 import { Assessment, AssessmentStatus } from "../types/assessment";
 import { CoursePreferences, DEFAULT_COURSE_PREFERENCES } from "../types/coursePreferences";
 import { isCompletedStatus } from "../constants/assessment";
+import { parseLocalDateTime } from "./dateUtils";
 
 export interface GradeInfo {
   letter: string;
@@ -131,6 +132,29 @@ export function pendingEdits(
 /** The target grade the tile shows and the projection uses; a saved 0 stays 0. */
 export const resolveTargetGrade = (preferences: CoursePreferences | null): number =>
   preferences?.targetGrade ?? DEFAULT_COURSE_PREFERENCES.targetGrade;
+
+/**
+ * The target-grade field's text as the target to save, from 0 to 100 like a weight, or null
+ * when there is no number to save. The field saves on every keystroke, so an emptied field
+ * (deleting the target to retype it) must not save 0 (A43); it snaps back on blur.
+ */
+export const parseTargetGradeInput = (raw: string): number | null => {
+  const target = parseFloat(raw);
+  return Number.isNaN(target) ? null : Math.min(100, Math.max(0, target));
+};
+
+/** The grade breakdown's status marker for a row. */
+export type BreakdownStatus = "submitted" | "missed" | "overdue" | "pending";
+
+/**
+ * Which marker a breakdown row shows; overdue is derived from the due date, not stored. A
+ * Missed assessment says so whatever its date, since the grade counts it (as 0 without a mark).
+ */
+export function breakdownStatus(assessment: Assessment, now: Date): BreakdownStatus {
+  if (assessment.status === "Submitted") return "submitted";
+  if (assessment.status === "Missed") return "missed";
+  return parseLocalDateTime(assessment.dueDate, assessment.dueTime) < now ? "overdue" : "pending";
+}
 
 /** A percentage rounded the way the tiles print it, so labels and colors match the number. */
 const shown = (percentage: number): number => Number(percentage.toFixed(1));

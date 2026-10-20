@@ -1,13 +1,16 @@
 import { describe, expect, it } from "vitest";
 import { makeAssessment } from "@/test/assessments";
+import type { AssessmentStatus } from "@/types/assessment";
 import {
   applyMarkInput,
+  breakdownStatus,
   calculateRequiredGrade,
   computeCurrentGrade,
   computeTotalWeight,
   currentGradeView,
   getGradeInfo,
   getProgressBarColor,
+  parseTargetGradeInput,
   pendingEdits,
   requiredGradeView,
   resolveTargetGrade,
@@ -257,6 +260,65 @@ describe("resolveTargetGrade", () => {
 
   it("A10: a target grade of 0 stays 0 (GradeCalculator's `|| 85`)", () => {
     expect(resolveTargetGrade({ targetGrade: 0 })).toBe(0);
+  });
+});
+
+describe("parseTargetGradeInput", () => {
+  it.each([
+    ["85", 85],
+    ["72.5", 72.5],
+    ["85.", 85],
+    ["0", 0],
+    ["100", 100],
+  ])("reads %j as %f", (raw, target) => {
+    expect(parseTargetGradeInput(raw)).toBe(target);
+  });
+
+  it.each(["", "  ", "-", ".", "abc"])(
+    "A43: gives nothing to save for %j, so the saved target stays",
+    (raw) => {
+      expect(parseTargetGradeInput(raw)).toBeNull();
+    },
+  );
+
+  it.each([
+    ["150", 100],
+    ["100.5", 100],
+    ["-5", 0],
+  ])("A43: clamps %j to %f", (raw, target) => {
+    expect(parseTargetGradeInput(raw)).toBe(target);
+  });
+});
+
+describe("breakdownStatus", () => {
+  const now = new Date(2026, 9, 15, 12, 0);
+  const row = (status: AssessmentStatus, dueDate: string, dueTime = "23:59") =>
+    makeAssessment({ status, dueDate, dueTime });
+
+  it("is submitted for a Submitted assessment, before or after its due date", () => {
+    expect(breakdownStatus(row("Submitted", "2026-10-20"), now)).toBe("submitted");
+    expect(breakdownStatus(row("Submitted", "2026-10-01"), now)).toBe("submitted");
+  });
+
+  it.each(["Not started", "In progress"] as const)(
+    "is pending for %s before the due moment",
+    (s) => {
+      expect(breakdownStatus(row(s, "2026-10-20"), now)).toBe("pending");
+      expect(breakdownStatus(row(s, "2026-10-15", "12:00"), now)).toBe("pending");
+    },
+  );
+
+  it.each(["Not started", "In progress"] as const)("is overdue for %s once it has passed", (s) => {
+    expect(breakdownStatus(row(s, "2026-10-15", "11:59"), now)).toBe("overdue");
+    expect(breakdownStatus(row(s, "2026-10-01"), now)).toBe("overdue");
+  });
+
+  it("A53: is missed for a Missed assessment due later (it counts as 0, D1)", () => {
+    expect(breakdownStatus(row("Missed", "2026-10-20"), now)).toBe("missed");
+  });
+
+  it("A53: is missed for a Missed assessment past its due date", () => {
+    expect(breakdownStatus(row("Missed", "2026-10-01"), now)).toBe("missed");
   });
 });
 

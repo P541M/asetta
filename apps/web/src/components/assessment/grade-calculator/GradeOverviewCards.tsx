@@ -1,4 +1,8 @@
-import { currentGradeView, requiredGradeView } from "../../../utils/gradeCalculations";
+import {
+  currentGradeView,
+  parseTargetGradeInput,
+  requiredGradeView,
+} from "../../../utils/gradeCalculations";
 import { cn } from "@/lib/utils";
 import NumberField from "./NumberField";
 
@@ -112,7 +116,10 @@ const GradeOverviewCards = ({
         <div className="mt-1 flex h-9 items-center gap-2">
           <NumberField
             value={targetGrade}
-            onRawChange={(raw) => onTargetGradeChange(parseFloat(raw) || 0)}
+            onRawChange={(raw) => {
+              const target = parseTargetGradeInput(raw);
+              if (target !== null) onTargetGradeChange(target);
+            }}
             disabled={preferencesLoading}
             aria-label="Target grade"
             className="h-9 w-20 px-3 text-right tabular-nums"
