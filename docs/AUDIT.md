@@ -412,7 +412,7 @@ branch. Tick the items off and add a session log entry when done. Don't commit.
   - **Problem:** RFC 5545 ends every content line with CRLF, including `END:VCALENDAR`; the file joins with CRLF but has none after the last line. Google Calendar accepts it; a strict parser may not.
   - **Fix:** append `\r\n` after the join and update the "wraps the events" test.
 
-- [x] **A43 · Clearing the target-grade field saves 0** · S · risk L · found during B7 (done 2026-10-19, B17, no PR yet)
+- [x] **A43 · Clearing the target-grade field saves 0** · S · risk L · found during B7 (done 2026-10-19, PR #23)
   - **Shipped (B17):** the field's text goes through `parseTargetGradeInput` (`utils/gradeCalculations.ts`, tested): no number (empty, spaces, "-", ".", letters) saves nothing, so the saved target stays and the field snaps back to it on blur; a number is clamped to 0 to 100, like a weight. Clamped rather than refused: the weight field already clamps, a target outside 0 to 100 means nothing for a course grade, and the field shows the saved value on blur, so the student sees the clamp. A typed 0 still saves 0. Left over: every keystroke still saves, so deleting "85" one digit at a time saves 8 on the way (A76).
   - **Where:** the target `NumberField` in `apps/web/src/components/assessment/grade-calculator/GradeOverviewCards.tsx` (`parseFloat(raw) || 0`).
   - **Problem:** every keystroke saves, so deleting the target to retype it writes 0 to Firestore, and leaving the field empty keeps 0. Before B7 the `|| 85` showed 85 while 0 was saved; now the 0 shows, with "Target already secured" while the field is empty.
@@ -453,7 +453,7 @@ branch. Tick the items off and add a session log entry when done. Don't commit.
   - **Problem:** the hint that says when reminders go out (A32) sits inside the custom-days panel, so a student who picks 1, 2, 3 or 7 days never sees it.
   - **Fix:** show the time under the timing field for every choice.
 
-- [x] **A51 · The stats bar's "Submitted" counts Missed assessments** · S · risk L · found during B10 (done 2026-10-19, B17, no PR yet)
+- [x] **A51 · The stats bar's "Submitted" counts Missed assessments** · S · risk L · found during B10 (done 2026-10-19, PR #23)
   - **Shipped (B17):** `computeStats` counts `status === "Submitted"` for `submitted`; the completion rate still counts Missed as done. The `it.fails` is a plain `it`. The table's filter has the same mismatch (A74).
   - **Where:** `computeStats` in `apps/web/src/utils/semesterAssessments.ts` (`submitted: completedCount`), shown by the "Submitted" card in `DashboardLayout.tsx`.
   - **Problem:** `isCompletedStatus` counts Submitted and Missed, so a student with one Submitted and one Missed assessment sees "Submitted 2". The completion rate counting Missed as done is deliberate; the label is not.
@@ -465,7 +465,7 @@ branch. Tick the items off and add a session log entry when done. Don't commit.
   - **Problem:** Firestore's `orderBy` leaves out docs without the field, so such an assessment never appears in any tab, and its weight and mark never reach the grade. The mapping's "today" default only applies to an empty or null `dueDate`. Before B10 it was worse: the grades tab read such docs with `getDocs` and its sort crashed the whole dashboard (`parseLocalDateTime(undefined)`, reproduced on main with a seeded doc). The upload (B8's normalizer) and the Add form always write a date, so only old or hand-edited docs can be affected.
   - **Fix:** drop the `orderBy` and sort on the client (every consumer sorts anyway), and give such a doc `needsReview` with the viewer's today rather than a silent default (D10's rule). Or first check with an admin script whether any production doc lacks a `dueDate`.
 
-- [x] **A53 · The grade breakdown labels a Missed assessment "Pending" or "Overdue"** · S · risk L · found during B10 (done 2026-10-19, B17, no PR yet)
+- [x] **A53 · The grade breakdown labels a Missed assessment "Pending" or "Overdue"** · S · risk L · found during B10 (done 2026-10-19, PR #23)
   - **Shipped (B17):** the row rule is `breakdownStatus(assessment, now)` in `utils/gradeCalculations.ts` (tested), returning `submitted`, `missed`, `overdue` or `pending`; a Missed assessment is `missed` whatever its date. The component maps each to its icon, tint and label: Missed has `CircleX` (the status menu's Missed icon) and `statusTintClasses.Missed`. The breakdown now reads its clock from `useNow`, so a row turns Overdue on a page left open. Flagged rows still go by their placeholder date (A75).
   - **Where:** `getAssessmentStatus` in `apps/web/src/components/assessment/grade-calculator/AssessmentBreakdown.tsx`.
   - **Problem:** the label looks at Submitted and the due date only. A Missed assessment due later reads "Pending" and a past one "Overdue", while the grade counts it as 0 (D1).
@@ -481,7 +481,7 @@ branch. Tick the items off and add a session log entry when done. Don't commit.
   - **Problem:** each write ack and each connectivity change sets new state, so the whole dashboard re-renders two or three times per user-doc write (a settings toggle, the daily `lastLogin`).
   - **Fix:** after the first server answer, skip the state update when only the metadata changed.
 
-- [x] **A56 · The calendar's Today button never opens today** · S · risk L · found during B10 (done 2026-10-19, B17, no PR yet)
+- [x] **A56 · The calendar's Today button never opens today** · S · risk L · found during B10 (done 2026-10-19, PR #23)
   - **Shipped (B17):** cells and the open day are matched with `isSameLocalDay` (`utils/dateUtils.ts`, tested with `vi.setSystemTime` through Mar 8 and Nov 1, 2026). A second fault hid behind the first: Today looked for today's cell in the grid on screen, which from another month doesn't hold it. Now Today (and Home) sets the open day by date and the new month's grid finds it; like a click, it opens only a day with assessments (with none, or a filter hiding them, it just moves to this month).
   - **Where:** `goToToday` in `apps/web/src/components/calendar/CalendarView.tsx` (also the Home key).
   - **Problem:** it compares each day's midnight with `new Date()` (the current time), which never matches, so the month moves but today's day never opens.
@@ -1292,7 +1292,7 @@ Newest last. One entry per session: date, branch, items, what changed, what's le
   - Long emulator sessions slow down (heap); restart it and interleave the builds being compared.
   - Junctions into the worktree's `node_modules` (main's scratch build) must be removed as links, never with `rm -rf` (B13's gotcha).
 
-### 2026-10-19 · B17 (`claude/b17-dashboard-bugs-9c0744`, no PR yet)
+### 2026-10-19 · B17 (`claude/b17-dashboard-bugs-9c0744`, PR #23)
 
 - **A51, A53, A43 and A56 done**, four dashboard bugs students see. Started from another session's brief. The worktree was cut from local main and brought up to origin/main (2a66255, the merge of PR #22) with the app's sync; `npm ci` (Node 24.22, npm 11.19) left the lockfile unchanged. After reviewing, the founder asked for one last `/code-review` and the PR, so the agent committed, pushed and opened it (the founder merges).
 - **What changed:**
