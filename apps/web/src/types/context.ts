@@ -1,5 +1,6 @@
 import { User } from "firebase/auth";
 import { DisplayPreferences, OnboardingStatus, UserDocError, UserProfile } from "@/utils/userDoc";
+import { OnboardingUserData } from "./onboarding";
 
 export interface AuthContextType {
   user: User | null;
@@ -11,6 +12,8 @@ export interface AuthContextType {
   onboardingStatus: OnboardingStatus | null;
   profile: UserProfile;
   displayPreferences: DisplayPreferences;
+  /** The profile and notification choices onboarding starts from. */
+  onboardingChoices: OnboardingUserData;
   /** The notification address confirmed through its link (A17), or null. */
   verifiedEmail: string | null;
   logout: () => Promise<void>;

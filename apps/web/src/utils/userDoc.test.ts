@@ -3,7 +3,10 @@ import {
   DEFAULT_DISPLAY_PREFERENCES,
   displayPreferencesFromUserDoc,
   lastLoginToWrite,
+  onboardingChoicesFromUserDoc,
+  onboardingChoicesToWrite,
   onboardingStatusFromUserDoc,
+  pathAfterAuth,
   profileFromUserDoc,
   shouldRedirectToOnboarding,
   timeZoneToWrite,
@@ -65,6 +68,23 @@ describe("shouldRedirectToOnboarding", () => {
     const status = onboardingStatusFromUserDoc(undefined);
     expect(shouldRedirectToOnboarding(status)).toBe(true);
     expect(shouldRedirectToOnboarding({ ...status, needsOnboarding: false })).toBe(false);
+  });
+});
+
+describe("pathAfterAuth", () => {
+  it("sends an account that hasn't finished onboarding to onboarding", () => {
+    expect(pathAfterAuth(onboardingStatusFromUserDoc(undefined))).toBe("/onboarding");
+    expect(pathAfterAuth(onboardingStatusFromUserDoc({ institution: "" }))).toBe("/onboarding");
+  });
+
+  it("sends an account that finished onboarding to the dashboard", () => {
+    expect(pathAfterAuth(onboardingStatusFromUserDoc({ hasCompletedOnboarding: true }))).toBe(
+      "/dashboard",
+    );
+  });
+
+  it("A54: sends a user doc that couldn't be read to the dashboard, never to onboarding", () => {
+    expect(pathAfterAuth(null)).toBe("/dashboard");
   });
 });
 
@@ -188,5 +208,86 @@ describe("verifiedEmailFromUserDoc", () => {
     expect(verifiedEmailFromUserDoc({ email: "sam@example.test" })).toBeNull();
     expect(verifiedEmailFromUserDoc({ verifiedEmail: true })).toBeNull();
     expect(verifiedEmailFromUserDoc(undefined)).toBeNull();
+  });
+});
+
+describe("onboardingChoicesFromUserDoc", () => {
+  it("starts from the choices the user doc holds", () => {
+    expect(
+      onboardingChoicesFromUserDoc({
+        displayName: "Sam",
+        institution: "University of Guelph",
+        hasConsentedToNotifications: true,
+        emailNotifications: true,
+        notificationDaysBefore: 14,
+        email: "sam@example.test",
+      }),
+    ).toEqual({
+      institution: "University of Guelph",
+      hasConsentedToNotifications: true,
+      emailNotifications: true,
+      notificationDaysBefore: 14,
+      email: "sam@example.test",
+    });
+  });
+
+  it("keeps notifications switched off", () => {
+    expect(
+      onboardingChoicesFromUserDoc({
+        emailNotifications: false,
+        hasConsentedToNotifications: false,
+      }),
+    ).toMatchObject({ emailNotifications: false, hasConsentedToNotifications: false });
+  });
+
+  it("uses the defaults, notifications off, without a doc or without the fields", () => {
+    const defaults = {
+      institution: "",
+      hasConsentedToNotifications: false,
+      emailNotifications: false,
+      notificationDaysBefore: 1,
+      email: "",
+    };
+    expect(onboardingChoicesFromUserDoc(undefined)).toEqual(defaults);
+    expect(onboardingChoicesFromUserDoc({ displayName: "Sam" })).toEqual(defaults);
+  });
+
+  it("A48: writes back as it was read when the student changes nothing", () => {
+    const off = { emailNotifications: false, hasConsentedToNotifications: false };
+    expect(onboardingChoicesToWrite(onboardingChoicesFromUserDoc(off))).toMatchObject(off);
+  });
+});
+
+describe("onboardingChoicesToWrite", () => {
+  it("writes what the student chose", () => {
+    const choices = {
+      institution: "University of Guelph",
+      hasConsentedToNotifications: true,
+      emailNotifications: true,
+      notificationDaysBefore: 14,
+      email: "sam@example.test",
+    };
+    expect(onboardingChoicesToWrite(choices)).toEqual(choices);
+  });
+
+  it("A48: writes email notifications off when the student switched them off", () => {
+    expect(
+      onboardingChoicesToWrite({
+        hasConsentedToNotifications: false,
+        emailNotifications: false,
+        notificationDaysBefore: 3,
+        email: "sam@example.test",
+      }),
+    ).toMatchObject({ hasConsentedToNotifications: false, emailNotifications: false });
+  });
+
+  it("A48: writes the defaults, notifications off, for choices never made", () => {
+    expect(onboardingChoicesToWrite({})).toEqual({
+      institution: "",
+      hasConsentedToNotifications: false,
+      emailNotifications: false,
+      notificationDaysBefore: 1,
+      email: "",
+    });
   });
 });

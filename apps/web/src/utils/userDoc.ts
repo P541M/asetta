@@ -1,7 +1,8 @@
 import type { DocumentData } from "firebase/firestore";
+import type { OnboardingUserData } from "../types/onboarding";
 import { storedDate } from "./dateUtils";
 
-/** Reads of the user doc (`users/{uid}`) and the rules for what sign-in writes to it. */
+/** Reads of the user doc (`users/{uid}`) and the rules for what sign-in and onboarding write. */
 
 export interface OnboardingStatus {
   hasCompletedOnboarding: boolean;
@@ -66,6 +67,16 @@ export function shouldRedirectToOnboarding(onboardingStatus: OnboardingStatus | 
   return onboardingStatus.needsOnboarding;
 }
 
+/**
+ * Where sign-in and sign-up go once the user doc is in: onboarding for an account that hasn't
+ * finished it, else the dashboard. A doc that couldn't be read has no status and goes to the
+ * dashboard too, which shows the error screen (A54): never to onboarding over an account it
+ * can't read.
+ */
+export function pathAfterAuth(onboardingStatus: OnboardingStatus | null): string {
+  return shouldRedirectToOnboarding(onboardingStatus) ? "/onboarding" : "/dashboard";
+}
+
 /** Display preferences from the user doc's data, defaulting each one that isn't set. */
 export function displayPreferencesFromUserDoc(data: DocumentData | undefined): DisplayPreferences {
   if (!data) return DEFAULT_DISPLAY_PREFERENCES;
@@ -113,4 +124,26 @@ export function lastLoginToWrite(stored: unknown, now: Date): Date | null {
  */
 export function timeZoneToWrite(stored: unknown, browserZone: string | null): string | null {
   return browserZone && browserZone !== stored ? browserZone : null;
+}
+
+/** The profile and notification choices onboarding starts from: what the user doc holds. */
+export function onboardingChoicesFromUserDoc(data: DocumentData | undefined): OnboardingUserData {
+  return {
+    institution: data?.institution || "",
+    hasConsentedToNotifications: data?.hasConsentedToNotifications || false,
+    emailNotifications: data?.emailNotifications || false,
+    notificationDaysBefore: data?.notificationDaysBefore || 1,
+    email: data?.email || "",
+  };
+}
+
+/** The profile and notification choices finishing onboarding writes, each with its default. */
+export function onboardingChoicesToWrite(userData: OnboardingUserData) {
+  return {
+    institution: userData.institution || "",
+    hasConsentedToNotifications: userData.hasConsentedToNotifications || false,
+    emailNotifications: userData.emailNotifications ?? false,
+    notificationDaysBefore: userData.notificationDaysBefore || 1,
+    email: userData.email || "",
+  };
 }
