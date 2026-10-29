@@ -1,6 +1,6 @@
 import {
   currentGradeView,
-  parseTargetGradeInput,
+  parsePercentInput,
   requiredGradeView,
 } from "../../../utils/gradeCalculations";
 import { cn } from "@/lib/utils";
@@ -10,8 +10,12 @@ interface GradeOverviewCardsProps {
   /** Null until graded assessments carry some weight. */
   currentGrade: number | null;
   totalWeight: number;
+  /** The target as typed while the field is being edited, else the saved one. */
   targetGrade: number;
-  onTargetGradeChange: (value: number) => void;
+  /** Each keystroke's target, or null when the field holds no number. */
+  onTargetInput: (target: number | null) => void;
+  /** The field was left: save what was typed. */
+  onTargetCommit: () => void;
   preferencesLoading: boolean;
   /** Null when nothing weighted is left to grade. */
   requiredGrade: number | null;
@@ -32,7 +36,8 @@ const GradeOverviewCards = ({
   currentGrade,
   totalWeight,
   targetGrade,
-  onTargetGradeChange,
+  onTargetInput,
+  onTargetCommit,
   preferencesLoading,
   requiredGrade,
 }: GradeOverviewCardsProps) => {
@@ -116,10 +121,8 @@ const GradeOverviewCards = ({
         <div className="mt-1 flex h-9 items-center gap-2">
           <NumberField
             value={targetGrade}
-            onRawChange={(raw) => {
-              const target = parseTargetGradeInput(raw);
-              if (target !== null) onTargetGradeChange(target);
-            }}
+            onRawChange={(raw) => onTargetInput(parsePercentInput(raw))}
+            onCommit={onTargetCommit}
             disabled={preferencesLoading}
             aria-label="Target grade"
             className="h-9 w-20 px-3 text-right tabular-nums"

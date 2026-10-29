@@ -6,6 +6,8 @@ interface NumberFieldProps {
   value: number | null;
   /** Raw text on each keystroke — the parent parses, clamps, and persists. */
   onRawChange: (raw: string) => void;
+  /** Called when the field is left (blur, or Enter, which blurs it), for a parent that saves then. */
+  onCommit?: () => void;
   id?: string;
   placeholder?: string;
   disabled?: boolean;
@@ -21,7 +23,7 @@ interface NumberFieldProps {
  * blur; external updates (auto-save echoes, course switches) are adopted
  * only while the field is idle.
  */
-const NumberField = ({ value, onRawChange, ...props }: NumberFieldProps) => {
+const NumberField = ({ value, onRawChange, onCommit, ...props }: NumberFieldProps) => {
   const [text, setText] = useState(value === null ? "" : String(value));
   const focused = useRef(false);
 
@@ -43,6 +45,10 @@ const NumberField = ({ value, onRawChange, ...props }: NumberFieldProps) => {
       onBlur={() => {
         focused.current = false;
         setText(value === null ? "" : String(value));
+        onCommit?.();
+      }}
+      onKeyDown={(e) => {
+        if (onCommit && e.key === "Enter") e.currentTarget.blur();
       }}
       onChange={(e) => {
         setText(e.target.value);

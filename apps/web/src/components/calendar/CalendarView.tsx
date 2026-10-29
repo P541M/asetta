@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, KeyboardEvent, useCallback } from "react";
 import { ChevronLeft, ChevronRight, ChevronsUpDown, Download } from "lucide-react";
-import { isSameLocalDay } from "../../utils/dateUtils";
+import { useNow } from "../../hooks/useNow";
+import { isSameLocalDay, parseLocalDateTime } from "../../utils/dateUtils";
 import { generateICSFile } from "../../utils/icsGenerator";
 import { Assessment } from "../../types/assessment";
 import { Day, CalendarViewProps } from "../../types/calendar";
@@ -67,6 +68,9 @@ const CalendarView = ({ selectedSemester, assessments }: CalendarViewProps) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const calendarRef = useRef<HTMLDivElement>(null);
+  // Today's mark follows the clock past midnight (A77); keyed by the day, so the grid is
+  // rebuilt once a day, not on each of useNow's minute ticks
+  const todayKey = formatDateForComparison(useNow());
 
   // Filter assessments based on search and status
   const getAssessmentsForDate = useCallback(
@@ -94,7 +98,7 @@ const CalendarView = ({ selectedSemester, assessments }: CalendarViewProps) => {
       const lastDayOfMonth = new Date(year, month + 1, 0);
       const daysFromPrevMonth = firstDayOfMonth.getDay();
       const daysFromNextMonth = 6 - lastDayOfMonth.getDay();
-      const now = new Date();
+      const today = parseLocalDateTime(todayKey, "00:00");
       const days: Day[] = [];
 
       // Previous month days
@@ -105,7 +109,7 @@ const CalendarView = ({ selectedSemester, assessments }: CalendarViewProps) => {
         days.push({
           date,
           isCurrentMonth: false,
-          isToday: isSameLocalDay(date, now),
+          isToday: isSameLocalDay(date, today),
           assessments: getAssessmentsForDate(date),
         });
       }
@@ -116,7 +120,7 @@ const CalendarView = ({ selectedSemester, assessments }: CalendarViewProps) => {
         days.push({
           date,
           isCurrentMonth: true,
-          isToday: isSameLocalDay(date, now),
+          isToday: isSameLocalDay(date, today),
           assessments: getAssessmentsForDate(date),
         });
       }
@@ -127,7 +131,7 @@ const CalendarView = ({ selectedSemester, assessments }: CalendarViewProps) => {
         days.push({
           date,
           isCurrentMonth: false,
-          isToday: isSameLocalDay(date, now),
+          isToday: isSameLocalDay(date, today),
           assessments: getAssessmentsForDate(date),
         });
       }
@@ -136,7 +140,7 @@ const CalendarView = ({ selectedSemester, assessments }: CalendarViewProps) => {
     };
 
     generateCalendarDays();
-  }, [currentMonth, getAssessmentsForDate]);
+  }, [currentMonth, getAssessmentsForDate, todayKey]);
 
   const selectedDay = selectedDate
     ? (calendarDays.find((day) => isSameLocalDay(day.date, selectedDate)) ?? null)

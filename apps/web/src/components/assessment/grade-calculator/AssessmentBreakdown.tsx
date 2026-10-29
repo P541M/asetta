@@ -3,6 +3,7 @@ import {
   CircleAlert,
   CircleCheck,
   CircleDashed,
+  CircleQuestionMark,
   CircleX,
   type LucideIcon,
 } from "lucide-react";
@@ -11,6 +12,7 @@ import { cn } from "@/lib/utils";
 import { useNow } from "../../../hooks/useNow";
 import { formatLocalDate } from "../../../utils/dateUtils";
 import { breakdownStatus, type BreakdownStatus } from "../../../utils/gradeCalculations";
+import { NEEDS_REVIEW_LABEL } from "../../../utils/urgency";
 import EmptyState from "../../ui/EmptyState";
 import { statusTintClasses } from "../../tables/assessments/StatusSelect";
 import NumberField from "./NumberField";
@@ -33,6 +35,12 @@ const statusMarkers: Record<
 > = {
   submitted: { icon: CircleCheck, tintClass: statusTintClasses.Submitted, label: "Submitted" },
   missed: { icon: CircleX, tintClass: statusTintClasses.Missed, label: "Missed" },
+  // The amber the assessments table gives the same label
+  review: {
+    icon: CircleQuestionMark,
+    tintClass: statusTintClasses["In progress"],
+    label: NEEDS_REVIEW_LABEL,
+  },
   overdue: { icon: CircleAlert, tintClass: statusTintClasses.Missed, label: "Overdue" },
   pending: { icon: CircleDashed, tintClass: statusTintClasses["Not started"], label: "Pending" },
 };

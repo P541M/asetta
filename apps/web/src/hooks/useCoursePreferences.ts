@@ -58,17 +58,18 @@ export const useCoursePreferences = (
         throw new Error("Missing required parameters for updating target grade");
       }
 
+      // Shown before the write resolves (it waits for the server), so the field that saved it
+      // doesn't flash the old target; a failed write shows the error in place of the calculator
+      setPreferences((prev) =>
+        prev ? { ...prev, targetGrade } : { ...DEFAULT_COURSE_PREFERENCES, targetGrade },
+      );
+
       try {
         // One merged write creates or updates the doc (merge: never clobber a concurrent color write)
         await setDoc(
           getCoursePreferencesDocRef(user.uid, semesterId, courseName),
           { targetGrade },
           { merge: true },
-        );
-
-        // Update local state
-        setPreferences((prev) =>
-          prev ? { ...prev, targetGrade } : { ...DEFAULT_COURSE_PREFERENCES, targetGrade },
         );
       } catch (err) {
         console.error("Error updating target grade:", err);

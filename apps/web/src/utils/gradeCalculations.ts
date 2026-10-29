@@ -134,25 +134,51 @@ export const resolveTargetGrade = (preferences: CoursePreferences | null): numbe
   preferences?.targetGrade ?? DEFAULT_COURSE_PREFERENCES.targetGrade;
 
 /**
- * The target-grade field's text as the target to save, from 0 to 100 like a weight, or null
- * when there is no number to save. The field saves on every keystroke, so an emptied field
- * (deleting the target to retype it) must not save 0 (A43); it snaps back on blur.
+ * A target or weight field's text as a percentage from 0 to 100, or null when there is no
+ * number in it. Deleting a value to retype it leaves no number for a moment, and that must not
+ * save 0 (A43, A78); the field snaps back to the saved value on blur.
  */
-export const parseTargetGradeInput = (raw: string): number | null => {
-  const target = parseFloat(raw);
-  return Number.isNaN(target) ? null : Math.min(100, Math.max(0, target));
+export const parsePercentInput = (raw: string): number | null => {
+  const value = parseFloat(raw);
+  return Number.isNaN(value) ? null : Math.min(100, Math.max(0, value));
 };
 
+/**
+ * What leaving the target-grade field saves: the typed target, or null when the field was
+ * left without a number (the saved target stays) or with the saved target itself. The field
+ * saves only when left, never per keystroke (A76).
+ */
+export const targetToSave = (typed: number | null, saved: number): number | null =>
+  typed === null || typed === saved ? null : typed;
+
+/**
+ * The grades tab's weight edit for `assessment` as shown (unsaved edits included). A field with
+ * no number goes back to `savedWeight`, or saves nothing when it is already there: deleting
+ * "10" digit by digit queues 1 on the way, and the empty field must not leave that to save
+ * (A78). The mark and status go along unchanged.
+ */
+export function weightEdit(
+  assessment: Assessment,
+  raw: string,
+  savedWeight: number,
+): GradeEdit | null {
+  const typed = parsePercentInput(raw);
+  if (typed === null && assessment.weight === savedWeight) return null;
+  return { mark: assessment.mark ?? null, weight: typed ?? savedWeight, status: assessment.status };
+}
+
 /** The grade breakdown's status marker for a row. */
-export type BreakdownStatus = "submitted" | "missed" | "overdue" | "pending";
+export type BreakdownStatus = "submitted" | "missed" | "review" | "overdue" | "pending";
 
 /**
  * Which marker a breakdown row shows; overdue is derived from the due date, not stored. A
  * Missed assessment says so whatever its date, since the grade counts it (as 0 without a mark).
+ * An open flagged assessment's date is a placeholder (D10), so it is never overdue (A75).
  */
 export function breakdownStatus(assessment: Assessment, now: Date): BreakdownStatus {
   if (assessment.status === "Submitted") return "submitted";
   if (assessment.status === "Missed") return "missed";
+  if (assessment.needsReview) return "review";
   return parseLocalDateTime(assessment.dueDate, assessment.dueTime) < now ? "overdue" : "pending";
 }
 
