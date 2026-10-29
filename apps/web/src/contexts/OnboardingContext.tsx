@@ -1,10 +1,10 @@
-import React, { createContext, useContext, useReducer, useCallback, useEffect } from "react";
+import React, { createContext, useContext, useReducer, useCallback, useMemo } from "react";
 import { useRouter } from "next/router";
 import { useAuth } from "./AuthContext";
 import { db } from "../lib/firestore";
 import { doc, serverTimestamp, updateDoc } from "firebase/firestore";
-import { loadUserDataForOnboarding } from "../utils/onboardingUtils";
 import { notificationEmailStatus } from "../utils/notificationEmail";
+import { onboardingChoicesToWrite } from "../utils/userDoc";
 import { requestConfirmLink } from "../lib/notificationEmailClient";
 import {
   OnboardingState,
@@ -18,16 +18,10 @@ import { ExtractionResult } from "../types/upload";
 const initialState: OnboardingState = {
   currentStep: 1,
   totalSteps: 6,
-  userData: {
-    hasConsentedToNotifications: false,
-    emailNotifications: false,
-    notificationDaysBefore: 1,
-    email: "",
-  },
+  // Only what the student changes here; the provider lays it over the user doc's choices
+  userData: {},
   semesterData: { name: "" },
   isLoading: false,
-  isLoadingData: false,
-  dataLoaded: false,
   error: null,
   hasCompletedUpload: false,
   extractionResults: null,
@@ -43,17 +37,8 @@ type OnboardingAction =
   | { type: "UPDATE_SEMESTER_DATA"; payload: Partial<OnboardingSemesterData> }
   | { type: "SET_CREATED_SEMESTER_ID"; payload: string }
   | { type: "SET_LOADING"; payload: boolean }
-  | { type: "SET_LOADING_DATA"; payload: boolean }
   | { type: "SET_ERROR"; payload: string | null }
   | { type: "SET_UPLOAD_COMPLETE"; payload: ExtractionResult }
-  | {
-      type: "LOAD_EXISTING_DATA";
-      payload: {
-        userData?: Partial<OnboardingUserData>;
-        semesterData?: Partial<OnboardingSemesterData>;
-        currentStep?: number;
-      };
-    }
   | { type: "SHOW_EXIT_MODAL" }
   | { type: "HIDE_EXIT_MODAL" };
 
@@ -95,24 +80,10 @@ function onboardingReducer(state: OnboardingState, action: OnboardingAction): On
         ...state,
         isLoading: action.payload,
       };
-    case "SET_LOADING_DATA":
-      return {
-        ...state,
-        isLoadingData: action.payload,
-      };
     case "SET_ERROR":
       return {
         ...state,
         error: action.payload,
-      };
-    case "LOAD_EXISTING_DATA":
-      return {
-        ...state,
-        userData: { ...state.userData, ...action.payload.userData },
-        semesterData: { ...state.semesterData, ...action.payload.semesterData },
-        currentStep: action.payload.currentStep || state.currentStep,
-        dataLoaded: true,
-        isLoadingData: false,
       };
     case "SET_UPLOAD_COMPLETE":
       return {
@@ -141,42 +112,15 @@ const OnboardingContext = createContext<OnboardingContextType | undefined>(undef
 // Provider component
 export function OnboardingProvider({ children }: { children: React.ReactNode }) {
   const [state, dispatch] = useReducer(onboardingReducer, initialState);
-  const { user, verifiedEmail } = useAuth();
+  const { user, verifiedEmail, onboardingChoices } = useAuth();
   const router = useRouter();
 
-  // Load existing user data when user is available
-  useEffect(() => {
-    const loadExistingData = async () => {
-      if (!user || state.dataLoaded) return;
-
-      try {
-        dispatch({ type: "SET_LOADING_DATA", payload: true });
-        const existingData = await loadUserDataForOnboarding(user);
-
-        if (existingData) {
-          dispatch({
-            type: "LOAD_EXISTING_DATA",
-            payload: existingData,
-          });
-        } else {
-          // No existing data, mark as loaded with defaults
-          dispatch({
-            type: "LOAD_EXISTING_DATA",
-            payload: { currentStep: 1 },
-          });
-        }
-      } catch (error) {
-        console.error("Failed to load existing onboarding data:", error);
-        // Still mark as loaded to prevent infinite loading
-        dispatch({
-          type: "LOAD_EXISTING_DATA",
-          payload: { currentStep: 1 },
-        });
-      }
-    };
-
-    loadExistingData();
-  }, [user, state.dataLoaded]);
+  // The form starts from the choices on the user doc, which useAuth reads live (A54), with the
+  // student's changes on top
+  const userData = useMemo(
+    () => ({ ...onboardingChoices, ...state.userData }),
+    [onboardingChoices, state.userData],
+  );
 
   const nextStep = useCallback(() => {
     dispatch({ type: "NEXT_STEP" });
@@ -258,11 +202,7 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
       await updateDoc(userRef, {
         hasCompletedOnboarding: true,
         onboardingCompletedAt: new Date(),
-        institution: state.userData.institution || "",
-        hasConsentedToNotifications: state.userData.hasConsentedToNotifications || false,
-        emailNotifications: state.userData.emailNotifications || true,
-        notificationDaysBefore: state.userData.notificationDaysBefore || 1,
-        email: state.userData.email || "",
+        ...onboardingChoicesToWrite(userData),
         // The reminder cron looks at this user at its next run, with the settings chosen here
         nextReminderAt: serverTimestamp(),
       });
@@ -271,11 +211,11 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
       // finishing shouldn't wait on the mail server, and Settings can send the link again.
       const unconfirmed =
         notificationEmailStatus({
-          email: state.userData.email,
+          email: userData.email,
           verifiedEmail,
           accountEmail: user.email,
         }) === "unconfirmed";
-      if (state.userData.emailNotifications && unconfirmed) void requestConfirmLink(user);
+      if (userData.emailNotifications && unconfirmed) void requestConfirmLink(user);
 
       // Navigate to dashboard
       router.push("/dashboard");
@@ -285,10 +225,10 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
     } finally {
       setLoading(false);
     }
-  }, [user, verifiedEmail, state.userData, router, setLoading, setError]);
+  }, [user, verifiedEmail, userData, router, setLoading, setError]);
 
   const value: OnboardingContextType = {
-    state,
+    state: { ...state, userData },
     nextStep,
     prevStep,
     setStep,

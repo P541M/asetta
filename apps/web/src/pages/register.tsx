@@ -1,11 +1,10 @@
 import { useState, useEffect } from "react";
-import { useRouter } from "next/router";
 import Link from "next/link";
 import { Circle, CircleCheck, Loader2 } from "lucide-react";
 import { createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 import { auth } from "../lib/firebase";
 import { useAuth } from "../contexts/AuthContext";
-import { redirectAfterAuth } from "../utils/authRedirect";
+import { useRedirectAfterAuth } from "../hooks/useRedirectAfterAuth";
 import LoadingScreen from "../components/ui/LoadingScreen";
 import { getAuthErrorMessage } from "../utils/authErrors";
 import AuthShell from "../components/auth/AuthShell";
@@ -44,15 +43,9 @@ const Register = () => {
     hasSpecialChar: false,
   });
   const [passwordFocused, setPasswordFocused] = useState(false);
-  const router = useRouter();
   const { user, loading } = useAuth();
-
-  // A signed-in visitor skips the form; during an active submit the handler owns the redirect
-  useEffect(() => {
-    if (!loading && user && !isSubmitting) {
-      redirectAfterAuth(user, router);
-    }
-  }, [user, loading, isSubmitting, router]);
+  // A signed-in visitor skips the form, and a successful submit moves on the same way
+  useRedirectAfterAuth();
 
   useEffect(() => {
     setPasswordCriteria({
@@ -76,8 +69,7 @@ const Register = () => {
 
     setIsSubmitting(true);
     try {
-      const result = await createUserWithEmailAndPassword(auth, email, password);
-      await redirectAfterAuth(result.user, router);
+      await createUserWithEmailAndPassword(auth, email, password);
     } catch (error: unknown) {
       const message = getAuthErrorMessage(
         error,
@@ -93,8 +85,7 @@ const Register = () => {
     setIsSubmitting(true);
     const provider = new GoogleAuthProvider();
     try {
-      const result = await signInWithPopup(auth, provider);
-      await redirectAfterAuth(result.user, router);
+      await signInWithPopup(auth, provider);
     } catch (error: unknown) {
       const message = getAuthErrorMessage(
         error,
