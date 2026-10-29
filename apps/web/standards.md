@@ -255,8 +255,10 @@ are what make Asetta look like Asetta and not a default shadcn app:
   every keystroke ("12." re-rendering as "12") resets the caret — the 2026-07-22
   cursor-jump lesson. A keystroke that leaves no number (an emptied field, "-", ".") saves
   nothing, so deleting a value to retype it never writes 0; the field snaps back to the saved
-  value on blur (A43, `parseTargetGradeInput` in `utils/gradeCalculations.ts`; the weight field
-  still saves 0 until A78).
+  value on blur (A43, A78: `parsePercentInput` and `weightEdit` in `utils/gradeCalculations.ts`).
+  A field whose save is a whole doc write with no debounce (the target grade) saves only when it
+  is left, on blur or Enter (`NumberField`'s `onCommit`), and shows the typed value until then, so
+  typing "72.5" writes once and the 8 on the way from "85" to empty is never saved (A76).
 
 ### Motion
 
