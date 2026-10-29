@@ -23,17 +23,22 @@ All new code follows these.
   `assessment/grade-calculator/`, `components/auth/`).
 - **The user doc is read once, live.** `hooks/useUserDoc.ts` keeps one `onSnapshot` on
   `users/{uid}` for the session (`hooks/userDocListener.ts`, which it loads on sign-in; see the
-  next rule), and `AuthContext` derives the profile, display preferences and
-  onboarding status from it: read them from `useAuth()`, never with a `getDoc` of your own. The
-  sign-in writes run on the server's first answer: the doc is created only when the server says
-  it is missing (an offline cache can't, or the app would write a new doc over the real one),
-  `lastLogin` at most once per local day, and the zone when it is missing or has changed.
+  next rule), and `AuthContext` derives the profile, display preferences, onboarding status and
+  the choices onboarding starts from (`onboardingChoices`): read them from `useAuth()`, never with
+  a `getDoc` of your own. A page that routes by the doc waits for `loading` to end and then reads
+  `onboardingStatus` (the sign-in pages through `hooks/useRedirectAfterAuth.ts`); a doc that
+  couldn't be read has no status and goes to the dashboard, whose error screen shows it, never to
+  onboarding (A54). A form that starts from the doc lays the user's changes over the live values
+  (onboarding's `userData`), so nothing waits on a read of its own. The sign-in writes run on
+  the server's first answer: the doc is created only when the server says it is missing (an
+  offline cache can't, or the app would write a new doc over the real one), `lastLogin` at most
+  once per local day, and the zone when it is missing or has changed.
 - **`_app` ships Firebase Auth, never Firestore** (A15). `lib/firebase.ts` holds the app and
   Auth; `db` lives in `lib/firestore.ts`, which nothing in `_app`'s import graph (`AuthContext`,
   `useUserDoc`, what they import) may import statically. Firestore code those files need loads
-  with `import()` when it runs: the user-doc listener on sign-in, the sign-in redirect's
-  onboarding read. So does a page that reads Firestore only once the user doc is in
-  (`/dashboard`'s first-semester lookup, `hooks/firstSemester.ts`). Lazy-load a module of your
+  with `import()` when it runs, as the user-doc listener does on sign-in. So does a page that
+  reads Firestore only once the user doc is in (`/dashboard`'s first-semester lookup,
+  `hooks/firstSemester.ts`). Lazy-load a module of your
   own with named imports, never `import("firebase/firestore")` itself: the namespace stops
   webpack from tree-shaking Firestore, which added 30 kB to every page that uses it. After
   changing what `_app` or a page imports, compare `npm run build`'s First Load JS with the
@@ -86,6 +91,8 @@ All new code follows these.
   no informational `console.log`.
 - No dead code: unused exports, unreachable branches, and "just in case" props get deleted, not
   commented out. (Deliberate exception: `src/pages/index.tsx` is kept as a redirect safety net.)
+- Default a stored or chosen boolean with `??`, never `||` toward `true`: `false || true` is
+  `true`, which saved switched-off reminders as on (A48).
 - Comments explain constraints the code can't express (see the adjust-state-during-render note in
   `components/pages/dashboard-tabs/GradesTab.tsx`), never narrate what the next line does.
 
@@ -610,6 +617,10 @@ never duplicated into component state (the source of the 2026-07-16 flicker fix)
 - **Preferences apply instantly**: theme and display toggles persist per field the moment they
   change (optimistic state, reverted with an inline destructive alert on write failure). No Save
   button on instant-apply cards.
+- **The reminder timing says when reminders go out**, under its menu for every choice, in the
+  Notifications card and in onboarding's notifications step alike (A50): "Reminders go out at
+  about 9:30 AM in your time zone." The menu's trigger is `aria-describedby` that line; the
+  custom-days panel adds only its range ("Choose between 1 and 30 days.").
 - **Profile and Notifications save per card**: each card is its own small form with its own
   Save button, dirty check against the fetched snapshot, and success/error message scoped to
   the card.
