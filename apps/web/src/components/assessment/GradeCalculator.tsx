@@ -88,9 +88,10 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
   };
 
   const handleMarkChange = (assessmentId: string, value: string) => {
-    const edited = applyMarkInput(assessments, assessmentId, value).find(
-      (assessment) => assessment.id === assessmentId,
-    );
+    const marked = applyMarkInput(assessments, assessmentId, value);
+    // Text with no number changes nothing, so nothing is queued (A79)
+    if (marked === assessments) return;
+    const edited = marked.find((assessment) => assessment.id === assessmentId);
     if (edited?.id) {
       saveEdit(edited.id, {
         mark: edited.mark ?? null,

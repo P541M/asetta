@@ -256,9 +256,15 @@ are what make Asetta look like Asetta and not a default shadcn app:
   cursor-jump lesson. A keystroke that leaves no number (an emptied field, "-", ".") saves
   nothing, so deleting a value to retype it never writes 0; the field snaps back to the saved
   value on blur (A43, A78: `parsePercentInput` and `weightEdit` in `utils/gradeCalculations.ts`).
+  The mark field is the one where an emptied field is an edit: it clears the mark, while "-" or
+  "." still saves nothing (A79, `applyMarkInput`).
   A field whose save is a whole doc write with no debounce (the target grade) saves only when it
   is left, on blur or Enter (`NumberField`'s `onCommit`), and shows the typed value until then, so
-  typing "72.5" writes once and the 8 on the way from "85" to empty is never saved (A76).
+  typing "72.5" writes once and the 8 on the way from "85" to empty is never saved (A76). A
+  reload or a closed tab loses a value still being typed: don't count on `pagehide` or
+  `beforeunload` to save it. In B19's check a Firestore write started in `pagehide` never left
+  the page, and one started in `beforeunload` only did when the write stream was already open
+  (A80).
 
 ### Motion
 
@@ -482,6 +488,12 @@ never duplicated into component state (the source of the 2026-07-16 flicker fix)
 - **List rows hover with `transition-colors hover:bg-accent/50`** — the shared row-hover recipe
   (grades breakdown, assessment rows, overlay list rows). Full `hover:bg-accent` is reserved
   for clickable *cards* that navigate (course cards).
+- **The filter groups by what is left to do** (A74, the founder's call, 2026-10-29): "To do" is
+  Not started and In progress, "Done" is Submitted and Missed, so a missed assessment never
+  clutters the to-do list and no filter called "Submitted" lists a Missed one (the stats bar's
+  Submitted counts Submitted only, A51). The rule is `matchesAssessmentFilter`
+  (`utils/semesterAssessments.ts`); the stored keys (`not_submitted`, `submitted`) are older than
+  the labels and stay, so a student's saved filter carries over.
 - **The course-filtered view titles the panel with a breadcrumb**: "Courses / {course}" as the
   `PanelHeader` title — the parent crumb is a muted text button (`text-muted-foreground
   hover:text-foreground`) that navigates back, the current name truncates. No separate back
