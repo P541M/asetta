@@ -65,17 +65,20 @@ export function calculateRequiredGrade(
 }
 
 /**
- * The grades tab's mark edit: an empty field clears the mark, anything else is parsed and
- * floored at 0. Entering a mark makes a Not started or In progress assessment Submitted;
- * Submitted and Missed keep their status, and clearing a mark never changes it (A41), so a
- * stray keystroke can't turn a Missed assessment into a Submitted one.
+ * The grades tab's mark edit: an empty field clears the mark, and a number is floored at 0 with
+ * no cap (bonus marks). Other text with no number ("-", the "." of ".5") changes nothing and
+ * returns `assessments` itself, so it saves no 0 (A79). Entering a mark makes a Not started or
+ * In progress assessment Submitted; Submitted and Missed keep their status, and clearing a mark
+ * never changes it (A41), so a stray keystroke can't turn a Missed assessment into a Submitted one.
  */
 export function applyMarkInput(
   assessments: Assessment[],
   assessmentId: string,
   raw: string,
 ): Assessment[] {
-  const mark = raw === "" ? null : Math.max(0, parseFloat(raw) || 0);
+  const typed = parseFloat(raw);
+  if (raw !== "" && Number.isNaN(typed)) return assessments;
+  const mark = raw === "" ? null : Math.max(0, typed);
   return assessments.map((assessment) => {
     if (assessment.id !== assessmentId) return assessment;
     const status =

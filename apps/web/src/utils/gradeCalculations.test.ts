@@ -184,10 +184,32 @@ describe("applyMarkInput", () => {
 
   it.each([
     ["-5", 0],
-    ["abc", 0],
     ["12.", 12],
-  ])("parses %s as %f", (raw, mark) => {
+    ["0.5", 0.5],
+    ["105", 105],
+  ])("parses %s as %f, floored at 0 and with no cap (bonus marks)", (raw, mark) => {
     expect(applyMarkInput(course, "a1", raw)[0].mark).toBe(mark);
+  });
+
+  it.each(["-", ".", "-.", " ", "abc"])(
+    "A79: changes nothing for %j, which has no number",
+    (raw) => {
+      expect(applyMarkInput(course, "a1", raw)).toBe(course);
+    },
+  );
+
+  it("A79: a stray '-' keeps a saved mark and its status", () => {
+    const marked = applyMarkInput(course, "a1", "87.5");
+    expect(applyMarkInput(marked, "a1", "-")).toBe(marked);
+  });
+
+  it("A79: starting to type .5 never marks the assessment Submitted with 0", () => {
+    const afterDot = applyMarkInput(course, "a1", ".");
+    expect(afterDot[0]).toMatchObject({ mark: null, status: "Not started" });
+    expect(applyMarkInput(afterDot, "a1", ".5")[0]).toMatchObject({
+      mark: 0.5,
+      status: "Submitted",
+    });
   });
 
   it("leaves the other assessments alone", () => {
