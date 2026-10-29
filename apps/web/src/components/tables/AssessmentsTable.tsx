@@ -8,7 +8,7 @@ import { useTab } from "../../contexts/TabContext";
 import { useNow } from "../../hooks/useNow";
 import { getDaysUntil, parseLocalDateTime } from "../../utils/dateUtils";
 import { Assessment, AssessmentStatus, AssessmentsTableProps } from "../../types/assessment";
-import { isCompletedStatus } from "../../constants/assessment";
+import { matchesAssessmentFilter } from "../../utils/semesterAssessments";
 import { resolveCourseColor } from "../../constants/courseColors";
 import ConfirmationModal from "../common/ConfirmationModal";
 import { Button } from "../ui/button";
@@ -27,10 +27,12 @@ import AssessmentRow from "./assessments/AssessmentRow";
 import AssessmentEditRow from "./assessments/AssessmentEditRow";
 import NotesModal from "./assessments/NotesModal";
 
+// Done holds Missed too, so it isn't called Submitted (A74). The keys are older than the labels
+// and stay, so a filter stored by useTableSettings carries over.
 const filterOptions = [
   { value: "all", label: "All tasks" },
-  { value: "not_submitted", label: "Not submitted" },
-  { value: "submitted", label: "Submitted" },
+  { value: "not_submitted", label: "To do" },
+  { value: "submitted", label: "Done" },
 ];
 
 const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
@@ -78,11 +80,9 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
   };
 
   const sortedAssessments = useMemo(() => {
-    const filtered = localAssessments.filter((assessment) => {
-      if (filter === "not_submitted") return !isCompletedStatus(assessment.status);
-      if (filter === "submitted") return isCompletedStatus(assessment.status);
-      return true;
-    });
+    const filtered = localAssessments.filter((assessment) =>
+      matchesAssessmentFilter(assessment.status, filter),
+    );
 
     return filtered.sort((a, b) => {
       if (sortKey === "dueDate") {

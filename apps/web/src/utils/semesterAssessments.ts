@@ -1,5 +1,5 @@
 import type { DocumentData } from "firebase/firestore";
-import { Assessment } from "../types/assessment";
+import { Assessment, AssessmentStatus } from "../types/assessment";
 import { CourseStats } from "../types/course";
 import { isCompletedStatus } from "../constants/assessment";
 import { getTodayDateString, parseLocalDateTime } from "./dateUtils";
@@ -102,4 +102,16 @@ export function computeStats(assessmentsList: Assessment[], now: Date): Dashboar
     upcomingDeadlines: upcomingCount,
     completionRate: completionRate,
   };
+}
+
+/**
+ * Whether the assessments table's filter (`useTableSettings`, stored in localStorage) shows an
+ * assessment with this status. "not_submitted" is To do (Not started, In progress) and
+ * "submitted" is Done (Submitted, Missed): a Missed assessment needs no more work, so it stays
+ * off the to-do list (A74). An unknown stored filter shows every one, like "all".
+ */
+export function matchesAssessmentFilter(status: AssessmentStatus, filter: string): boolean {
+  if (filter === "not_submitted") return !isCompletedStatus(status);
+  if (filter === "submitted") return isCompletedStatus(status);
+  return true;
 }
