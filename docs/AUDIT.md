@@ -68,7 +68,8 @@ branch. Tick the items off and add a session log entry when done. Don't commit.
 | B15 | A19 | Cron throughput | After A8 |
 | B17 | A51, A53, A43, A56 | Dashboard bugs students see | Test-first |
 | B18 | A78, A76, A75, A77 | Grades and calendar follow-ups from B17 | Test-first where the rule is pure |
-| any | A21 to A28, A33 to A35, A39, A40, A42, A45 to A50, A52, A54, A55, A57 to A64, A66, A68 to A74, A79, A80 | Later items | As time allows; A34 needs D8; A47 once 5 days have passed since A8's first production run |
+| B19 | A79, A74, A80 | Grades and table leftovers | Test-first where the rule is pure; A74 needs the founder's copy call |
+| any | A21 to A28, A33 to A35, A39, A40, A42, A45 to A50, A52, A54, A55, A57 to A64, A66, A68 to A73, A81, A82 | Later items | As time allows; A34 needs D8; A47 once 5 days have passed since A8's first production run; A81 changes A41's rule, so the founder decides |
 
 ## Fix now
 
@@ -573,36 +574,38 @@ branch. Tick the items off and add a session log entry when done. Don't commit.
   - **Problem:** each send is claimed (an attempt counted) before the login check, so with a revoked app password every due reminder fails its 3 attempts within about an hour and is never sent, even after the password is fixed the same day. Same before B15, when the check ran before every email.
   - **Fix (decide):** check the login once at the start of a run that has reminders to send; if it fails, log it, claim nothing, and give the due users a short retry (`nextReminderRun` with a retry) so the reminders go out once the login works.
 
-- [ ] **A74 · The assessments table's "Submitted" filter shows Missed assessments** · S · risk L · found during B17
+- [x] **A74 · The assessments table's "Submitted" filter shows Missed assessments** · S · risk L · found during B17 (done 2026-10-29, B19, not yet committed)
+  - **Shipped (B19, the founder's call 2026-10-29):** keep the grouping and name it for what it is: "To do" (Not started, In progress) and "Done" (Submitted, Missed). Students use the list as a to-do list, which missed work would clutter, and Done matches the completion rate, which already counts Missed as done. The rule is `matchesAssessmentFilter` in `utils/semesterAssessments.ts` (tested), moved out of the table unchanged; only the labels changed. The stored keys (`not_submitted`, `submitted`) stay, so a saved filter carries over.
   - **Where:** `filterOptions` and the filter in `apps/web/src/components/tables/AssessmentsTable.tsx` (`isCompletedStatus`).
   - **Problem:** the A51 mismatch in the table: "Submitted" lists Missed assessments too, and "Not submitted" hides them, though they were never submitted.
   - **Fix (decide the copy):** filter by status (Submitted only, everything else under "Not submitted"), or keep the grouping and name it for what it is (for example "To do" and "Done").
 
-- [x] **A75 · The grade breakdown marks a flagged assessment Overdue** · S · risk L · found during B17 (done 2026-10-29, B18, not yet committed)
+- [x] **A75 · The grade breakdown marks a flagged assessment Overdue** · S · risk L · found during B17 (done 2026-10-29, PR #24)
   - **Shipped (B18):** `breakdownStatus` returns `review` for a flagged (`needsReview`) Not started or In progress assessment, whatever its placeholder date; Submitted and Missed keep their markers. The row shows `CircleQuestionMark` in the amber `statusTintClasses["In progress"]` with `NEEDS_REVIEW_LABEL` as its label, the amber the assessments table gives the same label.
   - **Where:** `breakdownStatus` in `apps/web/src/utils/gradeCalculations.ts`.
   - **Problem:** a `needsReview` assessment's date is a placeholder (the upload day, D10), so from the next day its breakdown row reads Overdue in the destructive tint, while the assessments table says "Check the due date" and gives it no urgency.
   - **Fix:** a flagged open assessment is never `overdue`: `pending`, or a marker of its own with `NEEDS_REVIEW_LABEL` as its label.
 
-- [x] **A76 · The target-grade field saves every keystroke** · S · risk L · found during B17 (done 2026-10-29, B18, not yet committed)
+- [x] **A76 · The target-grade field saves every keystroke** · S · risk L · found during B17 (done 2026-10-29, PR #24)
   - **Shipped (B18):** the field saves only when it is left: blur, or Enter (which blurs it), through `NumberField`'s new `onCommit`. Until then `GradeCalculator` keeps the typed target as a draft that the tile and the projection show at once. `targetToSave` (`utils/gradeCalculations.ts`, tested) decides what leaving saves: nothing for a field with no number (it snaps back to the saved target, which never changed during the edit) or for the saved target itself. A draft still open when the course changes or the calculator unmounts is saved to its own course in an effect cleanup. `updateTargetGrade` sets local state before the write, so the field doesn't flash the old target while the server acks. Save on leave instead of a debounce, because a debounced 8 could still land during a slow delete.
   - **Where:** the target `NumberField` in `GradeOverviewCards.tsx` and `updateTargetGrade` in `apps/web/src/hooks/useCoursePreferences.ts` (one `setDoc` per keystroke, no debounce).
   - **Problem:** typing "72.5" writes four times. Deleting "85" one digit at a time saves 8 on the way, so a field left empty snaps back to 8, not 85 (checked on the emulator in B17; A43 stopped the empty field itself from saving 0).
   - **Fix:** debounce the save like the assessments' auto-save (`useAssessmentAutoSave`), or save on blur with the projection reading the typed value, and snap an emptied field back to the target from before the edit.
 
-- [x] **A77 · The calendar's today highlight doesn't follow the clock** · S · risk L · found during B17 (done 2026-10-29, B18, not yet committed)
+- [x] **A77 · The calendar's today highlight doesn't follow the clock** · S · risk L · found during B17 (done 2026-10-29, PR #24)
   - **Shipped (B18):** `CalendarView` reads `useNow` and keys the grid on today's `YYYY-MM-DD`, so the grid is rebuilt when the day changes, not on each minute tick. Today and Home still read the real clock when pressed.
   - **Where:** `generateCalendarDays` in `apps/web/src/components/calendar/CalendarView.tsx`.
   - **Problem:** "today" is read only when the month, the data or a filter changes, so on a dashboard left open past midnight the highlight stays on yesterday. Time-relative UI reads `hooks/useNow` (standards.md).
   - **Fix:** read `useNow` in the calendar and pass its time where the grid is built (it already marks today with `isSameLocalDay`).
 
-- [x] **A78 · Clearing a weight in the grade breakdown saves 0** · S · risk L · found during B17 (`/code-review`) (done 2026-10-29, B18, not yet committed)
+- [x] **A78 · Clearing a weight in the grade breakdown saves 0** · S · risk L · found during B17 (`/code-review`) (done 2026-10-29, PR #24)
   - **Shipped (B18):** `weightEdit(assessment, raw, savedWeight)` (`utils/gradeCalculations.ts`, tested) is the weight field's edit. Text with no number takes the weight back to the saved one (or queues nothing when it is already there), so deleting "10" digit by digit doesn't leave the 1 it queued on the way to save (a `/code-review` find); the field snaps back on blur. It parses with `parsePercentInput`, B17's `parseTargetGradeInput` renamed now that both fields use it. The weight still auto-saves per keystroke through the debounced `useAssessmentAutoSave`. `applyMarkInput` still clears a mark on an empty field; its other unparseable input is A79.
   - **Where:** `handleWeightChange` in `apps/web/src/components/assessment/GradeCalculator.tsx` (`value === "" ? 0`).
   - **Problem:** A43's fault in the weight field: deleting a weight to retype it queues 0, which saves after the auto-save's debounce, and a field left empty shows 0, so the course weight and "remaining" change.
   - **Fix:** parse it like the target (`parseTargetGradeInput`'s rule: no number saves nothing, a number is clamped to 0 to 100), with a test; check `applyMarkInput` keeps clearing a mark, which is meaningful there.
 
-- [ ] **A79 · Typing "-" or "." in a mark field marks the assessment Submitted with 0** · S · risk L · found during B18
+- [x] **A79 · Typing "-" or "." in a mark field marks the assessment Submitted with 0** · S · risk L · found during B18 (done 2026-10-29, B19, not yet committed)
+  - **Shipped (B19):** `applyMarkInput` returns its input array itself for text with no number other than an empty field, and `GradeCalculator`'s `handleMarkChange` queues nothing when it does, so the field snaps back on blur to the mark it shows. "" still clears the mark; a number is still floored at 0 with no cap (bonus marks). The "abc" case is now an A79 test of that.
   - **Where:** `applyMarkInput` in `apps/web/src/utils/gradeCalculations.ts` (`Math.max(0, parseFloat(raw) || 0)`); its test "parses %s as %f" in `gradeCalculations.test.ts`.
   - **Problem:** text with no number other than an empty field ("-", ".", "abc") becomes a mark of 0, and a Not started or In progress assessment then turns Submitted (A41's rule), so starting to type ".5" or a stray "-" saves a 0 and a status change. The test asserts `"abc"` as 0, a known bug written as correct behavior (standards.md, Testing). Read from the code, not reproduced in the UI.
   - **Fix:** keep "" as "clear the mark"; for any other text with no number, change nothing (`parsePercentInput`'s rule, without its 100 cap, since a mark can go over 100 with bonus marks). Turn the "abc" case into an A79 test of that.
@@ -611,6 +614,18 @@ branch. Tick the items off and add a session log entry when done. Don't commit.
   - **Where:** the target draft in `apps/web/src/components/assessment/GradeCalculator.tsx` (A76's save on leave).
   - **Problem:** since A76 the target saves on blur, Enter, a course change or the calculator unmounting. A full page reload or a closed tab fires none of those, so a target typed and left focused is lost. Before A76 every keystroke saved it.
   - **Fix (if it matters in practice):** also save the draft on `pagehide`; Firestore queues the write locally, but whether it reaches the server before the page goes is not guaranteed.
+  - **Checked (B19), left open: `pagehide` doesn't work.** The app's Firestore keeps its cache in memory, so a write has to leave the page before it goes. On a production build against the emulators, with 60 ms added each way between the page and Firestore (a proxy that logs what leaves the browser), "70" typed and the page reloaded with the field focused: with no handler (today) 85 stayed and nothing was sent; with a `pagehide` handler that leaves the field (the same save as a blur), the handler ran but no write left the page, both with the write stream closed (the first save after a load) and with it open from a save seconds before. A `beforeunload` handler did save 70 when the write stream was already open; with it closed, the stream's handshake left but the page was gone 11 ms later. Opening the stream takes about 2.5 round trips before the write itself goes, and a target typed right after opening the page has no open stream. Not tried: a closed tab, which goes at least as fast as a reload; Safari and Firefox (the pane is Chromium). Not tried either: switching tabs or apps, which browsers normally answer by blurring the focused field, which would save it.
+  - **Options (founder's call, none needed for B19):** (a) accept the gap: only a reload or a close with the field still focused loses the value, and the old target shows on return; (b) keep the draft in `localStorage` per course and save it on the next visit (survives a reload or a close on the same browser; a stale draft could overwrite a target changed on another device unless it expires); (c) send the draft with a `keepalive` request (`fetch` or `sendBeacon`), which browsers let outlive the page, through a small API route or Firestore's REST API: a second write path for one field. Recommended: (a).
+
+- [ ] **A81 · Typing a mark and deleting it leaves the assessment Submitted** · S · risk L · found during B19 · changes A41's rule, so the founder decides
+  - **Where:** `applyMarkInput` in `apps/web/src/utils/gradeCalculations.ts`, through `handleMarkChange` in `GradeCalculator.tsx`.
+  - **Problem:** a digit typed into a Not started or In progress assessment's empty mark field makes it Submitted; deleting the digit clears the mark but keeps Submitted (A41: clearing a mark never changes the status), and the auto-save writes Submitted with no mark, so a stray keystroke undone still moves the assessment to Submitted and Done. Read from the code, not reproduced in the UI.
+  - **Fix (decide):** clearing a mark goes back to the status the assessment has saved (as `weightEdit` goes back to the saved weight), so only a mark that stays changes the status; a Missed assessment keeps its status either way (D1).
+
+- [ ] **A82 · Old "Completed" and "Under Review" statuses show under the table's To do** · S · risk L · found during B19 (`/code-review`)
+  - **Where:** `matchesAssessmentFilter` in `apps/web/src/utils/semesterAssessments.ts` (`isCompletedStatus` knows only Submitted and Missed); `getDaysTillDue` in `components/tables/AssessmentsTable.tsx`, which treats both as complete.
+  - **Problem:** a doc still holding a legacy status is listed under To do, while the same row shows no days left as if done. Predates B19; the To do label makes it read as work left. Whether such docs still exist in production is unknown.
+  - **Fix:** count the legacy statuses with Submitted in one place (`constants/assessment.ts`), or migrate them, and type the stored status as possibly legacy.
 
 ## Baseline (2026-10-10)
 
@@ -620,6 +635,7 @@ Numbers to compare against when items land.
 - `apps/web` build (Next 15.5.27, after A2): 229 kB First Load JS shared by all pages (`_app` chunk 114 kB); `/dashboard/*` 320 kB (B8 measured main at 320; the 319 recorded after A2 was stale by then) and `/dashboard/[semester]/*` 320 kB after B7 (+767 bytes, 345 gzipped, in the shared dashboard chunk: the grade view helpers and ICS folding); `/login` and `/register` 242 kB; `/onboarding` 285 kB; `/settings` 285 kB after B9 (was 284: about 20 bytes for `serverTimestamp` in the Settings save took the page from 5.38 to 5.4 kB, measured against main). After B10 (main built first, same machine): shared 229 kB with `_app` 115 kB (was 114, the user-doc listener); `/dashboard/*`, `/login` and `/settings` unchanged; `/onboarding` 286 (was 285), `/register` 243 (was 242), `/reset-password` 241 (was 240). After B11 (main built first on the same machine, Node 24.22): shared 230 kB (was 229) with `_app` 115 kB (+686 bytes, 304 gzipped: `utils/courseName.ts` through `lib/firebaseUtils.ts`); `/login` 243 (was 242) and `/dashboard` 222 (was 221) from the shared chunk; every other first-load size unchanged (page sizes moved by chunk splitting only: `/onboarding` 12.1 to 12 kB, `/settings` 5.37 to 5.34 kB). After B12 (against B11's final build on this machine, which is main's code): shared 230 kB and `_app` 115 kB unchanged; `/settings` 286 kB (was 285; the page 6.39 kB, was 5.34), `/onboarding` 287 (was 286), `/dashboard/[semester]/*` 321 (was 320); the new `/confirm-email` is 238 kB. After B13 (A15; both builds in the B13 worktree with CI's placeholder env, which puts `/register` at 244 and `/confirm-email` at 239 before the change): shared 153 kB (was 230) with `_app` 38.4 kB (was 115); `/login` 166 (was 243), `/register` 167 (was 244), `/reset-password` 165 (was 241), `/confirm-email` 162 (was 239), `/404` 157 (was 234), `/dashboard` 145 (was 222), `/dashboard/*` and `/dashboard/[semester]/*` 271 (were 320 and 321), `/settings` 273 (was 286), `/onboarding` 287 (+283 bytes gzipped). After first paint a dashboard fetches the other tabs (the tab chunks total about 37 kB) and, when the semester menu opens, the drag list (dnd-kit, about 17 kB). After B14 (against main after PR #20, built from a scratch copy; see the B14 log for the build-location noise): shared 154 kB (main 153), `/onboarding` 288 (main 287, about 420 bytes gzipped net: the upload dialog's quota copy and helpers), every other page unchanged.
 - Live Firestore rules identical to `firestore.rules` until B12, whose new rules the founder deploys after its merge (B12 log); no Storage rules (Storage unused).
 - Vercel: projects `asetta` (apps/web) and `asetta-landing` (apps/landing), Hobby plan: runtime logs kept 1 hour; cron jobs run at most once a day and fire anywhere within the scheduled hour; functions on Fluid compute get a 300-second default and maximum duration (docs checked 2026-10-11). In `apps/web/vercel.json` the cron route has `maxDuration` 300 since A3 (was 10) and the upload route 60.
+- Tests (after B19, 2026-10-29): 25 suites, per zone 764 tests, all passing. The rules suite: 44 cases, unchanged.
 - Tests (after B18, 2026-10-29): 25 suites, per zone 744 tests, all passing. The rules suite: 44 cases, unchanged.
 - Tests (after B17, 2026-10-19): 25 suites, per zone 726 tests, all passing; no expected failure left (A51 is fixed). The rules suite: 44 cases, unchanged.
 - Tests (after B15, 2026-10-19): 25 suites, per zone 700 tests: 699 passing and 1 expected failure (A51). The rules suite: 44 cases, unchanged.
@@ -1341,7 +1357,7 @@ Newest last. One entry per session: date, branch, items, what changed, what's le
   - With the browser pane hidden, screenshots can show a stale frame; read values from the page instead.
   - Next's "inferred your workspace root" warning in a worktree build comes from the main checkout's lockfile above it; harmless.
 
-### 2026-10-29 · B18 (`claude/b18-grade-calendar-followups`, not yet committed)
+### 2026-10-29 · B18 (`claude/b18-grade-calendar-followups`, PR #24)
 
 - **A78, A76, A75 and A77 done**, the four grades and calendar follow-ups B17 filed. Local `main` was 6 commits behind origin (PR #23, B17, already merged); fast-forwarded first, then branched. Nothing committed: the founder commits.
 - **What changed:**
@@ -1371,3 +1387,33 @@ Newest last. One entry per session: date, branch, items, what changed, what's le
   - The dev server's and the emulators' child processes outlive their background shells on Windows; free ports 3005, 8080, 9099 and 4400 by PID afterwards.
   - The browser pane's `BackSpace` key name doesn't register; use `Backspace`.
   - Port 3001 on this machine was another project's dev server (not Asetta), so the build was safe to run beside it.
+
+### 2026-10-29 · B19 (`claude/b19-grades-table-be62fb`, not yet committed)
+
+- **A79 and A74 done; A80 checked and left open.** Started from another session's brief. The worktree was already at origin/main (7e0e463, the merge of PR #24); `npm ci` (Node 24.22, npm 11.19) left the lockfile unchanged. Housekeeping: B18's items and log header now say PR #24. After reviewing, the founder asked for one more `/code-review` and the PR, so the agent committed, pushed and opened it (the founder merges).
+- **What changed:**
+  - **A79:** `applyMarkInput` returns its input array itself for text with no number other than an empty field ("-", ".", " ", "abc"), and `handleMarkChange` queues nothing then; "" still clears the mark, and a number is still floored at 0 with no cap.
+  - **A74:** the table's filter rule is `matchesAssessmentFilter` in `utils/semesterAssessments.ts`, moved out of `AssessmentsTable` unchanged and tested; the labels are now "To do" and "Done". The stored keys stay.
+  - **A80:** no code change; the evidence and options are in its entry.
+- **Test-first:** the 7 new A79 cases per zone failed on their assertions in both zones (a new array with mark 0, and Submitted, for "-", ".", "-.", " ", "abc"; the saved 87.5 replaced on "-"; mark 0 and Submitted after "."), then passed. The old "parses abc as 0" case is gone; "0.5" and "105" (no cap) joined the parse cases. A74 changed no rule, so its tests pin the grouping (Missed under Done, never To do) and an unknown stored filter acting as "all"; they pass on the moved rule as on the old one.
+- **Decisions:**
+  - **A74 (the founder's call, asked in this session with a recommendation):** keep the grouping and rename it "To do" and "Done", over filtering by status (Missed would clutter the list students use as a to-do list) and over three filters (To do, Submitted, Missed).
+  - **A79 changes nothing for no-number text, as the entry says,** rather than going back to the saved mark as `weightEdit` does: an emptied mark field is an edit (it clears), so deleting digit by digit ends on a meaningful value, and a "-" typed over a just-typed digit leaves that digit queued, which the field shows on blur.
+  - **A80 stays open:** neither `pagehide` nor `beforeunload` gets a Firestore write out reliably (details below and in the entry). Recommended to the founder: accept the gap.
+- **UI check:** a production build against the emulators (`demo-asetta-b19`; Auth 9199, Firestore 8180, server on :3019), signed in through the `__FIREBASE_DEFAULTS__` cookie as a seeded tester. Scripts in `node_modules/.cache/b19/` (`emu.sh`, `e2e-env.sh`, `build.sh`, `start.sh`, `seed.cjs`, `dump.cjs` for the saved targets and CIS 3760's marks, `proxy.cjs`, a latency proxy that logs what leaves the browser; its A80 log is `proxy-a80-run1.log`).
+  - **A79:** "-" and then "." in a Not started quiz's mark field left it Not started with no mark in Firestore; ".5" saved 0.5 and Submitted; "-" over the Midterm's 80 left 80 saved, and leaving the field showed 80.
+  - **A74:** a stored "submitted" opened as "Done" with the three Submitted and two Missed rows; "To do" listed the two Not started and the In progress one, no Missed. Light desktop and dark 375 px, no sideways scroll.
+  - **A80:** through the proxy at 60 ms each way, "70" typed and the page reloaded with the field focused. No handler (today): 85 kept, nothing sent. A `pagehide` handler leaving the field (the save a blur makes): the handler ran, no write left, with the write stream closed and with it open. A `beforeunload` one: with the stream closed, its handshake left and the page was gone 11 ms later (85 kept); with it open from a save seconds before, 70 saved. A normal save from a closed stream took about 310 ms (handshake, back channel, write).
+- **Verification loop:** lint, `format:check`, typecheck, `npm test` (50 files, 1,528 passed) and build all green with CI's placeholder env and every B19 server stopped. Page sizes unchanged (shared 154 kB, `/dashboard/[semester]/*` 272 kB).
+- **`/code-review` (high):** five findings, none in what B19 set out to fix. Filed: old "Completed" and "Under Review" statuses list under To do (A82, predates B19). No change: a "-" over a just-typed digit keeps that digit queued (the rule the entry asked for; the field shows it on blur). Skipped: "no change" is signalled by returning the same array (`pendingEdits`'s idiom); the queue skip has no component test (the repo has none yet); "1e999" saves Infinity as a mark (predates B19, negligible).
+- **Last `/code-review` (high, the founder's request before the PR):** three findings, all in the docs, all fixed: standards.md said a `pagehide` write left the page once the write stream was open (only `beforeunload`'s did); A80's entry stated as checked that switching tabs saves the draft (not tried); the tracker still said "not yet committed".
+- **Docs:** `apps/web/standards.md` ("Forms & auth patterns": the mark field's emptied field clears and "-" or "." saves nothing; don't count on `pagehide` or `beforeunload` to save a draft. "Assessments table": the filter's To do and Done).
+- **New:** A81 (typing a mark and deleting it leaves the assessment Submitted; A41's rule, so the founder decides), A82 (legacy statuses under To do).
+- **Left for the founder:** the merge; A80's options; A81's call. No rules change; no deploy step besides the app. On the Vercel preview:
+  - Grades: in a Not started assessment's mark field type "-", wait a second, reload: still Not started with no mark. Select a saved mark, type "-", click away: the mark comes back.
+  - Assessments: the filter reads All tasks, To do, Done; To do has no Missed rows, Done has them. A filter picked before keeps its place (Submitted becomes Done).
+- **Gotchas:**
+  - The first emulator start printed nothing for a couple of minutes before "All emulators ready".
+  - A server's child kept port 3019 after its shell stopped and served while the next build wrote `.next`; kill it by PID before a rebuild.
+  - Radix menus open on pointer events: a script's `.click()` doesn't open the filter menu; click it through the pane.
+  - With the pane hidden the page still reported `visibilityState` "visible" and had focus, so focus and unload tests ran as with it shown.
