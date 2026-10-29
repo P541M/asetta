@@ -10,10 +10,12 @@ import {
   currentGradeView,
   getGradeInfo,
   getProgressBarColor,
-  parseTargetGradeInput,
+  parsePercentInput,
   pendingEdits,
   requiredGradeView,
   resolveTargetGrade,
+  targetToSave,
+  weightEdit,
   withEdits,
 } from "./gradeCalculations";
 
@@ -263,7 +265,7 @@ describe("resolveTargetGrade", () => {
   });
 });
 
-describe("parseTargetGradeInput", () => {
+describe("parsePercentInput", () => {
   it.each([
     ["85", 85],
     ["72.5", 72.5],
@@ -271,13 +273,13 @@ describe("parseTargetGradeInput", () => {
     ["0", 0],
     ["100", 100],
   ])("reads %j as %f", (raw, target) => {
-    expect(parseTargetGradeInput(raw)).toBe(target);
+    expect(parsePercentInput(raw)).toBe(target);
   });
 
   it.each(["", "  ", "-", ".", "abc"])(
     "A43: gives nothing to save for %j, so the saved target stays",
     (raw) => {
-      expect(parseTargetGradeInput(raw)).toBeNull();
+      expect(parsePercentInput(raw)).toBeNull();
     },
   );
 
@@ -286,7 +288,72 @@ describe("parseTargetGradeInput", () => {
     ["100.5", 100],
     ["-5", 0],
   ])("A43: clamps %j to %f", (raw, target) => {
-    expect(parseTargetGradeInput(raw)).toBe(target);
+    expect(parsePercentInput(raw)).toBe(target);
+  });
+});
+
+describe("targetToSave", () => {
+  it("saves a typed target that differs from the saved one", () => {
+    expect(targetToSave(72.5, 85)).toBe(72.5);
+    expect(targetToSave(0, 85)).toBe(0);
+  });
+
+  it("saves nothing when the typed target is the saved one", () => {
+    expect(targetToSave(85, 85)).toBeNull();
+  });
+
+  it("saves nothing when the field was left without a number", () => {
+    expect(targetToSave(null, 85)).toBeNull();
+  });
+
+  it("A76: deleting 85 digit by digit and leaving the field keeps 85", () => {
+    let typed: number | null = null;
+    for (const raw of ["8", ""]) typed = parsePercentInput(raw);
+    expect(targetToSave(typed, 85)).toBeNull();
+  });
+
+  it("A76: typing 72.5 saves 72.5 once, not each keystroke's value", () => {
+    let typed: number | null = null;
+    for (const raw of ["7", "72", "72.", "72.5"]) typed = parsePercentInput(raw);
+    expect(targetToSave(typed, 85)).toBe(72.5);
+  });
+});
+
+describe("weightEdit", () => {
+  const row = makeAssessment({ id: "a1", weight: 20, mark: 80, status: "Submitted" });
+
+  it("edits the weight and keeps the mark and status", () => {
+    expect(weightEdit(row, "25", 20)).toEqual({ mark: 80, weight: 25, status: "Submitted" });
+  });
+
+  it("clamps the weight to 0 to 100", () => {
+    expect(weightEdit(row, "150", 20)?.weight).toBe(100);
+    expect(weightEdit(row, "-5", 20)?.weight).toBe(0);
+  });
+
+  it("saves a typed 0", () => {
+    expect(weightEdit(row, "0", 20)?.weight).toBe(0);
+  });
+
+  it.each(["", " ", "-", ".", "abc"])(
+    "A78: gives nothing to save for %j when nothing is unsaved, so the saved weight stays",
+    (raw) => {
+      expect(weightEdit(row, raw, 20)).toBeNull();
+    },
+  );
+
+  it("A78: deleting 10 digit by digit doesn't leave the 1 to save", () => {
+    const saved = makeAssessment({ id: "a1", weight: 10, mark: null, status: "Not started" });
+    let shown = saved;
+    for (const raw of ["1", ""]) {
+      const edit = weightEdit(shown, raw, saved.weight);
+      if (edit) shown = { ...shown, ...edit };
+    }
+    expect(shown.weight).toBe(10);
+  });
+
+  it("sends a missing mark as null", () => {
+    expect(weightEdit(makeAssessment({ mark: undefined }), "5", 10)?.mark).toBeNull();
   });
 });
 
@@ -319,6 +386,23 @@ describe("breakdownStatus", () => {
 
   it("A53: is missed for a Missed assessment past its due date", () => {
     expect(breakdownStatus(row("Missed", "2026-10-01"), now)).toBe("missed");
+  });
+
+  it.each(["Not started", "In progress"] as const)(
+    "A75: is review for a flagged %s, even past its placeholder date",
+    (s) => {
+      const flagged = (dueDate: string) =>
+        makeAssessment({ status: s, dueDate, needsReview: true });
+      expect(breakdownStatus(flagged("2026-10-01"), now)).toBe("review");
+      expect(breakdownStatus(flagged("2026-10-20"), now)).toBe("review");
+    },
+  );
+
+  it("A75: a flagged assessment that is Submitted or Missed keeps that marker", () => {
+    const flagged = (status: AssessmentStatus) =>
+      makeAssessment({ status, dueDate: "2026-10-01", needsReview: true });
+    expect(breakdownStatus(flagged("Submitted"), now)).toBe("submitted");
+    expect(breakdownStatus(flagged("Missed"), now)).toBe("missed");
   });
 });
 

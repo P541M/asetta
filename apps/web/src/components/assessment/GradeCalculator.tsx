@@ -1,4 +1,4 @@
-import { memo, useEffect, useMemo, useState } from "react";
+import { memo, useEffect, useMemo, useRef, useState } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import { useAssessmentAutoSave } from "../../hooks/useAssessmentAutoSave";
 import { useCoursePreferences } from "../../hooks/useCoursePreferences";
@@ -12,6 +12,8 @@ import {
   GradeEdit,
   pendingEdits,
   resolveTargetGrade,
+  targetToSave,
+  weightEdit,
   withEdits,
 } from "../../utils/gradeCalculations";
 import { ChartColumn, CircleAlert } from "lucide-react";
@@ -99,20 +101,49 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
   };
 
   const handleWeightChange = (assessmentId: string, value: string) => {
-    const newWeight = value === "" ? 0 : Math.min(100, Math.max(0, parseFloat(value) || 0));
     const edited = assessments.find((assessment) => assessment.id === assessmentId);
-    if (edited?.id) {
-      saveEdit(edited.id, { mark: edited.mark ?? null, weight: newWeight, status: edited.status });
-    }
+    const saved = courseAssessments.find((assessment) => assessment.id === assessmentId);
+    const edit = edited && saved ? weightEdit(edited, value, saved.weight) : null;
+    if (edited?.id && edit) saveEdit(edited.id, edit);
   };
 
-  const handleTargetGradeChange = async (newTargetGrade: number) => {
-    try {
-      await updateTargetGrade(newTargetGrade);
-    } catch (error) {
+  const saveTargetGrade = (target: number) => {
+    updateTargetGrade(target).catch((error) => {
       console.error("Failed to update target grade:", error);
-    }
+    });
   };
+
+  // The target as typed: shown and projected at once, saved only when the field is left (A76).
+  // The ref lets the cleanup below read the draft without re-running on each keystroke.
+  const [typedTarget, setTypedTarget] = useState<number | null>(null);
+  const typedTargetRef = useRef<number | null>(null);
+  const setTyped = (target: number | null) => {
+    typedTargetRef.current = target;
+    setTypedTarget(target);
+  };
+  const savedTarget = resolveTargetGrade(coursePreferences);
+
+  const commitTarget = () => {
+    const target = targetToSave(typedTargetRef.current, savedTarget);
+    setTyped(null);
+    if (target !== null) saveTargetGrade(target);
+  };
+
+  // A draft still open when the course changes or the tab unmounts saves to its own course:
+  // a removed field gets no blur
+  useEffect(() => {
+    const draft = typedTargetRef;
+    return () => {
+      const pending = draft.current;
+      draft.current = null;
+      setTypedTarget(null);
+      if (pending !== null) {
+        updateTargetGrade(pending).catch((error) => {
+          console.error("Failed to update target grade:", error);
+        });
+      }
+    };
+  }, [updateTargetGrade]);
 
   if (!selectedCourse) {
     return (
@@ -144,7 +175,7 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
   // Derived on every render, never kept in state, so an edit can't leave a stale value on screen
   const currentGrade = computeCurrentGrade(assessments);
   const totalWeight = computeTotalWeight(assessments);
-  const targetGrade = resolveTargetGrade(coursePreferences);
+  const targetGrade = typedTarget ?? savedTarget;
   const requiredGrade = coursePreferences
     ? calculateRequiredGrade(assessments, targetGrade, totalWeight)
     : null;
@@ -163,7 +194,8 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
         currentGrade={currentGrade}
         totalWeight={totalWeight}
         targetGrade={targetGrade}
-        onTargetGradeChange={handleTargetGradeChange}
+        onTargetInput={setTyped}
+        onTargetCommit={commitTarget}
         preferencesLoading={preferencesLoading}
         requiredGrade={requiredGrade}
       />
