@@ -574,7 +574,7 @@ branch. Tick the items off and add a session log entry when done. Don't commit.
   - **Problem:** each send is claimed (an attempt counted) before the login check, so with a revoked app password every due reminder fails its 3 attempts within about an hour and is never sent, even after the password is fixed the same day. Same before B15, when the check ran before every email.
   - **Fix (decide):** check the login once at the start of a run that has reminders to send; if it fails, log it, claim nothing, and give the due users a short retry (`nextReminderRun` with a retry) so the reminders go out once the login works.
 
-- [x] **A74 · The assessments table's "Submitted" filter shows Missed assessments** · S · risk L · found during B17 (done 2026-10-29, B19, not yet committed)
+- [x] **A74 · The assessments table's "Submitted" filter shows Missed assessments** · S · risk L · found during B17 (done 2026-10-29, PR #25)
   - **Shipped (B19, the founder's call 2026-10-29):** keep the grouping and name it for what it is: "To do" (Not started, In progress) and "Done" (Submitted, Missed). Students use the list as a to-do list, which missed work would clutter, and Done matches the completion rate, which already counts Missed as done. The rule is `matchesAssessmentFilter` in `utils/semesterAssessments.ts` (tested), moved out of the table unchanged; only the labels changed. The stored keys (`not_submitted`, `submitted`) stay, so a saved filter carries over.
   - **Where:** `filterOptions` and the filter in `apps/web/src/components/tables/AssessmentsTable.tsx` (`isCompletedStatus`).
   - **Problem:** the A51 mismatch in the table: "Submitted" lists Missed assessments too, and "Not submitted" hides them, though they were never submitted.
@@ -604,7 +604,7 @@ branch. Tick the items off and add a session log entry when done. Don't commit.
   - **Problem:** A43's fault in the weight field: deleting a weight to retype it queues 0, which saves after the auto-save's debounce, and a field left empty shows 0, so the course weight and "remaining" change.
   - **Fix:** parse it like the target (`parseTargetGradeInput`'s rule: no number saves nothing, a number is clamped to 0 to 100), with a test; check `applyMarkInput` keeps clearing a mark, which is meaningful there.
 
-- [x] **A79 · Typing "-" or "." in a mark field marks the assessment Submitted with 0** · S · risk L · found during B18 (done 2026-10-29, B19, not yet committed)
+- [x] **A79 · Typing "-" or "." in a mark field marks the assessment Submitted with 0** · S · risk L · found during B18 (done 2026-10-29, PR #25)
   - **Shipped (B19):** `applyMarkInput` returns its input array itself for text with no number other than an empty field, and `GradeCalculator`'s `handleMarkChange` queues nothing when it does, so the field snaps back on blur to the mark it shows. "" still clears the mark; a number is still floored at 0 with no cap (bonus marks). The "abc" case is now an A79 test of that.
   - **Where:** `applyMarkInput` in `apps/web/src/utils/gradeCalculations.ts` (`Math.max(0, parseFloat(raw) || 0)`); its test "parses %s as %f" in `gradeCalculations.test.ts`.
   - **Problem:** text with no number other than an empty field ("-", ".", "abc") becomes a mark of 0, and a Not started or In progress assessment then turns Submitted (A41's rule), so starting to type ".5" or a stray "-" saves a 0 and a status change. The test asserts `"abc"` as 0, a known bug written as correct behavior (standards.md, Testing). Read from the code, not reproduced in the UI.
@@ -1388,7 +1388,7 @@ Newest last. One entry per session: date, branch, items, what changed, what's le
   - The browser pane's `BackSpace` key name doesn't register; use `Backspace`.
   - Port 3001 on this machine was another project's dev server (not Asetta), so the build was safe to run beside it.
 
-### 2026-10-29 · B19 (`claude/b19-grades-table-be62fb`, not yet committed)
+### 2026-10-29 · B19 (`claude/b19-grades-table-be62fb`, PR #25)
 
 - **A79 and A74 done; A80 checked and left open.** Started from another session's brief. The worktree was already at origin/main (7e0e463, the merge of PR #24); `npm ci` (Node 24.22, npm 11.19) left the lockfile unchanged. Housekeeping: B18's items and log header now say PR #24. After reviewing, the founder asked for one more `/code-review` and the PR, so the agent committed, pushed and opened it (the founder merges).
 - **What changed:**
