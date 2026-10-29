@@ -444,7 +444,7 @@ branch. Tick the items off and add a session log entry when done. Don't commit.
   - **Problem:** the check only matters for the first 4 days after A8's first production run: it stops the switch from resending what the old cron had just sent. After that it is one or two wasted reads for each new reminder.
   - **Fix:** delete it once 5 days have passed since the first production run (the first `cronRuns/{date}` doc with `sweptAt` dates it).
 
-- [x] **A48 · Onboarding saves email notifications as on even when switched off** · S · risk L · found during B9 (done 2026-10-29, B20, not yet committed)
+- [x] **A48 · Onboarding saves email notifications as on even when switched off** · S · risk L · found during B9 (done 2026-10-29, PR #26)
   - **Shipped (B20):** the save's field mapping is `onboardingChoicesToWrite` in `utils/userDoc.ts` (tested), with `emailNotifications: userData.emailNotifications ?? false`; `completeOnboarding` spreads it into the same `updateDoc` (same keys and types). The form starts from `onboardingChoicesFromUserDoc` (A54), whose default was already false. Docs saved before the fix with `emailNotifications: true` and `hasConsentedToNotifications: false` are untouched: D12.
   - **Where:** `completeOnboarding` in `apps/web/src/contexts/OnboardingContext.tsx`: `emailNotifications: state.userData.emailNotifications || true`.
   - **Problem:** `false || true` is true, so a student who turns email notifications off in onboarding is saved with `emailNotifications: true` and `hasConsentedToNotifications: false`. No reminder goes out (the cron needs consent), but Settings then shows the switch on, and the next save of the Notifications card sets consent to match it, turning reminders on without the student choosing it.
@@ -453,7 +453,7 @@ branch. Tick the items off and add a session log entry when done. Don't commit.
 - [ ] **A49 · Daily digest email (optional, from A8)** · M · risk M · found during B9
   - A8 left the digest to "decide while building"; B9 didn't build it. Since A8 a user's due reminders all go out in the same run, one email each. A digest would be one email per user per run listing them: fewer Gmail sends (D3) and less inbox noise. It needs one claim covering several records and a new builder in `lib/emailTemplates.ts`. Revisit with A19, or when sends approach the Gmail cap.
 
-- [x] **A50 · The reminder time shows only under Custom timing** · S · risk L · found during B9 (done 2026-10-29, B20, not yet committed)
+- [x] **A50 · The reminder time shows only under Custom timing** · S · risk L · found during B9 (done 2026-10-29, PR #26)
   - **Shipped (B20):** in Settings and onboarding the line "Reminders go out at about 9:30 AM in your time zone." sits right under the timing menu for every choice, and the menu's trigger is `aria-describedby` it; the custom panel keeps "Choose between 1 and 30 days."
   - **Where:** `apps/web/src/components/settings/NotificationsSection.tsx` and `apps/web/src/components/onboarding/steps/NotificationsStep.tsx`.
   - **Problem:** the hint that says when reminders go out (A32) sits inside the custom-days panel, so a student who picks 1, 2, 3 or 7 days never sees it.
@@ -477,7 +477,7 @@ branch. Tick the items off and add a session log entry when done. Don't commit.
   - **Problem:** the label looks at Submitted and the due date only. A Missed assessment due later reads "Pending" and a past one "Overdue", while the grade counts it as 0 (D1).
   - **Fix:** a "Missed" label with the Missed tint (`statusTintClasses.Missed`).
 
-- [x] **A54 · Sign-in reads the onboarding status on its own, and a read error sends an onboarded user to onboarding** · S · risk L · found during B10 (done 2026-10-29, B20, not yet committed)
+- [x] **A54 · Sign-in reads the onboarding status on its own, and a read error sends an onboarded user to onboarding** · S · risk L · found during B10 (done 2026-10-29, PR #26)
   - **Shipped (B20):** `utils/onboardingUtils.ts` and `utils/authRedirect.ts` are gone. Login and register call `useRedirectAfterAuth` (`hooks/`), which waits for `useAuth()`'s `loading` and then goes to `pathAfterAuth(onboardingStatus)` (`utils/userDoc.ts`, tested): onboarding when it isn't finished, else the dashboard, also when the doc couldn't be read (no status), where the error screen is. The submit handlers only sign in; the form keeps showing progress until the redirect. `useAuth()` now has `onboardingChoices` (`onboardingChoicesFromUserDoc`, the old reader's mapping), and the onboarding form lays the student's changes over it, so its load effect, `dataLoaded`, `isLoadingData` and two actions are gone.
   - **Where:** `getUserOnboardingStatus` in `apps/web/src/utils/onboardingUtils.ts` (used by `redirectAfterAuth` on login and register) and `loadUserDataForOnboarding` (`OnboardingContext`).
   - **Problem:** two `getDoc` readers of the user doc remain beside the live one in `AuthContext`. `getUserOnboardingStatus` turns any read error into "needs onboarding", so a failed read at sign-in sends an onboarded user to `/onboarding`. Since B10 that page shows the error screen instead of the flow, so nothing gets overwritten; checked with the user-doc read denied, `/login` lands on `/onboarding` with "Couldn't load your account". With the live listener active the extra `getDoc` shares its target, so it costs no extra read.
@@ -1439,9 +1439,9 @@ Newest last. One entry per session: date, branch, items, what changed, what's le
   - Radix menus open on pointer events: a script's `.click()` doesn't open the filter menu; click it through the pane.
   - With the pane hidden the page still reported `visibilityState` "visible" and had focus, so focus and unload tests ran as with it shown.
 
-### 2026-10-29 · B20 (`claude/b20-onboarding-notifications-300b61`, not yet committed)
+### 2026-10-29 · B20 (`claude/b20-onboarding-notifications-300b61`, PR #26)
 
-- **A48, A50 and A54 done.** Started from another session's brief. PR #25 (B19) was merged by the start, so the branch was fast-forwarded to origin/main (403cd28, the merge of PR #25) and is not stacked on B19. `npm ci` (Node 24.22, npm 11.19) left the lockfile unchanged. Nothing committed, pushed or opened: the founder decides after reviewing.
+- **A48, A50 and A54 done.** Started from another session's brief. PR #25 (B19) was merged by the start, so the branch was fast-forwarded to origin/main (403cd28, the merge of PR #25) and is not stacked on B19. `npm ci` (Node 24.22, npm 11.19) left the lockfile unchanged. After reviewing, the founder asked for one more `/code-review` and the PR, so the agent committed, pushed and opened it (the founder merges).
 - **What changed:**
   - **A48:** the onboarding save's mapping is `onboardingChoicesToWrite` (`utils/userDoc.ts`), with `emailNotifications ?? false`; `completeOnboarding` spreads it into the same `updateDoc` (same keys and types, no rules change). Its read side is `onboardingChoicesFromUserDoc`, the deleted `loadUserDataForOnboarding`'s mapping unchanged, whose default was already false.
   - **A50:** the reminder time line sits under the timing menu for every choice in Settings and in onboarding, and the trigger is `aria-describedby` it; the custom panel keeps "Choose between 1 and 30 days."
@@ -1459,7 +1459,7 @@ Newest last. One entry per session: date, branch, items, what changed, what's le
 - **Second `/code-review` (high, the founder's request before the PR):** three findings. Fixed: a comment line past 100 columns in `utils/userDoc.ts`. Filed: the notifications step's "Skip for now" keeps what the student already changed, so a switch turned on with an unfinished address saves as on (A85, predates B20). No change: the A48 round-trip case (read then write with nothing changed) overlaps two others, but it is the path onboarding takes when the student touches nothing.
 - **Docs:** `apps/web/standards.md` ("The user doc is read once, live": onboarding choices, sign-in routing and the read-error destination, forms that start from the doc; the `_app` rule no longer lists a sign-in read; Conventions: default a boolean with `??`, never `||` toward `true`; Settings page: the reminder time under the timing menu).
 - **New:** D12 (students A48 already saved), A83 (Settings reads the user doc with its own `getDoc`), A84 (onboarding's "Continue without upload" stays disabled until "Skip for now" is pressed, seen in the UI check), A85 (the notifications step's Skip for now keeps a half-made choice, from the second review).
-- **Left for the founder:** the commit, push and PR; D12. No rules change; no deploy step besides the app. On the Vercel preview, with a new test account:
+- **Left for the founder:** the merge; D12. No rules change; no deploy step besides the app. On the Vercel preview, with a new test account:
   - Register, go through onboarding with email notifications left off, finish: Settings shows them off.
   - Again with them on and a custom number of days: Settings shows on and the days. Under every timing choice, in onboarding and Settings, the line says reminders go out at about 9:30 AM.
   - Sign out and sign in: an onboarded account goes straight to the dashboard; a new one to onboarding.
