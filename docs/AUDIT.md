@@ -35,7 +35,7 @@ None open. D1 to D12 are answered (archive, "Answered decisions"); an item that 
 
 ## Batches
 
-**Done:** B1 to B18 (PRs #5 to #24): security, tests, reminders, data layer, rules, bundle size, rate limits, cron throughput, and the dashboard and grades bugs. B19 (writing rules and docs, 2026-10-30) is done but not yet committed. What each shipped is in the archive.
+**Done:** B1 to B18 (PRs #5 to #24): security, tests, reminders, data layer, rules, bundle size, rate limits, cron throughput, and the dashboard and grades bugs. B19 (writing rules and docs, 2026-10-30, PR #27) is done. What each shipped is in the archive.
 
 **Up next, in order** (reprioritized 2026-10-30 from the founder's list: after B1 to B18 hardened the backend, the work moves to agent rules, cleanup and UI/UX):
 
@@ -375,8 +375,8 @@ Full text and what shipped: archive, "Done items".
 - [x] A30 · Welcome email to unverified sign-up addresses · 2026-10-10, PR #6
 - [x] A31 · Redesign the welcome and reminder emails · 2026-10-10, PR #6
 - [x] A32 · Settings states the wrong reminder time · 2026-10-11, PR #14
-- [x] A34 · next dev writes apps/landing/AGENTS.md · 2026-10-30, B19, not yet committed
-- [x] A35 · Em dashes left in the rules docs and code comments · 2026-10-30, B19, not yet committed
+- [x] A34 · next dev writes apps/landing/AGENTS.md · 2026-10-30, PR #27
+- [x] A35 · Em dashes left in the rules docs and code comments · 2026-10-30, PR #27
 - [x] A36 · Current grade reads 0% when every marked assessment weighs 0 · 2026-10-11, PR #12
 - [x] A37 · Course-name fallback reads a term as the course code · 2026-10-11, PR #13
 - [x] A38 · A failed reminder is retried only on the same day count · 2026-10-11, PR #14
@@ -392,9 +392,9 @@ Full text and what shipped: archive, "Done items".
 - [x] A76 · The target-grade field saves every keystroke · 2026-10-29, PR #24
 - [x] A77 · The calendar's today highlight doesn't follow the clock · 2026-10-29, PR #24
 - [x] A78 · Clearing a weight in the grade breakdown saves 0 · 2026-10-29, PR #24
-- [x] A86 · Emojis in the code and copy · 2026-10-30, B19, not yet committed
-- [x] A92 · Clean this file · 2026-10-30, B19, not yet committed
-- [x] A97 · Writing rules for agents (no AI slop) · 2026-10-30, B19, not yet committed
+- [x] A86 · Emojis in the code and copy · 2026-10-30, PR #27
+- [x] A92 · Clean this file · 2026-10-30, PR #27
+- [x] A97 · Writing rules for agents (no AI slop) · 2026-10-30, PR #27
 
 ## Baseline
 
