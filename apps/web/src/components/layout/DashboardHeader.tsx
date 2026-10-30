@@ -21,7 +21,7 @@ interface DashboardHeaderProps {
 }
 
 // One casual variant alongside the two formal ones per period. Picked by
-// day-of-year so it holds steady for the day and shifts once daily — no
+// day-of-year so it holds steady for the day and shifts once daily, no
 // per-reload flicker, no timers.
 const GREETING_POOLS: Record<"morning" | "afternoon" | "evening", string[]> = {
   morning: ["Good morning", "Morning", "Mornin'"],

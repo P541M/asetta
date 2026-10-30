@@ -130,7 +130,7 @@ IP Address: ${ipAddress}
       html: `
 <h2>New Contact Form Submission</h2>
 <div style="background-color: #e8f5e8; padding: 10px; border-radius: 5px; margin-bottom: 15px;">
-  <p><strong>✅ CASL Compliant Submission</strong></p>
+  <p><strong>CASL compliant submission</strong></p>
   <p style="font-size: 12px;">User provided explicit consent for email communications as required by Canada's Anti-Spam Legislation.</p>
 </div>
 <p><strong>Name:</strong> ${escapeHtml(name)}</p>

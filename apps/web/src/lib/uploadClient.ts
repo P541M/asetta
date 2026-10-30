@@ -88,7 +88,7 @@ export interface ParsedUploadResponse {
  * offline captive portals) to something a student can act on.
  *
  * The API route itself always answers with JSON, so a non-JSON body means the
- * request never reached the handler — or the handler was killed mid-flight.
+ * request never reached the handler, or the handler was killed mid-flight.
  */
 const describeNonJsonResponse = (status: number): string => {
   if (status === 413) {

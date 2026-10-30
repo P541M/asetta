@@ -15,7 +15,7 @@ const AUTH_ERROR_MESSAGES: Record<string, string> = {
     "This email is already linked to a different sign-in method. Try Google or email instead.",
 };
 
-/** Deliberate user actions (closing the Google popup) — not errors, show nothing. */
+/** Deliberate user actions (closing the Google popup): not errors, show nothing. */
 const CANCELLED_CODES = new Set([
   "auth/popup-closed-by-user",
   "auth/cancelled-popup-request",

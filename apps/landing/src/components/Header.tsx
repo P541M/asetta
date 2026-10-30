@@ -32,7 +32,7 @@ export default function Header() {
 
   const isActive = (href: string) => router.pathname.startsWith(href);
 
-  // Show the bottom hairline once the page is scrolled.
+  // Show the soft shadow once the page is scrolled.
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 8);
     handleScroll();

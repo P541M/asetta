@@ -2,7 +2,7 @@
  * Course colors are user-chosen hex values (standards.md v4.3): stored as
  * "#RRGGBB" in coursePreferences/{id}.color (the ID from coursePreferencesDocId in
  * utils/courseName.ts) and rendered via inline
- * style — the sanctioned exception to the tokens-only rule, because they are
+ * style: the sanctioned exception to the tokens-only rule, because they are
  * user data, not theme styling. Unset courses fall back to a stable
  * name-hash default from the presets below.
  */
@@ -24,7 +24,7 @@ const HEX_COLOR_PATTERN = /^#[0-9a-fA-F]{6}$/;
 export const isValidCourseColor = (value: unknown): value is string =>
   typeof value === "string" && HEX_COLOR_PATTERN.test(value);
 
-/* djb2 — deterministic across sessions and devices so unset courses keep the
+/* djb2: deterministic across sessions and devices so unset courses keep the
    same default everywhere without any writes. */
 const defaultCourseColor = (courseName: string): string => {
   let hash = 5381;

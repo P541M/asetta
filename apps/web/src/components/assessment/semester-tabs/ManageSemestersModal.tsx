@@ -43,7 +43,7 @@ interface ManageSemestersModalProps {
   onReorder: (reordered: Semester[]) => void;
   onEdit: (id: string, name: string) => void;
   onDelete: (id: string) => void;
-  /** Add flow lives inside this modal — one surface owns all semester management */
+  /** Add flow lives inside this modal: one surface owns all semester management */
   addValue: string;
   onAddValueChange: (value: string) => void;
   onAdd: () => void;

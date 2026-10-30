@@ -35,7 +35,7 @@ const Switch = React.forwardRef<HTMLButtonElement, SwitchProps>(
           checked ? "bg-primary" : "bg-accent",
         )}
       >
-        {/* dark: override justified — the thumb must stay light in both themes;
+        {/* dark: override justified: the thumb must stay light in both themes;
             dark bg-card (#1E1E1E) would disappear on the dark accent track (#333) */}
         <span
           className={cn(

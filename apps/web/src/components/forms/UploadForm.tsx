@@ -310,7 +310,7 @@ const UploadForm = ({ semesterId }: UploadFormProps) => {
               <p className="mt-1 text-sm text-muted-foreground">
                 {uploadStatus === "uploading"
                   ? "Processing your files..."
-                  : `Supports multiple PDF files • Max ${formatBytes(MAX_FILE_BYTES)} per file`}
+                  : `Supports multiple PDF files · Max ${formatBytes(MAX_FILE_BYTES)} per file`}
               </p>
             </div>
           </div>
@@ -332,7 +332,7 @@ const UploadForm = ({ semesterId }: UploadFormProps) => {
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-sm font-medium text-foreground">{file.name}</p>
                       <p className="mt-0.5 text-xs font-medium text-muted-foreground">
-                        {formatFileSize(file.size)} • PDF
+                        {formatFileSize(file.size)} · PDF
                       </p>
                     </div>
                     <div className="shrink-0">
