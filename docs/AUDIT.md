@@ -39,7 +39,7 @@ Answered decisions are in the archive ("Answered decisions"); an item that depen
 
 ## Batches
 
-**Done:** B1 to B23 (PRs #5 to #28, then B23's): security, tests, reminders, data layer, rules, bundle size, rate limits, cron throughput, the dashboard and grades bugs, the onboarding and notification settings, the writing rules and docs (B21), and the UI/UX audit of both apps (B23, findings A105 to A129). What each shipped is in the archive.
+**Done:** B1 to B23 (PRs #5 to #29): security, tests, reminders, data layer, rules, bundle size, rate limits, cron throughput, the dashboard and grades bugs, the onboarding and notification settings, the writing rules and docs (B21), and the UI/UX audit of both apps (B23, findings A105 to A129). What each shipped is in the archive.
 
 **Up next, in order** (reprioritized 2026-10-30 from the founder's list: after the backend work, the focus moves to cleanup and UI/UX):
 

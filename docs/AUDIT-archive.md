@@ -1316,7 +1316,7 @@ Oldest first. One entry per session: date, branch, items, what changed, what's l
   - A fresh worktree has no `node_modules` or `.env.local`: `npm ci` first; the dev server against the emulators needs only placeholder `NEXT_PUBLIC_FIREBASE_*` values (no real keys), and `npm run build` needs CI's placeholders (`.github/workflows/ci.yml`) or it stops on `auth/invalid-api-key`. `next build` then warns about two lockfiles (the main checkout's and the worktree's); harmless.
   - Scripts (`emu.sh`, `dev.sh`, `seed.cjs`) were in the session scratchpad, not `node_modules/.cache/`; the emulator jar was reused from `node_modules/.cache/b11/emulators` in the main checkout.
 
-### 2026-10-30 · B23 (`claude/b23-ui-audit-63761f`, no PR yet)
+### 2026-10-30 · B23 (`claude/b23-ui-audit-63761f`, PR #29)
 
 - **The UI/UX audit of both apps (A89, A99, A100 audit phase; A105 added).** Started from another session's brief; the founder approved the plan with three calls: vendor Impeccable's skill folder only; audit the marketing site too (A105, fixes in B29); screenshots in a private gallery, not in git. On approval the founder added: `standards.md` Part 2 does not bind the findings ("AI slop standards"); keep the theme and amber, fix ratios and colors for the best experience, then rewrite the rules (A106). The `init` interview set the users (post-secondary students anywhere), devices (both; the phone for quick checks) and WCAG 2.2 AA.
 - **What changed:**
