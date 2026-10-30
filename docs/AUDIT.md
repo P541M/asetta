@@ -23,7 +23,7 @@ items off and add a session log entry to docs/AUDIT-archive.md when done. Don't 
 
 **Rules:**
 
-- IDs are permanent. Never renumber. New items take the next free number (**next: A103, D14**); split an item as A9a/A9b.
+- IDs are permanent. Never renumber. New items take the next free number (**next: A105, D14**); split an item as A9a/A9b.
 - Dropped items move to the archive struck through with a reason: `~~A24~~ dropped: <why>`.
 - Line numbers in items drift. Search by symbol name.
 - One theme per branch and PR.
@@ -39,18 +39,17 @@ Answered decisions are in the archive ("Answered decisions"); an item that depen
 
 ## Batches
 
-**Done:** B1 to B21 (PRs #5 to #27): security, tests, reminders, data layer, rules, bundle size, rate limits, cron throughput, the dashboard and grades bugs, the onboarding and notification settings, and the writing rules and docs (B21). What each shipped is in the archive.
+**Done:** B1 to B22 (PRs #5 to #28): security, tests, reminders, data layer, rules, bundle size, rate limits, cron throughput, the dashboard and grades bugs, the onboarding and notification settings, and the writing rules and docs (B21). What each shipped is in the archive.
 
 **Up next, in order** (reprioritized 2026-10-30 from the founder's list: after the backend work, the focus moves to cleanup and UI/UX):
 
 | Order | Batch | Items | Theme | Why here |
 | --- | --- | --- | --- | --- |
-| 1 | B22 | A87, A88, A86, A84 | Quick bugs the founder and students hit | Small and visible. A87 first: every session ends by checking the Vercel preview, and a preview's `/` opens the live marketing site today. A84 makes skipping the onboarding upload take two presses. |
-| 2 | B23 | A89, A99, A100 (audit phase only) | UI/UX audit: Impeccable, Windows and macOS, mobile | Read-only. It turns "improve the UI" into a list of findings per screen, filed as new items, so B26 has a plan and B25 knows which components the UI work will touch. |
-| 3 | B24 | A92, A93, A24, A47 | Cleanup sweep: test names, comments, dead code | Mechanical, no behavior change. Shrinks the code before B25 simplifies it. A47's 5-day wait ended long ago. |
-| 4 | B25 | A94, A95, A21, A22, A23, A83 | Simplify and modularize | Test-first wherever logic moves. Before the UI work so each screen is restyled once, in its final files. A83 is the last stray user-doc read. Expect 2 or 3 PRs, one per area. |
-| 5 | B26 | A89, A99, A100 (fixes), A66, A69 | UI/UX implementation | One screen or theme per PR, from B23's findings. A66 and A69 are UI items already on the list. |
-| 6 | B27 | A96, A25, A33, A62 | Deprecated and outdated dependencies | One major per PR. `@google/generative-ai` is Google's retired SDK and runs the core feature (extraction): if it starts failing, its move to `@google/genai` jumps the queue. Do Tiptap 3 before B26 restyles the notes editor. |
+| 1 | B23 | A89, A99, A100 (audit phase only) | UI/UX audit: Impeccable, Windows and macOS, mobile | Read-only. It turns "improve the UI" into a list of findings per screen, filed as new items, so B26 has a plan and B25 knows which components the UI work will touch. |
+| 2 | B24 | A92, A93, A24, A47 | Cleanup sweep: test names, comments, dead code | Mechanical, no behavior change. Shrinks the code before B25 simplifies it. A47's 5-day wait ended long ago. |
+| 3 | B25 | A94, A95, A21, A22, A23, A83 | Simplify and modularize | Test-first wherever logic moves. Before the UI work so each screen is restyled once, in its final files. A83 is the last stray user-doc read. Expect 2 or 3 PRs, one per area. |
+| 4 | B26 | A89, A99, A100 (fixes), A66, A69, A103, A104 | UI/UX implementation | One screen or theme per PR, from B23's findings. A66 and A69 are UI items already on the list; A103 and A104 are the accent color's use and contrast (founder, 2026-10-30: with the redesign). |
+| 5 | B27 | A96, A25, A33, A62 | Deprecated and outdated dependencies | One major per PR. `@google/generative-ai` is Google's retired SDK and runs the core feature (extraction): if it starts failing, its move to `@google/genai` jumps the queue. Do Tiptap 3 before B26 restyles the notes editor. |
 | any | B28 | A98 | One domain | D13 decided: the platform moves to `app.asetta.me`. Touches only config, env and cross-app links, so it can run beside any batch. |
 | any | B29 | A90, A27, A68 | Landing polish: Lenis, GIFs to video, tests | The landing shares no code with the platform, so this runs beside any batch. |
 | any | | A101 (the founder reads the docs), A14 (a manual check), A26, A28, A39, A40, A42, A45, A46, A49, A52, A55, A57 to A61, A63, A64, A70 to A73, A80, A81, A82, A85 | Remaining items | As time allows. Founder calls first: D12, A73, A80, A81 and A85. A64 once the D11 marker has `finishedAt`; A71 only if spam arrives. |
@@ -59,25 +58,20 @@ Answered decisions are in the archive ("Answered decisions"); an item that depen
 
 ### Bugs
 
-- [ ] **A86 · Today is hard to spot in the calendar** · S · risk L · UI
-  - **Where:** the day number in `apps/web/src/components/calendar/CalendarGrid.tsx` (`day.isToday ? "bg-primary/10 text-primary"`).
-  - **Problem:** today is a 24px circle in 10% amber with amber text, which reads as a faint orange ring among the other day numbers, more so in dark mode and on a day with assessment chips. A student should find today at a glance.
-  - **Fix:** a solid amber circle with `text-primary-foreground` for the number, plus one more cue that doesn't rely on color alone (a tinted cell or a small "Today" label on wide screens). Check it against "Surface language" in `standards.md` (amber is the accent) and update that section if the rule needs a line for it. Light and dark, desktop and 375px.
-  - **Done when:** the founder picks today out at a glance in both themes, on a month with assessments on and around today.
-
-- [ ] **A87 · A preview deploy's `/` opens the live marketing site** · S · risk L
-  - **Where:** `redirects()` in `apps/web/next.config.ts`; on the landing side, `APP_URL` in `apps/landing/src/lib/site.ts` and the `/login` and `/register` redirects in `apps/landing/next.config.ts`.
-  - **Problem:** the config sends `/` to `/login` only when `NODE_ENV` is `development`. Vercel builds every deploy, previews included, with `NODE_ENV=production`, so opening a platform preview's URL redirects to `https://www.asetta.me`, the production marketing site, and the preview looks broken. The redirect is also `permanent: true` (308), which browsers cache, so it can stick to a preview URL. The other direction has the same root: a landing preview's Login and Get started buttons go to the production platform.
-  - **Fix:** gate the production redirects on `process.env.VERCEL_ENV === "production"` (Vercel sets `preview` or `production` at build time); everywhere else `/` goes to `/login`, non-permanent. Decide whether a landing preview should keep pointing at production (fine for marketing review) or at a platform preview. Revisit with A98, which changes these URLs anyway.
-  - **Done when:** a platform preview's root opens its own login page; production's `/` still goes to the marketing site.
-
-- [ ] **A88 · Editing a due date shows no calendar on Windows** · S · risk L · reproduce first
-  - **Where:** the native `type="date"` and `type="time"` inputs in `components/forms/AddAssessmentForm.tsx` and `components/tables/assessments/AssessmentEditRow.tsx` (both layouts), styled by `components/ui/input.tsx`; `styles/globals.css`.
-  - **Problem (likely cause, read from the code, not yet reproduced on Windows):** Chrome and Edge on Windows open the date picker only from the small calendar icon at the right of the field; clicking the date text edits the day, month or year in place, so a click on the date shows no calendar. Safari on macOS opens its picker from a click anywhere in the field, which is why the same form works on a Mac. Also check the icon's contrast on the filled input (`bg-input`) in both themes; next-themes sets `color-scheme` on `<html>` (its `enableColorScheme` default), so the icon should follow the theme, but that is unverified.
-  - **Fix:** open the picker on a click in the field with `input.showPicker()` inside a try/catch (it throws in a cross-origin iframe, and older browsers lack it), in one place (`components/ui/input.tsx` for `type="date"` and `type="time"`, or a small `DateInput`). Check Chrome, Edge and Firefox on Windows and Safari and Chrome on macOS, both themes. If the native picker still feels wrong next to the app's design, a custom date picker is a B26 question, not this item.
-  - **Done when:** on Windows Chrome and Edge, clicking anywhere in the date field opens the picker in both themes, and the icon is visible in dark mode.
+None open outside "Backend and earlier items".
 
 ### UI/UX
+
+- [ ] **A103 · The calendar's assessment count badge is amber** · S · risk L · UI · found during B22
+  - **Where:** the count badge beside each day number in `apps/web/src/components/calendar/CalendarGrid.tsx` (`bg-primary/10 text-primary`). The same 10% amber tint is on the icon tile of the onboarding step headers (`UploadStep`, and likely the other steps).
+  - **Problem:** "Surface language" in `standards.md` keeps amber for primary buttons, the logo, links, focus rings and today's date. The badge uses it as decoration, and beside today's solid amber circle (A86) it puts two ambers in today's cell.
+  - **Fix:** a neutral badge (a `secondary` fill with `muted-foreground` text, for example), checked in both themes. Decide the onboarding icon tiles in A89's audit.
+
+- [ ] **A104 · White on amber is below AA contrast in light mode** · S · risk L · UI · found during B22 (`/code-review`) · B26
+  - **Where:** the light theme's `--primary` (#d97706) with `--primary-foreground` (#ffffff) in `apps/web/src/styles/globals.css`: primary buttons, and today's number in the calendar (A86).
+  - **Problem:** about 3.2:1, below WCAG AA's 4.5:1 for text under 18px (14px button labels, the calendar's day number). Dark mode (#f59e0b with #1a1a1a) is about 9:1.
+  - **Fix:** in the redesign, a light-mode pair that reaches 4.5:1 (dark text on amber, or a deeper amber such as `--primary-hover` #b45309, about 5:1, for filled surfaces), checked on every primary button and the calendar in both themes.
+  - **Done when:** every white-on-amber text in light mode reaches 4.5:1, or is 18px and up (3:1).
 
 - [ ] **A89 · UI/UX pass with Impeccable** · L · risk M · audit first (B23), then fixes per screen (B26)
   - **Where:** every platform screen: auth pages, onboarding, the dashboard tabs (Assessments, Courses, Calendar, Grades, Upload), the notes editor, Settings and the overlays.
@@ -92,7 +86,7 @@ Answered decisions are in the archive ("Answered decisions"); an item that depen
   - **Done when:** scrolling feels smooth with a mouse wheel and trackpad, an open overlay still locks the page, reduced motion turns it off, and the legal TOC jumps to each section below the header.
 
 - [ ] **A99 · Works the same on Windows and macOS** · M · risk L · audit with A89
-  - **Problem:** the founder works on Windows; students are split across both. Known Windows gaps so far: the date picker (A88); scrollbars were one (A65, done). Not yet checked: font rendering of the stack on Windows (ClearType, fallback fonts), native controls (date, time, select, checkbox) in dark mode, any keyboard shortcut hint that says Cmd or Ctrl, focus rings and hover states on touch laptops, and file pickers and drag and drop on upload.
+  - **Problem:** the founder works on Windows; students are split across both. Known Windows gaps so far: the date picker (A88, done); scrollbars were one (A65, done). Not yet checked: font rendering of the stack on Windows (ClearType, fallback fonts), native controls (date, time, select, checkbox) in dark mode, any keyboard shortcut hint that says Cmd or Ctrl, focus rings and hover states on touch laptops, and file pickers and drag and drop on upload.
   - **Fix:** a checklist run per screen on Windows (Chrome, Edge, Firefox) and macOS (Safari, Chrome) during B23; each problem becomes its own item. Add the checklist to "Quality bar for every screen" in `standards.md` so later screens are checked the same way.
   - **Done when:** the checklist is in `standards.md` and every screen passes it on both systems.
 
@@ -344,11 +338,6 @@ Answered decisions are in the archive ("Answered decisions"); an item that depen
   - **Problem:** the last reader of the user doc beside `AuthContext`'s live one (standards.md, "The user doc is read once, live"). It reads once at mount, so the cards don't follow later changes to the doc, and a failed read is only logged: the forms keep their defaults (notifications off) with Save disabled, and no error shows. A23 lists `UserSettings` among the Firestore calls outside hooks.
   - **Fix:** start the Profile and Notifications forms and the preferences from `useAuth()` (`profile`, `displayPreferences`, and a notifications mapping like B20's `onboardingChoicesFromUserDoc`, with `notifySubmittedAssessments`), as B20 did for onboarding; delete the `getDoc`. Keep the dirty check against what was loaded.
 
-- [ ] **A84 · Onboarding's "Continue without upload" stays disabled until "Skip for now" is pressed** · S · risk L · found during B20 (UI check)
-  - **Where:** `UploadStep` in `apps/web/src/components/onboarding/steps/UploadStep.tsx` (`canGoNext={state.hasCompletedUpload || hasAttemptedUpload}`; `handleSkipUpload` only sets `hasAttemptedUpload`).
-  - **Problem:** the step shows "Skip for now" and a disabled "Continue without upload". Skip doesn't move on: it enables Continue and hides itself, so skipping the upload takes two presses and the button that names the action looks broken until then.
-  - **Fix:** one control that moves on: "Continue without upload" enabled from the start, and no separate Skip (or a Skip that moves on). Ask the founder if the two-press skip was deliberate.
-
 - [ ] **A85 · Onboarding's "Skip for now" on the notifications step keeps what was already changed** · S · risk L · found during B20 (second `/code-review`)
   - **Where:** `NotificationsStep` (`components/onboarding/steps/NotificationsStep.tsx`): every change goes to `updateUserData` at once, and `StepNavigation`'s Skip calls `nextStep` without Continue's check (`canContinue`).
   - **Problem:** a student who switches notifications on, types part of an address and presses Skip for now finishes onboarding with `emailNotifications` and consent true and the unfinished address (reminders then go to the account email). Read from the code, not reproduced in the UI. Predates B20.
@@ -403,6 +392,10 @@ Full text and what shipped: archive, "Done items".
 - [x] A77 · The calendar's today highlight doesn't follow the clock · 2026-10-29, PR #24
 - [x] A78 · Clearing a weight in the grade breakdown saves 0 · 2026-10-29, PR #24
 - [x] A79 · Typing "-" or "." in a mark field marks the assessment Submitted with 0 · 2026-10-29, PR #25
+- [x] A84 · Onboarding's "Continue without upload" stays disabled until "Skip for now" is pressed · 2026-10-30, PR #28
+- [x] A86 · Today is hard to spot in the calendar · 2026-10-30, PR #28
+- [x] A87 · A preview deploy's `/` opens the live marketing site · 2026-10-30, PR #28
+- [x] A88 · Editing a due date shows no calendar on Windows · 2026-10-30, PR #28
 - [x] A91 · Emojis in the code and copy · 2026-10-30, PR #27
 - [x] A97 · Clean this file · 2026-10-30, PR #27
 - [x] A102 · Writing rules for agents (no AI slop) · 2026-10-30, PR #27
@@ -412,8 +405,8 @@ Full text and what shipped: archive, "Done items".
 The latest numbers to compare against. Every earlier value is in the archive ("Baselines as recorded").
 
 - `npm audit --omit=dev`: 38 vulnerabilities (0 critical, 5 high, 33 moderate) since A2 (2026-10-10); 43 (10 high) with dev dependencies. Why each high stays is in the B2 session log.
-- `apps/web` build (Next 15.5.27, after B21, 2026-10-30): First Load JS shared by every page 154 kB; `/login` 166 kB, `/register` 167, `/reset-password` 165, `/confirm-email` 162, `/404` 157, `/dashboard` 145, `/dashboard/*` 271, `/dashboard/[semester]/*` 272, `/settings` 273, `/onboarding` 288. A dashboard fetches the other tabs after first paint (about 37 kB in all) and the semester drag list when its menu opens (about 17 kB).
-- Tests (after B20, 2026-10-29; B21 added none): 25 suites, 774 tests per zone, all passing (1,548 across the two zones). The rules suite (`npm run test:rules`): 44 cases.
+- `apps/web` build (Next 15.5.27, after B22, 2026-10-30): First Load JS shared by every page 154 kB; `/login` 166 kB, `/register` 167, `/reset-password` 165, `/confirm-email` 162, `/404` 157, `/dashboard` 145, `/dashboard/*` 272, `/dashboard/[semester]/*` 272, `/settings` 273, `/onboarding` 288. A dashboard fetches the other tabs after first paint (about 37 kB in all) and the semester drag list when its menu opens (about 17 kB).
+- Tests (after B20, 2026-10-29; B21 and B22 added none): 25 suites, 774 tests per zone, all passing (1,548 across the two zones). The rules suite (`npm run test:rules`): 44 cases.
 - Reminder cron (B15, emulators, a simulated 25 ms per Firestore call): a day's first run with nobody due reads 4 docs at 10 to 500 users (6 at 2,000); a run with 300 of 500 users due takes 13.3 s and 3,514 reads.
 - Firestore reads (B10, emulator rule coverage): a dashboard load reads the user doc once and writes nothing; a day's first load also writes `lastLogin` once.
 - Vercel limits and the live rules' deploy state: `docs/ops.md`.

@@ -15,6 +15,11 @@ machine. Planned changes live in `docs/AUDIT.md`; this file describes what is tr
 - A push to `main` deploys both to production; every other branch gets preview deployments.
 - Vercel Authentication is on for previews and the generated `*.vercel.app` URLs: opening a
   preview needs a Vercel login. The custom domains are public.
+- The platform's redirects (`apps/web/next.config.ts`) read `VERCEL_ENV`, which Vercel sets at
+  build time: only a `production` build sends `/` to the marketing site (308). A preview, and
+  `npm run dev:web`, send `/` to `/login` (307). `NODE_ENV` can't tell them apart: Vercel builds
+  previews with `NODE_ENV=production`. The landing's Login and Get started links always point at
+  production (`APP_URL` in `apps/landing/src/lib/site.ts`), previews included.
 - Hobby limits that shape the code: runtime logs are kept for 1 hour, and a cron job runs at most
   once a day and fires anywhere within its scheduled hour.
 - Function limits in `apps/web/vercel.json`: the cron route has `maxDuration: 300`, the upload

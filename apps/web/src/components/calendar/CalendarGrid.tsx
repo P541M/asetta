@@ -36,16 +36,25 @@ const CalendarGrid = ({ calendarDays, onSelectDay }: CalendarGridProps) => (
         >
           <div className="mb-2 flex items-center justify-between">
             <span
-              className={cn(
-                "flex size-6 items-center justify-center rounded-full text-sm font-medium",
-                day.isToday
-                  ? "bg-primary/10 text-primary"
-                  : day.isCurrentMonth
-                    ? "text-foreground"
-                    : "text-muted-foreground/60",
-              )}
+              className="flex items-center gap-1.5"
+              aria-current={day.isToday ? "date" : undefined}
             >
-              {day.date.getDate()}
+              <span
+                className={cn(
+                  "flex size-6 items-center justify-center rounded-full text-sm font-medium",
+                  day.isToday
+                    ? "bg-primary font-semibold text-primary-foreground"
+                    : day.isCurrentMonth
+                      ? "text-foreground"
+                      : "text-muted-foreground/60",
+                )}
+              >
+                {day.date.getDate()}
+              </span>
+              {/* A cue that isn't color alone; the cells are too narrow for it on phones */}
+              {day.isToday && (
+                <span className="hidden text-xs font-medium text-foreground lg:inline">Today</span>
+              )}
             </span>
             {day.assessments.length > 0 && (
               <span className="flex size-5 items-center justify-center rounded-full bg-primary/10 text-xs font-medium text-primary">

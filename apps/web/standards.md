@@ -230,7 +230,9 @@ are what make Asetta look like Asetta and not a default shadcn app:
 - **No gradients, glows, badges-as-decoration, or fixed-dark sections.** Brand surfaces (e.g. the
   auth panel) are tonal bands that follow the active theme.
 - **Headings are solid `foreground`**, with no colored or highlighted words. Amber appears only on
-  primary buttons, the logo, links, and focus rings.
+  primary buttons, the logo, links, focus rings, and today's date in the calendar (a solid amber
+  circle with `text-primary-foreground`, plus a "Today" label where the cell is wide enough, so
+  today never depends on color alone).
 - **Shadows**: `shadow-soft` for elevated cards/panels; nothing heavier without a reason.
 - **Copy**: sentence case, quiet voice; the writing rules in the root `CLAUDE.md` apply.
 
@@ -249,6 +251,9 @@ are what make Asetta look like Asetta and not a default shadcn app:
   checks animate in as rules are met.
 - **Native number spinners are hidden at the `Input` primitive**: they never
   match the filled-input language; don't re-add per-field spinner CSS.
+- **Date and time fields open their picker from a click anywhere in the field**, at the `Input`
+  primitive (`showPicker()`): Chrome and Edge open it only from the small icon otherwise. Don't
+  add per-field picker handlers.
 - **Numeric fields that live-parse keep the raw string in the field while focused**
   (`assessment/grade-calculator/NumberField.tsx`): the parent owns parsed/clamped numbers,
   the field snaps to canonical on blur. Controlling an input with a value reformatted on
