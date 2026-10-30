@@ -1,7 +1,7 @@
 /**
  * Sets the theme inside a View Transitions crossfade where supported
  * (skipped under prefers-reduced-motion; instant otherwise). The single
- * entry point for theme switching — see standards.md, Motion.
+ * entry point for theme switching; see standards.md, Motion.
  */
 export function setThemeWithTransition(theme: string, setTheme: (theme: string) => void): void {
   const apply = () => setTheme(theme);

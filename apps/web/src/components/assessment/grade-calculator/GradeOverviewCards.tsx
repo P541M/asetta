@@ -28,7 +28,7 @@ const weightBarColor = (totalWeight: number) =>
 /**
  * The three summary tiles: current grade, course weight, target grade +
  * projection. One shared anatomy so the set reads as a unit: caption label
- * row, a fixed h-9 value row (number or the target input — tops align by
+ * row, a fixed h-9 value row (number or the target input; tops align by
  * construction), optional meter, and a caption support line pinned to the
  * tile bottom.
  */

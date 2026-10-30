@@ -7,7 +7,7 @@ on:
 
 env:
   # Build-time placeholders for apps/web only. `next build` initializes the Firebase client SDK
-  # while prerendering pages, which requires these to be non-empty — but it never
+  # while prerendering pages, which requires these to be non-empty, but it never
   # contacts Firebase during a build, so dummy values are safe here. Real values
   # live in Vercel, which builds production deploys with its own environment.
   # apps/landing ignores them.
@@ -37,6 +37,9 @@ jobs:
 
       - name: Check formatting (web + landing)
         run: npm run format:check
+
+      - name: Check copy (no em dash or emoji)
+        run: npm run check:copy
 
       - name: Typecheck (web)
         run: npm run typecheck

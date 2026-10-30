@@ -60,7 +60,7 @@ const AssessmentRow = ({
         </div>
       </div>
 
-      {/* Course and Assignment Info — the assignment is the card title, the course its label */}
+      {/* Course and assignment info: the assignment is the card title, the course its label */}
       <div className="space-y-1">
         <div className="flex items-center justify-between gap-3">
           <div className="flex min-w-0 items-center gap-1.5">
@@ -136,7 +136,7 @@ const AssessmentRow = ({
       </div>
     </div>
 
-    {/* Desktop Table Layout — same grid template as the header, one cell per column */}
+    {/* Desktop table layout: same grid template as the header, one cell per column */}
     <div className={assessmentGridClass(showWeight)}>
       <Checkbox
         checked={isSelected}

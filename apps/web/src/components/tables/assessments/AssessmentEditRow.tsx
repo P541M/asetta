@@ -121,7 +121,7 @@ const AssessmentEditRow = ({
       </div>
     </div>
 
-    {/* Desktop Edit Form — same grid template as the read rows, inputs in place of text */}
+    {/* Desktop edit form: same grid template as the read rows, inputs in place of text */}
     <div className={assessmentGridClass(showWeight)}>
       <Checkbox
         checked={isSelected}

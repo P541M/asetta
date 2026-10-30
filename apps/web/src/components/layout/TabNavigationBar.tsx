@@ -12,7 +12,7 @@ const TABS: { id: TabType; label: string; icon: LucideIcon }[] = [
 /**
  * Both navigations for the four destination tabs: text-only underline tabs on
  * md+, a fixed bottom bar (icons as navigation aids) below md. "Add" is not a
- * tab — it is the chrome's primary action.
+ * tab; it is the chrome's primary action.
  */
 const TabNavigationBar = () => {
   const { activeTab, setActiveTab } = useTab();

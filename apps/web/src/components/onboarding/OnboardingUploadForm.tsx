@@ -240,11 +240,11 @@ export function OnboardingUploadForm({
           <Sparkles aria-hidden />
           <AlertTitle>What types of files work best?</AlertTitle>
           <AlertDescription>
-            <ul className="mt-1 space-y-1 text-xs">
-              <li>• Course syllabi with assignment schedules</li>
-              <li>• Course outlines with assessment information</li>
-              <li>• Assignment calendars or timetables</li>
-              <li>• Any document containing due dates and weights</li>
+            <ul className="mt-1 list-disc space-y-1 pl-4 text-xs">
+              <li>Course syllabi with assignment schedules</li>
+              <li>Course outlines with assessment information</li>
+              <li>Assignment calendars or timetables</li>
+              <li>Any document containing due dates and weights</li>
             </ul>
           </AlertDescription>
         </Alert>

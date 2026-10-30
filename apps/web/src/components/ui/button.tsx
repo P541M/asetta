@@ -4,10 +4,10 @@ import { cn } from "@/lib/utils";
 
 /**
  * Asetta button. Customized from shadcn/ui to the platform surface language:
- * flat filled surfaces only — no borders, no `outline` variant (boxed buttons
+ * flat filled surfaces only: no borders, no `outline` variant (boxed buttons
  * don't exist in the Asetta design language; use `secondary` or `ghost`).
  * Primary hover darkens (`--primary-hover`), tonal hover deepens (`--accent`).
- * Add variants here — never restyle buttons at call sites.
+ * Add variants here; never restyle buttons at call sites.
  */
 const buttonVariants = cva(
   "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg text-sm font-medium transition-all duration-150 outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 active:scale-[0.98] [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 [&_svg]:shrink-0",

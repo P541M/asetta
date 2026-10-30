@@ -1,6 +1,6 @@
-/* react-colorful skin for the course color picker (standards.md v4.3) —
-   rounded, borderless, matched to the control language. Scoped under
-   .course-color-picker (the PopoverContent). */
+/* react-colorful skin for the course color picker: rounded, borderless,
+   matched to the control language. Scoped under .course-color-picker (the
+   PopoverContent). */
 
 .course-color-picker .react-colorful {
   width: 100%;

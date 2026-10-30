@@ -33,7 +33,7 @@
 }
 
 .dark {
-  /* Dark elevation ramp — four distinct steps so adjacent surfaces stay soft
+  /* Dark elevation ramp: four distinct steps so adjacent surfaces stay soft
      but never blend together (page -> surface -> fill -> hover):
      #141414 -> #1e1e1e -> #292929 -> #333333 */
   --background: #141414;
@@ -193,7 +193,7 @@
   }
 
   /* Tailwind v4 preflight stopped setting cursor:pointer on buttons (native OS
-     convention); this app is a web tool — clickable always shows the pointer */
+     convention); this app is a web tool; clickable always shows the pointer */
   button:not(:disabled),
   [role="button"]:not(:disabled) {
     cursor: pointer;

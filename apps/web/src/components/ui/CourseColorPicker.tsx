@@ -9,7 +9,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "./popover";
 interface CourseColorPickerProps {
   /** Current "#RRGGBB" hex. */
   value: string;
-  /** Commit callback — always receives a valid, uppercased "#RRGGBB". */
+  /** Commit callback: always receives a valid, uppercased "#RRGGBB". */
   onSelect: (color: string) => void;
   /** Names the trigger for screen readers, e.g. `Change color for CS 101`. */
   ariaLabel: string;
@@ -103,7 +103,7 @@ const CourseColorPicker = ({
     }
   };
 
-  /* While the popover is open the trigger echoes the live draft — commits to
+  /* While the popover is open the trigger echoes the live draft; commits to
      Firestore stay debounced, but the preview must never lag the drag. */
   const displayColor = open ? draft : value;
 

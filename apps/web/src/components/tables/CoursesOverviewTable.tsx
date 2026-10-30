@@ -154,7 +154,7 @@ const CoursesOverviewTable = ({
                   className="outline-hidden"
                   onBlur={(e) => {
                     /* Submit only when focus leaves the whole editor (input +
-                       swatches) — a swatch click must never close it mid-pick */
+                       swatches): a swatch click must never close it mid-pick */
                     if (!e.currentTarget.contains(e.relatedTarget as Node | null)) {
                       handleEditSubmit(course.courseName);
                     }

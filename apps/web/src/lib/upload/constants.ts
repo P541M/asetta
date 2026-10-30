@@ -3,7 +3,7 @@
  *
  * Vercel caps the *entire* request body of a serverless function at 4.5 MB.
  * That cap is enforced by the platform edge, before our handler runs, and the
- * rejection comes back as an HTML error page rather than JSON — which is why an
+ * rejection comes back as an HTML error page rather than JSON, which is why an
  * oversized upload used to surface to users as
  * `Unexpected token '<', "<!DOCTYPE "... is not valid JSON`.
  *

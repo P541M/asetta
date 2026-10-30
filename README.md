@@ -29,12 +29,13 @@ Vercel project. They link to each other by URL only and share no code.
 
 Other files at the root:
 
-- `docs/AUDIT.md`: the work tracker (checklist, open decisions, session log).
+- `docs/AUDIT.md`: the work tracker (open items, batch order, latest baseline); `docs/AUDIT-archive.md` keeps done items and the session log.
 - `docs/ops.md`: deploys, the reminder cron, environment variables, Firestore rules, dependency notes.
 - `firestore.rules`, `firebase.json`, `.firebaserc`: Firestore security rules and the Firebase CLI config.
 - `.github/workflows/ci.yml`: the CI job for both apps.
 - `.github/workflows/reminders.yml`: calls the reminder endpoint every 30 minutes.
-- `CLAUDE.md` and each app's `CLAUDE.md`: rules for AI coding agents (`apps/web/standards.md` holds the platform's code and design standards).
+- `CLAUDE.md` and each app's `CLAUDE.md`: rules for AI coding agents, including the writing rules (`apps/web/standards.md` holds the platform's code and design standards). `AGENTS.md` points other agent tools there.
+- `scripts/check-copy.mjs`: the copy check (`npm run check:copy`).
 
 ## Getting started
 
@@ -57,46 +58,7 @@ Run every npm command from the repository root. There is one lockfile, at the ro
 
 ### Environment variables
 
-Each app reads its own `.env.local`. `docs/ops.md` explains every variable.
-
-`apps/web/.env.local`:
-
-```env
-# Firebase
-NEXT_PUBLIC_FIREBASE_API_KEY=
-NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=
-NEXT_PUBLIC_FIREBASE_PROJECT_ID=
-NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=
-NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=
-NEXT_PUBLIC_FIREBASE_APP_ID=
-
-# Firebase Admin (complete service account JSON as a single line)
-FIREBASE_SERVICE_ACCOUNT=
-
-# Google Gemini
-GEMINI_API_KEY=
-
-# Email (Gmail via Nodemailer)
-EMAIL_USER=
-EMAIL_APP_PASSWORD=
-
-# Auth token for /api/cron/notifications
-CRON_SECRET=
-
-# Application URL (used in email links)
-NEXT_PUBLIC_APP_URL=
-```
-
-`apps/landing/.env.local`:
-
-```env
-# Contact form (Gmail via Nodemailer)
-EMAIL_USER=
-EMAIL_PASS=
-
-# Optional: Google Analytics 4
-NEXT_PUBLIC_GA_MEASUREMENT_ID=
-```
+Each app reads its own `.env.local` (`apps/web/.env.local`, `apps/landing/.env.local`). The variables, what uses each one and where production values live are in the matrix in `docs/ops.md` ("Environment variables").
 
 ### Development
 
@@ -107,19 +69,12 @@ npm run dev:landing    # the marketing site (3001 if the platform is already run
 
 ### Checks
 
-```bash
-npm run lint           # ESLint, both apps
-npm run format:check   # Prettier, both apps
-npm run typecheck      # TypeScript, apps/web
-npm test               # Vitest unit tests, apps/web
-npm run build          # production build, both apps
-npm run test:rules     # Firestore rules on the emulator (needs Java; before any rules deploy)
-```
+The full command list and the verification loop (lint, format, copy check, typecheck, tests, build) are in `CLAUDE.md`. CI runs the same loop.
 
 ## Deployment and CI
 
 - **Deploys**: two Vercel projects, `asetta` (`apps/web`) and `asetta-landing` (`apps/landing`), both connected to this repository. A push to `main` deploys both to production; other branches get preview deployments with their own URLs. Details in `docs/ops.md`.
-- **CI**: GitHub Actions (`.github/workflows/ci.yml`) runs one job, `verify`, on every push to `main` and every pull request: install, lint (web and landing), format check (web and landing), typecheck (web), unit tests (web) and build (web and landing). The build uses harmless placeholder Firebase values; real credentials stay in Vercel.
+- **CI**: GitHub Actions (`.github/workflows/ci.yml`) runs one job, `verify`, on every push to `main` and every pull request: install, then the verification loop from `CLAUDE.md`. The build uses harmless placeholder Firebase values; real credentials stay in Vercel.
 - **Reminders**: GitHub Actions (`.github/workflows/reminders.yml`) calls `/api/cron/notifications` every 30 minutes with the `CRON_SECRET` repository secret, so reminders go out at 9:30 in each user's time zone; the daily Vercel cron in `apps/web/vercel.json` is the backstop. Details in `docs/ops.md`.
 - **Recommended**: protect `main` (GitHub, Settings, Branches) by requiring the "CI / verify" check, so nothing broken can be merged and auto-deployed.
 

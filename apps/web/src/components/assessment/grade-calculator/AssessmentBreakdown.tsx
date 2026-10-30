@@ -23,7 +23,7 @@ interface AssessmentBreakdownProps {
   onMarkChange: (assessmentId: string, value: string) => void;
 }
 
-/* One grid template, two consumers (header + rows) — the tableGrid.ts rule
+/* One grid template, two consumers (header + rows): the tableGrid.ts rule
    applied to the breakdown. Columns: assessment · status · weight · mark · points. */
 const gradeGridClass =
   "hidden lg:grid lg:grid-cols-[minmax(0,1fr)_5rem_7rem_7rem_5rem] lg:items-center lg:gap-4";
@@ -55,7 +55,7 @@ const AssessmentBreakdown = ({
 
   return (
     <div>
-      {/* Item-title tier, no subtitle — the same "no header subtitles" call as
+      {/* Item-title tier, no subtitle, the same "no header subtitles" call as
         PanelHeader (editability is evident from the inputs themselves) */}
       <h3 className="mb-3 text-base font-semibold text-foreground">Assessment breakdown</h3>
 
@@ -171,7 +171,7 @@ const AssessmentBreakdown = ({
                     </div>
                   </div>
 
-                  {/* Desktop layout — same grid template as the header, one cell per column */}
+                  {/* Desktop layout: same grid template as the header, one cell per column */}
                   <div className={gradeGridClass}>
                     <div className="min-w-0">
                       <h4 className="truncate text-sm font-medium text-foreground">

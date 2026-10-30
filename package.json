@@ -13,6 +13,7 @@
     "build": "npm run build -w apps/web && npm run build -w apps/landing",
     "lint": "npm run lint -w apps/web && npm run lint -w apps/landing",
     "format:check": "npm run format:check -w apps/web && npm run format:check -w apps/landing",
+    "check:copy": "node scripts/check-copy.mjs",
     "typecheck": "tsc --noEmit -p apps/web",
     "test": "npm run test -w apps/web",
     "test:rules": "npm run test:rules -w apps/web"

@@ -21,7 +21,7 @@ const TableHeader = ({
 }: TableHeaderProps) => (
   <>
     {/* Desktop headers: same grid template as the rows, so every label sits over its column.
-        The actions column has no label — the icon buttons are self-describing. */}
+        The actions column has no label; the icon buttons are self-describing. */}
     <div className={`${assessmentGridClass(showWeight)} px-4 pb-2`}>
       <Checkbox
         checked={allSelected}

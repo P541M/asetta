@@ -3,6 +3,8 @@ import { LOGIN_URL, REGISTER_URL } from "./src/lib/site";
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  // Agent rules live in the root CLAUDE.md; stop `next dev` writing its own AGENTS.md here.
+  agentRules: false,
   async redirects() {
     return [
       // Auth lives on the main application; bounce auth routes there.
@@ -27,7 +29,7 @@ const nextConfig: NextConfig = {
         destination: "/about",
         permanent: true,
       },
-      // Pricing page removed — the product is simply free.
+      // There is no pricing page; the product is free.
       {
         source: "/pricing",
         destination: "/",
