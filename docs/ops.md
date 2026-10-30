@@ -72,7 +72,7 @@ machine. Planned changes live in `docs/AUDIT.md`; this file describes what is tr
     Gmail connections (`createReminderMailer` in `lib/email.ts`), closed when the run ends, and
     the Gmail login is verified once, before the first send (again only after a failed check).
     A run's time grows with the users due in it, not with the user count; B15's measurements
-    are in the B15 session log of `docs/AUDIT.md`.
+    are in the B15 session log (`docs/AUDIT-archive.md`).
   - A reminder belongs to a target day, N calendar days before the due date. From 9:30 that day
     in the user's zone, runs send it until it has gone out, up to 2 days late, so a missed run
     catches up. Never for an assessment that is already due, needs review, is Missed, or is
@@ -299,7 +299,7 @@ project. Never commit real values.
 - Fix with `npm audit fix`, never `--force`. A major upgrade is its own commit (its own PR in
   A25), smoke-tested.
 - Every high that stays gets a written reason in the session log. Today's accepted highs and why
-  they don't apply are in the B2 session log: the `@grpc/grpc-js` chain under the firebase
+  they don't apply are in the B2 session log (`docs/AUDIT-archive.md`): the `@grpc/grpc-js` chain under the firebase
   client SDK (no firebase release lifts it) and the `postcss` that web's Next 15 pins (clears
   with Next 16, A25).
 - CI has no audit step yet (A28).
@@ -349,8 +349,9 @@ project. Never commit real values.
   web is on `^20` (A25).
 - `next lint` is deprecated in Next 15.5 and removed in 16; the codemod to the ESLint CLI is part
   of web's Next 16 move (A25). The landing already lints with `eslint .`.
-- Next 16's `next dev` writes `apps/landing/AGENTS.md` on every run. Delete it rather than adding it to the repo
-  until D8 decides (A34).
+- Next 16's `next dev` writes an `AGENTS.md` into the app unless `next.config.ts` sets
+  `agentRules: false`. The landing sets it (D8); web needs the same line after its Next 16 move
+  (A25). The repo's agent rules are the root `CLAUDE.md`, with a root `AGENTS.md` pointing there.
 
 ## The Windows dev machine
 
