@@ -1,9 +1,11 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { makeAssessment } from "@/test/assessments";
+import type { AssessmentStatus } from "@/types/assessment";
 import {
   assessmentFromDoc,
   computeStats,
   courseNames,
+  matchesAssessmentFilter,
   processCourseStats,
 } from "./semesterAssessments";
 
@@ -255,5 +257,32 @@ describe("computeStats", () => {
       new Date(2026, 9, 28, 10, 0),
     );
     expect(stats.upcomingDeadlines).toBe(1);
+  });
+});
+
+describe("matchesAssessmentFilter", () => {
+  const statuses: AssessmentStatus[] = ["Not started", "In progress", "Submitted", "Missed"];
+
+  it.each(statuses)("shows %s under all tasks", (status) => {
+    expect(matchesAssessmentFilter(status, "all")).toBe(true);
+  });
+
+  it.each(statuses)("shows %s for a filter it doesn't know, like all tasks", (status) => {
+    expect(matchesAssessmentFilter(status, "something-old")).toBe(true);
+  });
+
+  it.each(["Not started", "In progress"] as const)("lists %s under To do only", (status) => {
+    expect(matchesAssessmentFilter(status, "not_submitted")).toBe(true);
+    expect(matchesAssessmentFilter(status, "submitted")).toBe(false);
+  });
+
+  it("lists Submitted under Done only", () => {
+    expect(matchesAssessmentFilter("Submitted", "submitted")).toBe(true);
+    expect(matchesAssessmentFilter("Submitted", "not_submitted")).toBe(false);
+  });
+
+  it("A74: lists Missed under Done, never on the to-do list", () => {
+    expect(matchesAssessmentFilter("Missed", "submitted")).toBe(true);
+    expect(matchesAssessmentFilter("Missed", "not_submitted")).toBe(false);
   });
 });

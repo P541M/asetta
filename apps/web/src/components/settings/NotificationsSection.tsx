@@ -135,6 +135,7 @@ const NotificationsSection = ({ form, onChange, emailStatus }: NotificationsSect
                   variant="secondary"
                   className="w-full justify-between"
                   aria-labelledby="notification-days-label"
+                  aria-describedby="notification-time-hint"
                 >
                   <span className="truncate">{selectedTiming}</span>
                   <ChevronsUpDown className="text-muted-foreground" aria-hidden />
@@ -160,6 +161,9 @@ const NotificationsSection = ({ form, onChange, emailStatus }: NotificationsSect
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
+            <p id="notification-time-hint" className="text-sm text-muted-foreground">
+              Reminders go out at about 9:30 AM in your time zone.
+            </p>
 
             {isCustomDays && (
               <div className="mt-4 space-y-1.5 rounded-xl bg-secondary/50 p-4">
@@ -174,9 +178,7 @@ const NotificationsSection = ({ form, onChange, emailStatus }: NotificationsSect
                   onBlur={handleCustomDaysBlur}
                   placeholder="Enter number of days (1-30)"
                 />
-                <p className="pt-1 text-sm text-muted-foreground">
-                  Choose between 1 and 30 days. Reminders go out at about 9:30 AM in your time zone.
-                </p>
+                <p className="pt-1 text-sm text-muted-foreground">Choose between 1 and 30 days.</p>
               </div>
             )}
           </div>

@@ -9,7 +9,7 @@ Asetta monorepo (npm workspaces). Two independent Next.js apps, each deployed as
 | `apps/web`      | Platform (Next.js 15, Firebase)    | asetta.me     | `apps/web/CLAUDE.md` and `apps/web/standards.md` (required)   |
 | `apps/landing`  | Marketing site (Next.js 16)        | www.asetta.me | `apps/landing/CLAUDE.md`                                      |
 
-The platform moves to `app.asetta.me` and the marketing site to `asetta.me` (D12, A93); until that ships, the domains above are live.
+The platform moves to `app.asetta.me` and the marketing site to `asetta.me` (D13, A98); until that ships, the domains above are live.
 
 ## Read order
 
@@ -90,5 +90,5 @@ These apply to everything written in this repo or about it: UI copy, emails, doc
 3. **Plain, direct English.** Sentence case for headings, buttons and labels. No exclamation marks in UI copy. Never use: delve, tapestry, seamless, elevate, robust, unlock, leverage, utilize, comprehensive, streamline, empower, effortless, cutting-edge, next-generation, blazing fast, "crafted with care", "dive into", "Let's get started!", "it's worth noting", "in today's fast-paced world". Don't call Asetta "modern".
 4. **Comments say why, never what.** No `// increment the counter` over `count++`, no `// imports` at the top of a file. Comment a constraint the code can't show: pdf-parse misreading a pooled `Buffer` (`lib/upload/pdfText.ts`), Gmail stripping `<style>`, Safari moving focus to a clicked button's ancestor.
 5. **No placeholders.** No `// TODO: implement`, `// ... rest of code`, lorem ipsum, made-up assessments or grades shown as real data, or a stub that returns a hardcoded value without saying so.
-6. **No history in code or rules.** No `// updated to fix the bug`, `// new implementation`, version stamps or dates in comments, and no tracker IDs in comments or rule text. Git and `docs/AUDIT-archive.md` hold history. A test for a bug that is still open names its item (`it.fails("A79: ...")`; `standards.md`, Testing).
+6. **No history in code or rules.** No `// updated to fix the bug`, `// new implementation`, version stamps or dates in comments, and no tracker IDs in comments or rule text. Git and `docs/AUDIT-archive.md` hold history. A test for a bug that is still open names its item (`it.fails("A<n>: ...")`; `standards.md`, Testing).
 7. **Replies and commit messages lead with the result.** Say what changed, what was verified and what wasn't. Commit subjects are short and imperative ("Save the target grade on leave"). No praise of the question, no "I hope this helps", no recap of what the reader just said.

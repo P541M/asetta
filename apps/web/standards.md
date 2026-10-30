@@ -24,17 +24,22 @@ All new code follows these.
   `assessment/grade-calculator/`, `components/auth/`).
 - **The user doc is read once, live.** `hooks/useUserDoc.ts` keeps one `onSnapshot` on
   `users/{uid}` for the session (`hooks/userDocListener.ts`, which it loads on sign-in; see the
-  next rule), and `AuthContext` derives the profile, display preferences and
-  onboarding status from it: read them from `useAuth()`, never with a `getDoc` of your own. The
-  sign-in writes run on the server's first answer: the doc is created only when the server says
+  next rule), and `AuthContext` derives the profile, display preferences, onboarding status and
+  the choices onboarding starts from (`onboardingChoices`): read them from `useAuth()`, never with
+  a `getDoc` of your own. A page that routes by the doc waits for `loading` to end and then reads
+  `onboardingStatus` (the sign-in pages through `hooks/useRedirectAfterAuth.ts`); a doc that
+  couldn't be read has no status and goes to the dashboard, whose error screen shows it, never to
+  onboarding. A form that starts from the doc lays the user's changes over the live values
+  (onboarding's `userData`), so nothing waits on a read of its own. The sign-in writes run on
+  the server's first answer: the doc is created only when the server says
   it is missing (an offline cache can't, or the app would write a new doc over the real one),
   `lastLogin` at most once per local day, and the zone when it is missing or has changed.
 - **`_app` ships Firebase Auth, never Firestore.** `lib/firebase.ts` holds the app and
   Auth; `db` lives in `lib/firestore.ts`, which nothing in `_app`'s import graph (`AuthContext`,
   `useUserDoc`, what they import) may import statically. Firestore code those files need loads
-  with `import()` when it runs: the user-doc listener on sign-in, the sign-in redirect's
-  onboarding read. So does a page that reads Firestore only once the user doc is in
-  (`/dashboard`'s first-semester lookup, `hooks/firstSemester.ts`). Lazy-load a module of your
+  with `import()` when it runs, as the user-doc listener does on sign-in. So does a page that
+  reads Firestore only once the user doc is in (`/dashboard`'s first-semester lookup,
+  `hooks/firstSemester.ts`). Lazy-load a module of your
   own with named imports, never `import("firebase/firestore")` itself: the namespace stops
   webpack from tree-shaking Firestore, which added 30 kB to every page that uses it. After
   changing what `_app` or a page imports, compare `npm run build`'s First Load JS with the
@@ -52,12 +57,12 @@ All new code follows these.
   semester menu opens) is a `next/dynamic` part of its surface too.
 - **No writes on read.** Viewing something never creates or updates a doc; a missing value falls
   back to its default when read (course preferences, course colors).
-- **User text never goes into a Firestore path as is.** A "/" adds path segments: one makes
-  `doc()` throw, two land on a nested path no rule matches. A course's `coursePreferences` doc is
-  reached only through `getCoursePreferencesDocRef`, whose ID is `coursePreferencesDocId`
+- **User text never goes into a Firestore path as is.** A "/" adds path segments: one makes `doc()`
+  throw, two land on a nested path no rule matches. A course's `coursePreferences` doc is reached
+  only through `getCoursePreferencesDocRef`, whose ID is `coursePreferencesDocId`
   (`utils/courseName.ts`): the name itself when Firestore takes it as one ID and it doesn't start
-  with `%` (so every doc written before this scheme keeps its ID), otherwise `%` plus the name with `%`
-  written as `%25` and `/` as `%2F`. Turn a listed doc's ID back into the name with
+  with `%` (so every doc written before this scheme keeps its ID), otherwise `%` plus the name with
+  `%` written as `%25` and `/` as `%2F`. Turn a listed doc's ID back into the name with
   `courseNameFromPreferencesDocId`. Course names may hold any character.
 - **Every client write passes the Firestore rules' allow-list** (`firestore.rules`): each
   collection lists the keys a client may write, with a type and a size cap. A new field the
@@ -87,6 +92,8 @@ All new code follows these.
   no informational `console.log`.
 - No dead code: unused exports, unreachable branches, and "just in case" props get deleted, not
   commented out. (Deliberate exception: `src/pages/index.tsx` is kept as a redirect safety net.)
+- Default a stored or chosen boolean with `??`, never `||` toward `true`: `false || true` is
+  `true`, which once saved switched-off reminders as on.
 - Comments explain constraints the code can't express (see the adjust-state-during-render note in
   `components/pages/dashboard-tabs/GradesTab.tsx`), never narrate what the next line does.
 
@@ -161,13 +168,13 @@ All new code follows these.
   (`Date.UTC(...)`), the same moment in both runs, across zones of its own (Auckland, UTC).
 - **"Now" is never the real clock**: use `vi.useFakeTimers()` with `vi.setSystemTime()`, or the
   function's `now` parameter. Day counts get cases on both 2026 DST weekends (Mar 8 and Nov 1).
-- **Known bugs are `it.fails`**: assert the correct result and name the open `docs/AUDIT.md`
-  item (`it.fails("A79: ...")`). The fix turns it into a plain `it` named for the behavior, without
-  the ID (some older passing tests still carry one; they lose it in the cleanup sweep). Vitest
-  fails an `it.fails` that starts passing, so it can't be left behind. An `it.fails` also passes when the test throws for an
-  unrelated reason, so run a new one once as a plain `it` and check it fails on its assertion. Use
-  `it.todo("A79: ...")` when the fix lives outside the function under test or isn't designed yet.
-  Never assert a known bug as correct behavior.
+- **Known bugs are `it.fails`**: assert the correct result and name the open `docs/AUDIT.md` item
+  (`it.fails("A<n>: ...")`). The fix turns it into a plain `it` named for the behavior, without the
+  ID (some older passing tests still carry one; they lose it in the cleanup sweep). Vitest fails an
+  `it.fails` that starts passing, so it can't be left behind. An `it.fails` also passes when the
+  test throws for an unrelated reason, so run a new one once as a plain `it` and check it fails on
+  its assertion. Use `it.todo("A<n>: ...")` when the fix lives outside the function under test or
+  isn't designed yet. Never assert a known bug as correct behavior.
 - **A logic fix starts with a failing test** (the items marked test-first in `docs/AUDIT.md`).
 - **Assert user-facing copy loosely** (`toContain` on its key words), so a copy edit doesn't break
   a logic test; assert values, dates and thresholds exactly.
@@ -245,12 +252,17 @@ are what make Asetta look like Asetta and not a default shadcn app:
 - **Numeric fields that live-parse keep the raw string in the field while focused**
   (`assessment/grade-calculator/NumberField.tsx`): the parent owns parsed/clamped numbers,
   the field snaps to canonical on blur. Controlling an input with a value reformatted on
-  every keystroke ("12." re-rendering as "12") resets the caret. A keystroke that leaves no number (an emptied field, "-", ".") saves
-  nothing, so deleting a value to retype it never writes 0; the field snaps back to the saved
-  value on blur (`parsePercentInput` and `weightEdit` in `utils/gradeCalculations.ts`).
-  A field whose save is a whole doc write with no debounce (the target grade) saves only when it
-  is left, on blur or Enter (`NumberField`'s `onCommit`), and shows the typed value until then, so
-  typing "72.5" writes once and the 8 on the way from "85" to empty is never saved.
+  every keystroke ("12." re-rendering as "12") resets the caret. A keystroke that leaves no
+  number (an emptied field, "-", ".") saves nothing, so deleting a value to retype it never
+  writes 0; the field snaps back to the saved value on blur (`parsePercentInput` and
+  `weightEdit` in `utils/gradeCalculations.ts`). The mark field is the one where an emptied field
+  is an edit: it clears the mark, while "-" or "." still saves nothing (`applyMarkInput`). A
+  field whose save is a whole doc write with no debounce (the target grade) saves only when it is
+  left, on blur or Enter (`NumberField`'s `onCommit`), and shows the typed value until then, so
+  typing "72.5" writes once and the 8 on the way from "85" to empty is never saved. A reload or a
+  closed tab loses a value still being typed: don't count on `pagehide` or `beforeunload` to save
+  it. In a check on a production build, a Firestore write started in `pagehide` never left the
+  page, and one started in `beforeunload` only did when the write stream was already open.
 
 ### Motion
 
@@ -258,10 +270,10 @@ are what make Asetta look like Asetta and not a default shadcn app:
   platform is a tool people open many times a day, so screens appear instantly. Motion is reserved
   for *feedback*: responses to a user action (a criteria check turning on, button press states),
   always behind `motion-safe:`.
-- **Alerts appear instantly, no drop-in fade** (founder decision: a drop-in fade read as cheap
-  and fired even on static banners that aren't feedback to any action). `ui/alert.tsx` has no entrance animation in its base class; this applies to every Alert
-  everywhere, including conditional error/success/rate-limit notices, the same
-  instant-appearance rule overlays follow.
+- **Alerts appear instantly, no drop-in fade** (founder decision: a drop-in fade read as cheap and
+  fired even on static banners that aren't feedback to any action). `ui/alert.tsx` has no entrance
+  animation in its base class; this applies to every Alert everywhere, including conditional
+  error/success/rate-limit notices, the same instant-appearance rule overlays follow.
 - **Micro-motion stays under about 150ms**: the `@theme` animation tokens are
   fade-in 150ms / scale-in 120ms, and control transitions (buttons, inputs, chevrons) run at
   150ms. Longer durations are reserved for genuine progress/timer animation (progress bars,
@@ -362,12 +374,12 @@ a tier, the ramp is wrong: update it here, don't invent a sixth size at the call
   arrows), **never decoration**.
 - **Dropdown triggers show value + chevron only.** No leading glyph next to the current value
   (the semester switcher, the course picker and the filter triggers).
-- **Selected menu items get a highlighted background, not a checkmark** (founder decision: a
-  check costs an icon slot and a layout gutter for a state a tint communicates better). `DropdownMenuItem` accepts
-  `data-selected`, styled `bg-primary/10 text-primary`, the same amber-tint recipe used
-  for selection under "Theme tokens", never a plain `bg-accent` swap (indistinguishable from the
-  item's own hover/focus state). Action items in the same menu (e.g. "Manage semesters") may keep
-  one identifying icon.
+- **Selected menu items get a highlighted background, not a checkmark** (founder decision: a check
+  costs an icon slot and a layout gutter for a state a tint communicates better). `DropdownMenuItem`
+  accepts `data-selected`, styled `bg-primary/10 text-primary`, the same amber-tint recipe used for
+  selection under "Theme tokens", never a plain `bg-accent` swap (indistinguishable from the item's
+  own hover/focus state). Action items in the same menu (e.g. "Manage semesters") may keep one
+  identifying icon.
 - **Menu items are separated by a subtle gap** (`space-y-1` on `DropdownMenuContent`, defined in
   the primitive) so hover/selection tints read as discrete pills and never bleed into each other.
 - Navigation icons live in the **mobile bottom nav only** (navigation aids, not decoration);
@@ -397,11 +409,11 @@ a tier, the ramp is wrong: update it here, don't invent a sixth size at the call
   script and persistence (`theme` key); `_document.tsx` carries only the one-time seed that
   migrates the legacy `darkMode` key.
 - **Theme is a Light / Dark / System choice** set in Settings, Preferences (the radiogroup on the
-  amber selection language). It applies **immediately** via `setThemeWithTransition` (`utils/theme.ts`):
-  the crossfade, not a Save round-trip. `defaultTheme` stays `"light"` on purpose: System is an
-  explicit opt-in, so no existing user's appearance changes without their action.
-  When rendering UI keyed off the selected theme, guard the highlight with a mounted flag (theme is
-  undefined pre-hydration) but always render the controls so layout doesn't shift.
+  amber selection language). It applies **immediately** via `setThemeWithTransition`
+  (`utils/theme.ts`): the crossfade, not a Save round-trip. `defaultTheme` stays `"light"` on
+  purpose: System is an explicit opt-in, so no existing user's appearance changes without their
+  action. When rendering UI keyed off the selected theme, guard the highlight with a mounted flag
+  (theme is undefined pre-hydration) but always render the controls so layout doesn't shift.
 - **Never** read/write theme localStorage directly and **never** touch
   `document.documentElement.classList` manually; `useTheme()` from next-themes is the only API.
 - A surface that is deliberately the same in both themes (e.g. the auth brand panel) opts in by
@@ -470,6 +482,12 @@ never duplicated into component state (duplicating it caused a flicker on switch
 - **List rows hover with `transition-colors hover:bg-accent/50`**, the shared row-hover recipe
   (grades breakdown, assessment rows, overlay list rows). Full `hover:bg-accent` is reserved
   for clickable *cards* that navigate (course cards).
+- **The filter groups by what is left to do** (the founder's call): "To do" is Not started and
+  In progress, "Done" is Submitted and Missed, so a missed assessment never clutters the to-do
+  list and no filter called "Submitted" lists a Missed one (the stats bar's Submitted counts
+  Submitted only). The rule is `matchesAssessmentFilter` (`utils/semesterAssessments.ts`); the
+  stored keys (`not_submitted`, `submitted`) are older than the labels and stay, so a student's
+  saved filter carries over.
 - **The course-filtered view titles the panel with a breadcrumb**: "Courses / {course}" as the
   `PanelHeader` title; the parent crumb is a muted text button (`text-muted-foreground
   hover:text-foreground`) that navigates back, the current name truncates. No separate back
@@ -551,14 +569,13 @@ never duplicated into component state (duplicating it caused a flicker on switch
   Deliberately not in the Calendar tab, notification emails, or the ICS export; no
   per-assessment colors; no color field on the Add assessment form (new courses get the hash
   default).
-- **Popovers inside blur-scoped editors render without a portal**, so the editor's
-  `relatedTarget` containment check keeps working, and the popover stops Escape propagation, so
-  Escape closes the popover, not its host editor. (In general: an editor that submits on blur scopes the check to its whole container, and
-  inline pick targets either stay inside that container or never take focus.) **The editor
-  container itself is `tabIndex={-1}`**: Safari and Firefox on macOS never
-  focus a clicked button; they move focus to its nearest focusable ancestor. Inside a
-  keyboard-activatable card that ancestor was the card, so clicking the picker trigger closed
-  the editor on Mac only.
+- **Popovers inside blur-scoped editors render without a portal**, so the editor's `relatedTarget`
+  containment check keeps working, and the popover stops Escape propagation, so Escape closes the
+  popover, not its host editor. (In general: an editor that submits on blur scopes the check to its
+  whole container, and inline pick targets either stay inside that container or never take focus.)
+  **The editor container itself is `tabIndex={-1}`**: Safari and Firefox on macOS never focus a
+  clicked button; they move focus to its nearest focusable ancestor. Inside a keyboard-activatable
+  card that ancestor was the card, so clicking the picker trigger closed the editor on Mac only.
 
 ### Tab panels & empty states
 
@@ -585,6 +602,10 @@ never duplicated into component state (duplicating it caused a flicker on switch
 - **Preferences apply instantly**: theme and display toggles persist per field the moment they
   change (optimistic state, reverted with an inline destructive alert on write failure). No Save
   button on instant-apply cards.
+- **The reminder timing says when reminders go out**, under its menu for every choice, in the
+  Notifications card and in onboarding's notifications step alike: "Reminders go out at about
+  9:30 AM in your time zone." The menu's trigger is `aria-describedby` that line; the custom-days
+  panel adds only its range ("Choose between 1 and 30 days.").
 - **Profile and Notifications save per card**: each card is its own small form with its own
   Save button, dirty check against the fetched snapshot, and success/error message scoped to
   the card.
@@ -594,15 +615,16 @@ never duplicated into component state (duplicating it caused a flicker on switch
 
 ### Scrollbars
 
-- **The browser's own scrolling, one look on every desktop OS, no JS** (founder call). `globals.css` is the only place scrollbars are styled: a 10px bar with a rounded
-  6px thumb (`--muted-foreground` at 35%, 60% on hover) on a clear track, no arrow buttons.
-  Chromium and Safari draw it from `::-webkit-scrollbar` (under `pointer: fine`); Firefox gets
-  `scrollbar-width: thin` in the same color. Touch screens keep their native overlay scrollbars.
-  No scrollbar libraries and no per-component scrollbar CSS. The landing site uses the same
-  recipe in its own palette (stone-500); keep the two in step.
-- **Never set `scrollbar-width` or `scrollbar-color` where `::-webkit-scrollbar` applies**:
-  Chrome ignores every `::-webkit-scrollbar` rule on an element that has either. The Firefox rule sits behind
-  `@supports not selector(::-webkit-scrollbar)`.
+- **The browser's own scrolling, one look on every desktop OS, no JS** (founder call). `globals.css`
+  is the only place scrollbars are styled: a 10px bar with a rounded 6px thumb (`--muted-foreground`
+  at 35%, 60% on hover) on a clear track, no arrow buttons. Chromium and Safari draw it from
+  `::-webkit-scrollbar` (under `pointer: fine`); Firefox gets `scrollbar-width: thin` in the same
+  color. Touch screens keep their native overlay scrollbars. No scrollbar libraries and no
+  per-component scrollbar CSS. The landing site uses the same recipe in its own palette (stone-500);
+  keep the two in step.
+- **Never set `scrollbar-width` or `scrollbar-color` where `::-webkit-scrollbar` applies**: Chrome
+  ignores every `::-webkit-scrollbar` rule on an element that has either. The Firefox rule sits
+  behind `@supports not selector(::-webkit-scrollbar)`.
 - **The page keeps its scrollbar strip** (`scrollbar-gutter: stable` on `html`), so content never
   shifts sideways between short and long pages. Never put `scrollbar-gutter` on `*`: it reserves
   a blank strip inside every `overflow-hidden` box.
@@ -627,9 +649,9 @@ never duplicated into component state (duplicating it caused a flicker on switch
   separate floating input), and exactly ONE control leads there (a single "Manage semesters"
   item, never two menu entries opening the same surface). Auto-focus the create input only when
   the list is empty.
-- Lists inside overlays sit on a `bg-secondary/50 rounded-xl` tonal container, rows on the
-  shared row-hover recipe (`hover:bg-accent/50`) with ghost icon actions (pencil/trash),
-  "Current"/status chips as `bg-primary/10 text-primary` pills. Read-only status chips reuse `statusTintClasses`
+- Lists inside overlays sit on a `bg-secondary/50 rounded-xl` tonal container, rows on the shared
+  row-hover recipe (`hover:bg-accent/50`) with ghost icon actions (pencil/trash), "Current"/status
+  chips as `bg-primary/10 text-primary` pills. Read-only status chips reuse `statusTintClasses`
   exported from `StatusSelect`; never re-derive the tint mapping.
 - Confirmation dialogs are `common/ConfirmationModal` (recipe panel, ghost Cancel + filled
   confirm; `variant="danger"` maps to the destructive button). No decorative icons in

@@ -23,7 +23,7 @@ items off and add a session log entry to docs/AUDIT-archive.md when done. Don't 
 
 **Rules:**
 
-- IDs are permanent. Never renumber. New items take the next free number (**next: A98, D13**); split an item as A9a/A9b.
+- IDs are permanent. Never renumber. New items take the next free number (**next: A103, D14**); split an item as A9a/A9b.
 - Dropped items move to the archive struck through with a reason: `~~A24~~ dropped: <why>`.
 - Line numbers in items drift. Search by symbol name.
 - One theme per branch and PR.
@@ -31,108 +31,112 @@ items off and add a session log entry to docs/AUDIT-archive.md when done. Don't 
 
 ## Decisions needed
 
-None open. D1 to D12 are answered (archive, "Answered decisions"); an item that depends on one says what was decided.
+Answered decisions are in the archive ("Answered decisions"); an item that depends on one says what was decided.
+
+| ID | Question | Blocks | Answer |
+| --- | --- | --- | --- |
+| D12 | Students whose onboarding saved `emailNotifications: true` with `hasConsentedToNotifications: false` before B20 (A48): leave them, or set `emailNotifications: false` on those docs once? | Nothing (B20 fixed new saves) | Open. **Who:** everyone who finished onboarding (not "Skip setup") without switching email notifications on, since the switch starts off and `false || true` saved it on. **What they get today:** no reminders (the cron needs consent), but Settings shows the switch on, and the next save of the Notifications card (a timing or address change) turns reminders on without the student choosing it. **Options:** (a) leave them; (b) first count them with a read-only admin query (`emailNotifications == true` and `hasConsentedToNotifications == false`; the Settings save always writes both the same, so such a doc comes from onboarding or code older than that save), then set `emailNotifications: false` on each once, a script the founder runs or a one-time cron step like D11's: no one's reminders change, and Settings then shows what they get. **Recommended: (b), after the count.** B20 changed no existing data. |
 
 ## Batches
 
-**Done:** B1 to B18 (PRs #5 to #24): security, tests, reminders, data layer, rules, bundle size, rate limits, cron throughput, and the dashboard and grades bugs. B19 (writing rules and docs, 2026-10-30, PR #27) is done. What each shipped is in the archive.
+**Done:** B1 to B21 (PRs #5 to #27): security, tests, reminders, data layer, rules, bundle size, rate limits, cron throughput, the dashboard and grades bugs, the onboarding and notification settings, and the writing rules and docs (B21). What each shipped is in the archive.
 
-**Up next, in order** (reprioritized 2026-10-30 from the founder's list: after B1 to B18 hardened the backend, the work moves to agent rules, cleanup and UI/UX):
+**Up next, in order** (reprioritized 2026-10-30 from the founder's list: after the backend work, the focus moves to cleanup and UI/UX):
 
 | Order | Batch | Items | Theme | Why here |
 | --- | --- | --- | --- | --- |
-| 1 | B20 | A82, A83, A81, A48, A79 | Quick bugs the founder and students hit | Small and visible. A82 first: every session ends by checking the Vercel preview, and a preview's `/` opens the live marketing site today. A48 saves a student's reminder choice wrong. |
-| 2 | B21 | A84, A94, A95 (audit phase only) | UI/UX audit: Impeccable, Windows and macOS, mobile | Read-only. It turns "improve the UI" into a list of findings per screen, filed as new items, so B24 has a plan and B23 knows which components the UI work will touch. |
-| 3 | B22 | A87, A88, A24, A47 | Cleanup sweep: test names, comments, dead code | Mechanical, no behavior change. Shrinks the code before B23 simplifies it. A47's 5-day wait ended long ago. |
-| 4 | B23 | A89, A90, A21, A22, A23, A54 | Simplify and modularize | Test-first wherever logic moves. Before the UI work so each screen is restyled once, in its final files. Expect 2 or 3 PRs, one per area. |
-| 5 | B24 | A84, A94, A95 (fixes), A66, A69, A50, A74 | UI/UX implementation | One screen or theme per PR, from B21's findings. A66, A69, A50 and A74 are UI items already on the list. |
-| 6 | B25 | A91, A25, A33, A62 | Deprecated and outdated dependencies | One major per PR. `@google/generative-ai` is Google's retired SDK and runs the core feature (extraction): if it starts failing, its move to `@google/genai` jumps the queue. Do Tiptap 3 before B24 restyles the notes editor. |
-| any | B26 | A93 | One domain | D12 decided: the platform moves to `app.asetta.me`. Touches only config, env and cross-app links, so it can run beside any batch. |
-| any | B27 | A85, A27, A68 | Landing polish: Lenis, GIFs to video, tests | The landing shares no code with the platform, so this runs beside any batch. |
-| any | | A96 (the founder reads the docs), A14 (a manual check), A26, A28, A39, A40, A42, A45, A46, A49, A52, A55, A57 to A61, A63, A64, A70 to A73, A80 | Remaining backend items | As time allows. A64 once the D11 marker has `finishedAt`; A71 only if spam arrives; A73 needs the founder. |
+| 1 | B22 | A87, A88, A86, A84 | Quick bugs the founder and students hit | Small and visible. A87 first: every session ends by checking the Vercel preview, and a preview's `/` opens the live marketing site today. A84 makes skipping the onboarding upload take two presses. |
+| 2 | B23 | A89, A99, A100 (audit phase only) | UI/UX audit: Impeccable, Windows and macOS, mobile | Read-only. It turns "improve the UI" into a list of findings per screen, filed as new items, so B26 has a plan and B25 knows which components the UI work will touch. |
+| 3 | B24 | A92, A93, A24, A47 | Cleanup sweep: test names, comments, dead code | Mechanical, no behavior change. Shrinks the code before B25 simplifies it. A47's 5-day wait ended long ago. |
+| 4 | B25 | A94, A95, A21, A22, A23, A83 | Simplify and modularize | Test-first wherever logic moves. Before the UI work so each screen is restyled once, in its final files. A83 is the last stray user-doc read. Expect 2 or 3 PRs, one per area. |
+| 5 | B26 | A89, A99, A100 (fixes), A66, A69 | UI/UX implementation | One screen or theme per PR, from B23's findings. A66 and A69 are UI items already on the list. |
+| 6 | B27 | A96, A25, A33, A62 | Deprecated and outdated dependencies | One major per PR. `@google/generative-ai` is Google's retired SDK and runs the core feature (extraction): if it starts failing, its move to `@google/genai` jumps the queue. Do Tiptap 3 before B26 restyles the notes editor. |
+| any | B28 | A98 | One domain | D13 decided: the platform moves to `app.asetta.me`. Touches only config, env and cross-app links, so it can run beside any batch. |
+| any | B29 | A90, A27, A68 | Landing polish: Lenis, GIFs to video, tests | The landing shares no code with the platform, so this runs beside any batch. |
+| any | | A101 (the founder reads the docs), A14 (a manual check), A26, A28, A39, A40, A42, A45, A46, A49, A52, A55, A57 to A61, A63, A64, A70 to A73, A80, A81, A82, A85 | Remaining items | As time allows. Founder calls first: D12, A73, A80, A81 and A85. A64 once the D11 marker has `finishedAt`; A71 only if spam arrives. |
 
 ## Open items
 
 ### Bugs
 
-- [ ] **A81 · Today is hard to spot in the calendar** · S · risk L · UI
+- [ ] **A86 · Today is hard to spot in the calendar** · S · risk L · UI
   - **Where:** the day number in `apps/web/src/components/calendar/CalendarGrid.tsx` (`day.isToday ? "bg-primary/10 text-primary"`).
   - **Problem:** today is a 24px circle in 10% amber with amber text, which reads as a faint orange ring among the other day numbers, more so in dark mode and on a day with assessment chips. A student should find today at a glance.
   - **Fix:** a solid amber circle with `text-primary-foreground` for the number, plus one more cue that doesn't rely on color alone (a tinted cell or a small "Today" label on wide screens). Check it against "Surface language" in `standards.md` (amber is the accent) and update that section if the rule needs a line for it. Light and dark, desktop and 375px.
   - **Done when:** the founder picks today out at a glance in both themes, on a month with assessments on and around today.
 
-- [ ] **A82 · A preview deploy's `/` opens the live marketing site** · S · risk L
+- [ ] **A87 · A preview deploy's `/` opens the live marketing site** · S · risk L
   - **Where:** `redirects()` in `apps/web/next.config.ts`; on the landing side, `APP_URL` in `apps/landing/src/lib/site.ts` and the `/login` and `/register` redirects in `apps/landing/next.config.ts`.
   - **Problem:** the config sends `/` to `/login` only when `NODE_ENV` is `development`. Vercel builds every deploy, previews included, with `NODE_ENV=production`, so opening a platform preview's URL redirects to `https://www.asetta.me`, the production marketing site, and the preview looks broken. The redirect is also `permanent: true` (308), which browsers cache, so it can stick to a preview URL. The other direction has the same root: a landing preview's Login and Get started buttons go to the production platform.
-  - **Fix:** gate the production redirects on `process.env.VERCEL_ENV === "production"` (Vercel sets `preview` or `production` at build time); everywhere else `/` goes to `/login`, non-permanent. Decide whether a landing preview should keep pointing at production (fine for marketing review) or at a platform preview. Revisit with A93, which changes these URLs anyway.
+  - **Fix:** gate the production redirects on `process.env.VERCEL_ENV === "production"` (Vercel sets `preview` or `production` at build time); everywhere else `/` goes to `/login`, non-permanent. Decide whether a landing preview should keep pointing at production (fine for marketing review) or at a platform preview. Revisit with A98, which changes these URLs anyway.
   - **Done when:** a platform preview's root opens its own login page; production's `/` still goes to the marketing site.
 
-- [ ] **A83 · Editing a due date shows no calendar on Windows** · S · risk L · reproduce first
+- [ ] **A88 · Editing a due date shows no calendar on Windows** · S · risk L · reproduce first
   - **Where:** the native `type="date"` and `type="time"` inputs in `components/forms/AddAssessmentForm.tsx` and `components/tables/assessments/AssessmentEditRow.tsx` (both layouts), styled by `components/ui/input.tsx`; `styles/globals.css`.
   - **Problem (likely cause, read from the code, not yet reproduced on Windows):** Chrome and Edge on Windows open the date picker only from the small calendar icon at the right of the field; clicking the date text edits the day, month or year in place, so a click on the date shows no calendar. Safari on macOS opens its picker from a click anywhere in the field, which is why the same form works on a Mac. Also check the icon's contrast on the filled input (`bg-input`) in both themes; next-themes sets `color-scheme` on `<html>` (its `enableColorScheme` default), so the icon should follow the theme, but that is unverified.
-  - **Fix:** open the picker on a click in the field with `input.showPicker()` inside a try/catch (it throws in a cross-origin iframe, and older browsers lack it), in one place (`components/ui/input.tsx` for `type="date"` and `type="time"`, or a small `DateInput`). Check Chrome, Edge and Firefox on Windows and Safari and Chrome on macOS, both themes. If the native picker still feels wrong next to the app's design, a custom date picker is a B24 question, not this item.
+  - **Fix:** open the picker on a click in the field with `input.showPicker()` inside a try/catch (it throws in a cross-origin iframe, and older browsers lack it), in one place (`components/ui/input.tsx` for `type="date"` and `type="time"`, or a small `DateInput`). Check Chrome, Edge and Firefox on Windows and Safari and Chrome on macOS, both themes. If the native picker still feels wrong next to the app's design, a custom date picker is a B26 question, not this item.
   - **Done when:** on Windows Chrome and Edge, clicking anywhere in the date field opens the picker in both themes, and the icon is visible in dark mode.
 
 ### UI/UX
 
-- [ ] **A84 · UI/UX pass with Impeccable** · L · risk M · audit first (B21), then fixes per screen (B24)
+- [ ] **A89 · UI/UX pass with Impeccable** · L · risk M · audit first (B23), then fixes per screen (B26)
   - **Where:** every platform screen: auth pages, onboarding, the dashboard tabs (Assessments, Courses, Calendar, Grades, Upload), the notes editor, Settings and the overlays.
   - **Tool:** Impeccable, the frontend design skill set for coding agents. It is not installed in this repo (`.claude/`) or in the user's skills (checked 2026-10-30); install it into the project's `.claude/skills` first so every session has the same version, with the founder's OK.
-  - **Audit (B21):** run its audit and critique per screen at desktop and 375px, both themes. File each finding as its own item (one screen or theme per item) with the screenshot path, and mark which ones conflict with a "locked" rule in `standards.md` Part 2. A conflict is the founder's call: either the rule changes in `standards.md` in the same PR, or the finding is dropped with the reason.
-  - **Fixes (B24):** one screen or theme per PR, checked in both themes and at mobile width.
+  - **Audit (B23):** run its audit and critique per screen at desktop and 375px, both themes. File each finding as its own item (one screen or theme per item) with the screenshot path, and mark which ones conflict with a "locked" rule in `standards.md` Part 2. A conflict is the founder's call: either the rule changes in `standards.md` in the same PR, or the finding is dropped with the reason.
+  - **Fixes (B26):** one screen or theme per PR, checked in both themes and at mobile width.
   - **Done when:** every screen has been audited, every finding is filed or dropped with a reason, and the fix items are done.
 
-- [ ] **A85 · Lenis smooth scroll on the marketing site** · S · risk L
+- [ ] **A90 · Lenis smooth scroll on the marketing site** · S · risk L
   - **Where:** `apps/landing` (`_app.tsx`, `hooks/useScrollLock.ts`, `components/LegalPage.tsx`'s "On this page" links); new dependency `lenis` (`npm install lenis -w apps/landing`).
   - **Fix:** one Lenis instance for the landing, started in `_app`. Things to handle: off under `prefers-reduced-motion` (the landing's Motion rule); `lenis.stop()` and `start()` while `useScrollLock` holds the page (the image lightbox and the mobile menu), or the page scrolls under the overlay; in-page anchor links (the legal pages' table of contents, the fixed header's offset); Motion's `whileInView` reveals still firing; the scrollbar recipe and `scrollbar-gutter` unchanged. Platform scrolling stays native (it is an app, not a page to read).
   - **Done when:** scrolling feels smooth with a mouse wheel and trackpad, an open overlay still locks the page, reduced motion turns it off, and the legal TOC jumps to each section below the header.
 
-- [ ] **A94 · Works the same on Windows and macOS** · M · risk L · audit with A84
-  - **Problem:** the founder works on Windows; students are split across both. Known Windows gaps so far: the date picker (A83); scrollbars were one (A65, done). Not yet checked: font rendering of the stack on Windows (ClearType, fallback fonts), native controls (date, time, select, checkbox) in dark mode, any keyboard shortcut hint that says Cmd or Ctrl, focus rings and hover states on touch laptops, and file pickers and drag and drop on upload.
-  - **Fix:** a checklist run per screen on Windows (Chrome, Edge, Firefox) and macOS (Safari, Chrome) during B21; each problem becomes its own item. Add the checklist to "Quality bar for every screen" in `standards.md` so later screens are checked the same way.
+- [ ] **A99 · Works the same on Windows and macOS** · M · risk L · audit with A89
+  - **Problem:** the founder works on Windows; students are split across both. Known Windows gaps so far: the date picker (A88); scrollbars were one (A65, done). Not yet checked: font rendering of the stack on Windows (ClearType, fallback fonts), native controls (date, time, select, checkbox) in dark mode, any keyboard shortcut hint that says Cmd or Ctrl, focus rings and hover states on touch laptops, and file pickers and drag and drop on upload.
+  - **Fix:** a checklist run per screen on Windows (Chrome, Edge, Firefox) and macOS (Safari, Chrome) during B23; each problem becomes its own item. Add the checklist to "Quality bar for every screen" in `standards.md` so later screens are checked the same way.
   - **Done when:** the checklist is in `standards.md` and every screen passes it on both systems.
 
-- [ ] **A95 · Mobile pass** · M-L · risk M · audit with A84
+- [ ] **A100 · Mobile pass** · M-L · risk M · audit with A89
   - **Problem:** screens are checked at 375px for overflow (`apps/web/CLAUDE.md`, "Verifying"), but they were designed desktop first. Not yet checked as a phone user would: the assessments table and its edit row, the calendar grid and day view, the grade breakdown's inputs, the notes editor's toolbar, overlays with the on-screen keyboard open, hover-only controls, touch targets (44px is the rule in `components/ui/input.tsx`), iOS Safari's viewport height and safe areas, and Android Chrome.
-  - **Fix:** audit each screen on a real phone or the browser's device mode at 375 and 390px during B21; file findings per screen; fix in B24.
+  - **Fix:** audit each screen on a real phone or the browser's device mode at 375 and 390px during B23; file findings per screen; fix in B26.
   - **Done when:** every main flow (sign up, onboarding upload, add and edit an assessment, check grades, write a note, change settings) works one-handed on a phone without zooming or sideways scroll.
 
 ### Cleanup
 
-- [ ] **A87 · Tracker IDs in test names** · S · risk L
+- [ ] **A92 · Tracker IDs in test names** · S · risk L
   - **Where:** 92 test names start with an item ID ("A19: verifies the Gmail login once ...", "A8: sends N days before the due date ..."), across the `apps/web` suites; the rule is "Known bugs are `it.fails`" in `standards.md` ("Testing").
   - **Problem:** the ID means something while the bug is open: an `it.fails("A10: ...")` says which item turns it green. Once fixed, the prefix is history in a place meant to describe behavior, and a reader needs the tracker to read the suite.
   - **Recommended:** keep IDs only on `it.fails` and `it.todo`. Remove them from passing tests and make sure each name still says the behavior on its own ("sends N days before the due date, from 9:30 local time"). The fix's history stays in git and on the item. Update the Testing rule to say so: a fixed bug's `it.fails` becomes a plain `it` and loses its ID.
   - **Done when:** no passing test name starts with an ID; `standards.md` states the rule; the suite count is unchanged.
 
-- [ ] **A88 · Comments that narrate or log history** · M · risk L · both apps · do with A35
+- [ ] **A93 · Comments that narrate or log history** · M · risk L · both apps · do with A35
   - **Found (2026-10-30):** `apps/web/src` has about 1,250 comment lines in about 20,200 lines (JSDoc included). Many are useful "why" notes. Patterns to remove: narration of the next line ("Navigation handlers" in `CalendarView.tsx`), version and history stamps ("standards.md v4.3" in `components/ui/input.tsx`, "Also handle direct /terms and /privacy routes for consistency" in `next.config.ts`, "Pricing page removed" in the landing config), and item IDs in comments where the constraint itself can be stated instead.
-  - **Fix:** per folder, keep comments that explain a constraint the code can't show (the A44 `Buffer` note in `lib/upload/pdfText.ts`, the adjust-state-during-render note in `GradesTab.tsx`, Safari or Gmail quirks); delete the rest or rewrite them as the reason. No code change in the same PR. The rule is A97's "Comments" rule.
+  - **Fix:** per folder, keep comments that explain a constraint the code can't show (the A44 `Buffer` note in `lib/upload/pdfText.ts`, the adjust-state-during-render note in `GradesTab.tsx`, Safari or Gmail quirks); delete the rest or rewrite them as the reason. No code change in the same PR. The rule is A102's "Comments" rule.
   - **Done when:** a pass over every folder of both apps is done, and the verification loop is green with no code diff besides comments.
 
-- [ ] **A89 · Simplify over-built logic** · L · risk M · test-first · after A87 and A88
+- [ ] **A94 · Simplify over-built logic** · L · risk M · test-first · after A92 and A93
   - **Goal (founder):** find code that does in many steps what could be done in a few, and simplify it without changing behavior. Look first; this is not a deletion pass.
   - **Known candidates:** the two upload forms' shared logic (A21); files over 300 lines (A22); Firestore calls in components, `alert()`s, the non-atomic bulk delete (A23); dead code and the `order` backfill (A24); the two extra user-doc readers (A54); the one-time cron code once its time has passed (A47, A64). To check: the target-grade draft held in state plus a mirrored ref (B18's review), the calendar's own date formatter that duplicates `utils/dateUtils.ts` (B18's review), and duplicated parsing between `lib/upload/textExtraction.ts` and `normalize.ts`.
   - **Method:** one area per PR (upload, grades, calendar, reminders, auth and user doc, dashboard shell). For each, list the candidates with a short before and after in the session log before changing code. Code without tests gets tests on today's behavior first; the simplification must keep them green. Run `/simplify` and `/code-review` on each PR. Measure what changes: lines, files, bundle size (Baseline).
   - **Done when:** every area has been reviewed, each simplification shipped or dropped with a reason, and tests and page sizes are no worse.
 
-- [ ] **A90 · Modularity** · M · risk M · with A89
+- [ ] **A95 · Modularity** · M · risk M · with A94
   - **Problem:** the rules already exist in `standards.md` ("Architecture & file layout": thin pages, components own markup and hooks own data, one responsibility per file, the folder pattern past 300 lines), but A22 and A23 list where the code breaks them, and nothing checks them.
-  - **Fix:** in B23, fix the breaks (A21, A22, A23, A54), then add the checks that are cheap to automate: an ESLint `no-restricted-imports` rule that keeps `firebase/firestore` out of `components/` (only `hooks/` and `lib/` may import it), and a line-count warning in CI for files over 300 lines. Keep `standards.md` the one place the rules are written.
+  - **Fix:** in B25, fix the breaks (A21, A22, A23, A54), then add the checks that are cheap to automate: an ESLint `no-restricted-imports` rule that keeps `firebase/firestore` out of `components/` (only `hooks/` and `lib/` may import it), and a line-count warning in CI for files over 300 lines. Keep `standards.md` the one place the rules are written.
   - **Done when:** A21, A22, A23 and A54 are done and the lint rule is on with zero warnings.
 
-- [ ] **A91 · Deprecated packages, dependencies and methods** · M each · risk M · one change per PR
+- [ ] **A96 · Deprecated packages, dependencies and methods** · M each · risk M · one change per PR
   - **Packages:** A25 has the list (`@google/generative-ai` to `@google/genai`; `pdf-parse` 1.1.1; Tiptap 2 to 3; firebase 11 to 12; web Next 15 to 16 and `next lint` to the ESLint CLI; firebase-admin's `uuid` chain; `@types/node` 20 to 22), plus A33 (the landing's Next pin) and A62 (Tiptap's `immediatelyRender` warning).
-  - **Add to A25:** start with a fresh inventory, since A25 was written 2026-10-10: `npm outdated --workspaces`, the `npm warn deprecated` lines from a clean `npm install`, and `npm audit --omit=dev`, recorded in the B25 log. Then search the code for deprecated APIs the upgrades will remove (React 19 and Next 16 deprecations, Firebase calls marked deprecated in the installed types).
+  - **Add to A25:** start with a fresh inventory, since A25 was written 2026-10-10: `npm outdated --workspaces`, the `npm warn deprecated` lines from a clean `npm install`, and `npm audit --omit=dev`, recorded in the B27 log. Then search the code for deprecated APIs the upgrades will remove (React 19 and Next 16 deprecations, Firebase calls marked deprecated in the installed types).
   - **Done when:** the inventory shows no deprecated direct dependency and no deprecated API in use, or each one left has a reason in `docs/ops.md` ("Pins to know").
 
-- [ ] **A93 · One domain** · M · risk M-H · D12 decided (a): the platform on `app.asetta.me`
+- [ ] **A98 · One domain** · M · risk M-H · D13 decided (a): the platform on `app.asetta.me`
   - **Today:** the platform (Vercel project `asetta`) serves `asetta.me`; the marketing site (`asetta-landing`) serves `www.asetta.me`. The platform's production `/`, `/terms`, `/privacy` and `/legal/*` redirect to `www` (`apps/web/next.config.ts`), and the landing's `/login` and `/register` redirect to the bare domain (`apps/landing/next.config.ts`, `APP_URL` in `src/lib/site.ts`). Two apps in one repo is normal; what's unusual is the app on the bare domain and marketing on `www`, which most people read as the same site.
-  - **Fix (D12, recommended (a)):** the platform moves to `app.asetta.me`; `asetta.me` serves the marketing site and `www` redirects to it. Checklist: the Vercel domains on both projects; Firebase Auth's authorized domains (Google sign-in fails on a host not listed); `APP_URL` in the platform's env (email links) and in the landing's `site.ts`; both `next.config.ts` redirect lists; keep `asetta.me/login`, `/register`, `/dashboard/*` and `/confirm-email` redirecting to `app.` for good, because sent emails and bookmarks point there; the reminder workflow's URL (`https://asetta.me/api/cron/notifications` in `.github/workflows/reminders.yml`; a redirect would drop its `Authorization` header); the GA settings; canonical URLs and the sitemap; the cross-app links section of the root `CLAUDE.md`, `README.md`, `docs/ops.md` and `apps/landing/CLAUDE.md`. The ICS UID stays `asetta.app` (D9). Users stay signed in only if Firebase Auth's persistence carries over to the new origin: it does not (storage is per origin), so everyone signs in once after the move; say so in the release.
+  - **Fix (D13, recommended (a)):** the platform moves to `app.asetta.me`; `asetta.me` serves the marketing site and `www` redirects to it. Checklist: the Vercel domains on both projects; Firebase Auth's authorized domains (Google sign-in fails on a host not listed); `APP_URL` in the platform's env (email links) and in the landing's `site.ts`; both `next.config.ts` redirect lists; keep `asetta.me/login`, `/register`, `/dashboard/*` and `/confirm-email` redirecting to `app.` for good, because sent emails and bookmarks point there; the reminder workflow's URL (`https://asetta.me/api/cron/notifications` in `.github/workflows/reminders.yml`; a redirect would drop its `Authorization` header); the GA settings; canonical URLs and the sitemap; the cross-app links section of the root `CLAUDE.md`, `README.md`, `docs/ops.md` and `apps/landing/CLAUDE.md`. The ICS UID stays `asetta.app` (D9). Users stay signed in only if Firebase Auth's persistence carries over to the new origin: it does not (storage is per origin), so everyone signs in once after the move; say so in the release.
   - **Done when:** each app answers on its one host, every old URL redirects to its new home, sign-in (password and Google) and every email link work on production.
 
-- [ ] **A96 · Docs overlap** · M · risk L · docs only · after A92 (docs done 2026-10-30 in B19; left: the founder reads the result)
-  - **Done in B19:** commands and the verification loop live only in the root `CLAUDE.md` (the app CLAUDE files and `README.md` link to it); env vars only in `docs/ops.md`; the scrollbar recipe only in `standards.md`; `standards.md` lost its "locked" dates, version stamps, item IDs in rule text, the verification loop copy and the handoff section; `apps/landing/CLAUDE.md` lost its component-by-component catalog for a short structure list and a Rules list. `docs/ops.md` still names items where it explains why a mechanism exists; it describes facts, not rules.
+- [ ] **A101 · Docs overlap** · M · risk L · docs only · after A97 (docs done 2026-10-30 in B21, PR #27; left: the founder reads the result)
+  - **Done in B21:** commands and the verification loop live only in the root `CLAUDE.md` (the app CLAUDE files and `README.md` link to it); env vars only in `docs/ops.md`; the scrollbar recipe only in `standards.md`; `standards.md` lost its "locked" dates, version stamps, item IDs in rule text, the verification loop copy and the handoff section; `apps/landing/CLAUDE.md` lost its component-by-component catalog for a short structure list and a Rules list. `docs/ops.md` still names items where it explains why a mechanism exists; it describes facts, not rules.
   - **Problem:** about 2,800 lines across seven docs plus this file, and the same facts live in several places, so they drift and agents read the same rule worded three ways. Found 2026-10-30:
     - Commands: the root `CLAUDE.md`, `apps/web/CLAUDE.md`, `apps/landing/CLAUDE.md` and `README.md`.
     - The verification loop: `standards.md`, `apps/web/CLAUDE.md`, the landing's Conventions (a shorter loop) and this file's "Ending a session".
@@ -140,7 +144,7 @@ None open. D1 to D12 are answered (archive, "Answered decisions"); an item that 
     - The scrollbar recipe: `standards.md` and `apps/landing/CLAUDE.md`.
     - History inside rules: "(locked 2026-07-14)" stamps on most `standards.md` Part 2 headings, item IDs in rule text (A13, A15, A17, A18, A19, A44), and a "Handoff notes for new sessions" section.
     - `apps/landing/CLAUDE.md` describes every component one by one, which repeats the code and goes stale.
-  - **Fix:** one home per fact (a table at the top of the root `CLAUDE.md`'s doc map already says which doc holds what; enforce it), the others link to it. Strip dates and item IDs from rule text. Cut the landing's component list to the rules a component must follow. Reword rules as plain instructions ("Do X", "Never Y") in the A97 style so agents read one voice. Target: each doc shorter, none repeating another.
+  - **Fix:** one home per fact (a table at the top of the root `CLAUDE.md`'s doc map already says which doc holds what; enforce it), the others link to it. Strip dates and item IDs from rule text. Cut the landing's component list to the rules a component must follow. Reword rules as plain instructions ("Do X", "Never Y") in the A102 style so agents read one voice. Target: each doc shorter, none repeating another.
   - **Done when:** each fact in the list above lives in one doc; no rule carries a date or an item ID; the founder has read the result.
 
 ### Backend and earlier items
@@ -230,28 +234,13 @@ None open. D1 to D12 are answered (archive, "Answered decisions"); an item that 
   - **Problem:** the check only matters for the first 4 days after A8's first production run: it stops the switch from resending what the old cron had just sent. After that it is one or two wasted reads for each new reminder.
   - **Fix:** delete it once 5 days have passed since the first production run (the first `cronRuns/{date}` doc with `sweptAt` dates it).
 
-- [ ] **A48 · Onboarding saves email notifications as on even when switched off** · S · risk L · found during B9
-  - **Where:** `completeOnboarding` in `apps/web/src/contexts/OnboardingContext.tsx`: `emailNotifications: state.userData.emailNotifications || true`.
-  - **Problem:** `false || true` is true, so a student who turns email notifications off in onboarding is saved with `emailNotifications: true` and `hasConsentedToNotifications: false`. No reminder goes out (the cron needs consent), but Settings then shows the switch on, and the next save of the Notifications card sets consent to match it, turning reminders on without the student choosing it.
-  - **Fix:** `?? false` (check what `loadUserDataForOnboarding` defaults it to), with a test once the save's mapping is pulled out.
-
 - [ ] **A49 · Daily digest email (optional, from A8)** · M · risk M · found during B9
   - A8 left the digest to "decide while building"; B9 didn't build it. Since A8 a user's due reminders all go out in the same run, one email each. A digest would be one email per user per run listing them: fewer Gmail sends (D3) and less inbox noise. It needs one claim covering several records and a new builder in `lib/emailTemplates.ts`. Revisit with A19, or when sends approach the Gmail cap.
-
-- [ ] **A50 · The reminder time shows only under Custom timing** · S · risk L · found during B9
-  - **Where:** `apps/web/src/components/settings/NotificationsSection.tsx` and `apps/web/src/components/onboarding/steps/NotificationsStep.tsx`.
-  - **Problem:** the hint that says when reminders go out (A32) sits inside the custom-days panel, so a student who picks 1, 2, 3 or 7 days never sees it.
-  - **Fix:** show the time under the timing field for every choice.
 
 - [ ] **A52 · An assessment without a due date is hidden everywhere** · S · risk L · found during B10
   - **Where:** the `orderBy("dueDate")` query in `apps/web/src/hooks/useSemesterAssessments.ts`; the `dueDate` default in `assessmentFromDoc` (`utils/semesterAssessments.ts`).
   - **Problem:** Firestore's `orderBy` leaves out docs without the field, so such an assessment never appears in any tab, and its weight and mark never reach the grade. The mapping's "today" default only applies to an empty or null `dueDate`. Before B10 it was worse: the grades tab read such docs with `getDocs` and its sort crashed the whole dashboard (`parseLocalDateTime(undefined)`, reproduced on main with a seeded doc). The upload (B8's normalizer) and the Add form always write a date, so only old or hand-edited docs can be affected.
   - **Fix:** drop the `orderBy` and sort on the client (every consumer sorts anyway), and give such a doc `needsReview` with the viewer's today rather than a silent default (D10's rule). Or first check with an admin script whether any production doc lacks a `dueDate`.
-
-- [ ] **A54 · Sign-in reads the onboarding status on its own, and a read error sends an onboarded user to onboarding** · S · risk L · found during B10
-  - **Where:** `getUserOnboardingStatus` in `apps/web/src/utils/onboardingUtils.ts` (used by `redirectAfterAuth` on login and register) and `loadUserDataForOnboarding` (`OnboardingContext`).
-  - **Problem:** two `getDoc` readers of the user doc remain beside the live one in `AuthContext`. `getUserOnboardingStatus` turns any read error into "needs onboarding", so a failed read at sign-in sends an onboarded user to `/onboarding`. Since B10 that page shows the error screen instead of the flow, so nothing gets overwritten; checked with the user-doc read denied, `/login` lands on `/onboarding` with "Couldn't load your account". With the live listener active the extra `getDoc` shares its target, so it costs no extra read.
-  - **Fix:** route login and register through `useAuth()` (wait for `loading`, then read `onboardingStatus`) and seed the onboarding form from `useAuth()` too; delete both readers.
 
 - [ ] **A55 · Metadata-only user-doc snapshots re-render every `useAuth` consumer** · S · risk L · found during B10 (`/code-review`, skipped)
   - **Where:** `useUserDoc` in `apps/web/src/hooks/useUserDoc.ts` (`includeMetadataChanges: true`, so the server confirming a cached doc counts as its first answer).
@@ -333,20 +322,37 @@ None open. D1 to D12 are answered (archive, "Answered decisions"); an item that 
   - **Problem:** each send is claimed (an attempt counted) before the login check, so with a revoked app password every due reminder fails its 3 attempts within about an hour and is never sent, even after the password is fixed the same day. Same before B15, when the check ran before every email.
   - **Fix (decide):** check the login once at the start of a run that has reminders to send; if it fails, log it, claim nothing, and give the due users a short retry (`nextReminderRun` with a retry) so the reminders go out once the login works.
 
-- [ ] **A74 · The assessments table's "Submitted" filter shows Missed assessments** · S · risk L · found during B17
-  - **Where:** `filterOptions` and the filter in `apps/web/src/components/tables/AssessmentsTable.tsx` (`isCompletedStatus`).
-  - **Problem:** the A51 mismatch in the table: "Submitted" lists Missed assessments too, and "Not submitted" hides them, though they were never submitted.
-  - **Fix (decide the copy):** filter by status (Submitted only, everything else under "Not submitted"), or keep the grouping and name it for what it is (for example "To do" and "Done").
-
-- [ ] **A79 · Typing "-" or "." in a mark field marks the assessment Submitted with 0** · S · risk L · found during B18
-  - **Where:** `applyMarkInput` in `apps/web/src/utils/gradeCalculations.ts` (`Math.max(0, parseFloat(raw) || 0)`); its test "parses %s as %f" in `gradeCalculations.test.ts`.
-  - **Problem:** text with no number other than an empty field ("-", ".", "abc") becomes a mark of 0, and a Not started or In progress assessment then turns Submitted (A41's rule), so starting to type ".5" or a stray "-" saves a 0 and a status change. The test asserts `"abc"` as 0, a known bug written as correct behavior (standards.md, Testing). Read from the code, not reproduced in the UI.
-  - **Fix:** keep "" as "clear the mark"; for any other text with no number, change nothing (`parsePercentInput`'s rule, without its 100 cap, since a mark can go over 100 with bonus marks). Turn the "abc" case into an A79 test of that.
-
 - [ ] **A80 · A target typed but not yet saved is lost on a reload or a closed tab** · S · risk L · found during B18 (`/code-review`)
   - **Where:** the target draft in `apps/web/src/components/assessment/GradeCalculator.tsx` (A76's save on leave).
   - **Problem:** since A76 the target saves on blur, Enter, a course change or the calculator unmounting. A full page reload or a closed tab fires none of those, so a target typed and left focused is lost. Before A76 every keystroke saved it.
   - **Fix (if it matters in practice):** also save the draft on `pagehide`; Firestore queues the write locally, but whether it reaches the server before the page goes is not guaranteed.
+  - **Checked (B19), left open: `pagehide` doesn't work.** The app's Firestore keeps its cache in memory, so a write has to leave the page before it goes. On a production build against the emulators, with 60 ms added each way between the page and Firestore (a proxy that logs what leaves the browser), "70" typed and the page reloaded with the field focused: with no handler (today) 85 stayed and nothing was sent; with a `pagehide` handler that leaves the field (the same save as a blur), the handler ran but no write left the page, both with the write stream closed (the first save after a load) and with it open from a save seconds before. A `beforeunload` handler did save 70 when the write stream was already open; with it closed, the stream's handshake left but the page was gone 11 ms later. Opening the stream takes about 2.5 round trips before the write itself goes, and a target typed right after opening the page has no open stream. Not tried: a closed tab, which goes at least as fast as a reload; Safari and Firefox (the pane is Chromium). Not tried either: switching tabs or apps, which browsers normally answer by blurring the focused field, which would save it.
+  - **Options (founder's call, none needed for B19):** (a) accept the gap: only a reload or a close with the field still focused loses the value, and the old target shows on return; (b) keep the draft in `localStorage` per course and save it on the next visit (survives a reload or a close on the same browser; a stale draft could overwrite a target changed on another device unless it expires); (c) send the draft with a `keepalive` request (`fetch` or `sendBeacon`), which browsers let outlive the page, through a small API route or Firestore's REST API: a second write path for one field. Recommended: (a).
+
+- [ ] **A81 · Typing a mark and deleting it leaves the assessment Submitted** · S · risk L · found during B19 · changes A41's rule, so the founder decides
+  - **Where:** `applyMarkInput` in `apps/web/src/utils/gradeCalculations.ts`, through `handleMarkChange` in `GradeCalculator.tsx`.
+  - **Problem:** a digit typed into a Not started or In progress assessment's empty mark field makes it Submitted; deleting the digit clears the mark but keeps Submitted (A41: clearing a mark never changes the status), and the auto-save writes Submitted with no mark, so a stray keystroke undone still moves the assessment to Submitted and Done. Read from the code, not reproduced in the UI.
+  - **Fix (decide):** clearing a mark goes back to the status the assessment has saved (as `weightEdit` goes back to the saved weight), so only a mark that stays changes the status; a Missed assessment keeps its status either way (D1).
+
+- [ ] **A82 · Old "Completed" and "Under Review" statuses show under the table's To do** · S · risk L · found during B19 (`/code-review`)
+  - **Where:** `matchesAssessmentFilter` in `apps/web/src/utils/semesterAssessments.ts` (`isCompletedStatus` knows only Submitted and Missed); `getDaysTillDue` in `components/tables/AssessmentsTable.tsx`, which treats both as complete.
+  - **Problem:** a doc still holding a legacy status is listed under To do, while the same row shows no days left as if done. Predates B19; the To do label makes it read as work left. Whether such docs still exist in production is unknown.
+  - **Fix:** count the legacy statuses with Submitted in one place (`constants/assessment.ts`), or migrate them, and type the stored status as possibly legacy.
+
+- [ ] **A83 · Settings reads the user doc with its own `getDoc`** · S · risk L · found during B20
+  - **Where:** `fetchUserData` in `apps/web/src/components/settings/UserSettings.tsx`.
+  - **Problem:** the last reader of the user doc beside `AuthContext`'s live one (standards.md, "The user doc is read once, live"). It reads once at mount, so the cards don't follow later changes to the doc, and a failed read is only logged: the forms keep their defaults (notifications off) with Save disabled, and no error shows. A23 lists `UserSettings` among the Firestore calls outside hooks.
+  - **Fix:** start the Profile and Notifications forms and the preferences from `useAuth()` (`profile`, `displayPreferences`, and a notifications mapping like B20's `onboardingChoicesFromUserDoc`, with `notifySubmittedAssessments`), as B20 did for onboarding; delete the `getDoc`. Keep the dirty check against what was loaded.
+
+- [ ] **A84 · Onboarding's "Continue without upload" stays disabled until "Skip for now" is pressed** · S · risk L · found during B20 (UI check)
+  - **Where:** `UploadStep` in `apps/web/src/components/onboarding/steps/UploadStep.tsx` (`canGoNext={state.hasCompletedUpload || hasAttemptedUpload}`; `handleSkipUpload` only sets `hasAttemptedUpload`).
+  - **Problem:** the step shows "Skip for now" and a disabled "Continue without upload". Skip doesn't move on: it enables Continue and hides itself, so skipping the upload takes two presses and the button that names the action looks broken until then.
+  - **Fix:** one control that moves on: "Continue without upload" enabled from the start, and no separate Skip (or a Skip that moves on). Ask the founder if the two-press skip was deliberate.
+
+- [ ] **A85 · Onboarding's "Skip for now" on the notifications step keeps what was already changed** · S · risk L · found during B20 (second `/code-review`)
+  - **Where:** `NotificationsStep` (`components/onboarding/steps/NotificationsStep.tsx`): every change goes to `updateUserData` at once, and `StepNavigation`'s Skip calls `nextStep` without Continue's check (`canContinue`).
+  - **Problem:** a student who switches notifications on, types part of an address and presses Skip for now finishes onboarding with `emailNotifications` and consent true and the unfinished address (reminders then go to the account email). Read from the code, not reproduced in the UI. Predates B20.
+  - **Fix (decide):** Skip for now saves notifications off (the step's default), or Skip is hidden once the switch is on. A small product call.
 
 ## Done
 
@@ -383,26 +389,31 @@ Full text and what shipped: archive, "Done items".
 - [x] A41 · A mark edit always sets the status to Submitted · 2026-10-11, PR #12
 - [x] A43 · Clearing the target-grade field saves 0 · 2026-10-19, PR #23
 - [x] A44 · Small PDFs fail to parse in the upload route · 2026-10-19, PR #21
+- [x] A48 · Onboarding saves email notifications as on even when switched off · 2026-10-29, PR #26
+- [x] A50 · The reminder time shows only under Custom timing · 2026-10-29, PR #26
 - [x] A51 · The stats bar's "Submitted" counts Missed assessments · 2026-10-19, PR #23
 - [x] A53 · The grade breakdown labels a Missed assessment "Pending" or "Overdue" · 2026-10-19, PR #23
+- [x] A54 · Sign-in reads the onboarding status on its own, and a read error sends an onboarded user to onboarding · 2026-10-29, PR #26
 - [x] A56 · The calendar's Today button never opens today · 2026-10-19, PR #23
 - [x] A65 · Scrollbars: one clean look on every OS, no sideways jumps · 2026-10-19, PR #20
 - [x] A67 · Landing scrollbars have the same Chrome bug · 2026-10-19, PR #20
+- [x] A74 · The assessments table's "Submitted" filter shows Missed assessments · 2026-10-29, PR #25
 - [x] A75 · The grade breakdown marks a flagged assessment Overdue · 2026-10-29, PR #24
 - [x] A76 · The target-grade field saves every keystroke · 2026-10-29, PR #24
 - [x] A77 · The calendar's today highlight doesn't follow the clock · 2026-10-29, PR #24
 - [x] A78 · Clearing a weight in the grade breakdown saves 0 · 2026-10-29, PR #24
-- [x] A86 · Emojis in the code and copy · 2026-10-30, PR #27
-- [x] A92 · Clean this file · 2026-10-30, PR #27
-- [x] A97 · Writing rules for agents (no AI slop) · 2026-10-30, PR #27
+- [x] A79 · Typing "-" or "." in a mark field marks the assessment Submitted with 0 · 2026-10-29, PR #25
+- [x] A91 · Emojis in the code and copy · 2026-10-30, PR #27
+- [x] A97 · Clean this file · 2026-10-30, PR #27
+- [x] A102 · Writing rules for agents (no AI slop) · 2026-10-30, PR #27
 
 ## Baseline
 
 The latest numbers to compare against. Every earlier value is in the archive ("Baselines as recorded").
 
 - `npm audit --omit=dev`: 38 vulnerabilities (0 critical, 5 high, 33 moderate) since A2 (2026-10-10); 43 (10 high) with dev dependencies. Why each high stays is in the B2 session log.
-- `apps/web` build (Next 15.5.27, after B18, 2026-10-29): First Load JS shared by every page 154 kB (`_app` 38.4 kB); `/login` 166 kB, `/register` 167, `/reset-password` 165, `/confirm-email` 162, `/404` 157, `/dashboard` 145, `/dashboard/*` 271, `/dashboard/[semester]/*` 272, `/settings` 273, `/onboarding` 288. A dashboard fetches the other tabs after first paint (about 37 kB in all) and the semester drag list when its menu opens (about 17 kB).
-- Tests (after B18, 2026-10-29): 25 suites, 744 tests per zone, all passing (1,488 across the two zones). The rules suite (`npm run test:rules`): 44 cases.
+- `apps/web` build (Next 15.5.27, after B21, 2026-10-30): First Load JS shared by every page 154 kB; `/login` 166 kB, `/register` 167, `/reset-password` 165, `/confirm-email` 162, `/404` 157, `/dashboard` 145, `/dashboard/*` 271, `/dashboard/[semester]/*` 272, `/settings` 273, `/onboarding` 288. A dashboard fetches the other tabs after first paint (about 37 kB in all) and the semester drag list when its menu opens (about 17 kB).
+- Tests (after B20, 2026-10-29; B21 added none): 25 suites, 774 tests per zone, all passing (1,548 across the two zones). The rules suite (`npm run test:rules`): 44 cases.
 - Reminder cron (B15, emulators, a simulated 25 ms per Firestore call): a day's first run with nobody due reads 4 docs at 10 to 500 users (6 at 2,000); a run with 300 of 500 users due takes 13.3 s and 3,514 reads.
 - Firestore reads (B10, emulator rule coverage): a dashboard load reads the user doc once and writes nothing; a day's first load also writes `lastLogin` once.
 - Vercel limits and the live rules' deploy state: `docs/ops.md`.
