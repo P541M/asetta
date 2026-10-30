@@ -39,7 +39,7 @@ Answered decisions are in the archive ("Answered decisions"); an item that depen
 
 ## Batches
 
-**Done:** B1 to B22 (PRs #5 to #27; B22 on branch `claude/b22-quick-bugs-2db694`, not yet merged): security, tests, reminders, data layer, rules, bundle size, rate limits, cron throughput, the dashboard and grades bugs, the onboarding and notification settings, and the writing rules and docs (B21). What each shipped is in the archive.
+**Done:** B1 to B22 (PRs #5 to #28): security, tests, reminders, data layer, rules, bundle size, rate limits, cron throughput, the dashboard and grades bugs, the onboarding and notification settings, and the writing rules and docs (B21). What each shipped is in the archive.
 
 **Up next, in order** (reprioritized 2026-10-30 from the founder's list: after the backend work, the focus moves to cleanup and UI/UX):
 
@@ -386,10 +386,10 @@ Full text and what shipped: archive, "Done items".
 - [x] A77 · The calendar's today highlight doesn't follow the clock · 2026-10-29, PR #24
 - [x] A78 · Clearing a weight in the grade breakdown saves 0 · 2026-10-29, PR #24
 - [x] A79 · Typing "-" or "." in a mark field marks the assessment Submitted with 0 · 2026-10-29, PR #25
-- [x] A84 · Onboarding's "Continue without upload" stays disabled until "Skip for now" is pressed · 2026-10-30, branch `claude/b22-quick-bugs-2db694`
-- [x] A86 · Today is hard to spot in the calendar · 2026-10-30, branch `claude/b22-quick-bugs-2db694`
-- [x] A87 · A preview deploy's `/` opens the live marketing site · 2026-10-30, branch `claude/b22-quick-bugs-2db694`
-- [x] A88 · Editing a due date shows no calendar on Windows · 2026-10-30, branch `claude/b22-quick-bugs-2db694`
+- [x] A84 · Onboarding's "Continue without upload" stays disabled until "Skip for now" is pressed · 2026-10-30, PR #28
+- [x] A86 · Today is hard to spot in the calendar · 2026-10-30, PR #28
+- [x] A87 · A preview deploy's `/` opens the live marketing site · 2026-10-30, PR #28
+- [x] A88 · Editing a due date shows no calendar on Windows · 2026-10-30, PR #28
 - [x] A91 · Emojis in the code and copy · 2026-10-30, PR #27
 - [x] A97 · Clean this file · 2026-10-30, PR #27
 - [x] A102 · Writing rules for agents (no AI slop) · 2026-10-30, PR #27
