@@ -295,6 +295,28 @@ project. Never commit real values.
 - Preview emails at `/api/dev/email-preview` on `npm run dev:web` (404 outside development).
   Real test sends go to the founder's own address only, with the founder's approval.
 
+## Impeccable (design skill)
+
+- **What:** the `impeccable` skill (github.com/pbakaus/impeccable, Apache-2.0), vendored in
+  `.claude/skills/impeccable` at commit `df3a4abe7d0840d5f60324812c432e00b66a4e75` (skill 0.1.18,
+  `scripts/VERSION`), with its `LICENSE` and `NOTICE.md`. Only the skill folder: no hook, no
+  subagents, no plugin. It reads product context from the root `PRODUCT.md`; it writes working
+  files to `.impeccable/` (gitignored).
+- **Engine:** the first run of `scripts/impeccable` downloads a native binary from the project's
+  GitHub releases into `~/.impeccable/bin/`, checked against `scripts/engine-checksums.txt`. On
+  Windows run it with `sh` from Git Bash (or `impeccable.cmd`); `.gitattributes` keeps `.cmd`
+  files CRLF, which cmd needs for `goto`.
+- **Telemetry:** only when a new design starts (which visual directions were shown and picked).
+  Run with `DO_NOT_TRACK=1`, or `impeccable telemetry off`.
+- **Detector:** `sh .claude/skills/impeccable/scripts/impeccable detect --json <dir|url>` from the
+  app's folder. Source scans find little in Tailwind markup; scan rendered pages: a URL with
+  `--viewport 375x812` for public pages, and `--cdp <port>` against a signed-in Chromium started
+  with `--remote-debugging-port` for the platform (B23's `detect-cdp.cjs` is in the B23 log).
+- **`check:copy`** skips the folder (`VENDORED` in `scripts/check-copy.mjs`): its text has em
+  dashes, and edits would be lost on the next update.
+- **Update:** copy `.claude/skills/impeccable/` from a newer commit of the repo (the folder of the
+  same name there), keep `LICENSE` and `NOTICE.md`, record the commit here, and run `check:copy`.
+
 ## Dependencies and `npm audit`
 
 **Audit policy:**
