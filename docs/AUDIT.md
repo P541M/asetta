@@ -23,7 +23,7 @@ items off and add a session log entry to docs/AUDIT-archive.md when done. Don't 
 
 **Rules:**
 
-- IDs are permanent. Never renumber. New items take the next free number (**next: A105, D14**); split an item as A9a/A9b.
+- IDs are permanent. Never renumber. New items take the next free number (**next: A130, D14**); split an item as A9a/A9b.
 - Dropped items move to the archive struck through with a reason: `~~A24~~ dropped: <why>`.
 - Line numbers in items drift. Search by symbol name.
 - One theme per branch and PR.
@@ -39,19 +39,20 @@ Answered decisions are in the archive ("Answered decisions"); an item that depen
 
 ## Batches
 
-**Done:** B1 to B22 (PRs #5 to #28): security, tests, reminders, data layer, rules, bundle size, rate limits, cron throughput, the dashboard and grades bugs, the onboarding and notification settings, and the writing rules and docs (B21). What each shipped is in the archive.
+**Done:** B1 to B23 (PRs #5 to #28, then B23's): security, tests, reminders, data layer, rules, bundle size, rate limits, cron throughput, the dashboard and grades bugs, the onboarding and notification settings, the writing rules and docs (B21), and the UI/UX audit of both apps (B23, findings A105 to A129). What each shipped is in the archive.
 
 **Up next, in order** (reprioritized 2026-10-30 from the founder's list: after the backend work, the focus moves to cleanup and UI/UX):
 
 | Order | Batch | Items | Theme | Why here |
 | --- | --- | --- | --- | --- |
-| 1 | B23 | A89, A99, A100 (audit phase only) | UI/UX audit: Impeccable, Windows and macOS, mobile | Read-only. It turns "improve the UI" into a list of findings per screen, filed as new items, so B26 has a plan and B25 knows which components the UI work will touch. |
-| 2 | B24 | A92, A93, A24, A47 | Cleanup sweep: test names, comments, dead code | Mechanical, no behavior change. Shrinks the code before B25 simplifies it. A47's 5-day wait ended long ago. |
-| 3 | B25 | A94, A95, A21, A22, A23, A83 | Simplify and modularize | Test-first wherever logic moves. Before the UI work so each screen is restyled once, in its final files. A83 is the last stray user-doc read. Expect 2 or 3 PRs, one per area. |
-| 4 | B26 | A89, A99, A100 (fixes), A66, A69, A103, A104 | UI/UX implementation | One screen or theme per PR, from B23's findings. A66 and A69 are UI items already on the list; A103 and A104 are the accent color's use and contrast (founder, 2026-10-30: with the redesign). |
+| any | | A117's overflow only | The Courses tab scrolls sideways on phones | A one-line layout fix on a P1 found in B23; it needn't wait for the redesign. |
+| any | | A129 | Self-serve account deletion | The privacy policy already promises it. Server code and a Settings section, so it can go before or with A121. |
+| 1 | B24 | A92, A93, A24, A47 | Cleanup sweep: test names, comments, dead code | Mechanical, no behavior change. Shrinks the code before B25 simplifies it. A47's 5-day wait ended long ago. |
+| 2 | B25 | A94, A95, A21, A22, A23, A83 | Simplify and modularize | Test-first wherever logic moves. Before the UI work so each screen is restyled once, in its final files. A83 is the last stray user-doc read. Expect 2 or 3 PRs, one per area. Each B23 item's "Touches" line names the files its redesign changes: split those along the lines the redesign needs (A114's onboarding, A116's table, A118's calendar). |
+| 3 | B26 | A106 first; then A107, A108, A109, A112 (with A104, A103, A66); then the screens in this order: A116, A117, A118, A114, A119, A120, A115, A121, A122, A123, A113; A110 and A111 alongside; A69 with A120 | UI/UX implementation | One screen or theme per PR, from B23's findings, each checked in both themes, at 320 to 390px and with the detector re-run. A106 rewrites the rules once (the founder's call: the old rules don't bind), so each screen is restyled once against them. Screens go by how often a student uses them. |
 | 5 | B27 | A96, A25, A33, A62 | Deprecated and outdated dependencies | One major per PR. `@google/generative-ai` is Google's retired SDK and runs the core feature (extraction): if it starts failing, its move to `@google/genai` jumps the queue. Do Tiptap 3 before B26 restyles the notes editor. |
 | any | B28 | A98 | One domain | D13 decided: the platform moves to `app.asetta.me`. Touches only config, env and cross-app links, so it can run beside any batch. |
-| any | B29 | A90, A27, A68 | Landing polish: Lenis, GIFs to video, tests | The landing shares no code with the platform, so this runs beside any batch. |
+| any | B29 | A105 (A124 to A128), A27, A68, then A90 | Marketing site: the B23 fixes, GIFs to video, tests, then Lenis | The landing shares no code with the platform, so this runs beside any batch. A126's false claims and A125's old screenshot first; A27 goes with A125 and A126 (new screenshots and video replace the GIFs); Lenis last, once the layout has settled. If A106 picks one typeface for both apps, A124 follows it. |
 | any | | A101 (the founder reads the docs), A14 (a manual check), A26, A28, A39, A40, A42, A45, A46, A49, A52, A55, A57 to A61, A63, A64, A70 to A73, A80, A81, A82, A85 | Remaining items | As time allows. Founder calls first: D12, A73, A80, A81 and A85. A64 once the D11 marker has `finishedAt`; A71 only if spam arrives. |
 
 ## Open items
@@ -65,7 +66,7 @@ None open outside "Backend and earlier items".
 - [ ] **A103 · The calendar's assessment count badge is amber** · S · risk L · UI · found during B22
   - **Where:** the count badge beside each day number in `apps/web/src/components/calendar/CalendarGrid.tsx` (`bg-primary/10 text-primary`). The same 10% amber tint is on the icon tile of the onboarding step headers (`UploadStep`, and likely the other steps).
   - **Problem:** "Surface language" in `standards.md` keeps amber for primary buttons, the logo, links, focus rings and today's date. The badge uses it as decoration, and beside today's solid amber circle (A86) it puts two ambers in today's cell.
-  - **Fix:** a neutral badge (a `secondary` fill with `muted-foreground` text, for example), checked in both themes. Decide the onboarding icon tiles in A89's audit.
+  - **Fix:** a neutral badge (a `secondary` fill with `muted-foreground` text, for example), checked in both themes. B23 answered the onboarding icon tiles: drop them (A108).
 
 - [ ] **A104 · White on amber is below AA contrast in light mode** · S · risk L · UI · found during B22 (`/code-review`) · B26
   - **Where:** the light theme's `--primary` (#d97706) with `--primary-foreground` (#ffffff) in `apps/web/src/styles/globals.css`: primary buttons, and today's number in the calendar (A86).
@@ -73,27 +74,243 @@ None open outside "Backend and earlier items".
   - **Fix:** in the redesign, a light-mode pair that reaches 4.5:1 (dark text on amber, or a deeper amber such as `--primary-hover` #b45309, about 5:1, for filled surfaces), checked on every primary button and the calendar in both themes.
   - **Done when:** every white-on-amber text in light mode reaches 4.5:1, or is 18px and up (3:1).
 
-- [ ] **A89 · UI/UX pass with Impeccable** · L · risk M · audit first (B23), then fixes per screen (B26)
+- [ ] **A89 · UI/UX pass with Impeccable** · L · risk M · audit done in B23 (findings A106 to A123); left: the fixes in B26
   - **Where:** every platform screen: auth pages, onboarding, the dashboard tabs (Assessments, Courses, Calendar, Grades, Upload), the notes editor, Settings and the overlays.
-  - **Tool:** Impeccable, the frontend design skill set for coding agents. It is not installed in this repo (`.claude/`) or in the user's skills (checked 2026-10-30); install it into the project's `.claude/skills` first so every session has the same version, with the founder's OK.
-  - **Audit (B23):** run its audit and critique per screen at desktop and 375px, both themes. File each finding as its own item (one screen or theme per item) with the screenshot path, and mark which ones conflict with a "locked" rule in `standards.md` Part 2. A conflict is the founder's call: either the rule changes in `standards.md` in the same PR, or the finding is dropped with the reason.
-  - **Fixes (B26):** one screen or theme per PR, checked in both themes and at mobile width.
-  - **Done when:** every screen has been audited, every finding is filed or dropped with a reason, and the fix items are done.
+  - **Tool:** Impeccable, vendored in `.claude/skills/impeccable` (source, pinned commit and how to update: `docs/ops.md`, "Impeccable"). Product context for it is the root `PRODUCT.md`.
+  - **Audit (B23, done):** its detector on every rendered screen and its audit and critique, at 1440 and 375px in both themes, plus Firefox, Edge and WebKit on Windows. The screenshots and the scores are in the B23 gallery (the archive's B23 log has the link); each finding names its screen IDs. The founder's call (2026-10-30): `standards.md` Part 2 does not bind the findings; A106 rewrites it from them before the screen fixes.
+  - **Fixes (B26):** A106 first, then one screen or theme per PR, checked in both themes, at mobile width, with the detector re-run on the screen.
+  - **Done when:** the fix items A106 to A123 are done or dropped with a reason.
 
 - [ ] **A90 · Lenis smooth scroll on the marketing site** · S · risk L
   - **Where:** `apps/landing` (`_app.tsx`, `hooks/useScrollLock.ts`, `components/LegalPage.tsx`'s "On this page" links); new dependency `lenis` (`npm install lenis -w apps/landing`).
   - **Fix:** one Lenis instance for the landing, started in `_app`. Things to handle: off under `prefers-reduced-motion` (the landing's Motion rule); `lenis.stop()` and `start()` while `useScrollLock` holds the page (the image lightbox and the mobile menu), or the page scrolls under the overlay; in-page anchor links (the legal pages' table of contents, the fixed header's offset); Motion's `whileInView` reveals still firing; the scrollbar recipe and `scrollbar-gutter` unchanged. Platform scrolling stays native (it is an app, not a page to read).
   - **Done when:** scrolling feels smooth with a mouse wheel and trackpad, an open overlay still locks the page, reduced motion turns it off, and the legal TOC jumps to each section below the header.
 
-- [ ] **A99 · Works the same on Windows and macOS** · M · risk L · audit with A89
+- [ ] **A99 · Works the same on Windows and macOS** · M · risk L · Windows run and checklist done in B23 (findings in A111); left: a run on a real Mac, and A111's fixes
   - **Problem:** the founder works on Windows; students are split across both. Known Windows gaps so far: the date picker (A88, done); scrollbars were one (A65, done). Not yet checked: font rendering of the stack on Windows (ClearType, fallback fonts), native controls (date, time, select, checkbox) in dark mode, any keyboard shortcut hint that says Cmd or Ctrl, focus rings and hover states on touch laptops, and file pickers and drag and drop on upload.
-  - **Fix:** a checklist run per screen on Windows (Chrome, Edge, Firefox) and macOS (Safari, Chrome) during B23; each problem becomes its own item. Add the checklist to "Quality bar for every screen" in `standards.md` so later screens are checked the same way.
-  - **Done when:** the checklist is in `standards.md` and every screen passes it on both systems.
+  - **Fix:** a checklist run per screen on Windows (Chrome, Edge, Firefox) and macOS (Safari, Chrome) during B23; each problem becomes its own item. The checklist is in "Quality bar for every screen" in `standards.md` (B23).
+  - **Done when:** every screen passes the checklist on both systems.
 
-- [ ] **A100 · Mobile pass** · M-L · risk M · audit with A89
+- [ ] **A100 · Mobile pass** · M-L · risk M · audit done in B23 at 320, 375 and 390px (the phone findings are in A109 and A113 to A123); left: the fixes in B26 and a check on a real phone
   - **Problem:** screens are checked at 375px for overflow (`apps/web/CLAUDE.md`, "Verifying"), but they were designed desktop first. Not yet checked as a phone user would: the assessments table and its edit row, the calendar grid and day view, the grade breakdown's inputs, the notes editor's toolbar, overlays with the on-screen keyboard open, hover-only controls, touch targets (44px is the rule in `components/ui/input.tsx`), iOS Safari's viewport height and safe areas, and Android Chrome.
   - **Fix:** audit each screen on a real phone or the browser's device mode at 375 and 390px during B23; file findings per screen; fix in B26.
   - **Done when:** every main flow (sign up, onboarding upload, add and edit an assessment, check grades, write a note, change settings) works one-handed on a phone without zooming or sideways scroll.
+
+- [ ] **A105 · UI/UX pass on the marketing site** · L · risk L · audit done in B23 (findings A124 to A128); left: the fixes in B29
+  - **Where:** every page of `apps/landing`: home, features, about, contact, privacy, terms, the header's mobile menu, the image lightbox and the 404.
+  - **Why:** A89 covered the platform only; the founder wants the marketing site held to the same bar.
+  - **Audit (B23, done):** Impeccable's detector on each rendered page at 1440 and 375px, its audit and critique, light theme only (the site has no dark theme). Screens L01 to L08 in the B23 gallery.
+  - **Done when:** A124 to A128 are done or dropped with a reason.
+
+#### B23 findings: the platform, by theme
+
+Severity is Impeccable's: P0 blocks a task, P1 makes it hard or fails WCAG 2.2 AA, P2 is a workaround-able annoyance, P3 is polish. Screen IDs (P01 to P21, L01 to L08) are the B23 gallery's; "Touches" lists the files a fix changes, for B25.
+
+- [ ] **A106 · Rewrite the UI rules in `standards.md` from B23's findings** · M · risk M · first PR of B26, before any screen
+  - **Where:** `apps/web/standards.md` Part 2 and its token table; `apps/web/src/styles/globals.css`; `apps/landing/CLAUDE.md` ("Design system") where the two apps change together.
+  - **Why:** the founder's call (2026-10-30): Part 2 carries patterns the audit flags as generic (six stat tiles on every tab, rows as cards inside a card, tinted chips that fail contrast, amber icon tiles), and it does not bind B23's findings. Amber and the light and dark themes stay; token values and where amber goes may change. One rewrite, so B26 restyles each screen once.
+  - **Decide in it:** light and dark values that pass WCAG 2.2 AA (A107, A104); where amber goes (A108, A103); the dark `--border` (A66); the surface model (A109); the small end of the type ramp; one typeface across both apps or not (A124); whether the UI rules move to Impeccable's `DESIGN.md` (`/impeccable document`), which Impeccable reads on every run, with `standards.md` keeping Part 1 and a pointer.
+  - **Rules B23 found in the way:** the amber tint as the selection state ("Theme tokens", "Icons"); "Rows are tonal cards" ("Assessments table"); the course card recipe ("Course cards"); the tab panel recipe with the stats bar above it ("Tab panels & empty states"); amber's list of uses ("Surface language"); the Settings recipe ("Settings page").
+  - **Done when:** Part 2 states the new rules, `globals.css` matches the token table, and A107 to A109 can be built from it.
+
+- [ ] **A107 · Text on tints, amber text and placeholders fail AA contrast** · M · risk L · theme · found in B23 (detector, both themes) · covers A104
+  - **Where:** the tokens in `globals.css`; `statusTintClasses` in `tables/assessments/StatusSelect.tsx`; `urgencyChipClass` and `urgencyTextClass` in `utils/urgency.ts`; the chips in `calendar/CalendarGrid.tsx`; the selected-item tint (`DropdownMenuItem`'s `data-selected`, the theme choice in Settings); `text-primary` links; placeholders in `ui/input.tsx`.
+  - **Found (ratios from Impeccable's detector on the rendered screens):**
+    - [P1] White on amber (#fff on #d97706, about 3.2:1) on every primary button and today's date, light mode (A104's case). Screens P01, P02, P12 to P18.
+    - [P1] Amber text on white and on its own tint (#d97706 on #fafafa, on #f7ede2): links ("Forgot password?", "Sign up"), "In progress" chips, "4 days left", the selected menu item and the selected theme. Screens P01, P12, P14, P15, P18.
+    - [P1] Status and urgency text on its tint: #dc2626 on #f5e2e1, #059669 on #e0ede8, and #ef4444 on #382727 in dark ("Missed", "Submitted", "Due today", "Overdue"). Screens P12, P14.
+    - [P1] Calendar chips in both themes (#49b392 on #e6f5f0, #e66161 on #fce9e9; #148f66 on #1d2e28, #b73a3a on #332222 in dark). Screen P15.
+    - [P2] Every placeholder (#939392 on #f0efed; #818181 on #292929 in dark). Screens P01, P02, P15, P17.
+  - **Fix:** in A106: a darker text step for each tint, or neutral chips with a colored icon; amber as text only where it passes (or a darker amber for text); placeholders at `muted-foreground`.
+  - **Done when:** the detector reports no `low-contrast` on any platform screen in either theme; close A104 with it.
+
+- [ ] **A108 · Amber used as decoration** · S-M · risk L · theme · found in B23 · answers A103's open question
+  - **Where:** onboarding (`components/onboarding/`: the icon tile over each step's heading, the filled step circles and bar, the four icon tiles on the last step); the calendar's count badges (A103); `ui/Avatar`; the course meters (`CoursesOverviewTable.tsx`) and grade meters (`grade-calculator/GradeOverviewCards.tsx`); "In progress" chips.
+  - **Problem:** with amber on progress, tiles, chips, badges and the avatar, the screen's one primary action stops standing out, and onboarding reads like a template. A103 asked about the onboarding icon tiles: drop them; each repeats its heading.
+  - **Fix:** in A106: amber for the screen's primary action, links, focus and today only; meters neutral (or `success` at 100%); no icon tiles or count badges; "In progress" a neutral chip with its icon.
+  - **Done when:** every screen in the B23 gallery uses amber only for those.
+
+- [ ] **A109 · Six stat tiles on every tab, and rows as cards inside a card** · M · risk M · theme · found in B23 (critique; detector `nested-cards`)
+  - **Where:** the stats bar (`showStatsBar`) above every dashboard tab and the Add tab; the `ui/PanelHeader` panels; assessment rows, grade breakdown rows, course cards, the day detail's card.
+  - **Problem:** the tiles (Total, Completion rate, Upcoming, Submitted, In progress, Not started) fill the whole first screen on a phone and repeat on Courses, Grades, Calendar and Add, where none answers that tab's question; a new account sees six zeros. Each row is a tinted card inside a white card on a grey page: three surfaces before any content. Screens P12 to P17, P21.
+  - **Fix:** one line that answers "what's next" (for example "3 due this week, 1 overdue") on the Assessments tab, or nothing; rows as one list on one surface, separated by space or a divider. The surface model is A106's call.
+  - **Done when:** no tab shows the six tiles, and the detector reports no `nested-cards`.
+
+- [ ] **A110 · Copy that reads as generic AI copy** · S-M · risk L · theme · found in B23 (critique, checked against the root `CLAUDE.md` "Writing")
+  - **Found:**
+    - [P2] "Join Asetta to streamline your academic journey" (register; "streamline" is on the banned list). "Welcome to Asetta, Sam Rivera!" (onboarding; an exclamation mark and the full name). "Your academic planning assistant is ready to help you stay organized" and the four "What's next?" tiles (onboarding's last step).
+    - [P2] The Add tab: "Transform your PDF course outlines into organized assessments automatically. Our AI extracts deadlines, requirements, and details in seconds.", then an "Automatic extraction" box that says it again. Onboarding's upload step does the same.
+    - [P2] Lines that reassure without informing: "Your email is secure and will only be used for assessment notifications" (with a lock icon), "Reminder: Notifications might end up in your spam folder".
+    - [P2] One thing, three names: "assessments", "tasks" ("All tasks"), "assignments".
+    - [P3] "Hey, {full name}" truncates on phones ("Hey, Jordan ..."); a first name fits.
+  - **Fix:** one pass over every string with `/impeccable clarify`, against the Writing rules.
+  - **Done when:** no banned word or exclamation mark in UI copy, one name for an assessment, and each line says something the student needs.
+
+- [ ] **A111 · Firefox clips the edit row's date and time, and native controls ignore dark mode** · S · risk L · theme · A99's Windows run (B23)
+  - **Found:**
+    - [P1] Firefox on Windows: the desktop edit row's date shows "10 / 06 /" with no year, and the time loses AM/PM (`tables/assessments/AssessmentEditRow.tsx`, the column widths in `tableGrid.ts`). Chrome and Edge fit. Screen P13 (`xb` set).
+    - [P2] Nothing sets `color-scheme`, so in dark mode the browser draws its own parts (the date and time pickers' popups, autofill) in light. From the code; native popups don't show in screenshots.
+    - [P2] Dates and times are formatted in a hard-coded `en-US` (`CalendarView.tsx`, `CalendarGrid.tsx`, `DashboardHeader.tsx`), while date and time inputs follow the OS locale: on a day-first or 24-hour system, the edit fields and the text beside them disagree. Format with the viewer's locale.
+    - [P2] The drop zones say "Drop your course files here, or click to browse your computer" on phones.
+    - Fine: Manrope loads in Chrome, Edge, Firefox and WebKit on Windows; no shortcut hints exist; scrollbars follow the recipe.
+  - **Not checked:** a real Mac (Safari) and a real phone (WebKit on Windows stood in); 125% and 150% display scaling; the file picker and drag and drop from Explorer (the browser pane can't pick local files).
+  - **Done when:** every screen passes the checklist in `standards.md` ("Quality bar for every screen") in each listed browser, a Mac included.
+
+- [ ] **A112 · Keyboard and screen reader gaps** · S-M · risk L · theme · found in B23 (audit, code)
+  - **Found:**
+    - [P1] Calendar day cells are `div`s with `onClick` (`calendar/CalendarGrid.tsx`): a keyboard user can't open a day.
+    - [P1] The course card's rename pencil is `opacity-0` until hover (`CoursesOverviewTable.tsx`): on a phone or touch laptop renaming can't be found, and a tap on the card navigates away.
+    - [P2] Each of 26 rows has buttons named "Edit assessment", "Delete assessment" and "View or edit notes"; a screen reader hears the same names 26 times. Put the assessment's name in each ("Edit Problem set 1").
+    - [P2] Headings skip levels: Settings goes h1 to h3 ("Profile information"); the Add tab h2 to h4 ("Drop PDFs or click to browse").
+    - [P2] Calendar chips show status by color alone (WCAG 1.4.1).
+    - [P3] Row actions and close buttons are 32px (`icon-sm`): AA's 24px passes, the 44px touch rule doesn't.
+  - **Done when:** every action works from the keyboard with a visible focus ring, and the detector reports no `skipped-heading`.
+
+#### B23 findings: the platform, by screen
+
+- [ ] **A113 · Auth pages** · S · risk L · screens P01 to P05 · found in B23
+  - **Where:** `pages/login.tsx`, `register.tsx`, `reset-password.tsx`, `confirm-email.tsx`, `404.tsx`; `components/auth/`.
+  - **Working:** a clear split layout, errors in plain words, autofill and the password toggle.
+  - **Found:**
+    - [P2] Register checks five password rules (8 characters, upper, lower, number, special). NIST's current guidance asks for length only; each extra rule is friction at sign-up.
+    - [P2] Desktop: the form and the brand panel's tagline sit at the same height and compete. Phones open on the theme toggle and a large wordmark before the form.
+    - [P3] The subheads say nothing ("Sign in to your academic dashboard"; register's, A110).
+  - **Touches (B25):** `components/auth/AuthShell.tsx`; the password criteria in `register.tsx`.
+
+- [ ] **A114 · Onboarding: six steps, and the upload is the fourth** · M · risk M · screens P06 to P11 · found in B23
+  - **Where:** `components/onboarding/` (`OnboardingFlow`, `steps/*`, `ui/*`); `contexts/OnboardingContext.tsx`.
+  - **Found:**
+    - [P1] Welcome, Profile (institution), Semester, Upload, Notifications, Completion: the upload, the reason to sign up, is step 4 of 6, and Welcome and Completion have nothing to do.
+    - [P1] On the upload step the amber button is "Continue without upload"; the drop zone, the thing to do, has none. The primary style rewards skipping.
+    - [P2] Progress shown three ways at once: numbered circles, a bar, and "Step 1 of 6 (0% complete)".
+    - [P2] An icon tile over every heading, a sparkle icon on the tips box, a second upload icon in the drop zone, a check medallion and four icon tiles at the end (A108).
+    - [P2] "Skip setup" stays on the last step; "Skip setup" and "Skip for now" mean different things (A85).
+    - [P2] Phones: "Drop your course files here / or click to browse your computer".
+  - **Fix (suggested):** three steps (name the semester; upload outlines, with Upload as the primary and Skip beside it; reminders on or off), then the assessments list showing what was extracted. The institution moves to Settings or goes. `/impeccable onboard`.
+  - **Touches (B25):** `OnboardingContext.tsx` (309 lines, A22), `OnboardingUploadForm.tsx` (A21), every step.
+
+- [ ] **A115 · App bar and tabs** · S · risk L · screen P12 · found in B23
+  - **Where:** `components/layout/DashboardHeader.tsx`, `TabNavigationBar.tsx`, `DashboardLayout.tsx`.
+  - **Found:**
+    - [P2] Opening a course from Courses moves the underline to Assessments while the panel says "Courses / CIS 3760": the tab and the breadcrumb disagree. Screen P14 (course view).
+    - [P2] The bar's "Add assessment" opens the Add tab, which ends in its own "Add assessment" button: two amber buttons with one label on one screen. Screen P17.
+    - [P3] The tabs read Courses, Assessments, Grades, Calendar while Assessments is the default; put the default first.
+  - **Touches (B25):** `components/pages/UnifiedDashboardPage.tsx` (396 lines, A22).
+
+- [ ] **A116 · The assessments list opens on finished work** · M · risk M · screens P12, P13, P20 · found in B23 (critique, phone)
+  - **Where:** `components/tables/AssessmentsTable.tsx`, `tables/assessments/*`, `utils/semesterAssessments.ts`.
+  - **Found:**
+    - [P1] "All tasks" lists the term from its first date. In the seeded term nine finished rows come before the first open one; on a 375px phone the first open assessment is about 3,000px down a 7,500px list. "What's due next?" needs a scroll every time. Default to To do, or start at today with past and done rows folded.
+    - [P2] Each row: a full status dropdown, a color dot, course, task, date and year, a relative label, weight and three icon buttons; 26 rows carry 78 icon buttons. On phones each row is a 290px card.
+    - [P2] Phones: "Select all (26) / 0 selected" sits above the list all the time; selection belongs behind a "Select" action. The edit form's time field cuts off its icon.
+    - [P2] The course view repeats the course on every row; a 0% weight shows an empty cell; there is no search here (the calendar has one).
+    - [P3] Every date repeats the year.
+  - **Touches (B25):** `AssessmentsTable.tsx` (448 lines, A22), `AssessmentRow.tsx`, `AssessmentEditRow.tsx`, `BulkActionsBar.tsx`, `tableGrid.ts`.
+
+- [ ] **A117 · The Courses tab scrolls sideways on phones** · S for the overflow, M for the rest · risk L · screen P14 · found in B23 (detector, width check)
+  - **Where:** `components/tables/CoursesOverviewTable.tsx`.
+  - **Found:**
+    - [P1] At 320, 375 and 390px the page is 599px wide: the course card (`div.group.rounded-xl.bg-secondary/50`) doesn't shrink for a long course name or "Next due" title. Every other screen fits. Small and separate from the redesign; it can ship before B26.
+    - [P2] The card shows "Next due" but never an overdue assessment: PSYC 1000 shows Midterm 2 in 6 days while Online quiz 2 is overdue and not started.
+    - [P2] The meter is a completion count; the per-course question is "where do I stand", which is a tab away (A119).
+    - [P2] The rename pencil shows on hover only (A112).
+  - **Touches (B25):** `CoursesOverviewTable.tsx`, `hooks/useCourseRename.ts`.
+
+- [ ] **A118 · The calendar can't be read on a phone** · M · risk M · screen P15 · found in B23 (phone, detector)
+  - **Where:** `components/calendar/CalendarView.tsx`, `CalendarGrid.tsx`, `DayDetailModal.tsx`.
+  - **Found:**
+    - [P1] At 375px a day is 43px wide: chips cut to "5:0" and "11:5", names disappear, and the count badge runs into the day number. Phones need an agenda (days from today, each with its assessments), not the month grid.
+    - [P1] Day cells can't be reached by keyboard (A112).
+    - [P2] The day detail is read-only: no status change, no edit, no way to the assessment.
+    - [P2] The toolbar (search, status filter, month arrows, Today, Export) stacks into four rows above the grid on phones.
+    - [P2] Chips by color alone (A112); count badges in amber (A103).
+  - **Touches (B25):** `CalendarView.tsx` (313 lines, A22) and its own date formatter (A94).
+
+- [ ] **A119 · Grades: one course at a time, and labels that need decoding** · M · risk M · screen P16 · found in B23
+  - **Where:** `components/assessment/GradeCalculator.tsx`, `grade-calculator/*`, `utils/gradeCalculations.ts`.
+  - **Found:**
+    - [P2] No view of the term's grades together; each course is behind the dropdown.
+    - [P2] "Course weight 72.00%" and "28.00% remaining" mean "your weights add up to 72%"; they read as part of the grade. Say so, and only when the weights don't reach 100.
+    - [P2] A letter and "GPA: 3" from one fixed scale (A+ from 90); scales differ by school and country. Drop them or let the student choose a scale.
+    - [P2] "Points 0.0" for an unmarked assessment reads as zero earned; show "-".
+    - [P3] "Need 89.6% average" is always green, however hard the number. Weights are editable here and in the table.
+  - **Touches (B25):** `GradeCalculator.tsx`, `GradeOverviewCards.tsx`, `AssessmentBreakdown.tsx`, `NumberField.tsx`.
+
+- [ ] **A120 · Add tab: uploading takes two steps, and a typo makes a new course** · M · risk M · screen P17 · found in B23
+  - **Where:** `components/pages/dashboard-tabs/AddTab.tsx`, `forms/UploadForm.tsx`, `forms/AddAssessmentForm.tsx`.
+  - **Found:**
+    - [P2] Drop the files, then press "Extract assessments", a full-width disabled bar until then. Start on drop or pick.
+    - [P2] The course field is free text, so "CIS3760" makes a second course (A58). Suggest the semester's courses as the student types.
+    - [P2] Marketing copy above the drop zone (A110).
+    - [P3] Weight starts at 0 and the date at today; both save if unnoticed.
+  - **Touches (B25):** `UploadForm.tsx` with `OnboardingUploadForm.tsx` (A21), `AddAssessmentForm.tsx` (A23).
+
+- [ ] **A121 · Settings** · S-M · risk L · screen P18 · found in B23
+  - **Where:** `components/settings/*`, `pages/settings.tsx`.
+  - **Found:**
+    - [P2] "Email notifications" titles both the card and its first row, and the card explains reminders three times.
+    - [P2] Four switches (statistics, days until due, weight, notes) hide core information; decide which still earn a switch after A109 and A116.
+    - [P2] No change of password, and no way to delete the account (A129); sign-out is only in the user menu. The founder's call (2026-10-30): add both. Password accounts get "Send a password reset email" (the reset page's flow); Google accounts get none.
+    - [P3] The back link sits under the page title; two "Save changes" buttons on one page.
+  - **Touches (B25):** `UserSettings.tsx` (A83), `NotificationsSection.tsx`.
+
+- [ ] **A122 · Overlays** · S · risk L · screen P19 · found in B23
+  - **Where:** `common/ConfirmationModal.tsx`, `tables/assessments/NotesModal.tsx`, `calendar/DayDetailModal.tsx`, `assessment/semester-tabs/ManageSemestersModal.tsx`.
+  - **Found:**
+    - [P2] Notes save with a "Save notes" button while grades, preferences and colors save on their own; Cancel drops typed notes without a word.
+    - [P2] Deleting one row asks "Are you sure ... cannot be undone"; an undo after the delete is quicker and safer.
+    - [P2] The day detail is a dead end (A118).
+
+- [ ] **A123 · Empty states point to typing, not uploading** · S · risk L · screen P21 · found in B23
+  - **Where:** `ui/EmptyState`, the dashboard tabs.
+  - **Found:**
+    - [P2] A new account sees six zero tiles (A109) and "Add assessment" on every tab; the first action should be uploading outlines.
+    - [P3] Grades with no courses shows a disabled "Select a course" above its empty state.
+
+#### B23 findings: the marketing site (A105)
+
+- [ ] **A124 · Marketing site: contrast, title case, headings, type** · S-M · risk L · theme · found in B23 (detector at 1440 and 375px)
+  - **Found:**
+    - [P1] Stone-400 (#a6a09b) at 2.4 to 2.6:1: the contact form's placeholders and some captions. White on amber (3.2:1) on "Get started".
+    - [P2] Title Case against the site's own sentence-case rule: the six feature titles, the four challenge titles, the legal section titles ("Our Liability Limits"), the "About Us" and "Contact Us" page titles.
+    - [P2] Headings skip levels: features h1 to h3, contact h1 to h4, privacy and terms h2 to h4.
+    - [P2] Inter here and Manrope on the platform: two typefaces for one brand (the detector also lists Inter among faces too common to read as a brand). A106 decides.
+    - [P2] Banned words: "effortlessly" (features), "academic journey" (about; the contact placeholder).
+    - [P3] `Reveal` keeps each section hidden until it scrolls into view even with reduced motion on (a capture with `prefers-reduced-motion: reduce` showed blank sections until scrolled).
+  - **Touches:** `src/styles/globals.css`, `src/lib/features.ts`, `components/Reveal.tsx`, `components/LegalPage.tsx`, the page titles.
+
+- [ ] **A125 · Home page: an old product screenshot and a stock layout** · M · risk L · screen L01 · found in B23
+  - **Found:**
+    - [P1] The hero's light and dark slider shows an old dashboard: "Good Morning, Eleazar!", a row of semester pills, Title Case labels, 40 assessments all "Not Started" at 0%. It isn't the product a visitor gets, and it shows a term with nothing done. Use current screenshots of a full term (the B23 seed works).
+    - [P2] Hero, four numbered problem cards ("01 Scattered Information"), three feature tiles, CTA: the stock SaaS page. What sets Asetta apart, an outline going in and a tracked term coming out, is never shown.
+    - [P2] At 375px the hero preview is too small to read.
+    - [P2] "You're not alone. These challenges are universal, but they don't have to be permanent." and "turning chaos into structure".
+  - **Fix:** `/impeccable critique` then `/impeccable shape` on the home page, built around the outline-to-tracker step with real screenshots.
+
+- [ ] **A126 · The features page claims what the product doesn't do** · S · risk L · screen L02 · found in B23
+  - **Found:**
+    - [P1] "drag-and-drop scheduling" (Calendar & Deadlines): the calendar has no drag and drop. "filtering, search, and bulk actions" (Assessment Tracking): the assessments list has no search; only the calendar does. `PRODUCT.md`: never claim what isn't there.
+    - [P2] GIF tiles of the old UI, unreadable at tile size, 9.3 MB in all (A27).
+
+- [ ] **A127 · About and contact pages** · S · risk L · screens L03, L04 · found in B23
+  - **Found:**
+    - [P2] About is five "we" sections; the founder's note, the most specific part, comes third. Lead with it.
+    - [P2] Contact needs a required "Email Communication Consent (CASL Compliance)" checkbox (a bare native box) before a message can go. The founder's call (2026-10-30): drop it; sending a message is consent to a reply. The route requires it too: remove the `emailConsent` check and its 400 in `pages/api/contact.ts`, the field in `lib/contact.ts`, and the "CASL compliant" lines in the email it sends.
+    - [P2] Errors on an empty submit are the browser's own bubbles; no inline messages.
+    - The contact address stays the founder's Gmail (the founder's call, 2026-10-30).
+
+- [ ] **A128 · Legal pages are hard to read** · S · risk L · screens L05, L06 · found in B23
+  - **Found:**
+    - [P2] Lines run about 93 to 109 characters on desktop (aim under 80).
+    - [P2] Headings jump h2 to h4, and the section titles are Title Case (A124).
+
+#### Found in B23, outside the UI work
+
+- [ ] **A129 · A student can't delete their account, though the privacy policy says they can** · M · risk M · test-first · found in B23 · the founder's call (2026-10-30): build it
+  - **Where:** a new server route (for example `pages/api/account/delete.ts`) with the admin SDK; a "Delete account" section at the bottom of Settings (`components/settings/`); the landing's privacy page (`apps/landing/src/pages/privacy.tsx`) only if the promise changes.
+  - **Problem:** the privacy policy lists "Delete your account and all associated data" among a student's rights and says account data is "permanently removed within 30 days" of deletion, but the platform has no way to ask for it; a student's only route is emailing the founder.
+  - **Fix:** a "Delete account" button in Settings opens a confirmation that names what goes (semesters, assessments, notes, grades, reminders) and asks the student to type "delete". The route authenticates first (standards.md, "API routes"), requires a recent sign-in (`auth_time` within a few minutes, or the client re-authenticates first), deletes `users/{uid}` with every subcollection (`recursiveDelete`), the server-only docs keyed by the uid (`welcomeEmails`, `emailVerifications`, `uploadUsage/{uid}_*`, `notifications` records), then the Auth user, and logs failures with the uid only. The client signs out and lands on the marketing site. Test the deletion list on the emulators: a seeded user with every kind of doc leaves nothing behind.
+  - **Done when:** a student can delete their account from Settings, nothing keyed by their uid remains in Firestore or Auth, and the rules suite and tests pass.
 
 ### Cleanup
 

@@ -5,6 +5,8 @@ import { existsSync, readFileSync } from "node:fs";
 
 const TEXT_FILE = /\.(ts|tsx|js|mjs|cjs|css|md|json|yml|yaml|rules|html)$/;
 const SKIPPED = new Set(["package-lock.json"]);
+// Vendored third-party text: not our writing, and editing it would break the next update.
+const VENDORED = [".claude/skills/impeccable/"];
 
 // These suites test how the code handles emoji in user text, so they need real ones.
 const EMOJI_ALLOWED = new Set([
@@ -23,7 +25,11 @@ const files = execFileSync("git", ["ls-files", "--cached", "--others", "--exclud
 })
   .split("\n")
   .filter(
-    (file) => TEXT_FILE.test(file) && !SKIPPED.has(file.split("/").pop()) && existsSync(file),
+    (file) =>
+      TEXT_FILE.test(file) &&
+      !SKIPPED.has(file.split("/").pop()) &&
+      !VENDORED.some((dir) => file.startsWith(dir)) &&
+      existsSync(file),
   );
 
 const problems = [];

@@ -13,3 +13,5 @@ firebase-adminsdk*.json
 # Firebase emulator logs (`npm run test:rules` writes them where it runs)
 firebase-debug.log
 firestore-debug.log
+# Impeccable's working files (the skill itself is vendored in .claude/skills/impeccable)
+.impeccable/

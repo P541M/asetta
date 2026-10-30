@@ -23,3 +23,6 @@
 *.mp4 binary
 *.webm binary
 *.pdf binary
+
+# Windows batch files need CRLF: cmd misreads goto labels in LF files.
+*.cmd text eol=crlf

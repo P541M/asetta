@@ -31,9 +31,11 @@ Each fact has one home. Link to it; don't restate it.
 | `apps/web/CLAUDE.md`     | Platform: where things live, how to verify a UI change.                                     |
 | `apps/web/standards.md`  | Platform code and UI rules. The source of truth for how platform code is written.          |
 | `apps/landing/CLAUDE.md` | Marketing site: stack, structure and design system.                                         |
+| `PRODUCT.md`             | Product facts for both apps (users, purpose, brand commitments, the WCAG 2.2 AA bar), read by the Impeccable design skill. No UI rules. |
+| `.claude/skills/impeccable/` | The vendored Impeccable design skill (`/impeccable audit`, `critique` and the rest). Source, pin and update steps: `docs/ops.md`, "Impeccable". |
 | `docs/AUDIT.md`          | The work tracker: open items with permanent IDs, the batch order, the latest baseline numbers. Read it before starting a batch; update it before ending a session. |
 | `docs/AUDIT-archive.md`  | Done items in full, answered decisions, past baselines and the session log. Read it when you need history. |
-| `docs/ops.md`            | Vercel projects, the reminder cron, the env matrix, Firestore rules deploy, the `npm audit` policy, npm workspace and Windows gotchas. |
+| `docs/ops.md`            | Vercel projects, the reminder cron, the env matrix, Firestore rules deploy, the Impeccable skill, the `npm audit` policy, npm workspace and Windows gotchas. |
 | `docs/superpowers/`      | In-flight plans and specs only; the folder exists only while something is in flight. Delete them in the PR that ships the work; the rules they produce go into the rules files. |
 | `.github/workflows/ci.yml` | One CI job covering both apps: the verification loop.                                     |
 | `.github/workflows/reminders.yml` | Calls the reminder endpoint every 30 minutes (needs the `CRON_SECRET` Actions secret; `docs/ops.md`). |

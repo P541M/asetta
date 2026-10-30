@@ -432,7 +432,25 @@ a tier, the ramp is wrong: update it here, don't invent a sixth size at the call
 - Existing `aria-label`s and form semantics are preserved or improved, never dropped.
 - Touch targets at least 44px on mobile.
 - Motion is subtle and respects `prefers-reduced-motion`.
+- Contrast meets WCAG 2.2 AA in both themes: 4.5:1 for text under 18px (placeholders and text
+  on tinted chips included), 3:1 for large text and the edges of controls.
 - Manually verified in **both themes** and at mobile width before the task is called done.
+
+**Windows and macOS checklist.** Run it on each screen a change touches, on Windows (Chrome,
+Edge, Firefox) and macOS (Safari, Chrome); where no Mac is at hand, Playwright's WebKit stands in
+for Safari, and the PR says so.
+
+- Text renders in Manrope, not a fallback, and stays sharp at 125% and 150% display scaling (the
+  usual Windows laptop settings).
+- Native controls (date, time, select, checkbox, file input) show their whole value in every
+  browser (Firefox draws date and time fields wider than Chrome) and follow the theme in dark mode.
+- A keyboard shortcut hint names the modifier of the viewer's OS (Ctrl on Windows, Cmd on macOS),
+  or there is no hint.
+- Nothing is reachable by hover only: a touch laptop or phone has a visible way to every control,
+  and focus rings show for the keyboard.
+- File picking and drag and drop work from File Explorer and from Finder.
+- At 320, 375 and 390px: no sideways scroll, 44px targets, and nothing hidden behind the bottom
+  nav or the on-screen keyboard.
 
 ### Theme control and context switchers
 
