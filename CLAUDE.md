@@ -71,7 +71,7 @@ All six green. CI runs the same steps. Also run `npm run test:rules` after any c
 
 The apps link to each other by URL only; no shared code.
 - `apps/landing/src/lib/site.ts`: `APP_URL` (`https://asetta.me`). Login/register links and the `/login` and `/register` redirects in `apps/landing/next.config.ts` point here.
-- `apps/web/next.config.ts`: production redirects `/`, `/terms`, `/privacy` (and `/legal/*`) to `https://www.asetta.me`.
+- `apps/web/next.config.ts`: redirects `/terms`, `/privacy` (and `/legal/*`) to `https://www.asetta.me`, and `/` too in a production build (`VERCEL_ENV`; previews and dev go to `/login`, `docs/ops.md`).
 
 Change one side and you probably need to change the other.
 

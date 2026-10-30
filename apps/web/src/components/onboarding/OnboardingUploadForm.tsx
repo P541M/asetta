@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback } from "react";
+import React, { useState, useRef, useCallback, useEffect } from "react";
 import {
   CircleAlert,
   CircleCheck,
@@ -32,12 +32,14 @@ interface OnboardingUploadFormProps {
   semesterId: string;
   semesterName?: string;
   onUploadSuccess: (results: ExtractionResult) => void;
+  onBusyChange?: (busy: boolean) => void;
   showGuidance?: boolean;
 }
 
 export function OnboardingUploadForm({
   semesterId,
   onUploadSuccess,
+  onBusyChange,
   showGuidance = false,
 }: OnboardingUploadFormProps) {
   const { user } = useAuth();
@@ -231,6 +233,10 @@ export function OnboardingUploadForm({
   };
 
   const isBusy = uploadStatus === "uploading" || uploadStatus === "processing";
+
+  useEffect(() => {
+    onBusyChange?.(isBusy);
+  }, [isBusy, onBusyChange]);
 
   return (
     <div className="w-full">

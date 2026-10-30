@@ -1,46 +1,26 @@
 import type { NextConfig } from "next";
 
+const MARKETING_URL = "https://www.asetta.me";
+
 const config: NextConfig = {
   reactStrictMode: true,
   async redirects() {
-    // Locally, "/" goes to the login page instead of the production landing site
-    // (non-permanent so browsers never cache a 308 for localhost).
-    if (process.env.NODE_ENV === "development") {
-      return [
-        {
-          source: "/",
-          destination: "/login",
-          permanent: false,
-        },
-      ];
-    }
+    // VERCEL_ENV, not NODE_ENV: Vercel builds previews with NODE_ENV=production too, and a
+    // preview's "/" must open its own login page, not the live marketing site. Locally it is unset.
+    const isProduction = process.env.VERCEL_ENV === "production";
+    // Browsers cache a 308, so only production's are permanent.
+    const permanent = isProduction;
     return [
       {
         source: "/",
-        destination: "https://www.asetta.me",
-        permanent: true,
+        destination: isProduction ? MARKETING_URL : "/login",
+        permanent,
       },
-      {
-        source: "/legal/terms",
-        destination: "https://www.asetta.me/terms",
-        permanent: true,
-      },
-      {
-        source: "/legal/privacy",
-        destination: "https://www.asetta.me/privacy",
-        permanent: true,
-      },
-      // Also handle direct /terms and /privacy routes for consistency
-      {
-        source: "/terms",
-        destination: "https://www.asetta.me/terms",
-        permanent: true,
-      },
-      {
-        source: "/privacy",
-        destination: "https://www.asetta.me/privacy",
-        permanent: true,
-      },
+      // The legal pages live only on the marketing site, so every environment sends them there.
+      { source: "/legal/terms", destination: `${MARKETING_URL}/terms`, permanent },
+      { source: "/legal/privacy", destination: `${MARKETING_URL}/privacy`, permanent },
+      { source: "/terms", destination: `${MARKETING_URL}/terms`, permanent },
+      { source: "/privacy", destination: `${MARKETING_URL}/privacy`, permanent },
     ];
   },
 };

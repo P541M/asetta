@@ -8,27 +8,15 @@ import { StepNavigation } from "../ui/StepNavigation";
 import { OnboardingUploadForm } from "../OnboardingUploadForm";
 import { Alert, AlertDescription, AlertTitle } from "../../ui/alert";
 import CourseColorPicker from "../../ui/CourseColorPicker";
-import { ExtractionResult } from "../../../types/upload";
 
 export function UploadStep() {
   const { user } = useAuth();
   const { state, setUploadComplete } = useOnboarding();
-  const [hasAttemptedUpload, setHasAttemptedUpload] = useState(false);
   const [colorError, setColorError] = useState<string | null>(null);
+  // Moving on mid-upload would leave the step while the server still saves the assessments
+  const [isUploading, setIsUploading] = useState(false);
 
   const { courseColors, setCourseColor } = useCourseColors(user, state.createdSemesterId ?? "");
-
-  const handleUploadSuccess = (results: ExtractionResult) => {
-    setUploadComplete(results);
-    setHasAttemptedUpload(true);
-  };
-
-  const handleSkipUpload = () => {
-    // Allow skipping if they haven't attempted upload yet
-    if (!hasAttemptedUpload) {
-      setHasAttemptedUpload(true);
-    }
-  };
 
   const handleColorSelect = async (courseName: string, color: string) => {
     setColorError(null);
@@ -63,7 +51,8 @@ export function UploadStep() {
           <OnboardingUploadForm
             semesterId={state.createdSemesterId}
             semesterName={state.semesterData.name}
-            onUploadSuccess={handleUploadSuccess}
+            onUploadSuccess={setUploadComplete}
+            onBusyChange={setIsUploading}
             showGuidance={true}
           />
         </div>
@@ -119,11 +108,8 @@ export function UploadStep() {
       )}
 
       <StepNavigation
-        canGoNext={state.hasCompletedUpload || hasAttemptedUpload}
+        canGoNext={!isUploading}
         nextLabel={state.hasCompletedUpload ? "Complete setup" : "Continue without upload"}
-        showSkip={!state.hasCompletedUpload && !hasAttemptedUpload}
-        skipLabel="Skip for now"
-        onSkip={handleSkipUpload}
       />
     </div>
   );
