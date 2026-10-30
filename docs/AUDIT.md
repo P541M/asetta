@@ -23,7 +23,7 @@ items off and add a session log entry to docs/AUDIT-archive.md when done. Don't 
 
 **Rules:**
 
-- IDs are permanent. Never renumber. New items take the next free number (**next: A104, D14**); split an item as A9a/A9b.
+- IDs are permanent. Never renumber. New items take the next free number (**next: A105, D14**); split an item as A9a/A9b.
 - Dropped items move to the archive struck through with a reason: `~~A24~~ dropped: <why>`.
 - Line numbers in items drift. Search by symbol name.
 - One theme per branch and PR.
@@ -48,11 +48,11 @@ Answered decisions are in the archive ("Answered decisions"); an item that depen
 | 1 | B23 | A89, A99, A100 (audit phase only) | UI/UX audit: Impeccable, Windows and macOS, mobile | Read-only. It turns "improve the UI" into a list of findings per screen, filed as new items, so B26 has a plan and B25 knows which components the UI work will touch. |
 | 2 | B24 | A92, A93, A24, A47 | Cleanup sweep: test names, comments, dead code | Mechanical, no behavior change. Shrinks the code before B25 simplifies it. A47's 5-day wait ended long ago. |
 | 3 | B25 | A94, A95, A21, A22, A23, A83 | Simplify and modularize | Test-first wherever logic moves. Before the UI work so each screen is restyled once, in its final files. A83 is the last stray user-doc read. Expect 2 or 3 PRs, one per area. |
-| 4 | B26 | A89, A99, A100 (fixes), A66, A69 | UI/UX implementation | One screen or theme per PR, from B23's findings. A66 and A69 are UI items already on the list. |
+| 4 | B26 | A89, A99, A100 (fixes), A66, A69, A103, A104 | UI/UX implementation | One screen or theme per PR, from B23's findings. A66 and A69 are UI items already on the list; A103 and A104 are the accent color's use and contrast (founder, 2026-10-30: with the redesign). |
 | 5 | B27 | A96, A25, A33, A62 | Deprecated and outdated dependencies | One major per PR. `@google/generative-ai` is Google's retired SDK and runs the core feature (extraction): if it starts failing, its move to `@google/genai` jumps the queue. Do Tiptap 3 before B26 restyles the notes editor. |
 | any | B28 | A98 | One domain | D13 decided: the platform moves to `app.asetta.me`. Touches only config, env and cross-app links, so it can run beside any batch. |
 | any | B29 | A90, A27, A68 | Landing polish: Lenis, GIFs to video, tests | The landing shares no code with the platform, so this runs beside any batch. |
-| any | | A101 (the founder reads the docs), A103, A14 (a manual check), A26, A28, A39, A40, A42, A45, A46, A49, A52, A55, A57 to A61, A63, A64, A70 to A73, A80, A81, A82, A85 | Remaining items | As time allows. Founder calls first: D12, A73, A80, A81 and A85. A64 once the D11 marker has `finishedAt`; A71 only if spam arrives. |
+| any | | A101 (the founder reads the docs), A14 (a manual check), A26, A28, A39, A40, A42, A45, A46, A49, A52, A55, A57 to A61, A63, A64, A70 to A73, A80, A81, A82, A85 | Remaining items | As time allows. Founder calls first: D12, A73, A80, A81 and A85. A64 once the D11 marker has `finishedAt`; A71 only if spam arrives. |
 
 ## Open items
 
@@ -66,6 +66,12 @@ None open outside "Backend and earlier items".
   - **Where:** the count badge beside each day number in `apps/web/src/components/calendar/CalendarGrid.tsx` (`bg-primary/10 text-primary`). The same 10% amber tint is on the icon tile of the onboarding step headers (`UploadStep`, and likely the other steps).
   - **Problem:** "Surface language" in `standards.md` keeps amber for primary buttons, the logo, links, focus rings and today's date. The badge uses it as decoration, and beside today's solid amber circle (A86) it puts two ambers in today's cell.
   - **Fix:** a neutral badge (a `secondary` fill with `muted-foreground` text, for example), checked in both themes. Decide the onboarding icon tiles in A89's audit.
+
+- [ ] **A104 · White on amber is below AA contrast in light mode** · S · risk L · UI · found during B22 (`/code-review`) · B26
+  - **Where:** the light theme's `--primary` (#d97706) with `--primary-foreground` (#ffffff) in `apps/web/src/styles/globals.css`: primary buttons, and today's number in the calendar (A86).
+  - **Problem:** about 3.2:1, below WCAG AA's 4.5:1 for text under 18px (14px button labels, the calendar's day number). Dark mode (#f59e0b with #1a1a1a) is about 9:1.
+  - **Fix:** in the redesign, a light-mode pair that reaches 4.5:1 (dark text on amber, or a deeper amber such as `--primary-hover` #b45309, about 5:1, for filled surfaces), checked on every primary button and the calendar in both themes.
+  - **Done when:** every white-on-amber text in light mode reaches 4.5:1, or is 18px and up (3:1).
 
 - [ ] **A89 · UI/UX pass with Impeccable** · L · risk M · audit first (B23), then fixes per screen (B26)
   - **Where:** every platform screen: auth pages, onboarding, the dashboard tabs (Assessments, Courses, Calendar, Grades, Upload), the notes editor, Settings and the overlays.
