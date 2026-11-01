@@ -1,13 +1,11 @@
 /**
  * Shared inline SVG icons. Each accepts a className so call sites keep their
- * exact sizing/colors; path data must not change (icons render byte-identical
- * to the inline SVGs they replaced).
+ * exact sizing/colors.
  */
 interface IconProps {
   className?: string;
 }
 
-/** Clipboard/notes icon (solid). */
 export const NotesIcon = ({ className }: IconProps) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
@@ -24,7 +22,6 @@ export const NotesIcon = ({ className }: IconProps) => (
   </svg>
 );
 
-/** Pencil/edit icon (solid). */
 export const EditIcon = ({ className }: IconProps) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
@@ -36,7 +33,6 @@ export const EditIcon = ({ className }: IconProps) => (
   </svg>
 );
 
-/** Trash icon (solid). */
 export const TrashIcon = ({ className }: IconProps) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"

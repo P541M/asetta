@@ -24,7 +24,6 @@ export function ProfileStep() {
 
   return (
     <div className="mx-auto max-w-lg">
-      {/* Header */}
       <div className="mb-8 text-center">
         <div className="mx-auto mb-4 flex size-16 items-center justify-center rounded-xl bg-primary/10">
           <UserRound className="size-8 text-primary" aria-hidden />
@@ -35,14 +34,11 @@ export function ProfileStep() {
         <p className="text-muted-foreground">Add some basic info to personalize your experience.</p>
       </div>
 
-      {/* Avatar */}
       <div className="mb-8 flex justify-center">
         <Avatar size="lg" name={user?.displayName || user?.email || undefined} />
       </div>
 
-      {/* Form */}
       <div className="space-y-6">
-        {/* Institution */}
         <div className="space-y-1.5">
           <Label htmlFor="institution">
             Institution <span className="text-destructive">*</span>

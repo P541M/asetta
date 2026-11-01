@@ -23,7 +23,7 @@ const NO_ASSESSMENTS: Assessment[] = [];
 /**
  * Live assessments for the selected semester (Firestore onSnapshot), plus the
  * derived course list and dashboard stats. Every dashboard tab reads this one
- * listener (A11).
+ * listener.
  *
  * The subscription is keyed on user + semester only. Each snapshot is stored with
  * the user and semester it belongs to, so after a switch no tab shows (or edits) the last

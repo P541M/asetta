@@ -1,6 +1,6 @@
 /**
  * Pure date math for the reminder cron (lib/notifications.ts): which reminders a run sends, and
- * when to look at a user again. Reminders go out at 9:30 in each user's own time zone (D4).
+ * when to look at a user again. Reminders go out at 9:30 in each user's own time zone.
  *
  * A reminder belongs to a target day, N calendar days before the due date. From 9:30 that day, in
  * the user's zone, every run sends it until it has gone out (lib/reminderCron.ts keeps the record),
@@ -12,7 +12,7 @@ import { isValidTimeZone } from "../utils/timeZone";
 import { RETRY_DELAY_MS } from "./reminderCron";
 import { DEFAULT_DUE_TIME, parseDueDate, parseDueTime } from "./upload/normalize";
 
-/** For users without a stored zone: everyone who hasn't signed in since A8. */
+/** For users without a stored zone: no sign-in since sign-in started saving the zone. */
 export const DEFAULT_TIME_ZONE = "America/Toronto";
 const REMINDER_HOURS = 9;
 const REMINDER_MINUTES = 30;
@@ -38,7 +38,7 @@ export interface ReminderSettings {
 
 export interface DueReminder {
   assessmentId: string;
-  /** The local day the reminder belongs to (YYYY-MM-DD); its record ID ends with it (A38). */
+  /** The local day the reminder belongs to (YYYY-MM-DD); its record ID ends with it. */
   targetDay: string;
   /** Calendar days from the user's local today to the due date, as the UI counts them. */
   daysUntilDue: number;
@@ -101,7 +101,7 @@ export function dueReminders({
 
   const reminders: DueReminder[] = [];
   for (const assessment of assessments) {
-    if (assessment.needsReview) continue; // the date is a placeholder (B8)
+    if (assessment.needsReview) continue; // the date is a placeholder
     if (assessment.status === "Missed") continue;
     if (assessment.status === "Submitted" && !settings.notifySubmitted) continue;
 
@@ -129,7 +129,7 @@ export function dueReminders({
 /**
  * The due dates (YYYY-MM-DD, inclusive) whose reminder a run at `now` may send: the reminder day
  * is today in the user's zone or one of the catch-up days before it. The cron reads only the
- * assessments due in this range (A19); `dueReminders` then decides which go out.
+ * assessments due in this range; `dueReminders` then decides which go out.
  */
 export function reminderDueDates(
   timeZone: string,

@@ -24,7 +24,7 @@ const LINK_FEEDBACK: Partial<Record<ConfirmLinkRequest, string>> = {
 const captionClass = "flex items-start gap-2 text-xs font-medium text-muted-foreground";
 
 /**
- * Where reminders go for the address in the Notifications card (A17): a chosen address gets them
+ * Where reminders go for the address in the Notifications card: a chosen address gets them
  * only once its owner confirms it through the emailed link; until then they go to the account
  * email.
  */

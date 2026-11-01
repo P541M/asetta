@@ -5,13 +5,11 @@ import { Label } from "../ui/label";
 const ProfileSection = ({ form, onChange }: ProfileSectionProps) => {
   return (
     <div className="space-y-8">
-      {/* Section header */}
       <div className="border-b border-border pb-4">
         <h3 className="text-base font-semibold text-foreground">Profile information</h3>
         <p className="mt-1 text-sm text-muted-foreground">Update your profile details</p>
       </div>
 
-      {/* Profile fields */}
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         <div className="space-y-1.5">
           <Label htmlFor="displayName">Display name</Label>

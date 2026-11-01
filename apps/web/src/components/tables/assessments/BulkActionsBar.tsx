@@ -24,7 +24,6 @@ const BulkActionsBar = ({
   onClearSelection,
 }: BulkActionsBarProps) => (
   <div className="mb-4 rounded-xl bg-primary/10 p-4 motion-safe:animate-fade-in">
-    {/* Mobile Layout */}
     <div className="lg:hidden space-y-4">
       <p className="text-center text-sm font-medium text-primary">
         {selectedCount} {selectedCount === 1 ? "item" : "items"} selected
@@ -58,7 +57,6 @@ const BulkActionsBar = ({
       </div>
     </div>
 
-    {/* Desktop Layout */}
     <div className="hidden lg:flex items-center justify-between gap-4">
       <div className="flex items-center gap-4">
         <span className="text-sm font-medium text-primary">

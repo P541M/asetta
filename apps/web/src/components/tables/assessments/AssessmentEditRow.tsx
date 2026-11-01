@@ -32,7 +32,6 @@ const AssessmentEditRow = ({
   showWeight,
 }: AssessmentEditRowProps) => (
   <div className="rounded-xl bg-secondary/50 p-4 motion-safe:animate-fade-in lg:py-3">
-    {/* Mobile Edit Form */}
     <div className="lg:hidden space-y-4">
       <div className="flex items-center gap-3">
         <Checkbox

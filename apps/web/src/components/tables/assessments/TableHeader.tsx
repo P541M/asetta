@@ -35,7 +35,6 @@ const TableHeader = ({
       {showWeight && <span className={`${headerLabelClass} text-right`}>Weight</span>}
     </div>
 
-    {/* Mobile Select All Header */}
     <div className="lg:hidden flex items-center justify-between px-4 py-2">
       <div className="flex items-center gap-3">
         <Checkbox

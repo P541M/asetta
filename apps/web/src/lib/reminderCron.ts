@@ -10,7 +10,7 @@ export function isCronAuthorized(
 }
 
 /**
- * How many due users a run handles at once (A19). One user's reads and sends still run one after
+ * How many due users a run handles at once. One user's reads and sends still run one after
  * another, and every email goes through the run's few Gmail connections (lib/email.ts).
  */
 export const USERS_AT_ONCE = 10;

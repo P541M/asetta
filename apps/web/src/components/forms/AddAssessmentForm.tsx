@@ -18,7 +18,7 @@ const AddAssessmentForm = ({ semesterId }: AddAssessmentFormProps) => {
     courseName: "",
     assignmentName: "",
     dueDate: getTodayDateString(),
-    dueTime: "23:59", // Default to 11:59 PM
+    dueTime: "23:59",
     weight: 0,
     status: "Not started" as AssessmentStatus,
   });

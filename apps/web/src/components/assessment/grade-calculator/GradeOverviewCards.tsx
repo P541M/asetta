@@ -46,7 +46,6 @@ const GradeOverviewCards = ({
 
   return (
     <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
-      {/* Current grade */}
       <div className="flex flex-col rounded-xl bg-secondary/50 p-4">
         <div className="flex min-h-5 items-center justify-between gap-2">
           <h3 className="text-xs font-medium text-muted-foreground">Current grade</h3>
@@ -85,7 +84,6 @@ const GradeOverviewCards = ({
         )}
       </div>
 
-      {/* Course weight */}
       <div className="flex flex-col rounded-xl bg-secondary/50 p-4">
         <div className="flex min-h-5 items-center">
           <h3 className="text-xs font-medium text-muted-foreground">Course weight</h3>
@@ -113,7 +111,6 @@ const GradeOverviewCards = ({
         </p>
       </div>
 
-      {/* Target grade & projection */}
       <div className="flex flex-col rounded-xl bg-secondary/50 p-4">
         <div className="flex min-h-5 items-center">
           <h3 className="text-xs font-medium text-muted-foreground">Target grade</h3>

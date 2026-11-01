@@ -9,7 +9,7 @@ export function isValidTimeZone(zone: unknown): zone is string {
   }
 }
 
-/** The browser's IANA zone, saved on the user doc for reminders at 9:30 local (A8); null if unusable. */
+/** The browser's IANA zone, saved on the user doc for reminders at 9:30 local; null if unusable. */
 export function browserTimeZone(): string | null {
   try {
     const zone = Intl.DateTimeFormat().resolvedOptions().timeZone;

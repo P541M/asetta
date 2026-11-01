@@ -46,9 +46,7 @@ const AssessmentRow = ({
   onDeleteClick,
 }: AssessmentRowProps) => (
   <div className="rounded-xl bg-secondary/50 p-4 transition-colors hover:bg-accent/50 lg:py-3">
-    {/* Mobile Card Layout */}
     <div className="lg:hidden space-y-4">
-      {/* Header with checkbox and status */}
       <div className="flex items-center gap-3">
         <Checkbox
           checked={isSelected}
@@ -76,7 +74,6 @@ const AssessmentRow = ({
         <h3 className="text-base font-semibold text-foreground">{assessment.assignmentName}</h3>
       </div>
 
-      {/* Due Date Info */}
       <div className="space-y-1.5">
         <p className="text-sm text-muted-foreground">
           Due {formatLocalDateTime(assessment.dueDate, assessment.dueTime)}
@@ -100,7 +97,6 @@ const AssessmentRow = ({
         )}
       </div>
 
-      {/* Action Buttons */}
       <div className="flex items-center justify-end gap-1">
         {showNotes && (
           <Button

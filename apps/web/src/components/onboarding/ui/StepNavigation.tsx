@@ -55,7 +55,6 @@ export function StepNavigation({
 
   return (
     <div className="mt-8 flex items-center justify-between border-t border-border pt-6">
-      {/* Back button */}
       <div>
         {state.currentStep > 1 && canGoBack && (
           <Button type="button" variant="secondary" onClick={handleBack} disabled={isLoading}>
@@ -65,7 +64,6 @@ export function StepNavigation({
         )}
       </div>
 
-      {/* Skip button (centered) */}
       <div>
         {showSkip && (
           <Button
@@ -80,7 +78,6 @@ export function StepNavigation({
         )}
       </div>
 
-      {/* Next button */}
       <div>
         <Button type="button" onClick={handleNext} disabled={!canGoNext || isLoading}>
           {isLoading ? (

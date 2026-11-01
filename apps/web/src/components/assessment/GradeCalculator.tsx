@@ -26,7 +26,7 @@ import AssessmentBreakdown from "./grade-calculator/AssessmentBreakdown";
 interface GradeCalculatorProps {
   semesterId: string;
   selectedCourse: string | null;
-  /** The semester's assessments, live from the dashboard's listener (A11). */
+  /** The semester's assessments, live from the dashboard's listener. */
   assessments: Assessment[];
   onAutoSaveStatusChange?: (status: "idle" | "saving" | "saved" | "error", error?: string) => void;
 }
@@ -39,7 +39,6 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
 }) => {
   const { user } = useAuth();
 
-  // Course preferences hook for target grade
   const {
     preferences: coursePreferences,
     loading: preferencesLoading,
@@ -56,7 +55,6 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
     error: saveError,
   } = useAssessmentAutoSave(user, semesterId);
 
-  // Notify parent of auto-save status changes
   useEffect(() => {
     onAutoSaveStatusChange?.(saveStatus, saveError || undefined);
   }, [saveStatus, saveError, onAutoSaveStatusChange]);
@@ -89,7 +87,7 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
 
   const handleMarkChange = (assessmentId: string, value: string) => {
     const marked = applyMarkInput(assessments, assessmentId, value);
-    // Text with no number changes nothing, so nothing is queued (A79)
+    // Text with no number changes nothing, so nothing is queued
     if (marked === assessments) return;
     const edited = marked.find((assessment) => assessment.id === assessmentId);
     if (edited?.id) {
@@ -114,7 +112,7 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
     });
   };
 
-  // The target as typed: shown and projected at once, saved only when the field is left (A76).
+  // The target as typed: shown and projected at once, saved only when the field is left.
   // The ref lets the cleanup below read the draft without re-running on each keystroke.
   const [typedTarget, setTypedTarget] = useState<number | null>(null);
   const typedTargetRef = useRef<number | null>(null);
@@ -190,7 +188,6 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
         </Alert>
       )}
 
-      {/* Grade Overview Cards */}
       <GradeOverviewCards
         currentGrade={currentGrade}
         totalWeight={totalWeight}
@@ -201,7 +198,6 @@ const GradeCalculator: React.FC<GradeCalculatorProps> = ({
         requiredGrade={requiredGrade}
       />
 
-      {/* Assessment Breakdown */}
       <AssessmentBreakdown
         assessments={assessments}
         onWeightChange={handleWeightChange}

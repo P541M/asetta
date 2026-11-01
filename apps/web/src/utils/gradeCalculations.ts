@@ -13,7 +13,7 @@ export interface GradeInfo {
 /**
  * The mark an assessment counts toward the grade with, or null while it is still to be
  * graded. A completed assessment counts with its mark; a Missed one without a mark counts
- * as 0 (D1 in docs/AUDIT.md).
+ * as 0.
  */
 const countedMark = (a: Assessment): number | null => {
   if (!isCompletedStatus(a.status)) return null;
@@ -67,9 +67,9 @@ export function calculateRequiredGrade(
 /**
  * The grades tab's mark edit: an empty field clears the mark, and a number is floored at 0 with
  * no cap (bonus marks). Other text with no number ("-", the "." of ".5") changes nothing and
- * returns `assessments` itself, so it saves no 0 (A79). Entering a mark makes a Not started or
+ * returns `assessments` itself, so it saves no 0. Entering a mark makes a Not started or
  * In progress assessment Submitted; Submitted and Missed keep their status, and clearing a mark
- * never changes it (A41), so a stray keystroke can't turn a Missed assessment into a Submitted one.
+ * never changes it, so a stray keystroke can't turn a Missed assessment into a Submitted one.
  */
 export function applyMarkInput(
   assessments: Assessment[],
@@ -139,7 +139,7 @@ export const resolveTargetGrade = (preferences: CoursePreferences | null): numbe
 /**
  * A target or weight field's text as a percentage from 0 to 100, or null when there is no
  * number in it. Deleting a value to retype it leaves no number for a moment, and that must not
- * save 0 (A43, A78); the field snaps back to the saved value on blur.
+ * save 0; the field snaps back to the saved value on blur.
  */
 export const parsePercentInput = (raw: string): number | null => {
   const value = parseFloat(raw);
@@ -149,7 +149,7 @@ export const parsePercentInput = (raw: string): number | null => {
 /**
  * What leaving the target-grade field saves: the typed target, or null when the field was
  * left without a number (the saved target stays) or with the saved target itself. The field
- * saves only when left, never per keystroke (A76).
+ * saves only when left, never per keystroke.
  */
 export const targetToSave = (typed: number | null, saved: number): number | null =>
   typed === null || typed === saved ? null : typed;
@@ -157,8 +157,8 @@ export const targetToSave = (typed: number | null, saved: number): number | null
 /**
  * The grades tab's weight edit for `assessment` as shown (unsaved edits included). A field with
  * no number goes back to `savedWeight`, or saves nothing when it is already there: deleting
- * "10" digit by digit queues 1 on the way, and the empty field must not leave that to save
- * (A78). The mark and status go along unchanged.
+ * "10" digit by digit queues 1 on the way, and the empty field must not leave that to save.
+ * The mark and status go along unchanged.
  */
 export function weightEdit(
   assessment: Assessment,
@@ -176,7 +176,7 @@ export type BreakdownStatus = "submitted" | "missed" | "review" | "overdue" | "p
 /**
  * Which marker a breakdown row shows; overdue is derived from the due date, not stored. A
  * Missed assessment says so whatever its date, since the grade counts it (as 0 without a mark).
- * An open flagged assessment's date is a placeholder (D10), so it is never overdue (A75).
+ * An open flagged assessment's date is a placeholder, so it is never overdue.
  */
 export function breakdownStatus(assessment: Assessment, now: Date): BreakdownStatus {
   if (assessment.status === "Submitted") return "submitted";
@@ -225,7 +225,7 @@ export function requiredGradeView(required: number): RequiredGradeView {
 }
 
 // Three semantic tints instead of five raw-palette bands: A reads as success,
-// B/C as the neutral amber, D/F as trouble (2026-07-15 judgment call).
+// B/C as the neutral amber, D/F as trouble.
 const successTint = "bg-success/10 text-success";
 const primaryTint = "bg-primary/10 text-primary";
 const destructiveTint = "bg-destructive/10 text-destructive";

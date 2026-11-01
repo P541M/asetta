@@ -27,7 +27,7 @@ const COPY = {
 };
 
 /**
- * The page a notification address's confirm link opens (A17). Confirming takes a button press,
+ * The page a notification address's confirm link opens. Confirming takes a button press,
  * not the page load: mail scanners fetch links in emails, and a fetch must not confirm.
  */
 const ConfirmEmail = () => {

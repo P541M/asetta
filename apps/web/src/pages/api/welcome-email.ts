@@ -49,7 +49,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(400).json({ error: "No email address on this account" });
   }
 
-  // D7: password sign-ups never verify their address, so anyone can register someone else's.
+  // Password sign-ups never verify their address, so anyone can register someone else's.
   // Only a verified address (Google sign-ups) gets the name; that keeps text the account holder
   // chose out of other people's inboxes.
   const body = (req.body ?? {}) as { displayName?: unknown };

@@ -6,7 +6,7 @@ import { Input } from "../../ui/input";
 import LoadingSpinner from "../../ui/LoadingSpinner";
 import { useScrollLock } from "../../../hooks/useScrollLock";
 
-/** The list's chunk (dnd-kit). SemesterTabs fetches it when the semester menu opens (A15). */
+/** The list's chunk (dnd-kit). SemesterTabs fetches it when the semester menu opens. */
 export const loadSortableSemesterList = () => import("./SortableSemesterList");
 
 /** The list still loading: nothing for the first 200 ms, then a spinner. */

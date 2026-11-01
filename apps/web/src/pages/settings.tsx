@@ -13,7 +13,6 @@ const SettingsPage = () => {
   const router = useRouter();
   const { user, loading, userDocError, logout } = useAuth();
 
-  // Redirect to login if not authenticated
   useEffect(() => {
     if (!loading && !user) {
       router.push("/login");

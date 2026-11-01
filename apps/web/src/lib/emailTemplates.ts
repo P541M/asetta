@@ -207,7 +207,7 @@ ${course ? `<p class="muted" style="margin:0;${BODY_MUTED}">${escapeHtml(course)
   return { subject, html, text };
 }
 
-/** Pass `name` only for a verified address (D7); without it the email greets "Hi there". */
+/** Pass `name` only for a verified address; without it the email greets "Hi there". */
 export function welcomeEmail(name?: string, appUrl = DEFAULT_APP_URL): EmailContent {
   const cleanName = name ? oneLine(name) : "";
   const heading = "Welcome to Asetta";
@@ -243,7 +243,7 @@ ${paragraphs.map((line) => `<p class="fg" style="margin:16px 0 0 0;${BODY}">${li
 }
 
 /**
- * The confirm link for a notification address (A17). It goes to an address the student typed,
+ * The confirm link for a notification address. It goes to an address the student typed,
  * which may not be theirs, so it carries no text they chose: only the link.
  */
 export function confirmAddressEmail(confirmUrl: string, appUrl = DEFAULT_APP_URL): EmailContent {

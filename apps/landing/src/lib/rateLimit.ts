@@ -1,5 +1,5 @@
 /**
- * A per-key sliding-window limit held in memory (the contact form's per-IP limit, A20).
+ * A per-key sliding-window limit held in memory (the contact form's per-IP limit).
  *
  * On Vercel the state lives in one function instance: a warm instance serves many requests in a
  * row, so this stops one client resubmitting in a loop, but a cold start forgets it and parallel

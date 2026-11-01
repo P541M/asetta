@@ -15,7 +15,7 @@
   @apply mb-4;
 }
 
-/* pl-6 keeps outside-positioned markers inside the text area (pl-4 clipped them) */
+/* pl-6 keeps outside-positioned markers inside the text area (pl-4 clips them) */
 .rich-text-editor .ProseMirror ul {
   @apply mb-4 list-disc pl-6;
 }

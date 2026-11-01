@@ -21,7 +21,6 @@ const PreferencesSection = ({ prefs, onPrefChange }: PreferencesSectionProps) =>
 
   return (
     <div className="space-y-8">
-      {/* Appearance */}
       <div>
         <div className="mb-6 border-b border-border pb-4">
           <h3 className="text-base font-semibold text-foreground">Appearance</h3>
@@ -55,7 +54,6 @@ const PreferencesSection = ({ prefs, onPrefChange }: PreferencesSectionProps) =>
         </div>
       </div>
 
-      {/* Data & display */}
       <div>
         <div className="mb-6 border-b border-border pb-4">
           <h3 className="text-base font-semibold text-foreground">Data & display</h3>

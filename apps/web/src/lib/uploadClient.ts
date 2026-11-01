@@ -27,7 +27,7 @@ export interface UploadApiPayload {
   error?: string;
   message?: string;
   retryAfter?: number;
-  /** "daily": Gemini's shared quota; "temporary": its rate limit; "user": the account's (A18). */
+  /** "daily": Gemini's shared quota; "temporary": its rate limit; "user": the account's. */
   quotaType?: string;
   /** With quotaType "user": the files the account can still upload today. */
   remaining?: number;
@@ -36,7 +36,7 @@ export interface UploadApiPayload {
   hasRateLimitErrors?: boolean;
 }
 
-/** The account's daily upload limit (A18), as the limit modal shows it. */
+/** The account's daily upload limit, as the limit modal shows it. */
 export interface UploadQuota {
   remaining: number;
   /** When the count starts over, on the browser's clock; null when the server didn't say. */

@@ -12,7 +12,7 @@ import { isValidDocId } from "../../../utils/validation";
 export const config = { api: { bodyParser: { sizeLimit: "1kb" } } };
 
 /**
- * Confirms a notification address with the token from its link (A17). No sign-in: the link may
+ * Confirms a notification address with the token from its link. No sign-in: the link may
  * be opened on another device, and the token is the proof. The confirm page POSTs here from a
  * button, so a mail scanner fetching the link confirms nothing. Only this route writes
  * `verifiedEmail`; the rules refuse it from clients.

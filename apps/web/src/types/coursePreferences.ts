@@ -12,7 +12,6 @@ export interface CoursePreferencesHook {
   updateTargetGrade: (targetGrade: number) => Promise<void>;
 }
 
-// Default preferences for new courses
 export const DEFAULT_COURSE_PREFERENCES: CoursePreferences = {
   targetGrade: 85,
 };

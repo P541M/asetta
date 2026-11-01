@@ -26,7 +26,6 @@ const NotificationsSection = ({ form, onChange, emailStatus }: NotificationsSect
   const [isCustomDays, setIsCustomDays] = useState(false);
   const [customDays, setCustomDays] = useState(form.notificationDaysBefore);
 
-  // Update isCustomDays when notificationDaysBefore changes
   useEffect(() => {
     const isCustom = ![1, 2, 3, 7].includes(form.notificationDaysBefore);
     setIsCustomDays(isCustom);
@@ -48,7 +47,6 @@ const NotificationsSection = ({ form, onChange, emailStatus }: NotificationsSect
   const handleCustomDaysChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value;
 
-    // Allow only digits
     if (inputValue && !/^\d+$/.test(inputValue)) {
       return;
     }
@@ -69,7 +67,6 @@ const NotificationsSection = ({ form, onChange, emailStatus }: NotificationsSect
 
   return (
     <div className="space-y-8">
-      {/* Section header */}
       <div className="border-b border-border pb-4">
         <h3 className="text-base font-semibold text-foreground">Email notifications</h3>
         <p className="mt-1 text-sm text-muted-foreground">
@@ -77,7 +74,6 @@ const NotificationsSection = ({ form, onChange, emailStatus }: NotificationsSect
         </p>
       </div>
 
-      {/* Main toggle */}
       <div className="flex items-center justify-between gap-4 rounded-xl bg-secondary/50 p-6">
         <div className="flex-1">
           <h4 className="text-base font-semibold text-foreground">Email notifications</h4>
@@ -99,7 +95,6 @@ const NotificationsSection = ({ form, onChange, emailStatus }: NotificationsSect
 
       {form.emailNotifications && (
         <div className="space-y-6">
-          {/* Email address */}
           <div className="space-y-1.5">
             <Label htmlFor="email">Notification email address</Label>
             <Input
@@ -125,7 +120,6 @@ const NotificationsSection = ({ form, onChange, emailStatus }: NotificationsSect
             {form.email && isValidEmail(form.email) && emailStatus}
           </div>
 
-          {/* Timing */}
           <div className="space-y-1.5">
             <Label id="notification-days-label">Send notifications before due date</Label>
             <DropdownMenu>

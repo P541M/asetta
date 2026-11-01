@@ -17,7 +17,6 @@ import { REGISTER_URL, SITE_DESCRIPTION, SITE_TITLE } from "@/lib/site";
 export default function LandingPage() {
   return (
     <Layout title={SITE_TITLE} description={SITE_DESCRIPTION}>
-      {/* Hero: tagline up top, product visible in the first viewport */}
       <section className="pb-24 md:pb-32">
         <Container>
           <Reveal className="mx-auto max-w-3xl pt-4 text-center md:pt-8">
@@ -46,10 +45,8 @@ export default function LandingPage() {
             </div>
           </Reveal>
 
-          {/* Dashboard preview, cresting into the first screen */}
           <Reveal delay={0.1} className="mx-auto mt-12 max-w-5xl md:mt-16">
             <div className="overflow-hidden rounded-2xl shadow-[0_32px_80px_-32px_rgb(28_25_23/0.35)]">
-              {/* macOS-style window bar */}
               <div className="relative flex items-center bg-stone-100 px-4 py-3">
                 <span className="flex gap-1.5" aria-hidden>
                   <span className="h-3 w-3 rounded-full bg-[#ff5f57]" />
@@ -85,7 +82,6 @@ export default function LandingPage() {
         </Container>
       </section>
 
-      {/* Student challenges: white tiles on a tinted band */}
       <section className="bg-stone-50 py-24 md:py-32">
         <Container>
           <SectionHeading
@@ -112,7 +108,6 @@ export default function LandingPage() {
         </Container>
       </section>
 
-      {/* Features */}
       <section id="features" className="pt-24 md:pt-32">
         <Container>
           <SectionHeading
@@ -137,7 +132,6 @@ export default function LandingPage() {
         </Container>
       </section>
 
-      {/* Closing CTA */}
       <CTAPanel
         title="Get organized today"
         lead="Organize your semesters, track your grades, and never miss a deadline. Free for students."

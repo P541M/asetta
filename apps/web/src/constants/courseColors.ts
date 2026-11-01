@@ -1,5 +1,5 @@
 /**
- * Course colors are user-chosen hex values (standards.md v4.3): stored as
+ * Course colors are user-chosen hex values: stored as
  * "#RRGGBB" in coursePreferences/{id}.color (the ID from coursePreferencesDocId in
  * utils/courseName.ts) and rendered via inline
  * style: the sanctioned exception to the tokens-only rule, because they are

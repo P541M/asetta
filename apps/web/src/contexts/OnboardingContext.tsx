@@ -14,7 +14,6 @@ import {
 } from "../types/onboarding";
 import { ExtractionResult } from "../types/upload";
 
-// Initial state
 const initialState: OnboardingState = {
   currentStep: 1,
   totalSteps: 6,
@@ -28,7 +27,6 @@ const initialState: OnboardingState = {
   showExitModal: false,
 };
 
-// Action types
 type OnboardingAction =
   | { type: "NEXT_STEP" }
   | { type: "PREV_STEP" }
@@ -42,7 +40,6 @@ type OnboardingAction =
   | { type: "SHOW_EXIT_MODAL" }
   | { type: "HIDE_EXIT_MODAL" };
 
-// Reducer
 function onboardingReducer(state: OnboardingState, action: OnboardingAction): OnboardingState {
   switch (action.type) {
     case "NEXT_STEP":
@@ -106,16 +103,14 @@ function onboardingReducer(state: OnboardingState, action: OnboardingAction): On
   }
 }
 
-// Context
 const OnboardingContext = createContext<OnboardingContextType | undefined>(undefined);
 
-// Provider component
 export function OnboardingProvider({ children }: { children: React.ReactNode }) {
   const [state, dispatch] = useReducer(onboardingReducer, initialState);
   const { user, verifiedEmail, onboardingChoices } = useAuth();
   const router = useRouter();
 
-  // The form starts from the choices on the user doc, which useAuth reads live (A54), with the
+  // The form starts from the choices on the user doc, which useAuth reads live, with the
   // student's changes on top
   const userData = useMemo(
     () => ({ ...onboardingChoices, ...state.userData }),
@@ -172,15 +167,13 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
     try {
       setLoading(true);
 
-      // Mark onboarding as completed (skipped) without saving profile data
       const userRef = doc(db, "users", user.uid);
       await updateDoc(userRef, {
         hasCompletedOnboarding: true,
         onboardingCompletedAt: new Date(),
-        onboardingSkipped: true, // Flag to indicate it was skipped
+        onboardingSkipped: true,
       });
 
-      // Hide modal and navigate to dashboard
       dispatch({ type: "HIDE_EXIT_MODAL" });
       router.push("/dashboard");
     } catch (error) {
@@ -197,7 +190,6 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
     try {
       setLoading(true);
 
-      // Update user document with onboarding completion and profile data
       const userRef = doc(db, "users", user.uid);
       await updateDoc(userRef, {
         hasCompletedOnboarding: true,
@@ -207,7 +199,7 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
         nextReminderAt: serverTimestamp(),
       });
 
-      // Another address gets reminders once confirmed through its link (A17). Not awaited:
+      // Another address gets reminders once confirmed through its link. Not awaited:
       // finishing shouldn't wait on the mail server, and Settings can send the link again.
       const unconfirmed =
         notificationEmailStatus({
@@ -217,7 +209,6 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
         }) === "unconfirmed";
       if (userData.emailNotifications && unconfirmed) void requestConfirmLink(user);
 
-      // Navigate to dashboard
       router.push("/dashboard");
     } catch (error) {
       console.error("Error completing onboarding:", error);
@@ -247,7 +238,6 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
   return <OnboardingContext.Provider value={value}>{children}</OnboardingContext.Provider>;
 }
 
-// Custom hook to use onboarding context
 export function useOnboarding() {
   const context = useContext(OnboardingContext);
   if (context === undefined) {

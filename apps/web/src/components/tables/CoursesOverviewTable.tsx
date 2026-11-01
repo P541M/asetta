@@ -33,7 +33,6 @@ const CoursesOverviewTable = ({
     onSuccess: (oldName, newName) => {
       setEditingCourse(null);
 
-      // Update navigation if user is currently viewing the renamed course
       if (router.query.course === oldName) {
         const newQuery = { ...router.query };
         newQuery.course = newName;
@@ -207,7 +206,6 @@ const CoursesOverviewTable = ({
                 </div>
               )}
 
-              {/* Quiet completion meter: amber while in progress, green when done */}
               <div className="mt-4">
                 <div className="h-1.5 w-full overflow-hidden rounded-full bg-foreground/10">
                   <div

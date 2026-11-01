@@ -9,7 +9,7 @@ import { uploadLimitResetText, type UploadQuota } from "../../lib/uploadClient";
 interface ApiLimitReachedModalProps {
   isOpen: boolean;
   onClose: () => void;
-  /** The account's own daily limit (A18); without it, the copy is about Gemini's shared quota. */
+  /** The account's own daily limit; without it, the copy is about Gemini's shared quota. */
   quota?: UploadQuota | null;
 }
 

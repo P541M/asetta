@@ -18,7 +18,7 @@ const nextConfig: NextConfig = {
         destination: REGISTER_URL,
         permanent: true,
       },
-      // Former narrative pages, merged into /about.
+      // The story and founder's note are part of /about.
       {
         source: "/story",
         destination: "/about",

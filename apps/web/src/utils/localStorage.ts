@@ -1,5 +1,3 @@
-// Utility functions for handling local storage with type safety
-
 export const getFromLocalStorage = <T>(key: string, defaultValue: T): T => {
   if (typeof window === "undefined") return defaultValue;
 

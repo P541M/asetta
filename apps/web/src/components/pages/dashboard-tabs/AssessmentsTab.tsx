@@ -24,7 +24,6 @@ const AssessmentsTab = memo(function AssessmentsTab({ data }: { data: DashboardD
     setSelectedCourse(null);
     const newQuery = { ...router.query };
     delete newQuery.course;
-    // Switch back to courses tab when clearing course selection
     newQuery.tab = "courses";
     router.replace({ pathname: router.pathname, query: newQuery }, undefined, {
       shallow: true,

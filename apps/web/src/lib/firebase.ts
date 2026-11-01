@@ -1,9 +1,8 @@
-// lib/firebase.ts
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 
 // Auth only: every page loads this through AuthContext. Firestore's `db` lives in lib/firestore.ts,
-// so pages without account data (the auth pages) never ship Firestore (A15).
+// so pages without account data (the auth pages) never ship Firestore.
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
   authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,

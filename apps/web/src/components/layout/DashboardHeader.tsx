@@ -45,7 +45,7 @@ const getTimeGreeting = () => {
 const getTodayLabel = () =>
   new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" });
 
-/** The app bar: wordmark, semester context switcher, primary action, user menu. */
+/** The app bar: greeting, semester context switcher, primary action, user menu. */
 const DashboardHeader = ({ onLogout, semesterProps, onAddAssessment }: DashboardHeaderProps) => {
   const { user, profile } = useAuth();
   const router = useRouter();

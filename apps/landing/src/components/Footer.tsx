@@ -9,7 +9,6 @@ export default function Footer() {
     <footer className="bg-stone-50">
       <Container className="pb-[calc(2.5rem+env(safe-area-inset-bottom,0px))] pt-16 md:pt-20">
         <div className="grid grid-cols-1 gap-12 sm:grid-cols-2 lg:grid-cols-4">
-          {/* Brand */}
           <div>
             <Logo href="/" />
             <p className="mt-6 text-sm leading-relaxed text-stone-500">

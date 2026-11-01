@@ -17,7 +17,6 @@ export const useCoursePreferences = (
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Load preferences when semesterId or courseName changes
   useEffect(() => {
     const loadPreferences = async () => {
       if (!user || !semesterId || !courseName) {
@@ -34,7 +33,7 @@ export const useCoursePreferences = (
         const preferencesDoc = await getDoc(preferencesRef);
 
         // Merge over defaults: a doc created color-first has no targetGrade yet. A course without
-        // a doc just shows the defaults; viewing it writes nothing (A12).
+        // a doc just shows the defaults; viewing it writes nothing.
         setPreferences({
           ...DEFAULT_COURSE_PREFERENCES,
           ...(preferencesDoc.exists() ? (preferencesDoc.data() as Partial<CoursePreferences>) : {}),
@@ -42,7 +41,6 @@ export const useCoursePreferences = (
       } catch (err) {
         console.error("Error loading course preferences:", err);
         setError("Failed to load course preferences");
-        // Fallback to default preferences
         setPreferences({ ...DEFAULT_COURSE_PREFERENCES });
       } finally {
         setLoading(false);

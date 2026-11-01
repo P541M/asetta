@@ -3,7 +3,7 @@ import { isValidDocId } from "./validation";
 /** The longest course name a rename or an upload keeps. */
 export const MAX_COURSE_NAME_LENGTH = 100;
 
-// Marks an escaped ID. A raw ID never starts with it, so the two can't collide (A13).
+// Marks an escaped ID. A raw ID never starts with it, so the two can't collide.
 const ESCAPED = "%";
 
 /**
@@ -19,8 +19,8 @@ export const coursePreferencesDocId = (courseName: string): string =>
 
 /**
  * The course name a coursePreferences doc ID was made from, or null for an ID
- * `coursePreferencesDocId` never makes (a doc saved before A13 for a name starting with "%"), so
- * such a doc can't be read as another course's.
+ * `coursePreferencesDocId` never makes (a doc saved before course names were escaped, for a
+ * name starting with "%"), so such a doc can't be read as another course's.
  */
 export const courseNameFromPreferencesDocId = (docId: string): string | null => {
   if (!docId.startsWith(ESCAPED)) return docId;

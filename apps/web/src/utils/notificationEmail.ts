@@ -1,7 +1,7 @@
 import { isValidEmail } from "./validation";
 
 /**
- * Where reminders go (A17). The user doc's `email` is the address the student picks, and any
+ * Where reminders go. The user doc's `email` is the address the student picks, and any
  * client can write it, so it gets reminders only once it is safe to send to: the account's own
  * email, or an address whose owner used the confirm link (`verifiedEmail`, which only the server
  * writes). Until then reminders go to the account email.
@@ -56,10 +56,10 @@ export function reminderRecipient(addresses: Addresses): string | null {
 }
 
 /**
- * D11: the address a one-time step marks confirmed for a user from before A17, so the change
- * doesn't move anyone's reminders: the saved address, unless it isn't one or the user has already
- * confirmed an address through a link (then a different saved one was changed since, and waits
- * for its own link).
+ * The address a one-time step marks confirmed for a user who saved it before confirm links
+ * existed, so the links don't move anyone's reminders: the saved address, unless it isn't one or
+ * the user has already confirmed an address through a link (then a different saved one was
+ * changed since, and waits for its own link).
  */
 export function existingAddressToConfirm(email: unknown, verifiedEmail: unknown): string | null {
   if (typeof verifiedEmail === "string" && verifiedEmail !== "") return null;

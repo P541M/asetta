@@ -1,4 +1,4 @@
-// The emulator suite for `firestore.rules` at the repo root (A16): every write the app makes is
+// The emulator suite for `firestore.rules` at the repo root: every write the app makes is
 // allowed, and writes outside the schema are denied. `npm run test:rules` starts the Firestore
 // emulator and runs it; `npm test` leaves it out. Each payload below copies the app's own write
 // (the comment names where it lives), so change both together.
@@ -539,7 +539,7 @@ describe("users/{uid}/semesters/{semesterId}/assessments/{assessmentId}", () => 
 });
 
 describe("users/{uid}/semesters/{semesterId}/coursePreferences/{prefsId}", () => {
-  // IDs come from coursePreferencesDocId: the name itself, or an escaped one (A13)
+  // IDs come from coursePreferencesDocId: the name itself, or an escaped one
   const prefsRef = (db: Firestore, uid: string, semesterId: string, id: string) =>
     doc(db, "users", uid, "semesters", semesterId, "coursePreferences", id);
 

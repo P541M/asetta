@@ -18,7 +18,7 @@ const dueAt = (assessment: Assessment): number =>
 
 /**
  * One doc from the semester's live assessments listener, with defaults for missing fields. Every
- * dashboard view reads this, so it keeps the mark and the timestamps as stored (A11).
+ * dashboard view reads this, so it keeps the mark and the timestamps as stored.
  */
 export function assessmentFromDoc(id: string, data: DocumentData): Assessment {
   return {
@@ -85,7 +85,7 @@ export function computeStats(assessmentsList: Assessment[], now: Date): Dashboar
   const totalCount = assessmentsList.length;
   const notStartedCount = assessmentsList.filter((a) => a.status === "Not started").length;
   const inProgressCount = assessmentsList.filter((a) => a.status === "In progress").length;
-  // Missed counts as done for the completion rate, but it isn't Submitted (A51)
+  // Missed counts as done for the completion rate, but it isn't Submitted
   const completedCount = assessmentsList.filter((a) => isCompletedStatus(a.status)).length;
   const submittedCount = assessmentsList.filter((a) => a.status === "Submitted").length;
   const upcomingCount = assessmentsList.filter((a) => {
@@ -108,7 +108,7 @@ export function computeStats(assessmentsList: Assessment[], now: Date): Dashboar
  * Whether the assessments table's filter (`useTableSettings`, stored in localStorage) shows an
  * assessment with this status. "not_submitted" is To do (Not started, In progress) and
  * "submitted" is Done (Submitted, Missed): a Missed assessment needs no more work, so it stays
- * off the to-do list (A74). An unknown stored filter shows every one, like "all".
+ * off the to-do list. An unknown stored filter shows every one, like "all".
  */
 export function matchesAssessmentFilter(status: AssessmentStatus, filter: string): boolean {
   if (filter === "not_submitted") return !isCompletedStatus(status);

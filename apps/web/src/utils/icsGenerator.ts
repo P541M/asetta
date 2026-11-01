@@ -8,7 +8,6 @@ export function generateICSFile(
   // DTSTAMP is when the file was made, the same for every event
   const stamp = formatUTCStamp(now);
 
-  // ICS file header
   const icsContent = [
     "BEGIN:VCALENDAR",
     "VERSION:2.0",
@@ -16,12 +15,11 @@ export function generateICSFile(
     "CALSCALE:GREGORIAN",
   ];
 
-  // Add each assessment as a VEVENT
   assessments.forEach((assessment) => {
     const startDateTime = formatFloatingDateTime(assessment.dueDate, assessment.dueTime);
     // One hour long; a late due time ends on the next day
     const endDateTime = formatFloatingDateTime(assessment.dueDate, assessment.dueTime, 1);
-    // Calendars match re-imported events by UID: changing the domain duplicates them (D9)
+    // Calendars match re-imported events by UID: changing the domain duplicates them
     const uid = `${assessment.id}@asetta.app`;
     const summary = `${assessment.courseName}: ${assessment.assignmentName}`;
     const description = `Weight: ${assessment.weight}%\nStatus: ${assessment.status}`;
@@ -44,7 +42,6 @@ export function generateICSFile(
     );
   });
 
-  // ICS file footer
   icsContent.push("END:VCALENDAR");
 
   // Join with CRLF (required by ICS spec)

@@ -3,7 +3,7 @@ import { Assessment } from "./assessment";
 import { Semester } from "./semester";
 
 export interface CourseFilteredAssessmentsProps {
-  /** The semester's assessments, live from the dashboard's listener (A11). */
+  /** The semester's assessments, live from the dashboard's listener. */
   assessments: Assessment[];
   error: string | null;
   semesterId: string;
