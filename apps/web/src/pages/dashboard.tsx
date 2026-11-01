@@ -21,7 +21,6 @@ const Dashboard = () => {
         return;
       }
 
-      // Check if user needs to complete onboarding first
       if (shouldRedirectToOnboarding(onboardingStatus)) {
         router.push("/onboarding");
         return;
@@ -31,7 +30,7 @@ const Dashboard = () => {
         setRedirecting(true);
         try {
           // Loaded here, not with the page: the user doc's listener has loaded Firestore by now,
-          // and a signed-out visitor never needs it (A15)
+          // and a signed-out visitor never needs it
           const { firstSemesterId } = await import("../hooks/firstSemester");
           const semesterId = await firstSemesterId(user.uid);
 
@@ -43,7 +42,6 @@ const Dashboard = () => {
           }
         } catch (error) {
           console.error("Error fetching first semester:", error);
-          // Fallback to assessments page
           router.push("/dashboard/assessments");
         }
       }

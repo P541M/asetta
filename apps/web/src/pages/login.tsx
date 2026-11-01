@@ -1,4 +1,3 @@
-// src/pages/login.tsx
 import { useState } from "react";
 import Link from "next/link";
 import { Loader2 } from "lucide-react";

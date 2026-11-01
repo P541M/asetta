@@ -4,8 +4,7 @@
 
 /*
   Semantic design tokens (shadcn/ui convention). All code uses ONLY these via
-  their utilities (bg-background, text-primary, ...). The legacy "light-"/"dark-"
-  palette was removed once the migration completed (2026-07-15).
+  their utilities (bg-background, text-primary, ...).
   Values are locked in standards.md - change them there and here together.
 */
 :root {
@@ -167,7 +166,6 @@
 
 @layer base {
   :root {
-    /* Safe Area Support for Mobile Devices */
     --safe-area-inset-top: env(safe-area-inset-top);
     --safe-area-inset-right: env(safe-area-inset-right);
     --safe-area-inset-bottom: env(safe-area-inset-bottom);
@@ -178,7 +176,7 @@
 @layer base {
   * {
     @apply border-border;
-    /* Optimize touch interactions */
+    /* No double-tap zoom, so a tap responds without waiting for a second one */
     touch-action: manipulation;
   }
   body {
@@ -187,13 +185,12 @@
     line-height: 1.6;
   }
 
-  /* Smooth scrolling for better UX */
   html {
     scroll-behavior: smooth;
   }
 
-  /* Tailwind v4 preflight stopped setting cursor:pointer on buttons (native OS
-     convention); this app is a web tool; clickable always shows the pointer */
+  /* Tailwind v4's preflight leaves buttons on the default cursor (the native OS
+     convention); in this web tool, clickable always shows the pointer */
   button:not(:disabled),
   [role="button"]:not(:disabled) {
     cursor: pointer;
@@ -280,7 +277,7 @@
   }
 }
 
-/* SVG Logo Color Filter for Main App */
+/* Tints the monochrome SVG logo amber */
 .filter-primary-main {
   filter: brightness(0) saturate(100%) invert(60%) sepia(95%) saturate(1342%) hue-rotate(0deg)
     brightness(97%) contrast(95%);

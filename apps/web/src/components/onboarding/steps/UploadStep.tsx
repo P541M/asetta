@@ -32,7 +32,6 @@ export function UploadStep() {
 
   return (
     <div className="mx-auto max-w-3xl">
-      {/* Header */}
       <div className="mb-8 text-center">
         <div className="mx-auto mb-4 flex size-16 items-center justify-center rounded-xl bg-primary/10">
           <CloudUpload className="size-8 text-primary" aria-hidden />
@@ -45,7 +44,6 @@ export function UploadStep() {
         </p>
       </div>
 
-      {/* Upload form */}
       {state.createdSemesterId && (
         <div className="mb-8">
           <OnboardingUploadForm
@@ -58,7 +56,6 @@ export function UploadStep() {
         </div>
       )}
 
-      {/* Success message */}
       {state.hasCompletedUpload && state.extractionResults && (
         <Alert variant="success" className="mb-8">
           <CircleCheck aria-hidden />

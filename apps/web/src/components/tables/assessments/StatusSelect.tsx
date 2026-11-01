@@ -47,7 +47,7 @@ const sizeClasses = {
   md: "min-h-11 w-full px-4 text-sm",
 };
 
-/** Assessment status control: a tinted chip that opens a check-marked menu. */
+/** Assessment status control: a tinted chip that opens a menu of the statuses. */
 const StatusSelect = ({
   value,
   onChange,

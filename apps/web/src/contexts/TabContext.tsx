@@ -19,7 +19,6 @@ export const TabProvider: React.FC<TabProviderProps> = ({ children, initialTab =
   const router = useRouter();
   const [activeTab, setActiveTabState] = useState<TabType>(initialTab);
 
-  // Sync tab state with URL query parameter
   useEffect(() => {
     const { tab } = router.query;
     if (typeof tab === "string" && isValidTab(tab)) {
@@ -45,9 +44,8 @@ export const TabProvider: React.FC<TabProviderProps> = ({ children, initialTab =
       const currentPath = router.asPath.split("?")[0];
       let newQuery = { ...router.query, tab };
 
-      // Clean up course parameter when switching tabs to ensure clean state
-      // User expectation: any tab switch from filtered course view should reset to normal tab
-      // Also clear when clicking assessments tab while already in filtered assessments view
+      // Drop the course filter: any tab switch from the filtered course view resets to the plain
+      // tab, and so does clicking Assessments while already in the filtered view
       if (
         (tab !== "assessments" && "course" in newQuery) ||
         (tab === "assessments" && activeTab === "assessments" && "course" in newQuery)

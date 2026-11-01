@@ -1,6 +1,6 @@
 /**
  * A minimal one-page PDF with the given lines of text, about 700 bytes: small enough that Node
- * reads it back from disk as a slice of a shared buffer, the case A44 is about.
+ * reads it back from disk as a slice of a shared buffer, the case `lib/upload/pdfText.ts` handles.
  */
 export function minimalPdf(lines: string[]): Buffer {
   const escape = (text: string) => text.replace(/[\\()]/g, (c) => `\\${c}`);
@@ -27,7 +27,7 @@ export function minimalPdf(lines: string[]): Buffer {
   pdf += `xref\n0 ${objects.length + 1}\n0000000000 65535 f \n`;
   pdf += offsets.map((offset) => `${String(offset).padStart(10, "0")} 00000 n \n`).join("");
   pdf += `trailer\n<< /Size ${objects.length + 1} /Root 1 0 R >>\nstartxref\n${xref}\n%%EOF\n`;
-  // Memory of its own: Buffer.from would hand back a slice of Node's shared pool (A44)
+  // Memory of its own: Buffer.from would hand back a slice of Node's shared pool
   const out = Buffer.alloc(pdf.length);
   out.write(pdf, "latin1");
   return out;

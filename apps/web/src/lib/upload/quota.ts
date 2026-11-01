@@ -1,7 +1,7 @@
 import { MAX_FILES_PER_DAY } from "./constants";
 
 /**
- * The per-account upload quota (A18), server side: at most `MAX_FILES_PER_DAY` files per UTC day.
+ * The per-account upload quota, server side: at most `MAX_FILES_PER_DAY` files per UTC day.
  * The count lives in the server-only `uploadUsage/{uid}_{YYYY-MM-DD}` doc. The upload route claims
  * a request's files in a transaction before any extraction, and refunds the ones extraction never
  * ran on (an unreadable PDF, a file Gemini refused for its own quota or rate limit).

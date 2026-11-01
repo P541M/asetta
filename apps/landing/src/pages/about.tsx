@@ -50,7 +50,6 @@ export default function AboutPage() {
               </p>
             </ContentSection>
 
-            {/* Founder's note */}
             <Reveal>
               <section>
                 <h2 className="text-2xl font-semibold tracking-tight text-stone-900 sm:text-3xl">

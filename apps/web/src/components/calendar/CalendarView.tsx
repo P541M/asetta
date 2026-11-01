@@ -40,7 +40,6 @@ const statusFilterOptions: { value: string; label: string }[] = [
   { value: "Missed", label: "Missed" },
 ];
 
-// Date formatting helpers
 const formatDateForComparison = (date: Date): string => {
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, "0");
@@ -68,11 +67,10 @@ const CalendarView = ({ selectedSemester, assessments }: CalendarViewProps) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const calendarRef = useRef<HTMLDivElement>(null);
-  // Today's mark follows the clock past midnight (A77); keyed by the day, so the grid is
+  // Today's mark follows the clock past midnight; keyed by the day, so the grid is
   // rebuilt once a day, not on each of useNow's minute ticks
   const todayKey = formatDateForComparison(useNow());
 
-  // Filter assessments based on search and status
   const getAssessmentsForDate = useCallback(
     (date: Date): Assessment[] => {
       const dateStr = formatDateForComparison(date);
@@ -89,7 +87,6 @@ const CalendarView = ({ selectedSemester, assessments }: CalendarViewProps) => {
     [assessments, searchTerm, statusFilter],
   );
 
-  // Generate calendar days
   useEffect(() => {
     const generateCalendarDays = () => {
       const year = currentMonth.getFullYear();
@@ -101,7 +98,6 @@ const CalendarView = ({ selectedSemester, assessments }: CalendarViewProps) => {
       const today = parseLocalDateTime(todayKey, "00:00");
       const days: Day[] = [];
 
-      // Previous month days
       const prevMonth = new Date(year, month, 0);
       const prevMonthDays = prevMonth.getDate();
       for (let i = daysFromPrevMonth - 1; i >= 0; i--) {
@@ -114,7 +110,6 @@ const CalendarView = ({ selectedSemester, assessments }: CalendarViewProps) => {
         });
       }
 
-      // Current month days
       for (let i = 1; i <= lastDayOfMonth.getDate(); i++) {
         const date = new Date(year, month, i);
         days.push({
@@ -125,7 +120,6 @@ const CalendarView = ({ selectedSemester, assessments }: CalendarViewProps) => {
         });
       }
 
-      // Next month days
       for (let i = 1; i <= daysFromNextMonth; i++) {
         const date = new Date(year, month + 1, i);
         days.push({
@@ -146,7 +140,6 @@ const CalendarView = ({ selectedSemester, assessments }: CalendarViewProps) => {
     ? (calendarDays.find((day) => isSameLocalDay(day.date, selectedDate)) ?? null)
     : null;
 
-  // Navigation handlers
   const previousMonth = () => {
     setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1));
     setSelectedDate(null);
@@ -165,7 +158,6 @@ const CalendarView = ({ selectedSemester, assessments }: CalendarViewProps) => {
     setSelectedDate(getAssessmentsForDate(today).length > 0 ? today : null);
   };
 
-  // Keyboard navigation
   const handleKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
     if (!calendarRef.current) return;
 
@@ -185,7 +177,7 @@ const CalendarView = ({ selectedSemester, assessments }: CalendarViewProps) => {
     }
   };
 
-  // Export calendar (the button is disabled when there is nothing to export)
+  // The button is disabled when there is nothing to export
   const handleExportCalendar = () => {
     const icsContent = generateICSFile(assessments, selectedSemester);
     const blob = new Blob([icsContent], { type: "text/calendar" });
@@ -295,7 +287,6 @@ const CalendarView = ({ selectedSemester, assessments }: CalendarViewProps) => {
         />
       </div>
 
-      {/* Day detail modal */}
       {selectedDay && (
         <DayDetailModal
           day={selectedDay}

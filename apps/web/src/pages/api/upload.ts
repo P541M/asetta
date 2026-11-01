@@ -41,7 +41,7 @@ export const config = {
 // violation is a 413. Reading httpCode avoids importing formidable's error
 // constants, which are NOT reachable via `formidable.errors` once the bundler
 // applies ESM interop (it resolves to the default export, which has no
-// `.errors`) -- that lookup threw at module load and served an HTML 500.
+// `.errors`), so that lookup throws at module load and serves an HTML 500.
 const FORMIDABLE_MAX_FILES_EXCEEDED = 1015;
 
 // Check isTooManyFilesError first: it also carries httpCode 413.
@@ -170,7 +170,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     const adminDb = getFirestore(adminApp);
-    // Verify the semester exists by checking if we can access it
     const semesterRef = adminDb.doc(`users/${userId}/semesters/${semesterId}`);
     const semesterDoc = await semesterRef.get();
     if (!semesterDoc.exists) {
@@ -190,7 +189,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(400).json({ success: false, error: "No valid files were uploaded" });
     }
 
-    // The day's limit (A18), claimed in a transaction before any extraction so overlapping
+    // The day's limit, claimed in a transaction before any extraction so overlapping
     // requests can't both pass it: all of this request's files, or none. Files extraction never
     // runs on are refunded below.
     const now = new Date();
@@ -261,7 +260,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             errors.push(`Rate limit exceeded: ${fileName}. Please wait a moment and try again.`);
             continue;
           }
-          // Fall back to basic extraction
           assessments = extractAssessmentsBasic(extractedText, localDate);
         }
         countedFiles++;
@@ -334,12 +332,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       }
     }
 
-    // Check if any files failed due to daily quota or rate limiting
     const hasDailyQuotaErrors = errors.some((error) => error.includes("Daily quota exceeded"));
     const hasRateLimitErrors = errors.some((error) => error.includes("Rate limit exceeded"));
 
     if (hasDailyQuotaErrors && processedFiles === 0) {
-      // All files failed due to daily quota exhaustion
       return res.status(429).json({
         success: false,
         error: "DAILY_QUOTA_EXCEEDED",
@@ -350,7 +346,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     if (hasRateLimitErrors && processedFiles === 0) {
-      // All files failed due to temporary rate limiting
       return res.status(429).json({
         success: false,
         error: "RATE_LIMITED",

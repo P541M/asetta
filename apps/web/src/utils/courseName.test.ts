@@ -70,7 +70,8 @@ describe("courseNameFromPreferencesDocId", () => {
   });
 
   it("reads no name from an ID it never makes, so it can't land on another course", () => {
-    // Saved before A13 for "%Stats"; decoding it would give "Stats", another course's name.
+    // Saved before course names were escaped, for "%Stats"; decoding it would give "Stats",
+    // another course's name.
     expect(courseNameFromPreferencesDocId("%Stats")).toBeNull();
     expect(courseNameFromPreferencesDocId("%25")).toBeNull();
     expect(courseNameFromPreferencesDocId("%A%2Z")).toBeNull();

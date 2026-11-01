@@ -107,7 +107,7 @@ const numericOrder = (first: number, second: number): DateOrder | "either" | nul
  * The first date in `raw` as YYYY-MM-DD, or null when there is none or it isn't a real date.
  * Accepts ISO dates, month names and abbreviations in either order ("Sept 30, 2026",
  * "15 Mar. 2026"), and numeric dates. A numeric date whose day and month could swap
- * ("03/04/2026") is read in `order`; without one it is ambiguous and gives null (D10).
+ * ("03/04/2026") is read in `order`; without one it is ambiguous and gives null.
  */
 export function parseDueDate(raw: unknown, order?: DateOrder): string | null {
   if (typeof raw !== "string") return null;

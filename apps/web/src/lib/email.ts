@@ -4,7 +4,7 @@ import { devError } from "../utils/devLog";
 import { confirmAddressEmail, reminderEmail, welcomeEmail } from "./emailTemplates";
 import type { EmailContent, ReminderDetails } from "./emailTemplates";
 
-/** The most Gmail connections one reminder cron run opens; each sends its emails in turn (A19). */
+/** The most Gmail connections one reminder cron run opens; each sends its emails in turn. */
 const REMINDER_CONNECTIONS = 3;
 
 const gmailAuth = () => ({
@@ -47,12 +47,12 @@ async function deliver(
 const deliverOne = (to: string, content: EmailContent) =>
   deliver(transporter, () => transporter.verify(), to, content);
 
-/** `name` only for a verified address; see the welcome-email route (D7). */
+/** `name` only for a verified address; see the welcome-email route. */
 export async function sendWelcomeEmail(to: string, name?: string) {
   await deliverOne(to, welcomeEmail(name));
 }
 
-/** The confirm link for a notification address the student chose (A17). */
+/** The confirm link for a notification address the student chose. */
 export async function sendConfirmAddressEmail(to: string, confirmUrl: string) {
   await deliverOne(to, confirmAddressEmail(confirmUrl));
 }
@@ -65,7 +65,7 @@ export interface ReminderMailer {
 }
 
 /**
- * The mailer for one cron run (A19): its emails share a few pooled Gmail connections, and the
+ * The mailer for one cron run: its emails share a few pooled Gmail connections, and the
  * login is verified once, before the first send (again only after a failed check).
  */
 export function createReminderMailer(): ReminderMailer {

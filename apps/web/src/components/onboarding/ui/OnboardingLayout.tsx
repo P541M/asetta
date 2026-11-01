@@ -10,7 +10,6 @@ interface OnboardingLayoutProps {
 export function OnboardingLayout({ children, onSkip, showSkip = true }: OnboardingLayoutProps) {
   return (
     <div className="flex min-h-screen flex-col">
-      {/* Header with skip button */}
       {showSkip && onSkip && (
         <header className="shrink-0">
           <div className="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8">
@@ -28,12 +27,10 @@ export function OnboardingLayout({ children, onSkip, showSkip = true }: Onboardi
         </header>
       )}
 
-      {/* Main content */}
       <main className="flex flex-1 items-center justify-center p-4 sm:p-6 lg:p-8">
         <div className="w-full max-w-4xl">{children}</div>
       </main>
 
-      {/* Footer */}
       <footer className="shrink-0">
         <div className="mx-auto max-w-7xl px-4 py-3 sm:px-6 lg:px-8">
           <div className="text-center text-xs font-medium text-muted-foreground">

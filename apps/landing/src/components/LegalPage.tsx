@@ -130,7 +130,6 @@ export default function LegalPage({
           delay={0.1}
           className="mt-12 md:mt-16 lg:grid lg:grid-cols-[13rem_minmax(0,1fr)] lg:gap-16"
         >
-          {/* Sticky table of contents (desktop only) */}
           <aside className="hidden lg:block">
             <nav aria-label="On this page" className="sticky top-28">
               <h2 className="text-sm font-semibold text-stone-900">On this page</h2>

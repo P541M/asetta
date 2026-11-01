@@ -3,9 +3,8 @@
  *
  * Vercel caps the *entire* request body of a serverless function at 4.5 MB.
  * That cap is enforced by the platform edge, before our handler runs, and the
- * rejection comes back as an HTML error page rather than JSON, which is why an
- * oversized upload used to surface to users as
- * `Unexpected token '<', "<!DOCTYPE "... is not valid JSON`.
+ * rejection comes back as an HTML error page rather than JSON, which a JSON
+ * parse turns into `Unexpected token '<', "<!DOCTYPE "... is not valid JSON`.
  *
  * We validate against these numbers in the browser (so the request is never
  * sent) and again in the API route (so direct callers get JSON, not HTML).
@@ -15,7 +14,7 @@
 export const MAX_FILE_BYTES = 4 * 1024 * 1024; // 4 MB per file
 export const MAX_TOTAL_UPLOAD_BYTES = 4 * 1024 * 1024; // 4 MB per request
 export const MAX_FILES_PER_UPLOAD = 10;
-/** Per account, per UTC day (D5): each file can cost a Gemini call from the shared quota. */
+/** Per account, per UTC day: each file can cost a Gemini call from the shared quota. */
 export const MAX_FILES_PER_DAY = 20;
 
 export const ACCEPTED_MIME_TYPE = "application/pdf";

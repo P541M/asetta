@@ -1,4 +1,3 @@
-// src/contexts/AuthContext.tsx
 import { createContext, useContext, useEffect, useMemo, useState, ReactNode } from "react";
 import { User, onAuthStateChanged, signOut } from "firebase/auth";
 import { auth } from "../lib/firebase";
@@ -34,7 +33,7 @@ export const useAuth = () => useContext(AuthContext);
 /**
  * The signed-in user and their user doc. The doc is read once, live (useUserDoc), and everything
  * the app shows from it (profile, display preferences, onboarding status and choices, the
- * confirmed notification address) derives from that one read (A12, A54).
+ * confirmed notification address) derives from that one read.
  */
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);

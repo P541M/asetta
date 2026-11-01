@@ -27,7 +27,7 @@ describe("isCronAuthorized", () => {
     expect(isCronAuthorized(header, secret)).toBe(false);
   });
 
-  // A3: an unset secret used to accept "Bearer undefined", and an empty one "Bearer ".
+  // A naive check passes "Bearer undefined" for an unset secret and "Bearer " for an empty one.
   it.each([
     ["unset", undefined],
     ["empty", ""],
@@ -52,7 +52,6 @@ describe("claimDecision", () => {
     ).toEqual({ claim: false, reason: "sent" });
   });
 
-  // A3: a failed send used to block every later attempt.
   it("retries a failed send once the retry delay is up", () => {
     expect(
       claimDecision(

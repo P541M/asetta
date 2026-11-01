@@ -64,7 +64,6 @@ export function CompletionStep() {
         </p>
       </div>
 
-      {/* Results summary */}
       {state.hasCompletedUpload && (
         <div className="mb-8 rounded-xl bg-secondary/50 p-6">
           <h3 className="mb-4 text-base font-semibold text-foreground">Setup summary</h3>
@@ -92,7 +91,6 @@ export function CompletionStep() {
             </div>
           </div>
 
-          {/* Course breakdown */}
           {state.extractionResults?.courseBreakdown &&
             state.extractionResults.courseBreakdown.length > 0 && (
               <div className="mt-6 border-t border-border pt-6">
@@ -130,7 +128,6 @@ export function CompletionStep() {
         </div>
       )}
 
-      {/* What's next */}
       <div className="mb-8 rounded-xl bg-secondary/50 p-6">
         <h3 className="mb-4 text-base font-semibold text-foreground">What&apos;s next?</h3>
 
@@ -149,7 +146,6 @@ export function CompletionStep() {
         </div>
       </div>
 
-      {/* Action button */}
       <div className="flex justify-center">
         <Button type="button" onClick={handleViewDashboard} disabled={state.isLoading}>
           {state.isLoading ? (

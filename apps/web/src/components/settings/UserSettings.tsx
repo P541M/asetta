@@ -51,7 +51,7 @@ const UserSettings = () => {
   const [linkState, setLinkState] = useState<ConfirmLinkRequest | null>(null);
   const [linkSending, setLinkSending] = useState(false);
 
-  // A chosen address gets reminders once confirmed (A17); verifiedEmail is live from the user doc
+  // A chosen address gets reminders once confirmed; verifiedEmail is live from the user doc
   const accountEmail = user?.email ?? null;
   const emailStatus = notificationEmailStatus({
     email: notifForm.email,

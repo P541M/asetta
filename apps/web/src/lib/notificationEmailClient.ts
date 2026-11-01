@@ -1,7 +1,7 @@
 import { User } from "firebase/auth";
 
 /**
- * The client side of the notification-address confirm link (A17): asking for the link, and
+ * The client side of the notification-address confirm link: asking for the link, and
  * using it on the confirm page. The server routes are `pages/api/notification-email/`.
  */
 

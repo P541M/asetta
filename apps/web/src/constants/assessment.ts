@@ -1,6 +1,4 @@
 /**
- * Shared assessment status constants.
- *
  * "Completed" here means the assessment no longer needs work (submitted or missed);
  * it drives stats, filtering, and grade math identically across the app.
  */

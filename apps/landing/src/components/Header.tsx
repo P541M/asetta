@@ -32,7 +32,6 @@ export default function Header() {
 
   const isActive = (href: string) => router.pathname.startsWith(href);
 
-  // Show the soft shadow once the page is scrolled.
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 8);
     handleScroll();
@@ -40,7 +39,6 @@ export default function Header() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Close the mobile menu on outside click or Escape.
   useEffect(() => {
     if (!mobileMenuOpen) return;
 
@@ -68,13 +66,11 @@ export default function Header() {
         scrolled && "shadow-[0_1px_12px_rgb(28_25_23/0.08)]",
       )}
     >
-      {/* Three-zone layout: logo far left, page nav centered, auth far right */}
       <div className="grid h-16 grid-cols-[1fr_auto_1fr] items-center px-6 lg:px-8">
         <div className="col-start-1 flex justify-start">
           <Logo href="/" />
         </div>
 
-        {/* Centered page navigation */}
         <nav className="col-start-2 hidden items-center gap-1 md:flex" aria-label="Main">
           {NAV_LINKS.map((link) => (
             <Link
@@ -88,7 +84,6 @@ export default function Header() {
           ))}
         </nav>
 
-        {/* Auth actions, far right */}
         <div className="col-start-3 row-start-1 hidden items-center justify-end gap-1 md:flex">
           <Link
             href={LOGIN_URL}
@@ -102,7 +97,6 @@ export default function Header() {
           </ButtonLink>
         </div>
 
-        {/* Mobile menu */}
         <div className="col-start-3 row-start-1 flex justify-end md:hidden" ref={menuRef}>
           <button
             type="button"

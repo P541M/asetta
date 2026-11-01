@@ -67,7 +67,6 @@ const AssessmentBreakdown = ({
         />
       ) : (
         <div className="space-y-2">
-          {/* Desktop headers - hidden on mobile */}
           <div className={cn(gradeGridClass, "px-4 pb-1")}>
             <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
               Assessment
@@ -100,7 +99,6 @@ const AssessmentBreakdown = ({
                   key={assessment.id}
                   className="rounded-xl bg-secondary/50 p-4 transition-colors hover:bg-accent/50 lg:py-3"
                 >
-                  {/* Mobile layout */}
                   <div className="space-y-4 lg:hidden">
                     <div className="flex items-center justify-between gap-3">
                       <div className="min-w-0 flex-1">

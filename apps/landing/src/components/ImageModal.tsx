@@ -21,7 +21,6 @@ export default function ImageModal({
 }: ImageModalProps) {
   useScrollLock(isOpen);
 
-  // Close on Escape.
   useEffect(() => {
     if (!isOpen) return;
     const handleEsc = (event: KeyboardEvent) => {
@@ -39,7 +38,6 @@ export default function ImageModal({
       role="dialog"
       aria-modal="true"
     >
-      {/* Backdrop */}
       <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={onClose} />
 
       <div className="animate-fade-in relative z-10 mx-4 max-h-[95vh] max-w-[95vw] overflow-auto">
@@ -52,7 +50,6 @@ export default function ImageModal({
         </button>
 
         <div className="relative overflow-hidden rounded-2xl bg-white shadow-2xl">
-          {/* Title overlay */}
           <div className="absolute inset-x-0 top-0 z-10 bg-linear-to-b from-black/70 to-transparent p-4 md:p-6">
             <h3 className="text-lg font-semibold text-white md:text-xl">{title}</h3>
           </div>

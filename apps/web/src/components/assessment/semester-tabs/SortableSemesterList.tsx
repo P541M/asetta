@@ -27,7 +27,7 @@ interface SortableSemesterListProps {
 
 /**
  * The drag-to-reorder list in Manage semesters. Its own chunk (dnd-kit), loaded with the modal
- * rather than with every dashboard page (A15).
+ * rather than with every dashboard page.
  */
 const SortableSemesterList = ({
   semesters,

@@ -94,7 +94,7 @@ function ContactForm() {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      {/* Honeypot (A20): hidden with CSS, so people and autofill never see it, while a bot that
+      {/* Honeypot: hidden with CSS, so people and autofill never see it, while a bot that
           reads the HTML fills it. The API drops anything that arrives with it filled. */}
       <div className="hidden" aria-hidden="true">
         <label htmlFor="website">Leave this field empty</label>
@@ -149,7 +149,6 @@ function ContactForm() {
         />
       </Field>
 
-      {/* CASL compliance consent */}
       <div className="rounded-lg bg-stone-100 p-4">
         <h4 className="mb-2 text-sm font-semibold text-stone-900">
           Email Communication Consent (CASL Compliance)
@@ -199,7 +198,6 @@ export default function Contact() {
     >
       <Container className="pb-24 md:pb-32">
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-[1fr_1.2fr] lg:gap-20">
-          {/* Intro */}
           <Reveal>
             <h1 className="text-3xl font-semibold tracking-tight text-stone-900 sm:text-4xl lg:text-5xl">
               We're here to help
@@ -212,7 +210,6 @@ export default function Contact() {
             </p>
           </Reveal>
 
-          {/* Form */}
           <Reveal delay={0.1}>
             <ContactForm />
           </Reveal>

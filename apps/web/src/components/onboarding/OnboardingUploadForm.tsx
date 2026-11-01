@@ -146,7 +146,6 @@ export function OnboardingUploadForm({
       const { ok, status, payload, errorMessage } = await parseUploadResponse(response);
 
       if (!ok) {
-        // Handle daily quota exhaustion
         if (status === 429 && payload?.error === "DAILY_QUOTA_EXCEEDED") {
           setUploadStatus("daily_quota_exceeded");
           setUploadQuota(uploadQuotaFromPayload(payload, new Date()));
@@ -196,7 +195,6 @@ export function OnboardingUploadForm({
       console.error("Upload error:", err);
       setMessage("");
 
-      // Check for daily quota errors in catch block as well
       if (
         err instanceof Error &&
         (err.message.includes("DAILY_QUOTA_EXCEEDED") ||
@@ -240,7 +238,6 @@ export function OnboardingUploadForm({
 
   return (
     <div className="w-full">
-      {/* Guidance section */}
       {showGuidance && uploadStatus === "idle" && (
         <Alert className="mb-6">
           <Sparkles aria-hidden />
@@ -256,7 +253,6 @@ export function OnboardingUploadForm({
         </Alert>
       )}
 
-      {/* Upload area */}
       <div
         className={cn(
           "relative rounded-xl border-2 border-dashed p-8 text-center transition-colors",
@@ -339,7 +335,6 @@ export function OnboardingUploadForm({
         )}
       </div>
 
-      {/* Copyright agreement */}
       {files.length > 0 && uploadStatus === "idle" && (
         <CopyrightAgreement
           id="copyright-agreement"
@@ -349,7 +344,6 @@ export function OnboardingUploadForm({
         />
       )}
 
-      {/* Upload controls */}
       {files.length > 0 && uploadStatus === "idle" && (
         <div className="mt-4 flex items-center justify-between gap-3">
           <Button
@@ -367,7 +361,6 @@ export function OnboardingUploadForm({
         </div>
       )}
 
-      {/* Status messages */}
       {message && (
         <Alert className="mt-4">
           {isBusy ? (
@@ -399,7 +392,6 @@ export function OnboardingUploadForm({
         </Alert>
       )}
 
-      {/* Success state */}
       {uploadStatus === "success" && (
         <div className="mt-4 flex items-center justify-between gap-3">
           <p className="flex items-center gap-2 text-sm font-medium text-success">
@@ -412,7 +404,6 @@ export function OnboardingUploadForm({
         </div>
       )}
 
-      {/* API limit reached modal */}
       <ApiLimitReachedModal
         isOpen={showApiLimitModal}
         onClose={handleCloseApiLimitModal}

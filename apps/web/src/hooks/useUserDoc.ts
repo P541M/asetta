@@ -11,12 +11,12 @@ interface UserDocState {
 
 /**
  * The signed-in user's doc, live: one listener per sign-in, shared through AuthContext, so a
- * dashboard load reads the doc once (A12). The server's first answer runs the sign-in writes
+ * dashboard load reads the doc once. The server's first answer runs the sign-in writes
  * (hooks/userDocListener.ts).
  *
  * This hook is in every page's bundle (_app), so it imports no Firestore code: the listener loads
- * with `import()` once someone is signed in, and a signed-out visitor never downloads Firestore
- * (A15). A listener that can't load is an error state, like a read that fails.
+ * with `import()` once someone is signed in, and a signed-out visitor never downloads Firestore.
+ * A listener that can't load is an error state, like a read that fails.
  */
 export function useUserDoc(user: User | null) {
   const [state, setState] = useState<UserDocState | null>(null);

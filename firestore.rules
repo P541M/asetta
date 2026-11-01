@@ -2,7 +2,7 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     // Clients reach only their own user doc and what sits under it. Each collection lists the
-    // keys a client may write and the type of each (A16). A create checks every key; an update
+    // keys a client may write and the type of each. A create checks every key; an update
     // checks only the keys it adds or changes, so a key an older app version left in a doc never
     // blocks an edit. Removing a key is always allowed: the app reads a missing one as its
     // default. Caps sit far above anything typed; the app's own limits do the validation.

@@ -12,7 +12,7 @@ interface UnifiedDashboardPageProps {
   forceSemesterId?: string;
 }
 
-/* Each tab is its own chunk, so a dashboard page loads only the chrome up front (A15). The open
+/* Each tab is its own chunk, so a dashboard page loads only the chrome up front. The open
    tab's chunk is fetched at mount, while auth and the Firestore reads are still loading, so it is
    normally there before the data is. */
 const TAB_LOADERS = {
@@ -55,7 +55,6 @@ const GradesTab = dynamic(TAB_LOADERS.grades, { ssr: false, loading: TabLoading 
 const CalendarTab = dynamic(TAB_LOADERS.calendar, { ssr: false, loading: TabLoading });
 const AddTab = dynamic(TAB_LOADERS.add, { ssr: false, loading: TabLoading });
 
-// Main Content Component (with tab context)
 const DashboardContent = ({ urlSemesterId }: { urlSemesterId?: string }) => {
   const router = useRouter();
   const { activeTab } = useTab();
@@ -67,7 +66,6 @@ const DashboardContent = ({ urlSemesterId }: { urlSemesterId?: string }) => {
 
   const handleSelectCourse = useCallback(
     (courseName: string) => {
-      // Switch to assessments tab and set course filter
       const newQuery = {
         ...router.query,
         tab: "assessments",
@@ -117,12 +115,10 @@ const DashboardContent = ({ urlSemesterId }: { urlSemesterId?: string }) => {
   );
 };
 
-// Main Component (wraps with TabProvider)
 const UnifiedDashboardPage = ({ forceSemesterId }: UnifiedDashboardPageProps) => {
   const router = useRouter();
   const urlSemesterId = forceSemesterId || (router.query.semester as string);
 
-  // Determine initial tab from URL
   const getInitialTab = (): TabType => {
     if (router.query.tab && typeof router.query.tab === "string") {
       const tab = router.query.tab as TabType;
@@ -131,14 +127,13 @@ const UnifiedDashboardPage = ({ forceSemesterId }: UnifiedDashboardPageProps) =>
       }
     }
 
-    // Default based on pathname (for backward compatibility)
     if (router.pathname.includes("/courses")) return "courses";
     if (router.pathname.includes("/assessments")) return "assessments";
     if (router.pathname.includes("/grades")) return "grades";
     if (router.pathname.includes("/calendar")) return "calendar";
     if (router.pathname.includes("/add")) return "add";
 
-    return "assessments"; // Default tab
+    return "assessments";
   };
 
   return (

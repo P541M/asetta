@@ -19,7 +19,6 @@ const TabNavigationBar = () => {
 
   return (
     <>
-      {/* Desktop: underline tabs */}
       <div className="hidden gap-6 md:flex" role="tablist">
         {TABS.map(({ id, label }) => {
           const isActive = activeTab === id;
@@ -42,7 +41,7 @@ const TabNavigationBar = () => {
         })}
       </div>
 
-      {/* Mobile: fixed bottom navigation (below the overlay recipe's z-150) */}
+      {/* Below the overlay recipe's z-150 */}
       <nav
         className="pb-safe fixed right-[var(--scroll-lock-strip,0px)] bottom-0 left-0 z-40 bg-card shadow-soft md:hidden"
         role="tablist"

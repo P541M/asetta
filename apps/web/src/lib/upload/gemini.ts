@@ -113,13 +113,11 @@ async function extractAssessmentsAI(text: string, localDate: string): Promise<st
     const response = await result.response;
     return response.text();
   } catch (error: unknown) {
-    // Handle rate limiting and quota exhaustion specifically
     const errorMessage = error instanceof Error ? error.message : "";
     const errorObj = error as { status?: number };
     const errorStatus = errorObj.status;
 
     if (errorStatus === 429 || errorMessage.includes("429")) {
-      // Check for daily quota exhaustion vs temporary rate limiting
       if (
         errorMessage.includes("quota exceeded") ||
         errorMessage.includes("quota exhausted") ||
@@ -128,7 +126,6 @@ async function extractAssessmentsAI(text: string, localDate: string): Promise<st
       ) {
         throw new Error("DAILY_QUOTA_EXCEEDED");
       } else {
-        // Temporary rate limiting
         throw new Error("RATE_LIMITED");
       }
     } else if (
@@ -136,7 +133,6 @@ async function extractAssessmentsAI(text: string, localDate: string): Promise<st
       errorMessage.includes("rate limit") ||
       errorMessage.includes("QUOTA_EXCEEDED")
     ) {
-      // Additional quota checks for non-429 errors
       if (
         errorMessage.includes("quota exceeded") ||
         errorMessage.includes("quota exhausted") ||

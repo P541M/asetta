@@ -90,7 +90,7 @@ const NotesModal = ({ assessment, onClose, onSave }: NotesModalProps) => {
         {/* The canvas grows with the modal and its text area scrolls. This wrapper scrolls only
             on screens too short for the canvas's minimum height. */}
         <div className="flex min-h-0 flex-1 flex-col overflow-y-auto px-5">
-          {/* Writing canvas, not a form field: tonal fill only, no focus ring (founder call 2026-07-16) */}
+          {/* Writing canvas, not a form field: tonal fill only, no focus ring (founder call) */}
           <div className="flex min-h-72 flex-1 flex-col overflow-hidden rounded-xl bg-input">
             <RichTextEditor
               content={draft}

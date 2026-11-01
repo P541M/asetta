@@ -26,7 +26,7 @@ interface CourseColorPickerProps {
 const COMMIT_DELAY_MS = 400;
 
 /**
- * The course color picker (standards.md v4.3): a form-native trigger opening
+ * The course color picker: a form-native trigger opening
  * a popover with a saturation canvas + hue slider (react-colorful), a hex
  * field, and preset quick-picks. Instant-apply: drags commit debounced,
  * presets and valid hex entry commit immediately, close flushes any pending

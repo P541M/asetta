@@ -115,7 +115,7 @@ export async function checkAndSendNotifications(now: Date = new Date()): Promise
     const dueUsers = await firestore.collection("users").where("nextReminderAt", "<=", now).get();
     devLog(`Reminder cron: ${dueUsers.size} users due at ${now.toISOString()}`);
 
-    // A few users at a time (A19); each user's reminders still go out one after another.
+    // A few users at a time; each user's reminders still go out one after another.
     await mapWithConcurrency(dueUsers.docs, USERS_AT_ONCE, async (userDoc) => {
       users++;
       try {
@@ -149,10 +149,11 @@ export async function checkAndSendNotifications(now: Date = new Date()): Promise
 const ALREADY_EXISTS = 6;
 
 /**
- * D11, once ever: marks the address every user saved before A17 as confirmed (`verifiedEmail`),
- * so A17 moves no one's reminders; only an address saved from now on needs its link. The marker
- * `migrations/d11-existing-addresses` (server-only) claims it, so overlapping runs do it once; a
- * failure releases the claim for the next run, and users already confirmed are skipped.
+ * Once ever: marks the address every user saved before confirm links existed as confirmed
+ * (`verifiedEmail`), so the links move no one's reminders; only an address saved since needs
+ * its link. The marker `migrations/d11-existing-addresses` (server-only) claims it, so
+ * overlapping runs do it once; a failure releases the claim for the next run, and users already
+ * confirmed are skipped.
  */
 async function confirmExistingAddresses(db: Firestore, now: Date): Promise<void> {
   const marker = db.collection("migrations").doc("d11-existing-addresses");
@@ -191,10 +192,10 @@ const EARLIEST_TIMESTAMP = new Timestamp(-62_135_596_800, 0);
 
 /**
  * Once per UTC day, sets `nextReminderAt` to now for every user without one, so this run reads
- * them: every user on the first run after A8, then anyone whose sign-in didn't set it. A user is
+ * them: users from before the field existed, then anyone whose sign-in didn't set it. A user is
  * only ever read through the `nextReminderAt` query, and Firestore can't query a missing field,
  * so two counts (one read per 1,000 users each) say first whether any user lacks a timestamp
- * there, and only then is every user doc read (A19).
+ * there, and only then is every user doc read.
  */
 async function scheduleUnscheduledUsers(db: Firestore, now: Date): Promise<number | null> {
   const runRef = db.collection("cronRuns").doc(cronRunId(now));
@@ -302,7 +303,7 @@ function activePreferences(uid: string, userData: unknown): NotificationPreferen
 }
 
 /**
- * Where this user's reminders go (A17): the chosen address once it is the account's own or
+ * Where this user's reminders go: the chosen address once it is the account's own or
  * confirmed through the link, else the account's sign-in email. Null: nowhere to send.
  */
 async function reminderAddress(
@@ -338,9 +339,9 @@ interface AssessmentNames {
 
 /**
  * The user's assessments due in `dueDates`, the range a reminder can come from now
- * (`reminderDueDates`), read from every semester at once with only the fields a reminder uses
- * (A19). A stored date that isn't YYYY-MM-DD falls outside the range, and `dueReminders` would
- * skip it anyway.
+ * (`reminderDueDates`), read from every semester at once with only the fields a reminder uses.
+ * A stored date that isn't YYYY-MM-DD falls outside the range, and `dueReminders` would skip it
+ * anyway.
  */
 async function readAssessments(
   userDoc: QueryDocumentSnapshot,
@@ -523,7 +524,6 @@ function validateNotificationPreferences(preferences: unknown): {
 } {
   const errors: string[] = [];
 
-  // Check required fields exist
   if (typeof preferences !== "object" || preferences === null) {
     errors.push("Preferences must be an object");
     return { isValid: false, errors, sanitized: null };
@@ -531,12 +531,10 @@ function validateNotificationPreferences(preferences: unknown): {
 
   const prefs = preferences as Record<string, unknown>;
 
-  // Validate emailNotifications
   if (typeof prefs.emailNotifications !== "boolean") {
     errors.push("emailNotifications must be a boolean");
   }
 
-  // Validate notificationDaysBefore
   if (
     typeof prefs.notificationDaysBefore !== "number" ||
     prefs.notificationDaysBefore < 1 ||
@@ -545,7 +543,6 @@ function validateNotificationPreferences(preferences: unknown): {
     errors.push("notificationDaysBefore must be a number between 1 and 30");
   }
 
-  // Validate email if email notifications are enabled
   if (prefs.emailNotifications && prefs.email) {
     if (typeof prefs.email === "string" && !isValidEmail(prefs.email)) {
       errors.push("Invalid email format");
@@ -554,7 +551,6 @@ function validateNotificationPreferences(preferences: unknown): {
     errors.push("Email address required when email notifications are enabled");
   }
 
-  // Validate consent
   if (typeof prefs.hasConsentedToNotifications !== "boolean") {
     errors.push("hasConsentedToNotifications must be a boolean");
   }

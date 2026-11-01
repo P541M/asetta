@@ -23,7 +23,6 @@ const AuthShell = ({ title, description, heading, subheading, children }: AuthSh
       <meta name="description" content={description} />
     </Head>
 
-    {/* Brand panel */}
     <aside className="hidden w-[44%] flex-col justify-between bg-secondary p-12 lg:flex xl:p-16">
       <Logo />
       <div>
@@ -37,7 +36,6 @@ const AuthShell = ({ title, description, heading, subheading, children }: AuthSh
       <p className="text-sm text-muted-foreground">Free for students.</p>
     </aside>
 
-    {/* Form column */}
     <main className="relative flex flex-1 flex-col items-center justify-center px-6 py-16 sm:px-8">
       <ThemeToggle className="absolute right-4 top-4 text-muted-foreground" />
       <div className="w-full max-w-sm">

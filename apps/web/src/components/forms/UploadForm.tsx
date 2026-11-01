@@ -35,7 +35,6 @@ const UploadForm = ({ semesterId }: UploadFormProps) => {
   const processFiles = useCallback((selectedFiles: File[]) => {
     if (selectedFiles.length === 0) return;
 
-    // Filter for PDF files only
     const pdfFiles = selectedFiles.filter((file) => file.type === "application/pdf");
 
     if (pdfFiles.length === 0) {
@@ -65,7 +64,8 @@ const UploadForm = ({ semesterId }: UploadFormProps) => {
     setError("");
     setMessage("");
 
-    // Update the file input to match
+    // handleUpload reads the input element's files, so the accepted PDFs (dropped ones too) go
+    // into it
     if (fileInputRef.current) {
       const dt = new DataTransfer();
       pdfFiles.forEach((file) => dt.items.add(file));
@@ -124,7 +124,6 @@ const UploadForm = ({ semesterId }: UploadFormProps) => {
       const formData = new FormData();
       formData.append("semesterId", semesterId);
 
-      // Add all files to form data
       if (fileInputRef.current?.files) {
         Array.from(fileInputRef.current.files).forEach((file, index) => {
           formData.append(`file-${index}`, file);
@@ -146,13 +145,11 @@ const UploadForm = ({ semesterId }: UploadFormProps) => {
           fileInputRef.current.value = "";
         }
 
-        // Show success modal with enhanced data
         if (payload?.data) {
           setExtractionResult(payload.data);
           setShowSuccessModal(true);
         }
       } else {
-        // Check for different types of errors
         if (status === 429) {
           if (payload?.error === "DAILY_QUOTA_EXCEEDED") {
             const quota = uploadQuotaFromPayload(payload, new Date());
@@ -174,7 +171,6 @@ const UploadForm = ({ semesterId }: UploadFormProps) => {
       }
     } catch (err) {
       console.error("Upload error:", err);
-      // Check if it's a network-level error indicating quotas or rate limits
       if (
         err instanceof Error &&
         (err.message.includes("429") ||
@@ -256,7 +252,6 @@ const UploadForm = ({ semesterId }: UploadFormProps) => {
       </div>
 
       <div className="space-y-6">
-        {/* Drag and drop zone */}
         <div
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
@@ -370,7 +365,6 @@ const UploadForm = ({ semesterId }: UploadFormProps) => {
           )
         )}
 
-        {/* Copyright agreement */}
         {files.length > 0 && uploadStatus === "idle" && (
           <CopyrightAgreement
             id="upload-copyright-agreement"
@@ -414,7 +408,6 @@ const UploadForm = ({ semesterId }: UploadFormProps) => {
         </div>
       </div>
 
-      {/* Success modal */}
       {showSuccessModal && extractionResult && (
         <ExtractionSuccessModal
           isOpen={showSuccessModal}
@@ -424,7 +417,6 @@ const UploadForm = ({ semesterId }: UploadFormProps) => {
         />
       )}
 
-      {/* API limit reached modal */}
       <ApiLimitReachedModal
         isOpen={showApiLimitModal}
         onClose={handleCloseApiLimitModal}

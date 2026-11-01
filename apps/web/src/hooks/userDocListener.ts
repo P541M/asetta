@@ -19,7 +19,7 @@ import {
 
 /**
  * The user doc's Firestore side, loaded by useUserDoc with `import()` once someone is signed in,
- * so Firestore stays out of _app and the auth pages (A15).
+ * so Firestore stays out of _app and the auth pages.
  */
 
 /** Asks the server for the welcome email. It goes to the account's own address, at most once. */
@@ -41,12 +41,12 @@ async function requestWelcomeEmail(user: User, displayName: string) {
 
 /**
  * The sign-in writes, from the server's first answer: a missing doc is created (and requests
- * the welcome email); an existing one gets `lastLogin` at most once a day (A12) and the browser's
+ * the welcome email); an existing one gets `lastLogin` at most once a day and the browser's
  * zone when it is missing or has changed.
  */
 async function bootstrapUserDoc(user: User, snapshot: DocumentSnapshot): Promise<void> {
   const now = new Date();
-  // Reminders go out at 9:30 in this zone (A8). nextReminderAt set to the server's now asks
+  // Reminders go out at 9:30 in this zone. nextReminderAt set to the server's now asks
   // the reminder cron to look at this user at its next run, which then schedules the next 9:30.
   const timeZone = browserTimeZone();
 

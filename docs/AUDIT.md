@@ -23,7 +23,7 @@ items off and add a session log entry to docs/AUDIT-archive.md when done. Don't 
 
 **Rules:**
 
-- IDs are permanent. Never renumber. New items take the next free number (**next: A132, D14**); split an item as A9a/A9b.
+- IDs are permanent. Never renumber. New items take the next free number (**next: A133, D14**); split an item as A9a/A9b.
 - Dropped items move to the archive struck through with a reason: `~~A24~~ dropped: <why>`.
 - Line numbers in items drift. Search by symbol name.
 - One theme per branch and PR.
@@ -39,7 +39,7 @@ Answered decisions are in the archive ("Answered decisions"); an item that depen
 
 ## Batches
 
-**Done:** B1 to B23 (PRs #5 to #29): security, tests, reminders, data layer, rules, bundle size, rate limits, cron throughput, the dashboard and grades bugs, the onboarding and notification settings, the writing rules and docs (B21), and the UI/UX audit of both apps (B23, findings A105 to A129). What each shipped is in the archive.
+**Done:** B1 to B24 (PRs #5 to #32): security, tests, reminders, data layer, rules, bundle size, rate limits, cron throughput, the dashboard and grades bugs, the onboarding and notification settings, the writing rules and docs (B21), the UI/UX audit of both apps (B23, findings A105 to A129), and the cleanup sweep (B24: dead code, test names, comments). What each shipped is in the archive.
 
 **Up next, in order** (reprioritized 2026-10-30 from the founder's list: after the backend work, the focus moves to cleanup and UI/UX):
 
@@ -47,19 +47,21 @@ Answered decisions are in the archive ("Answered decisions"); an item that depen
 | --- | --- | --- | --- | --- |
 | any | | A117's overflow only | The Courses tab scrolls sideways on phones | A one-line layout fix on a P1 found in B23; it needn't wait for the redesign. |
 | any | | A129 | Self-serve account deletion | The privacy policy already promises it. Server code and a Settings section, so it can go before or with A121. |
-| 1 | B24 | ~~A47, A24~~ (done 2026-10-31), ~~A92~~ (done 2026-11-01), then A93 | Cleanup sweep: test names, comments, dead code | Mechanical. Shrinks the code before B25 simplifies it. A93 is a PR of its own (comments only). |
-| 2 | B25 | A94, A95, A21, A22, A23, A83 | Simplify and modularize | Test-first wherever logic moves. Before the UI work so each screen is restyled once, in its final files. A83 is the last stray user-doc read. Expect 2 or 3 PRs, one per area. Each B23 item's "Touches" line names the files its redesign changes: split those along the lines the redesign needs (A114's onboarding, A116's table, A118's calendar). |
-| 3 | B26 | A106 first; then A107, A108, A109, A112 (with A104, A103, A66); then the screens in this order: A116, A117, A118, A114, A119, A120, A115, A121, A122, A123, A113; A110 and A111 alongside; A69 with A120 | UI/UX implementation | One screen or theme per PR, from B23's findings, each checked in both themes, at 320 to 390px and with the detector re-run. A106 rewrites the rules once (the founder's call: the old rules don't bind), so each screen is restyled once against them. Screens go by how often a student uses them. |
-| 5 | B27 | A96, A25, A33, A62 | Deprecated and outdated dependencies | One major per PR. `@google/generative-ai` is Google's retired SDK and runs the core feature (extraction): if it starts failing, its move to `@google/genai` jumps the queue. Do Tiptap 3 before B26 restyles the notes editor. |
+| 1 | B25 | A94, A95, A21, A22, A23, A83 | Simplify and modularize | Test-first wherever logic moves. Before the UI work so each screen is restyled once, in its final files. A83 is the last stray user-doc read. Expect 2 or 3 PRs, one per area. Each B23 item's "Touches" line names the files its redesign changes: split those along the lines the redesign needs (A114's onboarding, A116's table, A118's calendar). |
+| 2 | B26 | A106 first; then A107, A108, A109, A112 (with A104, A103, A66); then the screens in this order: A116, A117, A118, A114, A119, A120, A115, A121, A122, A123, A113; A110 and A111 alongside; A69 with A120 | UI/UX implementation | One screen or theme per PR, from B23's findings, each checked in both themes, at 320 to 390px and with the detector re-run. A106 rewrites the rules once (the founder's call: the old rules don't bind), so each screen is restyled once against them. Screens go by how often a student uses them. |
+| 3 | B27 | A96, A25, A33, A62 | Deprecated and outdated dependencies | One major per PR. `@google/generative-ai` is Google's retired SDK and runs the core feature (extraction): if it starts failing, its move to `@google/genai` jumps the queue. Do Tiptap 3 before B26 restyles the notes editor. |
 | any | B28 | A98 | One domain | D13 decided: the platform moves to `app.asetta.me`. Touches only config, env and cross-app links, so it can run beside any batch. |
 | any | B29 | A105 (A124 to A128), A27, A68, then A90 | Marketing site: the B23 fixes, GIFs to video, tests, then Lenis | The landing shares no code with the platform, so this runs beside any batch. A126's false claims and A125's old screenshot first; A27 goes with A125 and A126 (new screenshots and video replace the GIFs); Lenis last, once the layout has settled. If A106 picks one typeface for both apps, A124 follows it. |
-| any | | A101 (the founder reads the docs), A14 (a manual check), A26, A28, A39, A40, A42, A45, A46, A49, A52, A55, A57 to A61, A63, A64, A70 to A73, A80, A81, A82, A85, A131 | Remaining items | As time allows. Founder calls first: D12, A73, A80, A81 and A85. A64 once the D11 marker has `finishedAt`; A71 only if spam arrives. |
+| any | | A101 (the founder reads the docs), A14 (a manual check), A26, A28, A39, A40, A42, A45, A46, A49, A52, A55, A57 to A61, A63, A64, A70 to A73, A80, A81, A82, A85, A131, A132 | Remaining items | As time allows. Founder calls first: D12, A73, A80, A81 and A85. A64 once the D11 marker has `finishedAt`; A71 only if spam arrives. |
 
 ## Open items
 
 ### Bugs
 
-None open outside "Backend and earlier items".
+- [ ] **A132 · A selection with no PDF leaves the upload form's input out of step with its list** · S · risk L · found during B24 (A93)
+  - **Where:** `processFiles` in `apps/web/src/components/forms/UploadForm.tsx`; `handleUpload` sends `fileInputRef.current.files`, not the `files` state.
+  - **Problem:** read from the code, not reproduced: when a picked selection holds no PDF, `processFiles` shows "Please select PDF files only." and returns without resetting the input, which still holds what the dialog just set, while the list still shows the earlier PDFs. Extract then sends the non-PDF files; the route's mimetype filter drops them, so the student sees nothing extracted from the PDFs the list shows. The onboarding form (`OnboardingUploadForm.tsx`) may share the pattern.
+  - **Fix:** on that path reset the input to the files the list shows (or clear both), as the validation-error path already clears both; or have `handleUpload` send the `files` the list holds. Check by picking a PDF, then a .docx, then pressing Extract.
 
 ### UI/UX
 
@@ -313,11 +315,6 @@ Severity is Impeccable's: P0 blocks a task, P1 makes it hard or fails WCAG 2.2 A
   - **Done when:** a student can delete their account from Settings, nothing keyed by their uid remains in Firestore or Auth, and the rules suite and tests pass.
 
 ### Cleanup
-
-- [ ] **A93 · Comments that narrate or log history** · M · risk L · both apps · do with A35
-  - **Found (2026-10-30):** `apps/web/src` has about 1,250 comment lines in about 20,200 lines (JSDoc included). Many are useful "why" notes. Patterns to remove: narration of the next line ("Navigation handlers" in `CalendarView.tsx`), version and history stamps ("standards.md v4.3" in `components/ui/input.tsx`, "Also handle direct /terms and /privacy routes for consistency" in `next.config.ts`, "Pricing page removed" in the landing config), and item IDs in comments where the constraint itself can be stated instead.
-  - **Fix:** per folder, keep comments that explain a constraint the code can't show (the A44 `Buffer` note in `lib/upload/pdfText.ts`, the adjust-state-during-render note in `GradesTab.tsx`, Safari or Gmail quirks); delete the rest or rewrite them as the reason. No code change in the same PR. The rule is A102's "Comments" rule.
-  - **Done when:** a pass over every folder of both apps is done, and the verification loop is green with no code diff besides comments.
 
 - [ ] **A94 · Simplify over-built logic** · L · risk M · test-first · after A92 and A93
   - **Goal (founder):** find code that does in many steps what could be done in a few, and simplify it without changing behavior. Look first; this is not a deletion pass.
@@ -611,6 +608,7 @@ Full text and what shipped: archive, "Done items".
 - [x] A88 · Editing a due date shows no calendar on Windows · 2026-10-30, PR #28
 - [x] A91 · Emojis in the code and copy · 2026-10-30, PR #27
 - [x] A92 · Tracker IDs in test names · 2026-11-01, PR #31
+- [x] A93 · Comments that narrate or log history · 2026-11-01, PR #32
 - [x] A97 · Clean this file · 2026-10-30, PR #27
 - [x] A102 · Writing rules for agents (no AI slop) · 2026-10-30, PR #27
 
@@ -619,8 +617,8 @@ Full text and what shipped: archive, "Done items".
 The latest numbers to compare against. Every earlier value is in the archive ("Baselines as recorded").
 
 - `npm audit --omit=dev`: 38 vulnerabilities (0 critical, 5 high, 33 moderate) since A2 (2026-10-10); 43 (10 high) with dev dependencies. Why each high stays is in the B2 session log.
-- `apps/web` build (Next 15.5.27, after B22, 2026-10-30; unchanged after B24's first part): First Load JS shared by every page 154 kB; `/login` 166 kB, `/register` 167, `/reset-password` 165, `/confirm-email` 162, `/404` 157, `/dashboard` 145, `/dashboard/*` 272, `/dashboard/[semester]/*` 272, `/settings` 273, `/onboarding` 288. A dashboard fetches the other tabs after first paint (about 37 kB in all) and the semester drag list when its menu opens (about 17 kB).
-- Tests (after A92, 2026-11-01; counts unchanged since B24's first part): 26 suites, 776 tests per zone, all passing (1,552 across the two zones). The rules suite (`npm run test:rules`): 44 cases.
+- `apps/web` build (Next 15.5.27, after B22, 2026-10-30; unchanged after B24): First Load JS shared by every page 154 kB; `/login` 166 kB, `/register` 167, `/reset-password` 165, `/confirm-email` 162, `/404` 157, `/dashboard` 145, `/dashboard/*` 272, `/dashboard/[semester]/*` 272, `/settings` 273, `/onboarding` 288. A dashboard fetches the other tabs after first paint (about 37 kB in all) and the semester drag list when its menu opens (about 17 kB).
+- Tests (after A93, 2026-11-01; counts unchanged since B24's first part): 26 suites, 776 tests per zone, all passing (1,552 across the two zones). The rules suite (`npm run test:rules`): 44 cases.
 - Reminder cron (B15, emulators, a simulated 25 ms per Firestore call): a day's first run with nobody due reads 4 docs at 10 to 500 users (6 at 2,000); a run with 300 of 500 users due takes 13.3 s and 3,514 reads.
 - Firestore reads (B10, emulator rule coverage): a dashboard load reads the user doc once and writes nothing; a day's first load also writes `lastLogin` once.
 - Vercel limits and the live rules' deploy state: `docs/ops.md`.

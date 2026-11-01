@@ -1,12 +1,8 @@
 @import "tailwindcss";
 
-/* ---------------------------------------------------------------------------
- * Design tokens (Tailwind v4 CSS-first config)
- * ------------------------------------------------------------------------- */
 @theme {
   --font-sans: var(--font-inter), "Inter", ui-sans-serif, system-ui, sans-serif;
 
-  /* Warm amber brand palette */
   --color-primary-50: #fefaf7;
   --color-primary-100: #fef2e8;
   --color-primary-200: #fde2c8;
@@ -31,9 +27,6 @@
   }
 }
 
-/* ---------------------------------------------------------------------------
- * Base
- * ------------------------------------------------------------------------- */
 @layer base {
   html {
     scroll-behavior: smooth;
@@ -58,10 +51,6 @@
     font-size: 16px;
   }
 }
-
-/* ---------------------------------------------------------------------------
- * Custom utilities
- * ------------------------------------------------------------------------- */
 
 /* Offsets page content below the fixed header, including notched devices.
    7rem = the 4rem header bar (h-16 in Header.tsx) + 3rem breathing room;

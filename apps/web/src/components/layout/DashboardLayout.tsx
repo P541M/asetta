@@ -130,7 +130,6 @@ const DashboardLayout = ({
             </div>
           )}
 
-          {/* Tab Content Area */}
           <div className="mt-6">
             <div className="rounded-xl bg-card shadow-soft">
               {isLoading ? (

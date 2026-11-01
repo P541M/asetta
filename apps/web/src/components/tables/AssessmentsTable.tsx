@@ -27,7 +27,7 @@ import AssessmentRow from "./assessments/AssessmentRow";
 import AssessmentEditRow from "./assessments/AssessmentEditRow";
 import NotesModal from "./assessments/NotesModal";
 
-// Done holds Missed too, so it isn't called Submitted (A74). The keys are older than the labels
+// Done holds Missed too, so it isn't called Submitted. The keys are older than the labels
 // and stay, so a filter stored by useTableSettings carries over.
 const filterOptions = [
   { value: "all", label: "All tasks" },
@@ -45,7 +45,6 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
   const { setActiveTab } = useTab();
   const [localAssessments, setLocalAssessments] = useState<Assessment[]>(assessments);
 
-  // Update local assessments when props change
   useEffect(() => {
     setLocalAssessments(assessments);
   }, [assessments]);
@@ -105,7 +104,6 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
   const handleStatusChange = async (assessmentId: string, newStatus: AssessmentStatus) => {
     if (!user || !assessmentId) return;
 
-    // Optimistic update: Update UI immediately
     setLocalAssessments((prev) =>
       prev.map((assessment) =>
         assessment.id === assessmentId ? { ...assessment, status: newStatus } : assessment,
@@ -120,7 +118,6 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
       });
     } catch (error) {
       console.error("Error updating assessment status:", error);
-      // Revert optimistic update on error
       setLocalAssessments(assessments);
     }
   };
@@ -131,7 +128,6 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
     try {
       const assessmentRef = getAssessmentDocRef(user.uid, semesterId, assessment.id);
       await deleteDoc(assessmentRef);
-      // Remove from local state after successful deletion
       setLocalAssessments((prev) => prev.filter((a) => a.id !== assessment.id));
       setShowDeleteModal(false);
       setAssessmentToDelete(null);
@@ -148,7 +144,6 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
         const assessmentRef = getAssessmentDocRef(user.uid, semesterId, id);
         await deleteDoc(assessmentRef);
       }
-      // Remove deleted assessments from local state
       setLocalAssessments((prev) => prev.filter((a) => !selectedRows.includes(a.id || "")));
       setSelectedRows([]);
       setShowBulkDeleteModal(false);
@@ -256,7 +251,6 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
           updatedAt: serverTimestamp(),
         });
       }
-      // Update local state optimistically
       setLocalAssessments((prev) =>
         prev.map((assessment) =>
           selectedRows.includes(assessment.id || "")
@@ -316,7 +310,6 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
         }
       />
 
-      {/* Bulk Actions Toolbar */}
       {selectedRows.length > 0 && (
         <BulkActionsBar
           selectedCount={selectedRows.length}
@@ -361,7 +354,6 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
             showWeight={showWeight}
           />
 
-          {/* Assessment Cards */}
           <div className="space-y-2">
             {sortedAssessments.map((assessment) => {
               if (!assessment) return null;
@@ -410,7 +402,6 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
           </div>
         </div>
       )}
-      {/* Notes Modal */}
       {selectedAssessment && (
         <NotesModal
           assessment={selectedAssessment}
@@ -418,7 +409,6 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
           onSave={handleSaveNotes}
         />
       )}
-      {/* Delete Confirmation Modal */}
       <ConfirmationModal
         isOpen={showDeleteModal}
         onClose={() => {
@@ -431,7 +421,6 @@ const AssessmentsTable: React.FC<AssessmentsTableProps> = ({
         confirmText="Delete"
         variant="danger"
       />
-      {/* Bulk Delete Confirmation Modal */}
       <ConfirmationModal
         isOpen={showBulkDeleteModal}
         onClose={() => setShowBulkDeleteModal(false)}

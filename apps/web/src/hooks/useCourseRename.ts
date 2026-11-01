@@ -35,7 +35,6 @@ export const useCourseRename = (
         return;
       }
 
-      // Validate new course name
       const validationError = validateCourseName(newName.trim());
       if (validationError) {
         setError(validationError);
@@ -46,7 +45,6 @@ export const useCourseRename = (
       const trimmedNewName = newName.trim();
       const trimmedOldName = oldName.trim();
 
-      // Check if names are the same
       if (trimmedOldName === trimmedNewName) {
         const errorMsg = "New course name must be different from current name";
         setError(errorMsg);
@@ -58,10 +56,8 @@ export const useCourseRename = (
       setError(null);
 
       try {
-        // Create a batch for atomic updates
         const batch = writeBatch(db);
 
-        // 1. Update all assessments with the old course name
         const assessmentsRef = getAssessmentsRef(user.uid, semesterId);
         const assessmentsQuery = query(assessmentsRef, where("courseName", "==", trimmedOldName));
         const assessmentsSnapshot = await getDocs(assessmentsQuery);
@@ -73,7 +69,7 @@ export const useCourseRename = (
           });
         });
 
-        // 2. Handle course preferences (copy to new document ID, delete old)
+        // The preferences doc's ID comes from the course name, so the doc moves to the new ID
         const oldPrefsRef = getCoursePreferencesDocRef(user.uid, semesterId, trimmedOldName);
         const newPrefsRef = getCoursePreferencesDocRef(user.uid, semesterId, trimmedNewName);
 
@@ -86,7 +82,6 @@ export const useCourseRename = (
               ...(isValidCourseColor(color) ? { color: color.toUpperCase() } : {}),
               ...(typeof targetGrade === "number" ? { targetGrade } : {}),
             });
-            // Delete old preferences document
             batch.delete(oldPrefsRef);
           }
         } catch (prefsError) {
@@ -94,7 +89,6 @@ export const useCourseRename = (
           // Don't fail the entire operation if preferences update fails
         }
 
-        // 3. Commit the batch
         await batch.commit();
 
         onSuccess?.(trimmedOldName, trimmedNewName);

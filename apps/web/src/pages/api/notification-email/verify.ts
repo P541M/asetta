@@ -18,7 +18,7 @@ const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "https://asetta.me";
 export const config = { api: { bodyParser: false } };
 
 /**
- * Emails the confirm link for the notification address saved on the signed-in user's doc (A17).
+ * Emails the confirm link for the notification address saved on the signed-in user's doc.
  * Until the link is used, reminders go to the account email. Links are capped per user
  * (lib/emailVerification.ts), because each one is an email to an address the student typed.
  */

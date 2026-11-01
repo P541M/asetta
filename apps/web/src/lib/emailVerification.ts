@@ -2,7 +2,7 @@ import { createHash, randomBytes, timingSafeEqual } from "node:crypto";
 import { storedDate } from "../utils/dateUtils";
 
 /**
- * The confirm link for a notification address (A17), server side. A link carries a random token;
+ * The confirm link for a notification address, server side. A link carries a random token;
  * only its SHA-256 hash is stored, in the server-only `emailVerifications/{uid}` doc, with the
  * address it confirms, its expiry and the day's send count.
  */

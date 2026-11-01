@@ -48,7 +48,6 @@ export function onboardingStatusFromUserDoc(data: DocumentData | undefined): Onb
   const hasCompletedOnboarding = data.hasCompletedOnboarding ?? false;
   const onboardingCompletedAt = data.onboardingCompletedAt?.toDate();
 
-  // Consider a user "new" if they don't have onboarding completion data
   const isNewUser = !hasCompletedOnboarding && !onboardingCompletedAt;
 
   return {
@@ -70,7 +69,7 @@ export function shouldRedirectToOnboarding(onboardingStatus: OnboardingStatus | 
 /**
  * Where sign-in and sign-up go once the user doc is in: onboarding for an account that hasn't
  * finished it, else the dashboard. A doc that couldn't be read has no status and goes to the
- * dashboard too, which shows the error screen (A54): never to onboarding over an account it
+ * dashboard too, which shows the error screen: never to onboarding over an account it
  * can't read.
  */
 export function pathAfterAuth(onboardingStatus: OnboardingStatus | null): string {
@@ -98,7 +97,7 @@ export function profileFromUserDoc(data: DocumentData | undefined): UserProfile 
 }
 
 /**
- * The notification address the student confirmed through its link (A17). Only the server writes
+ * The notification address the student confirmed through its link. Only the server writes
  * it; reminders go to the chosen address once it matches this one (utils/notificationEmail.ts).
  */
 export function verifiedEmailFromUserDoc(data: DocumentData | undefined): string | null {
@@ -109,7 +108,7 @@ const localDay = (date: Date) => `${date.getFullYear()}-${date.getMonth()}-${dat
 
 /**
  * The `lastLogin` a sign-in writes to an existing user doc, or null when it writes none: at most
- * once per local calendar day (A12), so most page loads write nothing.
+ * once per local calendar day, so most page loads write nothing.
  */
 export function lastLoginToWrite(stored: unknown, now: Date): Date | null {
   const last = storedDate(stored);
@@ -120,7 +119,7 @@ export function lastLoginToWrite(stored: unknown, now: Date): Date | null {
 
 /**
  * The browser's zone when sign-in should save it on an existing user doc (missing or changed),
- * else null. Saving it also sets `nextReminderAt`, so the reminder cron reschedules (A8).
+ * else null. Saving it also sets `nextReminderAt`, so the reminder cron reschedules.
  */
 export function timeZoneToWrite(stored: unknown, browserZone: string | null): string | null {
   return browserZone && browserZone !== stored ? browserZone : null;

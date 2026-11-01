@@ -37,12 +37,10 @@ export function OnboardingFlow() {
     <>
       <OnboardingLayout onSkip={requestExit} showSkip={true}>
         <div className="w-full max-w-2xl mx-auto">
-          {/* Progress Bar */}
           <div className="mb-8">
             <ProgressBar currentStep={state.currentStep} totalSteps={state.totalSteps} />
           </div>
 
-          {/* Error Display */}
           {state.error && (
             <Alert variant="destructive" className="mb-6">
               <CircleAlert aria-hidden />
@@ -57,7 +55,6 @@ export function OnboardingFlow() {
         </div>
       </OnboardingLayout>
 
-      {/* Exit Confirmation Modal */}
       <ConfirmationModal
         isOpen={state.showExitModal}
         onClose={cancelExit}

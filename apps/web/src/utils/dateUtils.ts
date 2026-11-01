@@ -1,7 +1,3 @@
-/**
- * Date utility functions for handling dates and times
- */
-
 const MS_PER_DAY = 1000 * 60 * 60 * 24;
 
 /**
@@ -58,7 +54,7 @@ const startOfDay = (date: Date): Date =>
 
 /**
  * Whether two moments fall on the same local calendar day: a calendar day cell (its midnight)
- * and the clock, say. Comparing the instants matches only at midnight (A56).
+ * and the clock, say. Comparing the instants matches only at midnight.
  */
 export const isSameLocalDay = (a: Date, b: Date): boolean =>
   startOfDay(a).getTime() === startOfDay(b).getTime();

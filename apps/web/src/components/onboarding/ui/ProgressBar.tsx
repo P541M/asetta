@@ -12,7 +12,6 @@ export function ProgressBar({ currentStep, totalSteps, className }: ProgressBarP
 
   return (
     <div className={cn("w-full", className)}>
-      {/* Step indicators */}
       <div className="mb-2 flex items-center justify-between">
         {Array.from({ length: totalSteps }, (_, i) => {
           const stepNumber = i + 1;
@@ -38,7 +37,6 @@ export function ProgressBar({ currentStep, totalSteps, className }: ProgressBarP
         })}
       </div>
 
-      {/* Progress track */}
       <div className="mb-4 h-2 w-full rounded-full bg-secondary">
         <div
           className="h-2 rounded-full bg-primary transition-all duration-300 ease-out"
@@ -46,7 +44,6 @@ export function ProgressBar({ currentStep, totalSteps, className }: ProgressBarP
         />
       </div>
 
-      {/* Progress text */}
       <p className="text-center text-xs font-medium text-muted-foreground">
         Step {currentStep} of {totalSteps} ({Math.round(progress)}% complete)
       </p>

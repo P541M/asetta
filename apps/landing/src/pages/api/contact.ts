@@ -20,7 +20,7 @@ function escapeHtml(value: string): string {
     .replaceAll("'", "&#39;");
 }
 
-// Every message lands in the founder's inbox, so one IP gets a few an hour (A20). The count lives
+// Every message lands in the founder's inbox, so one IP gets a few an hour. The count lives
 // in this instance only (see lib/rateLimit.ts): it slows a client resubmitting in a loop, it isn't
 // a hard cap.
 const SENDS_PER_IP = 5;
@@ -78,7 +78,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(400).json({ message: "Submission is too long" });
   }
 
-  // CASL Compliance Check
   if (!emailConsent) {
     return res.status(400).json({
       message:

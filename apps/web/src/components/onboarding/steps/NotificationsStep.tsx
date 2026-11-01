@@ -35,7 +35,6 @@ export function NotificationsStep() {
   const [isCustomDays, setIsCustomDays] = useState(false);
   const [customDays, setCustomDays] = useState(formData.notificationDaysBefore);
 
-  // Update isCustomDays when notificationDaysBefore changes
   useEffect(() => {
     const isCustom = ![1, 2, 3, 7].includes(formData.notificationDaysBefore);
     setIsCustomDays(isCustom);
@@ -47,7 +46,7 @@ export function NotificationsStep() {
   const handleInputChange = (field: string, value: string | boolean | number) => {
     const newFormData = { ...formData, [field]: value };
 
-    // Auto-sync consent with email notifications
+    // Consent mirrors the notifications switch (one decision, stored in both fields)
     const userData = {
       ...newFormData,
       hasConsentedToNotifications: newFormData.emailNotifications,
@@ -75,7 +74,6 @@ export function NotificationsStep() {
   const handleCustomDaysChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value;
 
-    // Allow only digits
     if (inputValue && !/^\d+$/.test(inputValue)) {
       return;
     }
@@ -91,7 +89,7 @@ export function NotificationsStep() {
     updateUserData(newFormData);
   };
 
-  // Another address gets reminders once confirmed through its link (A17), sent when onboarding ends
+  // Another address gets reminders once confirmed through its link, sent when onboarding ends
   const accountEmail = user?.email ?? null;
   const unconfirmed =
     notificationEmailStatus({ email: formData.email, verifiedEmail, accountEmail }) ===
@@ -107,7 +105,6 @@ export function NotificationsStep() {
 
   return (
     <div className="mx-auto max-w-2xl">
-      {/* Header */}
       <div className="mb-8 text-center">
         <div className="mx-auto mb-4 flex size-16 items-center justify-center rounded-xl bg-primary/10">
           <Bell className="size-8 text-primary" aria-hidden />
@@ -120,7 +117,6 @@ export function NotificationsStep() {
         </p>
       </div>
 
-      {/* Main toggle section */}
       <div className="mb-6 flex items-center justify-between gap-4 rounded-xl bg-secondary/50 p-6">
         <div className="flex-1">
           <h3 className="text-base font-semibold text-foreground">Email notifications</h3>
@@ -142,7 +138,6 @@ export function NotificationsStep() {
 
       {formData.emailNotifications && (
         <div className="space-y-6">
-          {/* Email configuration */}
           <div className="space-y-1.5">
             <Label htmlFor="email">
               Notification email address <span className="text-destructive">*</span>
@@ -177,7 +172,6 @@ export function NotificationsStep() {
             )}
           </div>
 
-          {/* Notification timing */}
           <div className="space-y-1.5">
             <Label id="notification-days-label">Send notifications before due date</Label>
             <DropdownMenu>
