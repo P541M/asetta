@@ -65,31 +65,6 @@ export function claimDecision(record: ReminderRecord | undefined, now: Date): Cl
   return { claim: true, attempt: attempts + 1 };
 }
 
-/** How far back a send by the cron before A8 still counts (its reminders were ~1 day off). */
-const LEGACY_SEND_WINDOW_MS = 4 * 24 * 60 * 60 * 1000;
-
-/**
- * The record IDs the cron before A8 wrote for the same reminder. It keyed them by its day count:
- * N, or 0 or 1 through its 12-36 hour window when reminders go 1 day before. Checked so the first
- * runs after A8 don't resend what it sent in its last days.
- */
-export function legacyRecordIds(uid: string, assessmentId: string, daysBefore: number): string[] {
-  const base = `${uid}_${assessmentId}`;
-  return daysBefore === 1 ? [`${base}_1`, `${base}_0`] : [`${base}_${daysBefore}`];
-}
-
-/** Whether a legacy record is a send recent enough to stand in for the reminder. */
-export function isRecentLegacySend(
-  record: { status?: unknown; sentAt?: Date | null } | undefined,
-  now: Date,
-): boolean {
-  return (
-    record?.status === "sent" &&
-    record.sentAt instanceof Date &&
-    now.getTime() - record.sentAt.getTime() < LEGACY_SEND_WINDOW_MS
-  );
-}
-
 /** The `cronRuns` doc ID: the run's UTC calendar day, so every run of a day shares one doc. */
 export function cronRunId(startedAt: Date): string {
   return startedAt.toISOString().slice(0, 10);

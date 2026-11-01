@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { timestamp } from "@/test/firestore";
 import {
   DEFAULT_DISPLAY_PREFERENCES,
   displayPreferencesFromUserDoc,
@@ -13,9 +14,6 @@ import {
   userDocErrorKind,
   verifiedEmailFromUserDoc,
 } from "./userDoc";
-
-/** What a Firestore Timestamp field reads back as: an object with toDate(). */
-const timestamp = (date: Date) => ({ toDate: () => date });
 
 describe("onboardingStatusFromUserDoc", () => {
   it("treats a missing doc as a new user who needs onboarding", () => {

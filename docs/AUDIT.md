@@ -23,7 +23,7 @@ items off and add a session log entry to docs/AUDIT-archive.md when done. Don't 
 
 **Rules:**
 
-- IDs are permanent. Never renumber. New items take the next free number (**next: A130, D14**); split an item as A9a/A9b.
+- IDs are permanent. Never renumber. New items take the next free number (**next: A131, D14**); split an item as A9a/A9b.
 - Dropped items move to the archive struck through with a reason: `~~A24~~ dropped: <why>`.
 - Line numbers in items drift. Search by symbol name.
 - One theme per branch and PR.
@@ -47,7 +47,7 @@ Answered decisions are in the archive ("Answered decisions"); an item that depen
 | --- | --- | --- | --- | --- |
 | any | | A117's overflow only | The Courses tab scrolls sideways on phones | A one-line layout fix on a P1 found in B23; it needn't wait for the redesign. |
 | any | | A129 | Self-serve account deletion | The privacy policy already promises it. Server code and a Settings section, so it can go before or with A121. |
-| 1 | B24 | A92, A93, A24, A47 | Cleanup sweep: test names, comments, dead code | Mechanical, no behavior change. Shrinks the code before B25 simplifies it. A47's 5-day wait ended long ago. |
+| 1 | B24 | ~~A47, A24~~ (done 2026-10-31), then A92, then A93 | Cleanup sweep: test names, comments, dead code | Mechanical. Shrinks the code before B25 simplifies it. A93 is a PR of its own (comments only). |
 | 2 | B25 | A94, A95, A21, A22, A23, A83 | Simplify and modularize | Test-first wherever logic moves. Before the UI work so each screen is restyled once, in its final files. A83 is the last stray user-doc read. Expect 2 or 3 PRs, one per area. Each B23 item's "Touches" line names the files its redesign changes: split those along the lines the redesign needs (A114's onboarding, A116's table, A118's calendar). |
 | 3 | B26 | A106 first; then A107, A108, A109, A112 (with A104, A103, A66); then the screens in this order: A116, A117, A118, A114, A119, A120, A115, A121, A122, A123, A113; A110 and A111 alongside; A69 with A120 | UI/UX implementation | One screen or theme per PR, from B23's findings, each checked in both themes, at 320 to 390px and with the detector re-run. A106 rewrites the rules once (the founder's call: the old rules don't bind), so each screen is restyled once against them. Screens go by how often a student uses them. |
 | 5 | B27 | A96, A25, A33, A62 | Deprecated and outdated dependencies | One major per PR. `@google/generative-ai` is Google's retired SDK and runs the core feature (extraction): if it starts failing, its move to `@google/genai` jumps the queue. Do Tiptap 3 before B26 restyles the notes editor. |
@@ -327,9 +327,14 @@ Severity is Impeccable's: P0 blocks a task, P1 makes it hard or fails WCAG 2.2 A
 
 - [ ] **A94 · Simplify over-built logic** · L · risk M · test-first · after A92 and A93
   - **Goal (founder):** find code that does in many steps what could be done in a few, and simplify it without changing behavior. Look first; this is not a deletion pass.
-  - **Known candidates:** the two upload forms' shared logic (A21); files over 300 lines (A22); Firestore calls in components, `alert()`s, the non-atomic bulk delete (A23); dead code and the `order` backfill (A24); the two extra user-doc readers (A54); the one-time cron code once its time has passed (A47, A64). To check: the target-grade draft held in state plus a mirrored ref (B18's review), the calendar's own date formatter that duplicates `utils/dateUtils.ts` (B18's review), and duplicated parsing between `lib/upload/textExtraction.ts` and `normalize.ts`.
+  - **Known candidates:** the two upload forms' shared logic (A21); files over 300 lines (A22); Firestore calls in components, `alert()`s, the non-atomic bulk delete (A23); the two extra user-doc readers (A54); the one-time cron code once its time has passed (A64); an unused type field (A130). To check: the target-grade draft held in state plus a mirrored ref (B18's review), the calendar's own date formatter that duplicates `utils/dateUtils.ts` (B18's review), and duplicated parsing between `lib/upload/textExtraction.ts` and `normalize.ts`.
   - **Method:** one area per PR (upload, grades, calendar, reminders, auth and user doc, dashboard shell). For each, list the candidates with a short before and after in the session log before changing code. Code without tests gets tests on today's behavior first; the simplification must keep them green. Run `/simplify` and `/code-review` on each PR. Measure what changes: lines, files, bundle size (Baseline).
   - **Done when:** every area has been reviewed, each simplification shipped or dropped with a reason, and tests and page sizes are no worse.
+
+- [ ] **A130 · `Semester.order` is never set or read** · S · risk L · found during B24
+  - **Where:** `order?: number` in `apps/web/src/types/semester.ts`.
+  - **Problem:** `useSemesters` builds each `Semester` from `id` and `name` only, after `sortSemesters` (`utils/semesterOrder.ts`) has used the doc's `order`; nothing reads `semester.order`. The type says a semester carries its order when it never does.
+  - **Fix:** delete the field, with A94's pass or on its own.
 
 - [ ] **A95 · Modularity** · M · risk M · with A94
   - **Problem:** the rules already exist in `standards.md` ("Architecture & file layout": thin pages, components own markup and hooks own data, one responsibility per file, the folder pattern past 300 lines), but A22 and A23 list where the code breaks them, and nothing checks them.
@@ -379,11 +384,6 @@ Severity is Impeccable's: P0 blocks a task, P1 makes it hard or fails WCAG 2.2 A
   - Bulk delete is a sequential, non-atomic loop that fails silently (`AssessmentsTable.tsx:146-162`); use `writeBatch` and show an error.
   - Deleting a semester leaves its `coursePreferences` subcollection behind (`SemesterTabs.tsx:94-112`).
   - Template-literal `className` in `tables/assessments/TableHeader.tsx`; use `cn()`.
-
-- [ ] **A24 · Dead code** · S · risk L
-  - `CheckSolidIcon` and `CloseSolidIcon` are unused (`components/ui/icons.tsx:56`, `:72`).
-  - The legacy `darkMode` theme seed in `pages/_document.tsx`.
-  - The `order` backfill in `hooks/useSemesters.ts:46-70`, once every semester doc has `order` (check with an admin script the founder runs). Until then it re-reads every semester doc on each dashboard mount (A12 listed it; B10 left it here).
 
 - [ ] **A25 · Outdated dependencies (not security)** · M each · risk M · one major per PR
   - `@google/generative-ai` is Google's deprecated legacy SDK; move to `@google/genai` (also unlocks structured output for A9).
@@ -440,18 +440,13 @@ Severity is Impeccable's: P0 blocks a task, P1 makes it hard or fails WCAG 2.2 A
   - **Problem:** "Lab 3 Dec 2026" or "Week 10 May 2026" reads 3 or 10 as the day, a valid but wrong date with no review flag. "3 Dec 2026" alone is a real day-first date, so the text can't tell them apart; before B8 the same reading happened through `\w+\s+\d{1,2},?\s*\d{4}`.
   - **Fix (decide while building):** accept a day-first date only when the number isn't right after an assessment word (Lab, Quiz, Week, Assignment), or flag it for review.
 
-- [ ] **A47 · Remove the reminder cron's check for records from before A8** · S · risk L · found during B9
-  - **Where:** `legacyRecordIds` and `isRecentLegacySend` in `apps/web/src/lib/reminderCron.ts`, their use in `sendReminder` (`lib/notifications.ts`), their tests, and the "Records from before A8" bullet in `docs/ops.md`.
-  - **Problem:** the check only matters for the first 4 days after A8's first production run: it stops the switch from resending what the old cron had just sent. After that it is one or two wasted reads for each new reminder.
-  - **Fix:** delete it once 5 days have passed since the first production run (the first `cronRuns/{date}` doc with `sweptAt` dates it).
-
 - [ ] **A49 · Daily digest email (optional, from A8)** · M · risk M · found during B9
   - A8 left the digest to "decide while building"; B9 didn't build it. Since A8 a user's due reminders all go out in the same run, one email each. A digest would be one email per user per run listing them: fewer Gmail sends (D3) and less inbox noise. It needs one claim covering several records and a new builder in `lib/emailTemplates.ts`. Revisit with A19, or when sends approach the Gmail cap.
 
 - [ ] **A52 · An assessment without a due date is hidden everywhere** · S · risk L · found during B10
   - **Where:** the `orderBy("dueDate")` query in `apps/web/src/hooks/useSemesterAssessments.ts`; the `dueDate` default in `assessmentFromDoc` (`utils/semesterAssessments.ts`).
   - **Problem:** Firestore's `orderBy` leaves out docs without the field, so such an assessment never appears in any tab, and its weight and mark never reach the grade. The mapping's "today" default only applies to an empty or null `dueDate`. Before B10 it was worse: the grades tab read such docs with `getDocs` and its sort crashed the whole dashboard (`parseLocalDateTime(undefined)`, reproduced on main with a seeded doc). The upload (B8's normalizer) and the Add form always write a date, so only old or hand-edited docs can be affected.
-  - **Fix:** drop the `orderBy` and sort on the client (every consumer sorts anyway), and give such a doc `needsReview` with the viewer's today rather than a silent default (D10's rule). Or first check with an admin script whether any production doc lacks a `dueDate`.
+  - **Fix:** drop the `orderBy` and sort on the client (every consumer sorts anyway; the semester list does the same, `utils/semesterOrder.ts`), and give such a doc `needsReview` with the viewer's today rather than a silent default (D10's rule). Or first check with an admin script whether any production doc lacks a `dueDate`.
 
 - [ ] **A55 · Metadata-only user-doc snapshots re-render every `useAuth` consumer** · S · risk L · found during B10 (`/code-review`, skipped)
   - **Where:** `useUserDoc` in `apps/web/src/hooks/useUserDoc.ts` (`includeMetadataChanges: true`, so the server confirming a cached doc counts as its first answer).
@@ -583,6 +578,7 @@ Full text and what shipped: archive, "Done items".
 - [x] A18 · Per-user upload quota · 2026-10-19, PR #21
 - [x] A19 · Cron throughput · 2026-10-19, PR #22
 - [x] A20 · Landing contact form: throttle and bot check · 2026-10-19, PR #21
+- [x] A24 · Dead code · 2026-10-31, PR #30
 - [x] A29 · Line endings: local format check fails on Windows · 2026-10-11, PR #11
 - [x] A30 · Welcome email to unverified sign-up addresses · 2026-10-10, PR #6
 - [x] A31 · Redesign the welcome and reminder emails · 2026-10-10, PR #6
@@ -595,6 +591,7 @@ Full text and what shipped: archive, "Done items".
 - [x] A41 · A mark edit always sets the status to Submitted · 2026-10-11, PR #12
 - [x] A43 · Clearing the target-grade field saves 0 · 2026-10-19, PR #23
 - [x] A44 · Small PDFs fail to parse in the upload route · 2026-10-19, PR #21
+- [x] A47 · Remove the reminder cron's check for records from before A8 · 2026-10-31, PR #30
 - [x] A48 · Onboarding saves email notifications as on even when switched off · 2026-10-29, PR #26
 - [x] A50 · The reminder time shows only under Custom timing · 2026-10-29, PR #26
 - [x] A51 · The stats bar's "Submitted" counts Missed assessments · 2026-10-19, PR #23
@@ -622,8 +619,8 @@ Full text and what shipped: archive, "Done items".
 The latest numbers to compare against. Every earlier value is in the archive ("Baselines as recorded").
 
 - `npm audit --omit=dev`: 38 vulnerabilities (0 critical, 5 high, 33 moderate) since A2 (2026-10-10); 43 (10 high) with dev dependencies. Why each high stays is in the B2 session log.
-- `apps/web` build (Next 15.5.27, after B22, 2026-10-30): First Load JS shared by every page 154 kB; `/login` 166 kB, `/register` 167, `/reset-password` 165, `/confirm-email` 162, `/404` 157, `/dashboard` 145, `/dashboard/*` 272, `/dashboard/[semester]/*` 272, `/settings` 273, `/onboarding` 288. A dashboard fetches the other tabs after first paint (about 37 kB in all) and the semester drag list when its menu opens (about 17 kB).
-- Tests (after B20, 2026-10-29; B21 and B22 added none): 25 suites, 774 tests per zone, all passing (1,548 across the two zones). The rules suite (`npm run test:rules`): 44 cases.
+- `apps/web` build (Next 15.5.27, after B22, 2026-10-30; unchanged after B24's first part): First Load JS shared by every page 154 kB; `/login` 166 kB, `/register` 167, `/reset-password` 165, `/confirm-email` 162, `/404` 157, `/dashboard` 145, `/dashboard/*` 272, `/dashboard/[semester]/*` 272, `/settings` 273, `/onboarding` 288. A dashboard fetches the other tabs after first paint (about 37 kB in all) and the semester drag list when its menu opens (about 17 kB).
+- Tests (after B24's first part, 2026-10-31): 26 suites, 776 tests per zone, all passing (1,552 across the two zones). The rules suite (`npm run test:rules`): 44 cases.
 - Reminder cron (B15, emulators, a simulated 25 ms per Firestore call): a day's first run with nobody due reads 4 docs at 10 to 500 users (6 at 2,000); a run with 300 of 500 users due takes 13.3 s and 3,514 reads.
 - Firestore reads (B10, emulator rule coverage): a dashboard load reads the user doc once and writes nothing; a day's first load also writes `lastLogin` once.
 - Vercel limits and the live rules' deploy state: `docs/ops.md`.

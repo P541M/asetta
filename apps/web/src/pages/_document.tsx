@@ -1,5 +1,4 @@
 import { Html, Head, Main, NextScript } from "next/document";
-import Script from "next/script";
 
 export default function Document() {
   return (
@@ -11,22 +10,6 @@ export default function Document() {
         />
       </Head>
       <body>
-        {/* One-time migration: seed next-themes ("theme") from the legacy "darkMode" key
-            so existing users keep their saved preference. Runs before next-themes' own
-            pre-hydration script, which handles all theming from here on. */}
-        <Script id="theme-migration" strategy="beforeInteractive">
-          {`
-            (function () {
-              try {
-                var theme = localStorage.getItem('theme');
-                var legacy = localStorage.getItem('darkMode');
-                if (!theme && legacy !== null) {
-                  localStorage.setItem('theme', legacy === 'true' ? 'dark' : 'light');
-                }
-              } catch (e) {}
-            })();
-          `}
-        </Script>
         <Main />
         <NextScript />
       </body>
