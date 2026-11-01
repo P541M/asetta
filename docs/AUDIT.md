@@ -571,7 +571,7 @@ Full text and what shipped: archive, "Done items".
 - [x] A18 · Per-user upload quota · 2026-10-19, PR #21
 - [x] A19 · Cron throughput · 2026-10-19, PR #22
 - [x] A20 · Landing contact form: throttle and bot check · 2026-10-19, PR #21
-- [x] A21 · Merge the two upload forms' logic · 2026-11-01, B25 (PR pending)
+- [x] A21 · Merge the two upload forms' logic · 2026-11-01, PR #33
 - [x] A24 · Dead code · 2026-10-31, PR #30
 - [x] A29 · Line endings: local format check fails on Windows · 2026-10-11, PR #11
 - [x] A30 · Welcome email to unverified sign-up addresses · 2026-10-10, PR #6
@@ -609,7 +609,7 @@ Full text and what shipped: archive, "Done items".
 - [x] A93 · Comments that narrate or log history · 2026-11-01, PR #32
 - [x] A97 · Clean this file · 2026-10-30, PR #27
 - [x] A102 · Writing rules for agents (no AI slop) · 2026-10-30, PR #27
-- [x] A132 · A selection with no PDF leaves the upload form's input out of step with its list · 2026-11-01, B25 (PR pending)
+- [x] A132 · A selection with no PDF leaves the upload form's input out of step with its list · 2026-11-01, PR #33
 
 ## Baseline
 
