@@ -48,7 +48,7 @@ describe("parseAiAssessments", () => {
       expect(() => parseAiAssessments(reply(item), TEXT, LOCAL_DATE)).toThrow(/not an array/);
     });
 
-    it("A9: finds the array after a bracket in the text before it", () => {
+    it("finds the array after a bracket in the text before it", () => {
       const aiContent = "Found [1] assessment:\n" + reply([item]);
       expect(parseAiAssessments(aiContent, TEXT, LOCAL_DATE)).toEqual([item]);
     });
@@ -115,8 +115,8 @@ describe("parseAiAssessments", () => {
     });
   });
 
-  describe("A9: every field normalized", () => {
-    it("A9: flags a missing date for review on the local day, not the UTC day", () => {
+  describe("every field normalized", () => {
+    it("flags a missing date for review on the local day, not the UTC day", () => {
       const [assessment] = parseAiAssessments(
         reply([{ ...item, dueDate: undefined }]),
         TEXT,
@@ -125,7 +125,7 @@ describe("parseAiAssessments", () => {
       expect(assessment).toMatchObject({ dueDate: LOCAL_DATE, needsReview: true });
     });
 
-    it("A9: flags an impossible date for review", () => {
+    it("flags an impossible date for review", () => {
       const [assessment] = parseAiAssessments(
         reply([{ ...item, dueDate: "2026-02-30" }]),
         TEXT,
@@ -134,7 +134,7 @@ describe("parseAiAssessments", () => {
       expect(assessment).toMatchObject({ dueDate: LOCAL_DATE, needsReview: true });
     });
 
-    it("A9: turns a 12-hour time into 24-hour HH:MM", () => {
+    it("turns a 12-hour time into 24-hour HH:MM", () => {
       const [assessment] = parseAiAssessments(
         reply([{ ...item, dueTime: "11:59 PM" }]),
         TEXT,
@@ -143,7 +143,7 @@ describe("parseAiAssessments", () => {
       expect(assessment.dueTime).toBe("23:59");
     });
 
-    it("A9: keeps the weight between 0 and 100", () => {
+    it("keeps the weight between 0 and 100", () => {
       const aiContent = reply([
         { ...item, weight: 150 },
         { ...item, weight: -5 },
@@ -153,7 +153,7 @@ describe("parseAiAssessments", () => {
       ]);
     });
 
-    it("A9: trims names and ignores a course name that isn't text", () => {
+    it("trims names and ignores a course name that isn't text", () => {
       const aiContent = reply([{ ...item, courseName: 3760, assignmentName: "  Assignment\n 1 " }]);
       expect(parseAiAssessments(aiContent, TEXT, LOCAL_DATE)[0]).toMatchObject({
         courseName: "CIS3760",

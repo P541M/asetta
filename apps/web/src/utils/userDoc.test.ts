@@ -81,7 +81,7 @@ describe("pathAfterAuth", () => {
     );
   });
 
-  it("A54: sends a user doc that couldn't be read to the dashboard, never to onboarding", () => {
+  it("sends a user doc that couldn't be read to the dashboard, never to onboarding", () => {
     expect(pathAfterAuth(null)).toBe("/dashboard");
   });
 });
@@ -140,20 +140,20 @@ describe("lastLoginToWrite", () => {
     },
   );
 
-  it("A12: writes nothing for a second sign-in the same local day", () => {
+  it("writes nothing for a second sign-in the same local day", () => {
     expect(lastLoginToWrite(timestamp(new Date(2026, 9, 11, 0, 5)), now)).toBeNull();
   });
 
-  it("A12: reads a stored Date as well as a Timestamp", () => {
+  it("reads a stored Date as well as a Timestamp", () => {
     expect(lastLoginToWrite(new Date(2026, 9, 11, 8, 0), now)).toBeNull();
   });
 
-  it("A12: counts the March DST day as one day", () => {
+  it("counts the March DST day as one day", () => {
     const last = timestamp(new Date(2026, 2, 8, 0, 30));
     expect(lastLoginToWrite(last, new Date(2026, 2, 8, 23, 30))).toBeNull();
   });
 
-  it("A12: counts the November DST day as one day", () => {
+  it("counts the November DST day as one day", () => {
     const last = timestamp(new Date(2026, 10, 1, 0, 30));
     expect(lastLoginToWrite(last, new Date(2026, 10, 1, 23, 30))).toBeNull();
   });
@@ -196,7 +196,7 @@ describe("timeZoneToWrite", () => {
 });
 
 describe("verifiedEmailFromUserDoc", () => {
-  it("reads the address the server confirmed (A17)", () => {
+  it("reads the address the server confirmed", () => {
     expect(verifiedEmailFromUserDoc({ verifiedEmail: "sam.lee@uni.example.test" })).toBe(
       "sam.lee@uni.example.test",
     );
@@ -250,7 +250,7 @@ describe("onboardingChoicesFromUserDoc", () => {
     expect(onboardingChoicesFromUserDoc({ displayName: "Sam" })).toEqual(defaults);
   });
 
-  it("A48: writes back as it was read when the student changes nothing", () => {
+  it("writes back as it was read when the student changes nothing", () => {
     const off = { emailNotifications: false, hasConsentedToNotifications: false };
     expect(onboardingChoicesToWrite(onboardingChoicesFromUserDoc(off))).toMatchObject(off);
   });
@@ -268,7 +268,7 @@ describe("onboardingChoicesToWrite", () => {
     expect(onboardingChoicesToWrite(choices)).toEqual(choices);
   });
 
-  it("A48: writes email notifications off when the student switched them off", () => {
+  it("writes email notifications off when the student switched them off", () => {
     expect(
       onboardingChoicesToWrite({
         hasConsentedToNotifications: false,
@@ -279,7 +279,7 @@ describe("onboardingChoicesToWrite", () => {
     ).toMatchObject({ hasConsentedToNotifications: false, emailNotifications: false });
   });
 
-  it("A48: writes the defaults, notifications off, for choices never made", () => {
+  it("writes the defaults, notifications off, for choices never made", () => {
     expect(onboardingChoicesToWrite({})).toEqual({
       institution: "",
       hasConsentedToNotifications: false,

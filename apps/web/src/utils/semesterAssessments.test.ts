@@ -65,11 +65,11 @@ describe("assessmentFromDoc", () => {
     expect(assessmentFromDoc("x", { ...stored, needsReview: "true" }).needsReview).toBe(false);
   });
 
-  it("A11: keeps the mark", () => {
+  it("keeps the mark", () => {
     expect(assessmentFromDoc("x", { ...stored, mark: 85 }).mark).toBe(85);
   });
 
-  it("A11: keeps a cleared mark as null", () => {
+  it("keeps a cleared mark as null", () => {
     expect(assessmentFromDoc("x", { ...stored, mark: null })).toHaveProperty("mark", null);
   });
 
@@ -77,7 +77,7 @@ describe("assessmentFromDoc", () => {
     expect(assessmentFromDoc("x", stored)).not.toHaveProperty("mark");
   });
 
-  it("A11: keeps createdAt and updatedAt", () => {
+  it("keeps createdAt and updatedAt", () => {
     const createdAt = new Date(2026, 8, 1);
     const updatedAt = new Date(2026, 9, 10);
     const assessment = assessmentFromDoc("x", { ...stored, createdAt, updatedAt });
@@ -203,7 +203,7 @@ describe("computeStats", () => {
     expect(stats.completionRate).toBe(50);
   });
 
-  it("A51: counts only Submitted assessments as submitted", () => {
+  it("counts only Submitted assessments as submitted", () => {
     const stats = computeStats(
       [makeAssessment({ status: "Submitted" }), makeAssessment({ status: "Missed" })],
       now,
@@ -281,7 +281,7 @@ describe("matchesAssessmentFilter", () => {
     expect(matchesAssessmentFilter("Submitted", "not_submitted")).toBe(false);
   });
 
-  it("A74: lists Missed under Done, never on the to-do list", () => {
+  it("lists Missed under Done, never on the to-do list", () => {
     expect(matchesAssessmentFilter("Missed", "submitted")).toBe(true);
     expect(matchesAssessmentFilter("Missed", "not_submitted")).toBe(false);
   });

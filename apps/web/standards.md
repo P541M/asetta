@@ -169,12 +169,13 @@ All new code follows these.
 - **"Now" is never the real clock**: use `vi.useFakeTimers()` with `vi.setSystemTime()`, or the
   function's `now` parameter. Day counts get cases on both 2026 DST weekends (Mar 8 and Nov 1).
 - **Known bugs are `it.fails`**: assert the correct result and name the open `docs/AUDIT.md` item
-  (`it.fails("A<n>: ...")`). The fix turns it into a plain `it` named for the behavior, without the
-  ID (some older passing tests still carry one; they lose it in the cleanup sweep). Vitest fails an
-  `it.fails` that starts passing, so it can't be left behind. An `it.fails` also passes when the
+  (`it.fails("A<n>: ...")`). Use `it.todo("A<n>: ...")` when the fix lives outside the function
+  under test or isn't designed yet. Only `it.fails` and `it.todo` names carry an ID, the open
+  item's; no other `it` or `describe` name carries an item or batch ID. The fix turns the
+  `it.fails` (or `it.todo`) into a plain `it` named for the behavior and drops the ID. Vitest fails
+  an `it.fails` that starts passing, so it can't be left behind. An `it.fails` also passes when the
   test throws for an unrelated reason, so run a new one once as a plain `it` and check it fails on
-  its assertion. Use `it.todo("A<n>: ...")` when the fix lives outside the function under test or
-  isn't designed yet. Never assert a known bug as correct behavior.
+  its assertion. Never assert a known bug as correct behavior.
 - **A logic fix starts with a failing test** (the items marked test-first in `docs/AUDIT.md`).
 - **Assert user-facing copy loosely** (`toContain` on its key words), so a copy edit doesn't break
   a logic test; assert values, dates and thresholds exactly.

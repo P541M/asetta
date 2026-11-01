@@ -27,7 +27,7 @@ function controlledTasks(count: number) {
 }
 
 describe("mapWithConcurrency", () => {
-  it("A19: never runs more than the limit at once, and starts the next as one finishes", async () => {
+  it("never runs more than the limit at once, and starts the next as one finishes", async () => {
     const { gates, started, task, items } = controlledTasks(7);
     const result = mapWithConcurrency(items, 3, task);
     await flush();
@@ -47,7 +47,7 @@ describe("mapWithConcurrency", () => {
     expect(started).toEqual([0, 1, 2, 3, 4, 5, 6]);
   });
 
-  it("A19: resolves with the results in the items' order, whatever order the tasks finish in", async () => {
+  it("resolves with the results in the items' order, whatever order the tasks finish in", async () => {
     const { gates, task, items } = controlledTasks(4);
     const result = mapWithConcurrency(items, 4, task);
     gates[3].resolve("d");
@@ -102,7 +102,7 @@ describe("mapWithConcurrency", () => {
 });
 
 describe("onceUntilSuccess", () => {
-  it("A19: runs once after a success, and later calls get the same result", async () => {
+  it("runs once after a success, and later calls get the same result", async () => {
     const fn = vi.fn(async () => "verified");
     const verify = onceUntilSuccess(fn);
     await expect(verify()).resolves.toBe("verified");
@@ -111,7 +111,7 @@ describe("onceUntilSuccess", () => {
     expect(fn).toHaveBeenCalledTimes(1);
   });
 
-  it("A19: calls made while the first attempt runs share it", async () => {
+  it("calls made while the first attempt runs share it", async () => {
     const gate = deferred<string>();
     const fn = vi.fn(() => gate.promise);
     const verify = onceUntilSuccess(fn);
@@ -122,7 +122,7 @@ describe("onceUntilSuccess", () => {
     expect(fn).toHaveBeenCalledTimes(1);
   });
 
-  it("A19: doesn't keep a failure: the next call tries again", async () => {
+  it("doesn't keep a failure: the next call tries again", async () => {
     const fn = vi
       .fn<() => Promise<string>>()
       .mockRejectedValueOnce(new Error("timeout"))

@@ -9,11 +9,11 @@ const outline = (code: string) =>
   minimalPdf([`${code} Course Outline`, "Midterm Exam: November 12"]);
 
 describe("pdfText", () => {
-  it('A44: reads a PDF under 4 KB (pdf-parse failed with "bad XRef entry")', async () => {
+  it('reads a PDF under 4 KB, which pdf-parse fails on as a Buffer ("bad XRef entry")', async () => {
     expect(await pdfText(outline("CIS 3760"))).toContain("CIS 3760 Course Outline");
   });
 
-  it("A44: reads each PDF of a shared buffer as itself, not as the bytes around it", async () => {
+  it("reads each PDF of a shared buffer as itself, not as the bytes around it", async () => {
     const first = outline("CIS 3760");
     const second = outline("MATH 2050");
     // The layout Node gives small files read from disk: slices of one shared buffer
@@ -36,7 +36,7 @@ describe("pdfText", () => {
     });
     afterAll(() => fs.rmSync(dir, { recursive: true, force: true }));
 
-    it("A44: reads each one as itself", async () => {
+    it("reads each one as itself", async () => {
       const codes = ["CIS 3760", "MATH 2050", "HIST 1010"];
       codes.forEach((code, i) => fs.writeFileSync(path.join(dir, `${i}.pdf`), outline(code)));
       for (const [i, code] of codes.entries()) {
