@@ -23,7 +23,7 @@ items off and add a session log entry to docs/AUDIT-archive.md when done. Don't 
 
 **Rules:**
 
-- IDs are permanent. Never renumber. New items take the next free number (**next: A133, D14**); split an item as A9a/A9b.
+- IDs are permanent. Never renumber. New items take the next free number (**next: A134, D14**); split an item as A9a/A9b.
 - Dropped items move to the archive struck through with a reason: `~~A24~~ dropped: <why>`.
 - Line numbers in items drift. Search by symbol name.
 - One theme per branch and PR.
@@ -52,16 +52,16 @@ Answered decisions are in the archive ("Answered decisions"); an item that depen
 | 3 | B27 | A96, A25, A33, A62 | Deprecated and outdated dependencies | One major per PR. `@google/generative-ai` is Google's retired SDK and runs the core feature (extraction): if it starts failing, its move to `@google/genai` jumps the queue. Do Tiptap 3 before B26 restyles the notes editor. |
 | any | B28 | A98 | One domain | D13 decided: the platform moves to `app.asetta.me`. Touches only config, env and cross-app links, so it can run beside any batch. |
 | any | B29 | A105 (A124 to A128), A27, A68, then A90 | Marketing site: the B23 fixes, GIFs to video, tests, then Lenis | The landing shares no code with the platform, so this runs beside any batch. A126's false claims and A125's old screenshot first; A27 goes with A125 and A126 (new screenshots and video replace the GIFs); Lenis last, once the layout has settled. If A106 picks one typeface for both apps, A124 follows it. |
-| any | | A101 (the founder reads the docs), A14 (a manual check), A26, A28, A39, A40, A42, A45, A46, A49, A52, A55, A57 to A61, A63, A64, A70 to A73, A80, A81, A82, A85, A131, A132 | Remaining items | As time allows. Founder calls first: D12, A73, A80, A81 and A85. A64 once the D11 marker has `finishedAt`; A71 only if spam arrives. |
+| any | | A101 (the founder reads the docs), A14 (a manual check), A26, A28, A39, A40, A42, A45, A46, A49, A52, A55, A57 to A61, A63, A64, A70 to A73, A80, A81, A82, A85, A131, A133 | Remaining items | As time allows. Founder calls first: D12, A73, A80, A81 and A85. A64 once the D11 marker has `finishedAt`; A71 only if spam arrives. |
 
 ## Open items
 
 ### Bugs
 
-- [ ] **A132 · A selection with no PDF leaves the upload form's input out of step with its list** · S · risk L · found during B24 (A93)
-  - **Where:** `processFiles` in `apps/web/src/components/forms/UploadForm.tsx`; `handleUpload` sends `fileInputRef.current.files`, not the `files` state.
-  - **Problem:** read from the code, not reproduced: when a picked selection holds no PDF, `processFiles` shows "Please select PDF files only." and returns without resetting the input, which still holds what the dialog just set, while the list still shows the earlier PDFs. Extract then sends the non-PDF files; the route's mimetype filter drops them, so the student sees nothing extracted from the PDFs the list shows. The onboarding form (`OnboardingUploadForm.tsx`) may share the pattern.
-  - **Fix:** on that path reset the input to the files the list shows (or clear both), as the validation-error path already clears both; or have `handleUpload` send the `files` the list holds. Check by picking a PDF, then a .docx, then pressing Extract.
+- [ ] **A133 · The Add tab's "Clear files" spills out of its panel at 320px** · S · risk L · UI · found during B25 (A21's check)
+  - **Where:** the button row under the file list in `apps/web/src/components/forms/UploadForm.tsx` (`Extract assessments`, `flex-1`, beside `Clear files`).
+  - **Problem:** with a file listed, at 320px the row is wider than the panel: "Clear files" ends past the card's right edge (the page itself doesn't scroll sideways). At 375 and 390px it fits. The markup is older than B25.
+  - **Fix:** let the row wrap or stack on narrow screens (`flex-wrap`, or the Extract button full width with Clear below it), or fold it into A120's Add tab redesign. Check at 320px with a file listed, in both themes.
 
 ### UI/UX
 
@@ -316,7 +316,7 @@ Severity is Impeccable's: P0 blocks a task, P1 makes it hard or fails WCAG 2.2 A
 
 ### Cleanup
 
-- [ ] **A94 · Simplify over-built logic** · L · risk M · test-first · after A92 and A93
+- [ ] **A94 · Simplify over-built logic** · L · risk M · test-first · after A92 and A93 (B25: the upload area done; left: auth and user doc, dashboard shell, calendar and grades, reminders, in that order; the plan and what each holds are in the B25 log)
   - **Goal (founder):** find code that does in many steps what could be done in a few, and simplify it without changing behavior. Look first; this is not a deletion pass.
   - **Known candidates:** the two upload forms' shared logic (A21); files over 300 lines (A22); Firestore calls in components, `alert()`s, the non-atomic bulk delete (A23); the two extra user-doc readers (A54); the one-time cron code once its time has passed (A64); an unused type field (A130). To check: the target-grade draft held in state plus a mirrored ref (B18's review), the calendar's own date formatter that duplicates `utils/dateUtils.ts` (B18's review), and duplicated parsing between `lib/upload/textExtraction.ts` and `normalize.ts`.
   - **Method:** one area per PR (upload, grades, calendar, reminders, auth and user doc, dashboard shell). For each, list the candidates with a short before and after in the session log before changing code. Code without tests gets tests on today's behavior first; the simplification must keep them green. Run `/simplify` and `/code-review` on each PR. Measure what changes: lines, files, bundle size (Baseline).
@@ -368,10 +368,7 @@ Severity is Impeccable's: P0 blocks a task, P1 makes it hard or fails WCAG 2.2 A
   - **Tests:** `utils/icsGenerator.test.ts` covers the 23:59 end, DTSTAMP, SUMMARY escaping and 75-octet folding, and keeps the UID on `asetta.app` (D9); all plain passing tests since PR #12, none left as `it.fails` or `it.todo`.
   - **Done when:** tests cover 23:59 and names with commas and semicolons; the file imports cleanly into Google Calendar.
 
-- [ ] **A21 · Merge the two upload forms' logic** · M · risk M
-  - `apps/web/src/components/forms/UploadForm.tsx` (425 lines) and `apps/web/src/components/onboarding/OnboardingUploadForm.tsx` (403) share about 120 identical lines (file selection, drag and drop, validation, response handling). Extract a `useSyllabusUpload` hook; keep the two UIs.
-
-- [ ] **A22 · Split files over the 300-line limit** · M · risk M
+- [ ] **A22 · Split files over the 300-line limit** · M · risk M (B25: the upload forms and `pages/api/upload.ts` done; `UnifiedDashboardPage.tsx` (146) and `OnboardingContext.tsx` (247) are already under; left: `AssessmentsTable.tsx` 439, `CalendarView.tsx` 301, `lib/notifications.ts` 573)
   - `components/tables/AssessmentsTable.tsx` 448, `components/pages/UnifiedDashboardPage.tsx` 396, `components/calendar/CalendarView.tsx` 313, `contexts/OnboardingContext.tsx` 309. Use the folder pattern from standards.md.
 
 - [ ] **A23 · Standards drift in components** · S-M each · risk L
@@ -574,6 +571,7 @@ Full text and what shipped: archive, "Done items".
 - [x] A18 · Per-user upload quota · 2026-10-19, PR #21
 - [x] A19 · Cron throughput · 2026-10-19, PR #22
 - [x] A20 · Landing contact form: throttle and bot check · 2026-10-19, PR #21
+- [x] A21 · Merge the two upload forms' logic · 2026-11-01, PR #33
 - [x] A24 · Dead code · 2026-10-31, PR #30
 - [x] A29 · Line endings: local format check fails on Windows · 2026-10-11, PR #11
 - [x] A30 · Welcome email to unverified sign-up addresses · 2026-10-10, PR #6
@@ -611,14 +609,15 @@ Full text and what shipped: archive, "Done items".
 - [x] A93 · Comments that narrate or log history · 2026-11-01, PR #32
 - [x] A97 · Clean this file · 2026-10-30, PR #27
 - [x] A102 · Writing rules for agents (no AI slop) · 2026-10-30, PR #27
+- [x] A132 · A selection with no PDF leaves the upload form's input out of step with its list · 2026-11-01, PR #33
 
 ## Baseline
 
 The latest numbers to compare against. Every earlier value is in the archive ("Baselines as recorded").
 
 - `npm audit --omit=dev`: 38 vulnerabilities (0 critical, 5 high, 33 moderate) since A2 (2026-10-10); 43 (10 high) with dev dependencies. Why each high stays is in the B2 session log.
-- `apps/web` build (Next 15.5.27, after B22, 2026-10-30; unchanged after B24): First Load JS shared by every page 154 kB; `/login` 166 kB, `/register` 167, `/reset-password` 165, `/confirm-email` 162, `/404` 157, `/dashboard` 145, `/dashboard/*` 272, `/dashboard/[semester]/*` 272, `/settings` 273, `/onboarding` 288. A dashboard fetches the other tabs after first paint (about 37 kB in all) and the semester drag list when its menu opens (about 17 kB).
-- Tests (after A93, 2026-11-01; counts unchanged since B24's first part): 26 suites, 776 tests per zone, all passing (1,552 across the two zones). The rules suite (`npm run test:rules`): 44 cases.
+- `apps/web` build (Next 15.5.27, after B22, 2026-10-30; unchanged after B24): First Load JS shared by every page 154 kB; `/login` 166 kB, `/register` 167, `/reset-password` 165, `/confirm-email` 162, `/404` 157, `/dashboard` 145, `/dashboard/*` 272, `/dashboard/[semester]/*` 272, `/settings` 273, `/onboarding` 272 (288 before B25's upload PR: its upload step now loads as its own chunk). A dashboard fetches the other tabs after first paint (about 37 kB in all) and the semester drag list when its menu opens (about 17 kB).
+- Tests (after B25's upload PR, 2026-11-01): 27 suites, 796 tests per zone, all passing (1,592 across the two zones). The rules suite (`npm run test:rules`): 44 cases.
 - Reminder cron (B15, emulators, a simulated 25 ms per Firestore call): a day's first run with nobody due reads 4 docs at 10 to 500 users (6 at 2,000); a run with 300 of 500 users due takes 13.3 s and 3,514 reads.
 - Firestore reads (B10, emulator rule coverage): a dashboard load reads the user doc once and writes nothing; a day's first load also writes `lastLogin` once.
 - Vercel limits and the live rules' deploy state: `docs/ops.md`.

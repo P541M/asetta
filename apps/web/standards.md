@@ -52,9 +52,11 @@ All new code follows these.
   `components/pages/UnifiedDashboardPage.tsx`, the tabs in `components/pages/dashboard-tabs/`),
   so a dashboard page loads only the chrome up front. The open tab's chunk is fetched at mount,
   while auth and the data load; the other tabs render hidden once the data is in, which fetches
-  theirs, and they stay mounted. A tab still loading shows nothing for 200 ms, then the spinner.
-  Heavy UI behind a click (the notes editor, Manage semesters' drag list, fetched when the
-  semester menu opens) is a `next/dynamic` part of its surface too.
+  theirs, and they stay mounted. A tab still loading shows `ui/ChunkLoading`: nothing for 200 ms,
+  then the spinner, or the error with "Try again". Heavy UI behind a click (the notes editor,
+  Manage semesters' drag list, fetched when the semester menu opens) is a `next/dynamic` part of
+  its surface too, and so is onboarding's upload step (the upload form and the color picker),
+  fetched when onboarding opens.
 - **No writes on read.** Viewing something never creates or updates a doc; a missing value falls
   back to its default when read (course preferences, course colors).
 - **User text never goes into a Firestore path as is.** A "/" adds path segments: one makes `doc()`

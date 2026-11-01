@@ -13,8 +13,13 @@ import {
 // A date as a syllabus writes it: numeric, or with a month name or abbreviation either side of
 // the day ("Sept. 30, 2026", "15 March 2026"). ISO comes first, and a numeric date never starts
 // inside a longer number, so "2026-10-15" is never read as "26-10-15".
-const DATE_TEXT =
-  "\\d{4}[\\/-]\\d{1,2}[\\/-]\\d{1,2}|(?<!\\d)\\d{1,2}[\\/-]\\d{1,2}[\\/-]\\d{2,4}|\\w+\\.?\\s+\\d{1,2}(?:st|nd|rd|th)?,?\\s*\\d{4}|\\d{1,2}\\s+[A-Za-z]+\\.?,?\\s+\\d{4}";
+const DATE_FORMS = [
+  /\d{4}[\/-]\d{1,2}[\/-]\d{1,2}/,
+  /(?<!\d)\d{1,2}[\/-]\d{1,2}[\/-]\d{2,4}/,
+  /\w+\.?\s+\d{1,2}(?:st|nd|rd|th)?,?\s*\d{4}/,
+  /\d{1,2}\s+[A-Za-z]+\.?,?\s+\d{4}/,
+];
+const DATE_TEXT = DATE_FORMS.map((form) => form.source).join("|");
 
 const HAS_DATE = new RegExp(DATE_TEXT, "i");
 
@@ -86,16 +91,11 @@ export function extractCourseName(text: string): string | null {
   return null;
 }
 
+/** The first date in the text, trying each form in turn: an ISO date anywhere comes first. */
 function extractDate(text: string): string | undefined {
-  const datePatterns = [
-    /(\d{4}[\/-]\d{1,2}[\/-]\d{1,2})/,
-    /(?<!\d)(\d{1,2}[\/-]\d{1,2}[\/-]\d{2,4})/,
-    /(\w+\.?\s+\d{1,2}(?:st|nd|rd|th)?,?\s*\d{4})/,
-    /(\d{1,2}\s+[A-Za-z]+\.?,?\s+\d{4})/,
-  ];
-  for (const pattern of datePatterns) {
-    const match = text.match(pattern);
-    if (match) return match[1];
+  for (const form of DATE_FORMS) {
+    const match = text.match(form);
+    if (match) return match[0];
   }
   return undefined;
 }

@@ -1,12 +1,9 @@
 import { useCallback, useEffect } from "react";
 import { useRouter } from "next/router";
 import dynamic, { type DynamicOptionsLoadingProps } from "next/dynamic";
-import { CircleAlert } from "lucide-react";
 import { TabProvider, useTab, TabType } from "../../contexts/TabContext";
 import DashboardLayout from "../layout/DashboardLayout";
-import { Button } from "../ui/button";
-import EmptyState from "../ui/EmptyState";
-import LoadingSpinner from "../ui/LoadingSpinner";
+import ChunkLoading from "../ui/ChunkLoading";
 
 interface UnifiedDashboardPageProps {
   forceSemesterId?: string;
@@ -23,29 +20,7 @@ const TAB_LOADERS = {
   add: () => import("./dashboard-tabs/AddTab"),
 } satisfies Record<TabType, () => Promise<unknown>>;
 
-/** A tab still loading: nothing for the first 200 ms (nearly every load), then the spinner. */
-const TabLoading = ({ error, pastDelay, retry }: DynamicOptionsLoadingProps) => {
-  if (error) {
-    return (
-      <EmptyState
-        icon={CircleAlert}
-        title="Couldn't load this tab"
-        description="Check your internet connection, then try again."
-        action={
-          <Button type="button" onClick={retry}>
-            Try again
-          </Button>
-        }
-      />
-    );
-  }
-  if (!pastDelay) return null;
-  return (
-    <div className="flex justify-center py-16">
-      <LoadingSpinner />
-    </div>
-  );
-};
+const TabLoading = (props: DynamicOptionsLoadingProps) => <ChunkLoading {...props} part="tab" />;
 
 // The tabs render only after the client has the user's data, never on the server. (next/dynamic
 // needs its options as a literal in each call.)

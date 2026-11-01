@@ -1,238 +1,39 @@
-import { useState, useRef, useCallback } from "react";
 import { CircleAlert, CircleCheck, CloudUpload, FileText, Loader2, Zap } from "lucide-react";
-import { useAuth } from "../../contexts/AuthContext";
-import { UploadFormProps, UploadStatus, FileProgress, ExtractionResult } from "../../types/upload";
+import { UploadFormProps } from "../../types/upload";
 import { cn } from "@/lib/utils";
+import { useSyllabusUpload } from "../../hooks/useSyllabusUpload";
 import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
 import { Button } from "../ui/button";
 import RateLimitNotice from "../ui/RateLimitNotice";
 import ExtractionSuccessModal from "../modals/ExtractionSuccessModal";
 import ApiLimitReachedModal from "../modals/ApiLimitReachedModal";
 import CopyrightAgreement from "./CopyrightAgreement";
-import {
-  postUploadForm,
-  parseUploadResponse,
-  uploadQuotaFromPayload,
-  type UploadQuota,
-} from "../../lib/uploadClient";
-import { MAX_FILE_BYTES, formatBytes, validateUploadSelection } from "../../lib/upload/constants";
+import { ACCEPTED_MIME_TYPE, MAX_FILE_BYTES, formatBytes } from "../../lib/upload/constants";
 
 const UploadForm = ({ semesterId }: UploadFormProps) => {
-  const { user } = useAuth();
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const [files, setFiles] = useState<FileProgress[]>([]);
-  const [uploadStatus, setUploadStatus] = useState<UploadStatus>("idle");
-  const [message, setMessage] = useState<string>("");
-  const [error, setError] = useState<string>("");
-  const [retryAfter, setRetryAfter] = useState<number>(120);
-  const [showSuccessModal, setShowSuccessModal] = useState<boolean>(false);
-  const [showApiLimitModal, setShowApiLimitModal] = useState<boolean>(false);
-  const [uploadQuota, setUploadQuota] = useState<UploadQuota | null>(null);
-  const [extractionResult, setExtractionResult] = useState<ExtractionResult | null>(null);
-  const [isDragActive, setIsDragActive] = useState<boolean>(false);
-  const [copyrightAgreed, setCopyrightAgreed] = useState<boolean>(false);
-
-  const processFiles = useCallback((selectedFiles: File[]) => {
-    if (selectedFiles.length === 0) return;
-
-    const pdfFiles = selectedFiles.filter((file) => file.type === "application/pdf");
-
-    if (pdfFiles.length === 0) {
-      setError("Please select PDF files only.");
-      return;
-    }
-
-    const validationError = validateUploadSelection(pdfFiles);
-    if (validationError) {
-      setError(validationError);
-      setMessage("");
-      setFiles([]);
-      if (fileInputRef.current) {
-        fileInputRef.current.value = "";
-      }
-      return;
-    }
-
-    const newFiles: FileProgress[] = pdfFiles.map((file) => ({
-      name: file.name,
-      size: file.size,
-      progress: 0,
-      status: "idle" as UploadStatus,
-    }));
-
-    setFiles(newFiles);
-    setError("");
-    setMessage("");
-
-    // handleUpload reads the input element's files, so the accepted PDFs (dropped ones too) go
-    // into it
-    if (fileInputRef.current) {
-      const dt = new DataTransfer();
-      pdfFiles.forEach((file) => dt.items.add(file));
-      fileInputRef.current.files = dt.files;
-    }
-  }, []);
-
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFiles = Array.from(e.target.files || []);
-    processFiles(selectedFiles);
-  };
-
-  const handleDragOver = useCallback(
-    (e: React.DragEvent) => {
-      e.preventDefault();
-      e.stopPropagation();
-      if (!isDragActive) setIsDragActive(true);
-    },
-    [isDragActive],
-  );
-
-  const handleDragLeave = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-
-    // Only set drag inactive if we're leaving the drop zone entirely
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = e.clientX;
-    const y = e.clientY;
-
-    if (x < rect.left || x >= rect.right || y < rect.top || y >= rect.bottom) {
-      setIsDragActive(false);
-    }
-  }, []);
-
-  const handleDrop = useCallback(
-    (e: React.DragEvent) => {
-      e.preventDefault();
-      e.stopPropagation();
-      setIsDragActive(false);
-
-      const droppedFiles = Array.from(e.dataTransfer.files);
-      processFiles(droppedFiles);
-    },
-    [processFiles],
-  );
-
-  const handleUpload = async () => {
-    if (!user || files.length === 0 || !copyrightAgreed) return;
-
-    setUploadStatus("uploading");
-    setError("");
-    setMessage("");
-
-    try {
-      const formData = new FormData();
-      formData.append("semesterId", semesterId);
-
-      if (fileInputRef.current?.files) {
-        Array.from(fileInputRef.current.files).forEach((file, index) => {
-          formData.append(`file-${index}`, file);
-        });
-      }
-
-      const response = await postUploadForm(user, formData);
-
-      // Never call response.json() directly: a platform-level failure (payload
-      // too large, function timeout) answers with an HTML page, which throws a
-      // confusing "Unexpected token '<'" and hides the real cause.
-      const { ok, status, payload, errorMessage } = await parseUploadResponse(response);
-
-      if (ok) {
-        setUploadStatus("success");
-        setMessage(payload?.message || "Upload complete.");
-        setFiles([]);
-        if (fileInputRef.current) {
-          fileInputRef.current.value = "";
-        }
-
-        if (payload?.data) {
-          setExtractionResult(payload.data);
-          setShowSuccessModal(true);
-        }
-      } else {
-        if (status === 429) {
-          if (payload?.error === "DAILY_QUOTA_EXCEEDED") {
-            const quota = uploadQuotaFromPayload(payload, new Date());
-            // With files left today, Extract stays enabled so the student can pick fewer
-            setUploadStatus(quota && quota.remaining > 0 ? "error" : "daily_quota_exceeded");
-            setUploadQuota(quota);
-            setShowApiLimitModal(true);
-            setError(payload.message || "Daily processing limit reached");
-          } else if (payload?.error === "RATE_LIMITED") {
-            setUploadStatus("rate_limited");
-            setRetryAfter(payload.retryAfter || 120);
-            setError(payload.message || "Servers are busy. Please wait and try again.");
-          } else {
-            throw new Error(errorMessage || "Upload failed");
-          }
-        } else {
-          throw new Error(errorMessage || "Upload failed");
-        }
-      }
-    } catch (err) {
-      console.error("Upload error:", err);
-      if (
-        err instanceof Error &&
-        (err.message.includes("429") ||
-          err.message.includes("rate limit") ||
-          err.message.includes("quota"))
-      ) {
-        if (err.message.includes("daily") || err.message.includes("quota exceeded")) {
-          setUploadStatus("daily_quota_exceeded");
-          setUploadQuota(null);
-          setShowApiLimitModal(true);
-          setError("Daily processing limit reached");
-        } else {
-          setUploadStatus("rate_limited");
-          setRetryAfter(120);
-          setError("Servers are busy. Please wait and try again.");
-        }
-      } else {
-        setUploadStatus("error");
-        setError(err instanceof Error ? err.message : "Upload failed");
-      }
-    }
-  };
-
-  const handleRetry = () => {
-    setUploadStatus("idle");
-    setError("");
-    setMessage("");
-    // Don't clear files on retry, user wants to retry the same files
-    handleUpload();
-  };
-
-  const handleReset = () => {
-    setFiles([]);
-    setUploadStatus("idle");
-    setMessage("");
-    setError("");
-    setRetryAfter(120);
-    setShowSuccessModal(false);
-    setShowApiLimitModal(false);
-    setExtractionResult(null);
-    setCopyrightAgreed(false);
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
-    }
-  };
-
-  const handleCloseSuccessModal = () => {
-    setShowSuccessModal(false);
-    setExtractionResult(null);
-  };
-
-  const handleCloseApiLimitModal = () => {
-    setShowApiLimitModal(false);
-  };
-
-  const formatFileSize = (bytes: number) => {
-    if (bytes === 0) return "0 Bytes";
-    const k = 1024;
-    const sizes = ["Bytes", "KB", "MB", "GB"];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
-  };
+  const {
+    files: picked,
+    status: uploadStatus,
+    canUpload,
+    message,
+    error,
+    result,
+    resultOpen,
+    retryAfter,
+    limitModalOpen,
+    quota,
+    copyrightAgreed,
+    isDragActive,
+    setCopyrightAgreed,
+    onInputChange,
+    dropZoneProps,
+    upload,
+    reset,
+    closeResult,
+    closeLimitModal,
+  } = useSyllabusUpload(semesterId);
+  // Uploaded files leave the list; the next pick starts a new one
+  const files = uploadStatus === "success" ? [] : picked;
 
   return (
     <div>
@@ -253,9 +54,7 @@ const UploadForm = ({ semesterId }: UploadFormProps) => {
 
       <div className="space-y-6">
         <div
-          onDragOver={handleDragOver}
-          onDragLeave={handleDragLeave}
-          onDrop={handleDrop}
+          {...dropZoneProps}
           className={cn(
             "relative rounded-xl border-2 border-dashed p-8 text-center transition-colors",
             isDragActive ? "border-primary bg-primary/5" : "border-border bg-secondary/30",
@@ -263,11 +62,10 @@ const UploadForm = ({ semesterId }: UploadFormProps) => {
           )}
         >
           <input
-            ref={fileInputRef}
             type="file"
             multiple
-            accept="application/pdf"
-            onChange={handleFileSelect}
+            accept={ACCEPTED_MIME_TYPE}
+            onChange={onInputChange}
             disabled={uploadStatus === "uploading"}
             aria-label="Upload PDF course outlines"
             className="absolute inset-0 h-full w-full cursor-pointer opacity-0 disabled:cursor-not-allowed"
@@ -327,7 +125,7 @@ const UploadForm = ({ semesterId }: UploadFormProps) => {
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-sm font-medium text-foreground">{file.name}</p>
                       <p className="mt-0.5 text-xs font-medium text-muted-foreground">
-                        {formatFileSize(file.size)} · PDF
+                        {formatBytes(file.size)} · PDF
                       </p>
                     </div>
                     <div className="shrink-0">
@@ -347,7 +145,7 @@ const UploadForm = ({ semesterId }: UploadFormProps) => {
           </div>
         )}
 
-        {message && !showSuccessModal && (
+        {message && !resultOpen && (
           <Alert variant="success">
             <CircleCheck aria-hidden />
             <AlertDescription>{message}</AlertDescription>
@@ -355,7 +153,7 @@ const UploadForm = ({ semesterId }: UploadFormProps) => {
         )}
 
         {uploadStatus === "rate_limited" ? (
-          <RateLimitNotice onRetry={handleRetry} retryAfter={retryAfter} autoRetry={true} />
+          <RateLimitNotice onRetry={upload} retryAfter={retryAfter} autoRetry={true} />
         ) : (
           error && (
             <Alert variant="destructive">
@@ -376,15 +174,9 @@ const UploadForm = ({ semesterId }: UploadFormProps) => {
         <div className="flex gap-3">
           <Button
             type="button"
-            onClick={handleUpload}
-            disabled={
-              files.length === 0 ||
-              uploadStatus === "uploading" ||
-              uploadStatus === "rate_limited" ||
-              uploadStatus === "daily_quota_exceeded" ||
-              !user ||
-              !copyrightAgreed
-            }
+            onClick={upload}
+            // While rate limited, the notice above retries
+            disabled={!canUpload || uploadStatus === "rate_limited"}
             className="flex-1"
           >
             {uploadStatus === "uploading" ? (
@@ -401,27 +193,23 @@ const UploadForm = ({ semesterId }: UploadFormProps) => {
           </Button>
 
           {files.length > 0 && uploadStatus !== "uploading" && (
-            <Button type="button" variant="secondary" onClick={handleReset}>
+            <Button type="button" variant="secondary" onClick={reset}>
               {uploadStatus === "rate_limited" ? "Cancel and clear" : "Clear files"}
             </Button>
           )}
         </div>
       </div>
 
-      {showSuccessModal && extractionResult && (
+      {resultOpen && result && (
         <ExtractionSuccessModal
-          isOpen={showSuccessModal}
-          onClose={handleCloseSuccessModal}
-          result={extractionResult}
+          isOpen
+          onClose={closeResult}
+          result={result}
           semesterId={semesterId}
         />
       )}
 
-      <ApiLimitReachedModal
-        isOpen={showApiLimitModal}
-        onClose={handleCloseApiLimitModal}
-        quota={uploadQuota}
-      />
+      <ApiLimitReachedModal isOpen={limitModalOpen} onClose={closeLimitModal} quota={quota} />
     </div>
   );
 };

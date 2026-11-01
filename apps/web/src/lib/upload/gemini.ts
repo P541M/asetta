@@ -2,6 +2,14 @@ import { GoogleGenerativeAI, ResponseSchema, SchemaType } from "@google/generati
 import { parseAiAssessments } from "./aiResponse";
 import type { ExtractedAssessment } from "./normalize";
 
+/** Gemini's own daily quota or its rate limit stopped the call: the file gets nothing, no fallback. */
+export class GeminiLimitError extends Error {
+  constructor(readonly limit: "DAILY_QUOTA_EXCEEDED" | "RATE_LIMITED") {
+    super(limit);
+    this.name = "GeminiLimitError";
+  }
+}
+
 // Gemini answers in this shape (structured output), so the reply is a bare JSON array.
 // `normalizeExtractedAssessment` still checks every value.
 const ASSESSMENTS_SCHEMA: ResponseSchema = {
@@ -124,9 +132,9 @@ async function extractAssessmentsAI(text: string, localDate: string): Promise<st
         errorMessage.includes("daily limit") ||
         errorMessage.includes("QUOTA_EXCEEDED")
       ) {
-        throw new Error("DAILY_QUOTA_EXCEEDED");
+        throw new GeminiLimitError("DAILY_QUOTA_EXCEEDED");
       } else {
-        throw new Error("RATE_LIMITED");
+        throw new GeminiLimitError("RATE_LIMITED");
       }
     } else if (
       errorMessage.includes("quota") ||
@@ -138,9 +146,9 @@ async function extractAssessmentsAI(text: string, localDate: string): Promise<st
         errorMessage.includes("quota exhausted") ||
         errorMessage.includes("daily limit")
       ) {
-        throw new Error("DAILY_QUOTA_EXCEEDED");
+        throw new GeminiLimitError("DAILY_QUOTA_EXCEEDED");
       } else {
-        throw new Error("RATE_LIMITED");
+        throw new GeminiLimitError("RATE_LIMITED");
       }
     }
     throw error;
@@ -149,9 +157,8 @@ async function extractAssessmentsAI(text: string, localDate: string): Promise<st
 
 /**
  * Runs AI extraction over the PDF text and returns validated assessments.
- * Throws "DAILY_QUOTA_EXCEEDED" / "RATE_LIMITED" for quota problems (handled
- * specially by the route); any other throw makes the route fall back to the
- * regex-based extraction.
+ * Throws a `GeminiLimitError` for Gemini's own quota or rate limit; any other throw makes
+ * `assessmentsFromText` fall back to the regex-based extraction.
  */
 export async function extractAssessmentsWithAI(
   extractedText: string,
