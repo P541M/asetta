@@ -250,7 +250,7 @@ describe("users/{uid}", () => {
     await updateDoc(userRef(db, uid), { verifiedEmail: deleteField(), photoURL: deleteField() });
   });
 
-  it("denies a confirmed address written by the client (A17: server only)", async () => {
+  it("denies a confirmed address written by the client (only the server sets it)", async () => {
     const { uid, db } = newUser();
     await seedUser(uid);
     await expectDenied(updateDoc(userRef(db, uid), { verifiedEmail: "someone@example.test" }));
@@ -497,7 +497,7 @@ describe("users/{uid}/semesters/{semesterId}/assessments/{assessmentId}", () => 
     await deleteDoc(assessmentRef(db, uid, semesterId, second));
   });
 
-  it("denies the doc's own ID as a field (the edit row wrote it before A16)", async () => {
+  it("denies the doc's own ID as a field", async () => {
     const { uid, db } = newUser();
     const semesterId = await seedSemester(uid);
     const id = await seedAssessment(uid, semesterId);

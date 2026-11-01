@@ -23,7 +23,7 @@ items off and add a session log entry to docs/AUDIT-archive.md when done. Don't 
 
 **Rules:**
 
-- IDs are permanent. Never renumber. New items take the next free number (**next: A131, D14**); split an item as A9a/A9b.
+- IDs are permanent. Never renumber. New items take the next free number (**next: A132, D14**); split an item as A9a/A9b.
 - Dropped items move to the archive struck through with a reason: `~~A24~~ dropped: <why>`.
 - Line numbers in items drift. Search by symbol name.
 - One theme per branch and PR.
@@ -47,13 +47,13 @@ Answered decisions are in the archive ("Answered decisions"); an item that depen
 | --- | --- | --- | --- | --- |
 | any | | A117's overflow only | The Courses tab scrolls sideways on phones | A one-line layout fix on a P1 found in B23; it needn't wait for the redesign. |
 | any | | A129 | Self-serve account deletion | The privacy policy already promises it. Server code and a Settings section, so it can go before or with A121. |
-| 1 | B24 | ~~A47, A24~~ (done 2026-10-31), then A92, then A93 | Cleanup sweep: test names, comments, dead code | Mechanical. Shrinks the code before B25 simplifies it. A93 is a PR of its own (comments only). |
+| 1 | B24 | ~~A47, A24~~ (done 2026-10-31), ~~A92~~ (done 2026-11-01), then A93 | Cleanup sweep: test names, comments, dead code | Mechanical. Shrinks the code before B25 simplifies it. A93 is a PR of its own (comments only). |
 | 2 | B25 | A94, A95, A21, A22, A23, A83 | Simplify and modularize | Test-first wherever logic moves. Before the UI work so each screen is restyled once, in its final files. A83 is the last stray user-doc read. Expect 2 or 3 PRs, one per area. Each B23 item's "Touches" line names the files its redesign changes: split those along the lines the redesign needs (A114's onboarding, A116's table, A118's calendar). |
 | 3 | B26 | A106 first; then A107, A108, A109, A112 (with A104, A103, A66); then the screens in this order: A116, A117, A118, A114, A119, A120, A115, A121, A122, A123, A113; A110 and A111 alongside; A69 with A120 | UI/UX implementation | One screen or theme per PR, from B23's findings, each checked in both themes, at 320 to 390px and with the detector re-run. A106 rewrites the rules once (the founder's call: the old rules don't bind), so each screen is restyled once against them. Screens go by how often a student uses them. |
 | 5 | B27 | A96, A25, A33, A62 | Deprecated and outdated dependencies | One major per PR. `@google/generative-ai` is Google's retired SDK and runs the core feature (extraction): if it starts failing, its move to `@google/genai` jumps the queue. Do Tiptap 3 before B26 restyles the notes editor. |
 | any | B28 | A98 | One domain | D13 decided: the platform moves to `app.asetta.me`. Touches only config, env and cross-app links, so it can run beside any batch. |
 | any | B29 | A105 (A124 to A128), A27, A68, then A90 | Marketing site: the B23 fixes, GIFs to video, tests, then Lenis | The landing shares no code with the platform, so this runs beside any batch. A126's false claims and A125's old screenshot first; A27 goes with A125 and A126 (new screenshots and video replace the GIFs); Lenis last, once the layout has settled. If A106 picks one typeface for both apps, A124 follows it. |
-| any | | A101 (the founder reads the docs), A14 (a manual check), A26, A28, A39, A40, A42, A45, A46, A49, A52, A55, A57 to A61, A63, A64, A70 to A73, A80, A81, A82, A85 | Remaining items | As time allows. Founder calls first: D12, A73, A80, A81 and A85. A64 once the D11 marker has `finishedAt`; A71 only if spam arrives. |
+| any | | A101 (the founder reads the docs), A14 (a manual check), A26, A28, A39, A40, A42, A45, A46, A49, A52, A55, A57 to A61, A63, A64, A70 to A73, A80, A81, A82, A85, A131 | Remaining items | As time allows. Founder calls first: D12, A73, A80, A81 and A85. A64 once the D11 marker has `finishedAt`; A71 only if spam arrives. |
 
 ## Open items
 
@@ -314,12 +314,6 @@ Severity is Impeccable's: P0 blocks a task, P1 makes it hard or fails WCAG 2.2 A
 
 ### Cleanup
 
-- [ ] **A92 · Tracker IDs in test names** · S · risk L
-  - **Where:** 92 test names start with an item ID ("A19: verifies the Gmail login once ...", "A8: sends N days before the due date ..."), across the `apps/web` suites; the rule is "Known bugs are `it.fails`" in `standards.md` ("Testing").
-  - **Problem:** the ID means something while the bug is open: an `it.fails("A10: ...")` says which item turns it green. Once fixed, the prefix is history in a place meant to describe behavior, and a reader needs the tracker to read the suite.
-  - **Recommended:** keep IDs only on `it.fails` and `it.todo`. Remove them from passing tests and make sure each name still says the behavior on its own ("sends N days before the due date, from 9:30 local time"). The fix's history stays in git and on the item. Update the Testing rule to say so: a fixed bug's `it.fails` becomes a plain `it` and loses its ID.
-  - **Done when:** no passing test name starts with an ID; `standards.md` states the rule; the suite count is unchanged.
-
 - [ ] **A93 · Comments that narrate or log history** · M · risk L · both apps · do with A35
   - **Found (2026-10-30):** `apps/web/src` has about 1,250 comment lines in about 20,200 lines (JSDoc included). Many are useful "why" notes. Patterns to remove: narration of the next line ("Navigation handlers" in `CalendarView.tsx`), version and history stamps ("standards.md v4.3" in `components/ui/input.tsx`, "Also handle direct /terms and /privacy routes for consistency" in `next.config.ts`, "Pricing page removed" in the landing config), and item IDs in comments where the constraint itself can be stated instead.
   - **Fix:** per folder, keep comments that explain a constraint the code can't show (the A44 `Buffer` note in `lib/upload/pdfText.ts`, the adjust-state-during-render note in `GradesTab.tsx`, Safari or Gmail quirks); delete the rest or rewrite them as the reason. No code change in the same PR. The rule is A102's "Comments" rule.
@@ -330,6 +324,11 @@ Severity is Impeccable's: P0 blocks a task, P1 makes it hard or fails WCAG 2.2 A
   - **Known candidates:** the two upload forms' shared logic (A21); files over 300 lines (A22); Firestore calls in components, `alert()`s, the non-atomic bulk delete (A23); the two extra user-doc readers (A54); the one-time cron code once its time has passed (A64); an unused type field (A130). To check: the target-grade draft held in state plus a mirrored ref (B18's review), the calendar's own date formatter that duplicates `utils/dateUtils.ts` (B18's review), and duplicated parsing between `lib/upload/textExtraction.ts` and `normalize.ts`.
   - **Method:** one area per PR (upload, grades, calendar, reminders, auth and user doc, dashboard shell). For each, list the candidates with a short before and after in the session log before changing code. Code without tests gets tests on today's behavior first; the simplification must keep them green. Run `/simplify` and `/code-review` on each PR. Measure what changes: lines, files, bundle size (Baseline).
   - **Done when:** every area has been reviewed, each simplification shipped or dropped with a reason, and tests and page sizes are no worse.
+
+- [ ] **A131 · Three `parseWeight` cases share one test name** · S · risk L · found during B24 (A92)
+  - **Where:** the `it.each` in `describe("parseWeight")`, `apps/web/src/lib/upload/normalize.test.ts` ("reads %j as %s").
+  - **Problem:** `%j` prints `NaN`, `Infinity` and `null` all as `null`, so Vitest lists three tests as "parseWeight > reads null as 0" in each zone; when one fails, its name doesn't say which input it was. The only duplicate full name in the suites.
+  - **Fix:** name the input with `%s`, which prints all 14 inputs differently, or add a label column.
 
 - [ ] **A130 · `Semester.order` is never set or read** · S · risk L · found during B24
   - **Where:** `order?: number` in `apps/web/src/types/semester.ts`.
@@ -369,7 +368,7 @@ Severity is Impeccable's: P0 blocks a task, P1 makes it hard or fails WCAG 2.2 A
   - **Where:** `apps/web/src/utils/icsGenerator.ts`.
   - **Problem:** The default 23:59 due time makes DTEND 00:59 on the same day, before DTSTART (verified; `incrementHour` at :54-58 wraps without rolling the date). `DTSTAMP`, required by RFC 5545, is missing. SUMMARY and DESCRIPTION aren't escaped for `,` `;` `\`. No 75-octet line folding. The UID uses `@asetta.app` (the domain is asetta.me).
   - **Fix:** Compute the end from a Date (or make due-time events zero-length). Add DTSTAMP, escaping and folding. Changing the UID domain would duplicate events for anyone who already imported, so decide whether it's worth it.
-  - **Tests:** `utils/icsGenerator.test.ts` holds the A14 `it.fails` (the 23:59 end, DTSTAMP, SUMMARY escaping, 75-octet folding) and an `it.todo` for the UID domain decision.
+  - **Tests:** `utils/icsGenerator.test.ts` covers the 23:59 end, DTSTAMP, SUMMARY escaping and 75-octet folding, and keeps the UID on `asetta.app` (D9); all plain passing tests since PR #12, none left as `it.fails` or `it.todo`.
   - **Done when:** tests cover 23:59 and names with commas and semicolons; the file imports cleanly into Google Calendar.
 
 - [ ] **A21 · Merge the two upload forms' logic** · M · risk M
@@ -611,6 +610,7 @@ Full text and what shipped: archive, "Done items".
 - [x] A87 · A preview deploy's `/` opens the live marketing site · 2026-10-30, PR #28
 - [x] A88 · Editing a due date shows no calendar on Windows · 2026-10-30, PR #28
 - [x] A91 · Emojis in the code and copy · 2026-10-30, PR #27
+- [x] A92 · Tracker IDs in test names · 2026-11-01, PR #31
 - [x] A97 · Clean this file · 2026-10-30, PR #27
 - [x] A102 · Writing rules for agents (no AI slop) · 2026-10-30, PR #27
 
@@ -620,7 +620,7 @@ The latest numbers to compare against. Every earlier value is in the archive ("B
 
 - `npm audit --omit=dev`: 38 vulnerabilities (0 critical, 5 high, 33 moderate) since A2 (2026-10-10); 43 (10 high) with dev dependencies. Why each high stays is in the B2 session log.
 - `apps/web` build (Next 15.5.27, after B22, 2026-10-30; unchanged after B24's first part): First Load JS shared by every page 154 kB; `/login` 166 kB, `/register` 167, `/reset-password` 165, `/confirm-email` 162, `/404` 157, `/dashboard` 145, `/dashboard/*` 272, `/dashboard/[semester]/*` 272, `/settings` 273, `/onboarding` 288. A dashboard fetches the other tabs after first paint (about 37 kB in all) and the semester drag list when its menu opens (about 17 kB).
-- Tests (after B24's first part, 2026-10-31): 26 suites, 776 tests per zone, all passing (1,552 across the two zones). The rules suite (`npm run test:rules`): 44 cases.
+- Tests (after A92, 2026-11-01; counts unchanged since B24's first part): 26 suites, 776 tests per zone, all passing (1,552 across the two zones). The rules suite (`npm run test:rules`): 44 cases.
 - Reminder cron (B15, emulators, a simulated 25 ms per Firestore call): a day's first run with nobody due reads 4 docs at 10 to 500 users (6 at 2,000); a run with 300 of 500 users due takes 13.3 s and 3,514 reads.
 - Firestore reads (B10, emulator rule coverage): a dashboard load reads the user doc once and writes nothing; a day's first load also writes `lastLogin` once.
 - Vercel limits and the live rules' deploy state: `docs/ops.md`.

@@ -18,7 +18,7 @@ describe("extractCourseName", () => {
     expect(extractCourseName("Welcome to the class")).toBeNull();
   });
 
-  it("A37: doesn't read a term such as Winter 2027 as the course code", () => {
+  it("doesn't read a term such as Winter 2027 as the course code", () => {
     expect(extractCourseName("Course outline, Winter 2027\nCIS 3760 Software Engineering")).toBe(
       "CIS3760",
     );
@@ -29,7 +29,7 @@ describe("extractCourseName", () => {
     ["Summer 2026\nMATH 1200 Linear Algebra", "MATH1200"],
     ["FALL 2026\nCIS 3760", "CIS3760"],
     ["WINTER 2027 ENGG 4450", "ENGG4450"],
-  ])("A37: skips the term in %j", (text, expected) => {
+  ])("skips the term in %j", (text, expected) => {
     expect(extractCourseName(text)).toBe(expected);
   });
 
@@ -38,14 +38,14 @@ describe("extractCourseName", () => {
     ["COMP-1405 Intro to Computer Science", "COMP1405"],
     ["CIS3760", "CIS3760"],
     ["Course code: ECON 101", "ECON101"],
-  ])("A37: reads the code format in %j as %s", (text, expected) => {
+  ])("reads the code format in %j as %s", (text, expected) => {
     expect(extractCourseName(text)).toBe(expected);
   });
 
   it.each([
     ["lowercase letters", "see room 2026 on the map"],
     ["letters inside a word", "Interim 2026 notes"],
-  ])("A37: needs capitals at a word boundary (%s)", (_label, text) => {
+  ])("needs capitals at a word boundary (%s)", (_label, text) => {
     expect(extractCourseName(text)).toBeNull();
   });
 });
@@ -121,7 +121,7 @@ describe("extractAssessmentsBasic", () => {
     expect(assessment.weight).toBe(12.5);
   });
 
-  it("A9: reads day-first dates when the outline settles the order", () => {
+  it("reads day-first dates when the outline settles the order", () => {
     const text = "Quiz 1 due 03/10/2026\nQuiz 2 due 17/10/2026";
     expect(extractAssessmentsBasic(text, LOCAL_DATE).map((a) => a.dueDate)).toEqual([
       "2026-10-03",
@@ -129,7 +129,7 @@ describe("extractAssessmentsBasic", () => {
     ]);
   });
 
-  it("A9: flags a date whose day and month could swap when nothing settles it (D10)", () => {
+  it("flags a date whose day and month could swap when nothing settles it", () => {
     const text = "Quiz 1 due 03/04/2026\nQuiz 2 due 05/06/2026";
     const assessments = extractAssessmentsBasic(text, LOCAL_DATE);
     expect(assessments).toHaveLength(2);
@@ -138,14 +138,14 @@ describe("extractAssessmentsBasic", () => {
     }
   });
 
-  it("A9: flags an impossible date for review on the local day, not the UTC day", () => {
+  it("flags an impossible date for review on the local day, not the UTC day", () => {
     const text = "MATH 1010 Calculus\n\nMidterm exam\nDate: Sep 31, 2026, 7:00 PM";
     expect(extractAssessmentsBasic(text, LOCAL_DATE)).toEqual([
       expect.objectContaining({ dueDate: LOCAL_DATE, dueTime: "19:00", needsReview: true }),
     ]);
   });
 
-  it("A9: reads an ISO date, on its own line or in a paragraph", () => {
+  it("reads an ISO date, on its own line or in a paragraph", () => {
     expect(extractAssessmentsBasic("Quiz 1 due 2026-10-15", LOCAL_DATE)[0].dueDate).toBe(
       "2026-10-15",
     );
@@ -153,7 +153,7 @@ describe("extractAssessmentsBasic", () => {
     expect(extractAssessmentsBasic(text, LOCAL_DATE)[0].dueDate).toBe("2026-10-15");
   });
 
-  it("A9: normalizes every extracted assessment (date, padded time, weight 0 to 100)", () => {
+  it("normalizes every extracted assessment (date, padded time, weight 0 to 100)", () => {
     const syllabus = [
       "CIS 3760 Software Engineering, Fall 2026",
       "Assignment 1 due Sept. 30, 2026 at 11:59 PM (10%)",

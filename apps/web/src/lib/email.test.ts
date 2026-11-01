@@ -48,7 +48,7 @@ afterEach(() => {
 });
 
 describe("createReminderMailer", () => {
-  it("A19: verifies the Gmail login once for all of a run's emails", async () => {
+  it("verifies the Gmail login once for all of a run's emails", async () => {
     const mailer = createReminderMailer();
     const pool = latestPool();
     await Promise.all([
@@ -64,7 +64,7 @@ describe("createReminderMailer", () => {
     );
   });
 
-  it("A19: sends over a few pooled Gmail connections, closed at the end of the run", () => {
+  it("sends over a few pooled Gmail connections, closed at the end of the run", () => {
     const mailer = createReminderMailer();
     const pool = latestPool();
     expect(pool.options).toMatchObject({ service: "gmail", pool: true, maxConnections: 3 });
@@ -72,7 +72,7 @@ describe("createReminderMailer", () => {
     expect(pool.close).toHaveBeenCalledTimes(1);
   });
 
-  it("A19: checks the login again after a failed check, and that send fails", async () => {
+  it("checks the login again after a failed check, and that send fails", async () => {
     const mailer = createReminderMailer();
     const pool = latestPool();
     pool.verify.mockRejectedValueOnce(new Error("Invalid login"));

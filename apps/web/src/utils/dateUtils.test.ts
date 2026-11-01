@@ -145,19 +145,19 @@ describe("clock-dependent helpers", () => {
       expect(todayCellMatches(new Date(2026, 9, 19), 9, 19)).toBe(true);
     });
 
-    it("A56: matches today's cell at any time of day", () => {
+    it("matches today's cell at any time of day", () => {
       expect(todayCellMatches(new Date(2026, 9, 19, 0, 0, 1), 9, 19)).toBe(true);
       expect(todayCellMatches(new Date(2026, 9, 19, 12, 0), 9, 19)).toBe(true);
       expect(todayCellMatches(new Date(2026, 9, 19, 23, 59, 59), 9, 19)).toBe(true);
     });
 
-    it("A56: matches today's cell through the 23-hour March 8", () => {
+    it("matches today's cell through the 23-hour March 8", () => {
       expect(todayCellMatches(new Date(2026, 2, 8, 0, 30), 2, 8)).toBe(true);
       expect(todayCellMatches(new Date(2026, 2, 8, 3, 30), 2, 8)).toBe(true);
       expect(todayCellMatches(new Date(2026, 2, 8, 23, 59), 2, 8)).toBe(true);
     });
 
-    it("A56: matches today's cell through the 25-hour November 1", () => {
+    it("matches today's cell through the 25-hour November 1", () => {
       expect(todayCellMatches(new Date(2026, 10, 1, 0, 30), 10, 1)).toBe(true);
       expect(todayCellMatches(new Date(2026, 10, 1, 1, 30), 10, 1)).toBe(true);
       expect(todayCellMatches(new Date(2026, 10, 1, 23, 59), 10, 1)).toBe(true);

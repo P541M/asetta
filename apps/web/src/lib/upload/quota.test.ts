@@ -52,7 +52,7 @@ describe("filesUsedFromData", () => {
 });
 
 describe("claimUploadFiles", () => {
-  it("allows 20 files a day (D5)", () => {
+  it("allows 20 files a day", () => {
     expect(MAX_FILES_PER_DAY).toBe(20);
   });
 

@@ -57,11 +57,11 @@ describe("computeCurrentGrade", () => {
     expect(computeCurrentGrade([missed(0, 10), submitted(100, 10)])).toBeCloseTo(50);
   });
 
-  it("A10 (D1): counts a Missed assessment with no mark as 0", () => {
+  it("counts a Missed assessment with no mark as 0", () => {
     expect(computeCurrentGrade([submitted(90, 50), missed(null, 50)])).toBeCloseTo(45);
   });
 
-  it("A36: is null when every marked assessment weighs 0", () => {
+  it("is null when every marked assessment weighs 0", () => {
     expect(computeCurrentGrade([submitted(95, 0)])).toBeNull();
   });
 
@@ -103,11 +103,11 @@ describe("calculateRequiredGrade", () => {
     );
   });
 
-  it("A10: is null when the remaining assessments carry no weight", () => {
+  it("is null when the remaining assessments carry no weight", () => {
     expect(calculateRequiredGrade([submitted(80, 100), notStarted(0)], 85, 100)).toBeNull();
   });
 
-  it("A10 (D1): treats a Missed assessment with no mark as completed with 0", () => {
+  it("treats a Missed assessment with no mark as completed with 0", () => {
     // 45 earned, 0 from the missed one, 25 weight left: 25 / 25
     expect(
       calculateRequiredGrade([submitted(90, 50), missed(null, 25), notStarted(25)], 70, 100),
@@ -128,7 +128,7 @@ describe("requiredGradeView", () => {
     expect(requiredGradeView(100.04)).toEqual({ kind: "needed", text: "100.0", reachable: true });
   });
 
-  it("A10: a target already secured (required below 0) doesn't render as a negative percentage", () => {
+  it("a target already secured (required below 0) doesn't render as a negative percentage", () => {
     expect(requiredGradeView(-12.5)).toEqual({ kind: "secured" });
   });
 
@@ -152,7 +152,7 @@ describe("applyMarkInput", () => {
   );
 
   it.each(["Submitted", "Missed"] as const)(
-    "A41: keeps the status (%s) when a mark is entered",
+    "keeps the status (%s) when a mark is entered",
     (status) => {
       const [edited] = applyMarkInput([makeAssessment({ id: "a1", status })], "a1", "40");
       expect(edited).toMatchObject({ mark: 40, status });
@@ -160,14 +160,14 @@ describe("applyMarkInput", () => {
   );
 
   it.each(["Not started", "In progress", "Submitted", "Missed"] as const)(
-    "A41: never changes the status (%s) when the mark is cleared",
+    "never changes the status (%s) when the mark is cleared",
     (status) => {
       const [edited] = applyMarkInput([makeAssessment({ id: "a1", status, mark: 70 })], "a1", "");
       expect(edited).toMatchObject({ mark: null, status });
     },
   );
 
-  it("A41: a stray mark typed and deleted on a Missed assessment leaves it counting as 0", () => {
+  it("a stray mark typed and deleted on a Missed assessment leaves it counting as 0", () => {
     const course = [
       makeAssessment({ id: "a1", status: "Submitted", mark: 90, weight: 50 }),
       makeAssessment({ id: "a2", status: "Missed", mark: null, weight: 50 }),
@@ -191,19 +191,16 @@ describe("applyMarkInput", () => {
     expect(applyMarkInput(course, "a1", raw)[0].mark).toBe(mark);
   });
 
-  it.each(["-", ".", "-.", " ", "abc"])(
-    "A79: changes nothing for %j, which has no number",
-    (raw) => {
-      expect(applyMarkInput(course, "a1", raw)).toBe(course);
-    },
-  );
+  it.each(["-", ".", "-.", " ", "abc"])("changes nothing for %j, which has no number", (raw) => {
+    expect(applyMarkInput(course, "a1", raw)).toBe(course);
+  });
 
-  it("A79: a stray '-' keeps a saved mark and its status", () => {
+  it("a stray '-' keeps a saved mark and its status", () => {
     const marked = applyMarkInput(course, "a1", "87.5");
     expect(applyMarkInput(marked, "a1", "-")).toBe(marked);
   });
 
-  it("A79: starting to type .5 never marks the assessment Submitted with 0", () => {
+  it("starting to type .5 never marks the assessment Submitted with 0", () => {
     const afterDot = applyMarkInput(course, "a1", ".");
     expect(afterDot[0]).toMatchObject({ mark: null, status: "Not started" });
     expect(applyMarkInput(afterDot, "a1", ".5")[0]).toMatchObject({
@@ -216,7 +213,7 @@ describe("applyMarkInput", () => {
     expect(applyMarkInput(course, "a1", "90")[1]).toBe(course[1]);
   });
 
-  it("A10: clearing the only mark clears the current grade", () => {
+  it("clearing the only mark clears the current grade", () => {
     const marked = applyMarkInput([notStarted(20)], "a1", "90");
     expect(computeCurrentGrade(marked)).toBeCloseTo(90);
     expect(computeCurrentGrade(applyMarkInput(marked, "a1", ""))).toBeNull();
@@ -282,7 +279,7 @@ describe("resolveTargetGrade", () => {
     expect(resolveTargetGrade(null)).toBe(85);
   });
 
-  it("A10: a target grade of 0 stays 0 (GradeCalculator's `|| 85`)", () => {
+  it("keeps a target grade of 0, not the default 85", () => {
     expect(resolveTargetGrade({ targetGrade: 0 })).toBe(0);
   });
 });
@@ -299,7 +296,7 @@ describe("parsePercentInput", () => {
   });
 
   it.each(["", "  ", "-", ".", "abc"])(
-    "A43: gives nothing to save for %j, so the saved target stays",
+    "gives nothing to save for %j, so the saved target stays",
     (raw) => {
       expect(parsePercentInput(raw)).toBeNull();
     },
@@ -309,7 +306,7 @@ describe("parsePercentInput", () => {
     ["150", 100],
     ["100.5", 100],
     ["-5", 0],
-  ])("A43: clamps %j to %f", (raw, target) => {
+  ])("clamps %j to %f", (raw, target) => {
     expect(parsePercentInput(raw)).toBe(target);
   });
 });
@@ -328,13 +325,13 @@ describe("targetToSave", () => {
     expect(targetToSave(null, 85)).toBeNull();
   });
 
-  it("A76: deleting 85 digit by digit and leaving the field keeps 85", () => {
+  it("deleting 85 digit by digit and leaving the field keeps 85", () => {
     let typed: number | null = null;
     for (const raw of ["8", ""]) typed = parsePercentInput(raw);
     expect(targetToSave(typed, 85)).toBeNull();
   });
 
-  it("A76: typing 72.5 saves 72.5 once, not each keystroke's value", () => {
+  it("typing 72.5 saves 72.5 once, not each keystroke's value", () => {
     let typed: number | null = null;
     for (const raw of ["7", "72", "72.", "72.5"]) typed = parsePercentInput(raw);
     expect(targetToSave(typed, 85)).toBe(72.5);
@@ -358,13 +355,13 @@ describe("weightEdit", () => {
   });
 
   it.each(["", " ", "-", ".", "abc"])(
-    "A78: gives nothing to save for %j when nothing is unsaved, so the saved weight stays",
+    "gives nothing to save for %j when nothing is unsaved, so the saved weight stays",
     (raw) => {
       expect(weightEdit(row, raw, 20)).toBeNull();
     },
   );
 
-  it("A78: deleting 10 digit by digit doesn't leave the 1 to save", () => {
+  it("deleting 10 digit by digit doesn't leave the 1 to save", () => {
     const saved = makeAssessment({ id: "a1", weight: 10, mark: null, status: "Not started" });
     let shown = saved;
     for (const raw of ["1", ""]) {
@@ -402,16 +399,16 @@ describe("breakdownStatus", () => {
     expect(breakdownStatus(row(s, "2026-10-01"), now)).toBe("overdue");
   });
 
-  it("A53: is missed for a Missed assessment due later (it counts as 0, D1)", () => {
+  it("is missed for a Missed assessment due later (it counts as 0)", () => {
     expect(breakdownStatus(row("Missed", "2026-10-20"), now)).toBe("missed");
   });
 
-  it("A53: is missed for a Missed assessment past its due date", () => {
+  it("is missed for a Missed assessment past its due date", () => {
     expect(breakdownStatus(row("Missed", "2026-10-01"), now)).toBe("missed");
   });
 
   it.each(["Not started", "In progress"] as const)(
-    "A75: is review for a flagged %s, even past its placeholder date",
+    "is review for a flagged %s, even past its placeholder date",
     (s) => {
       const flagged = (dueDate: string) =>
         makeAssessment({ status: s, dueDate, needsReview: true });
@@ -420,7 +417,7 @@ describe("breakdownStatus", () => {
     },
   );
 
-  it("A75: a flagged assessment that is Submitted or Missed keeps that marker", () => {
+  it("a flagged assessment that is Submitted or Missed keeps that marker", () => {
     const flagged = (status: AssessmentStatus) =>
       makeAssessment({ status, dueDate: "2026-10-01", needsReview: true });
     expect(breakdownStatus(flagged("Submitted"), now)).toBe("submitted");
@@ -438,13 +435,13 @@ describe("currentGradeView", () => {
     });
   });
 
-  it("A10: GradeOverviewCards picks the letter from the shown value (89.96 shows 90.0% and A+)", () => {
+  it("GradeOverviewCards picks the letter from the shown value (89.96 shows 90.0% and A+)", () => {
     const view = currentGradeView(89.96);
     expect(view.text).toBe("90.0");
     expect(view.info).toMatchObject({ letter: "A+", gpa: 4.0 });
   });
 
-  it("A10: picks the meter color from the shown value too (84.96 shows 85.0%)", () => {
+  it("picks the meter color from the shown value too (84.96 shows 85.0%)", () => {
     const view = currentGradeView(84.96);
     expect(view.text).toBe("85.0");
     expect(view.barColor).toBe("bg-success");

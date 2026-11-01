@@ -43,7 +43,7 @@ describe("reminderEmail", () => {
   });
 });
 
-describe("confirmAddressEmail (A17)", () => {
+describe("confirmAddressEmail", () => {
   const link = "https://asetta.me/confirm-email?uid=abc123&token=tok_EN-1";
 
   it("links to the confirm page, escaped in the HTML and as is in the text", () => {

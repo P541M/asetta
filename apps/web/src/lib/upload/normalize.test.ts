@@ -32,12 +32,12 @@ describe("parseDueDate", () => {
     ["Sept 30, 2026", "2026-09-30"],
     ["Mar 15, 2026", "2026-03-15"],
   ]) {
-    it(`A9: reads the abbreviated month in ${JSON.stringify(input)}`, () => {
+    it(`reads the abbreviated month in ${JSON.stringify(input)}`, () => {
       expect(parseDueDate(input)).toBe(expected);
     });
   }
 
-  it("A9: reads 15/03/2026 as March 15, not month 15", () => {
+  it("reads 15/03/2026 as March 15, not month 15", () => {
     expect(parseDueDate("15/03/2026")).toBe("2026-03-15");
   });
 
@@ -53,7 +53,7 @@ describe("parseDueDate", () => {
     ["Feb 29, 2028", "2028-02-29"],
     ["15.03.2026", "2026-03-15"],
     ["13/1/27", "2027-01-13"],
-  ])("A9: reads the syllabus date %j as %s", (input, expected) => {
+  ])("reads the syllabus date %j as %s", (input, expected) => {
     expect(parseDueDate(input)).toBe(expected);
   });
 
@@ -71,11 +71,11 @@ describe("parseDueDate", () => {
     ["an empty string", ""],
     ["a number", 20261015],
     ["undefined", undefined],
-  ])("A9: range-checks the result: %s gives null", (_label, input) => {
+  ])("range-checks the result: %s gives null", (_label, input) => {
     expect(parseDueDate(input)).toBeNull();
   });
 
-  describe("a day and month that could swap (D10)", () => {
+  describe("a day and month that could swap", () => {
     it("is null without the document's order, rather than a guess", () => {
       expect(parseDueDate("03/04/2026")).toBeNull();
       expect(parseDueDate("3/5/2026")).toBeNull();
@@ -120,7 +120,7 @@ describe("parseDueTime", () => {
     ["12:30 PM", "12:30"],
     ["12 pm", "12:00"],
     ["  2:30 PM EST", "14:30"],
-  ])("A9: reads %j as %s", (input, expected) => {
+  ])("reads %j as %s", (input, expected) => {
     expect(parseDueTime(input)).toBe(expected);
   });
 
@@ -134,7 +134,7 @@ describe("parseDueTime", () => {
     [""],
     [2359],
     [undefined],
-  ])("A9: gives null for %j", (input) => {
+  ])("gives null for %j", (input) => {
     expect(parseDueTime(input)).toBeNull();
   });
 });
@@ -155,7 +155,7 @@ describe("parseWeight", () => {
     ["none", 0],
     [null, 0],
     [undefined, 0],
-  ])("A9: reads %j as %s", (input, expected) => {
+  ])("reads %j as %s", (input, expected) => {
     expect(parseWeight(input)).toBe(expected);
   });
 });
@@ -238,13 +238,13 @@ describe("normalizeExtractedAssessment", () => {
       { assignmentName: "   ", dueDate: "2026-10-29" },
       { assignmentName: "Assessment 1" },
     ],
-  ])("A9: normalizes %s", (_label, raw, expected) => {
+  ])("normalizes %s", (_label, raw, expected) => {
     const assessment = normalizeExtractedAssessment(raw, options);
     expect(assessment).toMatchObject({ ...expected, status: "Not started" });
     expect(assessment).not.toHaveProperty("needsReview");
   });
 
-  it("A9: caps over-long names", () => {
+  it("caps over-long names", () => {
     const assessment = normalizeExtractedAssessment(
       { courseName: "C".repeat(500), assignmentName: "A".repeat(500), dueDate: "2026-10-15" },
       options,
@@ -253,7 +253,7 @@ describe("normalizeExtractedAssessment", () => {
     expect(assessment.assignmentName).toHaveLength(MAX_ASSESSMENT_NAME_LENGTH);
   });
 
-  it("A9: caps an over-long fallback course name too", () => {
+  it("caps an over-long fallback course name too", () => {
     const assessment = normalizeExtractedAssessment(
       { assignmentName: "Quiz", dueDate: "2026-10-15" },
       { ...options, fallbackCourseName: "Intro ".repeat(100) },
@@ -274,7 +274,7 @@ describe("normalizeExtractedAssessment", () => {
     ["an unreadable date", "TBA"],
     ["an impossible date", "February 30, 2026"],
     ["a date whose day and month could swap", "03/04/2026"],
-  ])("A9: flags %s for review, dated the local day", (_label, dueDate) => {
+  ])("flags %s for review, dated the local day", (_label, dueDate) => {
     const assessment = normalizeExtractedAssessment(
       { assignmentName: "Quiz 1", dueDate, dueTime: "9:00 AM" },
       options,
@@ -291,7 +291,7 @@ describe("normalizeExtractedAssessment", () => {
     expect(assessment).not.toHaveProperty("needsReview");
   });
 
-  it("A9: always stores a valid date and time", () => {
+  it("always stores a valid date and time", () => {
     const junk = [
       undefined,
       null,

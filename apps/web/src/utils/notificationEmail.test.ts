@@ -94,7 +94,7 @@ describe("notificationEmailStatus", () => {
   });
 });
 
-describe("reminderRecipient (A17)", () => {
+describe("reminderRecipient", () => {
   const accountEmail = "sam@example.test";
 
   it("sends to the chosen address when it is the account's own", () => {
@@ -143,8 +143,8 @@ describe("reminderRecipient (A17)", () => {
   });
 });
 
-describe("existingAddressToConfirm (D11)", () => {
-  it("confirms the address a user saved before A17, as saved", () => {
+describe("existingAddressToConfirm", () => {
+  it("confirms an address saved before confirm links existed, as saved", () => {
     expect(existingAddressToConfirm(" sam.lee@uni.example.test", undefined)).toBe(
       "sam.lee@uni.example.test",
     );

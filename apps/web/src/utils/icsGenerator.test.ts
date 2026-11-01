@@ -79,23 +79,23 @@ describe("generateICSFile", () => {
     expect(ics).toContain("BEGIN:VALARM\r\nTRIGGER:-PT1H\r\nACTION:DISPLAY\r\n");
   });
 
-  it("A14: ends a 23:59 event no earlier than it starts", () => {
+  it("ends a 23:59 event no earlier than it starts", () => {
     const lines = onlyEvent({ dueDate: "2026-10-15", dueTime: "23:59" });
     const start = field(lines, "DTSTART")!;
     const end = field(lines, "DTEND") ?? start;
     expect(stampValue(end)).toBeGreaterThanOrEqual(stampValue(start));
   });
 
-  it("A14: stamps every event with DTSTAMP (RFC 5545)", () => {
+  it("stamps every event with DTSTAMP (RFC 5545)", () => {
     expect(field(onlyEvent({}), "DTSTAMP")).toBeDefined();
   });
 
-  it("A14: escapes commas, semicolons and backslashes in SUMMARY", () => {
+  it("escapes commas, semicolons and backslashes in SUMMARY", () => {
     const lines = onlyEvent({ courseName: "Math, Stats; Intro\\Labs", assignmentName: "Quiz 1" });
     expect(field(lines, "SUMMARY")).toBe(String.raw`Math\, Stats\; Intro\\Labs: Quiz 1`);
   });
 
-  it("A14: folds lines longer than 75 octets", () => {
+  it("folds lines longer than 75 octets", () => {
     const ics = generateICSFile(
       [makeAssessment({ assignmentName: "x".repeat(120) })],
       "Fall 2026",
@@ -107,12 +107,12 @@ describe("generateICSFile", () => {
     }
   });
 
-  it("A14: ends a 23:59 event at 00:59 the next day", () => {
+  it("ends a 23:59 event at 00:59 the next day", () => {
     const lines = onlyEvent({ dueDate: "2026-10-15", dueTime: "23:59" });
     expect(field(lines, "DTEND")).toBe("20261016T005900");
   });
 
-  it("A14: rolls a late end over into the next year", () => {
+  it("rolls a late end over into the next year", () => {
     const lines = onlyEvent({ dueDate: "2026-12-31", dueTime: "23:30" });
     expect(field(lines, "DTEND")).toBe("20270101T003000");
   });
@@ -132,21 +132,21 @@ describe("generateICSFile", () => {
     expect(field(lines, "DTEND")).toBe("20261015T100500");
   });
 
-  it("A14: stamps DTSTAMP in UTC from the moment the file is made", () => {
+  it("stamps DTSTAMP in UTC from the moment the file is made", () => {
     expect(field(onlyEvent({}), "DTSTAMP")).toBe("20261011T160509Z");
   });
 
-  it("A14: escapes newlines in SUMMARY", () => {
+  it("escapes newlines in SUMMARY", () => {
     const lines = onlyEvent({ assignmentName: "Lab 2\nPart B" });
     expect(field(lines, "SUMMARY")).toBe(String.raw`CIS 3760: Lab 2\nPart B`);
   });
 
-  it("A14: escapes the semester name in PRODID", () => {
+  it("escapes the semester name in PRODID", () => {
     const ics = generateICSFile([], "Fall, 2026; Year 2", NOW);
     expect(ics).toContain(String.raw`PRODID:-//Asetta//Fall\, 2026\; Year 2 Calendar//EN`);
   });
 
-  it("A14: unfolds back to the original line", () => {
+  it("unfolds back to the original line", () => {
     const ics = generateICSFile(
       [makeAssessment({ assignmentName: "x".repeat(120) })],
       "Fall 2026",
@@ -155,7 +155,7 @@ describe("generateICSFile", () => {
     expect(field(eventLines(unfold(ics))[0], "SUMMARY")).toBe(`CIS 3760: ${"x".repeat(120)}`);
   });
 
-  it("A14: counts octets, not characters, and never splits a character when folding", () => {
+  it("counts octets, not characters, and never splits a character when folding", () => {
     const name = `${"é".repeat(40)}${"🎓".repeat(12)}`;
     const ics = generateICSFile([makeAssessment({ assignmentName: name })], "Fall 2026", NOW);
     const encoder = new TextEncoder();
@@ -168,7 +168,7 @@ describe("generateICSFile", () => {
     expect(field(eventLines(unfold(ics))[0], "SUMMARY")).toBe(`CIS 3760: ${name}`);
   });
 
-  it("A14 (D9): keeps the UID on asetta.app, so a re-import updates events instead of duplicating them", () => {
+  it("keeps the UID on asetta.app, so a re-import updates events instead of duplicating them", () => {
     expect(field(onlyEvent({ id: "abc123" }), "UID")).toBe("abc123@asetta.app");
   });
 });

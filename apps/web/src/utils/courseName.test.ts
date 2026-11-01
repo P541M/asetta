@@ -34,14 +34,14 @@ describe("coursePreferencesDocId", () => {
     expect(coursePreferencesDocId(name)).toBe(name);
   });
 
-  it("A13: gives a cross-listed name one document ID", () => {
+  it("gives a cross-listed name one document ID", () => {
     expect(coursePreferencesDocId("MATH/STAT 2050")).toBe("%MATH%2FSTAT 2050");
     expect(coursePreferencesDocId("ENG 1001/ENG 1002/ENG 1003")).toBe(
       "%ENG 1001%2FENG 1002%2FENG 1003",
     );
   });
 
-  it("A13: escapes the names Firestore reserves", () => {
+  it("escapes the names Firestore reserves", () => {
     expect(RESERVED_NAMES.map(coursePreferencesDocId)).toEqual(["%.", "%..", "%__init__", "%____"]);
   });
 
@@ -50,22 +50,22 @@ describe("coursePreferencesDocId", () => {
     expect(coursePreferencesDocId("%A%2FB")).not.toBe(coursePreferencesDocId("A/B"));
   });
 
-  it.each(ALL_NAMES)("A13: makes %j a valid document ID", (name) => {
+  it.each(ALL_NAMES)("makes %j a valid document ID", (name) => {
     expect(isValidDocId(coursePreferencesDocId(name))).toBe(true);
   });
 
-  it("A13: gives every name its own ID", () => {
+  it("gives every name its own ID", () => {
     expect(new Set(ALL_NAMES.map(coursePreferencesDocId)).size).toBe(ALL_NAMES.length);
   });
 });
 
 describe("courseNameFromPreferencesDocId", () => {
-  it("reads an ID written before A13 as the course name", () => {
+  it("reads an unescaped ID as the course name", () => {
     expect(courseNameFromPreferencesDocId("CIS 3760")).toBe("CIS 3760");
     expect(courseNameFromPreferencesDocId("100% attendance")).toBe("100% attendance");
   });
 
-  it.each(ALL_NAMES)("A13: reads the ID of %j back as that name", (name) => {
+  it.each(ALL_NAMES)("reads the ID of %j back as that name", (name) => {
     expect(courseNameFromPreferencesDocId(coursePreferencesDocId(name))).toBe(name);
   });
 
@@ -88,11 +88,11 @@ describe("validateCourseName", () => {
     expect(validateCourseName("x".repeat(101))).toMatch(/100/);
   });
 
-  it("A13: accepts a cross-listed name", () => {
+  it("accepts a cross-listed name", () => {
     expect(validateCourseName("MATH/STAT 2050")).toBeNull();
   });
 
-  it("A13: accepts the characters only the old document ID ruled out", () => {
+  it("accepts #, ?, brackets and backslashes", () => {
     expect(validateCourseName("C# 1001")).toBeNull();
     expect(validateCourseName("What? 1000")).toBeNull();
     expect(validateCourseName("[Lab] A\\B")).toBeNull();

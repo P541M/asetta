@@ -40,7 +40,7 @@ const ids = (reminders: { assessmentId: string }[]) => reminders.map((r) => r.as
 
 describe("dueReminders", () => {
   describe("9:30 on the target day, in the user's zone", () => {
-    it("A8: sends N days before the due date, from 9:30 in Toronto", () => {
+    it("sends N days before the due date, from 9:30 in Toronto", () => {
       // Oct 12, 09:35 EDT
       expect(run("America/Toronto", utc(10, 12, 13, 35), [assessment()])).toEqual([
         {
@@ -53,39 +53,39 @@ describe("dueReminders", () => {
       ]);
     });
 
-    it("A8: sends nothing on the target day before 9:30", () => {
+    it("sends nothing on the target day before 9:30", () => {
       // Oct 12, 09:25 EDT
       expect(run("America/Toronto", utc(10, 12, 13, 25), [assessment()])).toEqual([]);
     });
 
-    it("A8: sends nothing before the target day, even under N+1 days from the due moment", () => {
+    it("sends nothing before the target day, even under N+1 days from the due moment", () => {
       // Oct 11, 10:00 EDT; due Oct 15 at 08:00, so the reminder belongs to Oct 12
       expect(run("America/Toronto", utc(10, 11, 14), [assessment({ dueTime: "08:00" })])).toEqual(
         [],
       );
     });
 
-    it("A8: uses the user's zone east of UTC (Auckland, UTC+13 in October)", () => {
+    it("uses the user's zone east of UTC (Auckland, UTC+13 in October)", () => {
       // Oct 12, 09:35 NZDT is Oct 11 in UTC
       expect(run("Pacific/Auckland", utc(10, 11, 20, 35), [assessment()])).toEqual([
         expect.objectContaining({ targetDay: "2026-10-12", daysUntilDue: 3 }),
       ]);
     });
 
-    it("A8: uses a half-hour zone (Kolkata, UTC+5:30), from 9:30 exactly", () => {
+    it("uses a half-hour zone (Kolkata, UTC+5:30), from 9:30 exactly", () => {
       // Oct 12, 09:30 IST
       expect(run("Asia/Kolkata", utc(10, 12, 4), [assessment()])).toEqual([
         expect.objectContaining({ targetDay: "2026-10-12", daysUntilDue: 3 }),
       ]);
     });
 
-    it("A8: sends nothing in Kolkata at 09:29", () => {
+    it("sends nothing in Kolkata at 09:29", () => {
       expect(run("Asia/Kolkata", utc(10, 12, 3, 59), [assessment({ dueTime: "20:00" })])).toEqual(
         [],
       );
     });
 
-    it("A8: uses UTC as a zone", () => {
+    it("uses UTC as a zone", () => {
       // Oct 12, 09:30 UTC; due Oct 15 at 09:00 UTC
       expect(run("UTC", utc(10, 12, 9, 30), [assessment({ dueTime: "09:00" })])).toEqual([
         expect.objectContaining({ targetDay: "2026-10-12", daysUntilDue: 3 }),
@@ -94,14 +94,14 @@ describe("dueReminders", () => {
   });
 
   describe("day count", () => {
-    it("A8: counts calendar days, not 24-hour blocks: due at 08:00 three days out is 3", () => {
+    it("counts calendar days, not 24-hour blocks: due at 08:00 three days out is 3", () => {
       // Oct 12, 09:35 EDT; due Oct 15 at 08:00 (under 71 hours away)
       expect(
         run("America/Toronto", utc(10, 12, 13, 35), [assessment({ dueTime: "08:00" })]),
       ).toEqual([expect.objectContaining({ targetDay: "2026-10-12", daysUntilDue: 3 })]);
     });
 
-    it("A8: never says 'due in 0 days' for an assessment due tomorrow", () => {
+    it("never says 'due in 0 days' for an assessment due tomorrow", () => {
       // Oct 12, 17:00 EDT; due Oct 13 at 05:00, 12 hours away
       expect(
         run(
@@ -117,19 +117,19 @@ describe("dueReminders", () => {
   });
 
   describe("stored times", () => {
-    it("A8: accepts an unpadded time and pads it", () => {
+    it("accepts an unpadded time and pads it", () => {
       expect(
         run("America/Toronto", utc(10, 12, 13, 35), [assessment({ dueTime: "9:00" })]),
       ).toEqual([expect.objectContaining({ targetDay: "2026-10-12", dueTime: "09:00" })]);
     });
 
-    it("A8: accepts a 12-hour time from before B8", () => {
+    it("accepts a 12-hour time, as older uploads stored it", () => {
       expect(
         run("America/Toronto", utc(10, 12, 13, 35), [assessment({ dueTime: "11:59 PM" })]),
       ).toEqual([expect.objectContaining({ dueTime: "23:59" })]);
     });
 
-    it("A8: reads a missing time as 23:59 in the user's zone, not as UTC midnight", () => {
+    it("reads a missing time as 23:59 in the user's zone, not as UTC midnight", () => {
       // Oct 14, 09:35 EDT; due Oct 15 with no time
       expect(
         run("America/Toronto", utc(10, 14, 13, 35), [assessment({ dueTime: "" })], {
@@ -142,13 +142,13 @@ describe("dueReminders", () => {
   });
 
   describe("which assessments", () => {
-    it("A8: skips a Missed assessment", () => {
+    it("skips a Missed assessment", () => {
       expect(
         run("America/Toronto", utc(10, 12, 13, 35), [assessment({ status: "Missed" })]),
       ).toEqual([]);
     });
 
-    it("skips an assessment whose due date needs review (B8)", () => {
+    it("skips an assessment whose due date needs review", () => {
       expect(
         run("America/Toronto", utc(10, 12, 13, 35), [assessment({ needsReview: true })]),
       ).toEqual([]);
@@ -183,25 +183,25 @@ describe("dueReminders", () => {
   });
 
   describe("DST (2026)", () => {
-    it("A8: Mar 8, spring forward in Toronto: nothing at 09:29 EDT", () => {
+    it("Mar 8, spring forward in Toronto: nothing at 09:29 EDT", () => {
       expect(
         run("America/Toronto", utc(3, 8, 13, 29), [assessment({ dueDate: "2026-03-11" })]),
       ).toEqual([]);
     });
 
-    it("A8: Mar 8, spring forward in Toronto: sends at 09:30 EDT", () => {
+    it("Mar 8, spring forward in Toronto: sends at 09:30 EDT", () => {
       expect(
         run("America/Toronto", utc(3, 8, 13, 30), [assessment({ dueDate: "2026-03-11" })]),
       ).toEqual([expect.objectContaining({ targetDay: "2026-03-08", daysUntilDue: 3 })]);
     });
 
-    it("A8: Nov 1, fall back in Toronto: nothing at 08:35 EST", () => {
+    it("Nov 1, fall back in Toronto: nothing at 08:35 EST", () => {
       expect(
         run("America/Toronto", utc(11, 1, 13, 35), [assessment({ dueDate: "2026-11-04" })]),
       ).toEqual([]);
     });
 
-    it("A8: Nov 1, fall back in Toronto: sends at 09:35 EST", () => {
+    it("Nov 1, fall back in Toronto: sends at 09:35 EST", () => {
       expect(
         run("America/Toronto", utc(11, 1, 14, 35), [assessment({ dueDate: "2026-11-04" })]),
       ).toEqual([expect.objectContaining({ targetDay: "2026-11-01", daysUntilDue: 3 })]);
@@ -209,14 +209,14 @@ describe("dueReminders", () => {
   });
 
   describe("late runs", () => {
-    it("A8: a run later the same day still sends the day's reminder", () => {
+    it("a run later the same day still sends the day's reminder", () => {
       // Oct 12, 18:00 EDT: every slot since 09:30 was missed
       expect(run("America/Toronto", utc(10, 12, 22), [assessment()])).toEqual([
         expect.objectContaining({ targetDay: "2026-10-12", daysUntilDue: 3 }),
       ]);
     });
 
-    it("A8: a run the next morning catches up yesterday's reminder", () => {
+    it("a run the next morning catches up yesterday's reminder", () => {
       // Oct 13, 02:00 EDT
       expect(run("America/Toronto", utc(10, 13, 6), [assessment()])).toEqual([
         expect.objectContaining({ targetDay: "2026-10-12", daysUntilDue: 2 }),
@@ -224,8 +224,8 @@ describe("dueReminders", () => {
     });
   });
 
-  describe("A38: a failed send", () => {
-    it("A38: keeps its record ID the next day, after the day count has changed", () => {
+  describe("a failed send", () => {
+    it("keeps its record ID the next day, after the day count has changed", () => {
       const first = run("America/Toronto", utc(10, 12, 13, 35), [assessment()]);
       const next = run("America/Toronto", utc(10, 13, 13, 35), [assessment()]);
       expect(next).toHaveLength(1);
@@ -233,7 +233,7 @@ describe("dueReminders", () => {
       expect(reminderRecordId("u1", next[0])).toBe(reminderRecordId("u1", first[0]));
     });
 
-    it("A38: goes out in the next run after the day count has changed", () => {
+    it("goes out in the next run after the day count has changed", () => {
       // Run 1 (Oct 12, 09:35 EDT) claims the reminder, and the send fails.
       const firstRun = utc(10, 12, 13, 35);
       const [first] = run("America/Toronto", firstRun, [assessment()]);
@@ -291,11 +291,14 @@ describe("reminderDueDates", () => {
       "2026-11-11",
     ],
     ["across a year end", "UTC", utc(12, 30, 9, 35), 7, "2027-01-04", "2027-01-06"],
-  ])("A19: %s", (_case, zone, now, daysBefore, from, to) => {
-    expect(reminderDueDates(zone, now, daysBefore)).toEqual({ from, to });
-  });
+  ])(
+    "gives the due dates a reminder can come from: %s",
+    (_case, zone, now, daysBefore, from, to) => {
+      expect(reminderDueDates(zone, now, daysBefore)).toEqual({ from, to });
+    },
+  );
 
-  it("A19: holds every due date dueReminders can send, in any zone, across both DST weekends", () => {
+  it("holds every due date dueReminders can send, in any zone, across both DST weekends", () => {
     let sent = 0;
     for (const zone of ["America/Toronto", "Pacific/Auckland", "Asia/Kolkata", "UTC"]) {
       for (const start of [utc(3, 6, 0), utc(10, 30, 0)]) {
@@ -325,7 +328,7 @@ describe("reminderDueDates", () => {
     expect(sent).toBeGreaterThan(1000); // the check above really ran
   });
 
-  it("A19: holds nothing extra: after 9:30 every date in it has a reminder (2 days or more)", () => {
+  it("holds nothing extra: after 9:30 every date in it has a reminder (2 days or more)", () => {
     // Oct 12, 09:35 EDT
     const now = utc(10, 12, 13, 35);
     for (const daysBefore of [2, 3, 7, 30]) {
@@ -357,7 +360,7 @@ describe("resolveTimeZone", () => {
   });
 
   it.each([[undefined], [null], [""], ["Mars/Base"], [42]])(
-    "falls back to Toronto for %j (users who haven't signed in since A8)",
+    "falls back to Toronto for %j",
     (value) => {
       expect(resolveTimeZone(value)).toBe(DEFAULT_TIME_ZONE);
       expect(DEFAULT_TIME_ZONE).toBe("America/Toronto");
