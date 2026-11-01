@@ -1,5 +1,14 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { parseUploadResponse, uploadLimitResetText, uploadQuotaFromPayload } from "./uploadClient";
+import {
+  failedUpload,
+  parseUploadResponse,
+  pdfSelection,
+  uploadLimitResetText,
+  uploadOutcome,
+  uploadQuotaFromPayload,
+  type ParsedUploadResponse,
+} from "./uploadClient";
+import { MAX_FILE_BYTES, MAX_FILES_PER_UPLOAD } from "./upload/constants";
 
 const json = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), {
@@ -148,5 +157,121 @@ describe("uploadLimitResetText", () => {
 
   it("falls back to midnight UTC without a reset time", () => {
     expect(uploadLimitResetText(null, new Date(2026, 9, 19, 11, 0))).toBe("Resets at midnight UTC");
+  });
+});
+
+describe("pdfSelection", () => {
+  const pdf = (name: string, size = 1000) => ({ name, size, type: "application/pdf" });
+  const docx = (name: string) => ({
+    name,
+    size: 1000,
+    type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  });
+
+  it("is null for an empty pick, which changes nothing", () => {
+    expect(pdfSelection([])).toBeNull();
+  });
+
+  it("keeps the PDFs of a mixed pick", () => {
+    const a = pdf("a.pdf");
+    const b = pdf("b.pdf");
+    expect(pdfSelection([a, docx("notes.docx"), b])).toEqual({ files: [a, b] });
+  });
+
+  it("refuses a pick with no PDF and keeps the list", () => {
+    const result = pdfSelection([docx("notes.docx")]);
+    expect(result).toMatchObject({ clearList: false });
+    expect(result && "error" in result && result.error).toContain("PDF files only");
+  });
+
+  it("empties the list for a pick over the limits", () => {
+    const tooMany = Array.from({ length: MAX_FILES_PER_UPLOAD + 1 }, (_, i) => pdf(`${i}.pdf`));
+    expect(pdfSelection(tooMany)).toMatchObject({ clearList: true });
+    const result = pdfSelection([pdf("big.pdf", MAX_FILE_BYTES + 1)]);
+    expect(result).toMatchObject({ clearList: true });
+    expect(result && "error" in result && result.error).toContain("big.pdf");
+  });
+});
+
+describe("uploadOutcome", () => {
+  const NOW = new Date(Date.UTC(2026, 9, 19, 14, 0));
+  const answer = (
+    status: number,
+    payload: ParsedUploadResponse["payload"],
+    errorMessage: string | null = null,
+  ): ParsedUploadResponse => ({ ok: status === 200, status, payload, errorMessage });
+  const data = { processedFiles: 1, totalAssessments: 4 };
+
+  it("reads a success: the server's summary and the extraction", () => {
+    expect(
+      uploadOutcome(answer(200, { success: true, message: "Processed 1 file", data }), NOW),
+    ).toEqual({ status: "success", message: "Processed 1 file", result: data });
+  });
+
+  it("reads a success without a summary or data as nothing extracted", () => {
+    expect(uploadOutcome(answer(200, { success: true }), NOW)).toEqual({
+      status: "success",
+      message: "Upload complete.",
+      result: { processedFiles: 0, totalAssessments: 0 },
+    });
+  });
+
+  const userLimit = {
+    success: false,
+    error: "DAILY_QUOTA_EXCEEDED",
+    message: "You can upload 2 more files today.",
+    quotaType: "user",
+    retryAfter: 36_000,
+  };
+
+  it("keeps Extract on when the account has files left today", () => {
+    expect(uploadOutcome(answer(429, { ...userLimit, remaining: 2 }), NOW)).toEqual({
+      status: "error",
+      error: "You can upload 2 more files today.",
+      limit: { quota: { remaining: 2, resetsAt: new Date(Date.UTC(2026, 9, 20, 0, 0)) } },
+    });
+  });
+
+  it("stops at the account's limit when no files are left", () => {
+    expect(uploadOutcome(answer(429, { ...userLimit, remaining: 0 }), NOW)).toMatchObject({
+      status: "daily_quota_exceeded",
+      limit: { quota: { remaining: 0 } },
+    });
+  });
+
+  it("stops at Gemini's daily quota, with no account limit to show", () => {
+    expect(
+      uploadOutcome(answer(429, { error: "DAILY_QUOTA_EXCEEDED", quotaType: "daily" }), NOW),
+    ).toEqual({
+      status: "daily_quota_exceeded",
+      error: "Daily processing limit reached",
+      limit: { quota: null },
+    });
+  });
+
+  it("waits out a rate limit for the server's seconds, or 120", () => {
+    expect(
+      uploadOutcome(
+        answer(429, { error: "RATE_LIMITED", message: "Busy", retryAfter: 90 }, "Busy"),
+        NOW,
+      ),
+    ).toEqual({ status: "rate_limited", error: "Busy", retryAfter: 90 });
+    expect(uploadOutcome(answer(429, { error: "RATE_LIMITED" }), NOW)).toEqual({
+      status: "rate_limited",
+      error: "Servers are busy. Please wait and try again.",
+      retryAfter: 120,
+    });
+  });
+
+  it("shows the parsed message for any other failure", () => {
+    expect(uploadOutcome(answer(429, { error: "OTHER" }, "OTHER"), NOW)).toEqual(
+      failedUpload("OTHER"),
+    );
+    expect(
+      uploadOutcome(answer(400, { error: "Semester not found" }, "Semester not found"), NOW),
+    ).toEqual({ status: "error", error: "Semester not found" });
+    expect(uploadOutcome(answer(504, null, "Processing took too long"), NOW)).toEqual(
+      failedUpload("Processing took too long"),
+    );
   });
 });

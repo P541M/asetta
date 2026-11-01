@@ -19,6 +19,9 @@ export const MAX_FILES_PER_DAY = 20;
 
 export const ACCEPTED_MIME_TYPE = "application/pdf";
 
+/** Seconds a rate-limited upload waits before it is retried, when the server doesn't say. */
+export const RETRY_AFTER_SECONDS = 120;
+
 export const formatBytes = (bytes: number): string => {
   if (bytes < 1024) return `${bytes} B`;
   if (bytes < 1024 * 1024) return `${Math.round(bytes / 1024)} KB`;

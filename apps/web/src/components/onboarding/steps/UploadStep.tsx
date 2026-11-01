@@ -48,7 +48,6 @@ export function UploadStep() {
         <div className="mb-8">
           <OnboardingUploadForm
             semesterId={state.createdSemesterId}
-            semesterName={state.semesterData.name}
             onUploadSuccess={setUploadComplete}
             onBusyChange={setIsUploading}
             showGuidance={true}

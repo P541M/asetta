@@ -1,18 +1,44 @@
 import { User } from "firebase/auth";
 import { ExtractionResult } from "../types/upload";
-import { formatBytes, MAX_TOTAL_UPLOAD_BYTES } from "./upload/constants";
+import {
+  ACCEPTED_MIME_TYPE,
+  formatBytes,
+  MAX_TOTAL_UPLOAD_BYTES,
+  RETRY_AFTER_SECONDS,
+  validateUploadSelection,
+} from "./upload/constants";
 import { getTodayDateString } from "../utils/dateUtils";
+
+/**
+ * What a pick or a drop does to the upload list: its PDFs replace the list, or a message says why
+ * not. A pick with no PDF leaves the list as it was; one over the limits empties it. Null for an
+ * empty pick.
+ */
+export function pdfSelection<T extends { name: string; size: number; type: string }>(
+  picked: T[],
+): { files: T[] } | { error: string; clearList: boolean } | null {
+  if (picked.length === 0) return null;
+  const files = picked.filter((file) => file.type === ACCEPTED_MIME_TYPE);
+  if (files.length === 0) return { error: "Please select PDF files only.", clearList: false };
+  const error = validateUploadSelection(files);
+  return error ? { error, clearList: true } : { files };
+}
 
 /**
  * POSTs syllabus files to /api/upload with the user's Firebase ID token and local date (the
  * server dates any assessment flagged for review with it; its own clock only knows the UTC day).
- * Callers own response parsing/error handling (the two upload forms have
- * intentionally different success and error flows), but should parse via
- * `parseUploadResponse` so platform-level HTML errors stay readable.
+ * Read the answer with `parseUploadResponse`, so platform-level HTML errors stay readable.
  */
-export async function postUploadForm(user: User, formData: FormData): Promise<Response> {
+export async function postUploadForm(
+  user: User,
+  semesterId: string,
+  files: File[],
+): Promise<Response> {
   const token = await user.getIdToken();
-  formData.set("localDate", getTodayDateString());
+  const formData = new FormData();
+  formData.append("semesterId", semesterId);
+  formData.append("localDate", getTodayDateString());
+  files.forEach((file) => formData.append("files", file));
   return fetch("/api/upload", {
     method: "POST",
     headers: {
@@ -32,8 +58,6 @@ export interface UploadApiPayload {
   /** With quotaType "user": the files the account can still upload today. */
   remaining?: number;
   data?: ExtractionResult;
-  errors?: string[];
-  hasRateLimitErrors?: boolean;
 }
 
 /** The account's daily upload limit, as the limit modal shows it. */
@@ -155,4 +179,49 @@ export async function parseUploadResponse(response: Response): Promise<ParsedUpl
       ? null
       : payload.message || payload.error || "Upload failed. Please try again.",
   };
+}
+
+/** Where an upload ends, as the forms show it. */
+export type UploadOutcome =
+  | { status: "success"; message: string; result: ExtractionResult }
+  | { status: "rate_limited"; error: string; retryAfter: number }
+  | {
+      status: "error" | "daily_quota_exceeded";
+      error: string;
+      /**
+       * Set when a daily limit stopped the upload, which opens the limit modal: the account's own
+       * limit, or null for Gemini's.
+       */
+      limit?: { quota: UploadQuota | null };
+    };
+
+export const failedUpload = (error: string): UploadOutcome => ({ status: "error", error });
+
+/** How an /api/upload answer ends the upload. */
+export function uploadOutcome(response: ParsedUploadResponse, now: Date): UploadOutcome {
+  const { ok, status, payload, errorMessage } = response;
+  if (ok) {
+    return {
+      status: "success",
+      message: payload?.message || "Upload complete.",
+      result: payload?.data ?? { processedFiles: 0, totalAssessments: 0 },
+    };
+  }
+  if (status === 429 && payload?.error === "DAILY_QUOTA_EXCEEDED") {
+    const quota = uploadQuotaFromPayload(payload, now);
+    return {
+      // With files left today, Extract stays enabled so the student can pick fewer
+      status: quota && quota.remaining > 0 ? "error" : "daily_quota_exceeded",
+      error: payload.message || "Daily processing limit reached",
+      limit: { quota },
+    };
+  }
+  if (status === 429 && payload?.error === "RATE_LIMITED") {
+    return {
+      status: "rate_limited",
+      error: payload.message || "Servers are busy. Please wait and try again.",
+      retryAfter: payload.retryAfter || RETRY_AFTER_SECONDS,
+    };
+  }
+  return failedUpload(errorMessage || "Upload failed");
 }

@@ -1,24 +1,26 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import type { File as FormidableFile } from "formidable";
-import { IncomingForm, Fields, Files } from "formidable";
+import type { Fields, Files } from "formidable";
 import fs from "fs";
 import { getAdmin } from "../../lib/firebase-admin";
 import { getAuth } from "firebase-admin/auth";
 import { FieldValue, getFirestore } from "firebase-admin/firestore";
-import { extractAssessmentsWithAI } from "../../lib/upload/gemini";
 import { pdfText } from "../../lib/upload/pdfText";
-import { extractAssessmentsBasic, extractCourseName } from "../../lib/upload/textExtraction";
+import { assessmentsFromText, courseBreakdown } from "../../lib/upload/extract";
+import { GeminiLimitError } from "../../lib/upload/gemini";
 import {
-  ExtractedAssessment,
-  UNKNOWN_COURSE,
-  normalizeExtractedAssessment,
-  parseLocalDate,
-} from "../../lib/upload/normalize";
+  formField,
+  formFiles,
+  isPayloadTooLargeError,
+  isTooManyFilesError,
+  parseForm,
+  removeTempFiles,
+} from "../../lib/upload/form";
+import { ExtractedAssessment, parseLocalDate } from "../../lib/upload/normalize";
 import {
-  ACCEPTED_MIME_TYPE,
   MAX_FILES_PER_UPLOAD,
   MAX_FILE_BYTES,
   MAX_TOTAL_UPLOAD_BYTES,
+  RETRY_AFTER_SECONDS,
   formatBytes,
 } from "../../lib/upload/constants";
 import {
@@ -35,63 +37,6 @@ export const config = {
   api: {
     bodyParser: false,
   },
-};
-
-// formidable stamps its own errors with an httpCode, and every size/count
-// violation is a 413. Reading httpCode avoids importing formidable's error
-// constants, which are NOT reachable via `formidable.errors` once the bundler
-// applies ESM interop (it resolves to the default export, which has no
-// `.errors`), so that lookup throws at module load and serves an HTML 500.
-const FORMIDABLE_MAX_FILES_EXCEEDED = 1015;
-
-// Check isTooManyFilesError first: it also carries httpCode 413.
-const isTooManyFilesError = (error: unknown): boolean =>
-  (error as { code?: unknown })?.code === FORMIDABLE_MAX_FILES_EXCEEDED;
-
-const isPayloadTooLargeError = (error: unknown): boolean =>
-  (error as { httpCode?: unknown })?.httpCode === 413;
-
-/**
- * Parses the multipart body. formidable writes each file to the OS temp dir as it arrives; every
- * path it opens, including a partial file from a failed parse, is pushed onto `tempFiles` so the
- * handler can delete them all.
- */
-const parseForm = (
-  req: NextApiRequest,
-  tempFiles: string[],
-): Promise<{ fields: Fields; files: Files }> => {
-  return new Promise((resolve, reject) => {
-    const form = new IncomingForm({
-      multiples: true,
-      // Must stay under Vercel's 4.5 MB request-body cap. Anything larger is
-      // rejected at the edge with an HTML error page we never get to handle,
-      // so the browser validates against the same constants before sending.
-      maxFileSize: MAX_FILE_BYTES,
-      maxTotalFileSize: MAX_TOTAL_UPLOAD_BYTES,
-      maxFiles: MAX_FILES_PER_UPLOAD,
-      filter: ({ mimetype }) => mimetype === ACCEPTED_MIME_TYPE,
-    });
-    form.on("fileBegin", (_name, file) => {
-      tempFiles.push(file.filepath);
-    });
-    form.parse(req, (err, fields, files) => {
-      if (err) {
-        reject(err);
-        return;
-      }
-      resolve({ fields, files });
-    });
-  });
-};
-
-/** Deletes formidable's temp files. A file that is already gone is fine; anything else is logged. */
-const removeTempFiles = async (paths: string[]) => {
-  const results = await Promise.allSettled(paths.map((p) => fs.promises.rm(p, { force: true })));
-  for (const result of results) {
-    if (result.status === "rejected") {
-      console.error("Upload: could not delete a temp file", result.reason);
-    }
-  }
 };
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -145,8 +90,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       });
     }
 
-    const semesterIdField = fields.semesterId;
-    const semesterId = Array.isArray(semesterIdField) ? semesterIdField[0] : semesterIdField;
+    const semesterId = formField(fields, "semesterId");
     if (!semesterId) {
       return res.status(400).json({ success: false, error: "Semester ID is required" });
     }
@@ -157,11 +101,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     // The uploader's local today dates any assessment flagged for review. The server's own clock
     // only knows the UTC day, which is the wrong day for much of the world.
-    const localDateField = fields.localDate;
-    const localDate = parseLocalDate(
-      Array.isArray(localDateField) ? localDateField[0] : localDateField,
-      new Date(),
-    );
+    const localDate = parseLocalDate(formField(fields, "localDate"), new Date());
     if (!localDate) {
       return res.status(400).json({
         success: false,
@@ -176,15 +116,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(400).json({ success: false, error: "Semester not found" });
     }
 
-    const uploadedFiles: FormidableFile[] = [];
-    Object.keys(files).forEach((key) => {
-      const file = files[key];
-      if (Array.isArray(file)) {
-        uploadedFiles.push(...file);
-      } else if (file) {
-        uploadedFiles.push(file);
-      }
-    });
+    const uploadedFiles = formFiles(files);
     if (uploadedFiles.length === 0) {
       return res.status(400).json({ success: false, error: "No valid files were uploaded" });
     }
@@ -220,101 +152,57 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       });
     }
 
-    let totalAssessments = 0;
     let processedFiles = 0;
     let failedFiles = 0;
     // Files extraction ran on (Gemini, or the regex fallback): the ones the day's count keeps
     let countedFiles = 0;
-    const errors: string[] = [];
-    const courseBreakdown: Array<{
-      courseName: string;
-      assessmentCount: number;
-    }> = [];
+    // Files Gemini refused for its own daily quota or its rate limit
+    let quotaFiles = 0;
+    let rateLimitedFiles = 0;
+    const saved: ExtractedAssessment[] = [];
     const processingStartTime = Date.now();
 
     for (const fileData of uploadedFiles) {
       try {
-        const filePath = fileData.filepath;
-        const fileName = fileData.originalFilename || "unknown.pdf";
         let extractedText: string;
         try {
-          extractedText = await pdfText(fs.readFileSync(filePath));
+          extractedText = await pdfText(fs.readFileSync(fileData.filepath));
         } catch (error) {
           console.error("Upload: could not parse a PDF", { uid: userId, error });
           failedFiles++;
-          errors.push(`Failed to parse PDF: ${fileName}`);
           continue;
         }
 
-        let assessments: ExtractedAssessment[] = [];
+        let assessments: ExtractedAssessment[];
         try {
-          assessments = await extractAssessmentsWithAI(extractedText, localDate);
-        } catch (error: unknown) {
-          const errorMessage = error instanceof Error ? error.message : "";
-          if (errorMessage === "DAILY_QUOTA_EXCEEDED") {
-            failedFiles++;
-            errors.push(`Daily quota exceeded: ${fileName}. Please try again tomorrow.`);
-            continue;
-          } else if (errorMessage === "RATE_LIMITED") {
-            failedFiles++;
-            errors.push(`Rate limit exceeded: ${fileName}. Please wait a moment and try again.`);
-            continue;
-          }
-          assessments = extractAssessmentsBasic(extractedText, localDate);
+          assessments = await assessmentsFromText(extractedText, localDate);
+        } catch (error) {
+          if (!(error instanceof GeminiLimitError)) throw error;
+          failedFiles++;
+          if (error.limit === "DAILY_QUOTA_EXCEEDED") quotaFiles++;
+          else rateLimitedFiles++;
+          continue;
         }
         countedFiles++;
-
-        // Nothing found: one placeholder, flagged for review, so the upload isn't silently empty.
-        if (assessments.length === 0) {
-          assessments.push(
-            normalizeExtractedAssessment(
-              {},
-              {
-                fallbackCourseName: extractCourseName(extractedText) ?? UNKNOWN_COURSE,
-                fallbackAssignmentName: "Manual Review Required",
-                localDate,
-              },
-            ),
-          );
-        }
 
         const assessmentsRef = adminDb.collection(
           `users/${userId}/semesters/${semesterId}/assessments`,
         );
         const batch = adminDb.batch();
         for (const assessment of assessments) {
-          const newAssessmentRef = assessmentsRef.doc();
-          batch.set(newAssessmentRef, {
+          batch.set(assessmentsRef.doc(), {
             ...assessment,
             createdAt: new Date(),
-            sourceFile: fileName,
+            sourceFile: fileData.originalFilename || "unknown.pdf",
           });
         }
         await batch.commit();
 
-        totalAssessments += assessments.length;
+        saved.push(...assessments);
         processedFiles++;
-
-        // Track course breakdown for the success modal
-        if (assessments.length > 0) {
-          const courseNames = [...new Set(assessments.map((a) => a.courseName))];
-          courseNames.forEach((courseName) => {
-            const courseAssessments = assessments.filter((a) => a.courseName === courseName);
-            const existingCourse = courseBreakdown.find((c) => c.courseName === courseName);
-            if (existingCourse) {
-              existingCourse.assessmentCount += courseAssessments.length;
-            } else {
-              courseBreakdown.push({
-                courseName,
-                assessmentCount: courseAssessments.length,
-              });
-            }
-          });
-        }
       } catch (error) {
         console.error("Upload: could not process a file", { uid: userId, error });
         failedFiles++;
-        errors.push(`Failed to process file: ${fileData.originalFilename}`);
       }
     }
 
@@ -332,10 +220,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       }
     }
 
-    const hasDailyQuotaErrors = errors.some((error) => error.includes("Daily quota exceeded"));
-    const hasRateLimitErrors = errors.some((error) => error.includes("Rate limit exceeded"));
-
-    if (hasDailyQuotaErrors && processedFiles === 0) {
+    if (quotaFiles > 0 && processedFiles === 0) {
       return res.status(429).json({
         success: false,
         error: "DAILY_QUOTA_EXCEEDED",
@@ -345,13 +230,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       });
     }
 
-    if (hasRateLimitErrors && processedFiles === 0) {
+    if (rateLimitedFiles > 0 && processedFiles === 0) {
       return res.status(429).json({
         success: false,
         error: "RATE_LIMITED",
         message:
           "Our servers are currently busy processing requests. Please wait 1-2 minutes and try again.",
-        retryAfter: 120, // seconds
+        retryAfter: RETRY_AFTER_SECONDS,
         quotaType: "temporary",
       });
     }
@@ -360,18 +245,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     return res.status(200).json({
       success: true,
-      message: `Processed ${processedFiles} file(s), extracted ${totalAssessments} assessments. ${
+      message: `Processed ${processedFiles} file(s), extracted ${saved.length} assessments. ${
         failedFiles > 0 ? `Failed to process ${failedFiles} file(s).` : ""
       }`,
       data: {
         processedFiles,
-        totalAssessments,
-        failedFiles,
-        courseBreakdown: courseBreakdown.length > 0 ? courseBreakdown : undefined,
+        totalAssessments: saved.length,
+        courseBreakdown: courseBreakdown(saved),
         processingTime,
       },
-      errors: errors.length > 0 ? errors : undefined,
-      hasRateLimitErrors,
     });
   } catch (error) {
     console.error("Upload: request failed", { uid: userId, error });

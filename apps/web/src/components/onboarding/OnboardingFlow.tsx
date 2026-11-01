@@ -1,18 +1,34 @@
+import { useEffect } from "react";
+import dynamic, { type DynamicOptionsLoadingProps } from "next/dynamic";
 import { CircleAlert } from "lucide-react";
 import { useOnboarding } from "../../contexts/OnboardingContext";
 import { Alert, AlertDescription } from "../ui/alert";
+import ChunkLoading from "../ui/ChunkLoading";
 import { OnboardingLayout } from "./ui/OnboardingLayout";
 import { ProgressBar } from "./ui/ProgressBar";
 import { WelcomeStep } from "./steps/WelcomeStep";
 import { ProfileStep } from "./steps/ProfileStep";
 import { SemesterStep } from "./steps/SemesterStep";
-import { UploadStep } from "./steps/UploadStep";
 import { NotificationsStep } from "./steps/NotificationsStep";
 import { CompletionStep } from "./steps/CompletionStep";
 import ConfirmationModal from "../common/ConfirmationModal";
 
+/* The upload step is its own chunk (the upload form and the course color picker), so the page
+   loads without it. It is fetched when onboarding opens, so it is there by the time the student
+   reaches it. */
+const loadUploadStep = () => import("./steps/UploadStep").then((step) => step.UploadStep);
+
+const StepLoading = (props: DynamicOptionsLoadingProps) => <ChunkLoading {...props} part="step" />;
+
+const UploadStep = dynamic(loadUploadStep, { ssr: false, loading: StepLoading });
+
 export function OnboardingFlow() {
   const { state, requestExit, cancelExit, confirmExit } = useOnboarding();
+
+  useEffect(() => {
+    // A failed fetch is retried, and shown, by the step's own load
+    loadUploadStep().catch(() => {});
+  }, []);
 
   const renderCurrentStep = () => {
     switch (state.currentStep) {

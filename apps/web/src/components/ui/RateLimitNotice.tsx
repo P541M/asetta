@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Clock, Loader2 } from "lucide-react";
 import { Button } from "./button";
+import { RETRY_AFTER_SECONDS } from "../../lib/upload/constants";
 
 interface RateLimitNoticeProps {
   onRetry: () => void;
@@ -8,7 +9,11 @@ interface RateLimitNoticeProps {
   autoRetry?: boolean;
 }
 
-const RateLimitNotice = ({ onRetry, retryAfter = 120, autoRetry = true }: RateLimitNoticeProps) => {
+const RateLimitNotice = ({
+  onRetry,
+  retryAfter = RETRY_AFTER_SECONDS,
+  autoRetry = true,
+}: RateLimitNoticeProps) => {
   const [countdown, setCountdown] = useState(retryAfter);
   const [isRetrying, setIsRetrying] = useState(false);
 
