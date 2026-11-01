@@ -578,7 +578,7 @@ Full text and what shipped: archive, "Done items".
 - [x] A18 · Per-user upload quota · 2026-10-19, PR #21
 - [x] A19 · Cron throughput · 2026-10-19, PR #22
 - [x] A20 · Landing contact form: throttle and bot check · 2026-10-19, PR #21
-- [x] A24 · Dead code · 2026-10-31
+- [x] A24 · Dead code · 2026-10-31, PR #30
 - [x] A29 · Line endings: local format check fails on Windows · 2026-10-11, PR #11
 - [x] A30 · Welcome email to unverified sign-up addresses · 2026-10-10, PR #6
 - [x] A31 · Redesign the welcome and reminder emails · 2026-10-10, PR #6
@@ -591,7 +591,7 @@ Full text and what shipped: archive, "Done items".
 - [x] A41 · A mark edit always sets the status to Submitted · 2026-10-11, PR #12
 - [x] A43 · Clearing the target-grade field saves 0 · 2026-10-19, PR #23
 - [x] A44 · Small PDFs fail to parse in the upload route · 2026-10-19, PR #21
-- [x] A47 · Remove the reminder cron's check for records from before A8 · 2026-10-31
+- [x] A47 · Remove the reminder cron's check for records from before A8 · 2026-10-31, PR #30
 - [x] A48 · Onboarding saves email notifications as on even when switched off · 2026-10-29, PR #26
 - [x] A50 · The reminder time shows only under Custom timing · 2026-10-29, PR #26
 - [x] A51 · The stats bar's "Submitted" counts Missed assessments · 2026-10-19, PR #23
