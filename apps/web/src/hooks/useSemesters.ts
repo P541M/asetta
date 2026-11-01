@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import { User } from "firebase/auth";
-import { collection, getDocs, onSnapshot, orderBy, query, writeBatch } from "firebase/firestore";
+import { collection, onSnapshot } from "firebase/firestore";
 import { db } from "../lib/firestore";
 import { Semester } from "@/types/semester";
+import { semesterFromDoc, sortSemesters } from "@/utils/semesterOrder";
 
 /**
- * Live semester list for the user (ordered by `order`), plus the one-time
- * migration that backfills the `order` field on older documents.
+ * Live semester list for the user, in the switcher's order (`sortSemesters`, which also lists
+ * the semesters that have no `order`).
  *
  * The active semester derives synchronously: the URL's semester id when given,
  * else the first semester. No selection state exists outside the URL.
@@ -24,14 +25,14 @@ export function useSemesters(user: User | null, forceSemesterId?: string) {
 
     setIsLoading(true);
     const semColRef = collection(db, "users", user.uid, "semesters");
-    const q = query(semColRef, orderBy("order", "asc"));
 
     const unsubscribe = onSnapshot(
-      q,
+      semColRef,
       (snapshot) => {
-        setSemesters(
-          snapshot.docs.map((docSnap) => ({ id: docSnap.id, name: docSnap.data().name })),
+        const sorted = sortSemesters(
+          snapshot.docs.map((docSnap) => semesterFromDoc(docSnap.id, docSnap.data())),
         );
+        setSemesters(sorted.map(({ id, name }) => ({ id, name })));
         setIsLoading(false);
       },
       (error) => {
@@ -41,32 +42,6 @@ export function useSemesters(user: User | null, forceSemesterId?: string) {
     );
 
     return () => unsubscribe();
-  }, [user]);
-
-  useEffect(() => {
-    const migrateSemesters = async () => {
-      if (!user) return;
-
-      try {
-        const semColRef = collection(db, "users", user.uid, "semesters");
-        const snapshot = await getDocs(semColRef);
-        const needsMigration = snapshot.docs.some((doc) => !doc.data().hasOwnProperty("order"));
-
-        if (needsMigration) {
-          const batch = writeBatch(db);
-          snapshot.docs.forEach((doc, index) => {
-            if (!doc.data().hasOwnProperty("order")) {
-              batch.update(doc.ref, { order: index });
-            }
-          });
-          await batch.commit();
-        }
-      } catch (error) {
-        console.error("Error during migration:", error);
-      }
-    };
-
-    migrateSemesters();
   }, [user]);
 
   const activeSemester = forceSemesterId

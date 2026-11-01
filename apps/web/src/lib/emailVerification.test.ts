@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { timestamp } from "@/test/firestore";
 import {
   CONFIRM_LINK_TTL_MS,
   MAX_LINKS_PER_DAY,
@@ -146,9 +147,6 @@ describe("newLinkRecord", () => {
 });
 
 describe("verificationRecordFromData", () => {
-  // A Firestore Timestamp as the admin SDK returns it
-  const timestamp = (date: Date) => ({ toDate: () => date });
-
   it("reads a stored record, its timestamps as Dates", () => {
     expect(
       verificationRecordFromData({

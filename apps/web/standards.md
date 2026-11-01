@@ -411,8 +411,7 @@ a tier, the ramp is wrong: update it here, don't invent a sixth size at the call
 
 - Strategy: class-based (`.dark` on `<html>` via `@custom-variant`), managed by **next-themes**
   (`ThemeProvider` in `_app.tsx`, `defaultTheme="light"`). It owns the no-flash pre-hydration
-  script and persistence (`theme` key); `_document.tsx` carries only the one-time seed that
-  migrates the legacy `darkMode` key.
+  script and persistence (`theme` key).
 - **Theme is a Light / Dark / System choice** set in Settings, Preferences (the radiogroup on the
   amber selection language). It applies **immediately** via `setThemeWithTransition`
   (`utils/theme.ts`): the crossfade, not a Save round-trip. `defaultTheme` stays `"light"` on

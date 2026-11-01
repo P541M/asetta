@@ -340,7 +340,7 @@ describe("users/{uid}/semesters/{semesterId}", () => {
     });
   });
 
-  it("allows a rename and a reorder (handleEditSave, handleReorder, the order backfill)", async () => {
+  it("allows a rename and a reorder (handleEditSave, handleReorder)", async () => {
     const { uid, db } = newUser();
     await seedSemester(uid, "fall");
     await seedSemester(uid, "winter");
