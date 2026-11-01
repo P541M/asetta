@@ -14,8 +14,6 @@ import {
   USERS_AT_ONCE,
   claimDecision,
   cronRunId,
-  isRecentLegacySend,
-  legacyRecordIds,
   type ClaimDecision,
 } from "./reminderCron";
 import {
@@ -269,7 +267,6 @@ async function processUser(
     for (const reminder of reminders) {
       const outcome = await sendReminder(db, mailer, {
         uid: userDoc.id,
-        preferences,
         getRecipient,
         reminder,
         names: names.get(reminder.assessmentId)!,
@@ -393,14 +390,12 @@ async function sendReminder(
   mailer: ReminderMailer,
   {
     uid,
-    preferences,
     getRecipient,
     reminder,
     names,
     now,
   }: {
     uid: string;
-    preferences: NotificationPreferences;
     getRecipient: () => Promise<string | null>;
     reminder: DueReminder;
     names: AssessmentNames;
@@ -427,25 +422,6 @@ async function sendReminder(
   const existing = await recordRef.get();
   const precheck = claimDecision(toRecord(existing), now);
   if (!precheck.claim) return skipped(precheck);
-
-  if (!existing.exists) {
-    const legacy = await db.getAll(
-      ...legacyRecordIds(uid, assessmentId, preferences.notificationDaysBefore).map((id) =>
-        notifications.doc(id),
-      ),
-    );
-    if (
-      legacy.some((snapshot) =>
-        isRecentLegacySend(
-          { status: snapshot.get("status"), sentAt: toDate(snapshot.get("sentAt")) },
-          now,
-        ),
-      )
-    ) {
-      devLog(`Reminder cron: ${uid}_${assessmentId} went out before A8, skipping`);
-      return { status: "skipped", retry: false };
-    }
-  }
 
   const recipient = await getRecipient();
   if (!recipient) {

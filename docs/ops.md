@@ -98,11 +98,8 @@ machine. Planned changes live in `docs/AUDIT.md`; this file describes what is tr
   transaction (status `sending`, with `attempts` and `lastAttemptAt`) before sending, then marks
   it `sent` or `failed` (with the error message). Only `sent` blocks it for good, so overlapping
   runs can't both send one. A failed send is retried by a later run at least 20 minutes on, up to
-  3 attempts; a claim whose run died is taken over after 10 minutes.
-- **Records from before A8** are `notifications/{uid}_{assessmentId}_{days}`. For the first days
-  after A8, a run skips a reminder whose old-format record says `sent` within the last 4 days, so
-  the switch doesn't resend what the old cron had just sent (A47 removes that check). Nothing
-  else reads or deletes the old records.
+  3 attempts; a claim whose run died is taken over after 10 minutes. Older records keyed by day
+  count (`{uid}_{assessmentId}_{days}`) are still in the collection; nothing reads or deletes them.
 - **Run summary:** every run writes `cronRuns/{YYYY-MM-DD}`, keyed by the UTC day of the run.
   `runs`, `sent` and `failed` are that day's totals; `sweptAt` is when that day's first run
   scheduled the users without a `nextReminderAt`; `lastRun` is the latest run (`startedAt`,

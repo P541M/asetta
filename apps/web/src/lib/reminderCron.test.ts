@@ -6,8 +6,6 @@ import {
   claimDecision,
   cronRunId,
   isCronAuthorized,
-  isRecentLegacySend,
-  legacyRecordIds,
 } from "./reminderCron";
 
 describe("isCronAuthorized", () => {
@@ -115,37 +113,6 @@ describe("claimDecision", () => {
       expect(claimDecision(record, now)).toEqual({ claim: true, attempt: 1 });
     },
   );
-});
-
-describe("legacy records (the cron before A8)", () => {
-  const now = new Date(Date.UTC(2026, 9, 12, 13, 35));
-  const daysAgo = (days: number) => new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
-
-  it("names the record the old cron wrote for the same reminder: the day count", () => {
-    expect(legacyRecordIds("u1", "a1", 3)).toEqual(["u1_a1_3"]);
-  });
-
-  it("also checks day count 0 when reminders go 1 day before (its 12-36 hour window)", () => {
-    expect(legacyRecordIds("u1", "a1", 1)).toEqual(["u1_a1_1", "u1_a1_0"]);
-  });
-
-  it("counts a legacy send from the last few days", () => {
-    expect(isRecentLegacySend({ status: "sent", sentAt: daysAgo(1) }, now)).toBe(true);
-    expect(isRecentLegacySend({ status: "sent", sentAt: daysAgo(3.9) }, now)).toBe(true);
-  });
-
-  it("ignores an older legacy send, so a moved due date still gets its reminder", () => {
-    expect(isRecentLegacySend({ status: "sent", sentAt: daysAgo(4) }, now)).toBe(false);
-  });
-
-  it.each([
-    [undefined],
-    [{ status: "failed", sentAt: new Date(Date.UTC(2026, 9, 11)) }],
-    [{ status: "sent" }],
-    [{ status: "sent", sentAt: null }],
-  ])("ignores %j", (record) => {
-    expect(isRecentLegacySend(record, now)).toBe(false);
-  });
 });
 
 describe("cronRunId", () => {
