@@ -39,7 +39,7 @@ Answered decisions are in the archive ("Answered decisions"); an item that depen
 
 ## Batches
 
-**Done:** B1 to B24 (PRs #5 to #31, and A93's): security, tests, reminders, data layer, rules, bundle size, rate limits, cron throughput, the dashboard and grades bugs, the onboarding and notification settings, the writing rules and docs (B21), the UI/UX audit of both apps (B23, findings A105 to A129), and the cleanup sweep (B24: dead code, test names, comments). What each shipped is in the archive.
+**Done:** B1 to B24 (PRs #5 to #32): security, tests, reminders, data layer, rules, bundle size, rate limits, cron throughput, the dashboard and grades bugs, the onboarding and notification settings, the writing rules and docs (B21), the UI/UX audit of both apps (B23, findings A105 to A129), and the cleanup sweep (B24: dead code, test names, comments). What each shipped is in the archive.
 
 **Up next, in order** (reprioritized 2026-10-30 from the founder's list: after the backend work, the focus moves to cleanup and UI/UX):
 
@@ -608,7 +608,7 @@ Full text and what shipped: archive, "Done items".
 - [x] A88 · Editing a due date shows no calendar on Windows · 2026-10-30, PR #28
 - [x] A91 · Emojis in the code and copy · 2026-10-30, PR #27
 - [x] A92 · Tracker IDs in test names · 2026-11-01, PR #31
-- [x] A93 · Comments that narrate or log history · 2026-11-01
+- [x] A93 · Comments that narrate or log history · 2026-11-01, PR #32
 - [x] A97 · Clean this file · 2026-10-30, PR #27
 - [x] A102 · Writing rules for agents (no AI slop) · 2026-10-30, PR #27
 
