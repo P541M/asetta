@@ -610,7 +610,7 @@ Full text and what shipped: archive, "Done items".
 - [x] A87 · A preview deploy's `/` opens the live marketing site · 2026-10-30, PR #28
 - [x] A88 · Editing a due date shows no calendar on Windows · 2026-10-30, PR #28
 - [x] A91 · Emojis in the code and copy · 2026-10-30, PR #27
-- [x] A92 · Tracker IDs in test names · 2026-11-01
+- [x] A92 · Tracker IDs in test names · 2026-11-01, PR #31
 - [x] A97 · Clean this file · 2026-10-30, PR #27
 - [x] A102 · Writing rules for agents (no AI slop) · 2026-10-30, PR #27
 
