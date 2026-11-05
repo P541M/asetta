@@ -1,8 +1,9 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Loader2 } from "lucide-react";
-import { signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
+import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../lib/firebase";
+import { signInWithGoogle } from "../lib/googleSignIn";
 import { useAuth } from "../contexts/AuthContext";
 import { useRedirectAfterAuth } from "../hooks/useRedirectAfterAuth";
 import LoadingScreen from "../components/ui/LoadingScreen";
@@ -34,22 +35,6 @@ const Login = () => {
       const message = getAuthErrorMessage(
         error,
         "Something went wrong signing you in. Please try again.",
-      );
-      if (message) setError(message);
-      setIsSubmitting(false);
-    }
-  };
-
-  const handleGoogleSignIn = async () => {
-    setError(null);
-    setIsSubmitting(true);
-    const provider = new GoogleAuthProvider();
-    try {
-      await signInWithPopup(auth, provider);
-    } catch (error: unknown) {
-      const message = getAuthErrorMessage(
-        error,
-        "Something went wrong with Google sign-in. Please try again.",
       );
       if (message) setError(message);
       setIsSubmitting(false);
@@ -119,7 +104,7 @@ const Login = () => {
       </form>
 
       <GoogleSignInButton
-        onClick={handleGoogleSignIn}
+        onClick={() => signInWithGoogle({ setError, setIsSubmitting })}
         disabled={isSubmitting}
         label={isSubmitting ? "Signing in..." : "Continue with Google"}
       />

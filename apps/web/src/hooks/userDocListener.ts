@@ -7,7 +7,7 @@ import {
   setDoc,
   Unsubscribe,
 } from "firebase/firestore";
-import { getUserDocRef } from "../lib/firebaseUtils";
+import { getUserDocRef } from "../lib/firestore";
 import { devError } from "../utils/devLog";
 import { browserTimeZone } from "../utils/timeZone";
 import {

@@ -24,15 +24,17 @@ All new code follows these.
   `assessment/grade-calculator/`, `components/auth/`).
 - **The user doc is read once, live.** `hooks/useUserDoc.ts` keeps one `onSnapshot` on
   `users/{uid}` for the session (`hooks/userDocListener.ts`, which it loads on sign-in; see the
-  next rule), and `AuthContext` derives the profile, display preferences, onboarding status and
-  the choices onboarding starts from (`onboardingChoices`): read them from `useAuth()`, never with
-  a `getDoc` of your own. A page that routes by the doc waits for `loading` to end and then reads
-  `onboardingStatus` (the sign-in pages through `hooks/useRedirectAfterAuth.ts`); a doc that
-  couldn't be read has no status and goes to the dashboard, whose error screen shows it, never to
-  onboarding. A form that starts from the doc lays the user's changes over the live values
-  (onboarding's `userData`), so nothing waits on a read of its own. The sign-in writes run on
-  the server's first answer: the doc is created only when the server says
-  it is missing (an offline cache can't, or the app would write a new doc over the real one),
+  next rule), and `AuthContext` derives the profile, display preferences, notification settings,
+  onboarding status and the choices onboarding starts from (`onboardingChoices`): read them from
+  `useAuth()`, never with a `getDoc` of your own. A page that routes by the doc waits for
+  `loading` to end and then reads `onboardingStatus` (the sign-in pages through
+  `hooks/useRedirectAfterAuth.ts`); a doc that couldn't be read has no status and goes to the
+  dashboard, whose error screen shows it, never to onboarding. A form that starts from the doc
+  holds only the user's edits and lays them over the live values (`utils/formEdits.ts`:
+  onboarding's `userData`, Settings' Profile and Notifications cards), so nothing waits on a read
+  of its own. Writes to the doc are plain functions in `hooks/userDocWrites.ts`. The sign-in
+  writes run on the server's first answer: the doc is created only when the server says it is
+  missing (an offline cache can't, or the app would write a new doc over the real one),
   `lastLogin` at most once per local day, and the zone when it is missing or has changed.
 - **`_app` ships Firebase Auth, never Firestore.** `lib/firebase.ts` holds the app and
   Auth; `db` lives in `lib/firestore.ts`, which nothing in `_app`'s import graph (`AuthContext`,
@@ -625,15 +627,16 @@ never duplicated into component state (duplicating it caused a flicker on switch
 - **Avatars are initials only** (founder call): `ui/Avatar` renders the first letter
   of the display name. No photo uploads and no icon picker.
 - **Preferences apply instantly**: theme and display toggles persist per field the moment they
-  change (optimistic state, reverted with an inline destructive alert on write failure). No Save
-  button on instant-apply cards.
+  change. The toggles read the live doc, which shows the local write at once; a refused write is
+  reverted by Firestore and shows an inline destructive alert. No Save button on instant-apply
+  cards.
 - **The reminder timing says when reminders go out**, under its menu for every choice, in the
   Notifications card and in onboarding's notifications step alike: "Reminders go out at about
   9:30 AM in your time zone." The menu's trigger is `aria-describedby` that line; the custom-days
   panel adds only its range ("Choose between 1 and 30 days.").
 - **Profile and Notifications save per card**: each card is its own small form with its own
-  Save button, dirty check against the fetched snapshot, and success/error message scoped to
-  the card.
+  Save button, dirty check of its edits against the live values, and success/error message scoped
+  to the card. A save clears the edits it wrote.
 - Subpages render the slim bar (no semester switcher, no CTA; the greeting stays) plus their
   own in-page page-title-tier heading ("Settings").
   Subpages never show the mobile bottom nav.

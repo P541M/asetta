@@ -1,12 +1,14 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { Circle, CircleCheck, Loader2 } from "lucide-react";
-import { createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
+import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../lib/firebase";
+import { signInWithGoogle } from "../lib/googleSignIn";
 import { useAuth } from "../contexts/AuthContext";
 import { useRedirectAfterAuth } from "../hooks/useRedirectAfterAuth";
 import LoadingScreen from "../components/ui/LoadingScreen";
 import { getAuthErrorMessage } from "../utils/authErrors";
+import { passwordCriteria } from "../utils/passwordCriteria";
 import AuthShell from "../components/auth/AuthShell";
 import AuthMessageBanner from "../components/auth/AuthMessageBanner";
 import GoogleSignInButton from "../components/auth/GoogleSignInButton";
@@ -35,34 +37,18 @@ const Register = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [passwordCriteria, setPasswordCriteria] = useState({
-    minLength: false,
-    hasUppercase: false,
-    hasLowercase: false,
-    hasNumber: false,
-    hasSpecialChar: false,
-  });
   const [passwordFocused, setPasswordFocused] = useState(false);
   const { user, loading } = useAuth();
   // A signed-in visitor skips the form, and a successful submit moves on the same way
   useRedirectAfterAuth();
-
-  useEffect(() => {
-    setPasswordCriteria({
-      minLength: password.length >= 8,
-      hasUppercase: /[A-Z]/.test(password),
-      hasLowercase: /[a-z]/.test(password),
-      hasNumber: /[0-9]/.test(password),
-      hasSpecialChar: /[!@#$%^&*(),.?":{}|<>]/.test(password),
-    });
-  }, [password]);
+  const criteria = passwordCriteria(password);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
 
     // The visibility toggle replaces a confirm-password field; criteria still gate submission
-    if (!Object.values(passwordCriteria).every(Boolean)) {
+    if (!Object.values(criteria).every(Boolean)) {
       setError("Please meet all password requirements");
       return;
     }
@@ -74,22 +60,6 @@ const Register = () => {
       const message = getAuthErrorMessage(
         error,
         "Something went wrong creating your account. Please try again.",
-      );
-      if (message) setError(message);
-      setIsSubmitting(false);
-    }
-  };
-
-  const handleGoogleSignIn = async () => {
-    setError(null);
-    setIsSubmitting(true);
-    const provider = new GoogleAuthProvider();
-    try {
-      await signInWithPopup(auth, provider);
-    } catch (error: unknown) {
-      const message = getAuthErrorMessage(
-        error,
-        "Something went wrong with Google sign-in. Please try again.",
       );
       if (message) setError(message);
       setIsSubmitting(false);
@@ -143,11 +113,11 @@ const Register = () => {
           />
           {(passwordFocused || password) && (
             <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 pt-1">
-              <CriteriaRow met={passwordCriteria.minLength} label="8+ characters" />
-              <CriteriaRow met={passwordCriteria.hasUppercase} label="Uppercase letter" />
-              <CriteriaRow met={passwordCriteria.hasLowercase} label="Lowercase letter" />
-              <CriteriaRow met={passwordCriteria.hasNumber} label="Number" />
-              <CriteriaRow met={passwordCriteria.hasSpecialChar} label="Special character" />
+              <CriteriaRow met={criteria.minLength} label="8+ characters" />
+              <CriteriaRow met={criteria.hasUppercase} label="Uppercase letter" />
+              <CriteriaRow met={criteria.hasLowercase} label="Lowercase letter" />
+              <CriteriaRow met={criteria.hasNumber} label="Number" />
+              <CriteriaRow met={criteria.hasSpecialChar} label="Special character" />
             </div>
           )}
         </div>
@@ -164,7 +134,7 @@ const Register = () => {
       </form>
 
       <GoogleSignInButton
-        onClick={handleGoogleSignIn}
+        onClick={() => signInWithGoogle({ setError, setIsSubmitting })}
         disabled={isSubmitting}
         label={isSubmitting ? "Signing up..." : "Continue with Google"}
       />

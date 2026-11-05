@@ -23,7 +23,7 @@ items off and add a session log entry to docs/AUDIT-archive.md when done. Don't 
 
 **Rules:**
 
-- IDs are permanent. Never renumber. New items take the next free number (**next: A134, D14**); split an item as A9a/A9b.
+- IDs are permanent. Never renumber. New items take the next free number (**next: A137, D14**); split an item as A9a/A9b.
 - Dropped items move to the archive struck through with a reason: `~~A24~~ dropped: <why>`.
 - Line numbers in items drift. Search by symbol name.
 - One theme per branch and PR.
@@ -47,7 +47,7 @@ Answered decisions are in the archive ("Answered decisions"); an item that depen
 | --- | --- | --- | --- | --- |
 | any | | A117's overflow only | The Courses tab scrolls sideways on phones | A one-line layout fix on a P1 found in B23; it needn't wait for the redesign. |
 | any | | A129 | Self-serve account deletion | The privacy policy already promises it. Server code and a Settings section, so it can go before or with A121. |
-| 1 | B25 | A94, A95, A21, A22, A23, A83 | Simplify and modularize | Test-first wherever logic moves. Before the UI work so each screen is restyled once, in its final files. A83 is the last stray user-doc read. Expect 2 or 3 PRs, one per area. Each B23 item's "Touches" line names the files its redesign changes: split those along the lines the redesign needs (A114's onboarding, A116's table, A118's calendar). |
+| 1 | B25 | A94, A95, A21, A22, A23, A83 | Simplify and modularize | Test-first wherever logic moves. Before the UI work so each screen is restyled once, in its final files. Five PRs, one per area; the upload and the auth and user doc PRs are done, and the plan for the rest is `docs/superpowers/b25-plan.md`. Each B23 item's "Touches" line names the files its redesign changes: split those along the lines the redesign needs (A114's onboarding, A116's table, A118's calendar). |
 | 2 | B26 | A106 first; then A107, A108, A109, A112 (with A104, A103, A66); then the screens in this order: A116, A117, A118, A114, A119, A120, A115, A121, A122, A123, A113; A110 and A111 alongside; A69 with A120 | UI/UX implementation | One screen or theme per PR, from B23's findings, each checked in both themes, at 320 to 390px and with the detector re-run. A106 rewrites the rules once (the founder's call: the old rules don't bind), so each screen is restyled once against them. Screens go by how often a student uses them. |
 | 3 | B27 | A96, A25, A33, A62 | Deprecated and outdated dependencies | One major per PR. `@google/generative-ai` is Google's retired SDK and runs the core feature (extraction): if it starts failing, its move to `@google/genai` jumps the queue. Do Tiptap 3 before B26 restyles the notes editor. |
 | any | B28 | A98 | One domain | D13 decided: the platform moves to `app.asetta.me`. Touches only config, env and cross-app links, so it can run beside any batch. |
@@ -62,6 +62,21 @@ Answered decisions are in the archive ("Answered decisions"); an item that depen
   - **Where:** the button row under the file list in `apps/web/src/components/forms/UploadForm.tsx` (`Extract assessments`, `flex-1`, beside `Clear files`).
   - **Problem:** with a file listed, at 320px the row is wider than the panel: "Clear files" ends past the card's right edge (the page itself doesn't scroll sideways). At 375 and 390px it fits. The markup is older than B25.
   - **Fix:** let the row wrap or stack on narrow screens (`flex-wrap`, or the Extract button full width with Clear below it), or fold it into A120's Add tab redesign. Check at 320px with a file listed, in both themes.
+
+- [ ] **A134 · The Profile card blanks the doc's display name on an account with no name in Auth** · S · risk L · found during B25 (A83's check)
+  - **Where:** `savedProfile` in `apps/web/src/components/settings/UserSettings.tsx`; `saveProfile` in `hooks/userDocWrites.ts`.
+  - **Problem:** a password sign-up has no `displayName` in Auth, while `bootstrapUserDoc` gives its doc the email's first part. The card edits Auth's name, so its field is empty while the header greets the student by the doc's name, and any save of the card writes `displayName: ""` over the doc's value. Reproduced on the emulators: an institution-only save turned "reg" into "". Nothing visible changes today, because the header and avatar fall back to the email. The same whole-card write puts an unedited Auth name over a doc name changed on another device. Older than B25: the old save wrote the same.
+  - **Fix (decide):** start the field from `profile.displayName`, or write `displayName` only when the student changed it. Either one changes what the card shows or writes, so B25 left it. The second also lets `profileDirty` in `UserSettings.tsx` drop its failed-save case.
+
+- [ ] **A135 · Custom timing can close itself and change the reminder days** · S · risk L · found during B25 (`/code-review`)
+  - **Where:** `handleDaysChange` and the effect on `notificationDaysBefore` in `apps/web/src/components/settings/NotificationsSection.tsx`; `NotificationsStep.tsx` has the same state and effect (not checked there).
+  - **Problem:** choosing Custom timing writes `customDays` as the new value; if that is a preset other than the current value, the effect sees a preset and turns custom mode off. Reproduced on the emulators: from 3 days, pick 2 days, then Custom timing: no panel, and the timing is 3 days again. Older than B25, where the same steps jumped to 1 (`customDays` started at 1), as did picking Custom straight from a preset above 1. That direct path now works, because the card starts from the live value.
+  - **Fix:** derive custom mode from one piece of state instead of an effect that re-decides it, so choosing Custom opens the panel whatever the value is.
+
+- [ ] **A136 · A case-only edit to an unconfirmed address sends another confirm link** · S · risk L · found during B25 (`/simplify`)
+  - **Where:** `emailIsSaved` in `apps/web/src/components/settings/UserSettings.tsx`; `sameAddress` in `utils/notificationEmail.ts`.
+  - **Problem:** `emailIsSaved` compares trimmed text, case included, where `notificationEmailStatus` and the reminder cron ignore case. Saving "Sam@uni.example.test" over "sam@uni.example.test" counts as a new address and spends one of the day's 5 links. Read from the code, not reproduced.
+  - **Fix:** use `sameAddress`, which is false for two empty values; `emailIsSaved` is only read for a non-empty unconfirmed address, so that is safe.
 
 ### UI/UX
 
@@ -316,7 +331,7 @@ Severity is Impeccable's: P0 blocks a task, P1 makes it hard or fails WCAG 2.2 A
 
 ### Cleanup
 
-- [ ] **A94 · Simplify over-built logic** · L · risk M · test-first · after A92 and A93 (B25: the upload area done; left: auth and user doc, dashboard shell, calendar and grades, reminders, in that order; the plan and what each holds are in the B25 log)
+- [ ] **A94 · Simplify over-built logic** · L · risk M · test-first · after A92 and A93 (B25: the upload, auth and user doc areas done; left: dashboard shell, calendar and grades, reminders, in that order; the plan and what each holds are in `docs/superpowers/b25-plan.md`)
   - **Goal (founder):** find code that does in many steps what could be done in a few, and simplify it without changing behavior. Look first; this is not a deletion pass.
   - **Known candidates:** the two upload forms' shared logic (A21); files over 300 lines (A22); Firestore calls in components, `alert()`s, the non-atomic bulk delete (A23); the two extra user-doc readers (A54); the one-time cron code once its time has passed (A64); an unused type field (A130). To check: the target-grade draft held in state plus a mirrored ref (B18's review), the calendar's own date formatter that duplicates `utils/dateUtils.ts` (B18's review), and duplicated parsing between `lib/upload/textExtraction.ts` and `normalize.ts`.
   - **Method:** one area per PR (upload, grades, calendar, reminders, auth and user doc, dashboard shell). For each, list the candidates with a short before and after in the session log before changing code. Code without tests gets tests on today's behavior first; the simplification must keep them green. Run `/simplify` and `/code-review` on each PR. Measure what changes: lines, files, bundle size (Baseline).
@@ -368,11 +383,11 @@ Severity is Impeccable's: P0 blocks a task, P1 makes it hard or fails WCAG 2.2 A
   - **Tests:** `utils/icsGenerator.test.ts` covers the 23:59 end, DTSTAMP, SUMMARY escaping and 75-octet folding, and keeps the UID on `asetta.app` (D9); all plain passing tests since PR #12, none left as `it.fails` or `it.todo`.
   - **Done when:** tests cover 23:59 and names with commas and semicolons; the file imports cleanly into Google Calendar.
 
-- [ ] **A22 · Split files over the 300-line limit** · M · risk M (B25: the upload forms and `pages/api/upload.ts` done; `UnifiedDashboardPage.tsx` (146) and `OnboardingContext.tsx` (247) are already under; left: `AssessmentsTable.tsx` 439, `CalendarView.tsx` 301, `lib/notifications.ts` 573)
+- [ ] **A22 · Split files over the 300-line limit** · M · risk M (B25: the upload forms and `pages/api/upload.ts` done; `UnifiedDashboardPage.tsx` (146) and `OnboardingContext.tsx` (234) are already under; left: `AssessmentsTable.tsx` 439, `CalendarView.tsx` 301, `lib/notifications.ts` 573)
   - `components/tables/AssessmentsTable.tsx` 448, `components/pages/UnifiedDashboardPage.tsx` 396, `components/calendar/CalendarView.tsx` 313, `contexts/OnboardingContext.tsx` 309. Use the folder pattern from standards.md.
 
-- [ ] **A23 · Standards drift in components** · S-M each · risk L
-  - Firestore calls outside hooks: `SemesterTabs.tsx`, `AddAssessmentForm.tsx`, `AssessmentsTable.tsx`, `UserSettings.tsx`, `onboarding/steps/SemesterStep.tsx`, `pages/dashboard.tsx`.
+- [ ] **A23 · Standards drift in components** · S-M each · risk L (B25: `UserSettings.tsx` and `OnboardingContext.tsx` done; left: everything below, PR 3 in `docs/superpowers/b25-plan.md`)
+  - Firestore calls outside hooks: `SemesterTabs.tsx`, `AddAssessmentForm.tsx`, `AssessmentsTable.tsx`, `onboarding/steps/SemesterStep.tsx`, `pages/dashboard.tsx`.
   - Five `alert()` calls in `SemesterTabs.tsx` (:60, :80, :123, :136, :146); use inline alerts.
   - Bulk delete is a sequential, non-atomic loop that fails silently (`AssessmentsTable.tsx:146-162`); use `writeBatch` and show an error.
   - Deleting a semester leaves its `coursePreferences` subcollection behind (`SemesterTabs.tsx:94-112`).
@@ -538,11 +553,6 @@ Severity is Impeccable's: P0 blocks a task, P1 makes it hard or fails WCAG 2.2 A
   - **Problem:** a doc still holding a legacy status is listed under To do, while the same row shows no days left as if done. Predates B19; the To do label makes it read as work left. Whether such docs still exist in production is unknown.
   - **Fix:** count the legacy statuses with Submitted in one place (`constants/assessment.ts`), or migrate them, and type the stored status as possibly legacy.
 
-- [ ] **A83 · Settings reads the user doc with its own `getDoc`** · S · risk L · found during B20
-  - **Where:** `fetchUserData` in `apps/web/src/components/settings/UserSettings.tsx`.
-  - **Problem:** the last reader of the user doc beside `AuthContext`'s live one (standards.md, "The user doc is read once, live"). It reads once at mount, so the cards don't follow later changes to the doc, and a failed read is only logged: the forms keep their defaults (notifications off) with Save disabled, and no error shows. A23 lists `UserSettings` among the Firestore calls outside hooks.
-  - **Fix:** start the Profile and Notifications forms and the preferences from `useAuth()` (`profile`, `displayPreferences`, and a notifications mapping like B20's `onboardingChoicesFromUserDoc`, with `notifySubmittedAssessments`), as B20 did for onboarding; delete the `getDoc`. Keep the dirty check against what was loaded.
-
 - [ ] **A85 · Onboarding's "Skip for now" on the notifications step keeps what was already changed** · S · risk L · found during B20 (second `/code-review`)
   - **Where:** `NotificationsStep` (`components/onboarding/steps/NotificationsStep.tsx`): every change goes to `updateUserData` at once, and `StepNavigation`'s Skip calls `nextStep` without Continue's check (`canContinue`).
   - **Problem:** a student who switches notifications on, types part of an address and presses Skip for now finishes onboarding with `emailNotifications` and consent true and the unfinished address (reminders then go to the account email). Read from the code, not reproduced in the UI. Predates B20.
@@ -600,6 +610,7 @@ Full text and what shipped: archive, "Done items".
 - [x] A77 · The calendar's today highlight doesn't follow the clock · 2026-10-29, PR #24
 - [x] A78 · Clearing a weight in the grade breakdown saves 0 · 2026-10-29, PR #24
 - [x] A79 · Typing "-" or "." in a mark field marks the assessment Submitted with 0 · 2026-10-29, PR #25
+- [x] A83 · Settings reads the user doc with its own `getDoc` · 2026-11-04, PR #34
 - [x] A84 · Onboarding's "Continue without upload" stays disabled until "Skip for now" is pressed · 2026-10-30, PR #28
 - [x] A86 · Today is hard to spot in the calendar · 2026-10-30, PR #28
 - [x] A87 · A preview deploy's `/` opens the live marketing site · 2026-10-30, PR #28
@@ -616,8 +627,8 @@ Full text and what shipped: archive, "Done items".
 The latest numbers to compare against. Every earlier value is in the archive ("Baselines as recorded").
 
 - `npm audit --omit=dev`: 38 vulnerabilities (0 critical, 5 high, 33 moderate) since A2 (2026-10-10); 43 (10 high) with dev dependencies. Why each high stays is in the B2 session log.
-- `apps/web` build (Next 15.5.27, after B22, 2026-10-30; unchanged after B24): First Load JS shared by every page 154 kB; `/login` 166 kB, `/register` 167, `/reset-password` 165, `/confirm-email` 162, `/404` 157, `/dashboard` 145, `/dashboard/*` 272, `/dashboard/[semester]/*` 272, `/settings` 273, `/onboarding` 272 (288 before B25's upload PR: its upload step now loads as its own chunk). A dashboard fetches the other tabs after first paint (about 37 kB in all) and the semester drag list when its menu opens (about 17 kB).
-- Tests (after B25's upload PR, 2026-11-01): 27 suites, 796 tests per zone, all passing (1,592 across the two zones). The rules suite (`npm run test:rules`): 44 cases.
+- `apps/web` build (Next 15.5.27, after B25's user doc PR, 2026-11-04): First Load JS shared by every page 154 kB; `/login` 167 kB, `/register` 167, `/reset-password` 165, `/confirm-email` 162, `/404` 157, `/dashboard` 146, `/dashboard/*` 272, `/dashboard/[semester]/*` 272, `/settings` 273, `/onboarding` 272 (288 before B25's upload PR: its upload step now loads as its own chunk). `/login` and `/dashboard` moved up 1 by rounding only: 222 and 85 bytes gzipped. A dashboard fetches the other tabs after first paint (about 37 kB in all) and the semester drag list when its menu opens (about 17 kB).
+- Tests (after B25's user doc PR, 2026-11-04): 29 suites, 848 tests per zone, all passing (1,696 across the two zones). The rules suite (`npm run test:rules`): 44 cases.
 - Reminder cron (B15, emulators, a simulated 25 ms per Firestore call): a day's first run with nobody due reads 4 docs at 10 to 500 users (6 at 2,000); a run with 300 of 500 users due takes 13.3 s and 3,514 reads.
 - Firestore reads (B10, emulator rule coverage): a dashboard load reads the user doc once and writes nothing; a day's first load also writes `lastLogin` once.
 - Vercel limits and the live rules' deploy state: `docs/ops.md`.

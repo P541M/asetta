@@ -1,9 +1,6 @@
-export interface ProfileForm {
-  displayName: string;
-  institution: string;
-}
+import type { UserProfile } from "../utils/userDoc";
 
 export interface ProfileSectionProps {
-  form: ProfileForm;
-  onChange: <K extends keyof ProfileForm>(field: K, value: ProfileForm[K]) => void;
+  form: UserProfile;
+  onChange: <K extends keyof UserProfile>(field: K, value: UserProfile[K]) => void;
 }
