@@ -1,10 +1,9 @@
 import React, { createContext, useContext, useReducer, useCallback, useMemo } from "react";
 import { useRouter } from "next/router";
 import { useAuth } from "./AuthContext";
-import { db } from "../lib/firestore";
-import { doc, serverTimestamp, updateDoc } from "firebase/firestore";
+import { finishOnboarding, skipOnboarding } from "../hooks/userDocWrites";
+import { formWithEdits } from "../utils/formEdits";
 import { notificationEmailStatus } from "../utils/notificationEmail";
-import { onboardingChoicesToWrite } from "../utils/userDoc";
 import { requestConfirmLink } from "../lib/notificationEmailClient";
 import {
   OnboardingState,
@@ -113,7 +112,7 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
   // The form starts from the choices on the user doc, which useAuth reads live, with the
   // student's changes on top
   const userData = useMemo(
-    () => ({ ...onboardingChoices, ...state.userData }),
+    () => formWithEdits(onboardingChoices, state.userData),
     [onboardingChoices, state.userData],
   );
 
@@ -167,12 +166,7 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
     try {
       setLoading(true);
 
-      const userRef = doc(db, "users", user.uid);
-      await updateDoc(userRef, {
-        hasCompletedOnboarding: true,
-        onboardingCompletedAt: new Date(),
-        onboardingSkipped: true,
-      });
+      await skipOnboarding(user.uid);
 
       dispatch({ type: "HIDE_EXIT_MODAL" });
       router.push("/dashboard");
@@ -190,14 +184,7 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
     try {
       setLoading(true);
 
-      const userRef = doc(db, "users", user.uid);
-      await updateDoc(userRef, {
-        hasCompletedOnboarding: true,
-        onboardingCompletedAt: new Date(),
-        ...onboardingChoicesToWrite(userData),
-        // The reminder cron looks at this user at its next run, with the settings chosen here
-        nextReminderAt: serverTimestamp(),
-      });
+      await finishOnboarding(user.uid, userData);
 
       // Another address gets reminders once confirmed through its link. Not awaited:
       // finishing shouldn't wait on the mail server, and Settings can send the link again.

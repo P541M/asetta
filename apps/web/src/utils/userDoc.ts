@@ -87,13 +87,33 @@ export function displayPreferencesFromUserDoc(data: DocumentData | undefined): D
   };
 }
 
-/** What the app shows of the account: the name in the greeting and the avatar. */
+/** What the app shows of the account: the name in the greeting and the avatar, the institution. */
 export interface UserProfile {
   displayName: string;
+  institution: string;
 }
 
 export function profileFromUserDoc(data: DocumentData | undefined): UserProfile {
-  return { displayName: data?.displayName || "" };
+  return { displayName: data?.displayName || "", institution: data?.institution || "" };
+}
+
+/** The reminder choices the Notifications card edits. */
+export interface NotificationSettings {
+  emailNotifications: boolean;
+  notificationDaysBefore: number;
+  email: string;
+  notifySubmittedAssessments: boolean;
+}
+
+export function notificationSettingsFromUserDoc(
+  data: DocumentData | undefined,
+): NotificationSettings {
+  return {
+    emailNotifications: data?.emailNotifications ?? false,
+    notificationDaysBefore: data?.notificationDaysBefore ?? 1,
+    email: data?.email || "",
+    notifySubmittedAssessments: data?.notifySubmittedAssessments ?? true,
+  };
 }
 
 /**

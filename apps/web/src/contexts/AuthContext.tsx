@@ -6,6 +6,7 @@ import { useUserDoc } from "../hooks/useUserDoc";
 import {
   DEFAULT_DISPLAY_PREFERENCES,
   displayPreferencesFromUserDoc,
+  notificationSettingsFromUserDoc,
   onboardingChoicesFromUserDoc,
   onboardingStatusFromUserDoc,
   profileFromUserDoc,
@@ -21,8 +22,9 @@ const AuthContext = createContext<AuthContextType>({
   loading: true,
   userDocError: null,
   onboardingStatus: null,
-  profile: { displayName: "" },
+  profile: profileFromUserDoc(undefined),
   displayPreferences: DEFAULT_DISPLAY_PREFERENCES,
+  notificationSettings: notificationSettingsFromUserDoc(undefined),
   onboardingChoices: onboardingChoicesFromUserDoc(undefined),
   verifiedEmail: null,
   logout,
@@ -32,8 +34,8 @@ export const useAuth = () => useContext(AuthContext);
 
 /**
  * The signed-in user and their user doc. The doc is read once, live (useUserDoc), and everything
- * the app shows from it (profile, display preferences, onboarding status and choices, the
- * confirmed notification address) derives from that one read.
+ * the app shows from it (profile, display preferences, notification settings, onboarding status
+ * and choices, the confirmed notification address) derives from that one read.
  */
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
@@ -58,6 +60,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       onboardingStatus: docReady ? onboardingStatusFromUserDoc(userDoc.data) : null,
       profile: profileFromUserDoc(userDoc.data),
       displayPreferences: displayPreferencesFromUserDoc(userDoc.data),
+      notificationSettings: notificationSettingsFromUserDoc(userDoc.data),
       onboardingChoices: onboardingChoicesFromUserDoc(userDoc.data),
       verifiedEmail: verifiedEmailFromUserDoc(userDoc.data),
       logout,

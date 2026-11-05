@@ -187,7 +187,7 @@ describe("users/{uid}", () => {
     expect((await getDoc(userRef(db, uid))).exists()).toBe(true);
   });
 
-  it("allows the Settings profile save (UserSettings handleProfileSave)", async () => {
+  it("allows the Settings profile save (userDocWrites saveProfile)", async () => {
     const { uid, db } = newUser();
     await seedUser(uid);
     await updateDoc(userRef(db, uid), {
@@ -197,7 +197,7 @@ describe("users/{uid}", () => {
     });
   });
 
-  it("allows each Settings display preference (UserSettings handlePrefChange)", async () => {
+  it("allows each Settings display preference (userDocWrites saveDisplayPreference)", async () => {
     const { uid, db } = newUser();
     await seedUser(uid);
     for (const field of ["showDaysTillDue", "showWeight", "showNotes", "showStatsBar"]) {
@@ -205,7 +205,7 @@ describe("users/{uid}", () => {
     }
   });
 
-  it("allows the Settings notifications save (UserSettings handleNotifSave)", async () => {
+  it("allows the Settings notifications save (userDocWrites saveNotificationSettings)", async () => {
     const { uid, db } = newUser();
     await seedUser(uid);
     await updateDoc(userRef(db, uid), {
@@ -219,7 +219,7 @@ describe("users/{uid}", () => {
     });
   });
 
-  it("allows finishing onboarding (OnboardingContext completeOnboarding)", async () => {
+  it("allows finishing onboarding (userDocWrites finishOnboarding)", async () => {
     const { uid, db } = newUser();
     await seedUser(uid);
     await updateDoc(userRef(db, uid), {
@@ -234,7 +234,7 @@ describe("users/{uid}", () => {
     });
   });
 
-  it("allows skipping onboarding (OnboardingContext confirmExit)", async () => {
+  it("allows skipping onboarding (userDocWrites skipOnboarding)", async () => {
     const { uid, db } = newUser();
     await seedUser(uid);
     await updateDoc(userRef(db, uid), {

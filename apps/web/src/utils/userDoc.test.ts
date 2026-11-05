@@ -4,6 +4,7 @@ import {
   DEFAULT_DISPLAY_PREFERENCES,
   displayPreferencesFromUserDoc,
   lastLoginToWrite,
+  notificationSettingsFromUserDoc,
   onboardingChoicesFromUserDoc,
   onboardingChoicesToWrite,
   onboardingStatusFromUserDoc,
@@ -105,13 +106,64 @@ describe("displayPreferencesFromUserDoc", () => {
 });
 
 describe("profileFromUserDoc", () => {
-  it("reads the display name", () => {
-    expect(profileFromUserDoc({ displayName: "Sam" })).toEqual({ displayName: "Sam" });
+  it("reads the display name and the institution", () => {
+    expect(profileFromUserDoc({ displayName: "Sam", institution: "University of Guelph" })).toEqual(
+      { displayName: "Sam", institution: "University of Guelph" },
+    );
   });
 
-  it("is empty without a doc or a name", () => {
-    expect(profileFromUserDoc(undefined)).toEqual({ displayName: "" });
-    expect(profileFromUserDoc({ displayName: null })).toEqual({ displayName: "" });
+  it("is empty without a doc or without the fields", () => {
+    const empty = { displayName: "", institution: "" };
+    expect(profileFromUserDoc(undefined)).toEqual(empty);
+    expect(profileFromUserDoc({})).toEqual(empty);
+    expect(profileFromUserDoc({ displayName: null, institution: null })).toEqual(empty);
+  });
+});
+
+describe("notificationSettingsFromUserDoc", () => {
+  it("reads what the user doc holds, and nothing else", () => {
+    expect(
+      notificationSettingsFromUserDoc({
+        displayName: "Sam",
+        emailNotifications: true,
+        notificationDaysBefore: 7,
+        email: "sam@example.test",
+        notifySubmittedAssessments: false,
+        hasConsentedToNotifications: true,
+      }),
+    ).toEqual({
+      emailNotifications: true,
+      notificationDaysBefore: 7,
+      email: "sam@example.test",
+      notifySubmittedAssessments: false,
+    });
+  });
+
+  it("uses the defaults without a doc or without the fields", () => {
+    const defaults = {
+      emailNotifications: false,
+      notificationDaysBefore: 1,
+      email: "",
+      notifySubmittedAssessments: true,
+    };
+    expect(notificationSettingsFromUserDoc(undefined)).toEqual(defaults);
+    expect(notificationSettingsFromUserDoc({ displayName: "Sam" })).toEqual(defaults);
+  });
+
+  it("keeps a stored false and a stored 0, and reads a null address as empty", () => {
+    expect(
+      notificationSettingsFromUserDoc({
+        emailNotifications: false,
+        notificationDaysBefore: 0,
+        email: null,
+        notifySubmittedAssessments: false,
+      }),
+    ).toEqual({
+      emailNotifications: false,
+      notificationDaysBefore: 0,
+      email: "",
+      notifySubmittedAssessments: false,
+    });
   });
 });
 

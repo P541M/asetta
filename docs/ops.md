@@ -271,6 +271,10 @@ project. Never commit real values.
   as its data grows, and it slowed further after a few thousand-user runs (its java process
   reached 4 GB): compare builds interleaved on a freshly started emulator, and trust the read
   counts over its times.
+- **Loading rules without a restart:** `PUT http://127.0.0.1:<port>/emulator/v1/projects/<project>:securityRules`
+  with `{"rules":{"files":[{"name":"firestore.rules","content":"..."}]}}` swaps a running emulator's
+  rules at once, which also forces a refused read or write. An emulator started before its rules
+  file exists allows everything, with only a warning in its log.
 - **Forcing a read error:** edit the scratch rules file (for example `allow get: if false;`);
   the emulator reloads it. A copy can land mid-read and leave the old rules loaded, so check the
   report's `rules.files[0].content` and `touch` the file if needed. Stopping the Firestore

@@ -1,51 +1,41 @@
-import { useState, useEffect, FormEvent } from "react";
+import { useState, FormEvent } from "react";
 import { useAuth } from "../../contexts/AuthContext";
-import { updateProfile } from "firebase/auth";
-import { doc, updateDoc, getDoc, serverTimestamp } from "firebase/firestore";
-import { db } from "../../lib/firestore";
+import {
+  saveDisplayPreference,
+  saveNotificationSettings,
+  saveProfile,
+} from "../../hooks/userDocWrites";
 import ProfileSection from "./ProfileSection";
 import PreferencesSection from "./PreferencesSection";
 import NotificationsSection from "./NotificationsSection";
 import EmailConfirmationStatus from "./EmailConfirmationStatus";
 import SettingsActions from "./SettingsActions";
 import SettingsMessage from "./SettingsMessage";
-import { ProfileForm } from "../../types/profile";
-import { NotificationsForm } from "../../types/preferences";
+import { formWithEdits, isDirty, unsavedEdits } from "../../utils/formEdits";
 import { isValidEmail } from "../../utils/validation";
 import { notificationEmailStatus } from "../../utils/notificationEmail";
 import { requestConfirmLink, type ConfirmLinkRequest } from "../../lib/notificationEmailClient";
-import {
-  DisplayPreferences,
-  DEFAULT_DISPLAY_PREFERENCES,
-  displayPreferencesFromUserDoc,
-} from "../../utils/userDoc";
+import type { DisplayPreferences, NotificationSettings, UserProfile } from "../../utils/userDoc";
 
 type Message = { text: string; type: "success" | "error" } | null;
 
-const isDirty = <T extends object>(form: T, saved: T | null) =>
-  saved !== null && (Object.keys(form) as (keyof T)[]).some((key) => form[key] !== saved[key]);
-
 const UserSettings = () => {
-  const { user, verifiedEmail } = useAuth();
+  const { user, verifiedEmail, profile, displayPreferences, notificationSettings } = useAuth();
 
-  const [profileForm, setProfileForm] = useState<ProfileForm>({
+  // The card edits Auth's name, not the doc's copy: an account without one in Auth starts empty
+  const savedProfile: UserProfile = {
     displayName: user?.displayName || "",
-    institution: "",
-  });
-  const [savedProfile, setSavedProfile] = useState<ProfileForm | null>(null);
+    institution: profile.institution,
+  };
+  const [profileEdits, setProfileEdits] = useState<Partial<UserProfile>>({});
+  const profileForm = formWithEdits(savedProfile, profileEdits);
   const [profileSaving, setProfileSaving] = useState(false);
   const [profileMessage, setProfileMessage] = useState<Message>(null);
 
-  const [prefs, setPrefs] = useState<DisplayPreferences>(DEFAULT_DISPLAY_PREFERENCES);
   const [prefsError, setPrefsError] = useState<string | null>(null);
 
-  const [notifForm, setNotifForm] = useState<NotificationsForm>({
-    emailNotifications: false,
-    notificationDaysBefore: 1,
-    email: "",
-    notifySubmittedAssessments: true,
-  });
-  const [savedNotif, setSavedNotif] = useState<NotificationsForm | null>(null);
+  const [notifEdits, setNotifEdits] = useState<Partial<NotificationSettings>>({});
+  const notifForm = formWithEdits(notificationSettings, notifEdits);
   const [notifSaving, setNotifSaving] = useState(false);
   const [notifMessage, setNotifMessage] = useState<Message>(null);
   const [linkState, setLinkState] = useState<ConfirmLinkRequest | null>(null);
@@ -58,48 +48,19 @@ const UserSettings = () => {
     verifiedEmail,
     accountEmail,
   });
-  const emailIsSaved = notifForm.email.trim() === (savedNotif?.email ?? "").trim();
+  // The live doc shows a new address as soon as its save starts, before the server has it, and a
+  // confirm link goes to what the server has
+  const emailIsSaved =
+    notifForm.email.trim() === notificationSettings.email.trim() &&
+    !(notifSaving && "email" in notifEdits);
 
-  const setProfileField = <K extends keyof ProfileForm>(field: K, value: ProfileForm[K]) =>
-    setProfileForm((form) => ({ ...form, [field]: value }));
+  const setProfileField = <K extends keyof UserProfile>(field: K, value: UserProfile[K]) =>
+    setProfileEdits((edits) => ({ ...edits, [field]: value }));
 
-  const setNotifField = <K extends keyof NotificationsForm>(
+  const setNotifField = <K extends keyof NotificationSettings>(
     field: K,
-    value: NotificationsForm[K],
-  ) => setNotifForm((form) => ({ ...form, [field]: value }));
-
-  useEffect(() => {
-    const fetchUserData = async () => {
-      if (!user) return;
-
-      try {
-        const userSnapshot = await getDoc(doc(db, "users", user.uid));
-        if (!userSnapshot.exists()) return;
-        const userData = userSnapshot.data();
-
-        const profile: ProfileForm = {
-          displayName: user.displayName || "",
-          institution: userData.institution || "",
-        };
-        const notifications: NotificationsForm = {
-          emailNotifications: userData.emailNotifications ?? false,
-          notificationDaysBefore: userData.notificationDaysBefore ?? 1,
-          email: userData.email || "",
-          notifySubmittedAssessments: userData.notifySubmittedAssessments ?? true,
-        };
-
-        setProfileForm(profile);
-        setSavedProfile(profile);
-        setNotifForm(notifications);
-        setSavedNotif(notifications);
-        setPrefs(displayPreferencesFromUserDoc(userData));
-      } catch (error) {
-        console.error("Error fetching user data:", error);
-      }
-    };
-
-    fetchUserData();
-  }, [user]);
+    value: NotificationSettings[K],
+  ) => setNotifEdits((edits) => ({ ...edits, [field]: value }));
 
   const handleProfileSave = async (e: FormEvent) => {
     e.preventDefault();
@@ -109,11 +70,8 @@ const UserSettings = () => {
     setProfileMessage(null);
 
     try {
-      if (profileForm.displayName !== savedProfile?.displayName) {
-        await updateProfile(user, { displayName: profileForm.displayName });
-      }
-      await updateDoc(doc(db, "users", user.uid), { ...profileForm, updatedAt: new Date() });
-      setSavedProfile(profileForm);
+      await saveProfile(user, profileForm);
+      setProfileEdits((edits) => unsavedEdits(edits, profileForm));
       setProfileMessage({ text: "Profile updated", type: "success" });
     } catch (error) {
       console.error("Error updating profile:", error);
@@ -124,16 +82,13 @@ const UserSettings = () => {
   };
 
   const handlePrefChange = async (field: keyof DisplayPreferences, value: boolean) => {
-    const previous = prefs;
-    setPrefs({ ...prefs, [field]: value });
     setPrefsError(null);
     if (!user) return;
 
     try {
-      await updateDoc(doc(db, "users", user.uid), { [field]: value, updatedAt: new Date() });
+      await saveDisplayPreference(user.uid, field, value);
     } catch (error) {
       console.error("Error saving preference:", error);
-      setPrefs(previous);
       setPrefsError("Failed to save preference. Please try again.");
     }
   };
@@ -158,18 +113,11 @@ const UserSettings = () => {
     setNotifMessage(null);
 
     try {
-      await updateDoc(doc(db, "users", user.uid), {
-        ...notifForm,
-        // Consent mirrors the notifications toggle (one decision, stored in both fields)
-        hasConsentedToNotifications: notifForm.emailNotifications,
-        // The reminder cron looks at this user at its next run, so a change after 9:30 applies today
-        nextReminderAt: serverTimestamp(),
-        updatedAt: new Date(),
-      });
+      await saveNotificationSettings(user.uid, notifForm);
       // A new address that isn't confirmed gets its link as soon as it is saved
       const needsLink =
         notifForm.emailNotifications && emailStatus === "unconfirmed" && !emailIsSaved;
-      setSavedNotif(notifForm);
+      setNotifEdits((edits) => unsavedEdits(edits, notifForm));
       setNotifMessage({ text: "Notification settings updated", type: "success" });
       setLinkState(null);
       if (needsLink) void sendConfirmLink();
@@ -184,6 +132,10 @@ const UserSettings = () => {
     }
   };
 
+  // Auth keeps a new name even when the doc write after it fails, so the edit then matches what
+  // is loaded; a failed save has to stay saveable
+  const profileDirty = isDirty(profileEdits, savedProfile) || profileMessage?.type === "error";
+
   return (
     <div className="space-y-6">
       <section className="rounded-xl bg-card p-6 shadow-soft md:p-8">
@@ -193,12 +145,12 @@ const UserSettings = () => {
             text={profileMessage?.text ?? ""}
             type={profileMessage?.type ?? "success"}
           />
-          <SettingsActions dirty={isDirty(profileForm, savedProfile)} saving={profileSaving} />
+          <SettingsActions dirty={profileDirty} saving={profileSaving} />
         </form>
       </section>
 
       <section className="rounded-xl bg-card p-6 shadow-soft md:p-8">
-        <PreferencesSection prefs={prefs} onPrefChange={handlePrefChange} />
+        <PreferencesSection prefs={displayPreferences} onPrefChange={handlePrefChange} />
         <SettingsMessage text={prefsError ?? ""} type="error" />
       </section>
 
@@ -219,7 +171,7 @@ const UserSettings = () => {
             }
           />
           <SettingsMessage text={notifMessage?.text ?? ""} type={notifMessage?.type ?? "success"} />
-          <SettingsActions dirty={isDirty(notifForm, savedNotif)} saving={notifSaving} />
+          <SettingsActions dirty={isDirty(notifEdits, notificationSettings)} saving={notifSaving} />
         </form>
       </section>
     </div>

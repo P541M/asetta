@@ -2,10 +2,6 @@ import { db } from "./firestore";
 import { collection, doc, CollectionReference, DocumentReference } from "firebase/firestore";
 import { coursePreferencesDocId } from "../utils/courseName";
 
-export const getUserDocRef = (userId: string): DocumentReference => {
-  return doc(db, "users", userId);
-};
-
 export const getAssessmentsRef = (userId: string, semesterId: string): CollectionReference => {
   return collection(db, "users", userId, "semesters", semesterId, "assessments");
 };
