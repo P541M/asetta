@@ -610,7 +610,7 @@ Full text and what shipped: archive, "Done items".
 - [x] A77 · The calendar's today highlight doesn't follow the clock · 2026-10-29, PR #24
 - [x] A78 · Clearing a weight in the grade breakdown saves 0 · 2026-10-29, PR #24
 - [x] A79 · Typing "-" or "." in a mark field marks the assessment Submitted with 0 · 2026-10-29, PR #25
-- [x] A83 · Settings reads the user doc with its own `getDoc` · 2026-11-04, PR pending
+- [x] A83 · Settings reads the user doc with its own `getDoc` · 2026-11-04, PR #34
 - [x] A84 · Onboarding's "Continue without upload" stays disabled until "Skip for now" is pressed · 2026-10-30, PR #28
 - [x] A86 · Today is hard to spot in the calendar · 2026-10-30, PR #28
 - [x] A87 · A preview deploy's `/` opens the live marketing site · 2026-10-30, PR #28

@@ -407,7 +407,7 @@ In ID order. Each keeps its text from when it was open, plus what shipped.
   - **Problem:** text with no number other than an empty field ("-", ".", "abc") becomes a mark of 0, and a Not started or In progress assessment then turns Submitted (A41's rule), so starting to type ".5" or a stray "-" saves a 0 and a status change. The test asserts `"abc"` as 0, a known bug written as correct behavior (standards.md, Testing). Read from the code, not reproduced in the UI.
   - **Fix:** keep "" as "clear the mark"; for any other text with no number, change nothing (`parsePercentInput`'s rule, without its 100 cap, since a mark can go over 100 with bonus marks). Turn the "abc" case into an A79 test of that.
 
-- [x] **A83 · Settings reads the user doc with its own `getDoc`** · S · risk L · found during B20 (done 2026-11-04, PR pending)
+- [x] **A83 · Settings reads the user doc with its own `getDoc`** · S · risk L · found during B20 (done 2026-11-04, PR #34)
   - **Where:** `fetchUserData` in `apps/web/src/components/settings/UserSettings.tsx`.
   - **Problem:** the last reader of the user doc beside `AuthContext`'s live one (standards.md, "The user doc is read once, live"). It reads once at mount, so the cards don't follow later changes to the doc, and a failed read is only logged: the forms keep their defaults (notifications off) with Save disabled, and no error shows. A23 lists `UserSettings` among the Firestore calls outside hooks.
   - **Fix:** start the Profile and Notifications forms and the preferences from `useAuth()` (`profile`, `displayPreferences`, and a notifications mapping like B20's `onboardingChoicesFromUserDoc`, with `notifySubmittedAssessments`), as B20 did for onboarding; delete the `getDoc`. Keep the dirty check against what was loaded.
@@ -1458,7 +1458,7 @@ Oldest first. One entry per session: date, branch, items, what changed, what's l
   - The hidden dashboard tabs stay mounted, so a script's `button[role=checkbox]` can land on the Assessments table's row checkbox while the Add tab shows; select by id.
   - The A93 emulator on port 8080 (`demo-asetta-rules`) is still running; left alone.
 
-### 2026-11-04 · B25, second PR: auth and user doc (A83, part of A23) (`claude/b25-user-doc-c1d89c`, PR pending)
+### 2026-11-04 · B25, second PR: auth and user doc (A83, part of A23) (`claude/b25-user-doc-c1d89c`, PR #34)
 
 - **A83 done**; A22, A23, A94 and A95 stay open with the rest of B25. Started from a brief written for this session alone, on a branch already at origin/main with PR #33. The code matched the approved plan, so work started without asking again. The plan for PRs 3 to 5 is now `docs/superpowers/b25-plan.md`.
 - **Candidates in this area, before and after:**
